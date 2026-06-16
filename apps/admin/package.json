@@ -1,0 +1,9 @@
+{
+  "name": "admin",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "echo 'Admin Portal dev stub'",
+    "build": "echo 'Admin Portal build stub'"
+  }
+}
