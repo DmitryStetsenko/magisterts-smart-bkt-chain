@@ -42,7 +42,7 @@ interface DocData {
 }
 
 // Helper to format basic markdown (**bold**, *italic*, `code`) into JSX
-const formatMarkdown = (text: string): React.ReactNode => {
+const formatMarkdown = (text: string, isDarkMode: boolean): React.ReactNode => {
   if (!text) return '';
 
   let normalized = text;
@@ -67,7 +67,11 @@ const formatMarkdown = (text: string): React.ReactNode => {
         return (
           <code 
             key={idx} 
-            className="px-1.5 py-0.5 mx-0.5 rounded bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-[11px] font-mono text-pink-600 dark:text-pink-400 font-semibold whitespace-nowrap"
+            className={`px-1.5 py-0.5 mx-0.5 rounded border text-[11px] font-mono font-semibold whitespace-nowrap ${
+              isDarkMode 
+                ? 'bg-zinc-900 border-zinc-800 text-pink-400' 
+                : 'bg-zinc-100 border-zinc-200 text-pink-600'
+            }`}
           >
             {p.slice(1, -1)}
           </code>
@@ -75,13 +79,13 @@ const formatMarkdown = (text: string): React.ReactNode => {
       }
       
       // Parse italics inside non-code text
-      const italicParts = p.split(/(\*[^*]+\*)/g);
+      const cleanItalicParts = p.split(/(\*[^\*]+\*)/g);
       return (
         <React.Fragment key={idx}>
-          {italicParts.map((iPart, k) => {
+          {cleanItalicParts.map((iPart, k) => {
             if (iPart.startsWith('*') && iPart.endsWith('*')) {
               return (
-                <em key={k} className="italic text-zinc-800 dark:text-zinc-200">
+                <em key={k} className={`italic ${isDarkMode ? 'text-zinc-200' : 'text-zinc-800'}`}>
                   {iPart.slice(1, -1)}
                 </em>
               );
@@ -102,7 +106,7 @@ const formatMarkdown = (text: string): React.ReactNode => {
         if (bPart.startsWith('**') && bPart.endsWith('**')) {
           const boldText = bPart.slice(2, -2);
           return (
-            <strong key={j} className="font-bold text-zinc-900 dark:text-zinc-100">
+            <strong key={j} className={`font-bold ${isDarkMode ? 'text-zinc-100' : 'text-zinc-900'}`}>
               {renderInlineCode(boldText)}
             </strong>
           );
@@ -140,7 +144,7 @@ const renderParagraphs = (paragraphs: string[], isDarkMode: boolean, pClassName:
                   key={idx} 
                   className={`px-4 py-3 text-left text-xs font-bold uppercase tracking-wider ${isDarkMode ? 'text-zinc-400 border-zinc-800' : 'text-zinc-500 border-zinc-200'} border-b`}
                 >
-                  {formatMarkdown(cell.trim())}
+                  {formatMarkdown(cell.trim(), isDarkMode)}
                 </th>
               ))}
             </tr>
@@ -150,7 +154,7 @@ const renderParagraphs = (paragraphs: string[], isDarkMode: boolean, pClassName:
               <tr key={rIdx} className={isDarkMode ? 'hover:bg-zinc-900/20' : 'hover:bg-zinc-50/50'}>
                 {row.map((cell, cIdx) => (
                   <td key={cIdx} className={`px-4 py-3 text-xs md:text-sm font-medium ${isDarkMode ? 'text-zinc-300' : 'text-zinc-700'}`}>
-                    {formatMarkdown(cell.trim())}
+                    {formatMarkdown(cell.trim(), isDarkMode)}
                   </td>
                 ))}
               </tr>
@@ -181,7 +185,7 @@ const renderParagraphs = (paragraphs: string[], isDarkMode: boolean, pClassName:
           key={idx} 
           className={pClassName}
         >
-          {formatMarkdown(para)}
+          {formatMarkdown(para, isDarkMode)}
         </p>
       );
     }
@@ -703,7 +707,7 @@ export default function DocsPage() {
                                     </div>
 
                                     <p className={`text-sm leading-relaxed mb-6 ${isDarkMode ? 'text-zinc-300' : 'text-zinc-600'}`}>
-                                      {formatMarkdown(description || sub.paragraphs[0] || 'Опис фази відсутній.')}
+                                      {formatMarkdown(description || sub.paragraphs[0] || 'Опис фази відсутній.', isDarkMode)}
                                     </p>
 
                                     <div className={`grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t ${isDarkMode ? 'border-zinc-800/80' : 'border-zinc-200'}`}>
@@ -737,7 +741,7 @@ export default function DocsPage() {
                                           <svg className="w-4 h-4 text-emerald-500 dark:text-emerald-450 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                                           </svg>
-                                          <span>{formatMarkdown(milestone || 'Очікується визначення.')}</span>
+                                          <span>{formatMarkdown(milestone || 'Очікується визначення.', isDarkMode)}</span>
                                         </p>
                                       </div>
                                     </div>
@@ -834,7 +838,7 @@ export default function DocsPage() {
                                         </span>
                                       ) : (
                                         <div className={`text-sm font-semibold leading-relaxed ${isDarkMode ? 'text-zinc-100' : 'text-zinc-900'}`}>
-                                          {formatMarkdown(item.raw_text)}
+                                          {formatMarkdown(item.raw_text, isDarkMode)}
                                         </div>
                                       )}
                                     </div>
@@ -842,7 +846,7 @@ export default function DocsPage() {
 
                                   {item.type === 'kv' && (
                                     <p className={`text-sm leading-relaxed ${isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
-                                      {formatMarkdown(item.value || '')}
+                                      {formatMarkdown(item.value || '', isDarkMode)}
                                     </p>
                                   )}
 
@@ -862,7 +866,7 @@ export default function DocsPage() {
                                               <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4" />
                                             </svg>
                                             <p className={`text-xs leading-relaxed ${isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
-                                              {formatMarkdown(sub)}
+                                              {formatMarkdown(sub, isDarkMode)}
                                             </p>
                                           </li>
                                         ))}
@@ -954,7 +958,7 @@ export default function DocsPage() {
                                                   </span>
                                                 ) : (
                                                   <div className={`text-sm font-semibold leading-relaxed ${isDarkMode ? 'text-zinc-100' : 'text-zinc-900'}`}>
-                                                    {formatMarkdown(item.raw_text)}
+                                                    {formatMarkdown(item.raw_text, isDarkMode)}
                                                   </div>
                                                 )}
                                               </div>
@@ -962,7 +966,7 @@ export default function DocsPage() {
 
                                             {item.type === 'kv' && (
                                               <p className={`text-sm leading-relaxed ${isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
-                                                {formatMarkdown(item.value || '')}
+                                                {formatMarkdown(item.value || '', isDarkMode)}
                                               </p>
                                             )}
 
@@ -982,7 +986,7 @@ export default function DocsPage() {
                                                         <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4" />
                                                       </svg>
                                                       <p className={`text-xs leading-relaxed ${isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
-                                                        {formatMarkdown(subText)}
+                                                        {formatMarkdown(subText, isDarkMode)}
                                                       </p>
                                                     </li>
                                                   ))}
