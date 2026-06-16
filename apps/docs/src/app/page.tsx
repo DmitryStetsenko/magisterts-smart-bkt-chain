@@ -297,7 +297,7 @@ export default function DocsPage() {
       <div className="flex flex-1 relative font-sans">
         
         {/* SIDEBAR */}
-        <aside className={`w-80 flex-shrink-0 hidden md:flex flex-col sticky top-[73px] h-[calc(100vh-73px)] border-r ${isDarkMode ? 'bg-zinc-950/50 border-zinc-900' : 'bg-zinc-100/50 border-zinc-200'}`}>
+        <aside className={`w-96 flex-shrink-0 hidden md:flex flex-col sticky top-[73px] h-[calc(100vh-73px)] border-r ${isDarkMode ? 'bg-zinc-950/50 border-zinc-900' : 'bg-zinc-100/50 border-zinc-200'}`}>
           
           {/* Tab Switcher */}
           <div className="p-4 border-b border-zinc-200 dark:border-zinc-900">
