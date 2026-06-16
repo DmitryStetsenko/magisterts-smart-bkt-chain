@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useMemo, useEffect } from 'react';
+import roadmapData from '../data/roadmap.json';
 import techStackData from '../data/tech_stack.json';
 import projectManagementData from '../data/project_management.json';
 
@@ -40,18 +41,25 @@ interface DocData {
   sections: Section[];
 }
 
+type Tab = 'roadmap' | 'tech' | 'pm';
+
 export default function DocsPage() {
-  const [activeTab, setActiveTab] = useState<'tech' | 'pm'>('tech');
+  const [activeTab, setActiveTab] = useState<Tab>('roadmap');
   const [searchQuery, setSearchQuery] = useState('');
   const [activeSection, setActiveSection] = useState<string>('');
   const [copiedIndex, setCopiedIndex] = useState<string | null>(null);
   const [isDarkMode, setIsDarkMode] = useState(true);
 
   // Cast JSON data to types
+  const roadmapDoc = roadmapData as DocData;
   const techDoc = techStackData as DocData;
   const pmDoc = projectManagementData as DocData;
 
-  const currentDoc = activeTab === 'tech' ? techDoc : pmDoc;
+  const currentDoc = useMemo(() => {
+    if (activeTab === 'roadmap') return roadmapDoc;
+    if (activeTab === 'tech') return techDoc;
+    return pmDoc;
+  }, [activeTab, roadmapDoc, techDoc, pmDoc]);
 
   // Toggle theme
   useEffect(() => {
@@ -159,7 +167,6 @@ export default function DocsPage() {
 
         {/* Global Controls */}
         <div className="flex items-center gap-4">
-          {/* GitHub Repo Button */}
           <a
             href="https://github.com"
             target="_blank"
@@ -172,7 +179,6 @@ export default function DocsPage() {
             GitHub
           </a>
 
-          {/* Theme Toggle Button */}
           <button
             onClick={() => setIsDarkMode(!isDarkMode)}
             className={`p-2 rounded-lg border transition-all ${isDarkMode ? 'bg-zinc-900 border-zinc-800 text-yellow-400 hover:bg-zinc-800' : 'bg-white border-zinc-200 text-indigo-600 hover:bg-zinc-50'}`}
@@ -191,25 +197,31 @@ export default function DocsPage() {
         </div>
       </header>
 
-      <div className="flex flex-1 relative">
+      <div className="flex flex-1 relative font-sans">
         
         {/* SIDEBAR */}
         <aside className={`w-80 flex-shrink-0 hidden md:flex flex-col sticky top-[73px] h-[calc(100vh-73px)] border-r ${isDarkMode ? 'bg-zinc-950/50 border-zinc-900' : 'bg-zinc-100/50 border-zinc-200'}`}>
           
           {/* Tab Switcher */}
           <div className="p-4 border-b border-zinc-200 dark:border-zinc-900">
-            <div className={`flex p-1 rounded-xl ${isDarkMode ? 'bg-zinc-900' : 'bg-zinc-200'}`}>
+            <div className={`flex flex-col gap-1 p-1 rounded-xl ${isDarkMode ? 'bg-zinc-900' : 'bg-zinc-200'}`}>
+              <button
+                onClick={() => { setActiveTab('roadmap'); setSearchQuery(''); }}
+                className={`w-full text-left py-2 px-3 rounded-lg text-xs font-semibold tracking-wide transition-all ${activeTab === 'roadmap' ? (isDarkMode ? 'bg-zinc-800 text-white shadow-md' : 'bg-white text-zinc-950 shadow-sm') : (isDarkMode ? 'text-zinc-400 hover:text-zinc-200' : 'text-zinc-600 hover:text-zinc-900')}`}
+              >
+                🗺️ Дорожня карта
+              </button>
               <button
                 onClick={() => { setActiveTab('tech'); setSearchQuery(''); }}
-                className={`flex-1 py-2 px-3 rounded-lg text-xs font-semibold tracking-wide transition-all ${activeTab === 'tech' ? (isDarkMode ? 'bg-zinc-800 text-white shadow-md' : 'bg-white text-zinc-950 shadow-sm') : (isDarkMode ? 'text-zinc-400 hover:text-zinc-200' : 'text-zinc-600 hover:text-zinc-900')}`}
+                className={`w-full text-left py-2 px-3 rounded-lg text-xs font-semibold tracking-wide transition-all ${activeTab === 'tech' ? (isDarkMode ? 'bg-zinc-800 text-white shadow-md' : 'bg-white text-zinc-950 shadow-sm') : (isDarkMode ? 'text-zinc-400 hover:text-zinc-200' : 'text-zinc-600 hover:text-zinc-900')}`}
               >
-                Технічний стек
+                💻 Технічний стек
               </button>
               <button
                 onClick={() => { setActiveTab('pm'); setSearchQuery(''); }}
-                className={`flex-1 py-2 px-3 rounded-lg text-xs font-semibold tracking-wide transition-all ${activeTab === 'pm' ? (isDarkMode ? 'bg-zinc-800 text-white shadow-md' : 'bg-white text-zinc-950 shadow-sm') : (isDarkMode ? 'text-zinc-400 hover:text-zinc-200' : 'text-zinc-600 hover:text-zinc-900')}`}
+                className={`w-full text-left py-2 px-3 rounded-lg text-xs font-semibold tracking-wide transition-all ${activeTab === 'pm' ? (isDarkMode ? 'bg-zinc-800 text-white shadow-md' : 'bg-white text-zinc-950 shadow-sm') : (isDarkMode ? 'text-zinc-400 hover:text-zinc-200' : 'text-zinc-600 hover:text-zinc-900')}`}
               >
-                Управління & Jira
+                📊 Управління & Jira
               </button>
             </div>
 
@@ -282,7 +294,7 @@ export default function DocsPage() {
             <div className="space-y-4">
               <div className="flex items-center gap-2">
                 <span className={`px-2.5 py-1 text-xs font-semibold rounded-full uppercase tracking-wider ${isDarkMode ? 'bg-indigo-500/10 text-indigo-400' : 'bg-indigo-100 text-indigo-800'}`}>
-                  {activeTab === 'tech' ? 'Технічна специфікація' : 'Управління розробкою'}
+                  {activeTab === 'roadmap' ? 'Дорожня карта' : activeTab === 'tech' ? 'Технічна специфікація' : 'Управління розробкою'}
                 </span>
                 <span className={`px-2.5 py-1 text-xs font-semibold rounded-full ${isDarkMode ? 'bg-zinc-900 text-zinc-400' : 'bg-zinc-200 text-zinc-600'}`}>
                   v1.0.0
@@ -291,215 +303,347 @@ export default function DocsPage() {
               <h2 className="text-4xl font-extrabold tracking-tight md:text-5xl">
                 {currentDoc.project_title}
               </h2>
-              <div className={`h-1.5 w-24 rounded-full bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500`}></div>
+              <div className="h-1.5 w-24 rounded-full bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500"></div>
             </div>
 
             {/* SECTIONS RENDER */}
             <div className="space-y-16">
-              {filteredDoc.sections.map((section, secIdx) => {
-                const sectionSlug = getSlug(section.title);
+              
+              {/* ROADMAP TIMELINE CUSTOM VIEW */}
+              {activeTab === 'roadmap' ? (
+                <div className="space-y-12">
+                  {filteredDoc.sections.map((section, secIdx) => {
+                    const sectionSlug = getSlug(section.title);
 
-                return (
-                  <section
-                    key={section.title}
-                    id={sectionSlug}
-                    className={`scroll-mt-24 space-y-6 pb-12 border-b last:border-b-0 ${isDarkMode ? 'border-zinc-900' : 'border-zinc-200'}`}
-                  >
-                    
-                    {/* H2 Title */}
-                    <div className="group flex items-center gap-3">
-                      <h2 className="text-2xl font-bold tracking-tight text-indigo-500 dark:text-indigo-400">
-                        {section.title}
-                      </h2>
-                      <a
-                        href={`#${sectionSlug}`}
-                        onClick={(e) => {
-                          e.preventDefault();
-                          scrollTo(sectionSlug);
-                        }}
-                        className={`opacity-0 group-hover:opacity-100 transition-opacity ${isDarkMode ? 'text-zinc-600 hover:text-zinc-400' : 'text-zinc-400 hover:text-zinc-600'}`}
-                      >
-                        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
-                        </svg>
-                      </a>
-                    </div>
+                    return (
+                      <div key={section.title} id={sectionSlug} className="scroll-mt-24 space-y-8">
+                        {/* Summary Header */}
+                        <div className={`p-6 rounded-2xl border ${isDarkMode ? 'bg-zinc-900/40 border-zinc-800' : 'bg-zinc-100/80 border-zinc-200'} shadow-lg`}>
+                          {section.paragraphs.map((para, idx) => (
+                            <p key={idx} className={`leading-relaxed text-base md:text-lg ${isDarkMode ? 'text-zinc-300' : 'text-zinc-700'}`}>
+                              {para}
+                            </p>
+                          ))}
 
-                    {/* Section Paragraphs */}
-                    {section.paragraphs.map((para, idx) => (
-                      <p key={idx} className={`leading-relaxed ${isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
-                        {para}
-                      </p>
-                    ))}
-
-                    {/* Section Code Blocks */}
-                    {section.code_blocks.map((block, idx) => {
-                      const id = `sec-${secIdx}-code-${idx}`;
-                      return (
-                        <div key={idx} className="relative rounded-xl overflow-hidden shadow-2xl border border-zinc-800 bg-zinc-950 group">
-                          <div className="flex items-center justify-between px-4 py-2.5 bg-zinc-900 border-b border-zinc-800/80 text-xs font-mono text-zinc-400">
-                            <span>{block.lang || 'code'}</span>
-                            <button
-                              onClick={() => handleCopy(block.content, id)}
-                              className="px-2 py-1.5 rounded bg-zinc-800 text-zinc-400 hover:text-white transition-all flex items-center gap-1.5 hover:bg-zinc-700/80"
-                            >
-                              {copiedIndex === id ? 'Скопійовано!' : 'Копіювати'}
-                            </button>
-                          </div>
-                          <pre className="p-5 overflow-x-auto text-sm font-mono text-zinc-300 leading-relaxed max-h-[400px]">
-                            <code>{block.content}</code>
-                          </pre>
-                        </div>
-                      );
-                    })}
-
-                    {/* Section Key-Value and Bullet list items */}
-                    {section.items && section.items.length > 0 && (
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {section.items.map((item, idx) => (
-                          <div
-                            key={idx}
-                            className={`p-4 rounded-xl border transition-all hover:shadow-md ${isDarkMode ? 'bg-zinc-900/40 border-zinc-900 hover:border-zinc-800' : 'bg-zinc-50 border-zinc-200 hover:border-zinc-300'}`}
-                          >
-                            {item.type === 'kv' ? (
-                              <div className="space-y-2">
-                                <span className="inline-block px-2.5 py-1 text-xs font-bold font-mono rounded bg-indigo-500/10 text-indigo-400">
-                                  {item.key}
-                                </span>
-                                <p className={`text-sm ${isDarkMode ? 'text-zinc-300' : 'text-zinc-700'}`}>
-                                  {item.value}
-                                </p>
-                              </div>
-                            ) : (
-                              <p className={`text-sm leading-relaxed ${isDarkMode ? 'text-zinc-300' : 'text-zinc-700'}`}>
-                                {item.raw_text}
-                              </p>
-                            )}
-
-                            {/* Render subitems (e.g. Rationale/Чому) */}
-                            {item.subitems && item.subitems.length > 0 && (
-                              <div className="mt-3 pl-3 border-l-2 border-zinc-700/80 dark:border-zinc-800 space-y-1">
-                                {item.subitems.map((sub, sidx) => (
-                                  <div key={sidx} className="flex gap-2">
-                                    <span className="text-zinc-500 text-xs">Чому:</span>
-                                    <p className={`text-xs ${isDarkMode ? 'text-zinc-400' : 'text-zinc-500'}`}>
-                                      {sub}
-                                    </p>
-                                  </div>
-                                ))}
-                              </div>
-                            )}
-                          </div>
-                        ))}
-                      </div>
-                    )}
-
-                    {/* SUB-SECTIONS RENDER */}
-                    {section.subsections && section.subsections.length > 0 && (
-                      <div className="mt-8 space-y-8 pl-4 border-l border-zinc-200 dark:border-zinc-900 ml-1">
-                        {section.subsections.map((sub, subIdx) => {
-                          const subSlug = getSlug(sub.title);
-
-                          return (
-                            <div key={sub.title} id={subSlug} className="scroll-mt-24 space-y-4">
-                              
-                              {/* H3 title */}
-                              <div className="group flex items-center gap-3">
-                                <h3 className={`text-lg font-bold tracking-tight ${isDarkMode ? 'text-zinc-200' : 'text-zinc-800'}`}>
-                                  {sub.title}
-                                </h3>
-                                <a
-                                  href={`#${subSlug}`}
-                                  onClick={(e) => {
-                                    e.preventDefault();
-                                    scrollTo(subSlug);
-                                  }}
-                                  className={`opacity-0 group-hover:opacity-100 transition-opacity ${isDarkMode ? 'text-zinc-700 hover:text-zinc-500' : 'text-zinc-400 hover:text-zinc-600'}`}
+                          {/* Steps Horizontal Flow */}
+                          {section.subsections && section.subsections.length > 0 && (
+                            <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 relative">
+                              {section.subsections.map((sub, idx) => (
+                                <button
+                                  key={idx}
+                                  onClick={() => scrollTo(getSlug(sub.title))}
+                                  className={`relative rounded-xl border p-4 transition-all duration-300 flex flex-col items-center text-center shadow-md group ${isDarkMode ? 'bg-zinc-950/80 border-zinc-850 hover:border-indigo-500/50' : 'bg-white border-zinc-200 hover:border-indigo-600/50'}`}
                                 >
-                                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
-                                  </svg>
-                                </a>
-                              </div>
-
-                              {/* Subsection Paragraphs */}
-                              {sub.paragraphs.map((p, idx) => (
-                                <p key={idx} className={`leading-relaxed text-sm ${isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
-                                  {p}
-                                </p>
-                              ))}
-
-                              {/* Subsection Code Blocks */}
-                              {sub.code_blocks.map((block, idx) => {
-                                const id = `sec-${secIdx}-sub-${subIdx}-code-${idx}`;
-                                return (
-                                  <div key={idx} className="relative rounded-xl overflow-hidden shadow-xl border border-zinc-800 bg-zinc-950 group">
-                                    <div className="flex items-center justify-between px-4 py-2.5 bg-zinc-900 border-b border-zinc-800/80 text-xs font-mono text-zinc-400">
-                                      <span>{block.lang || 'code'}</span>
-                                      <button
-                                        onClick={() => handleCopy(block.content, id)}
-                                        className="px-2 py-1.5 rounded bg-zinc-800 text-zinc-400 hover:text-white transition-all flex items-center gap-1.5 hover:bg-zinc-700/80"
-                                      >
-                                        {copiedIndex === id ? 'Скопійовано!' : 'Копіювати'}
-                                      </button>
-                                    </div>
-                                    <pre className="p-4 overflow-x-auto text-xs font-mono text-zinc-300 leading-relaxed max-h-[350px]">
-                                      <code>{block.content}</code>
-                                    </pre>
+                                  <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm mb-2 transition-all duration-300 ${isDarkMode ? 'bg-indigo-600/10 text-indigo-400 group-hover:bg-indigo-600 group-hover:text-white' : 'bg-indigo-100 text-indigo-700 group-hover:bg-indigo-600 group-hover:text-white'}`}>
+                                    {idx + 1}
                                   </div>
-                                );
-                              })}
+                                  <span className={`font-semibold text-[11px] uppercase tracking-wider ${isDarkMode ? 'text-zinc-400 group-hover:text-white' : 'text-zinc-600 group-hover:text-zinc-950'}`}>
+                                    {sub.title.split(':')[0]}
+                                  </span>
+                                </button>
+                              ))}
+                            </div>
+                          )}
+                        </div>
 
-                              {/* Subsection Key-Value or Bullet items */}
-                              {sub.items && sub.items.length > 0 && (
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                  {sub.items.map((item, idx) => (
-                                    <div
-                                      key={idx}
-                                      className={`p-4 rounded-xl border transition-all hover:shadow-md ${isDarkMode ? 'bg-zinc-900/30 border-zinc-900 hover:border-zinc-800' : 'bg-zinc-50 border-zinc-200 hover:border-zinc-300'}`}
-                                    >
-                                      {item.type === 'kv' ? (
-                                        <div className="space-y-2">
-                                          <span className="inline-block px-2.5 py-1 text-xs font-bold font-mono rounded bg-indigo-500/10 text-indigo-400">
-                                            {item.key}
-                                          </span>
-                                          <p className={`text-sm ${isDarkMode ? 'text-zinc-300' : 'text-zinc-700'}`}>
-                                            {item.value}
-                                          </p>
+                        {/* Vertical Timeline Phases */}
+                        {section.subsections && section.subsections.length > 0 && (
+                          <div className="space-y-8 relative before:absolute before:inset-y-0 before:left-8 before:w-0.5 before:bg-gradient-to-b before:from-indigo-500 before:to-emerald-500 mt-12">
+                            {section.subsections.map((sub, idx) => {
+                              const subSlug = getSlug(sub.title);
+                              const isFirst = idx === 0;
+
+                              // Parse details
+                              let description = '';
+                              let epics: string[] = [];
+                              let milestone = '';
+
+                              sub.items.forEach((item) => {
+                                const text = item.raw_text;
+                                if (text.startsWith('Опис:')) {
+                                  description = text.replace('Опис:', '').trim();
+                                } else if (text.includes('Епіки') || text.includes('Jira Epics')) {
+                                  const epicsText = text.split(':')[1] || '';
+                                  epics = epicsText.split(',').map((e) => e.replace(/`/g, '').trim()).filter(Boolean);
+                                } else if (text.startsWith('Результат:')) {
+                                  milestone = text.replace('Результат:', '').trim();
+                                }
+                              });
+
+                              return (
+                                <div key={idx} id={subSlug} className="relative pl-16 group scroll-mt-24">
+                                  {/* Pulsing indicator for active phase */}
+                                  <div className={`absolute left-5 top-2 w-6 h-6 rounded-full border-4 ${isFirst ? 'bg-indigo-500 border-indigo-950 dark:border-zinc-950 animate-ping' : 'bg-zinc-800 border-zinc-950'}`} />
+                                  <div className={`absolute left-5 top-2 w-6 h-6 rounded-full border-4 flex items-center justify-center font-bold text-[9px] text-white ${isFirst ? 'bg-indigo-500 border-indigo-950 dark:border-zinc-950' : 'bg-zinc-800 border-zinc-950'}`}>
+                                    {idx + 1}
+                                  </div>
+
+                                  {/* Phase Card */}
+                                  <div className={`rounded-2xl border p-6 shadow-md transition-all duration-300 ${isDarkMode ? 'bg-zinc-900/60 backdrop-blur-md border-zinc-900 hover:border-zinc-800' : 'bg-white border-zinc-200 hover:border-zinc-300'} ${isFirst ? 'ring-2 ring-indigo-500/20' : ''}`}>
+                                    <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
+                                      <h3 className="text-xl font-bold tracking-tight text-white group-hover:text-indigo-400 transition-colors duration-300">
+                                        {sub.title}
+                                      </h3>
+                                      <span className={`px-2.5 py-0.5 rounded-full text-xs font-semibold border ${isFirst ? 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20 animate-pulse' : 'bg-zinc-800 text-zinc-500 border-zinc-700'}`}>
+                                        {isFirst ? '🚀 Поточна фаза' : '🗓️ Заплановано'}
+                                      </span>
+                                    </div>
+
+                                    <p className={`text-sm leading-relaxed mb-6 ${isDarkMode ? 'text-zinc-300' : 'text-zinc-600'}`}>
+                                      {description || sub.paragraphs[0] || 'Опис фази відсутній.'}
+                                    </p>
+
+                                    <div className={`grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t ${isDarkMode ? 'border-zinc-800/80' : 'border-zinc-150'}`}>
+                                      {/* Jira Epics list */}
+                                      <div>
+                                        <h4 className={`text-xs font-bold uppercase tracking-wider mb-2 ${isDarkMode ? 'text-zinc-500' : 'text-zinc-400'}`}>
+                                          Jira Epics
+                                        </h4>
+                                        <div className="flex flex-wrap gap-1.5">
+                                          {epics.length > 0 ? (
+                                            epics.map((epic, eIdx) => (
+                                              <span
+                                                key={eIdx}
+                                                className={`px-2 py-0.5 rounded font-mono text-xs font-semibold ${isDarkMode ? 'bg-zinc-850 border border-zinc-800 text-zinc-300' : 'bg-zinc-100 border border-zinc-200 text-zinc-700'}`}
+                                              >
+                                                {epic}
+                                              </span>
+                                            ))
+                                          ) : (
+                                            <span className="text-xs text-zinc-500">Немає закріплених епіків</span>
+                                          )}
                                         </div>
-                                      ) : (
-                                        <p className={`text-sm leading-relaxed ${isDarkMode ? 'text-zinc-300' : 'text-zinc-700'}`}>
-                                          {item.raw_text}
+                                      </div>
+
+                                      {/* Phase Milestone */}
+                                      <div>
+                                        <h4 className={`text-xs font-bold uppercase tracking-wider mb-2 ${isDarkMode ? 'text-zinc-500' : 'text-zinc-400'}`}>
+                                          Ціль фази (Milestone)
+                                        </h4>
+                                        <p className="text-emerald-500 dark:text-emerald-400 text-sm font-semibold flex items-start gap-1.5">
+                                          <span>🎯</span>
+                                          <span>{milestone || 'Очікується визначення.'}</span>
                                         </p>
-                                      )}
+                                      </div>
+                                    </div>
 
-                                      {/* Subitems */}
-                                      {item.subitems && item.subitems.length > 0 && (
-                                        <div className="mt-3 pl-3 border-l-2 border-zinc-700/80 dark:border-zinc-800 space-y-1">
-                                          {item.subitems.map((subText, sidx) => (
-                                            <div key={sidx} className="flex gap-2">
-                                              <span className="text-zinc-500 text-xs">Чому:</span>
-                                              <p className={`text-xs ${isDarkMode ? 'text-zinc-400' : 'text-zinc-500'}`}>
-                                                {subText}
-                                              </p>
-                                            </div>
-                                          ))}
-                                        </div>
-                                      )}
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                /* STANDARD TAB VIEW FOR TECH STACK AND PROJECT MANAGEMENT */
+                filteredDoc.sections.map((section, secIdx) => {
+                  const sectionSlug = getSlug(section.title);
+
+                  return (
+                    <section
+                      key={section.title}
+                      id={sectionSlug}
+                      className={`scroll-mt-24 space-y-6 pb-12 border-b last:border-b-0 ${isDarkMode ? 'border-zinc-900' : 'border-zinc-200'}`}
+                    >
+                      
+                      {/* H2 Title */}
+                      <div className="group flex items-center gap-3">
+                        <h2 className="text-2xl font-bold tracking-tight text-indigo-500 dark:text-indigo-400">
+                          {section.title}
+                        </h2>
+                        <a
+                          href={`#${sectionSlug}`}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            scrollTo(sectionSlug);
+                          }}
+                          className={`opacity-0 group-hover:opacity-100 transition-opacity ${isDarkMode ? 'text-zinc-600 hover:text-zinc-400' : 'text-zinc-400 hover:text-zinc-600'}`}
+                        >
+                          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                          </svg>
+                        </a>
+                      </div>
+
+                      {/* Section Paragraphs */}
+                      {section.paragraphs.map((para, idx) => (
+                        <p key={idx} className={`leading-relaxed ${isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
+                          {para}
+                        </p>
+                      ))}
+
+                      {/* Section Code Blocks */}
+                      {section.code_blocks.map((block, idx) => {
+                        const id = `sec-${secIdx}-code-${idx}`;
+                        return (
+                          <div key={idx} className="relative rounded-xl overflow-hidden shadow-2xl border border-zinc-800 bg-zinc-950 group">
+                            <div className="flex items-center justify-between px-4 py-2.5 bg-zinc-900 border-b border-zinc-800/80 text-xs font-mono text-zinc-400">
+                              <span>{block.lang || 'code'}</span>
+                              <button
+                                onClick={() => handleCopy(block.content, id)}
+                                className="px-2 py-1.5 rounded bg-zinc-800 text-zinc-400 hover:text-white transition-all flex items-center gap-1.5 hover:bg-zinc-700/80"
+                              >
+                                {copiedIndex === id ? 'Скопійовано!' : 'Копіювати'}
+                              </button>
+                            </div>
+                            <pre className="p-5 overflow-x-auto text-sm font-mono text-zinc-300 leading-relaxed max-h-[400px]">
+                              <code>{block.content}</code>
+                            </pre>
+                          </div>
+                        );
+                      })}
+
+                      {/* Section Key-Value and Bullet list items */}
+                      {section.items && section.items.length > 0 && (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          {section.items.map((item, idx) => (
+                            <div
+                              key={idx}
+                              className={`p-4 rounded-xl border transition-all hover:shadow-md ${isDarkMode ? 'bg-zinc-900/40 border-zinc-900 hover:border-zinc-800' : 'bg-zinc-50 border-zinc-200 hover:border-zinc-300'}`}
+                            >
+                              {item.type === 'kv' ? (
+                                <div className="space-y-2">
+                                  <span className="inline-block px-2.5 py-1 text-xs font-bold font-mono rounded bg-indigo-500/10 text-indigo-400">
+                                    {item.key}
+                                  </span>
+                                  <p className={`text-sm ${isDarkMode ? 'text-zinc-300' : 'text-zinc-700'}`}>
+                                    {item.value}
+                                  </p>
+                                </div>
+                              ) : (
+                                <p className={`text-sm leading-relaxed ${isDarkMode ? 'text-zinc-300' : 'text-zinc-700'}`}>
+                                  {item.raw_text}
+                                </p>
+                              )}
+
+                              {/* Render subitems */}
+                              {item.subitems && item.subitems.length > 0 && (
+                                <div className="mt-3 pl-3 border-l-2 border-zinc-700/80 dark:border-zinc-800 space-y-1">
+                                  {item.subitems.map((sub, sidx) => (
+                                    <div key={sidx} className="flex gap-2">
+                                      <span className="text-zinc-500 text-xs">Чому:</span>
+                                      <p className={`text-xs ${isDarkMode ? 'text-zinc-400' : 'text-zinc-500'}`}>
+                                        {sub}
+                                      </p>
                                     </div>
                                   ))}
                                 </div>
                               )}
-
                             </div>
-                          );
-                        })}
-                      </div>
-                    )}
+                          ))}
+                        </div>
+                      )}
 
-                  </section>
-                );
-              })}
+                      {/* SUB-SECTIONS RENDER */}
+                      {section.subsections && section.subsections.length > 0 && (
+                        <div className="mt-8 space-y-8 pl-4 border-l border-zinc-200 dark:border-zinc-900 ml-1">
+                          {section.subsections.map((sub, subIdx) => {
+                            const subSlug = getSlug(sub.title);
+
+                            return (
+                              <div key={sub.title} id={subSlug} className="scroll-mt-24 space-y-4">
+                                
+                                {/* H3 title */}
+                                <div className="group flex items-center gap-3">
+                                  <h3 className={`text-lg font-bold tracking-tight ${isDarkMode ? 'text-zinc-200' : 'text-zinc-800'}`}>
+                                    {sub.title}
+                                  </h3>
+                                  <a
+                                    href={`#${subSlug}`}
+                                    onClick={(e) => {
+                                      e.preventDefault();
+                                      scrollTo(subSlug);
+                                    }}
+                                    className={`opacity-0 group-hover:opacity-100 transition-opacity ${isDarkMode ? 'text-zinc-700 hover:text-zinc-500' : 'text-zinc-400 hover:text-zinc-600'}`}
+                                  >
+                                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                      <path strokeLinecap="round" strokeLinejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                                    </svg>
+                                  </a>
+                                </div>
+
+                                {/* Subsection Paragraphs */}
+                                {sub.paragraphs.map((p, idx) => (
+                                  <p key={idx} className={`leading-relaxed text-sm ${isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
+                                    {p}
+                                  </p>
+                                ))}
+
+                                {/* Subsection Code Blocks */}
+                                {sub.code_blocks.map((block, idx) => {
+                                  const id = `sec-${secIdx}-sub-${subIdx}-code-${idx}`;
+                                  return (
+                                    <div key={idx} className="relative rounded-xl overflow-hidden shadow-xl border border-zinc-800 bg-zinc-950 group">
+                                      <div className="flex items-center justify-between px-4 py-2.5 bg-zinc-900 border-b border-zinc-800/80 text-xs font-mono text-zinc-400">
+                                        <span>{block.lang || 'code'}</span>
+                                        <button
+                                          onClick={() => handleCopy(block.content, id)}
+                                          className="px-2 py-1.5 rounded bg-zinc-800 text-zinc-400 hover:text-white transition-all flex items-center gap-1.5 hover:bg-zinc-700/80"
+                                        >
+                                          {copiedIndex === id ? 'Скопійовано!' : 'Копіювати'}
+                                        </button>
+                                      </div>
+                                      <pre className="p-4 overflow-x-auto text-xs font-mono text-zinc-300 leading-relaxed max-h-[350px]">
+                                        <code>{block.content}</code>
+                                      </pre>
+                                    </div>
+                                  );
+                                })}
+
+                                {/* Subsection Key-Value or Bullet items */}
+                                {sub.items && sub.items.length > 0 && (
+                                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    {sub.items.map((item, idx) => (
+                                      <div
+                                        key={idx}
+                                        className={`p-4 rounded-xl border transition-all hover:shadow-md ${isDarkMode ? 'bg-zinc-900/30 border-zinc-900 hover:border-zinc-800' : 'bg-zinc-50 border-zinc-200 hover:border-zinc-300'}`}
+                                      >
+                                        {item.type === 'kv' ? (
+                                          <div className="space-y-2">
+                                            <span className="inline-block px-2.5 py-1 text-xs font-bold font-mono rounded bg-indigo-500/10 text-indigo-400">
+                                              {item.key}
+                                            </span>
+                                            <p className={`text-sm ${isDarkMode ? 'text-zinc-300' : 'text-zinc-700'}`}>
+                                              {item.value}
+                                            </p>
+                                          </div>
+                                        ) : (
+                                          <p className={`text-sm leading-relaxed ${isDarkMode ? 'text-zinc-300' : 'text-zinc-700'}`}>
+                                            {item.raw_text}
+                                          </p>
+                                        )}
+
+                                        {/* Subitems */}
+                                        {item.subitems && item.subitems.length > 0 && (
+                                          <div className="mt-3 pl-3 border-l-2 border-zinc-700/80 dark:border-zinc-800 space-y-1">
+                                            {item.subitems.map((subText, sidx) => (
+                                              <div key={sidx} className="flex gap-2">
+                                                <span className="text-zinc-500 text-xs">Чому:</span>
+                                                <p className={`text-xs ${isDarkMode ? 'text-zinc-400' : 'text-zinc-500'}`}>
+                                                  {subText}
+                                                </p>
+                                              </div>
+                                            ))}
+                                          </div>
+                                        )}
+                                      </div>
+                                    ))}
+                                  </div>
+                                )}
+
+                              </div>
+                            );
+                          })}
+                        </div>
+                      )}
+
+                    </section>
+                  );
+                })
+              )}
             </div>
 
           </div>
