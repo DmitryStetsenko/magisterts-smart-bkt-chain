@@ -1,0 +1,457 @@
+{
+  "project_title": "Управління проєктом та інтеграція з Jira «Smart-BKT-Chain»",
+  "sections": [
+    {
+      "title": "1. Система кодування та компонентів (Jira Components)",
+      "level": 2,
+      "paragraphs": [
+        "Для забезпечення чіткої фільтрації завдань, автоматизації аналітики та зручності розробки в межах монорепозиторію, кожне завдання прив'язується до відповідного архітектурного компонента за допомогою префіксів у назві та вибору поля **Component** у Jira.",
+        "| Код (Префікс) | Компонент Jira | Сфера відповідальності (Scope) | Робоча директорія |",
+        "| :--- | :--- | :--- | :--- |",
+        "| **`INF`** | `DevOps-Infra` | Конфігурація монорепозиторію, Docker, CI/CD, хмарний деплой | `/`, `/.github/`, `/docker/` |",
+        "| **`BK`** | `Backend-API` | Ядро NestJS бекенду, авторизація, робота з базою даних | `/apps/api/` |",
+        "| **`BKT`** | `BKT-Engine-AI` | Математичний рушій BKT, оцінювання коду (LLM Judge), черги | `/apps/api/src/bkt/` |",
+        "| **`W3`** | `Web3-Blockchain` | Смарт-контракти Solidity, Hardhat/Foundry, релейєр транзакцій | `/packages/contracts/` |",
+        "| **`CF`** | `Client-Frontend` | Клієнтська частина Next.js (кабінет студента, викладача, граф знань) | `/apps/web/` |",
+        "| **`AF`** | `Admin-Frontend` | Панель адміністрування Next.js (CMS для контенту, CRM аналітика) | `/apps/admin/` |",
+        "| **`SH`** | `Shared-Packages` | Спільні пакети монорепозиторію (Prisma schema, E2E типи) | `/packages/` |"
+      ],
+      "code_blocks": [],
+      "items": [
+        {
+          "type": "text",
+          "raw_text": "",
+          "subitems": []
+        }
+      ],
+      "subsections": []
+    },
+    {
+      "title": "2. Реєстр епіків (Jira Epics Registry)",
+      "level": 2,
+      "paragraphs": [
+        "Весь обсяг робіт розділено на **8 ключових епіків**, кожен з яких представляє собою логічно завершений етап або великий блок функціоналу системи."
+      ],
+      "code_blocks": [],
+      "items": [],
+      "subsections": [
+        {
+          "title": "`SBC-EP-INF` | [INF] Monorepo & CI/CD Setup",
+          "level": 3,
+          "paragraphs": [],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "Опис:** Створення інфраструктурного каркаса монорепозиторію, локального середовища розробки та автоматичних перевірок коду.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Ключові результати (Deliverables):**",
+              "subitems": [
+                "Ініціалізовано Turborepo з підтримкою npm Workspaces.",
+                "Створено спільні конфігураційні файли (TSConfig, ESLint, Prettier).",
+                "Розгорнуто Docker-compose конфіг (PostgreSQL + pgAdmin).",
+                "Налаштовано GitHub Actions (Linter, Type Check, автоматичні тести).",
+                "Запущено Next.js сайт документації `apps/docs` з деплоєм на GitHub Pages."
+              ]
+            }
+          ]
+        },
+        {
+          "title": "`SBC-EP-SH` | [SH] Database Modeling & Shared Packages",
+          "level": 3,
+          "paragraphs": [],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "Опис:** Створення єдиної схеми даних та типів для гарантування E2E Type Safety.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Ключові результати (Deliverables):**",
+              "subitems": [
+                "Описано Prisma схему у `packages/database` (користувачі, курси, навички, логи відповідей).",
+                "Виконано перші міграції PostgreSQL.",
+                "Створено спільний пакет `packages/types` з типами REST API.",
+                "Налаштовано автоматичну генерацію ERD-схеми бази даних."
+              ]
+            }
+          ]
+        },
+        {
+          "title": "`SBC-EP-BK` | [BK] Authentication & Authorization Services",
+          "level": 3,
+          "paragraphs": [],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "Опис:** Реалізація безпеки платформи, реєстрації та розмежування ролей (RBAC).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Ключові результати (Deliverables):**",
+              "subitems": [
+                "Інтегровано SIWE (Sign-In with Ethereum) для верифікації криптогаманців студентів.",
+                "Налаштовано JWT / OAuth2 (Google SSO) для викладачів та адміністраторів.",
+                "Написано `RolesGuard` у NestJS для захисту ендпоінтів на основі ролей (Admin, Educator, Student, Employer)."
+              ]
+            }
+          ]
+        },
+        {
+          "title": "`SBC-EP-BKT` | [BKT] Bayesian Knowledge Tracing Core Engine",
+          "level": 3,
+          "paragraphs": [],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "Опис:** Розробка математичного алгоритму оцінювання знань студента в режимі реального часу.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Ключові результати (Deliverables):**",
+              "subitems": [
+                "Реалізовано сервіс розрахунку матриць ймовірностей BKT (на основі $P(L_0), P(T), P(G), P(S)$).",
+                "Створено логіку «Холодного старту» (Cold Start) з вхідними діагностичними тестами.",
+                "Реалізовано API для обходу та валідації графів знань."
+              ]
+            }
+          ]
+        },
+        {
+          "title": "`SBC-EP-LLM` | [BKT] Automated Code Assessment & LLM Judge",
+          "level": 3,
+          "paragraphs": [],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "Опис:** Реалізація системи автоматичної перевірки практичних завдань з програмування.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Ключові результати (Deliverables):**",
+              "subitems": [
+                "Створено ізольований сервіс виконання unit-тестів коду студента.",
+                "Інтегровано Gemini API для семантичного аналізу коду та надання розширеного текстового фідбеку.",
+                "Налаштовано черги BullMQ (Redis) для асинхронної обробки перевірок без затримки API."
+              ]
+            }
+          ]
+        },
+        {
+          "title": "`SBC-EP-W3` | [W3] Web3 Infrastructure & Smart Contracts",
+          "level": 3,
+          "paragraphs": [],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "Опис:** Розробка та деплой смарт-контрактів для верифікації навичок на рівні блокчейну.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Ключові результати (Deliverables):**",
+              "subitems": [
+                "Написано та скомпільовано смарт-контракти для dNFT (ERC-721) та SBT (ERC-5192).",
+                "Створено систему відновлення токенів у разі компрометації гаманця (SBT Recovery).",
+                "Налаштовано релейєр (Relayer) для оплати газу за студентів (gasless transactions).",
+                "Створено юніт-тести контрактів у Foundry з покриттям >95% та Fuzzing-тестуванням."
+              ]
+            }
+          ]
+        },
+        {
+          "title": "`SBC-EP-CF` | [CF] Client Web Application Portal",
+          "level": 3,
+          "paragraphs": [],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "Опис:** Інтерфейс клієнтської частини для студентів, викладачів та працедавців.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Ключові результати (Deliverables):**",
+              "subitems": [
+                "Реалізовано дашборд студента з інтерактивним графом знань (Apache ECharts / D3).",
+                "Створено кабінет викладача для аналізу прогресу груп студентів.",
+                "Інтегровано криптогаманець через RainbowKit/Wagmi.",
+                "Реалізовано інтерфейс проходження завдань та редактор коду (CodeMirror/Monaco)."
+              ]
+            }
+          ]
+        },
+        {
+          "title": "`SBC-EP-AF` | [AF] Administrative CMS & CRM Panel",
+          "level": 3,
+          "paragraphs": [],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "Опис:** Створення робочого місця адміністратора для управління навчальним контентом та аудиту.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Ключові результати (Deliverables):**",
+              "subitems": [
+                "Розроблено візуальний конструктор графа навичок (Skill Graph Builder).",
+                "Створено CRM інтерфейс перевірки успішності студентів та університетських доменів.",
+                "Реалізовано адміністративну панель виклику SBT Recovery."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "",
+              "subitems": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "3. Типи завдань у Jira (Issue Types)",
+      "level": 2,
+      "paragraphs": [
+        "Для ведення розробки використовуються стандартні типи завдань Agile, розширені для потреб R&D проєкту:"
+      ],
+      "code_blocks": [],
+      "items": [
+        {
+          "type": "text",
+          "raw_text": "`Story` (Користувацька історія):** Опис нової бізнес-фічі з точки зору кінцевого користувача. Має містити Acceptance Criteria (AC).",
+          "subitems": []
+        },
+        {
+          "type": "text",
+          "raw_text": "`Task` (Технічне завдання):** Чисто інженерна робота (налаштування конфігів, баз даних, написання тестів).",
+          "subitems": []
+        },
+        {
+          "type": "text",
+          "raw_text": "`Bug` (Помилка):** Дефект у вже існуючому та протестованому коді.",
+          "subitems": []
+        },
+        {
+          "type": "text",
+          "raw_text": "`Spike` (Дослідження):** Дослідницьке завдання для вивчення нових технологій, алгоритмів або підходів. Завжди завершується написанням текстового документа (ADR) та фіксованим Time-box (наприклад, 4 або 8 годин).",
+          "subitems": []
+        },
+        {
+          "type": "text",
+          "raw_text": "",
+          "subitems": []
+        }
+      ],
+      "subsections": []
+    },
+    {
+      "title": "4. Правила роботи з Git (Git Flow)",
+      "level": 2,
+      "paragraphs": [],
+      "code_blocks": [],
+      "items": [],
+      "subsections": [
+        {
+          "title": "4.1. Найменування гілок (Branch Naming)",
+          "level": 3,
+          "paragraphs": [
+            "Кожна гілка повинна починатись із префікса напрямку, номера та короткого опису англійською мовою (через дефіс):"
+          ],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "`feature/CF-12-knowledge-graph`",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "`feature/W3-45-sbt-recovery`",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "`bugfix/BK-99-jwt-expiration`",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "`spike/BKT-5-cold-start-analysis`",
+              "subitems": []
+            }
+          ]
+        },
+        {
+          "title": "4.2. Правила оформлення коммітів (Conventional Commits)",
+          "level": 3,
+          "paragraphs": [
+            "Усі повідомлення коммітів повинні відповідати стандарту Conventional Commits з обов'язковим вказуванням архітектурного префікса (Scope) та номера завдання з Jira:"
+          ],
+          "code_blocks": [
+            {
+              "lang": "text",
+              "content": "<type>(<scope>): <опис англійською мовою> <номер_таски>"
+            }
+          ],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "Дозволені типи (`type`):** `feat` (нова фіча), `fix` (виправлення багу), `docs` (документація), `style` (форматування), `refactor` (рефакторинг), `test` (тести), `chore` (налаштування білду тощо).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Приклади:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "`feat(CF): add interactive ECharts skill graph to dashboard SBC-12`",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "`fix(BK): resolve JWT validation crash on expired token SBC-99`",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "`test(W3): add foundry fuzz tests for SBT recovery logic SBC-45`",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "",
+              "subitems": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "5. Критерії готовності (Definition of Done - DoD)",
+      "level": 2,
+      "paragraphs": [
+        "Завдання не може бути переведене в статус **Done (Завершено)**, якщо воно не відповідає загальним та специфічним критеріям готовності."
+      ],
+      "code_blocks": [],
+      "items": [],
+      "subsections": [
+        {
+          "title": "Загальні критерії:",
+          "level": 3,
+          "paragraphs": [],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "Код пройшов перевірку лінтера (`npm run lint`) та збірку типів (`npm run typecheck`).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Написано необхідні юніт- та інтеграційні тести (покриття коду новими тестами >80%).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Оновлено відповідні файли документації в директорії `docs/` (якщо функціонал міняє API або архітектуру).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Створено Pull Request, який успішно пройшов автоматичні перевірки в CI/CD (GitHub Actions).",
+              "subitems": []
+            }
+          ]
+        },
+        {
+          "title": "Специфічні критерії готовності:",
+          "level": 3,
+          "paragraphs": [],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "Для Frontend (CF, AF):**",
+              "subitems": [
+                "Відсутність помилок Hydration Mismatch (елементи Web3 загорнуті в `dynamic` з `ssr: false`).",
+                "Інтерфейс повністю адаптивний (перевірено на мобільних роздільних здатностях).",
+                "Усі текстові ресурси винесені у файли локалізації `next-intl` (UA/EN)."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "Для Backend (BK, BKT):**",
+              "subitems": [
+                "Для всіх нових API-ендпоінтів додано декоратори Swagger (`@ApiOperation`, `@ApiResponse`).",
+                "Усі DTO валідуються за допомогою `class-validator`.",
+                "Для операцій з БД використано транзакційні блоки та оброблено помилки унікальних ключів."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "Для Web3 & Смарт-контрактів (W3):**",
+              "subitems": [
+                "Контракти скомпільовані за допомогою Solidity 0.8.20+ без попереджень (warnings).",
+                "100% покриття логіки контракту тестами у Foundry.",
+                "Виконано аналіз витрат газу (Gas Report) та оптимізовано змінні сховища (storage slots).",
+                "Логіку перевірено за допомогою фазінг-тестів (Fuzzing)."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "",
+              "subitems": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "6. Покрокова дорожня карта розвитку (Evolutionary Roadmap)",
+      "level": 2,
+      "paragraphs": [
+        "Для мінімізації ризиків інтеграції та забезпечення стабільного, безболісного розвитку монорепозиторію, розробка розбита на 4 послідовні фази. Кожна фаза завершується отриманням повністю робочого та протестованого продукту (MVP/Increment)."
+      ],
+      "code_blocks": [
+        {
+          "lang": "mermaid",
+          "content": "graph TD\n    Phase1[\"Фаза 1: Базовий LMS-каркас (Web2 CRUD)\"] -->|Додавання BKT математики| Phase2[\"Фаза 2: Адаптивне навчання (BKT & Graph)\"]\n    Phase2 -->|Додавання черг та LLM-аудиту| Phase3[\"Фаза 3: Автоперевірка та ШІ (LLM Judge)\"]\n    Phase3 -->|Додавання Web3-токенів| Phase4[\"Фаза 4: Децентралізована довіра (SBT & Web3)\"]"
+        }
+      ],
+      "items": [],
+      "subsections": [
+        {
+          "title": "Деталізація фаз розробки",
+          "level": 3,
+          "paragraphs": [
+            "| Фаза | Назва фази | Епіки (Jira Epics) | Опис та безболісна інтеграція | Критерій готовності фази (Milestone) |",
+            "| :--- | :--- | :--- | :--- | :--- |",
+            "| **Фаза 1** | **Базовий Web2 LMS-каркас** | `SBC-EP-INF`, `SBC-EP-SH`, `SBC-EP-BK`, `SBC-EP-CF` (частково), `SBC-EP-AF` (частково) | Створення монорепозиторію, налаштування БД PostgreSQL та авторизації. Розробка класичної навчальної платформи (відображення курсів, прості тести, кабінет студента та адмінка). Без складних алгоритмів. | Робоча Web2-платформа, де користувачі можуть реєструватися та проходити статичні тести. |",
+            "| **Фаза 2** | **Адаптивне навчання (BKT Core)** | `SBC-EP-BKT`, `SBC-EP-CF` (візуалізація графа) | Інтеграція алгоритму Bayesian Knowledge Tracing. База даних розширюється новими таблицями (`bkt_state`, `skill_logs`) без зміни існуючої структури. Фронтенд починає рендерити інтерактивний граф навичок. | Студент бачить свій граф знань у реальному часі; система рекомендує наступні матеріали на основі BKT. |",
+            "| **Фаза 3** | **ШІ-оцінювання та черги (LLM Judge)** | `SBC-EP-LLM` | Впровадження автоматичної перевірки коду. Додаються черги BullMQ (Redis) та сервіс LLM-аудиту. Система не ламає BKT, а просто розширює тип завдань (замість тестів — завдання з кодом, результати яких живлять BKT). | Студент може написати код у браузері, отримати фідбек від Gemini API, а граф знань оновиться автоматично. |",
+            "| **Фаза 4** | **Блокчейн-верифікація (Web3 Trust)** | `SBC-EP-W3`, `SBC-EP-CF` (Web3 auth), `SBC-EP-AF` (SBT recovery) | Додавання випуску SBT та dNFT. Web3-авторизація інтегрується як альтернативний метод входу. Смарт-контракти та релейєр запускаються як незалежна система, що реагує на події завершення навичок у БД. | Можливість увійти через гаманець та отримати Soulbound-токен за опановану навичку без сплати газу. |"
+          ],
+          "code_blocks": [],
+          "items": []
+        }
+      ]
+    }
+  ]
+}
