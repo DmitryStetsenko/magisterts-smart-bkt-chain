@@ -59,57 +59,55 @@ const formatMarkdown = (text: string): React.ReactNode => {
     }
   }
 
-  // Tokenize by inline code blocks first, to preserve backticks
-  const codeParts = normalized.split(/(`[^`]+`)/g);
+  // Render inline code blocks inside text segment
+  const renderInlineCode = (str: string) => {
+    const codeParts = str.split(/(`[^`]+`)/g);
+    return codeParts.map((p, idx) => {
+      if (p.startsWith('`') && p.endsWith('`')) {
+        return (
+          <code 
+            key={idx} 
+            className="px-1.5 py-0.5 mx-0.5 rounded bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-[11px] font-mono text-pink-600 dark:text-pink-400 font-semibold whitespace-nowrap"
+          >
+            {p.slice(1, -1)}
+          </code>
+        );
+      }
+      
+      // Parse italics inside non-code text
+      const italicParts = p.split(/(\*[^*]+\*)/g);
+      return (
+        <React.Fragment key={idx}>
+          {italicParts.map((iPart, k) => {
+            if (iPart.startsWith('*') && iPart.endsWith('*')) {
+              return (
+                <em key={k} className="italic text-zinc-800 dark:text-zinc-200">
+                  {iPart.slice(1, -1)}
+                </em>
+              );
+            }
+            return iPart;
+          })}
+        </React.Fragment>
+      );
+    });
+  };
+
+  // Split by bold block pairs first, so that we can support code blocks inside bold
+  const boldParts = normalized.split(/(\*\*[^*]+\*\*)/g);
   
   return (
     <>
-      {codeParts.map((part, i) => {
-        if (part.startsWith('`') && part.endsWith('`')) {
-          const codeText = part.slice(1, -1);
+      {boldParts.map((bPart, j) => {
+        if (bPart.startsWith('**') && bPart.endsWith('**')) {
+          const boldText = bPart.slice(2, -2);
           return (
-            <code 
-              key={i} 
-              className="px-1.5 py-0.5 mx-0.5 rounded bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-[11px] font-mono text-pink-600 dark:text-pink-400 font-semibold whitespace-nowrap"
-            >
-              {codeText}
-            </code>
+            <strong key={j} className="font-bold text-zinc-900 dark:text-zinc-100">
+              {renderInlineCode(boldText)}
+            </strong>
           );
         }
-        
-        // For non-code segments, parse bold (**bold**) and italics (*italic*)
-        const boldParts = part.split(/(\*\*[^*]+\*\*)/g);
-        return (
-          <React.Fragment key={i}>
-            {boldParts.map((bPart, j) => {
-              if (bPart.startsWith('**') && bPart.endsWith('**')) {
-                const boldText = bPart.slice(2, -2);
-                return (
-                  <strong key={j} className="font-bold text-zinc-900 dark:text-zinc-100">
-                    {boldText}
-                  </strong>
-                );
-              }
-              
-              // Now parse italics
-              const italicParts = bPart.split(/(\*[^*]+\*)/g);
-              return (
-                <React.Fragment key={j}>
-                  {italicParts.map((iPart, k) => {
-                    if (iPart.startsWith('*') && iPart.endsWith('*')) {
-                      return (
-                        <em key={k} className="italic text-zinc-800 dark:text-zinc-200">
-                          {iPart.slice(1, -1)}
-                        </em>
-                      );
-                    }
-                    return iPart;
-                  })}
-                </React.Fragment>
-              );
-            })}
-          </React.Fragment>
-        );
+        return <React.Fragment key={j}>{renderInlineCode(bPart)}</React.Fragment>;
       })}
     </>
   );
@@ -615,7 +613,7 @@ export default function DocsPage() {
                                     <span className={`font-semibold text-[11px] uppercase tracking-wider ${
                                       isSubActive
                                         ? (isDarkMode ? 'text-white' : 'text-zinc-955')
-                                        : (isDarkMode ? 'text-zinc-400 group-hover:text-white' : 'text-zinc-650 group-hover:text-zinc-800')
+                                        : (isDarkMode ? 'text-zinc-400 group-hover:text-white' : 'text-zinc-600 group-hover:text-zinc-800')
                                     }`}>
                                       {sub.title.split(':')[0]}
                                     </span>
@@ -708,7 +706,7 @@ export default function DocsPage() {
                                       {formatMarkdown(description || sub.paragraphs[0] || 'Опис фази відсутній.')}
                                     </p>
 
-                                    <div className={`grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t ${isDarkMode ? 'border-zinc-800/80' : 'border-zinc-150'}`}>
+                                    <div className={`grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t ${isDarkMode ? 'border-zinc-800/80' : 'border-zinc-200'}`}>
                                       {/* Jira Epics list */}
                                       <div>
                                         <h4 className={`text-xs font-bold uppercase tracking-wider mb-2 ${isDarkMode ? 'text-zinc-500' : 'text-zinc-400'}`}>
@@ -719,7 +717,7 @@ export default function DocsPage() {
                                             epics.map((epic, eIdx) => (
                                               <span
                                                 key={eIdx}
-                                                className={`px-2 py-0.5 rounded font-mono text-xs font-semibold ${isDarkMode ? 'bg-zinc-850 border border-zinc-800 text-zinc-300' : 'bg-zinc-100 border border-zinc-200 text-zinc-700'}`}
+                                                className={`px-2 py-0.5 rounded font-mono text-xs font-semibold ${isDarkMode ? 'bg-zinc-800 border border-zinc-800 text-zinc-300' : 'bg-zinc-100 border border-zinc-200 text-zinc-700'}`}
                                               >
                                                 {epic}
                                               </span>
@@ -835,7 +833,7 @@ export default function DocsPage() {
                                           {item.key}
                                         </span>
                                       ) : (
-                                        <div className={`text-sm font-semibold leading-relaxed ${isDarkMode ? 'text-zinc-100' : 'text-zinc-850'}`}>
+                                        <div className={`text-sm font-semibold leading-relaxed ${isDarkMode ? 'text-zinc-100' : 'text-zinc-900'}`}>
                                           {formatMarkdown(item.raw_text)}
                                         </div>
                                       )}
@@ -843,7 +841,7 @@ export default function DocsPage() {
                                   </div>
 
                                   {item.type === 'kv' && (
-                                    <p className={`text-sm leading-relaxed ${isDarkMode ? 'text-zinc-355' : 'text-zinc-650'}`}>
+                                    <p className={`text-sm leading-relaxed ${isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
                                       {formatMarkdown(item.value || '')}
                                     </p>
                                   )}
@@ -955,7 +953,7 @@ export default function DocsPage() {
                                                     {item.key}
                                                   </span>
                                                 ) : (
-                                                  <div className={`text-sm font-semibold leading-relaxed ${isDarkMode ? 'text-zinc-100' : 'text-zinc-850'}`}>
+                                                  <div className={`text-sm font-semibold leading-relaxed ${isDarkMode ? 'text-zinc-100' : 'text-zinc-900'}`}>
                                                     {formatMarkdown(item.raw_text)}
                                                   </div>
                                                 )}
@@ -963,7 +961,7 @@ export default function DocsPage() {
                                             </div>
 
                                             {item.type === 'kv' && (
-                                              <p className={`text-sm leading-relaxed ${isDarkMode ? 'text-zinc-355' : 'text-zinc-650'}`}>
+                                              <p className={`text-sm leading-relaxed ${isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
                                                 {formatMarkdown(item.value || '')}
                                               </p>
                                             )}
