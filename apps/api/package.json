@@ -1,0 +1,9 @@
+{
+  "name": "api",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "echo 'Backend API dev stub'",
+    "build": "echo 'Backend API build stub'"
+  }
+}
