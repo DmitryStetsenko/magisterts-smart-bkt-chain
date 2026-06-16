@@ -179,6 +179,7 @@ def compile_file(source_path, primary_output_path, secondary_output_path=None):
         print(f"Error parsing {source_path}: {str(e)}")
 
 def main():
+    compile_file("docs/roadmap.md", "docs/roadmap.json", "apps/docs/src/data/roadmap.json")
     compile_file("docs/tech_stack.source.md", "docs/tech_stack.json", "apps/docs/src/data/tech_stack.json")
     compile_file("docs/project_management.md", "docs/project_management.json", "apps/docs/src/data/project_management.json")
 
