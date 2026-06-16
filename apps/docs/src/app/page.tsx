@@ -708,14 +708,14 @@ export default function DocsPage() {
                                   </div>
 
                                   {item.type === 'kv' && (
-                                    <p className={`text-sm pl-12 leading-relaxed ${isDarkMode ? 'text-zinc-355' : 'text-zinc-650'}`}>
+                                    <p className={`text-sm leading-relaxed ${isDarkMode ? 'text-zinc-355' : 'text-zinc-650'}`}>
                                       {item.value}
                                     </p>
                                   )}
 
                                   {/* Render subitems */}
                                   {item.subitems && item.subitems.length > 0 && (
-                                    <div className="mt-4 pt-3.5 border-t border-zinc-200/50 dark:border-zinc-800/60 space-y-2 pl-12">
+                                    <div className="mt-4 pt-3.5 border-t border-zinc-200/50 dark:border-zinc-800/60 space-y-2">
                                       <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-indigo-500 dark:text-indigo-400/90 mb-1">
                                         <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                                           <path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -832,14 +832,14 @@ export default function DocsPage() {
                                             </div>
 
                                             {item.type === 'kv' && (
-                                              <p className={`text-sm pl-12 leading-relaxed ${isDarkMode ? 'text-zinc-355' : 'text-zinc-650'}`}>
+                                              <p className={`text-sm leading-relaxed ${isDarkMode ? 'text-zinc-355' : 'text-zinc-650'}`}>
                                                 {item.value}
                                               </p>
                                             )}
 
                                             {/* Subitems */}
                                             {item.subitems && item.subitems.length > 0 && (
-                                              <div className="mt-4 pt-3.5 border-t border-zinc-200/50 dark:border-zinc-800/60 space-y-2 pl-12">
+                                              <div className="mt-4 pt-3.5 border-t border-zinc-200/50 dark:border-zinc-800/60 space-y-2">
                                                 <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-indigo-500 dark:text-indigo-400/90 mb-1">
                                                   <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                                                     <path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
