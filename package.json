@@ -1,0 +1,13 @@
+{
+  "name": "smart-bkt-chain",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev:docs": "npm run dev --workspace=apps/docs",
+    "build:docs": "npm run build --workspace=apps/docs",
+    "compile:docs": "python scripts/compile_docs.py"
+  }
+}
