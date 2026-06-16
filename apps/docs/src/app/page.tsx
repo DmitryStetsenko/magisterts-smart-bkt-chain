@@ -546,13 +546,11 @@ export default function DocsPage() {
 
                               {/* Render subitems */}
                               {item.subitems && item.subitems.length > 0 && (
-                                <div className="mt-3 pl-3 border-l-2 border-zinc-700/80 dark:border-zinc-800 space-y-1.5">
+                                <div className="mt-3 pl-3 border-l-2 border-zinc-700/80 dark:border-zinc-800 space-y-1">
                                   {item.subitems.map((sub, sidx) => (
-                                    <div key={sidx} className="flex items-start gap-1.5">
-                                      <svg className="w-3.5 h-3.5 text-indigo-500 dark:text-indigo-400 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                      </svg>
-                                      <p className={`text-xs leading-relaxed ${isDarkMode ? 'text-zinc-400' : 'text-zinc-500'}`}>
+                                    <div key={sidx} className="flex gap-2">
+                                      <span className="text-zinc-500 text-xs flex-shrink-0">Чому:</span>
+                                      <p className={`text-xs ${isDarkMode ? 'text-zinc-400' : 'text-zinc-500'}`}>
                                         {sub}
                                       </p>
                                     </div>
@@ -645,13 +643,11 @@ export default function DocsPage() {
 
                                         {/* Subitems */}
                                         {item.subitems && item.subitems.length > 0 && (
-                                          <div className="mt-3 pl-3 border-l-2 border-zinc-700/80 dark:border-zinc-800 space-y-1.5">
+                                          <div className="mt-3 pl-3 border-l-2 border-zinc-700/80 dark:border-zinc-800 space-y-1">
                                             {item.subitems.map((subText, sidx) => (
-                                              <div key={sidx} className="flex items-start gap-1.5">
-                                                <svg className="w-3.5 h-3.5 text-indigo-500 dark:text-indigo-400 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                                </svg>
-                                                <p className={`text-xs leading-relaxed ${isDarkMode ? 'text-zinc-400' : 'text-zinc-500'}`}>
+                                              <div key={sidx} className="flex gap-2">
+                                                <span className="text-zinc-500 text-xs flex-shrink-0">Чому:</span>
+                                                <p className={`text-xs ${isDarkMode ? 'text-zinc-400' : 'text-zinc-500'}`}>
                                                   {subText}
                                                 </p>
                                               </div>
