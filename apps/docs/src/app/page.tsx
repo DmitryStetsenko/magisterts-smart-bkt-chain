@@ -71,6 +71,39 @@ export default function DocsPage() {
     }
   }, [isDarkMode]);
 
+  // Intersection Observer for scroll synchronization
+  useEffect(() => {
+    if (searchQuery.trim()) return;
+
+    const observerOptions = {
+      root: null,
+      rootMargin: '-80px 0px -60% 0px',
+      threshold: 0,
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          setActiveSection(entry.target.id);
+        }
+      });
+    }, observerOptions);
+
+    const ids = currentDoc.sections.flatMap((section) => [
+      getSlug(section.title),
+      ...section.subsections.map((sub) => getSlug(sub.title)),
+    ]);
+
+    ids.forEach((id) => {
+      const el = document.getElementById(id);
+      if (el) observer.observe(el);
+    });
+
+    return () => {
+      observer.disconnect();
+    };
+  }, [currentDoc, activeTab, searchQuery]);
+
   // Handle Copy to Clipboard for code blocks
   const handleCopy = (text: string, id: string) => {
     navigator.clipboard.writeText(text);
@@ -326,6 +359,25 @@ export default function DocsPage() {
 
                     return (
                       <div key={section.title} id={sectionSlug} className="scroll-mt-24 space-y-8">
+                        {/* H2 Title */}
+                        <div className="group flex items-center gap-3">
+                          <h2 className="text-2xl font-bold tracking-tight text-indigo-500 dark:text-indigo-400">
+                            {section.title}
+                          </h2>
+                          <a
+                            href={`#${sectionSlug}`}
+                            onClick={(e) => {
+                              e.preventDefault();
+                              scrollTo(sectionSlug);
+                            }}
+                            className={`opacity-0 group-hover:opacity-100 transition-opacity ${isDarkMode ? 'text-zinc-600 hover:text-zinc-400' : 'text-zinc-400 hover:text-zinc-600'}`}
+                          >
+                            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                            </svg>
+                          </a>
+                        </div>
+
                         {/* Summary Header */}
                         <div className={`p-6 rounded-2xl border ${isDarkMode ? 'bg-zinc-900/40 border-zinc-800' : 'bg-zinc-100/80 border-zinc-200'} shadow-lg`}>
                           {section.paragraphs.map((para, idx) => (
@@ -337,20 +389,36 @@ export default function DocsPage() {
                           {/* Steps Horizontal Flow */}
                           {section.subsections && section.subsections.length > 0 && (
                             <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 relative">
-                              {section.subsections.map((sub, idx) => (
-                                <button
-                                  key={idx}
-                                  onClick={() => scrollTo(getSlug(sub.title))}
-                                  className={`relative rounded-xl border p-4 transition-all duration-300 flex flex-col items-center text-center shadow-md group ${isDarkMode ? 'bg-zinc-950/80 border-zinc-850 hover:border-indigo-500/50' : 'bg-white border-zinc-200 hover:border-indigo-600/50'}`}
-                                >
-                                  <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm mb-2 transition-all duration-300 ${isDarkMode ? 'bg-indigo-600/10 text-indigo-400 group-hover:bg-indigo-600 group-hover:text-white' : 'bg-indigo-100 text-indigo-700 group-hover:bg-indigo-600 group-hover:text-white'}`}>
-                                    {idx + 1}
-                                  </div>
-                                  <span className={`font-semibold text-[11px] uppercase tracking-wider ${isDarkMode ? 'text-zinc-400 group-hover:text-white' : 'text-zinc-600 group-hover:text-zinc-950'}`}>
-                                    {sub.title.split(':')[0]}
-                                  </span>
-                                </button>
-                              ))}
+                              {section.subsections.map((sub, idx) => {
+                                const subSlug = getSlug(sub.title);
+                                const isSubActive = activeSection === subSlug || (idx === 0 && !section.subsections.some(s => getSlug(s.title) === activeSection));
+                                return (
+                                  <button
+                                    key={idx}
+                                    onClick={() => scrollTo(subSlug)}
+                                    className={`relative rounded-xl border p-4 transition-all duration-300 flex flex-col items-center text-center shadow-md group ${
+                                      isSubActive 
+                                        ? (isDarkMode ? 'bg-indigo-950/20 border-indigo-500 ring-2 ring-indigo-500/20' : 'bg-indigo-50/50 border-indigo-500 ring-2 ring-indigo-500/20') 
+                                        : (isDarkMode ? 'bg-zinc-950/80 border-zinc-850 hover:border-indigo-500/50' : 'bg-white border-zinc-200 hover:border-indigo-600/50')
+                                    }`}
+                                  >
+                                    <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm mb-2 transition-all duration-300 ${
+                                      isSubActive 
+                                        ? 'bg-indigo-600 text-white' 
+                                        : (isDarkMode ? 'bg-indigo-600/10 text-indigo-400 group-hover:bg-indigo-600 group-hover:text-white' : 'bg-indigo-100 text-indigo-700 group-hover:bg-indigo-600 group-hover:text-white')
+                                    }`}>
+                                      {idx + 1}
+                                    </div>
+                                    <span className={`font-semibold text-[11px] uppercase tracking-wider ${
+                                      isSubActive
+                                        ? (isDarkMode ? 'text-white' : 'text-zinc-950')
+                                        : (isDarkMode ? 'text-zinc-400 group-hover:text-white' : 'text-zinc-600 group-hover:text-zinc-950')
+                                    }`}>
+                                      {sub.title.split(':')[0]}
+                                    </span>
+                                  </button>
+                                );
+                              })}
                             </div>
                           )}
                         </div>
@@ -361,6 +429,7 @@ export default function DocsPage() {
                             {section.subsections.map((sub, idx) => {
                               const subSlug = getSlug(sub.title);
                               const isFirst = idx === 0;
+                              const isActive = activeSection === subSlug || (isFirst && !section.subsections.some(s => getSlug(s.title) === activeSection));
 
                               // Parse details
                               let description = '';
@@ -382,19 +451,23 @@ export default function DocsPage() {
                               return (
                                 <div key={idx} id={subSlug} className="relative pl-16 group scroll-mt-24">
                                   {/* Pulsing indicator for active phase */}
-                                  <div className={`absolute left-5 top-2 w-6 h-6 rounded-full border-4 ${isFirst ? 'bg-indigo-500 border-indigo-950 dark:border-zinc-950 animate-ping' : 'bg-zinc-800 border-zinc-950'}`} />
-                                  <div className={`absolute left-5 top-2 w-6 h-6 rounded-full border-4 flex items-center justify-center font-bold text-[9px] text-white ${isFirst ? 'bg-indigo-500 border-indigo-950 dark:border-zinc-950' : 'bg-zinc-800 border-zinc-950'}`}>
+                                  <div className={`absolute left-5 top-2 w-6 h-6 rounded-full border-4 ${isActive ? (isDarkMode ? 'bg-indigo-500 border-zinc-950 animate-ping' : 'bg-indigo-500 border-white animate-ping') : (isDarkMode ? 'bg-zinc-800 border-zinc-950' : 'bg-zinc-200 border-white')}`} />
+                                  <div className={`absolute left-5 top-2 w-6 h-6 rounded-full border-4 flex items-center justify-center font-bold text-[9px] ${isActive ? (isDarkMode ? 'bg-indigo-500 border-zinc-950 text-white' : 'bg-indigo-500 border-white text-white') : (isDarkMode ? 'bg-zinc-800 border-zinc-950 text-zinc-400' : 'bg-zinc-200 border-white text-zinc-600')}`}>
                                     {idx + 1}
                                   </div>
 
                                   {/* Phase Card */}
-                                  <div className={`rounded-2xl border p-6 shadow-md transition-all duration-300 ${isDarkMode ? 'bg-zinc-900/60 backdrop-blur-md border-zinc-900 hover:border-zinc-800' : 'bg-white border-zinc-200 hover:border-zinc-300'} ${isFirst ? 'ring-2 ring-indigo-500/20' : ''}`}>
+                                  <div className={`rounded-2xl border p-6 shadow-md transition-all duration-300 ${isDarkMode ? 'bg-zinc-900/60 backdrop-blur-md border-zinc-900 hover:border-zinc-800' : 'bg-white border-zinc-200 hover:border-zinc-300 hover:shadow-lg'} ${isActive ? 'ring-2 ring-indigo-500/20' : ''}`}>
                                     <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
-                                      <h3 className="text-xl font-bold tracking-tight text-white group-hover:text-indigo-400 transition-colors duration-300">
+                                      <h3 className={`text-xl font-bold tracking-tight transition-colors duration-300 ${isDarkMode ? 'text-white' : 'text-zinc-900'} group-hover:text-indigo-600 dark:group-hover:text-indigo-400`}>
                                         {sub.title}
                                       </h3>
-                                      <span className={`px-2.5 py-0.5 rounded-full text-xs font-semibold border flex items-center gap-1 ${isFirst ? 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20 animate-pulse' : 'bg-zinc-800 text-zinc-500 border-zinc-700'}`}>
-                                        {isFirst ? (
+                                      <span className={`px-2.5 py-0.5 rounded-full text-xs font-semibold border flex items-center gap-1 ${
+                                        isActive 
+                                          ? (isDarkMode ? 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20 animate-pulse' : 'bg-indigo-50 text-indigo-600 border-indigo-200 animate-pulse') 
+                                          : (isDarkMode ? 'bg-zinc-800 text-zinc-500 border-zinc-700' : 'bg-zinc-100 text-zinc-500 border-zinc-200')
+                                      }`}>
+                                        {isActive ? (
                                           <>
                                             <svg className="w-3 h-3 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 10V3L4 14h7v7l9-11h-7z" />
