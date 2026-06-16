@@ -457,7 +457,14 @@ export default function DocsPage() {
                                   </div>
 
                                   {/* Phase Card */}
-                                  <div className={`rounded-2xl border p-6 shadow-md transition-all duration-300 ${isDarkMode ? 'bg-zinc-900/60 backdrop-blur-md border-zinc-900 hover:border-zinc-800' : 'bg-white border-zinc-200 hover:border-zinc-300 hover:shadow-lg'} ${isActive ? 'ring-2 ring-indigo-500/20' : ''}`}>
+                                  <div 
+                                    onClick={() => setActiveSection(subSlug)}
+                                    className={`rounded-2xl border p-6 shadow-md cursor-pointer transition-all duration-300 ${
+                                      isActive 
+                                        ? (isDarkMode ? 'bg-indigo-950/10 border-indigo-500 shadow-indigo-500/5 ring-2 ring-indigo-500/20' : 'bg-indigo-50/20 border-indigo-500 shadow-indigo-500/5 ring-2 ring-indigo-500/20')
+                                        : (isDarkMode ? 'bg-zinc-900/60 backdrop-blur-md border-zinc-900 hover:border-zinc-850 hover:border-indigo-500/30' : 'bg-white border-zinc-200 hover:border-zinc-300 hover:shadow-lg')
+                                    }`}
+                                  >
                                     <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
                                       <h3 className={`text-xl font-bold tracking-tight transition-colors duration-300 ${isDarkMode ? 'text-white' : 'text-zinc-900'} group-hover:text-indigo-600 dark:group-hover:text-indigo-400`}>
                                         {sub.title}
