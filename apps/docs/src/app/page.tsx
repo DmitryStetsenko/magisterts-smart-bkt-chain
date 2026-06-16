@@ -41,16 +41,159 @@ interface DocData {
   sections: Section[];
 }
 
-// Helper to format basic bold markdown (**text**) into JSX
-const formatMarkdown = (text: string) => {
+// Helper to format basic markdown (**bold**, *italic*, `code`) into JSX
+const formatMarkdown = (text: string): React.ReactNode => {
   if (!text) return '';
-  const parts = text.split(/(\*\*[^*]+\*\*)/g);
-  return parts.map((part, i) => {
-    if (part.startsWith('**') && part.endsWith('**')) {
-      return <strong key={i} className="font-bold">{part.slice(2, -2)}</strong>;
+
+  let normalized = text;
+  
+  // Normalize custom shorthand labels like "Опис:** Створення..." or "Приклади:** ..."
+  // by prefixing the opening "**" before the text if it is missing.
+  if (/^[^*]+\*\*/.test(normalized)) {
+    const firstDblAst = normalized.indexOf('**');
+    const prefix = normalized.slice(0, firstDblAst);
+    const suffix = normalized.slice(firstDblAst + 2);
+    // If the prefix doesn't have any asterisks, wrap it in double asterisks
+    if (!prefix.includes('*')) {
+      normalized = `**${prefix}**${suffix}`;
     }
-    return part;
+  }
+
+  // Tokenize by inline code blocks first, to preserve backticks
+  const codeParts = normalized.split(/(`[^`]+`)/g);
+  
+  return (
+    <>
+      {codeParts.map((part, i) => {
+        if (part.startsWith('`') && part.endsWith('`')) {
+          const codeText = part.slice(1, -1);
+          return (
+            <code 
+              key={i} 
+              className="px-1.5 py-0.5 mx-0.5 rounded bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-[11px] font-mono text-pink-600 dark:text-pink-400 font-semibold whitespace-nowrap"
+            >
+              {codeText}
+            </code>
+          );
+        }
+        
+        // For non-code segments, parse bold (**bold**) and italics (*italic*)
+        const boldParts = part.split(/(\*\*[^*]+\*\*)/g);
+        return (
+          <React.Fragment key={i}>
+            {boldParts.map((bPart, j) => {
+              if (bPart.startsWith('**') && bPart.endsWith('**')) {
+                const boldText = bPart.slice(2, -2);
+                return (
+                  <strong key={j} className="font-bold text-zinc-900 dark:text-zinc-100">
+                    {boldText}
+                  </strong>
+                );
+              }
+              
+              // Now parse italics
+              const italicParts = bPart.split(/(\*[^*]+\*)/g);
+              return (
+                <React.Fragment key={j}>
+                  {italicParts.map((iPart, k) => {
+                    if (iPart.startsWith('*') && iPart.endsWith('*')) {
+                      return (
+                        <em key={k} className="italic text-zinc-800 dark:text-zinc-200">
+                          {iPart.slice(1, -1)}
+                        </em>
+                      );
+                    }
+                    return iPart;
+                  })}
+                </React.Fragment>
+              );
+            })}
+          </React.Fragment>
+        );
+      })}
+    </>
+  );
+};
+
+// Helper to render lists of paragraphs, automatically detecting and formatting Markdown Tables
+const renderParagraphs = (paragraphs: string[], isDarkMode: boolean, pClassName: string) => {
+  if (!paragraphs || paragraphs.length === 0) return null;
+
+  const elements: React.ReactNode[] = [];
+  let currentTableRows: string[][] = [];
+  let isTable = false;
+
+  const flushTable = (key: string | number) => {
+    if (currentTableRows.length === 0) return;
+    
+    const headers = currentTableRows[0];
+    const bodyRows = currentTableRows.slice(1).filter(row => {
+      const isSeparator = row.every(cell => /^[:\-\s]+$/.test(cell));
+      return !isSeparator;
+    });
+
+    elements.push(
+      <div key={`table-${key}`} className="overflow-x-auto my-6 border border-zinc-200 dark:border-zinc-800 rounded-xl shadow-sm">
+        <table className="min-w-full divide-y divide-zinc-200 dark:divide-zinc-800 text-sm">
+          <thead className={isDarkMode ? 'bg-zinc-900/50' : 'bg-zinc-50'}>
+            <tr>
+              {headers.map((cell, idx) => (
+                <th 
+                  key={idx} 
+                  className={`px-4 py-3 text-left text-xs font-bold uppercase tracking-wider ${isDarkMode ? 'text-zinc-400 border-zinc-800' : 'text-zinc-500 border-zinc-200'} border-b`}
+                >
+                  {formatMarkdown(cell.trim())}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody className={`divide-y ${isDarkMode ? 'divide-zinc-800/60 bg-zinc-950/20' : 'divide-zinc-100 bg-white'}`}>
+            {bodyRows.map((row, rIdx) => (
+              <tr key={rIdx} className={isDarkMode ? 'hover:bg-zinc-900/20' : 'hover:bg-zinc-50/50'}>
+                {row.map((cell, cIdx) => (
+                  <td key={cIdx} className={`px-4 py-3 text-xs md:text-sm font-medium ${isDarkMode ? 'text-zinc-300' : 'text-zinc-700'}`}>
+                    {formatMarkdown(cell.trim())}
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    );
+    currentTableRows = [];
+  };
+
+  paragraphs.forEach((para, idx) => {
+    const trimmed = para.trim();
+    if (trimmed.startsWith('|') && trimmed.endsWith('|')) {
+      const cells = para.split('|').map(c => c.trim());
+      if (cells[0] === '') cells.shift();
+      if (cells[cells.length - 1] === '') cells.pop();
+      
+      currentTableRows.push(cells);
+      isTable = true;
+    } else {
+      if (isTable) {
+        flushTable(idx);
+        isTable = false;
+      }
+      elements.push(
+        <p 
+          key={idx} 
+          className={pClassName}
+        >
+          {formatMarkdown(para)}
+        </p>
+      );
+    }
   });
+
+  if (isTable) {
+    flushTable('final');
+  }
+
+  return elements;
 };
 
 // Helper to get beautiful SVG icons based on card titles
@@ -444,11 +587,7 @@ export default function DocsPage() {
 
                         {/* Summary Header */}
                         <div className={`p-6 rounded-2xl border ${isDarkMode ? 'bg-zinc-900/40 border-zinc-800' : 'bg-zinc-100/80 border-zinc-200'} shadow-lg`}>
-                          {section.paragraphs.map((para, idx) => (
-                            <p key={idx} className={`leading-relaxed text-base md:text-lg ${isDarkMode ? 'text-zinc-300' : 'text-zinc-700'}`}>
-                              {para}
-                            </p>
-                          ))}
+                          {renderParagraphs(section.paragraphs, isDarkMode, `leading-relaxed text-base md:text-lg ${isDarkMode ? 'text-zinc-300' : 'text-zinc-700'}`)}
 
                           {/* Steps Horizontal Flow */}
                           {section.subsections && section.subsections.length > 0 && (
@@ -566,7 +705,7 @@ export default function DocsPage() {
                                     </div>
 
                                     <p className={`text-sm leading-relaxed mb-6 ${isDarkMode ? 'text-zinc-300' : 'text-zinc-600'}`}>
-                                      {description || sub.paragraphs[0] || 'Опис фази відсутній.'}
+                                      {formatMarkdown(description || sub.paragraphs[0] || 'Опис фази відсутній.')}
                                     </p>
 
                                     <div className={`grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t ${isDarkMode ? 'border-zinc-800/80' : 'border-zinc-150'}`}>
@@ -600,7 +739,7 @@ export default function DocsPage() {
                                           <svg className="w-4 h-4 text-emerald-500 dark:text-emerald-450 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                                           </svg>
-                                          <span>{milestone || 'Очікується визначення.'}</span>
+                                          <span>{formatMarkdown(milestone || 'Очікується визначення.')}</span>
                                         </p>
                                       </div>
                                     </div>
@@ -647,11 +786,7 @@ export default function DocsPage() {
                       </div>
 
                       {/* Section Paragraphs */}
-                      {section.paragraphs.map((para, idx) => (
-                        <p key={idx} className={`leading-relaxed ${isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
-                          {para}
-                        </p>
-                      ))}
+                      {renderParagraphs(section.paragraphs, isDarkMode, `leading-relaxed ${isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}`)}
 
                       {/* Section Code Blocks */}
                       {section.code_blocks.map((block, idx) => {
@@ -709,7 +844,7 @@ export default function DocsPage() {
 
                                   {item.type === 'kv' && (
                                     <p className={`text-sm leading-relaxed ${isDarkMode ? 'text-zinc-355' : 'text-zinc-650'}`}>
-                                      {item.value}
+                                      {formatMarkdown(item.value || '')}
                                     </p>
                                   )}
 
@@ -729,7 +864,7 @@ export default function DocsPage() {
                                               <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4" />
                                             </svg>
                                             <p className={`text-xs leading-relaxed ${isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
-                                              {sub}
+                                              {formatMarkdown(sub)}
                                             </p>
                                           </li>
                                         ))}
@@ -771,11 +906,7 @@ export default function DocsPage() {
                                 </div>
 
                                 {/* Subsection Paragraphs */}
-                                {sub.paragraphs.map((p, idx) => (
-                                  <p key={idx} className={`leading-relaxed text-sm ${isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
-                                    {p}
-                                  </p>
-                                ))}
+                                {renderParagraphs(sub.paragraphs, isDarkMode, `leading-relaxed text-sm ${isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}`)}
 
                                 {/* Subsection Code Blocks */}
                                 {sub.code_blocks.map((block, idx) => {
@@ -833,7 +964,7 @@ export default function DocsPage() {
 
                                             {item.type === 'kv' && (
                                               <p className={`text-sm leading-relaxed ${isDarkMode ? 'text-zinc-355' : 'text-zinc-650'}`}>
-                                                {item.value}
+                                                {formatMarkdown(item.value || '')}
                                               </p>
                                             )}
 
@@ -853,7 +984,7 @@ export default function DocsPage() {
                                                         <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4" />
                                                       </svg>
                                                       <p className={`text-xs leading-relaxed ${isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
-                                                        {subText}
+                                                        {formatMarkdown(subText)}
                                                       </p>
                                                     </li>
                                                   ))}
