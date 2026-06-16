@@ -41,6 +41,70 @@ interface DocData {
   sections: Section[];
 }
 
+// Helper to format basic bold markdown (**text**) into JSX
+const formatMarkdown = (text: string) => {
+  if (!text) return '';
+  const parts = text.split(/(\*\*[^*]+\*\*)/g);
+  return parts.map((part, i) => {
+    if (part.startsWith('**') && part.endsWith('**')) {
+      return <strong key={i} className="font-bold">{part.slice(2, -2)}</strong>;
+    }
+    return part;
+  });
+};
+
+// Helper to get beautiful SVG icons based on card titles
+const getCardIcon = (text: string) => {
+  const t = text.toLowerCase();
+  if (t.includes('бази даних') || t.includes('database') || t.includes('postgresql')) {
+    return (
+      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M4 7v10c0 2.21 3.58 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.58 4 8 4s8-1.79 8-4M4 7c0-2.21 3.58-4 8-4s8 1.79 8 4m0 5c0 2.21-3.58 4-8 4s-8-1.79-8-4" />
+      </svg>
+    );
+  }
+  if (t.includes('api') || t.includes('types') || t.includes('типізація') || t.includes('інтерфейси') || t.includes('swagger')) {
+    return (
+      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+      </svg>
+    );
+  }
+  if (t.includes('контракт') || t.includes('contracts') || t.includes('solidity') || t.includes('web3') || t.includes('безпека') || t.includes('security')) {
+    return (
+      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+      </svg>
+    );
+  }
+  if (t.includes('frontend') || t.includes('фронтенд') || t.includes('ui') || t.includes('стилізація') || t.includes('візуалізація') || t.includes('введення коду')) {
+    return (
+      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+      </svg>
+    );
+  }
+  if (t.includes('backend') || t.includes('бекенд') || t.includes('сервер') || t.includes('орм') || t.includes('orm') || t.includes('джерела')) {
+    return (
+      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01" />
+      </svg>
+    );
+  }
+  if (t.includes('docker') || t.includes('devops') || t.includes('ci/cd') || t.includes('github') || t.includes('контейнер') || t.includes('тест') || t.includes('fuzzing')) {
+    return (
+      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1H9L8 4zm.5 12h7a1.5 1.5 0 001.5-1.5v-7A1.5 1.5 0 0015.5 4h-7A1.5 1.5 0 007 5.5v7A1.5 1.5 0 008.5 16z" />
+      </svg>
+    );
+  }
+  return (
+    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+    </svg>
+  );
+};
+
 type Tab = 'roadmap' | 'tech' | 'pm';
 
 export default function DocsPage() {
@@ -330,7 +394,7 @@ export default function DocsPage() {
 
         {/* MAIN CONTENT PORTAL */}
         <main className="flex-1 overflow-y-auto px-6 py-10 md:px-16 lg:px-24">
-          <div className="max-w-4xl mx-auto space-y-16">
+          <div className="max-w-none w-full space-y-16">
             
             {/* Header section info */}
             <div className="space-y-4">
@@ -411,11 +475,20 @@ export default function DocsPage() {
                                     </div>
                                     <span className={`font-semibold text-[11px] uppercase tracking-wider ${
                                       isSubActive
-                                        ? (isDarkMode ? 'text-white' : 'text-zinc-950')
-                                        : (isDarkMode ? 'text-zinc-400 group-hover:text-white' : 'text-zinc-600 group-hover:text-zinc-950')
+                                        ? (isDarkMode ? 'text-white' : 'text-zinc-955')
+                                        : (isDarkMode ? 'text-zinc-400 group-hover:text-white' : 'text-zinc-650 group-hover:text-zinc-800')
                                     }`}>
                                       {sub.title.split(':')[0]}
                                     </span>
+                                    {sub.title.split(':')[1] && (
+                                      <span className={`text-[10px] mt-1 line-clamp-2 leading-tight transition-colors ${
+                                        isSubActive
+                                          ? (isDarkMode ? 'text-indigo-300' : 'text-indigo-600 font-medium')
+                                          : (isDarkMode ? 'text-zinc-500 group-hover:text-zinc-450' : 'text-zinc-450 group-hover:text-zinc-500')
+                                      }`}>
+                                        {sub.title.split(':')[1].trim()}
+                                      </span>
+                                    )}
                                   </button>
                                 );
                               })}
@@ -458,7 +531,7 @@ export default function DocsPage() {
 
                                   {/* Phase Card */}
                                   <div 
-                                    onClick={() => setActiveSection(subSlug)}
+                                    onClick={() => scrollTo(subSlug)}
                                     className={`rounded-2xl border p-6 shadow-md cursor-pointer transition-all duration-300 ${
                                       isActive 
                                         ? (isDarkMode ? 'bg-indigo-950/10 border-indigo-500 shadow-indigo-500/5 ring-2 ring-indigo-500/20' : 'bg-indigo-50/20 border-indigo-500 shadow-indigo-500/5 ring-2 ring-indigo-500/20')
@@ -602,43 +675,70 @@ export default function DocsPage() {
                       })}
 
                       {/* Section Key-Value and Bullet list items */}
-                      {section.items && section.items.length > 0 && (
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          {section.items.map((item, idx) => (
-                            <div
-                              key={idx}
-                              className={`p-4 rounded-xl border transition-all hover:shadow-md ${isDarkMode ? 'bg-zinc-900/40 border-zinc-900 hover:border-zinc-800' : 'bg-zinc-50 border-zinc-200 hover:border-zinc-300'}`}
-                            >
-                              {item.type === 'kv' ? (
-                                <div className="space-y-2">
-                                  <span className="inline-block px-2.5 py-1 text-xs font-bold font-mono rounded bg-indigo-500/10 text-indigo-400">
-                                    {item.key}
-                                  </span>
-                                  <p className={`text-sm ${isDarkMode ? 'text-zinc-300' : 'text-zinc-700'}`}>
-                                    {item.value}
-                                  </p>
-                                </div>
-                              ) : (
-                                <p className={`text-sm leading-relaxed ${isDarkMode ? 'text-zinc-300' : 'text-zinc-700'}`}>
-                                  {item.raw_text}
-                                </p>
-                              )}
-
-                              {/* Render subitems */}
-                              {item.subitems && item.subitems.length > 0 && (
-                                <div className="mt-3 pl-3 border-l-2 border-zinc-700/80 dark:border-zinc-800 space-y-1">
-                                  {item.subitems.map((sub, sidx) => (
-                                    <div key={sidx} className="flex gap-2">
-                                      <span className="text-zinc-500 text-xs flex-shrink-0">Чому:</span>
-                                      <p className={`text-xs ${isDarkMode ? 'text-zinc-400' : 'text-zinc-500'}`}>
-                                        {sub}
-                                      </p>
+                      {section.items && section.items.some(item => (item.raw_text && item.raw_text.trim() !== '') || (item.type === 'kv' && item.key && item.key.trim() !== '')) && (
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                          {section.items
+                            .filter(item => (item.raw_text && item.raw_text.trim() !== '') || (item.type === 'kv' && item.key && item.key.trim() !== ''))
+                            .map((item, idx) => {
+                              const icon = getCardIcon(item.type === 'kv' ? (item.key || '') : (item.raw_text || ''));
+                              return (
+                                <div
+                                  key={idx}
+                                  className={`p-5 rounded-2xl border transition-all duration-300 hover:shadow-lg ${
+                                    isDarkMode 
+                                      ? 'bg-zinc-900/40 backdrop-blur-sm border-zinc-900 hover:border-zinc-800' 
+                                      : 'bg-white border-zinc-200 hover:border-zinc-300/80 hover:shadow-zinc-200/50'
+                                  }`}
+                                >
+                                  <div className="flex items-start gap-3 mb-3">
+                                    <div className={`p-2 rounded-xl flex-shrink-0 ${isDarkMode ? 'bg-indigo-500/10 text-indigo-400' : 'bg-indigo-50 text-indigo-600'}`}>
+                                      {icon}
                                     </div>
-                                  ))}
+                                    <div className="flex-1 min-w-0 pt-0.5">
+                                      {item.type === 'kv' ? (
+                                        <span className={`inline-block px-2.5 py-0.5 text-xs font-bold font-mono rounded ${isDarkMode ? 'bg-indigo-500/10 text-indigo-400' : 'bg-indigo-50 text-indigo-600'}`}>
+                                          {item.key}
+                                        </span>
+                                      ) : (
+                                        <div className={`text-sm font-semibold leading-relaxed ${isDarkMode ? 'text-zinc-100' : 'text-zinc-850'}`}>
+                                          {formatMarkdown(item.raw_text)}
+                                        </div>
+                                      )}
+                                    </div>
+                                  </div>
+
+                                  {item.type === 'kv' && (
+                                    <p className={`text-sm pl-12 leading-relaxed ${isDarkMode ? 'text-zinc-355' : 'text-zinc-650'}`}>
+                                      {item.value}
+                                    </p>
+                                  )}
+
+                                  {/* Render subitems */}
+                                  {item.subitems && item.subitems.length > 0 && (
+                                    <div className="mt-4 pt-3.5 border-t border-zinc-200/50 dark:border-zinc-800/60 space-y-2 pl-12">
+                                      <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-indigo-500 dark:text-indigo-400/90 mb-1">
+                                        <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                                          <path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                        <span>Обґрунтування рішення:</span>
+                                      </div>
+                                      <ul className="space-y-2">
+                                        {item.subitems.map((sub, sidx) => (
+                                          <li key={sidx} className="flex items-start gap-2">
+                                            <svg className="w-3.5 h-3.5 text-indigo-500 dark:text-indigo-400 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                                              <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4" />
+                                            </svg>
+                                            <p className={`text-xs leading-relaxed ${isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
+                                              {sub}
+                                            </p>
+                                          </li>
+                                        ))}
+                                      </ul>
+                                    </div>
+                                  )}
                                 </div>
-                              )}
-                            </div>
-                          ))}
+                              );
+                            })}
                         </div>
                       )}
 
@@ -699,43 +799,70 @@ export default function DocsPage() {
                                 })}
 
                                 {/* Subsection Key-Value or Bullet items */}
-                                {sub.items && sub.items.length > 0 && (
-                                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    {sub.items.map((item, idx) => (
-                                      <div
-                                        key={idx}
-                                        className={`p-4 rounded-xl border transition-all hover:shadow-md ${isDarkMode ? 'bg-zinc-900/30 border-zinc-900 hover:border-zinc-800' : 'bg-zinc-50 border-zinc-200 hover:border-zinc-300'}`}
-                                      >
-                                        {item.type === 'kv' ? (
-                                          <div className="space-y-2">
-                                            <span className="inline-block px-2.5 py-1 text-xs font-bold font-mono rounded bg-indigo-500/10 text-indigo-400">
-                                              {item.key}
-                                            </span>
-                                            <p className={`text-sm ${isDarkMode ? 'text-zinc-300' : 'text-zinc-700'}`}>
-                                              {item.value}
-                                            </p>
-                                          </div>
-                                        ) : (
-                                          <p className={`text-sm leading-relaxed ${isDarkMode ? 'text-zinc-300' : 'text-zinc-700'}`}>
-                                            {item.raw_text}
-                                          </p>
-                                        )}
-
-                                        {/* Subitems */}
-                                        {item.subitems && item.subitems.length > 0 && (
-                                          <div className="mt-3 pl-3 border-l-2 border-zinc-700/80 dark:border-zinc-800 space-y-1">
-                                            {item.subitems.map((subText, sidx) => (
-                                              <div key={sidx} className="flex gap-2">
-                                                <span className="text-zinc-500 text-xs flex-shrink-0">Чому:</span>
-                                                <p className={`text-xs ${isDarkMode ? 'text-zinc-400' : 'text-zinc-500'}`}>
-                                                  {subText}
-                                                </p>
+                                {sub.items && sub.items.some(item => (item.raw_text && item.raw_text.trim() !== '') || (item.type === 'kv' && item.key && item.key.trim() !== '')) && (
+                                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                    {sub.items
+                                      .filter(item => (item.raw_text && item.raw_text.trim() !== '') || (item.type === 'kv' && item.key && item.key.trim() !== ''))
+                                      .map((item, idx) => {
+                                        const icon = getCardIcon(item.type === 'kv' ? (item.key || '') : (item.raw_text || ''));
+                                        return (
+                                          <div
+                                            key={idx}
+                                            className={`p-5 rounded-2xl border transition-all duration-300 hover:shadow-lg ${
+                                              isDarkMode 
+                                                ? 'bg-zinc-900/40 backdrop-blur-sm border-zinc-900 hover:border-zinc-800' 
+                                                : 'bg-white border-zinc-200 hover:border-zinc-300/80 hover:shadow-zinc-200/50'
+                                            }`}
+                                          >
+                                            <div className="flex items-start gap-3 mb-3">
+                                              <div className={`p-2 rounded-xl flex-shrink-0 ${isDarkMode ? 'bg-indigo-500/10 text-indigo-400' : 'bg-indigo-50 text-indigo-600'}`}>
+                                                {icon}
                                               </div>
-                                            ))}
+                                              <div className="flex-1 min-w-0 pt-0.5">
+                                                {item.type === 'kv' ? (
+                                                  <span className={`inline-block px-2.5 py-0.5 text-xs font-bold font-mono rounded ${isDarkMode ? 'bg-indigo-500/10 text-indigo-400' : 'bg-indigo-50 text-indigo-600'}`}>
+                                                    {item.key}
+                                                  </span>
+                                                ) : (
+                                                  <div className={`text-sm font-semibold leading-relaxed ${isDarkMode ? 'text-zinc-100' : 'text-zinc-850'}`}>
+                                                    {formatMarkdown(item.raw_text)}
+                                                  </div>
+                                                )}
+                                              </div>
+                                            </div>
+
+                                            {item.type === 'kv' && (
+                                              <p className={`text-sm pl-12 leading-relaxed ${isDarkMode ? 'text-zinc-355' : 'text-zinc-650'}`}>
+                                                {item.value}
+                                              </p>
+                                            )}
+
+                                            {/* Subitems */}
+                                            {item.subitems && item.subitems.length > 0 && (
+                                              <div className="mt-4 pt-3.5 border-t border-zinc-200/50 dark:border-zinc-800/60 space-y-2 pl-12">
+                                                <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-indigo-500 dark:text-indigo-400/90 mb-1">
+                                                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                  </svg>
+                                                  <span>Обґрунтування рішення:</span>
+                                                </div>
+                                                <ul className="space-y-2">
+                                                  {item.subitems.map((subText, sidx) => (
+                                                    <li key={sidx} className="flex items-start gap-2">
+                                                      <svg className="w-3.5 h-3.5 text-indigo-500 dark:text-indigo-400 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                                                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4" />
+                                                      </svg>
+                                                      <p className={`text-xs leading-relaxed ${isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
+                                                        {subText}
+                                                      </p>
+                                                    </li>
+                                                  ))}
+                                                </ul>
+                                              </div>
+                                            )}
                                           </div>
-                                        )}
-                                      </div>
-                                    ))}
+                                        );
+                                      })}
                                   </div>
                                 )}
 
