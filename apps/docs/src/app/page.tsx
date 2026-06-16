@@ -207,21 +207,30 @@ export default function DocsPage() {
             <div className={`flex flex-col gap-1 p-1 rounded-xl ${isDarkMode ? 'bg-zinc-900' : 'bg-zinc-200'}`}>
               <button
                 onClick={() => { setActiveTab('roadmap'); setSearchQuery(''); }}
-                className={`w-full text-left py-2 px-3 rounded-lg text-xs font-semibold tracking-wide transition-all ${activeTab === 'roadmap' ? (isDarkMode ? 'bg-zinc-800 text-white shadow-md' : 'bg-white text-zinc-950 shadow-sm') : (isDarkMode ? 'text-zinc-400 hover:text-zinc-200' : 'text-zinc-600 hover:text-zinc-900')}`}
+                className={`w-full text-left py-2.5 px-3 rounded-lg text-xs font-semibold tracking-wide transition-all flex items-center gap-2.5 ${activeTab === 'roadmap' ? (isDarkMode ? 'bg-zinc-800 text-white shadow-md' : 'bg-white text-zinc-950 shadow-sm') : (isDarkMode ? 'text-zinc-400 hover:text-zinc-200' : 'text-zinc-600 hover:text-zinc-900')}`}
               >
-                🗺️ Дорожня карта
+                <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+                </svg>
+                <span>Дорожня карта</span>
               </button>
               <button
                 onClick={() => { setActiveTab('tech'); setSearchQuery(''); }}
-                className={`w-full text-left py-2 px-3 rounded-lg text-xs font-semibold tracking-wide transition-all ${activeTab === 'tech' ? (isDarkMode ? 'bg-zinc-800 text-white shadow-md' : 'bg-white text-zinc-950 shadow-sm') : (isDarkMode ? 'text-zinc-400 hover:text-zinc-200' : 'text-zinc-600 hover:text-zinc-900')}`}
+                className={`w-full text-left py-2.5 px-3 rounded-lg text-xs font-semibold tracking-wide transition-all flex items-center gap-2.5 ${activeTab === 'tech' ? (isDarkMode ? 'bg-zinc-800 text-white shadow-md' : 'bg-white text-zinc-950 shadow-sm') : (isDarkMode ? 'text-zinc-400 hover:text-zinc-200' : 'text-zinc-600 hover:text-zinc-900')}`}
               >
-                💻 Технічний стек
+                <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+                </svg>
+                <span>Технічний стек</span>
               </button>
               <button
                 onClick={() => { setActiveTab('pm'); setSearchQuery(''); }}
-                className={`w-full text-left py-2 px-3 rounded-lg text-xs font-semibold tracking-wide transition-all ${activeTab === 'pm' ? (isDarkMode ? 'bg-zinc-800 text-white shadow-md' : 'bg-white text-zinc-950 shadow-sm') : (isDarkMode ? 'text-zinc-400 hover:text-zinc-200' : 'text-zinc-600 hover:text-zinc-900')}`}
+                className={`w-full text-left py-2.5 px-3 rounded-lg text-xs font-semibold tracking-wide transition-all flex items-center gap-2.5 ${activeTab === 'pm' ? (isDarkMode ? 'bg-zinc-800 text-white shadow-md' : 'bg-white text-zinc-950 shadow-sm') : (isDarkMode ? 'text-zinc-400 hover:text-zinc-200' : 'text-zinc-600 hover:text-zinc-900')}`}
               >
-                📊 Управління & Jira
+                <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 002 2h2a2 2 0 002-2z" />
+                </svg>
+                <span>Управління & Jira</span>
               </button>
             </div>
 
@@ -384,8 +393,22 @@ export default function DocsPage() {
                                       <h3 className="text-xl font-bold tracking-tight text-white group-hover:text-indigo-400 transition-colors duration-300">
                                         {sub.title}
                                       </h3>
-                                      <span className={`px-2.5 py-0.5 rounded-full text-xs font-semibold border ${isFirst ? 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20 animate-pulse' : 'bg-zinc-800 text-zinc-500 border-zinc-700'}`}>
-                                        {isFirst ? '🚀 Поточна фаза' : '🗓️ Заплановано'}
+                                      <span className={`px-2.5 py-0.5 rounded-full text-xs font-semibold border flex items-center gap-1 ${isFirst ? 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20 animate-pulse' : 'bg-zinc-800 text-zinc-500 border-zinc-700'}`}>
+                                        {isFirst ? (
+                                          <>
+                                            <svg className="w-3 h-3 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                            </svg>
+                                            <span>Поточна фаза</span>
+                                          </>
+                                        ) : (
+                                          <>
+                                            <svg className="w-3 h-3 text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 3V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                            </svg>
+                                            <span>Заплановано</span>
+                                          </>
+                                        )}
                                       </span>
                                     </div>
 
@@ -421,7 +444,9 @@ export default function DocsPage() {
                                           Ціль фази (Milestone)
                                         </h4>
                                         <p className="text-emerald-500 dark:text-emerald-400 text-sm font-semibold flex items-start gap-1.5">
-                                          <span>🎯</span>
+                                          <svg className="w-4 h-4 text-emerald-500 dark:text-emerald-450 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                          </svg>
                                           <span>{milestone || 'Очікується визначення.'}</span>
                                         </p>
                                       </div>
@@ -521,11 +546,13 @@ export default function DocsPage() {
 
                               {/* Render subitems */}
                               {item.subitems && item.subitems.length > 0 && (
-                                <div className="mt-3 pl-3 border-l-2 border-zinc-700/80 dark:border-zinc-800 space-y-1">
+                                <div className="mt-3 pl-3 border-l-2 border-zinc-700/80 dark:border-zinc-800 space-y-1.5">
                                   {item.subitems.map((sub, sidx) => (
-                                    <div key={sidx} className="flex gap-2">
-                                      <span className="text-zinc-500 text-xs">Чому:</span>
-                                      <p className={`text-xs ${isDarkMode ? 'text-zinc-400' : 'text-zinc-500'}`}>
+                                    <div key={sidx} className="flex items-start gap-1.5">
+                                      <svg className="w-3.5 h-3.5 text-indigo-500 dark:text-indigo-400 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                      </svg>
+                                      <p className={`text-xs leading-relaxed ${isDarkMode ? 'text-zinc-400' : 'text-zinc-500'}`}>
                                         {sub}
                                       </p>
                                     </div>
@@ -618,11 +645,13 @@ export default function DocsPage() {
 
                                         {/* Subitems */}
                                         {item.subitems && item.subitems.length > 0 && (
-                                          <div className="mt-3 pl-3 border-l-2 border-zinc-700/80 dark:border-zinc-800 space-y-1">
+                                          <div className="mt-3 pl-3 border-l-2 border-zinc-700/80 dark:border-zinc-800 space-y-1.5">
                                             {item.subitems.map((subText, sidx) => (
-                                              <div key={sidx} className="flex gap-2">
-                                                <span className="text-zinc-500 text-xs">Чому:</span>
-                                                <p className={`text-xs ${isDarkMode ? 'text-zinc-400' : 'text-zinc-500'}`}>
+                                              <div key={sidx} className="flex items-start gap-1.5">
+                                                <svg className="w-3.5 h-3.5 text-indigo-500 dark:text-indigo-400 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                </svg>
+                                                <p className={`text-xs leading-relaxed ${isDarkMode ? 'text-zinc-400' : 'text-zinc-500'}`}>
                                                   {subText}
                                                 </p>
                                               </div>
