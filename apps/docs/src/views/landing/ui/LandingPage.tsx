@@ -17,8 +17,8 @@ export function LandingPage() {
 
   const features = [
     {
-      title: 'Адаптивний BKT',
-      description: 'Математична модель Bayesian Knowledge Tracing з динамічним оновленням Slip & Guess на основі історії успішності для точної оцінки навичок.',
+      title: 'Адаптивний BKT & Sequencing',
+      description: 'Математична модель Bayesian Knowledge Tracing з динамічним Slip & Guess та алгоритмом автоматичного планування індивідуального навчального треку під учня.',
       icon: (
         <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 002 2h2a2 2 0 002-2z" />
@@ -160,37 +160,13 @@ export function LandingPage() {
           </Link>
         </div>
 
-        {/* CORE FEATURES GRID */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-full pt-12 text-left">
-          {features.map((feat, idx) => (
-            <div
-              key={idx}
-              className={`p-6 rounded-2xl border transition-all duration-300 hover:shadow-lg hover:scale-[1.01] ${
-                isDarkMode 
-                  ? 'bg-zinc-900/30 backdrop-blur-sm border-zinc-900 hover:border-zinc-850 hover:bg-zinc-900/40' 
-                  : 'bg-white border-zinc-200 hover:border-zinc-300/80 hover:bg-zinc-50/50'
-              }`}
-            >
-              <div className="flex items-center gap-3.5 mb-4">
-                <div className={`p-3 rounded-xl ${isDarkMode ? 'bg-indigo-500/10 text-indigo-400' : 'bg-indigo-50 text-indigo-600'}`}>
-                  {feat.icon}
-                </div>
-                <h3 className="text-lg font-bold tracking-tight">{feat.title}</h3>
-              </div>
-              <p className={`text-sm leading-relaxed ${isDarkMode ? 'text-zinc-400' : 'text-zinc-650'}`}>
-                {feat.description}
-              </p>
-            </div>
-          ))}
-        </div>
-
         {/* DETAILED CONCEPT SECTION */}
-        <div className="w-full pt-16 text-left border-t border-zinc-200 dark:border-zinc-900 space-y-8">
+        <div className="w-full pt-12 text-left space-y-8">
           <div className="space-y-3">
             <h2 className="text-2xl font-bold tracking-tight bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
               Концепція та Філософія Проєкту
             </h2>
-            <p className={`text-sm max-w-3xl leading-relaxed ${isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
+            <p className={`text-sm max-w-3xl leading-relaxed ${isDarkMode ? 'text-zinc-400' : 'text-zinc-650'}`}>
               Проєкт створює відкрите, прозоре та адаптивне навчальне середовище, що автоматично перевіряє практичні знання користувача та надає надійні докази його компетенцій, захищені криптографічно.
             </p>
           </div>
@@ -215,6 +191,30 @@ export function LandingPage() {
               </p>
             </div>
           </div>
+        </div>
+
+        {/* CORE FEATURES GRID */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-full pt-16 text-left border-t border-zinc-200 dark:border-zinc-900">
+          {features.map((feat, idx) => (
+            <div
+              key={idx}
+              className={`p-6 rounded-2xl border transition-all duration-300 hover:shadow-lg hover:scale-[1.01] ${
+                isDarkMode 
+                  ? 'bg-zinc-900/30 backdrop-blur-sm border-zinc-900 hover:border-zinc-850 hover:bg-zinc-900/40' 
+                  : 'bg-white border-zinc-200 hover:border-zinc-300/80 hover:bg-zinc-50/50'
+              }`}
+            >
+              <div className="flex items-center gap-3.5 mb-4">
+                <div className={`p-3 rounded-xl ${isDarkMode ? 'bg-indigo-500/10 text-indigo-400' : 'bg-indigo-50 text-indigo-600'}`}>
+                  {feat.icon}
+                </div>
+                <h3 className="text-lg font-bold tracking-tight">{feat.title}</h3>
+              </div>
+              <p className={`text-sm leading-relaxed ${isDarkMode ? 'text-zinc-400' : 'text-zinc-650'}`}>
+                {feat.description}
+              </p>
+            </div>
+          ))}
         </div>
       </main>
 
