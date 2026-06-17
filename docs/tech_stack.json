@@ -10,7 +10,7 @@
       "code_blocks": [
         {
           "lang": "mermaid",
-          "content": "graph TB\n    subgraph Client [\"Клієнтський рівень (Frontend)\"]\n        NextJS[\"Next.js (Latest Stable / React 19)\"]\n        Wagmi[\"Wagmi / RainbowKit\"]\n        GraphVis[\"Graph Visualization (ECharts/D3)\"]\n    end\n\n    subgraph Backend [\"Серверний рівень (Backend)\"]\n        NestJS[\"NestJS (Latest Stable)\"]\n        BKT[\"BKT Engine (Bayesian Logic)\"]\n        LLM[\"LLM Judge (Pre-processing)\"]\n        Prisma[\"Prisma ORM\"]\n    end\n\n    subgraph Database [\"Рівень даних\"]\n        Postgres[(PostgreSQL)]\n    end\n\n    subgraph Blockchain [\"Рівень блокчейну (Trust Layer)\"]\n        EVM[\"EVM Testnet (Arbitrum/Optimism Sepolia)\"]\n        dNFT[\"ERC-721 (dNFT Diplomas)\"]\n        SBT[\"ERC-5192 (Soulbound ISA)\"]\n    end\n\n    %% Взаємодія\n    NextJS <-->|REST API / WebSocket| NestJS\n    NextJS <-->|Web3 Provider| EVM\n    NestJS <-->|SQL queries| Prisma\n    Prisma <--> Postgres\n    NestJS <-->|Read/Verify events| EVM"
+          "content": "graph TB\n    subgraph Client [\"Клієнтський рівень (Frontend)\"]\n        NextJS[\"Next.js (Latest Stable / React 19)\"]\n        Wagmi[\"Wagmi / RainbowKit\"]\n        GraphVis[\"Graph Visualization (ECharts/D3)\"]\n        TelemetryCollector[\"Telemetry Collector (Monaco Tracing)\"]\n    end\n\n    subgraph Backend [\"Серверний рівень (Backend)\"]\n        NestJS[\"NestJS (Latest Stable)\"]\n        BKT[\"Adaptive BKT Engine\"]\n        BehavioralEngine[\"Behavioral Analytics Engine\"]\n        LLM[\"LLM Judge (AI Code Check)\"]\n        Prisma[\"Prisma ORM\"]\n    end\n\n    subgraph Database [\"Рівень даних\"]\n        Postgres[(PostgreSQL)]\n    end\n\n    subgraph Blockchain [\"Рівень блокчейну (Trust Layer)\"]\n        EVM[\"EVM Testnet (Arbitrum/Optimism Sepolia)\"]\n        dNFT[\"ERC-721 (dNFT Diplomas)\"]\n        SBT[\"ERC-5192 (Soulbound ISA)\"]\n    end\n\n    %% Взаємодія\n    NextJS <-->|REST API / WebSocket| NestJS\n    TelemetryCollector -->|Raw Telemetry Stream| BehavioralEngine\n    BehavioralEngine -->|Trust Coefficient & Profiles| BKT\n    NextJS <-->|Web3 Provider| EVM\n    NestJS <-->|SQL queries| Prisma\n    Prisma <--> Postgres\n    NestJS <-->|Read/Verify events| EVM"
         }
       ],
       "items": [
@@ -170,6 +170,13 @@
               "subitems": [
                 "Студенти мають писати код у повноцінному середовищі з підсвічуванням синтаксису та автодоповненням. Для оптимізації швидкості завантаження сторінки (LCP) редактор завантажується динамічно з відображенням Skeleton UI під час підготовки."
               ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Збір телеметрії (Telemetry Collector):** Спеціальний перехоплювач подій введення для Monaco/CodeMirror.",
+              "subitems": [
+                "Необхідний для реєстрації часових пауз, темпу введення символів та подій вставки тексту (copy-paste) з метою виявлення використання сторонніх інструментів або ШІ-генераторів безпосередньо в процесі написання коду."
+              ]
             }
           ]
         },
@@ -253,8 +260,9 @@
               "type": "text",
               "raw_text": "**Штучний інтелект та математика:**",
               "subitems": [
-                "**BKT-модуль:** Окрема сервісна служба на NestJS, що оперує матрицями ймовірностей для розрахунку $P(L)$. Для подолання проблеми **«Холодного старту» (Cold Start)** впроваджується обов'язковий вхідний діагностичний тест для розрахунку індивідуального стартового $P(L_0)$.",
-                "**LLM Judge (Гібридний підхід):** Для уникнення високих затримок (latency) та витрат на API, перевірка коду будується каскадно: спочатку виконуються локальні швидкі Unit-тести / статичний аналіз AST на бекенді, і лише у разі потреби семантичного аналізу нестандартних рішень або формування розширеного текстового фідбеку підключається LLM."
+                "**Адаптивний BKT-модуль:** Окрема сервісна служба на NestJS, що оперує ймовірнісними матрицями для розрахунку $P(L_t)$. На відміну від класичного BKT, параметри Slip $P(S)$ та Guess $P(G)$ оновлюються динамічно на основі поведінкових метрик студента. Для вирішення проблеми **«Холодного старту» (Cold Start)** інтегрується стартове діагностичне тестування для оцінки базового $P(L_0)$.",
+                "**Модуль поведінкової аналітики (Behavioral Analytics):** Сервіс на бекенді, що агрегує потоки сирої телеметрії введення коду. Обчислює аномалії темпу, тривалості пауз між блоками та виявляє факти масової вставки готового коду, вираховуючи коефіцієнт довіри (Trust Coefficient) до результату.",
+                "**LLM Judge (Гібридний підхід):** Для оптимізації latency та витрат на API перевірка коду будується каскадно: спочатку виконуються unit-тести та статичний аналіз AST, і лише у разі потреби семантичного аналізу чи детального фідбеку підключається LLM (Gemini API), результат якого коригується рівнем довіри від модуля аналітики."
               ]
             },
             {
