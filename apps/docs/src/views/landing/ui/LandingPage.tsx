@@ -164,10 +164,10 @@ export function LandingPage() {
         <div className="w-full pt-12 text-left space-y-8">
           <div className="space-y-3">
             <h2 className="text-2xl font-bold tracking-tight bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
-              Концепція та Філософія Проєкту
+              Наукова Концепція та Філософія Платформи
             </h2>
             <p className={`text-sm max-w-3xl leading-relaxed ${isDarkMode ? 'text-zinc-400' : 'text-zinc-650'}`}>
-              Проєкт створює відкрите, прозоре та адаптивне навчальне середовище, що автоматично перевіряє практичні знання користувача та надає надійні докази його компетенцій, захищені криптографічно.
+              Побудова прозорого децентралізованого освітнього середовища, що поєднує методи штучного інтелекту для об'єктивного оцінювання прикладних ІТ-компетенцій та технології розподіленого реєстру для криптографічного захисту кваліфікаційних результатів.
             </p>
           </div>
 
@@ -175,19 +175,19 @@ export function LandingPage() {
             <div className={`p-6 rounded-2xl border ${isDarkMode ? 'bg-zinc-900/10 border-zinc-900/80' : 'bg-zinc-50 border-zinc-200'}`}>
               <h4 className="font-bold text-lg mb-2 text-indigo-500 dark:text-indigo-400">1. Багатофакторна адаптивність</h4>
               <p className={`text-sm leading-relaxed ${isDarkMode ? 'text-zinc-400' : 'text-zinc-650'}`}>
-                Індивідуальна траєкторія будується на синергії ймовірнісного моделювання знань (BKT), аналізу поведінкової телеметрії (темпу введення, пауз, копіювання) та результатів автоматичної перевірки коду для гнучкого вибору наступних завдань.
+                Проектування персональної освітньої траєкторії на основі синергетичного поєднання математичного апарату Bayesian Knowledge Tracing (BKT) та інтелектуального аналізу клієнтської телеметрії. Система в реальному часі коригує граф знань та адаптує складність контенту під когнітивний темп студента.
               </p>
             </div>
             <div className={`p-6 rounded-2xl border ${isDarkMode ? 'bg-zinc-900/10 border-zinc-900/80' : 'bg-zinc-50 border-zinc-200'}`}>
-              <h4 className="font-bold text-lg mb-2 text-purple-500 dark:text-purple-400">2. Гібридне Оцінювання</h4>
+              <h4 className="font-bold text-lg mb-2 text-purple-500 dark:text-purple-400">2. Гібридне оцінювання (Human-in-the-Loop)</h4>
               <p className={`text-sm leading-relaxed ${isDarkMode ? 'text-zinc-400' : 'text-zinc-650'}`}>
-                Оцінювання коду на основі новітніх LLM-моделей та AST-аналізу для надання миттєвого фідбеку з можливістю залучення викладача для вирішення спірних оцінок та фінального контролю.
+                Каскадна верифікація рішень за допомогою синтаксичного аналізу (AST-парсинг) та генеративних моделей (LLM Judge) останнього покоління. ШІ автоматизує рутину й надає розгорнутий семантичний фідбек, а педагог виступає як арбітр і ментор для вирішення девіантних чи спірних кейсів.
               </p>
             </div>
             <div className={`p-6 rounded-2xl border ${isDarkMode ? 'bg-zinc-900/10 border-zinc-900/80' : 'bg-zinc-50 border-zinc-200'}`}>
-              <h4 className="font-bold text-lg mb-2 text-pink-500 dark:text-pink-400">3. Захищені Цифрові Сертифікати</h4>
+              <h4 className="font-bold text-lg mb-2 text-pink-500 dark:text-pink-400">3. Криптографічний Proof of Competence</h4>
               <p className={`text-sm leading-relaxed ${isDarkMode ? 'text-zinc-400' : 'text-zinc-650'}`}>
-                Результати навчання належать студенту. Завдяки SBT (Soulbound) та dNFT, сертифікати не можна підробити чи передати іншим, створюючи надійний цифровий профіль для рекрутерів.
+                Децентралізоване підтвердження кваліфікацій на базі технологій Web3 (SBT ERC-5192 та dNFT ERC-721). Формує захищене цифрове портфоліо навичок з унікальним механізмом смарт-відновлення токенів, що унеможливлює фальсифікацію та забезпечує пряму інтеграцію з ринком праці.
               </p>
             </div>
           </div>
