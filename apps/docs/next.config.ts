@@ -6,6 +6,7 @@ const repoName = "magisterts-smart-bkt-chain";
 const nextConfig: NextConfig = {
   reactCompiler: true,
   output: "export",
+  trailingSlash: true,
   basePath: isProd ? `/${repoName}` : "",
   images: {
     unoptimized: true,
