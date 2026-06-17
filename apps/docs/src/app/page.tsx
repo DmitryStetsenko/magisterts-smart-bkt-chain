@@ -58,14 +58,14 @@ export default function LandingPage() {
     <div className={`min-h-screen flex flex-col font-sans transition-colors duration-300 ${isDarkMode ? 'bg-zinc-950 text-zinc-100' : 'bg-zinc-50 text-zinc-900'}`}>
       {/* HEADER */}
       <header className={`sticky top-0 z-50 h-[73px] flex items-center justify-between px-6 sm:px-12 border-b backdrop-blur-md ${isDarkMode ? 'bg-zinc-950/80 border-zinc-900' : 'bg-white/80 border-zinc-200'}`}>
-        <div className="flex items-center gap-3">
+        <Link href="/" className="flex items-center gap-3 hover:opacity-90 transition-all">
           <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-600 via-purple-600 to-pink-500 flex items-center justify-center shadow-lg shadow-indigo-500/20 text-white font-bold text-base">
             S
           </div>
           <span className="text-md font-bold tracking-tight bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
             Smart-BKT-Chain
           </span>
-        </div>
+        </Link>
 
         <div className="flex items-center gap-4">
           <a
