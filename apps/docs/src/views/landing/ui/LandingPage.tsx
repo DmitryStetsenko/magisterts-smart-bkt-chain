@@ -17,8 +17,8 @@ export function LandingPage() {
 
   const features = [
     {
-      title: 'BKT Engine',
-      description: 'Адаптивна математична модель Bayesian Knowledge Tracing для точного оцінювання та прогнозування ймовірності засвоєння навичок.',
+      title: 'Адаптивний BKT',
+      description: 'Математична модель Bayesian Knowledge Tracing з динамічним оновленням Slip & Guess на основі історії успішності для точної оцінки навичок.',
       icon: (
         <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 002 2h2a2 2 0 002-2z" />
@@ -26,8 +26,18 @@ export function LandingPage() {
       ),
     },
     {
+      title: 'Поведінкова телеметрія',
+      description: 'Аналіз процесу написання коду (темп введення, паузи, copy-paste) для створення поведінкового профілю та визначення коефіцієнта довіри.',
+      icon: (
+        <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+          <path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+        </svg>
+      ),
+    },
+    {
       title: 'LLM Judge & AST',
-      description: 'Каскадна перевірка рішень від статичного аналізу структури коду (AST) до інтелектуального семантичного оцінювання мовною моделлю.',
+      description: 'Каскадна перевірка практичних рішень від статичного аналізу структури коду (AST) до інтелектуального семантичного оцінювання за допомогою ШІ.',
       icon: (
         <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1H9L8 4zm.5 12h7a1.5 1.5 0 001.5-1.5v-7A1.5 1.5 0 0015.5 4h-7A1.5 1.5 0 007 5.5v7A1.5 1.5 0 008.5 16z" />
@@ -36,7 +46,7 @@ export function LandingPage() {
     },
     {
       title: 'Blockchain Layer',
-      description: 'Децентралізований рівень довіри: динамічні дипломи dNFT (ERC-721) та Soulbound-угоди ISA (ERC-5192) із захистом від втрати.',
+      description: 'Децентралізований рівень довіри: динамічні дипломи dNFT (ERC-721) та Soulbound-угоди ISA (ERC-5192) із захистом від втрати гаманця.',
       icon: (
         <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
@@ -45,10 +55,20 @@ export function LandingPage() {
     },
     {
       title: 'Type Safety',
-      description: 'Наскрізна типізація між реляційною базою даних (Prisma), смарт-контрактами (Solidity) та API (NestJS/Next.js).',
+      description: 'Наскрізна типізація між реляційною базою даних (Prisma), смарт-контрактами (Solidity) та REST/WebSocket API (NestJS/Next.js).',
       icon: (
         <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+        </svg>
+      ),
+    },
+    {
+      title: 'Сучасна інфраструктура',
+      description: 'Монорепозиторій на базі Turborepo, спільні UI-пакети в Storybook, локальний Docker-оточення та автоматичне тестування.',
+      icon: (
+        <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+          <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
         </svg>
       ),
     },
@@ -99,16 +119,16 @@ export function LandingPage() {
       </header>
 
       {/* HERO SECTION */}
-      <main className="flex-1 flex flex-col items-center justify-center px-6 py-16 sm:py-24 text-center max-w-5xl mx-auto space-y-12">
+      <main className="flex-1 flex flex-col items-center justify-center px-6 py-16 sm:py-24 text-center max-w-7xl mx-auto space-y-12">
         <div className="space-y-6">
-          <h1 className="text-4xl sm:text-6xl font-extrabold tracking-tight leading-tight max-w-4xl">
+          <h1 className="text-4xl sm:text-6xl font-extrabold tracking-tight leading-tight max-w-4xl mx-auto">
             Децентралізована система{' '}
             <span className="bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
               адаптивного навчання
             </span>
           </h1>
           <p className={`text-base sm:text-xl max-w-2xl mx-auto leading-relaxed ${isDarkMode ? 'text-zinc-400' : 'text-zinc-650'}`}>
-            Поєднання Bayesian Knowledge Tracing (BKT) та технологій Blockchain для автоматизованого підтвердження компетенцій та динамічної сертифікації.
+            Поєднання Adaptive Bayesian Knowledge Tracing (BKT), поведінкової телеметрії та технологій Blockchain для об’єктивної оцінки компетенцій.
           </p>
         </div>
 
@@ -141,14 +161,14 @@ export function LandingPage() {
         </div>
 
         {/* CORE FEATURES GRID */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full pt-12 text-left">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-full pt-12 text-left">
           {features.map((feat, idx) => (
             <div
               key={idx}
-              className={`p-6 rounded-2xl border transition-all duration-300 hover:shadow-lg ${
+              className={`p-6 rounded-2xl border transition-all duration-300 hover:shadow-lg hover:scale-[1.01] ${
                 isDarkMode 
-                  ? 'bg-zinc-900/30 backdrop-blur-sm border-zinc-900 hover:border-zinc-850' 
-                  : 'bg-white border-zinc-200 hover:border-zinc-300/80'
+                  ? 'bg-zinc-900/30 backdrop-blur-sm border-zinc-900 hover:border-zinc-850 hover:bg-zinc-900/40' 
+                  : 'bg-white border-zinc-200 hover:border-zinc-300/80 hover:bg-zinc-50/50'
               }`}
             >
               <div className="flex items-center gap-3.5 mb-4">
