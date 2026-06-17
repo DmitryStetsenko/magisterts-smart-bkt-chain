@@ -250,7 +250,16 @@ const getCardIcon = (text: string) => {
   );
 };
 
+// Helper to generate HTML-friendly element IDs from titles
+const getSlug = (title: string) => {
+  return title
+    .toLowerCase()
+    .replace(/[^a-z0-9а-яєіїґ\s-]/g, '')
+    .replace(/\s+/g, '-');
+};
+
 type Tab = 'roadmap' | 'tech' | 'pm';
+
 
 export default function DocsPage() {
   const [activeTab, setActiveTab] = useState<Tab>('roadmap');
@@ -371,13 +380,6 @@ export default function DocsPage() {
     };
   }, [currentDoc, searchQuery]);
 
-  // Helper to generate HTML-friendly element IDs from titles
-  const getSlug = (title: string) => {
-    return title
-      .toLowerCase()
-      .replace(/[^a-z0-9а-яєіїґ\s-]/g, '')
-      .replace(/\s+/g, '-');
-  };
 
   // Scroll to element smooth
   const scrollTo = (id: string) => {
@@ -563,7 +565,7 @@ export default function DocsPage() {
               {/* ROADMAP TIMELINE CUSTOM VIEW */}
               {activeTab === 'roadmap' ? (
                 <div className="space-y-12">
-                  {filteredDoc.sections.map((section, secIdx) => {
+                  {filteredDoc.sections.map((section) => {
                     const sectionSlug = getSlug(section.title);
 
                     return (
