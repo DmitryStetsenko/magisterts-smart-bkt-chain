@@ -181,19 +181,19 @@ export default function LandingPage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className={`p-6 rounded-2xl border ${isDarkMode ? 'bg-zinc-900/10 border-zinc-900/80' : 'bg-zinc-50 border-zinc-200'}`}>
               <h4 className="font-bold text-sm mb-2 text-indigo-500 dark:text-indigo-400">1. Адаптивність через Дані</h4>
-              <p className={`text-xs leading-relaxed ${isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
+              <p className={`text-xs leading-relaxed ${isDarkMode ? 'text-zinc-400' : 'text-zinc-650'}`}>
                 Використовуючи алгоритм BKT, система в режимі реального часу адаптує навчальний шлях. Вона визначає сильні та слабкі сторони студента і формує оптимальну послідовність завдань.
               </p>
             </div>
             <div className={`p-6 rounded-2xl border ${isDarkMode ? 'bg-zinc-900/10 border-zinc-900/80' : 'bg-zinc-50 border-zinc-200'}`}>
               <h4 className="font-bold text-sm mb-2 text-purple-500 dark:text-purple-400">2. Гібридне Оцінювання</h4>
-              <p className={`text-xs leading-relaxed ${isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
+              <p className={`text-xs leading-relaxed ${isDarkMode ? 'text-zinc-400' : 'text-zinc-650'}`}>
                 Поєднання об'єктивного AST-аналізу та розумного LLM-судді забезпечує швидкий та глибокий фідбек без потреби ручної перевірки викладачами.
               </p>
             </div>
             <div className={`p-6 rounded-2xl border ${isDarkMode ? 'bg-zinc-900/10 border-zinc-900/80' : 'bg-zinc-50 border-zinc-200'}`}>
-              <h4 className="font-bold text-sm mb-2 text-pink-500 dark:text-pink-400">3. Суверенні Дипломи</h4>
-              <p className={`text-xs leading-relaxed ${isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
+              <h4 className="font-bold text-sm mb-2 text-pink-500 dark:text-pink-400">3. Захищені Цифрові Сертифікати</h4>
+              <p className={`text-xs leading-relaxed ${isDarkMode ? 'text-zinc-400' : 'text-zinc-650'}`}>
                 Результати навчання належать студенту. Завдяки SBT (Soulbound) та dNFT, сертифікати не можна підробити чи передати іншим, створюючи надійний цифровий профіль для рекрутерів.
               </p>
             </div>
