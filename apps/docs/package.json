@@ -25,8 +25,11 @@
     "typescript": "^5"
   },
   "optionalDependencies": {
-    "@next/swc-win32-x64-msvc": "16.2.9",
+    "@next/swc-darwin-x64": "16.2.9",
     "@next/swc-linux-x64-gnu": "16.2.9",
-    "@next/swc-darwin-x64": "16.2.9"
+    "@next/swc-win32-x64-msvc": "16.2.9",
+    "lightningcss-darwin-x64": "1.32.0",
+    "lightningcss-linux-x64-gnu": "1.32.0",
+    "lightningcss-win32-x64-msvc": "1.32.0"
   }
 }
