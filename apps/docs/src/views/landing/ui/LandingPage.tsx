@@ -173,9 +173,9 @@ export function LandingPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className={`p-6 rounded-2xl border ${isDarkMode ? 'bg-zinc-900/10 border-zinc-900/80' : 'bg-zinc-50 border-zinc-200'}`}>
-              <h4 className="font-bold text-lg mb-2 text-indigo-500 dark:text-indigo-400">1. Адаптивність через Дані</h4>
+              <h4 className="font-bold text-lg mb-2 text-indigo-500 dark:text-indigo-400">1. Багатофакторна адаптивність</h4>
               <p className={`text-sm leading-relaxed ${isDarkMode ? 'text-zinc-400' : 'text-zinc-650'}`}>
-                Використовуючи алгоритм BKT, система в режимі реального часу адаптує навчальний шлях. Вона визначає сильні та слабкі сторони студента і формує оптимальну послідовність завдань.
+                Індивідуальна траєкторія будується на синергії ймовірнісного моделювання знань (BKT), аналізу поведінкової телеметрії (темпу введення, пауз, копіювання) та результатів автоматичної перевірки коду для гнучкого вибору наступних завдань.
               </p>
             </div>
             <div className={`p-6 rounded-2xl border ${isDarkMode ? 'bg-zinc-900/10 border-zinc-900/80' : 'bg-zinc-50 border-zinc-200'}`}>
