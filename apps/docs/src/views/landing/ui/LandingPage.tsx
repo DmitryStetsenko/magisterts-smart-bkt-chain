@@ -181,7 +181,7 @@ export function LandingPage() {
             <div className={`p-6 rounded-2xl border ${isDarkMode ? 'bg-zinc-900/10 border-zinc-900/80' : 'bg-zinc-50 border-zinc-200'}`}>
               <h4 className="font-bold text-lg mb-2 text-purple-500 dark:text-purple-400">2. Гібридне Оцінювання</h4>
               <p className={`text-sm leading-relaxed ${isDarkMode ? 'text-zinc-400' : 'text-zinc-650'}`}>
-                Поєднання об'єктивного AST-аналізу та гнучкого LLM-судді дозволяє автоматизувати перевірку рішень і надавати миттєвий фідбек, суттєво знижуючи навантаження на викладачів.
+                Оцінювання коду на основі новітніх LLM-моделей та AST-аналізу для надання миттєвого фідбеку з можливістю залучення викладача для вирішення спірних оцінок та фінального контролю.
               </p>
             </div>
             <div className={`p-6 rounded-2xl border ${isDarkMode ? 'bg-zinc-900/10 border-zinc-900/80' : 'bg-zinc-50 border-zinc-200'}`}>
