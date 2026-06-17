@@ -179,15 +179,15 @@ export function LandingPage() {
               </p>
             </div>
             <div className={`p-6 rounded-2xl border ${isDarkMode ? 'bg-zinc-900/10 border-zinc-900/80' : 'bg-zinc-50 border-zinc-200'}`}>
-              <h4 className="font-bold text-lg mb-2 text-purple-500 dark:text-purple-400">2. Гібридне оцінювання (Human-in-the-Loop)</h4>
+              <h4 className="font-bold text-lg mb-2 text-purple-500 dark:text-purple-400">2. Гібридне Оцінювання</h4>
               <p className={`text-sm leading-relaxed ${isDarkMode ? 'text-zinc-400' : 'text-zinc-650'}`}>
-                Каскадна верифікація рішень за допомогою синтаксичного аналізу (AST-парсинг) та генеративних моделей (LLM Judge) останнього покоління. ШІ автоматизує рутину й надає розгорнутий семантичний фідбек, а педагог виступає як арбітр і ментор для вирішення девіантних чи спірних кейсів.
+                Оцінювання рішень на основі автоматичного AST-аналізу та сучасних LLM-моделей з можливістю залучення викладача лише за наявності апеляцій чи вагомої необхідності для вирішення спірних питань.
               </p>
             </div>
             <div className={`p-6 rounded-2xl border ${isDarkMode ? 'bg-zinc-900/10 border-zinc-900/80' : 'bg-zinc-50 border-zinc-200'}`}>
-              <h4 className="font-bold text-lg mb-2 text-pink-500 dark:text-pink-400">3. Криптографічний Proof of Competence</h4>
+              <h4 className="font-bold text-lg mb-2 text-pink-500 dark:text-pink-400">3. Захищені Цифрові Сертифікати</h4>
               <p className={`text-sm leading-relaxed ${isDarkMode ? 'text-zinc-400' : 'text-zinc-650'}`}>
-                Децентралізоване підтвердження кваліфікацій на базі технологій Web3 (SBT ERC-5192 та dNFT ERC-721). Формує захищене цифрове портфоліо навичок з унікальним механізмом смарт-відновлення токенів, що унеможливлює фальсифікацію та забезпечує пряму інтеграцію з ринком праці.
+                Результати навчання належать студенту. Завдяки SBT (Soulbound) та dNFT, сертифікати не можна підробити чи передати іншим, створюючи надійний цифровий профіль для рекрутерів.
               </p>
             </div>
           </div>
