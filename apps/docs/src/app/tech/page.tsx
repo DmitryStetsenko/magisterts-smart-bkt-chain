@@ -1,15 +1,7 @@
 'use client';
 
-import React from 'react';
-import DocsShell from '../../components/DocsShell';
-import DocStandardView from '../../components/DocStandardView';
+import { TechPage } from '../../views/tech/ui/TechPage';
 
-export default function TechPage() {
-  return (
-    <DocsShell>
-      {({ isDarkMode, filteredDoc, scrollTo }) => (
-        <DocStandardView isDarkMode={isDarkMode} filteredDoc={filteredDoc} scrollTo={scrollTo} />
-      )}
-    </DocsShell>
-  );
+export default function TechRoute() {
+  return <TechPage />;
 }
