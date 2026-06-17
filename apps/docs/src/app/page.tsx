@@ -101,9 +101,6 @@ export default function LandingPage() {
       {/* HERO SECTION */}
       <main className="flex-1 flex flex-col items-center justify-center px-6 py-16 sm:py-24 text-center max-w-5xl mx-auto space-y-12">
         <div className="space-y-6">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border text-xs font-semibold uppercase tracking-wider bg-indigo-500/10 text-indigo-400 border-indigo-500/25">
-            AlgoProof.org / KnowLedger.org
-          </div>
           <h1 className="text-4xl sm:text-6xl font-extrabold tracking-tight leading-tight max-w-4xl">
             Децентралізована система{' '}
             <span className="bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
