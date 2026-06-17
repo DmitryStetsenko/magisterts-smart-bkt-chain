@@ -201,6 +201,14 @@ const getSlug = (title: string) => {
     .replace(/\s+/g, '-');
 };
 
+// Helper to check if item is a valid displayable card (ignores markdown dividers like '---')
+const isValidItem = (item: any) => {
+  if (item.type === 'kv') {
+    return item.key && item.key.trim() !== '';
+  }
+  return item.raw_text && item.raw_text.trim() !== '' && item.raw_text.trim() !== '---';
+};
+
 type Tab = 'roadmap' | 'tech' | 'pm';
 
 
@@ -794,10 +802,10 @@ export default function DocsPage() {
                       })}
 
                       {/* Section Key-Value and Bullet list items */}
-                      {section.items && section.items.some(item => (item.raw_text && item.raw_text.trim() !== '') || (item.type === 'kv' && item.key && item.key.trim() !== '')) && (
+                      {section.items && section.items.some(isValidItem) && (
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                           {section.items
-                            .filter(item => (item.raw_text && item.raw_text.trim() !== '') || (item.type === 'kv' && item.key && item.key.trim() !== ''))
+                            .filter(isValidItem)
                             .map((item, idx) => {
                               const icon = getCardIcon(item.type === 'kv' ? (item.key || '') : (item.raw_text || ''));
                               return (
@@ -914,10 +922,10 @@ export default function DocsPage() {
                                 })}
 
                                 {/* Subsection Key-Value or Bullet items */}
-                                {sub.items && sub.items.some(item => (item.raw_text && item.raw_text.trim() !== '') || (item.type === 'kv' && item.key && item.key.trim() !== '')) && (
+                                {sub.items && sub.items.some(isValidItem) && (
                                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                                     {sub.items
-                                      .filter(item => (item.raw_text && item.raw_text.trim() !== '') || (item.type === 'kv' && item.key && item.key.trim() !== ''))
+                                      .filter(isValidItem)
                                       .map((item, idx) => {
                                         const icon = getCardIcon(item.type === 'kv' ? (item.key || '') : (item.raw_text || ''));
                                         return (
