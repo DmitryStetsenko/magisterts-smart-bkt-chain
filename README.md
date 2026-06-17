@@ -1,4 +1,4 @@
-# Smart-BKT-Chain (AlgoProof.org / KnowLedger.org)
+# Smart-BKT-Chain
 
 > Децентралізована система адаптивного навчання та автоматизованого підтвердження компетенцій на базі Bayesian Knowledge Tracing (BKT) та Blockchain.
 
