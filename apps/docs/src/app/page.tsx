@@ -573,7 +573,7 @@ export default function DocsPage() {
         </aside>
 
         {/* MAIN CONTENT PORTAL */}
-        <main className="flex-1 overflow-y-auto px-6 py-10 md:px-16 lg:px-24">
+        <main className="flex-1 overflow-y-auto pl-3 pr-4 sm:px-6 py-10 md:px-16 lg:px-24">
           <div className="max-w-none w-full space-y-16">
             
             {/* Header section info */}
@@ -674,7 +674,7 @@ export default function DocsPage() {
 
                         {/* Vertical Timeline Phases */}
                         {section.subsections && section.subsections.length > 0 && (
-                          <div className="space-y-8 relative before:absolute before:inset-y-0 before:left-8 before:w-0.5 before:bg-gradient-to-b before:from-indigo-500 before:to-emerald-500 mt-12">
+                          <div className="space-y-8 relative before:absolute before:inset-y-0 before:left-3 sm:before:left-8 before:w-0.5 before:bg-gradient-to-b before:from-indigo-500 before:to-emerald-500 mt-12">
                             {section.subsections.map((sub, idx) => {
                               const subSlug = getSlug(sub.title);
                               const isFirst = idx === 0;
@@ -698,10 +698,10 @@ export default function DocsPage() {
                               });
 
                               return (
-                                <div key={idx} id={subSlug} className="relative pl-16 group scroll-mt-24">
+                                <div key={idx} id={subSlug} className="relative pl-9 sm:pl-16 group scroll-mt-24">
                                   {/* Pulsing indicator for active phase */}
-                                  <div className={`absolute left-5 top-2 w-6 h-6 rounded-full border-4 ${isActive ? (isDarkMode ? 'bg-indigo-500 border-zinc-950 animate-ping' : 'bg-indigo-500 border-white animate-ping') : (isDarkMode ? 'bg-zinc-800 border-zinc-950' : 'bg-zinc-200 border-white')}`} />
-                                  <div className={`absolute left-5 top-2 w-6 h-6 rounded-full border-4 flex items-center justify-center font-bold text-[9px] ${isActive ? (isDarkMode ? 'bg-indigo-500 border-zinc-950 text-white' : 'bg-indigo-500 border-white text-white') : (isDarkMode ? 'bg-zinc-800 border-zinc-950 text-zinc-400' : 'bg-zinc-200 border-white text-zinc-600')}`}>
+                                  <div className={`absolute left-0 sm:left-5 top-2 w-6 h-6 rounded-full border-4 ${isActive ? (isDarkMode ? 'bg-indigo-500 border-zinc-950 animate-ping' : 'bg-indigo-500 border-white animate-ping') : (isDarkMode ? 'bg-zinc-800 border-zinc-950' : 'bg-zinc-200 border-white')}`} />
+                                  <div className={`absolute left-0 sm:left-5 top-2 w-6 h-6 rounded-full border-4 flex items-center justify-center font-bold text-[9px] ${isActive ? (isDarkMode ? 'bg-indigo-500 border-zinc-950 text-white' : 'bg-indigo-500 border-white text-white') : (isDarkMode ? 'bg-zinc-800 border-zinc-950 text-zinc-400' : 'bg-zinc-200 border-white text-zinc-600')}`}>
                                     {idx + 1}
                                   </div>
 
