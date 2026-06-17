@@ -1,7 +1,9 @@
 'use client';
 
 import React, { useState } from 'react';
-import { getSlug, formatMarkdown, renderParagraphs, getCardIcon, isValidItem } from './DocsShell';
+import { getSlug, isValidItem } from '../../../entities/document/lib/helpers';
+import { formatMarkdown, renderParagraphs } from '../../../shared/ui/markdown';
+import { getCardIcon } from '../../../shared/ui/icons';
 
 interface DocStandardViewProps {
   isDarkMode: boolean;
@@ -106,7 +108,7 @@ export default function DocStandardView({ isDarkMode, filteredDoc, scrollTo }: D
                         </div>
 
                         {item.type === 'kv' && (
-                          <p className={`text-sm leading-relaxed ${isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
+                          <p className={`text-sm leading-relaxed ${isDarkMode ? 'text-zinc-400' : 'text-zinc-650'}`}>
                             {formatMarkdown(item.value || '', isDarkMode)}
                           </p>
                         )}
@@ -126,7 +128,7 @@ export default function DocStandardView({ isDarkMode, filteredDoc, scrollTo }: D
                                   <svg className="w-3.5 h-3.5 text-indigo-500 dark:text-indigo-400 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4" />
                                   </svg>
-                                  <p className={`text-xs leading-relaxed ${isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
+                                  <p className={`text-xs leading-relaxed ${isDarkMode ? 'text-zinc-400' : 'text-zinc-650'}`}>
                                     {formatMarkdown(sub, isDarkMode)}
                                   </p>
                                 </li>
@@ -225,7 +227,7 @@ export default function DocStandardView({ isDarkMode, filteredDoc, scrollTo }: D
                                   </div>
 
                                   {item.type === 'kv' && (
-                                    <p className={`text-sm leading-relaxed ${isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
+                                    <p className={`text-sm leading-relaxed ${isDarkMode ? 'text-zinc-400' : 'text-zinc-650'}`}>
                                       {formatMarkdown(item.value || '', isDarkMode)}
                                     </p>
                                   )}
@@ -245,7 +247,7 @@ export default function DocStandardView({ isDarkMode, filteredDoc, scrollTo }: D
                                             <svg className="w-3.5 h-3.5 text-indigo-500 dark:text-indigo-400 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                                               <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4" />
                                             </svg>
-                                            <p className={`text-xs leading-relaxed ${isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
+                                            <p className={`text-xs leading-relaxed ${isDarkMode ? 'text-zinc-400' : 'text-zinc-650'}`}>
                                               {formatMarkdown(subText, isDarkMode)}
                                             </p>
                                           </li>

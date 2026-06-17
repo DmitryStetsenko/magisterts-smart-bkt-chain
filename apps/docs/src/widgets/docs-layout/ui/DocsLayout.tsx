@@ -3,221 +3,19 @@
 import React, { useState, useMemo, useEffect, Suspense } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
-import roadmapData from '../data/roadmap.json';
-import techStackData from '../data/tech_stack.json';
-import projectManagementData from '../data/project_management.json';
+import roadmapData from '../../../data/roadmap.json';
+import techStackData from '../../../data/tech_stack.json';
+import projectManagementData from '../../../data/project_management.json';
+import { DocData, Section, Tab } from '../../../entities/document/model/types';
+import { getSlug } from '../../../entities/document/lib/helpers';
+import { ThemeSwitcher } from '../../../features/theme-switcher/ui/ThemeSwitcher';
+import { SearchDocs } from '../../../features/search-docs/ui/SearchDocs';
 
-// Define TS Interfaces
-export interface CodeBlock {
-  lang: string;
-  content: string;
-}
-
-export interface Item {
-  type: string;
-  key?: string;
-  value?: string;
-  raw_text: string;
-  subitems: string[];
-}
-
-export interface Subsection {
-  title: string;
-  level: number;
-  paragraphs: string[];
-  code_blocks: CodeBlock[];
-  items: Item[];
-}
-
-export interface Section {
-  title: string;
-  level: number;
-  paragraphs: string[];
-  code_blocks: CodeBlock[];
-  items: Item[];
-  subsections: Subsection[];
-}
-
-export interface DocData {
-  project_title: string;
-  sections: Section[];
-}
-
-export type Tab = 'roadmap' | 'tech' | 'pm';
-
-// Helper to format basic markdown (**bold**, *italic*, `code`) into JSX
-export const formatMarkdown = (text: string, isDarkMode: boolean): React.ReactNode => {
-  if (!text) return '';
-
-  return (
-    <ReactMarkdown
-      remarkPlugins={[remarkGfm]}
-      allowedElements={['strong', 'em', 'code', 'a', 'p']}
-      unwrapDisallowed
-      components={{
-        a: ({ node, ...props }) => <a className="text-indigo-400 hover:underline" {...props} />,
-        code: ({ node, ...props }) => (
-          <code 
-            className={`px-1.5 py-0.5 mx-0.5 rounded border text-[11px] font-mono font-semibold whitespace-nowrap ${
-              isDarkMode 
-                ? 'bg-zinc-900 border-zinc-800 text-pink-400' 
-                : 'bg-zinc-100 border-zinc-200 text-pink-600'
-            }`}
-            {...props}
-          />
-        ),
-        strong: ({ node, ...props }) => <strong className={`font-bold ${isDarkMode ? 'text-zinc-100' : 'text-zinc-900'}`} {...props} />,
-        em: ({ node, ...props }) => <em className={`italic ${isDarkMode ? 'text-zinc-200' : 'text-zinc-800'}`} {...props} />,
-        p: ({ node, ...props }) => <span {...props} />
-      }}
-    >
-      {text}
-    </ReactMarkdown>
-  );
-};
-
-// Helper to render lists of paragraphs, automatically detecting and formatting Markdown Tables
-export const renderParagraphs = (paragraphs: string[], isDarkMode: boolean, pClassName: string) => {
-  if (!paragraphs || paragraphs.length === 0) return null;
-
-  const groupedParagraphs: string[] = [];
-  let currentTable: string[] = [];
-
-  paragraphs.forEach((para) => {
-    const trimmed = para.trim();
-    const isTableRow = trimmed.startsWith('|') && trimmed.endsWith('|');
-
-    if (isTableRow) {
-      currentTable.push(para);
-    } else {
-      if (currentTable.length > 0) {
-        groupedParagraphs.push(currentTable.join('\n'));
-        currentTable = [];
-      }
-      groupedParagraphs.push(para);
-    }
-  });
-
-  if (currentTable.length > 0) {
-    groupedParagraphs.push(currentTable.join('\n'));
-  }
-
-  return (
-    <div className="space-y-4">
-      {groupedParagraphs.map((para, idx) => (
-        <div key={idx} className={pClassName}>
-          <ReactMarkdown
-            remarkPlugins={[remarkGfm]}
-            components={{
-              p: ({ node, ...props }) => <span {...props} />,
-              a: ({ node, ...props }) => <a className="text-indigo-400 hover:underline" {...props} />,
-              code: ({ node, ...props }) => (
-                <code 
-                  className={`px-1.5 py-0.5 mx-0.5 rounded border text-[11px] font-mono font-semibold whitespace-nowrap ${
-                    isDarkMode 
-                      ? 'bg-zinc-900 border-zinc-800 text-pink-400' 
-                      : 'bg-zinc-100 border-zinc-200 text-pink-600'
-                  }`}
-                  {...props}
-                />
-              ),
-              strong: ({ node, ...props }) => <strong className={`font-bold ${isDarkMode ? 'text-zinc-100' : 'text-zinc-900'}`} {...props} />,
-              em: ({ node, ...props }) => <em className={`italic ${isDarkMode ? 'text-zinc-200' : 'text-zinc-800'}`} {...props} />,
-              table: ({ node, ...props }) => (
-                <div className="overflow-x-auto my-6 border border-zinc-200 dark:border-zinc-800 rounded-xl shadow-sm">
-                  <table className="min-w-full divide-y divide-zinc-200 dark:divide-zinc-800 text-sm" {...props} />
-                </div>
-              ),
-              thead: ({ node, ...props }) => <thead className={isDarkMode ? 'bg-zinc-900/50' : 'bg-zinc-50'} {...props} />,
-              tbody: ({ node, ...props }) => <tbody className={`divide-y ${isDarkMode ? 'divide-zinc-800/60 bg-zinc-950/20' : 'divide-zinc-100 bg-white'}`} {...props} />,
-              tr: ({ node, ...props }) => <tr className={isDarkMode ? 'hover:bg-zinc-900/20' : 'hover:bg-zinc-50/50'} {...props} />,
-              th: ({ node, ...props }) => <th className={`px-4 py-3 text-left text-xs font-bold uppercase tracking-wider ${isDarkMode ? 'text-zinc-400 border-zinc-800' : 'text-zinc-500 border-zinc-200'} border-b`} {...props} />,
-              td: ({ node, ...props }) => <td className={`px-4 py-3 text-xs md:text-sm font-medium ${isDarkMode ? 'text-zinc-300' : 'text-zinc-700'}`} {...props} />
-            }}
-          >
-            {para}
-          </ReactMarkdown>
-        </div>
-      ))}
-    </div>
-  );
-};
-
-// Helper to get beautiful SVG icons based on card titles
-export const getCardIcon = (text: string) => {
-  const t = text.toLowerCase();
-  if (t.includes('бази даних') || t.includes('database') || t.includes('postgresql')) {
-    return (
-      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M4 7v10c0 2.21 3.58 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.58 4 8 4s8-1.79 8-4M4 7c0-2.21 3.58-4 8-4s8 1.79 8 4m0 5c0 2.21-3.58 4-8 4s-8-1.79-8-4" />
-      </svg>
-    );
-  }
-  if (t.includes('api') || t.includes('types') || t.includes('типізація') || t.includes('інтерфейси') || t.includes('swagger')) {
-    return (
-      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-      </svg>
-    );
-  }
-  if (t.includes('контракт') || t.includes('contracts') || t.includes('solidity') || t.includes('web3') || t.includes('безпека') || t.includes('security')) {
-    return (
-      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-      </svg>
-    );
-  }
-  if (t.includes('frontend') || t.includes('фронтенд') || t.includes('ui') || t.includes('стилізація') || t.includes('візуалізація') || t.includes('введення коду')) {
-    return (
-      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-      </svg>
-    );
-  }
-  if (t.includes('backend') || t.includes('бекенд') || t.includes('сервер') || t.includes('орм') || t.includes('orm') || t.includes('джерела')) {
-    return (
-      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01" />
-      </svg>
-    );
-  }
-  if (t.includes('docker') || t.includes('devops') || t.includes('ci/cd') || t.includes('github') || t.includes('контейнер') || t.includes('тест') || t.includes('fuzzing')) {
-    return (
-      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1H9L8 4zm.5 12h7a1.5 1.5 0 001.5-1.5v-7A1.5 1.5 0 0015.5 4h-7A1.5 1.5 0 007 5.5v7A1.5 1.5 0 008.5 16z" />
-      </svg>
-    );
-  }
-  return (
-    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-      <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-    </svg>
-  );
-};
-
-// Helper to generate HTML-friendly element IDs from titles
-export const getSlug = (title: string) => {
-  return title
-    .toLowerCase()
-    .replace(/[^a-z0-9а-яєіїґ\s-]/g, '')
-    .replace(/\s+/g, '-');
-};
-
-// Helper to check if item is a valid displayable card
-export const isValidItem = (item: any) => {
-  if (item.type === 'kv') {
-    return item.key && item.key.trim() !== '';
-  }
-  return item.raw_text && item.raw_text.trim() !== '' && item.raw_text.trim() !== '---';
-};
-
-interface DocsShellContentProps {
+interface DocsLayoutContentProps {
   children: (props: { isDarkMode: boolean; filteredDoc: DocData; activeSection: string; scrollTo: (id: string) => void }) => React.ReactNode;
 }
 
-function DocsShellContent({ children }: DocsShellContentProps) {
+function DocsLayoutContent({ children }: DocsLayoutContentProps) {
   const router = useRouter();
   const pathname = usePathname() || '';
   const searchParams = useSearchParams();
@@ -381,19 +179,19 @@ function DocsShellContent({ children }: DocsShellContentProps) {
             </svg>
           </button>
           
-        <Link href="/" className="flex items-center gap-3 min-w-0 hover:opacity-90 transition-all">
-          <div className="w-10 h-10 flex-shrink-0 rounded-xl bg-gradient-to-tr from-indigo-600 via-purple-600 to-pink-500 flex items-center justify-center shadow-lg shadow-indigo-500/20 text-white font-bold text-lg">
-            S
-          </div>
-          <div className="min-w-0">
-            <h1 className="text-sm sm:text-lg font-bold tracking-tight bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent truncate">
-              Smart-BKT-Chain
-            </h1>
-            <p className={`text-xs hidden sm:block ${isDarkMode ? 'text-zinc-400' : 'text-zinc-500'} truncate`}>
-              Централізована документація архітектури та Jira
-            </p>
-          </div>
-        </Link>
+          <Link href="/" className="flex items-center gap-3 min-w-0 hover:opacity-90 transition-all">
+            <div className="w-10 h-10 flex-shrink-0 rounded-xl bg-gradient-to-tr from-indigo-600 via-purple-600 to-pink-500 flex items-center justify-center shadow-lg shadow-indigo-500/20 text-white font-bold text-lg">
+              S
+            </div>
+            <div className="min-w-0">
+              <h1 className="text-sm sm:text-lg font-bold tracking-tight bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent truncate">
+                Smart-BKT-Chain
+              </h1>
+              <p className={`text-xs hidden sm:block ${isDarkMode ? 'text-zinc-400' : 'text-zinc-500'} truncate`}>
+                Централізована документація архітектури та Jira
+              </p>
+            </div>
+          </Link>
         </div>
 
         {/* Global Controls */}
@@ -410,21 +208,7 @@ function DocsShellContent({ children }: DocsShellContentProps) {
             <span className="hidden sm:inline">GitHub</span>
           </a>
 
-          <button
-            onClick={() => setIsDarkMode(!isDarkMode)}
-            className={`p-2 rounded-lg border transition-all ${isDarkMode ? 'bg-zinc-900 border-zinc-800 text-yellow-400 hover:bg-zinc-800' : 'bg-white border-zinc-200 text-indigo-600 hover:bg-zinc-50'}`}
-            title="Змінити тему"
-          >
-            {isDarkMode ? (
-              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 9H3m15.364-3.364l-.707.707M6.343 17.657l-.707.707m0-12.728l.707.707m12.728 12.728l.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z" />
-              </svg>
-            ) : (
-              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
-              </svg>
-            )}
-          </button>
+          <ThemeSwitcher isDarkMode={isDarkMode} onToggle={() => setIsDarkMode(!isDarkMode)} />
         </div>
       </header>
 
@@ -446,7 +230,7 @@ function DocsShellContent({ children }: DocsShellContentProps) {
           md:flex md:w-96 md:h-[calc(100vh-73px)]
         `}>
           
-          {/* Tab Switcher (using Links now) */}
+          {/* Tab Switcher */}
           <div className="p-4 border-b border-zinc-200 dark:border-zinc-900">
             <div className={`flex flex-col gap-1 p-1 rounded-xl ${isDarkMode ? 'bg-zinc-900' : 'bg-zinc-200'}`}>
               <Link
@@ -481,19 +265,7 @@ function DocsShellContent({ children }: DocsShellContentProps) {
               </Link>
             </div>
 
-            {/* Search Input */}
-            <div className="mt-4 relative">
-              <input
-                type="text"
-                placeholder="Швидкий пошук у тексті..."
-                value={searchQuery}
-                onChange={(e) => handleSearchChange(e.target.value)}
-                className={`w-full pl-9 pr-4 py-2 text-sm rounded-lg border focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all ${isDarkMode ? 'bg-zinc-900 border-zinc-800 text-zinc-200 placeholder-zinc-500' : 'bg-white border-zinc-200 text-zinc-800 placeholder-zinc-400'}`}
-              />
-              <svg className={`w-4 h-4 absolute left-3 top-3 ${isDarkMode ? 'text-zinc-500' : 'text-zinc-400'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-            </div>
+            <SearchDocs searchQuery={searchQuery} onSearchChange={handleSearchChange} isDarkMode={isDarkMode} />
           </div>
 
           {/* Navigation Links */}
@@ -572,10 +344,10 @@ function DocsShellContent({ children }: DocsShellContentProps) {
   );
 }
 
-export default function DocsShell({ children }: DocsShellContentProps) {
+export default function DocsLayout({ children }: DocsLayoutContentProps) {
   return (
     <Suspense fallback={<div className="min-h-screen bg-zinc-950 flex items-center justify-center text-zinc-400">Завантаження...</div>}>
-      <DocsShellContent>{children}</DocsShellContent>
+      <DocsLayoutContent>{children}</DocsLayoutContent>
     </Suspense>
   );
 }
