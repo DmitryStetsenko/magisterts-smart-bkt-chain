@@ -381,6 +381,7 @@ function DocsShellContent({ children }: DocsShellContentProps) {
             </svg>
           </button>
           
+        <Link href="/" className="flex items-center gap-3 min-w-0 hover:opacity-90 transition-all">
           <div className="w-10 h-10 flex-shrink-0 rounded-xl bg-gradient-to-tr from-indigo-600 via-purple-600 to-pink-500 flex items-center justify-center shadow-lg shadow-indigo-500/20 text-white font-bold text-lg">
             S
           </div>
@@ -392,6 +393,7 @@ function DocsShellContent({ children }: DocsShellContentProps) {
               Централізована документація архітектури та Jira
             </p>
           </div>
+        </Link>
         </div>
 
         {/* Global Controls */}
