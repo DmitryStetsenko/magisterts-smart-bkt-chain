@@ -119,7 +119,9 @@ export default function LandingPage() {
         <div className="flex flex-wrap gap-4 justify-center pt-4">
           <Link
             href="/roadmap/"
-            className="px-6 py-3.5 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold shadow-lg shadow-indigo-500/25 hover:opacity-90 hover:scale-[1.02] active:scale-[0.98] transition-all"
+            className={`px-6 py-3.5 rounded-xl border font-semibold transition-all hover:scale-[1.02] active:scale-[0.98] ${
+              isDarkMode ? 'bg-zinc-900 border-zinc-800 text-zinc-200 hover:bg-zinc-850 hover:text-white' : 'bg-white border-zinc-200 text-zinc-700 hover:bg-zinc-50 hover:text-black'
+            }`}
           >
             Дорожня карта
           </Link>
@@ -146,10 +148,10 @@ export default function LandingPage() {
           {features.map((feat, idx) => (
             <div
               key={idx}
-              className={`p-6 rounded-2xl border transition-all duration-300 hover:shadow-xl ${
+              className={`p-6 rounded-2xl border transition-all duration-300 hover:shadow-lg ${
                 isDarkMode 
-                  ? 'bg-zinc-900/40 backdrop-blur-sm border-zinc-900 hover:border-zinc-850' 
-                  : 'bg-white border-zinc-200 hover:border-zinc-300'
+                  ? 'bg-zinc-900/30 backdrop-blur-sm border-zinc-900 hover:border-zinc-850' 
+                  : 'bg-white border-zinc-200 hover:border-zinc-300/80'
               }`}
             >
               <div className="flex items-center gap-3.5 mb-4">
@@ -163,6 +165,39 @@ export default function LandingPage() {
               </p>
             </div>
           ))}
+        </div>
+
+        {/* DETAILED CONCEPT SECTION */}
+        <div className="w-full pt-16 text-left border-t border-zinc-200 dark:border-zinc-900 space-y-8">
+          <div className="space-y-3">
+            <h2 className="text-2xl font-bold tracking-tight bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
+              Концепція та Філософія Проєкту
+            </h2>
+            <p className={`text-sm max-w-3xl leading-relaxed ${isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
+              Проєкт створює відкрите, прозоре та адаптивне навчальне середовище, що автоматично перевіряє практичні знання користувача та надає надійні докази його компетенцій, захищені криптографічно.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className={`p-6 rounded-2xl border ${isDarkMode ? 'bg-zinc-900/10 border-zinc-900/80' : 'bg-zinc-50 border-zinc-200'}`}>
+              <h4 className="font-bold text-sm mb-2 text-indigo-500 dark:text-indigo-400">1. Адаптивність через Дані</h4>
+              <p className={`text-xs leading-relaxed ${isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
+                Використовуючи алгоритм BKT, система в режимі реального часу адаптує навчальний шлях. Вона визначає сильні та слабкі сторони студента і формує оптимальну послідовність завдань.
+              </p>
+            </div>
+            <div className={`p-6 rounded-2xl border ${isDarkMode ? 'bg-zinc-900/10 border-zinc-900/80' : 'bg-zinc-50 border-zinc-200'}`}>
+              <h4 className="font-bold text-sm mb-2 text-purple-500 dark:text-purple-400">2. Гібридне Оцінювання</h4>
+              <p className={`text-xs leading-relaxed ${isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
+                Поєднання об'єктивного AST-аналізу та розумного LLM-судді забезпечує швидкий та глибокий фідбек без потреби ручної перевірки викладачами.
+              </p>
+            </div>
+            <div className={`p-6 rounded-2xl border ${isDarkMode ? 'bg-zinc-900/10 border-zinc-900/80' : 'bg-zinc-50 border-zinc-200'}`}>
+              <h4 className="font-bold text-sm mb-2 text-pink-500 dark:text-pink-400">3. Суверенні Дипломи</h4>
+              <p className={`text-xs leading-relaxed ${isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
+                Результати навчання належать студенту. Завдяки SBT (Soulbound) та dNFT, сертифікати не можна підробити чи передати іншим, створюючи надійний цифровий профіль для рекрутерів.
+              </p>
+            </div>
+          </div>
         </div>
       </main>
 
