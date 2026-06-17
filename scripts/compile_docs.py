@@ -108,7 +108,7 @@ def parse_markdown(filepath):
                 is_subitem = line.startswith("    ") or line.startswith("\t") or stripped.startswith("*Чому:*") or stripped.startswith("_Чому:_")
                 
                 if is_subitem:
-                    sub_text = stripped.lstrip("*-\t ").strip()
+                    sub_text = re.sub(r'^\s*[*+-]\s+', '', stripped).strip()
                     # Clean up markdown formatting from rationale prefix
                     if sub_text.startswith("*Чому:*"):
                         sub_text = sub_text[len("*Чому:*"):].strip()
@@ -123,7 +123,7 @@ def parse_markdown(filepath):
                         target["paragraphs"].append(stripped)
                 elif stripped.startswith("*") or stripped.startswith("-") or (stripped[0].isdigit() and stripped[1] == '.'):
                     # Clean the list item bullet
-                    item_text = stripped.lstrip("*-\t ").strip()
+                    item_text = re.sub(r'^\s*[*+-]\s+', '', stripped).strip()
                     if item_text and item_text[0].isdigit() and '.' in item_text[:3]:
                         item_text = item_text.split('.', 1)[1].strip()
                     

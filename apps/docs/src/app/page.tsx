@@ -1,6 +1,8 @@
 'use client';
 
 import React, { useState, useMemo, useEffect } from 'react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import roadmapData from '../data/roadmap.json';
 import techStackData from '../data/tech_stack.json';
 import projectManagementData from '../data/project_management.json';
@@ -45,75 +47,30 @@ interface DocData {
 const formatMarkdown = (text: string, isDarkMode: boolean): React.ReactNode => {
   if (!text) return '';
 
-  let normalized = text;
-  
-  // Normalize custom shorthand labels like "Опис:** Створення..." or "Приклади:** ..."
-  // by prefixing the opening "**" before the text if it is missing.
-  if (/^[^*]+\*\*/.test(normalized)) {
-    const firstDblAst = normalized.indexOf('**');
-    const prefix = normalized.slice(0, firstDblAst);
-    const suffix = normalized.slice(firstDblAst + 2);
-    // If the prefix doesn't have any asterisks, wrap it in double asterisks
-    if (!prefix.includes('*')) {
-      normalized = `**${prefix}**${suffix}`;
-    }
-  }
-
-  // Render inline code blocks inside text segment
-  const renderInlineCode = (str: string) => {
-    const codeParts = str.split(/(`[^`]+`)/g);
-    return codeParts.map((p, idx) => {
-      if (p.startsWith('`') && p.endsWith('`')) {
-        return (
+  return (
+    <ReactMarkdown
+      remarkPlugins={[remarkGfm]}
+      allowedElements={['strong', 'em', 'code', 'a', 'p']}
+      unwrapDisallowed
+      components={{
+        a: ({ node, ...props }) => <a className="text-indigo-400 hover:underline" {...props} />,
+        code: ({ node, ...props }) => (
           <code 
-            key={idx} 
             className={`px-1.5 py-0.5 mx-0.5 rounded border text-[11px] font-mono font-semibold whitespace-nowrap ${
               isDarkMode 
                 ? 'bg-zinc-900 border-zinc-800 text-pink-400' 
                 : 'bg-zinc-100 border-zinc-200 text-pink-600'
             }`}
-          >
-            {p.slice(1, -1)}
-          </code>
-        );
-      }
-      
-      // Parse italics inside non-code text
-      const cleanItalicParts = p.split(/(\*[^\*]+\*)/g);
-      return (
-        <React.Fragment key={idx}>
-          {cleanItalicParts.map((iPart, k) => {
-            if (iPart.startsWith('*') && iPart.endsWith('*')) {
-              return (
-                <em key={k} className={`italic ${isDarkMode ? 'text-zinc-200' : 'text-zinc-800'}`}>
-                  {iPart.slice(1, -1)}
-                </em>
-              );
-            }
-            return iPart;
-          })}
-        </React.Fragment>
-      );
-    });
-  };
-
-  // Split by bold block pairs first, so that we can support code blocks inside bold
-  const boldParts = normalized.split(/(\*\*[^*]+\*\*)/g);
-  
-  return (
-    <>
-      {boldParts.map((bPart, j) => {
-        if (bPart.startsWith('**') && bPart.endsWith('**')) {
-          const boldText = bPart.slice(2, -2);
-          return (
-            <strong key={j} className={`font-bold ${isDarkMode ? 'text-zinc-100' : 'text-zinc-900'}`}>
-              {renderInlineCode(boldText)}
-            </strong>
-          );
-        }
-        return <React.Fragment key={j}>{renderInlineCode(bPart)}</React.Fragment>;
-      })}
-    </>
+            {...props}
+          />
+        ),
+        strong: ({ node, ...props }) => <strong className={`font-bold ${isDarkMode ? 'text-zinc-100' : 'text-zinc-900'}`} {...props} />,
+        em: ({ node, ...props }) => <em className={`italic ${isDarkMode ? 'text-zinc-200' : 'text-zinc-800'}`} {...props} />,
+        p: ({ node, ...props }) => <span {...props} />
+      }}
+    >
+      {text}
+    </ReactMarkdown>
   );
 };
 
@@ -121,81 +78,45 @@ const formatMarkdown = (text: string, isDarkMode: boolean): React.ReactNode => {
 const renderParagraphs = (paragraphs: string[], isDarkMode: boolean, pClassName: string) => {
   if (!paragraphs || paragraphs.length === 0) return null;
 
-  const elements: React.ReactNode[] = [];
-  let currentTableRows: string[][] = [];
-  let isTable = false;
-
-  const flushTable = (key: string | number) => {
-    if (currentTableRows.length === 0) return;
-    
-    const headers = currentTableRows[0];
-    const bodyRows = currentTableRows.slice(1).filter(row => {
-      const isSeparator = row.every(cell => /^[:\-\s]+$/.test(cell));
-      return !isSeparator;
-    });
-
-    elements.push(
-      <div key={`table-${key}`} className="overflow-x-auto my-6 border border-zinc-200 dark:border-zinc-800 rounded-xl shadow-sm">
-        <table className="min-w-full divide-y divide-zinc-200 dark:divide-zinc-800 text-sm">
-          <thead className={isDarkMode ? 'bg-zinc-900/50' : 'bg-zinc-50'}>
-            <tr>
-              {headers.map((cell, idx) => (
-                <th 
-                  key={idx} 
-                  className={`px-4 py-3 text-left text-xs font-bold uppercase tracking-wider ${isDarkMode ? 'text-zinc-400 border-zinc-800' : 'text-zinc-500 border-zinc-200'} border-b`}
-                >
-                  {formatMarkdown(cell.trim(), isDarkMode)}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody className={`divide-y ${isDarkMode ? 'divide-zinc-800/60 bg-zinc-950/20' : 'divide-zinc-100 bg-white'}`}>
-            {bodyRows.map((row, rIdx) => (
-              <tr key={rIdx} className={isDarkMode ? 'hover:bg-zinc-900/20' : 'hover:bg-zinc-50/50'}>
-                {row.map((cell, cIdx) => (
-                  <td key={cIdx} className={`px-4 py-3 text-xs md:text-sm font-medium ${isDarkMode ? 'text-zinc-300' : 'text-zinc-700'}`}>
-                    {formatMarkdown(cell.trim(), isDarkMode)}
-                  </td>
-                ))}
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    );
-    currentTableRows = [];
-  };
-
-  paragraphs.forEach((para, idx) => {
-    const trimmed = para.trim();
-    if (trimmed.startsWith('|') && trimmed.endsWith('|')) {
-      const cells = para.split('|').map(c => c.trim());
-      if (cells[0] === '') cells.shift();
-      if (cells[cells.length - 1] === '') cells.pop();
-      
-      currentTableRows.push(cells);
-      isTable = true;
-    } else {
-      if (isTable) {
-        flushTable(idx);
-        isTable = false;
-      }
-      elements.push(
-        <p 
-          key={idx} 
-          className={pClassName}
-        >
-          {formatMarkdown(para, isDarkMode)}
-        </p>
-      );
-    }
-  });
-
-  if (isTable) {
-    flushTable('final');
-  }
-
-  return elements;
+  return (
+    <div className="space-y-4">
+      {paragraphs.map((para, idx) => (
+        <div key={idx} className={pClassName}>
+          <ReactMarkdown
+            remarkPlugins={[remarkGfm]}
+            components={{
+              p: ({ node, ...props }) => <span {...props} />,
+              a: ({ node, ...props }) => <a className="text-indigo-400 hover:underline" {...props} />,
+              code: ({ node, ...props }) => (
+                <code 
+                  className={`px-1.5 py-0.5 mx-0.5 rounded border text-[11px] font-mono font-semibold whitespace-nowrap ${
+                    isDarkMode 
+                      ? 'bg-zinc-900 border-zinc-800 text-pink-400' 
+                      : 'bg-zinc-100 border-zinc-200 text-pink-600'
+                  }`}
+                  {...props}
+                />
+              ),
+              strong: ({ node, ...props }) => <strong className={`font-bold ${isDarkMode ? 'text-zinc-100' : 'text-zinc-900'}`} {...props} />,
+              em: ({ node, ...props }) => <em className={`italic ${isDarkMode ? 'text-zinc-200' : 'text-zinc-800'}`} {...props} />,
+              table: ({ node, ...props }) => (
+                <div className="overflow-x-auto my-6 border border-zinc-200 dark:border-zinc-800 rounded-xl shadow-sm">
+                  <table className="min-w-full divide-y divide-zinc-200 dark:divide-zinc-800 text-sm" {...props} />
+                </div>
+              ),
+              thead: ({ node, ...props }) => <thead className={isDarkMode ? 'bg-zinc-900/50' : 'bg-zinc-50'} {...props} />,
+              tbody: ({ node, ...props }) => <tbody className={`divide-y ${isDarkMode ? 'divide-zinc-800/60 bg-zinc-950/20' : 'divide-zinc-100 bg-white'}`} {...props} />,
+              tr: ({ node, ...props }) => <tr className={isDarkMode ? 'hover:bg-zinc-900/20' : 'hover:bg-zinc-50/50'} {...props} />,
+              th: ({ node, ...props }) => <th className={`px-4 py-3 text-left text-xs font-bold uppercase tracking-wider ${isDarkMode ? 'text-zinc-400 border-zinc-800' : 'text-zinc-500 border-zinc-200'} border-b`} {...props} />,
+              td: ({ node, ...props }) => <td className={`px-4 py-3 text-xs md:text-sm font-medium ${isDarkMode ? 'text-zinc-300' : 'text-zinc-700'}`} {...props} />
+            }}
+          >
+            {para}
+          </ReactMarkdown>
+        </div>
+      ))}
+    </div>
+  );
 };
 
 // Helper to get beautiful SVG icons based on card titles
