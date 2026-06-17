@@ -415,7 +415,7 @@ export default function DocsPage() {
 
         {/* SIDEBAR */}
         <aside className={`
-          w-80 max-w-[85vw] flex-shrink-0 flex flex-col fixed md:static top-[73px] bottom-0 left-0 z-40 border-r transition-transform duration-300 ease-in-out
+          w-80 max-w-[85vw] flex-shrink-0 flex flex-col fixed md:sticky top-[73px] bottom-0 left-0 z-40 border-r transition-transform duration-300 ease-in-out
           ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
           ${isDarkMode ? 'bg-zinc-950/95 md:bg-zinc-955/50 border-zinc-900' : 'bg-zinc-50 md:bg-zinc-100/50 border-zinc-200'}
           md:flex md:w-96 md:h-[calc(100vh-73px)]
