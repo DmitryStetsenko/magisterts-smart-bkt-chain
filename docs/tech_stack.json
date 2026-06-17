@@ -38,16 +38,16 @@
           "code_blocks": [
             {
               "lang": "text",
-              "content": "smart-bkt-chain/\n├── apps/\n│   ├── web/                  # Next.js Frontend (Студенти, викладачі, роботодавці)\n│   │   ├── src/app/          # App Router\n│   │   └── package.json\n│   ├── admin/                # Next.js Admin Panel (CMS для контенту та CRM аналітика)\n│   │   ├── src/app/          # App Router (Окремий захищений бандл)\n│   │   └── package.json\n│   ├── api/                  # NestJS Backend (Latest Stable)\n│   │   ├── src/              # Модулі (BKT, Auth, Courses, Web3)\n│   │   └── package.json\n│   └── docs/                 # Next.js Docs & Tech Stack Presenter (Static Export для GitHub Pages)\n│       ├── src/\n│       └── package.json\n├── packages/\n│   ├── database/             # Prisma schema та клієнт БД\n│   │   ├── prisma/\n│   │   │   └── schema.prisma\n│   │   └── package.json\n│   ├── contracts/            # Solidity смарт-контракти (Hardhat/Foundry)\n│   │   ├── contracts/\n│   │   └── package.json\n│   └── types/                # Спільні інтерфейси та DTO\n│       ├── index.ts\n│       └── package.json\n├── docs/                     # Проєктна документація\n│   └── tech_stack.md\n├── docker-compose.yml        # Локальна інфраструктура (PostgreSQL)\n├── package.json              # Корневий конфіг workspaces\n└── turbo.json                # Конфігурація Turborepo (опціонально)"
+              "content": "smart-bkt-chain/\n├── apps/\n│   ├── web/                  # Next.js Frontend (Студенти, викладачі, роботодавці)\n│   │   ├── src/app/          # App Router\n│   │   └── package.json\n│   ├── admin/                # Next.js Admin Panel (CMS для контенту та CRM аналітика)\n│   │   ├── src/app/          # App Router (Окремий захищений бандл)\n│   │   └── package.json\n│   ├── api/                  # NestJS Backend (Latest Stable)\n│   │   ├── src/              # Модулі (BKT, Auth, Courses, Web3)\n│   │   └── package.json\n│   └── docs/                 # Next.js Docs & Tech Stack Presenter (Static Export для GitHub Pages)\n│       ├── src/\n│       └── package.json\n├── packages/\n│   ├── database/             # Prisma schema та клієнт БД\n│   │   ├── prisma/\n│   │   │   └── schema.prisma\n│   │   └── package.json\n│   ├── contracts/            # Solidity смарт-контракти (Hardhat/Foundry)\n│   │   ├── contracts/\n│   │   └── package.json\n│   ├── types/                # Спільні інтерфейси та DTO\n│   │   ├── index.ts\n│   │   └── package.json\n│   └── ui/                   # Спільні компоненти та Storybook (Tailwind + shadcn/ui)\n│       ├── src/              # Компоненти інтерфейсу\n│       ├── .storybook/       # Конфігурація Storybook\n│       └── package.json\n├── docs/                     # Проєктна документація\n│   └── tech_stack.md\n├── docker-compose.yml        # Локальна інфраструктура (PostgreSQL)\n├── package.json              # Корневий конфіг workspaces\n└── turbo.json                # Конфігурація Turborepo (опціонально)"
             }
           ],
           "items": []
         },
         {
-          "title": "2.1. Концепція наскрізної типізації (End-to-End Type Safety)",
+          "title": "2.1. Концепція наскрізної типізації та ізоляції інтерфейсу (End-to-End Type Safety & Component Isolation)",
           "level": 3,
           "paragraphs": [
-            "Для запобігання помилкам узгодженості даних на різних рівнях системи, монорепозиторій реалізує наскрізну типізацію за трьома основними векторами:"
+            "Для запобігання помилкам узгодженості даних на різних рівнях системи та забезпечення однакового дизайну, монорепозиторій реалізує наскрізну типізацію та ізоляцію інтерфейсу за чотирма основними векторами:"
           ],
           "code_blocks": [],
           "items": [
@@ -74,6 +74,15 @@
               "subitems": [
                 "При компіляції Solidity-контрактів у `packages/contracts`, утиліти (Foundry/Hardhat) генерують JSON ABI та відповідні TypeScript-інтерфейси.",
                 "Фронтенд (через Wagmi/Viem) та бекенд (через Viem релейєри) імпортують ці згенеровані ABI та типи. При зміні сигнатури методу смарт-контракту (наприклад, додавання аргументу у функцію `mintDiploma`), TypeScript підсвітить помилки компіляції у коді викликів і на клієнтській, і на серверній частині."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Спільна дизайн-система та Storybook (`@sbc/ui`):**",
+              "subitems": [
+                "Усі UI-компоненти, побудовані на базі Tailwind CSS та Radix UI (shadcn/ui), розробляються в ізольованому пакеті `packages/ui`.",
+                "Storybook** (на базі `@storybook/react-vite`) інтегрований безпосередньо у цей пакет для розробки компонентів у повній ізоляції від логіки сторінок, стану додатків чи API-запитів.",
+                "Такий підхід запобігає дублюванню верстки між `apps/web` та `apps/admin`, гарантує повну відповідність єдиному дизайн-коду та дозволяє тестувати складні інтерактивні стани (наприклад, візуалізацію графа знань та Web3-віджети) з використанням моків."
               ]
             },
             {
