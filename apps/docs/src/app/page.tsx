@@ -78,9 +78,31 @@ const formatMarkdown = (text: string, isDarkMode: boolean): React.ReactNode => {
 const renderParagraphs = (paragraphs: string[], isDarkMode: boolean, pClassName: string) => {
   if (!paragraphs || paragraphs.length === 0) return null;
 
+  const groupedParagraphs: string[] = [];
+  let currentTable: string[] = [];
+
+  paragraphs.forEach((para) => {
+    const trimmed = para.trim();
+    const isTableRow = trimmed.startsWith('|') && trimmed.endsWith('|');
+
+    if (isTableRow) {
+      currentTable.push(para);
+    } else {
+      if (currentTable.length > 0) {
+        groupedParagraphs.push(currentTable.join('\n'));
+        currentTable = [];
+      }
+      groupedParagraphs.push(para);
+    }
+  });
+
+  if (currentTable.length > 0) {
+    groupedParagraphs.push(currentTable.join('\n'));
+  }
+
   return (
     <div className="space-y-4">
-      {paragraphs.map((para, idx) => (
+      {groupedParagraphs.map((para, idx) => (
         <div key={idx} className={pClassName}>
           <ReactMarkdown
             remarkPlugins={[remarkGfm]}
@@ -608,13 +630,17 @@ export default function DocsPage() {
 
                               sub.items.forEach((item) => {
                                 const text = item.raw_text;
-                                if (text.startsWith('Опис:')) {
-                                  description = text.replace('Опис:', '').trim();
-                                } else if (text.includes('Епіки') || text.includes('Jira Epics')) {
-                                  const epicsText = text.split(':')[1] || '';
-                                  epics = epicsText.split(',').map((e) => e.replace(/`/g, '').trim()).filter(Boolean);
-                                } else if (text.startsWith('Результат:')) {
-                                  milestone = text.replace('Результат:', '').trim();
+                                const match = text.match(/^\s*\**([^*:]+)(?::\*\*|\*\*:\s*)\s*(.*)$/);
+                                if (match) {
+                                  const key = match[1].trim();
+                                  const value = match[2].trim();
+                                  if (key === 'Опис') {
+                                    description = value;
+                                  } else if (key.includes('Епіки') || key.includes('Jira Epics')) {
+                                    epics = value.split(',').map((e) => e.replace(/`/g, '').trim()).filter(Boolean);
+                                  } else if (key === 'Результат') {
+                                    milestone = value;
+                                  }
                                 }
                               });
 
