@@ -1,0 +1,245 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  STUDENT
+  TEACHER
+  RECRUITER
+  ADMIN
+}
+
+enum TaskDifficulty {
+  EASY
+  MEDIUM
+  HARD
+  ADVANCED
+}
+
+enum SubmissionStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+  ERROR
+}
+
+enum CredentialType {
+  SBT_ERC5192
+  DNFT_ERC721
+}
+
+model User {
+  id                 String              @id @default(uuid())
+  email              String              @unique
+  passwordHash       String?
+  walletAddress      String?             @unique
+  role               UserRole            @default(STUDENT)
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+  profile            UserProfile?
+  bktStates          BktState[]
+  bktHistories       BktHistory[]
+  telemetrySessions  TelemetrySession[]
+  behavioralProfiles BehavioralProfile[]
+  submissions        Submission[]
+  credentials        Credential[]
+
+  @@map("users")
+}
+
+model UserProfile {
+  id        String   @id @default(uuid())
+  userId    String   @unique
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  firstName String?
+  lastName  String?
+  avatarUrl String?
+  bio       String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("user_profiles")
+}
+
+model SkillNode {
+  id                 String            @id @default(uuid())
+  slug               String            @unique
+  title              String
+  description        String
+  category           String
+  difficulty         TaskDifficulty    @default(EASY)
+  createdAt          DateTime          @default(now())
+  updatedAt          DateTime          @updatedAt
+  tasks              Task[]
+  bktStates          BktState[]
+  bktHistories       BktHistory[]
+  parentDependencies SkillDependency[] @relation("ChildSkill")
+  childDependencies  SkillDependency[] @relation("ParentSkill")
+  credentials        Credential[]
+
+  @@map("skill_nodes")
+}
+
+model SkillDependency {
+  id              String    @id @default(uuid())
+  parentSkillId   String
+  parentSkill     SkillNode @relation("ParentSkill", fields: [parentSkillId], references: [id], onDelete: Cascade)
+  childSkillId    String
+  childSkill      SkillNode @relation("ChildSkill", fields: [childSkillId], references: [id], onDelete: Cascade)
+  requiredMastery Float     @default(0.95)
+
+  @@unique([parentSkillId, childSkillId])
+  @@map("skill_dependencies")
+}
+
+model Task {
+  id                String             @id @default(uuid())
+  skillId           String
+  skill             SkillNode          @relation(fields: [skillId], references: [id], onDelete: Cascade)
+  title             String
+  description       String
+  starterCode       String
+  difficulty        TaskDifficulty     @default(EASY)
+  timeLimitMs       Int                @default(5000)
+  memoryLimitMb     Int                @default(128)
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+  testCases         TestCase[]
+  submissions       Submission[]
+  telemetrySessions TelemetrySession[]
+
+  @@map("tasks")
+}
+
+model TestCase {
+  id             String  @id @default(uuid())
+  taskId         String
+  task           Task    @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  input          String
+  expectedOutput String
+  isSecret       Boolean @default(false)
+
+  @@map("test_cases")
+}
+
+model BktState {
+  id            String    @id @default(uuid())
+  userId        String
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  skillId       String
+  skill         SkillNode @relation(fields: [skillId], references: [id], onDelete: Cascade)
+  pMastery      Float     @default(0.1)
+  pTransit      Float     @default(0.2)
+  pSlip         Float     @default(0.1)
+  pGuess        Float     @default(0.2)
+  attemptsCount Int       @default(0)
+  isMastered    Boolean   @default(false)
+  masteredAt    DateTime?
+  updatedAt     DateTime  @updatedAt
+
+  @@unique([userId, skillId])
+  @@map("bkt_states")
+}
+
+model BktHistory {
+  id             String    @id @default(uuid())
+  userId         String
+  user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  skillId        String
+  skill          SkillNode @relation(fields: [skillId], references: [id], onDelete: Cascade)
+  pMasteryBefore Float
+  pMasteryAfter  Float
+  isCorrect      Boolean
+  createdAt      DateTime  @default(now())
+
+  @@map("bkt_histories")
+}
+
+model TelemetrySession {
+  id                String             @id @default(uuid())
+  userId            String
+  user              User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  taskId            String
+  task              Task               @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  startedAt         DateTime           @default(now())
+  endedAt           DateTime?
+  logs              TelemetryLog[]
+  behavioralProfile BehavioralProfile?
+
+  @@map("telemetry_sessions")
+}
+
+model TelemetryLog {
+  id        String           @id @default(uuid())
+  sessionId String
+  session   TelemetrySession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  eventType String
+  eventData Json
+  timestamp DateTime         @default(now())
+
+  @@map("telemetry_logs")
+}
+
+model BehavioralProfile {
+  id               String           @id @default(uuid())
+  userId           String
+  user             User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sessionId        String           @unique
+  session          TelemetrySession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  typingSpeedWpm   Float            @default(0)
+  pasteRatio       Float            @default(0)
+  pauseDurationMs  Int              @default(0)
+  trustCoefficient Float            @default(1.0)
+  createdAt        DateTime         @default(now())
+
+  @@map("behavioral_profiles")
+}
+
+model Submission {
+  id               String            @id @default(uuid())
+  userId           String
+  user             User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  taskId           String
+  task             Task              @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  code             String
+  status           SubmissionStatus  @default(PENDING)
+  createdAt        DateTime          @default(now())
+  evaluationResult EvaluationResult?
+
+  @@map("submissions")
+}
+
+model EvaluationResult {
+  id              String     @id @default(uuid())
+  submissionId    String     @unique
+  submission      Submission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+  astPassed       Boolean    @default(false)
+  unitTestsPassed Int        @default(0)
+  unitTestsTotal  Int        @default(0)
+  llmFeedback     String?
+  llmScore        Float?
+  createdAt       DateTime   @default(now())
+
+  @@map("evaluation_results")
+}
+
+model Credential {
+  id              String         @id @default(uuid())
+  userId          String
+  user            User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  skillId         String
+  skill           SkillNode      @relation(fields: [skillId], references: [id], onDelete: Cascade)
+  type            CredentialType @default(SBT_ERC5192)
+  contractAddress String
+  tokenId         String
+  txHash          String
+  tokenUri        String
+  issuedAt        DateTime       @default(now())
+
+  @@map("credentials")
+}
