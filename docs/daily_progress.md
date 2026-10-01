@@ -4,6 +4,18 @@
 
 ---
 
+## 📅 01 жовтня 2026 року
+
+### ✅ Що зроблено за день:
+1. **Завершено Крок 1 Master Plan (Проєктування бази даних та локальне оточення):**
+   - **Docker & локальне середовище:** Розгорнуто `docker-compose.yml` з інстансами **PostgreSQL 16** (`sbc-postgres`, порт 5432) та **Redis 7** (`sbc-redis`, порт 6379) з автоматичними healthcheck перевірками.
+   - **Схема бази даних ([schema.prisma](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/packages/database/prisma/schema.prisma)):** Спроєктовано та реалізовано 14 моделей даних (`User`, `UserProfile`, `SkillNode`, `SkillDependency`, `Task`, `TestCase`, `BktState`, `BktHistory`, `TelemetrySession`, `TelemetryLog`, `BehavioralProfile`, `Submission`, `EvaluationResult`, `Credential`).
+   - **Міграція та генерація типізованого клієнта:** Виконано початкову міграцію `20261001091705_init` та згенеровано тип-безпечний Prisma Client v6.
+   - **Початкові дані (Seeding):** Створено скрипт `seed.ts` для автозаповнення тестовими користувачами, орієнтованим графом навичок (DAG), початковим BKT-станом та практичним завданням.
+   - **Усунено конфлікти конфігурацій та IDE:** Виправлено помилки підключення до Prisma Studio, налаштовано типізацію у `packages/database/tsconfig.json` та додано команду `npm run db:studio`.
+
+---
+
 ## 📅 17 червня 2026 року
 
 ### ✅ Що зроблено за день:
