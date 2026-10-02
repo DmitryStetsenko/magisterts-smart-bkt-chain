@@ -7,6 +7,7 @@
   ],
   "scripts": {
     "db:studio": "prisma studio --schema=packages/database/prisma/schema.prisma",
+    "db:seed": "npm run prisma:seed --workspace=@sbc/database",
     "dev:docs": "npm run dev --workspace=apps/docs",
     "build:docs": "npm run build --workspace=apps/docs",
     "compile:docs": "python scripts/compile_docs.py"
