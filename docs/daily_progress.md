@@ -11,6 +11,11 @@
    - **Інтеграція Prisma ORM:** Реалізовано `PrismaService` та `DatabaseModule` у [src/adapters/outbound/persistence/prisma.service.ts](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/api/src/adapters/outbound/persistence/prisma.service.ts), що імпортують Prisma Client з `@sbc/database`.
    - **Healthcheck REST ендпоінт:** Додано [HealthController](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/api/src/adapters/inbound/http/health.controller.ts) (`GET /api/v1/health`) для перевірки готовності сервера та активного з'єднання з PostgreSQL.
    - **Скрипти розробки:** У кореневий [package.json](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/package.json) додано команди `dev:api` та `build:api`. успішно виконано збірку проекту.
+2. **Завершено Крок 3 Master Plan (BKT Core Engine & Task Sequencing):**
+   - **Наповнення Міні-Курсом ([seed.ts](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/packages/database/prisma/seed.ts)):** Розширено базу даних 3 модулями (`js-basics` -> `js-arrays` -> `js-async`) та 5 практичними завданнями із відкритими й прихованими тест-кейсами.
+   - **BKT Math Engine ([bkt-engine.ts](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/api/src/domain/bkt/bkt-engine.ts)):** Написано чисту бізнес-логіку обчислення $P(L_t | \text{obs})$ при правильній/неправильній відповіді та оновлення переходу $P(L_t)$ з обмеженням діапазону $[0.0001, 0.9999]$.
+   - **Task Sequencing Engine ([task-sequencer.ts](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/api/src/domain/sequencing/task-sequencer.ts)):** Реалізовано алгоритм адаптивного вибору наступного завдання на основі порогу $P(L_t) \ge 0.95$ та структури графа знань (DAG).
+   - **100% Покриття Unit-Тестами ([bkt-engine.spec.ts](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/api/src/domain/bkt/bkt-engine.spec.ts), [task-sequencer.spec.ts](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/api/src/domain/sequencing/task-sequencer.spec.ts)):** Створено та успішно виконано 7 юніт-тестів для перевірки динаміки $P(L_t)$ та логіки переходу між модулями курсу.
 
 ---
 
