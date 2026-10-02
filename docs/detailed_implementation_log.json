@@ -1,0 +1,523 @@
+{
+  "project_title": "📚 Детальний Технічний Журнал Реалізації (Detailed Technical Implementation Log)",
+  "sections": [
+    {
+      "title": "🏗️ 0. Загальна Архітектура Монорепозиторію",
+      "level": 2,
+      "paragraphs": [
+        "Проєкт побудовано за принципами монорепозиторію (npm workspaces):"
+      ],
+      "code_blocks": [],
+      "items": [
+        {
+          "type": "text",
+          "raw_text": "`apps/api` — NestJS бекенд (Гексагональна архітектура Ports & Adapters, Swagger OpenAPI, WebSockets, REST).",
+          "subitems": []
+        },
+        {
+          "type": "text",
+          "raw_text": "`apps/docs` — Документаційний портал (Next.js 16, React 19, TailwindCSS 4).",
+          "subitems": []
+        },
+        {
+          "type": "text",
+          "raw_text": "`apps/web` — Студентський кабінет з інтеграцією Monaco Editor (Next.js).",
+          "subitems": []
+        },
+        {
+          "type": "text",
+          "raw_text": "`packages/database` — Ізольований пакет роботи з БД (Prisma ORM, PostgreSQL schema, міграції, сидинг).",
+          "subitems": []
+        },
+        {
+          "type": "text",
+          "raw_text": "`packages/contracts` — Web3 / Solidity смарт-контракти для атестації результатів (Hardhat).",
+          "subitems": []
+        },
+        {
+          "type": "text",
+          "raw_text": "---",
+          "subitems": []
+        }
+      ],
+      "subsections": []
+    },
+    {
+      "title": "🧱 Крок 1: Проєктування бази даних (Prisma Schema) та локальне оточення",
+      "level": 2,
+      "paragraphs": [],
+      "code_blocks": [],
+      "items": [],
+      "subsections": [
+        {
+          "title": "1.1 Docker & Локальні Сервіси",
+          "level": 3,
+          "paragraphs": [
+            "У файлі `docker-compose.yml` розгорнуто та сконфігуровано 2 контейнери:"
+          ],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "kv",
+              "key": "`sbc-postgres`",
+              "value": "PostgreSQL 16 Alpine (порт `5432:5432`), база даних `smart_bkt_chain`.",
+              "raw_text": "**`sbc-postgres`**: PostgreSQL 16 Alpine (порт `5432:5432`), база даних `smart_bkt_chain`.",
+              "subitems": []
+            },
+            {
+              "type": "kv",
+              "key": "`sbc-redis`",
+              "value": "Redis 7 Alpine (порт `6379:6379`), призначений для квешування телеметрії та сесій.",
+              "raw_text": "**`sbc-redis`**: Redis 7 Alpine (порт `6379:6379`), призначений для квешування телеметрії та сесій.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Додано автоматичні перевірки стану (Healthchecks) з інтервалом 10с.",
+              "subitems": []
+            }
+          ]
+        },
+        {
+          "title": "1.2 Схема даних Prisma (`packages/database/prisma/schema.prisma`)",
+          "level": 3,
+          "paragraphs": [
+            "Спроєктовано **14 моделей даних**:",
+            "10. `TelemetryLog` — Сирі події телеметрії (KeystrokePauseMs, Wpm, DeleteCount, PasteEvents).",
+            "11. `BehavioralProfile` — Поведінковий профіль студента (FatigueIndex, CopyPasteRatio, AvgPauseTime).",
+            "12. `Submission` — Спроба вирішення завдання (UserId, TaskId, SourceCode, Status).",
+            "13. `EvaluationResult` — Результат перевірки коду (PassedTestsCount, TotalTestsCount, ExecutionTimeMs).",
+            "14. `Credential` — Специфікація Web3 NFT-сертифіката засвоєння навичок."
+          ],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "`User` — Базова сутність користувача (Email, PasswordHash, Role: STUDENT/TEACHER/ADMIN).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "`UserProfile` — Профіль (FirstName, LastName, Bio, Avatar).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "`SkillNode` — Вузол графа знань (Title, Slug, Category, Difficulty).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "`SkillDependency` — Ребра орієнтованого графа (ParentSkillId, ChildSkillId, RequiredMastery = 0.95).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "`Task` — Практичне завдання (SkillId, Title, Description, StarterCode, Difficulty).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "`TestCase` — Тест-кейси до задач (Input, ExpectedOutput, IsSecret).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "`BktState` — Актуальний стан знань $P(L_t)$, $P(T)$, $P(S)$, $P(G)$ для пари (UserId, SkillId).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "`BktHistory` — Хронологічний лог змін $P(L_t)$ після кожного виконання завдання.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "`TelemetrySession` — Сесія збору телеметрії вводу коду (UserId, TaskId, StartedAt, EndedAt).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "---",
+              "subitems": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "⚙️ Крок 2: Ініціалізація NestJS бекенду (`apps/api`) & Swagger UI",
+      "level": 2,
+      "paragraphs": [],
+      "code_blocks": [],
+      "items": [],
+      "subsections": [
+        {
+          "title": "2.1 Налаштування модуля `@sbc/api`",
+          "level": 3,
+          "paragraphs": [],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "Ініціалізовано NestJS v10 у папці `apps/api`.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Додано глобальний префікс всіх REST-запитів `/api/v1`.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Налаштовано CORS для підтримки взаємодії з клієнтськими веб-додатками.",
+              "subitems": []
+            }
+          ]
+        },
+        {
+          "title": "2.2 Гексагональна архітектура (Ports & Adapters)",
+          "level": 3,
+          "paragraphs": [
+            "Організовано структуру директорій:"
+          ],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "kv",
+              "key": "`src/domain/`",
+              "value": "Чиста бізнес-логіка (BKT моделі, Task Sequencing).",
+              "raw_text": "**`src/domain/`**: Чиста бізнес-логіка (BKT моделі, Task Sequencing).",
+              "subitems": []
+            },
+            {
+              "type": "kv",
+              "key": "`src/ports/`",
+              "value": "Інтерфейси вхідних use-cases та вихідних репозиторіїв.",
+              "raw_text": "**`src/ports/`**: Інтерфейси вхідних use-cases та вихідних репозиторіїв.",
+              "subitems": []
+            },
+            {
+              "type": "kv",
+              "key": "`src/adapters/`",
+              "value": "",
+              "raw_text": "**`src/adapters/`**:",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "`adapters/outbound/persistence/`: `PrismaService` та `DatabaseModule` для з'єднання з PostgreSQL.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "`adapters/inbound/http/`: REST контролери (`HealthController`).",
+              "subitems": []
+            }
+          ]
+        },
+        {
+          "title": "2.3 Свагер Документація (OpenAPI 3.0)",
+          "level": 3,
+          "paragraphs": [],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "Інтегровано `@nestjs/swagger` та `swagger-ui-express`.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Swagger UI доступний за адресою: **`http://localhost:3000/api/v1/docs`**.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Створено анотації для `HealthController` (`GET /api/v1/health`), що повертає статус сервера та перевіряє стан БД через `SELECT 1`.",
+              "subitems": []
+            }
+          ]
+        },
+        {
+          "title": "2.4 Усунення сумісності з Node.js v22",
+          "level": 3,
+          "paragraphs": [],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "Оновлено `packages/database/tsconfig.json` (`rootDir: \"src\"`) для коректної збірки в `dist/index.js`.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Замінено синтаксис `declare global` у `packages/database/src/index.ts` на тип-безпечне приведення `globalThis as unknown as ...`.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "---",
+              "subitems": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "🧮 Крок 3: BKT Core Engine, Task Sequencing & Наповнення Міні-Курсом",
+      "level": 2,
+      "paragraphs": [],
+      "code_blocks": [],
+      "items": [],
+      "subsections": [
+        {
+          "title": "3.1 Контент Міні-Курсу («JavaScript: від синтаксису до асинхронності»)",
+          "level": 3,
+          "paragraphs": [
+            "У скрипті `packages/database/prisma/seed.ts` реалізовано автозаповнення БД:"
+          ],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "**Вузол 1 (`js-basics`):** «Основи JavaScript та Синтаксис»",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Задача 1: `sum(a, b)` — Сума двох чисел (EASY)",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Задача 2: `isEven(n)` — Перевірка парності (EASY)",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Вузол 2 (`js-arrays`):** «Масиви та Методи обходу»",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Задача 3: `filterEvens(numbers)` — Фільтрація парних елементів (MEDIUM)",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Задача 4: `calcTotal(items)` — Сума об'єктів кошика (MEDIUM)",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Вузол 3 (`js-async`):** «Асинхронне програмування»",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Задача 5: `fetchUser(id)` — Асинхронний запит профілю (HARD)",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Зв'язки DAG:** `js-basics` ($0.95$) $\\rightarrow$ `js-arrays` ($0.95$) $\\rightarrow$ `js-async`.",
+              "subitems": []
+            }
+          ]
+        },
+        {
+          "title": "3.2 BKT Core Engine ([`apps/api/src/domain/bkt/bkt-engine.ts`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/api/src/domain/bkt/bkt-engine.ts))",
+          "level": 3,
+          "paragraphs": [
+            "Математичний рушій обчислення $P(L_t)$ на основі Байєсівської адаптації:",
+            "$$P(L_t | \\text{correct}) = \\frac{P(L_{t-1}) \\cdot (1 - P(S))}{P(L_{t-1}) \\cdot (1 - P(S)) + (1 - P(L_{t-1})) \\cdot P(G)}$$",
+            "$$P(L_t | \\text{incorrect}) = \\frac{P(L_{t-1}) \\cdot P(S)}{P(L_{t-1}) \\cdot P(S) + (1 - P(L_{t-1})) \\cdot (1 - P(G))}$$",
+            "$$P(L_t) = P(L_t | \\text{obs}) + (1 - P(L_t | \\text{obs})) \\cdot P(T)$$"
+          ],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "При правильній відповіді:",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "При помилці:",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Оновлення переходу знань:",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Обмеження діапазону $[0.0001, 0.9999]$ для числової стабільності.",
+              "subitems": []
+            }
+          ]
+        },
+        {
+          "title": "3.3 Task Sequencing Engine ([`apps/api/src/domain/sequencing/task-sequencer.ts`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/api/src/domain/sequencing/task-sequencer.ts))",
+          "level": 3,
+          "paragraphs": [],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "Автоматичний аналіз графа знань (DAG).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Якщо $P(L_t) < 0.95$ — підбір наступного незавершеного завдання з поточного вузла.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Якщо $P(L_t) \\ge 0.95$ — автоматичне розблокування та перехід до наступного зв'язаного вузла у графі.",
+              "subitems": []
+            }
+          ]
+        },
+        {
+          "title": "3.4 Юніт-тести (Jest)",
+          "level": 3,
+          "paragraphs": [],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "Написано 7 комплексних тестів у `bkt-engine.spec.ts` та `task-sequencer.spec.ts`.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Результат:** 100% тестів пройдено успішно (`7 passed, 7 total`).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "---",
+              "subitems": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "📡 Крок 4: REST API, WebSockets та Збір Телеметрії",
+      "level": 2,
+      "paragraphs": [],
+      "code_blocks": [],
+      "items": [],
+      "subsections": [
+        {
+          "title": "4.1 REST Контролери та Ендпоінти (`apps/api/src/adapters/inbound/http/`)",
+          "level": 3,
+          "paragraphs": [],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "**`TaskController` (`/api/v1/tasks`):**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "`GET /api/v1/tasks` — Отримання списку всіх доступних практичних завдань згрупованих за вузлами графа навичок.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "`GET /api/v1/tasks/recommended` — Запит адаптивного рекомендованого завдання для студента на основі стану $P(L_t)$ у BKT.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "`GET /api/v1/tasks/:id` — Отримання детальної інформації про завдання (початковий код та відкриті тест-кейси).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**`BktController` (`/api/v1/bkt`):**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "`POST /api/v1/bkt/evaluate` — Відправка студентського рішення на ізольоване виконання в Node.js VM context:",
+              "subitems": [
+                "Безпечна перевірка рішень проти відкритих і прихованих тест-кейсів.",
+                "Автоматичний розрахунок нового $P(L_t)$ через `BktEngine`.",
+                "Збереження спроби `Submission` (статус `ACCEPTED` / `REJECTED`), результату `EvaluationResult` та хронології `BktHistory`."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "`GET /api/v1/bkt/state/:userId` — Перегляд актуального стану $P(L_t)$ студента за всіма вузлами графа навичок.",
+              "subitems": []
+            }
+          ]
+        },
+        {
+          "title": "4.2 WebSocket Gateway Телеметрії (`TelemetryGateway`)",
+          "level": 3,
+          "paragraphs": [],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "Шлях WebSocket: **`ws://localhost:3000/telemetry`** (Socket.io).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Події в реальному часі:",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "`join_session` — Приєднання до кімнати телеметрії (`session_{userId}_{taskId}`) та автоматичне створення `TelemetrySession` у PostgreSQL.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "`telemetry_data` — Збір показників динамики пауз (KeystrokePauseMs), швидкості набору (WPM), видалень (DeleteCount) та вставок (PasteEvents).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Автоматична фіксація сирих логів у таблиці `TelemetryLog`.",
+              "subitems": []
+            }
+          ]
+        },
+        {
+          "title": "4.3 Інтеграційне Тестування (End-to-End Verification)",
+          "level": 3,
+          "paragraphs": [],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "Проведено успішну перевірку ланцюжка через PowerShell HTTP запити:",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "`GET /api/v1/tasks/recommended` $\\rightarrow$ повернено рекомендовану задачу `sum(a, b)` ($P(L_t) = 0.5$).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "`POST /api/v1/bkt/evaluate` $\\rightarrow$ успішне виконання 3/3 тест-кейсів, оновлення $P(L_t) \\rightarrow 0.8545$, фіксація `SubmissionStatus.ACCEPTED` в БД.",
+              "subitems": []
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
