@@ -2,6 +2,16 @@
 
 Цей документ фіксує щоденний прогрес розробки, архітектурні рішення та планування наступних кроків для системи «Smart-BKT-Chain».
 
+## 📅 02 жовтня 2026 року
+
+### ✅ Що зроблено за день:
+1. **Завершено Крок 2 Master Plan (Ініціалізація NestJS бекенду `apps/api`):**
+   - **Каркас NestJS:** Налаштовано додаток NestJS v10 у [apps/api](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/api) (з `tsconfig.json`, `nest-cli.json` та глобальним префіксом `/api/v1`).
+   - **Гексагональна архітектура:** Створено структуру директорій та шар знань (`src/domain/bkt`), шари портів (`src/ports`) та адаптерів (`src/adapters`).
+   - **Інтеграція Prisma ORM:** Реалізовано `PrismaService` та `DatabaseModule` у [src/adapters/outbound/persistence/prisma.service.ts](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/api/src/adapters/outbound/persistence/prisma.service.ts), що імпортують Prisma Client з `@sbc/database`.
+   - **Healthcheck REST ендпоінт:** Додано [HealthController](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/api/src/adapters/inbound/http/health.controller.ts) (`GET /api/v1/health`) для перевірки готовності сервера та активного з'єднання з PostgreSQL.
+   - **Скрипти розробки:** У кореневий [package.json](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/package.json) додано команди `dev:api` та `build:api`. успішно виконано збірку проекту.
+
 ---
 
 ## 📅 01 жовтня 2026 року
