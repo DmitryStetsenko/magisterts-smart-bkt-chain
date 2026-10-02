@@ -16,6 +16,11 @@
    - **BKT Math Engine ([bkt-engine.ts](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/api/src/domain/bkt/bkt-engine.ts)):** Написано чисту бізнес-логіку обчислення $P(L_t | \text{obs})$ при правильній/неправильній відповіді та оновлення переходу $P(L_t)$ з обмеженням діапазону $[0.0001, 0.9999]$.
    - **Task Sequencing Engine ([task-sequencer.ts](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/api/src/domain/sequencing/task-sequencer.ts)):** Реалізовано алгоритм адаптивного вибору наступного завдання на основі порогу $P(L_t) \ge 0.95$ та структури графа знань (DAG).
    - **100% Покриття Unit-Тестами ([bkt-engine.spec.ts](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/api/src/domain/bkt/bkt-engine.spec.ts), [task-sequencer.spec.ts](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/api/src/domain/sequencing/task-sequencer.spec.ts)):** Створено та успішно виконано 7 юніт-тестів для перевірки динаміки $P(L_t)$ та логіки переходу між модулями курсу.
+3. **Завершено Крок 4 Master Plan (REST API, WebSockets та збір телеметрії):**
+   - **REST API Контролери:** Реалізовано [TaskController](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/api/src/adapters/inbound/http/task.controller.ts) (`/api/v1/tasks/recommended`) та [BktController](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/api/src/adapters/inbound/http/bkt.controller.ts) (`POST /api/v1/bkt/evaluate`).
+   - **Ізольоване виконання коду:** Налаштовано оцінювання в Node.js VM context з порівнянням результатів тест-кейсів та оновленням $P(L_t)$ у БД.
+   - **WebSocket Telemetry Gateway:** Створено [TelemetryGateway](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/api/src/adapters/inbound/websocket/telemetry.gateway.ts) (`ws://localhost:3000/telemetry`) для збору темпу (WPM), пауз та дельт коду в реальному часі.
+   - **Створено детальний технічний журнал:** Створено документ [docs/detailed_implementation_log.md](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/docs/detailed_implementation_log.md) для збереження розширених технічних специфікацій проєкту.
 
 ---
 
