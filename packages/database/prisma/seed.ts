@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import { PrismaClient, UserRole, TaskDifficulty } from '@prisma/client';
 
 const prisma = new PrismaClient();
