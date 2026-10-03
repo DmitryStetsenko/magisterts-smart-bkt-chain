@@ -2,6 +2,18 @@
 
 Цей документ фіксує щоденний прогрес розробки, архітектурні рішення та планування наступних кроків для системи «Smart-BKT-Chain».
 
+## 📅 03 жовтня 2026 року
+
+### ✅ Що зроблено за день:
+1. **Розпочато Крок 5 Master Plan (Фронтенд кабінету студента `apps/web`):**
+   - **Мікро-Крок 5.1 (Ініціалізація та конфігурація Next.js):**
+     - Розгорнуто каркас Next.js 16 у [apps/web](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/web) (з `package.json`, `tsconfig.json`, `next.config.ts`, `postcss.config.mjs`).
+     - Інтегровано TailwindCSS v4 та підключено кастомну темну кольорову гаму у [globals.css](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/web/src/app/globals.css).
+     - Створено початковий макет [RootLayout](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/web/src/app/layout.tsx) та головну сторінку кабінету [HomePage](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/web/src/app/page.tsx).
+     - Додано команди `dev:web` (порт 3002) та `build:web` у кореневий [package.json](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/package.json), успішно виконано статичну збірку проекту.
+
+---
+
 ## 📅 02 жовтня 2026 року
 
 ### ✅ Що зроблено за день:
