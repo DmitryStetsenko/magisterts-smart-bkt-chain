@@ -654,6 +654,43 @@
               "subitems": []
             }
           ]
+        },
+        {
+          "title": "5.3 Візуалізація Графа Знань Skill DAG (Мікро-Крок 5.3)",
+          "level": 3,
+          "paragraphs": [],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "**Компонент Skill DAG Graph ([SkillDagMap.tsx](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/web/src/features/skill-graph/ui/SkillDagMap.tsx)):**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Наочне відображення зв'язків орієнтованого графа навчального курсу у форматі прогресивних карток (`js-basics` $\\rightarrow$ `js-arrays` $\\rightarrow$ `js-async`).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Статусна індикація вузлів:",
+              "subitems": [
+                "🟢 **Засвоєно (`MASTERED`):** $P(L_t) \\ge 0.95$, плашка з іконкою перевірки та зелене світіння.",
+                "🟡 **В процесі (`IN_PROGRESS`):** відкритий доступ для тренування.",
+                "🔒 **Заблоковано (`LOCKED`):** очікує засвоєння попередників у графі."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "Анімований progress-bar поточної ймовірності знань $P(L_t)$ під кожним вузлом.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Динамічне перезавантаження картки знань студента з ендпоінту `GET /api/v1/bkt/state/:userId` після кожної оціненої відповіді.",
+              "subitems": []
+            }
+          ]
         }
       ]
     }

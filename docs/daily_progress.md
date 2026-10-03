@@ -16,6 +16,10 @@
      - Написано кастомний хук [useTelemetry.ts](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/web/src/features/code-editor/lib/useTelemetry.ts) для вимірювання пауз (KeystrokePauseMs), темпу набору (WPM), підрахунку видалень та copy-paste подій.
      - Інтегровано `socket.io-client` для трансляції телеметрії по WebSockets (`ws://localhost:3000/telemetry`).
      - Налаштовано з'єднання з REST API (`GET /api/v1/tasks/recommended` та `POST /api/v1/bkt/evaluate`) у [StudentPortalPage](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/web/src/app/page.tsx).
+   - **Мікро-Крок 5.3 (Візуалізація Графа Знань Skill DAG):**
+     - Розроблено компонент [SkillDagMap.tsx](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/web/src/features/skill-graph/ui/SkillDagMap.tsx) з інтерактивними картками модулів курсу (`js-basics` -> `js-arrays` -> `js-async`).
+     - Реалізовано динамічне підсвічування статусу засвоєння на основі $P(L_t)$: 🟢 Засвоєно ($P(L) \ge 0.95$), 🟡 В процесі вивчення, 🔒 Заблокований вузол.
+     - Інтегровано в [StudentPortalPage](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/web/src/app/page.tsx) з автоматичним оновленням прогресу після перевірки завдань.
 
 ---
 
