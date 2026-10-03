@@ -176,6 +176,22 @@
     - **Posterior $P(L_t)$:** `0.9227`
   - Інтегровано передачу телеметричних параметрів: темп набору WPM = 52, натискання клавіш = 28.
 
+---
+
+## 🛡️ Крок 6: Панель викладача та адміністратора (`apps/admin`)
+
+### 6.1 Ініціалізація та конфігурація Next.js Admin App (Мікро-Крок 6.1)
+- **Фреймворк & Інструменти:** Розгорнуто додаток Next.js 16 (React 19, Turbopack) у директорії [`apps/admin`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/admin).
+- **Стилізація:** Інтегровано TailwindCSS v4 та налаштовано темну тему у [globals.css](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/admin/src/app/globals.css).
+- **Конфігурація:**
+  - `package.json` — визначено пакет `@sbc/admin` з портами запуску `3003`.
+  - `tsconfig.json` — підключено аліаси `@/*` та строгий режим TypeScript.
+  - `next.config.ts` — вимкнено індикатори розробника та підключено транспіляцію.
+- **Початкові сторінки:**
+  - `src/app/layout.tsx` — `RootLayout` із метаданими панелі адміністратора Smart-BKT-Chain.
+  - `src/app/page.tsx` — `AdminDashboardPage` з оглядовими картками стану графа знань та BKT показників студентів.
+- **Збірка:** Успішно протестовано статичну збірку `npm run build:admin`.
+
 
 
 

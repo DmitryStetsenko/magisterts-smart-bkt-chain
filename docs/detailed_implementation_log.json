@@ -720,6 +720,78 @@
               "type": "text",
               "raw_text": "Інтегровано передачу телеметричних параметрів: темп набору WPM = 52, натискання клавіш = 28.",
               "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "---",
+              "subitems": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "🛡️ Крок 6: Панель викладача та адміністратора (`apps/admin`)",
+      "level": 2,
+      "paragraphs": [],
+      "code_blocks": [],
+      "items": [],
+      "subsections": [
+        {
+          "title": "6.1 Ініціалізація та конфігурація Next.js Admin App (Мікро-Крок 6.1)",
+          "level": 3,
+          "paragraphs": [],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "**Фреймворк & Інструменти:** Розгорнуто додаток Next.js 16 (React 19, Turbopack) у директорії [`apps/admin`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/admin).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Стилізація:** Інтегровано TailwindCSS v4 та налаштовано темну тему у [globals.css](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/admin/src/app/globals.css).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Конфігурація:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "`package.json` — визначено пакет `@sbc/admin` з портами запуску `3003`.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "`tsconfig.json` — підключено аліаси `@/*` та строгий режим TypeScript.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "`next.config.ts` — вимкнено індикатори розробника та підключено транспіляцію.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Початкові сторінки:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "`src/app/layout.tsx` — `RootLayout` із метаданими панелі адміністратора Smart-BKT-Chain.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "`src/app/page.tsx` — `AdminDashboardPage` з оглядовими картками стану графа знань та BKT показників студентів.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Збірка:** Успішно протестовано статичну збірку `npm run build:admin`.",
+              "subitems": []
             }
           ]
         }
