@@ -820,15 +820,38 @@
               "type": "text",
               "raw_text": "**Створення та видалення:** підтримка інтерактивного створення нових вузлів навичок та видалення застарілих елементів.",
               "subitems": []
-            },
+            }
+          ]
+        },
+        {
+          "title": "6.3 Аналітичний Дашборд Студентів & BKT Heatmap (Мікро-Крок 6.3)",
+          "level": 3,
+          "paragraphs": [],
+          "code_blocks": [],
+          "items": [
             {
               "type": "text",
-              "raw_text": "**Типізація ([skill-editor.types.ts](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/admin/src/features/skill-editor/model/skill-editor.types.ts)):**",
+              "raw_text": "**Компонент StudentAnalyticsTable ([StudentAnalyticsTable.tsx](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/admin/src/features/analytics/ui/StudentAnalyticsTable.tsx)):**",
               "subitems": []
             },
             {
               "type": "text",
-              "raw_text": "Описано інтерфейс `AdminSkillNode` для точного керування BKT конфігурацією на боці панелі викладача.",
+              "raw_text": "**Теплова карта засвоєння (BKT Heatmap):** відображення матриці рівнів засвоєння $P(L_t)$ за кожним вузлом навичок для кожного студента з динамічною колірною схемою (зелений $\\ge 95\\%$, жовтий $\\ge 50\\%$, червоний $< 50\\%$).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Поведінкова телеметрія (Behavioral Telemetry):** візуалізація темпу написання коду (WPM), коефіцієнта копіювання коду (Copy-Paste Ratio) та обчисленого індексу втоми (Fatigue Index) з іконками сповіщення про можливе аномальне списування чи виснаження.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Типізація ([analytics.types.ts](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/admin/src/features/analytics/model/analytics.types.ts)):** інтерфейс `StudentAnalyticsItem` для зведення аналітики BKT та телеметрії.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Збірка:** Протестовано збірку через `npm run build:admin` (0 помилок).",
               "subitems": []
             }
           ]

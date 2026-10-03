@@ -41,12 +41,12 @@
             },
             {
               "type": "text",
-              "raw_text": "**Мікро-Крок 6.2 (Інтерактивний Конструктор Графа Знань Skill DAG):**",
+              "raw_text": "**Мікро-Крок 6.3 (Аналітична Таблиця Студентів & BKT Heatmap):**",
               "subitems": [
-                "Розроблено інтерактивний компонент [SkillDagEditor.tsx](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/admin/src/features/skill-editor/ui/SkillDagEditor.tsx) для візуального редагування вузлів графа навичок.",
-                "Додано форму налаштування параметрів BKT для кожного вузла: $P(L_0)$ (початкові знання), $P(T)$ (ймовірність навчання), $P(S)$ (помилка), $P(G)$ (вгадування).",
-                "Реалізовано можливість додавання нових вузлів, коригування їхніх властивостей, рівня складності та зв'язків з батьківськими вузлами.",
-                "Інтегровано в [AdminDashboardPage](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/admin/src/app/page.tsx) та перевірено збірку (`npm run build:admin`)."
+                "Розроблено компонент [StudentAnalyticsTable.tsx](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/admin/src/features/analytics/ui/StudentAnalyticsTable.tsx) для наочного аналізу прогресу групи студентів.",
+                "Реалізовано теплову карту (Heatmap) рівнів засвоєння $P(L_t)$ по кожному вузлу навичок із кольоровою дифференціацією (🟢 $\\ge 95\\%$, 🟡 $\\ge 50\\%$, 🔴 $< 50\\%$).",
+                "Додано індикатори поведінкової телеметрії: середній WPM, коефіцієнт копіювання коду (Copy-Paste Ratio) та розрахований індекс втоми (Fatigue Index) з алертом аномальної поведінки.",
+                "Інтегровано в [AdminDashboardPage](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/admin/src/app/page.tsx) та успішно виконано збірку (`npm run build:admin`)."
               ]
             },
             {

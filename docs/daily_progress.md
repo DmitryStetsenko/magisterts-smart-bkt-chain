@@ -16,11 +16,11 @@
      - Написано кастомний хук [useTelemetry.ts](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/web/src/features/code-editor/lib/useTelemetry.ts) для вимірювання пауз (KeystrokePauseMs), темпу набору (WPM), підрахунку видалень та copy-paste подій.
      - Інтегровано `socket.io-client` для трансляції телеметрії по WebSockets (`ws://localhost:3000/telemetry`).
      - Налаштовано з'єднання з REST API (`GET /api/v1/tasks/recommended` та `POST /api/v1/bkt/evaluate`) у [StudentPortalPage](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/web/src/app/page.tsx).
-   - **Мікро-Крок 6.2 (Інтерактивний Конструктор Графа Знань Skill DAG):**
-     - Розроблено інтерактивний компонент [SkillDagEditor.tsx](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/admin/src/features/skill-editor/ui/SkillDagEditor.tsx) для візуального редагування вузлів графа навичок.
-     - Додано форму налаштування параметрів BKT для кожного вузла: $P(L_0)$ (початкові знання), $P(T)$ (ймовірність навчання), $P(S)$ (помилка), $P(G)$ (вгадування).
-     - Реалізовано можливість додавання нових вузлів, коригування їхніх властивостей, рівня складності та зв'язків з батьківськими вузлами.
-     - Інтегровано в [AdminDashboardPage](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/admin/src/app/page.tsx) та перевірено збірку (`npm run build:admin`).
+   - **Мікро-Крок 6.3 (Аналітична Таблиця Студентів & BKT Heatmap):**
+     - Розроблено компонент [StudentAnalyticsTable.tsx](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/admin/src/features/analytics/ui/StudentAnalyticsTable.tsx) для наочного аналізу прогресу групи студентів.
+     - Реалізовано теплову карту (Heatmap) рівнів засвоєння $P(L_t)$ по кожному вузлу навичок із кольоровою дифференціацією (🟢 $\ge 95\%$, 🟡 $\ge 50\%$, 🔴 $< 50\%$).
+     - Додано індикатори поведінкової телеметрії: середній WPM, коефіцієнт копіювання коду (Copy-Paste Ratio) та розрахований індекс втоми (Fatigue Index) з алертом аномальної поведінки.
+     - Інтегровано в [AdminDashboardPage](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/admin/src/app/page.tsx) та успішно виконано збірку (`npm run build:admin`).
 
 ---
 
