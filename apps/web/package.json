@@ -1,9 +1,30 @@
 {
-  "name": "web",
+  "name": "@sbc/web",
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "echo 'Web Client dev stub'",
-    "build": "echo 'Web Client build stub'"
+    "dev": "npx next dev --port 3002",
+    "build": "npx next build",
+    "start": "npx next start --port 3002",
+    "lint": "eslint"
+  },
+  "dependencies": {
+    "@monaco-editor/react": "^4.7.0",
+    "clsx": "^2.1.1",
+    "lucide-react": "^0.475.0",
+    "next": "^16.2.9",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
+    "socket.io-client": "^4.8.1",
+    "tailwind-merge": "^3.0.1"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "postcss": "^8",
+    "tailwindcss": "^4",
+    "typescript": "^5"
   }
 }
