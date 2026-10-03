@@ -787,10 +787,48 @@
               "type": "text",
               "raw_text": "`src/app/page.tsx` — `AdminDashboardPage` з оглядовими картками стану графа знань та BKT показників студентів.",
               "subitems": []
+            }
+          ]
+        },
+        {
+          "title": "6.2 Інтерактивний Конструктор Графа Знань Skill DAG (Мікро-Крок 6.2)",
+          "level": 3,
+          "paragraphs": [],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "**Компонент SkillDagEditor ([SkillDagEditor.tsx](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/admin/src/features/skill-editor/ui/SkillDagEditor.tsx)):**",
+              "subitems": []
             },
             {
               "type": "text",
-              "raw_text": "**Збірка:** Успішно протестовано статичну збірку `npm run build:admin`.",
+              "raw_text": "**Візуальний полотно графа (DAG Canvas):** відображення списку всіх вузлів графа навичок із підсвічуванням вибраного елемента, їх рівня складності (EASY/MEDIUM/HARD) та батьківських зв'язків.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Плашка BKT параметрів:** швидке інформування про початковий рівень $P(L_0)$, ймовірність вивчення $P(T)$, помилки $P(S)$ та вгадування $P(G)$.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Інтерактивна форма редагування:** можливість тонкого налаштування параметрів кожного вузла з миттєвим оновленням стану та валідацією числових меж $[0, 1]$.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Створення та видалення:** підтримка інтерактивного створення нових вузлів навичок та видалення застарілих елементів.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Типізація ([skill-editor.types.ts](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/admin/src/features/skill-editor/model/skill-editor.types.ts)):**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Описано інтерфейс `AdminSkillNode` для точного керування BKT конфігурацією на боці панелі викладача.",
               "subitems": []
             }
           ]
