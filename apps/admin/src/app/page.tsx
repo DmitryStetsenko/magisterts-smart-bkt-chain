@@ -4,6 +4,8 @@ import React, { useState } from 'react';
 import { ShieldCheck, Network, Users, BarChart3, ArrowLeft } from 'lucide-react';
 import { SkillDagEditor } from '../features/skill-editor/ui/SkillDagEditor';
 import { AdminSkillNode } from '../features/skill-editor/model/skill-editor.types';
+import { StudentAnalyticsTable } from '../features/analytics/ui/StudentAnalyticsTable';
+import { StudentAnalyticsItem } from '../features/analytics/model/analytics.types';
 
 export default function AdminDashboardPage() {
   const [nodes, setNodes] = useState<AdminSkillNode[]>([
@@ -48,6 +50,51 @@ export default function AdminDashboardPage() {
     },
   ]);
 
+  const [students] = useState<StudentAnalyticsItem[]>([
+    {
+      studentId: 'student-1',
+      name: 'Дмитро Стеценко',
+      email: 'student.demo@smartbkt.edu',
+      skillMastery: {
+        'js-basics': 0.9227,
+        'js-arrays': 0.15,
+        'js-async': 0.0,
+      },
+      avgWpm: 52,
+      copyPasteRatio: 0.05,
+      fatigueIndex: 0.18,
+      lastActive: 'Щойно',
+    },
+    {
+      studentId: 'student-2',
+      name: 'Олена Коваленко',
+      email: 'olena.k@smartbkt.edu',
+      skillMastery: {
+        'js-basics': 0.965,
+        'js-arrays': 0.88,
+        'js-async': 0.42,
+      },
+      avgWpm: 68,
+      copyPasteRatio: 0.12,
+      fatigueIndex: 0.35,
+      lastActive: '12 хв тому',
+    },
+    {
+      studentId: 'student-3',
+      name: 'Олександр Петренко',
+      email: 'alex.p@smartbkt.edu',
+      skillMastery: {
+        'js-basics': 0.45,
+        'js-arrays': 0.0,
+        'js-async': 0.0,
+      },
+      avgWpm: 24,
+      copyPasteRatio: 0.45,
+      fatigueIndex: 0.72,
+      lastActive: '1 год тому',
+    },
+  ]);
+
   const handleSaveNode = (updatedNode: AdminSkillNode) => {
     setNodes((prev) => {
       const exists = prev.some((n) => n.id === updatedNode.id);
@@ -75,7 +122,7 @@ export default function AdminDashboardPage() {
               <span>Smart-BKT-Chain Admin Portal</span>
             </h1>
             <p className="text-sm text-slate-400">
-              Панель викладача: інтерактивне управління графом знань (DAG) та піднормалізація параметрів BKT
+              Панель викладача: управління графом знань (DAG) та аналітика BKT студентів
             </p>
           </div>
         </div>
@@ -105,7 +152,7 @@ export default function AdminDashboardPage() {
           <Users className="w-8 h-8 text-emerald-400" />
           <div>
             <span className="text-xs text-slate-400 font-semibold uppercase">Активні Студенти</span>
-            <h3 className="text-2xl font-bold text-white">1 Студент (Demo)</h3>
+            <h3 className="text-2xl font-bold text-white">{students.length} Студенти</h3>
           </div>
         </div>
 
@@ -113,10 +160,16 @@ export default function AdminDashboardPage() {
           <BarChart3 className="w-8 h-8 text-amber-400" />
           <div>
             <span className="text-xs text-slate-400 font-semibold uppercase">Середня Майстерність P(L)</span>
-            <h3 className="text-2xl font-bold text-white">92.3%</h3>
+            <h3 className="text-2xl font-bold text-white">77.9%</h3>
           </div>
         </div>
       </div>
+
+      {/* 📊 Student Analytics & BKT Heatmap */}
+      <StudentAnalyticsTable
+        students={students}
+        skillSlugs={nodes.map((n) => n.slug)}
+      />
 
       {/* 🗺️ Interactive Skill DAG Editor Component */}
       <SkillDagEditor
