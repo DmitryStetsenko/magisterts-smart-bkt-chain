@@ -16,12 +16,11 @@
      - Написано кастомний хук [useTelemetry.ts](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/web/src/features/code-editor/lib/useTelemetry.ts) для вимірювання пауз (KeystrokePauseMs), темпу набору (WPM), підрахунку видалень та copy-paste подій.
      - Інтегровано `socket.io-client` для трансляції телеметрії по WebSockets (`ws://localhost:3000/telemetry`).
      - Налаштовано з'єднання з REST API (`GET /api/v1/tasks/recommended` та `POST /api/v1/bkt/evaluate`) у [StudentPortalPage](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/web/src/app/page.tsx).
-2. **Розпочато Крок 6 Master Plan (Панель викладача та адміністратора `apps/admin`):**
-   - **Мікро-Крок 6.1 (Ініціалізація та конфігурація Next.js Admin App):**
-     - Створено каркас додатка Next.js 16 (App Router, React 19) у папці [apps/admin](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/admin).
-     - Інтегровано TailwindCSS v4 та налаштовано темну тему у [globals.css](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/admin/src/app/globals.css).
-     - Розроблено базовий макет [RootLayout](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/admin/src/app/layout.tsx) та головну панель викладача [AdminDashboardPage](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/admin/src/app/page.tsx).
-     - Додано скрипти `dev:admin` (порт 3003) та `build:admin` у кореневий [package.json](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/package.json), успішно виконано збірку.
+   - **Мікро-Крок 6.2 (Інтерактивний Конструктор Графа Знань Skill DAG):**
+     - Розроблено інтерактивний компонент [SkillDagEditor.tsx](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/admin/src/features/skill-editor/ui/SkillDagEditor.tsx) для візуального редагування вузлів графа навичок.
+     - Додано форму налаштування параметрів BKT для кожного вузла: $P(L_0)$ (початкові знання), $P(T)$ (ймовірність навчання), $P(S)$ (помилка), $P(G)$ (вгадування).
+     - Реалізовано можливість додавання нових вузлів, коригування їхніх властивостей, рівня складності та зв'язків з батьківськими вузлами.
+     - Інтегровано в [AdminDashboardPage](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/admin/src/app/page.tsx) та перевірено збірку (`npm run build:admin`).
 
 ---
 
