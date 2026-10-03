@@ -514,6 +514,63 @@
               "type": "text",
               "raw_text": "`POST /api/v1/bkt/evaluate` $\\rightarrow$ успішне виконання 3/3 тест-кейсів, оновлення $P(L_t) \\rightarrow 0.8545$, фіксація `SubmissionStatus.ACCEPTED` в БД.",
               "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "---",
+              "subitems": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "🎨 Крок 5: Фронтенд кабінету студента та Monaco Editor (`apps/web`)",
+      "level": 2,
+      "paragraphs": [],
+      "code_blocks": [],
+      "items": [],
+      "subsections": [
+        {
+          "title": "5.1 Ініціалізація та конфігурація Next.js (Мікро-Крок 5.1)",
+          "level": 3,
+          "paragraphs": [],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "**Фреймворк:** Створено додаток Next.js 16 (з App Router) та React 19 у директорії [`apps/web`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/web).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Стилізація:** Інтегровано TailwindCSS v4 з кастомними CSS-змінними темного інтерфейсу (`#090d16` background, `#6366f1` primary indigo, `#10b981` emerald accent).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Структура:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "`src/app/globals.css` — імпорт Tailwind v4 та змінні теми.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "`src/app/layout.tsx` — `RootLayout` з метаданими та системними шрифтами.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "`src/app/page.tsx` — початкова головна сторінка студентського кабінету з картками Monaco Editor та BKT Graph.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Порт розробки:** Налаштовано запуск локального веб-сервера на порту `3002` (`npm run dev:web`). Успішно проведено статичну збірку `npm run build:web`.",
+              "subitems": []
             }
           ]
         }

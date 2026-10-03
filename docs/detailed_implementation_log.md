@@ -128,3 +128,17 @@
 - Проведено успішну перевірку ланцюжка через PowerShell HTTP запити:
   - `GET /api/v1/tasks/recommended` $\rightarrow$ повернено рекомендовану задачу `sum(a, b)` ($P(L_t) = 0.5$).
   - `POST /api/v1/bkt/evaluate` $\rightarrow$ успішне виконання 3/3 тест-кейсів, оновлення $P(L_t) \rightarrow 0.8545$, фіксація `SubmissionStatus.ACCEPTED` в БД.
+
+---
+
+## 🎨 Крок 5: Фронтенд кабінету студента та Monaco Editor (`apps/web`)
+
+### 5.1 Ініціалізація та конфігурація Next.js (Мікро-Крок 5.1)
+- **Фреймворк:** Створено додаток Next.js 16 (з App Router) та React 19 у директорії [`apps/web`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/web).
+- **Стилізація:** Інтегровано TailwindCSS v4 з кастомними CSS-змінними темного інтерфейсу (`#090d16` background, `#6366f1` primary indigo, `#10b981` emerald accent).
+- **Структура:**
+  - `src/app/globals.css` — імпорт Tailwind v4 та змінні теми.
+  - `src/app/layout.tsx` — `RootLayout` з метаданими та системними шрифтами.
+  - `src/app/page.tsx` — початкова головна сторінка студентського кабінету з картками Monaco Editor та BKT Graph.
+- **Порт розробки:** Налаштовано запуск локального веб-сервера на порту `3002` (`npm run dev:web`). Успішно проведено статичну збірку `npm run build:web`.
+
