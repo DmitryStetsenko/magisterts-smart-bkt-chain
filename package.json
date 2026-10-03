@@ -13,6 +13,8 @@
     "test:api": "npm run test --workspace=apps/api",
     "dev:docs": "npm run dev --workspace=apps/docs",
     "build:docs": "npm run build --workspace=apps/docs",
+    "dev:web": "npm run dev --workspace=apps/web",
+    "build:web": "npm run build --workspace=apps/web",
     "compile:docs": "python scripts/compile_docs.py"
   }
 }
