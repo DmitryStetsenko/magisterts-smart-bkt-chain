@@ -11,7 +11,11 @@
 - `apps/docs` — Документаційний портал (Next.js 16, React 19, TailwindCSS 4).
 - `apps/web` — Студентський кабінет з інтеграцією Monaco Editor (Next.js).
 - `packages/database` — Ізольований пакет роботи з БД (Prisma ORM, PostgreSQL schema, міграції, сидинг).
-- `packages/contracts` — Web3 / Solidity смарт-контракти для атестації результатів (Hardhat).
+### 0.1 Правила Проєкту та Регламент AI-Агента ([`.agents/AGENTS.md`](file:///.agents/AGENTS.md))
+Регламент розробки проєкту Smart-BKT-Chain закріплено у файлі [`.agents/AGENTS.md`](file:///.agents/AGENTS.md). Він встановлює обов'язковий порядок дій:
+1. **Обов'язковий трьохкомпонентний лог прогресу:** Після виконання кожного мікро-кроку оновлюються [`daily_progress.md`](file:///docs/daily_progress.md), [`detailed_implementation_log.md`](file:///docs/detailed_implementation_log.md) та виконується компіляція `python scripts/compile_docs.py`.
+2. **Покрокова розробка (Micro-Steps):** Розбиття задач на малі ітерації із обов'язковим `npm run build:*` / `npm run test:*` та окремим `git commit`.
+3. **Захист від припущень:** Перевірка повних трасувань помилок перед виправленням коду.
 
 ---
 

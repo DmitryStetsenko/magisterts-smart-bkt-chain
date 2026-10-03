@@ -28,19 +28,40 @@
           "type": "text",
           "raw_text": "`packages/database` — Ізольований пакет роботи з БД (Prisma ORM, PostgreSQL schema, міграції, сидинг).",
           "subitems": []
-        },
-        {
-          "type": "text",
-          "raw_text": "`packages/contracts` — Web3 / Solidity смарт-контракти для атестації результатів (Hardhat).",
-          "subitems": []
-        },
-        {
-          "type": "text",
-          "raw_text": "---",
-          "subitems": []
         }
       ],
-      "subsections": []
+      "subsections": [
+        {
+          "title": "0.1 Правила Проєкту та Регламент AI-Агента ([`.agents/AGENTS.md`](file:///.agents/AGENTS.md))",
+          "level": 3,
+          "paragraphs": [
+            "Регламент розробки проєкту Smart-BKT-Chain закріплено у файлі [`.agents/AGENTS.md`](file:///.agents/AGENTS.md). Він встановлює обов'язковий порядок дій:"
+          ],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "**Обов'язковий трьохкомпонентний лог прогресу:** Після виконання кожного мікро-кроку оновлюються [`daily_progress.md`](file:///docs/daily_progress.md), [`detailed_implementation_log.md`](file:///docs/detailed_implementation_log.md) та виконується компіляція `python scripts/compile_docs.py`.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Покрокова розробка (Micro-Steps):** Розбиття задач на малі ітерації із обов'язковим `npm run build:*` / `npm run test:*` та окремим `git commit`.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Захист від припущень:** Перевірка повних трасувань помилок перед виправленням коду.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "---",
+              "subitems": []
+            }
+          ]
+        }
+      ]
     },
     {
       "title": "🧱 Крок 1: Проєктування бази даних (Prisma Schema) та локальне оточення",
