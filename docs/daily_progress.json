@@ -41,6 +41,15 @@
             },
             {
               "type": "text",
+              "raw_text": "**Мікро-Крок 5.3 (Візуалізація Графа Знань Skill DAG):**",
+              "subitems": [
+                "Розроблено компонент [SkillDagMap.tsx](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/web/src/features/skill-graph/ui/SkillDagMap.tsx) з інтерактивними картками модулів курсу (`js-basics` -> `js-arrays` -> `js-async`).",
+                "Реалізовано динамічне підсвічування статусу засвоєння на основі $P(L_t)$: 🟢 Засвоєно ($P(L) \\ge 0.95$), 🟡 В процесі вивчення, 🔒 Заблокований вузол.",
+                "Інтегровано в [StudentPortalPage](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/web/src/app/page.tsx) з автоматичним оновленням прогресу після перевірки завдань."
+              ]
+            },
+            {
+              "type": "text",
               "raw_text": "---",
               "subitems": []
             }

@@ -3,6 +3,8 @@
 import React, { useState, useEffect } from 'react';
 import { Brain, Sparkles, CheckCircle, AlertCircle, RefreshCw } from 'lucide-react';
 import { MonacoCodeEditor } from '../features/code-editor/ui/MonacoCodeEditor';
+import { SkillDagMap } from '../features/skill-graph/ui/SkillDagMap';
+import { SkillGraphNode } from '../features/skill-graph/model/skill-graph.types';
 
 interface TaskDetail {
   id: string;
@@ -29,11 +31,81 @@ export default function StudentPortalPage() {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [evalResult, setEvalResult] = useState<any>(null);
+  const [graphNodes, setGraphNodes] = useState<SkillGraphNode[]>([]);
+
+  // Default Mini-Course DAG Nodes fallback
+  const defaultNodes: SkillGraphNode[] = [
+    {
+      id: '1',
+      slug: 'js-basics',
+      title: 'Основи JavaScript',
+      description: 'Типи даних, змінне та оператори',
+      pMastery: 0.5,
+      status: 'IN_PROGRESS',
+      parentSkillIds: [],
+    },
+    {
+      id: '2',
+      slug: 'js-arrays',
+      title: 'Масиви та FP',
+      description: 'Методи map, filter, reduce',
+      pMastery: 0.0,
+      status: 'LOCKED',
+      parentSkillIds: ['js-basics'],
+    },
+    {
+      id: '3',
+      slug: 'js-async',
+      title: 'Асинхронність',
+      description: 'Promises та async/await',
+      pMastery: 0.0,
+      status: 'LOCKED',
+      parentSkillIds: ['js-arrays'],
+    },
+  ];
+
+  const fetchStudentState = async () => {
+    try {
+      const res = await fetch(`${API_URL}/api/v1/bkt/state/demo-student`);
+      if (res.ok) {
+        const states: Array<{ skillSlug: string; pMastery: number }> = await res.json();
+        const masteryMap: Record<string, number> = {};
+        states.forEach((s) => {
+          masteryMap[s.skillSlug] = s.pMastery;
+        });
+
+        const updated = defaultNodes.map((n) => {
+          const p = masteryMap[n.slug] ?? n.pMastery;
+          const isMastered = p >= 0.95;
+          const parentMastered =
+            n.parentSkillIds.length === 0 ||
+            n.parentSkillIds.every((pid) => (masteryMap[pid] ?? 0) >= 0.95);
+
+          return {
+            ...n,
+            pMastery: p,
+            status: isMastered
+              ? ('MASTERED' as const)
+              : parentMastered
+              ? ('IN_PROGRESS' as const)
+              : ('LOCKED' as const),
+          };
+        });
+
+        setGraphNodes(updated);
+      } else {
+        setGraphNodes(defaultNodes);
+      }
+    } catch {
+      setGraphNodes(defaultNodes);
+    }
+  };
 
   const fetchRecommendedTask = async () => {
     setIsLoading(true);
     setEvalResult(null);
     try {
+      await fetchStudentState();
       const res = await fetch(`${API_URL}/api/v1/tasks/recommended`);
       if (res.ok) {
         const data = await res.json();
@@ -68,6 +140,7 @@ export default function StudentPortalPage() {
       if (res.ok) {
         const data = await res.json();
         setEvalResult(data);
+        await fetchStudentState();
       }
     } catch (err) {
       console.error('Error evaluating code:', err);
@@ -86,11 +159,11 @@ export default function StudentPortalPage() {
           </div>
           <div>
             <h1 className="text-xl sm:text-2xl font-bold text-white flex items-center gap-2">
-              <span>Smart-BKT-Chain Portal</span>
+              <span>Smart-BKT-Chain Student Portal</span>
               <Sparkles className="w-4 h-4 text-emerald-400" />
             </h1>
             <p className="text-xs sm:text-sm text-slate-400">
-              Адаптивне практичне завдання з поведінковою телеметрією
+              Адаптивне практичне завдання з поведінковою телеметрією та візуалізацією графа знань BKT
             </p>
           </div>
         </div>
@@ -103,6 +176,12 @@ export default function StudentPortalPage() {
           <span>Оновити рекомендоване</span>
         </button>
       </header>
+
+      {/* 🗺️ Interactive Skill DAG Map Component */}
+      <SkillDagMap
+        nodes={graphNodes.length ? graphNodes : defaultNodes}
+        activeSkillSlug={task?.skill.slug}
+      />
 
       {/* Main Content Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
@@ -128,7 +207,7 @@ export default function StudentPortalPage() {
                 {task.description}
               </p>
 
-              {/* BKT Knowledge State Recommendation Box */}
+              {/* BKT Recommendation Box */}
               {recommendation && (
                 <div className="p-4 bg-indigo-950/40 border border-indigo-800/40 rounded-xl flex flex-col gap-1 text-xs">
                   <span className="font-semibold text-indigo-300">
