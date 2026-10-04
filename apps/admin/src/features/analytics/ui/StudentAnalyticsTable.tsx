@@ -1,22 +1,43 @@
 'use client';
 
-import React from 'react';
-import { Users, Activity, Zap, AlertTriangle } from 'lucide-react';
+import React, { useState } from 'react';
+import { Users, Activity, Zap, AlertTriangle, RotateCcw } from 'lucide-react';
 import { StudentAnalyticsItem } from '../model/analytics.types';
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
 
 interface StudentAnalyticsTableProps {
   students: StudentAnalyticsItem[];
   skillSlugs: string[];
+  onResetStudent?: (studentId: string) => void;
 }
 
 export const StudentAnalyticsTable: React.FC<StudentAnalyticsTableProps> = ({
   students,
   skillSlugs,
+  onResetStudent,
 }) => {
+  const [resettingId, setResettingId] = useState<string | null>(null);
+
   const getMasteryColor = (pMastery: number) => {
     if (pMastery >= 0.95) return 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30';
     if (pMastery >= 0.5) return 'bg-amber-500/20 text-amber-400 border-amber-500/30';
     return 'bg-rose-500/20 text-rose-400 border-rose-500/30';
+  };
+
+  const handleReset = async (studentId: string) => {
+    if (!confirm('Ви дійсно бажаєте анулювати всі результати BKT та історію спроб для цього студента?')) return;
+    setResettingId(studentId);
+    try {
+      const res = await fetch(`${API_URL}/api/v1/bkt/reset/${studentId}`, { method: 'POST' });
+      if (res.ok) {
+        if (onResetStudent) onResetStudent(studentId);
+      }
+    } catch (err) {
+      console.error('Error resetting student BKT state:', err);
+    } finally {
+      setResettingId(null);
+    }
   };
 
   return (
@@ -24,7 +45,12 @@ export const StudentAnalyticsTable: React.FC<StudentAnalyticsTableProps> = ({
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2 text-emerald-400">
           <Users className="w-5 h-5" />
-          <h3 className="font-bold text-white text-lg">Аналітика Студентів & BKT Heatmap</h3>
+          <h3 className="font-bold text-white text-lg flex items-center gap-2">
+            <span>Аналітика Студентів & BKT Heatmap</span>
+            <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-amber-500/10 text-amber-400 border border-amber-500/20">
+              Експериментально
+            </span>
+          </h3>
         </div>
         <span className="text-xs font-semibold text-slate-400">
           Всього студентів: {students.length}
@@ -44,7 +70,7 @@ export const StudentAnalyticsTable: React.FC<StudentAnalyticsTableProps> = ({
               <th className="p-3 text-center">Середній WPM</th>
               <th className="p-3 text-center">Copy-Paste Ratio</th>
               <th className="p-3 text-center">Індекс Втоми</th>
-              <th className="p-3 text-right">Останній вхід</th>
+              <th className="p-3 text-right">Дії</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-800/60 font-mono">
@@ -105,8 +131,16 @@ export const StudentAnalyticsTable: React.FC<StudentAnalyticsTableProps> = ({
                   </div>
                 </td>
 
-                <td className="p-3 text-right text-slate-500 text-[11px]">
-                  {student.lastActive}
+                <td className="p-3 text-right">
+                  <button
+                    onClick={() => handleReset(student.studentId)}
+                    disabled={resettingId === student.studentId}
+                    className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 text-xs font-semibold border border-rose-500/20 transition-all cursor-pointer disabled:opacity-50"
+                    title="Анулювати всі результати BKT та історію спроб"
+                  >
+                    <RotateCcw className={`w-3.5 h-3.5 ${resettingId === student.studentId ? 'animate-spin' : ''}`} />
+                    <span>Анулювати</span>
+                  </button>
                 </td>
               </tr>
             ))}
