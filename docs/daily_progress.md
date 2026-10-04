@@ -2,6 +2,21 @@
 
 Цей документ фіксує щоденний прогрес розробки, архітектурні рішення та планування наступних кроків для системи «Smart-BKT-Chain».
 
+## 📅 04 жовтня 2026 року
+
+### ✅ Що зроблено за день:
+1. **Розширення можливостей VM ізольованого виконання та розв'язання асинхронних завдань (`apps/api`):**
+   - Додано підтримку асинхронних функцій (`Promise`, `async/await`, `setTimeout`, `clearTimeout`) у контекс у Node.js VM для модуля `js-async`.
+   - Налаштовано автоматичне очікування резолву промісів `await result` під час виконання тест-кейсів у [bkt.controller.ts](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/api/src/adapters/inbound/http/bkt.controller.ts).
+   - Створено тестовий скрипт `scripts/test_async_eval.py` для перевірки асинхронного оцінювання рішення `fetchUser(id)`.
+2. **Анулювання стану BKT та підтримка відображення нерозпочатого стану в `apps/web` та `apps/admin`:**
+   - Модифіковано `POST /api/v1/bkt/reset/:studentId` у [bkt.controller.ts](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/api/src/adapters/inbound/http/bkt.controller.ts): видалено каскадні записи `BktState`, `Submission`, `BktHistory` та `TelemetrySession`.
+   - Впроваджено підтримку нерозпочатого стану ($P(L_t) = 0.0\%$, статус `UNSTARTED`) у [SkillDagMap.tsx](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/web/src/features/skill-graph/ui/SkillDagMap.tsx) та [page.tsx](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/web/src/app/page.tsx) для виправлення введеного в оману $50.0\%$ (Bayesian prior) при анулюванні результатів.
+3. **Відображення інформації активного студента у Порталі Студента:**
+   - Додано відображення профілю студента `👤 Дмитро Стеценко (student@example.com)` у шапку веб-кабінету у [page.tsx](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/web/src/app/page.tsx).
+
+---
+
 ## 📅 03 жовтня 2026 року
 
 ### ✅ Що зроблено за день:

@@ -855,6 +855,44 @@
               "subitems": []
             }
           ]
+        },
+        {
+          "title": "6.4 Експериментальний Функціонал Анулювання Прогресу Студентів (Мікро-Крок 6.4)",
+          "level": 3,
+          "paragraphs": [],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "**REST API Ендпоінт Reset (`POST /api/v1/bkt/reset/:studentId`):**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Видалення всіх активних записів `BktState`, спроб розв'язання `Submission`, логів `BktHistory` та сесій телеметрії `TelemetrySession` у [bkt.controller.ts](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/api/src/adapters/inbound/http/bkt.controller.ts).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Повне каскадне скидання дозволяє повернути студента до початкового стану без збереження застарілих апріорних ймовірностей.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Відображення Нерозпочатого Стан (\"UNSTARTED\"):**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Оновлено адаптацію порожніх відповідей `getStudentState` у [SkillDagMap.tsx](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/web/src/features/skill-graph/ui/SkillDagMap.tsx) та [page.tsx](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/web/src/app/page.tsx).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "При відсутності запису $P(L_t)$ у БД відображається точний показник `0.0%` зі статусом `UNSTARTED` (замість введеного в оману 50.0%), що забезпечує прозорість після анулювання.",
+              "subitems": []
+            }
+          ]
         }
       ]
     }
