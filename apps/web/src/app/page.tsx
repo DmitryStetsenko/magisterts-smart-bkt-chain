@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Brain, Sparkles, CheckCircle, AlertCircle, RefreshCw } from 'lucide-react';
+import { Brain, Sparkles, CheckCircle, AlertCircle, RefreshCw, User } from 'lucide-react';
 import { MonacoCodeEditor } from '../features/code-editor/ui/MonacoCodeEditor';
 import { SkillDagMap } from '../features/skill-graph/ui/SkillDagMap';
 import { SkillGraphNode } from '../features/skill-graph/model/skill-graph.types';
@@ -168,13 +168,26 @@ export default function StudentPortalPage() {
           </div>
         </div>
 
-        <button
-          onClick={fetchRecommendedTask}
-          className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold border border-slate-700 transition-all cursor-pointer"
-        >
-          <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin' : ''}`} />
-          <span>Оновити рекомендоване</span>
-        </button>
+        <div className="flex items-center gap-3">
+          {/* Active Student Profile Badge */}
+          <div className="flex items-center gap-2 px-3 py-1.5 bg-indigo-950/60 border border-indigo-800/60 rounded-xl text-xs">
+            <div className="p-1 bg-indigo-500/20 text-indigo-400 rounded-lg">
+              <User className="w-3.5 h-3.5" />
+            </div>
+            <div className="flex flex-col text-left">
+              <span className="font-bold text-slate-200">Дмитро Стеценко</span>
+              <span className="text-[10px] text-slate-400 font-mono">student@example.com</span>
+            </div>
+          </div>
+
+          <button
+            onClick={fetchRecommendedTask}
+            className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold border border-slate-700 transition-all cursor-pointer"
+          >
+            <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin' : ''}`} />
+            <span>Оновити рекомендоване</span>
+          </button>
+        </div>
       </header>
 
       {/* 🗺️ Interactive Skill DAG Map Component */}
