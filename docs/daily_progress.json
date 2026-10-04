@@ -13,7 +13,8 @@
           "level": 3,
           "paragraphs": [
             "10. **Гарантоване перехоплення подій вставки коду у Monaco Editor:**",
-            "11. **100% Покриття Unit-Тестами розробленої аналітики та телеметрії:**"
+            "11. **100% Покриття Unit-Тестами розробленої аналітики та телеметрії:**",
+            "12. **Стратегія впровадження Playwright E2E тестування у правила розробки:**"
           ],
           "code_blocks": [],
           "items": [
@@ -160,6 +161,16 @@
             {
               "type": "text",
               "raw_text": "Усі 9 юніт-тестів проєкту успішно пройдені (0 помилок).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Модифіковано обов'язкові правила проєкту у [.agents/AGENTS.md](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/.agents/AGENTS.md) (Додано розділ 4: «Обов'язкова скрізна перевірка E2E»).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Сформовано план автоматизованого E2E тестування наскрізного ланцюжка: Monaco Editor (`apps/web`) $\\rightarrow$ WebSockets $\\rightarrow$ NestJS API $\\rightarrow$ Admin Dashboard (`apps/admin`).",
               "subitems": []
             },
             {

@@ -36,6 +36,9 @@
 11. **100% Покриття Unit-Тестами розробленої аналітики та телеметрії:**
    - Створено специфікацію [bkt.controller.spec.ts](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/api/src/adapters/inbound/http/bkt.controller.spec.ts) для перевірки зведення `Copy-Paste Ratio = 1.0` при події вставки та обнулення телеметрії при анулюванні `getStudentsAnalytics()`.
    - Усі 9 юніт-тестів проєкту успішно пройдені (0 помилок).
+12. **Стратегія впровадження Playwright E2E тестування у правила розробки:**
+   - Модифіковано обов'язкові правила проєкту у [.agents/AGENTS.md](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/.agents/AGENTS.md) (Додано розділ 4: «Обов'язкова скрізна перевірка E2E»).
+   - Сформовано план автоматизованого E2E тестування наскрізного ланцюжка: Monaco Editor (`apps/web`) $\rightarrow$ WebSockets $\rightarrow$ NestJS API $\rightarrow$ Admin Dashboard (`apps/admin`).
 
 ---
 
