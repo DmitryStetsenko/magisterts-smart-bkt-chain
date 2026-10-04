@@ -14,6 +14,8 @@
    - Впроваджено підтримку нерозпочатого стану ($P(L_t) = 0.0\%$, статус `UNSTARTED`) у [SkillDagMap.tsx](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/web/src/features/skill-graph/ui/SkillDagMap.tsx) та [page.tsx](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/web/src/app/page.tsx) для виправлення введеного в оману $50.0\%$ (Bayesian prior) при анулюванні результатів.
 3. **Відображення інформації активного студента у Порталі Студента:**
    - Додано відображення профілю студента `👤 Дмитро Стеценко (student@example.com)` у шапку веб-кабінету у [page.tsx](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/web/src/app/page.tsx).
+4. **Усунення двозначності у відображенні відкритих тест-кейсах:**
+   - Модифіковано парсинг та форматування тест-кейсів у [page.tsx](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/web/src/app/page.tsx). Тепер замість сирого JSON-масиву аргументів контролеру `[4]` або `[2, 3]` відображаються чисті значення аргументів функції (`4` або `2, 3`), що усуває плутанину між числом та масивом.
 
 ---
 

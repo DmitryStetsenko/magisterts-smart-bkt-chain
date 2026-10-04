@@ -244,7 +244,20 @@ export default function StudentPortalPage() {
                       className="p-3 bg-slate-950/70 border border-slate-800 rounded-lg text-xs font-mono flex flex-col gap-1"
                     >
                       <div className="text-slate-400">
-                        <span className="text-slate-500">Input:</span> {tc.input}
+                        <span className="text-slate-500">Аргументи:</span>{' '}
+                        <span className="text-indigo-300 font-semibold">
+                          {(() => {
+                            try {
+                              const parsed = JSON.parse(tc.input);
+                              if (Array.isArray(parsed)) {
+                                return parsed.map((val) => JSON.stringify(val)).join(', ');
+                              }
+                              return tc.input;
+                            } catch {
+                              return tc.input;
+                            }
+                          })()}
+                        </span>
                       </div>
                       <div className="text-emerald-400">
                         <span className="text-slate-500">Expected:</span> {tc.expectedOutput}
