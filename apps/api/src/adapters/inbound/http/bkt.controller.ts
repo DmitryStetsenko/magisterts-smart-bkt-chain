@@ -231,7 +231,7 @@ export class BktController {
     // Delete submission history and BKT logs
     await this.prisma.submission.deleteMany({ where: { userId: student.id } });
     await this.prisma.bktHistory.deleteMany({ where: { userId: student.id } });
-    await this.prisma.telemetryLog.deleteMany({ where: { userId: student.id } });
+    await this.prisma.telemetrySession.deleteMany({ where: { userId: student.id } });
 
     return {
       message: `BKT progress for student ${student.email} has been reset`,
