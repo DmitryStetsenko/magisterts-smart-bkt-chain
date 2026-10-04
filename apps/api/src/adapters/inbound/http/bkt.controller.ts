@@ -183,8 +183,15 @@ export class BktController {
   @Get('state/:userId')
   @ApiOperation({ summary: 'Get current BKT mastery state for a student across all skills' })
   async getStudentState(@Param('userId') userId: string) {
+    let student = await this.prisma.user.findUnique({ where: { id: userId } });
+    if (!student) {
+      student = await this.prisma.user.findFirst({ where: { role: 'STUDENT' } });
+    }
+
+    if (!student) return [];
+
     const states = await this.prisma.bktState.findMany({
-      where: { userId },
+      where: { userId: student.id },
       include: { skill: true },
     });
 
