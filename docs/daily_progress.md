@@ -18,9 +18,10 @@
      - Налаштовано з'єднання з REST API (`GET /api/v1/tasks/recommended` та `POST /api/v1/bkt/evaluate`) у [StudentPortalPage](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/web/src/app/page.tsx).
    - **Мікро-Крок 6.3 (Аналітична Таблиця Студентів & BKT Heatmap):**
      - Розроблено компонент [StudentAnalyticsTable.tsx](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/admin/src/features/analytics/ui/StudentAnalyticsTable.tsx) для наочного аналізу прогресу групи студентів.
-     - Реалізовано теплову карту (Heatmap) рівнів засвоєння $P(L_t)$ по кожному вузлу навичок із кольоровою дифференціацією (🟢 $\ge 95\%$, 🟡 $\ge 50\%$, 🔴 $< 50\%$).
-     - Додано індикатори поведінкової телеметрії: середній WPM, коефіцієнт копіювання коду (Copy-Paste Ratio) та розрахований індекс втоми (Fatigue Index) з алертом аномальної поведінки.
-     - Інтегровано в [AdminDashboardPage](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/admin/src/app/page.tsx) та успішно виконано збірку (`npm run build:admin`).
+     - Реалізовано теплову карту (Heatmap) рівнів засвоєння $P(L_t)$ по кожному вузлу навичок із кольоровою дифференціацією.
+   - **Прийнято рішення щодо оптимізації та аудиту системи:**
+     - Крок 7 Master Plan (Web3 Smart Credentials) відтерміновано до фази розширення.
+     - Фокус розробки переведено на суворий технічний аудит, тестування та перевірку стабільності реалізованих компонентів (NestJS API, BKT Engine, Telemetry, Student/Admin Portals).
 
 ---
 
