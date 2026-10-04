@@ -280,12 +280,11 @@ export class BktController {
         });
       });
 
-      const avgWpm = totalLogs > 0 ? Math.round(totalWpm / totalLogs) : (totalPastes > 0 ? 180 : 45);
-      // Copy Paste Ratio is 100% (1.0) if paste events exist without typing
+      const avgWpm = totalLogs > 0 ? Math.round(totalWpm / totalLogs) : 0;
       const copyPasteRatio = totalPastes > 0 ? 1.0 : 0.0;
 
       const latestProfile = student.behavioralProfiles[0];
-      const fatigueIndex = latestProfile ? 1 - latestProfile.trustCoefficient : 0.15;
+      const fatigueIndex = latestProfile ? 1 - latestProfile.trustCoefficient : 0.0;
 
       const fullName = student.profile
         ? `${student.profile.firstName || ''} ${student.profile.lastName || ''}`.trim()
@@ -296,10 +295,10 @@ export class BktController {
         name: fullName || student.email,
         email: student.email,
         skillMastery,
-        avgWpm: avgWpm || (totalPastes > 0 ? 120 : 45),
+        avgWpm,
         copyPasteRatio,
         fatigueIndex,
-        lastActive: 'Щойно',
+        lastActive: totalLogs > 0 ? 'Щойно' : 'Нерозпочато',
       };
     });
   }

@@ -86,26 +86,8 @@ export default function AdminDashboardPage() {
     setNodes((prev) => prev.filter((n) => n.id !== nodeId));
   };
 
-  const handleResetStudent = (studentId: string) => {
-    setStudents((prev) =>
-      prev.map((s) => {
-        if (s.studentId === studentId) {
-          return {
-            ...s,
-            skillMastery: {
-              'js-basics': 0.5,
-              'js-arrays': 0.0,
-              'js-async': 0.0,
-            },
-            avgWpm: 0,
-            copyPasteRatio: 0,
-            fatigueIndex: 0,
-            lastActive: 'Анульовано',
-          };
-        }
-        return s;
-      })
-    );
+  const handleResetStudent = () => {
+    fetchStudentAnalytics();
   };
 
   return (

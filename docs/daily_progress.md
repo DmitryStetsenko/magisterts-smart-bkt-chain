@@ -28,6 +28,9 @@
 8. **Виправлення виявлення Copy-Paste в аналітиці викладача:**
    - Налаштовано миттєве випромінювання WebSocket-пакета `telemetry_data` при події `onDidPaste` у [useTelemetry.ts](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/web/src/features/code-editor/lib/useTelemetry.ts).
    - Оновлено зчитування поля `pasteEvents` у [bkt.controller.ts](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/api/src/adapters/inbound/http/bkt.controller.ts), завдяки чому при вставці коду `Copy-Paste Ratio` тепер виставляється у `100%`.
+9. **Обнулення показників телеметрії після анулювання результатів:**
+   - Оновлено дефолтні значення у [bkt.controller.ts](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/api/src/adapters/inbound/http/bkt.controller.ts): за відсутності логів аналітика видає `WPM = 0`, `Copy-Paste Ratio = 0%`, `Індекс втоми = 0%` та стан `Нерозпочато`.
+   - Впроваджено миттєве оновлення аналітики у [page.tsx](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/admin/src/app/page.tsx) після натискання кнопки «Анулювати».
 
 ---
 
