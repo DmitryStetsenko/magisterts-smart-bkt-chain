@@ -53,8 +53,18 @@ export function useTelemetry(userId: string, taskId: string) {
       const pauseDuration = now - lastKeyTimeRef.current;
       lastKeyTimeRef.current = now;
 
-      // Ignore control & modifier keys for WPM keystroke calculation
-      if (['Control', 'Alt', 'Shift', 'Meta', 'CapsLock', 'Tab', 'Escape'].includes(e.key)) {
+      const key = e.key || (e as any).browserEvent?.key || '';
+      const ctrlKey = e.ctrlKey || (e as any).browserEvent?.ctrlKey || false;
+      const metaKey = e.metaKey || (e as any).browserEvent?.metaKey || false;
+      const altKey = e.altKey || (e as any).browserEvent?.altKey || false;
+
+      // Ignore control & modifier keys as well as Ctrl/Cmd/Alt key combinations (Ctrl+V, Ctrl+C, Ctrl+A, etc.)
+      if (
+        ['Control', 'Alt', 'Shift', 'Meta', 'CapsLock', 'Tab', 'Escape'].includes(key) ||
+        ctrlKey ||
+        metaKey ||
+        altKey
+      ) {
         return;
       }
 
