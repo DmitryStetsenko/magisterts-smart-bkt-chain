@@ -73,7 +73,7 @@ describe('BktController (Analytics & Telemetry reset integration)', () => {
     expect(result).toHaveLength(1);
     expect(result[0].name).toBe('Дмитро Стеценко');
     expect(result[0].copyPasteRatio).toBe(1.0);
-    expect(result[0].avgWpm).toBe(180);
+    expect(result[0].avgWpm).toBe(0);
     expect(result[0].skillMastery['js-basics']).toBe(0.971);
   });
 

@@ -280,8 +280,10 @@ export class BktController {
         });
       });
 
-      const avgWpm = totalLogs > 0 ? Math.round(totalWpm / totalLogs) : 0;
+      // If code was entirely pasted (copyPasteRatio === 1.0) and no real typing occurred, set avgWpm to 0
+      const rawAvgWpm = totalLogs > 0 ? Math.round(totalWpm / totalLogs) : 0;
       const copyPasteRatio = totalPastes > 0 ? 1.0 : 0.0;
+      const avgWpm = copyPasteRatio === 1.0 && totalPastes >= totalLogs ? 0 : rawAvgWpm;
 
       const latestProfile = student.behavioralProfiles[0];
       const fatigueIndex = latestProfile ? 1 - latestProfile.trustCoefficient : 0.0;
