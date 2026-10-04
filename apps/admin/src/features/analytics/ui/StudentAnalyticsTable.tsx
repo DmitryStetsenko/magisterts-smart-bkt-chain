@@ -18,6 +18,7 @@ export const StudentAnalyticsTable: React.FC<StudentAnalyticsTableProps> = ({
   onResetStudent,
 }) => {
   const [resettingId, setResettingId] = useState<string | null>(null);
+  const [confirmTargetId, setConfirmTargetId] = useState<string | null>(null);
 
   const getMasteryColor = (pMastery: number) => {
     if (pMastery >= 0.95) return 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30';
@@ -25,9 +26,9 @@ export const StudentAnalyticsTable: React.FC<StudentAnalyticsTableProps> = ({
     return 'bg-rose-500/20 text-rose-400 border-rose-500/30';
   };
 
-  const handleReset = async (studentId: string) => {
-    if (!confirm('Ви дійсно бажаєте анулювати всі результати BKT та історію спроб для цього студента?')) return;
+  const executeReset = async (studentId: string) => {
     setResettingId(studentId);
+    setConfirmTargetId(null);
     try {
       const res = await fetch(`${API_URL}/api/v1/bkt/reset/${studentId}`, { method: 'POST' });
       if (res.ok) {
@@ -133,7 +134,7 @@ export const StudentAnalyticsTable: React.FC<StudentAnalyticsTableProps> = ({
 
                 <td className="p-3 text-right">
                   <button
-                    onClick={() => handleReset(student.studentId)}
+                    onClick={() => setConfirmTargetId(student.studentId)}
                     disabled={resettingId === student.studentId}
                     className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 text-xs font-semibold border border-rose-500/20 transition-all cursor-pointer disabled:opacity-50"
                     title="Анулювати всі результати BKT та історію спроб"
@@ -147,6 +148,39 @@ export const StudentAnalyticsTable: React.FC<StudentAnalyticsTableProps> = ({
           </tbody>
         </table>
       </div>
+
+      {/* ⚠️ Custom Reset Confirmation Modal */}
+      {confirmTargetId && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
+          <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 max-w-md w-full shadow-2xl flex flex-col gap-4 animate-in fade-in zoom-in-95">
+            <div className="flex items-center gap-3 text-rose-400">
+              <div className="p-2.5 bg-rose-500/10 border border-rose-500/20 rounded-xl">
+                <AlertTriangle className="w-6 h-6" />
+              </div>
+              <h3 className="text-lg font-bold text-white">Підтвердження анулювання</h3>
+            </div>
+
+            <p className="text-sm text-slate-300 leading-relaxed">
+              Ви дійсно бажаєте повністю анулювати всі BKT-оцінки, телеметрію та історію спроб для цього студента? Цю дію неможливо скасувати.
+            </p>
+
+            <div className="flex items-center justify-end gap-3 mt-2">
+              <button
+                onClick={() => setConfirmTargetId(null)}
+                className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold border border-slate-700 transition-all cursor-pointer"
+              >
+                Скасувати
+              </button>
+              <button
+                onClick={() => executeReset(confirmTargetId)}
+                className="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold shadow-lg shadow-rose-900/30 transition-all cursor-pointer"
+              >
+                Так, анулювати
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
