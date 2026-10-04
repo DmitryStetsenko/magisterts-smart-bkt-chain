@@ -59,7 +59,7 @@ export default function AdminDashboardPage() {
       const res = await fetch(`${API_URL}/api/v1/bkt/analytics/students`);
       if (res.ok) {
         const data = await res.json();
-        if (Array.isArray(data) && data.length > 0) {
+        if (Array.isArray(data)) {
           setStudents(data);
         }
       }
