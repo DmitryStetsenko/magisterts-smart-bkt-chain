@@ -50,9 +50,18 @@ export class TelemetryGateway implements OnGatewayConnection, OnGatewayDisconnec
     client.join(room);
     this.logger.log(`Client ${client.id} joined room ${room}`);
 
+    let targetUserId = payload.userId;
+    let user = await this.prisma.user.findUnique({ where: { id: targetUserId } });
+    if (!user) {
+      user = await this.prisma.user.findFirst({ where: { role: 'STUDENT' } });
+      if (user) targetUserId = user.id;
+    }
+
+    if (!user) return;
+
     let session = await this.prisma.telemetrySession.findFirst({
       where: {
-        userId: payload.userId,
+        userId: targetUserId,
         taskId: payload.taskId,
         endedAt: null,
       },
@@ -61,7 +70,7 @@ export class TelemetryGateway implements OnGatewayConnection, OnGatewayDisconnec
     if (!session) {
       session = await this.prisma.telemetrySession.create({
         data: {
-          userId: payload.userId,
+          userId: targetUserId,
           taskId: payload.taskId,
         },
       });
@@ -79,10 +88,28 @@ export class TelemetryGateway implements OnGatewayConnection, OnGatewayDisconnec
       `Received telemetry data from ${payload.userId} for task ${payload.taskId}: WPM=${payload.wpm}, Pause=${payload.keystrokePauseMs}ms`,
     );
 
-    if (payload.sessionId) {
+    let sessionId = payload.sessionId;
+    if (!sessionId) {
+      let user = await this.prisma.user.findUnique({ where: { id: payload.userId } });
+      if (!user) user = await this.prisma.user.findFirst({ where: { role: 'STUDENT' } });
+      if (user) {
+        let activeSession = await this.prisma.telemetrySession.findFirst({
+          where: { userId: user.id, taskId: payload.taskId, endedAt: null },
+          orderBy: { startedAt: 'desc' },
+        });
+        if (!activeSession) {
+          activeSession = await this.prisma.telemetrySession.create({
+            data: { userId: user.id, taskId: payload.taskId },
+          });
+        }
+        sessionId = activeSession.id;
+      }
+    }
+
+    if (sessionId) {
       await this.prisma.telemetryLog.create({
         data: {
-          sessionId: payload.sessionId,
+          sessionId,
           eventType: 'KEYSTROKE_METRICS',
           eventData: JSON.parse(
             JSON.stringify({

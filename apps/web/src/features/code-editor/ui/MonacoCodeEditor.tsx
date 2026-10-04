@@ -24,8 +24,9 @@ export function MonacoCodeEditor({
 }: MonacoCodeEditorProps) {
   const { metrics, handleKeyDown, handlePaste } = useTelemetry(userId, taskId);
   const editorRef = useRef<any>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
-  const handleEditorDidMount: OnMount = (editor) => {
+  const handleEditorDidMount: OnMount = (editor, monaco) => {
     editorRef.current = editor;
 
     editor.onKeyDown((e) => {
@@ -36,15 +37,23 @@ export function MonacoCodeEditor({
       handlePaste();
     });
 
-    // Fallback: detect paste when text length increases by > 10 characters in one change
+    // Detect paste when inserted text length is > 3 characters in a single change
     editor.onDidChangeModelContent((e) => {
       const changes = e.changes;
       for (const change of changes) {
-        if (change.text.length > 10) {
+        if (change.text.length > 3) {
           handlePaste();
         }
       }
     });
+
+    // Also attach native DOM paste event listener on editor container DOM node
+    const domNode = editor.getDomNode();
+    if (domNode) {
+      domNode.addEventListener('paste', () => {
+        handlePaste();
+      });
+    }
   };
 
   return (

@@ -32,7 +32,7 @@
    - Оновлено дефолтні значення у [bkt.controller.ts](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/api/src/adapters/inbound/http/bkt.controller.ts): за відсутності логів аналітика видає `WPM = 0`, `Copy-Paste Ratio = 0%`, `Індекс втоми = 0%` та стан `Нерозпочато`.
    - Впроваджено миттєве оновлення аналітики у [page.tsx](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/admin/src/app/page.tsx) після натискання кнопки «Анулювати».
 10. **Гарантоване перехоплення подій вставки коду у Monaco Editor:**
-   - Інтегровано подвійне перехоплення вставок у [MonacoCodeEditor.tsx](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/web/src/features/code-editor/ui/MonacoCodeEditor.tsx): через підписку `onDidPaste` та резервний детектор стрибків довжини символів `onDidChangeModelContent`.
+   - Інтегровано багаторівневе перехоплення вставок у [MonacoCodeEditor.tsx](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/web/src/features/code-editor/ui/MonacoCodeEditor.tsx): через `onDidPaste`, прямий DOM-слухач `paste` на DOM-вузлі Monaco Editor та поріг `onDidChangeModelContent` (> 3 символів у зміні замість 10). Це гарантує фіксацію вставок через контекстне меню миші, Ctrl+V / Cmd+V та перетягування.
 11. **100% Покриття Unit-Тестами розробленої аналітики та телеметрії:**
    - Створено специфікацію [bkt.controller.spec.ts](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/api/src/adapters/inbound/http/bkt.controller.spec.ts) для перевірки зведення `Copy-Paste Ratio = 1.0` при події вставки та обнулення телеметрії при анулюванні `getStudentsAnalytics()`.
    - Усі 9 юніт-тестів проєкту успішно пройдені (0 помилок).

@@ -150,7 +150,7 @@
             },
             {
               "type": "text",
-              "raw_text": "Інтегровано подвійне перехоплення вставок у [MonacoCodeEditor.tsx](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/web/src/features/code-editor/ui/MonacoCodeEditor.tsx): через підписку `onDidPaste` та резервний детектор стрибків довжини символів `onDidChangeModelContent`.",
+              "raw_text": "Інтегровано багаторівневе перехоплення вставок у [MonacoCodeEditor.tsx](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/web/src/features/code-editor/ui/MonacoCodeEditor.tsx): через `onDidPaste`, прямий DOM-слухач `paste` на DOM-вузлі Monaco Editor та поріг `onDidChangeModelContent` (> 3 символів у зміні замість 10). Це гарантує фіксацію вставок через контекстне меню миші, Ctrl+V / Cmd+V та перетягування.",
               "subitems": []
             },
             {
