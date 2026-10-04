@@ -14,8 +14,9 @@
    - Впроваджено підтримку нерозпочатого стану ($P(L_t) = 0.0\%$, статус `UNSTARTED`) у [SkillDagMap.tsx](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/web/src/features/skill-graph/ui/SkillDagMap.tsx) та [page.tsx](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/web/src/app/page.tsx) для виправлення введеного в оману $50.0\%$ (Bayesian prior) при анулюванні результатів.
 3. **Відображення інформації активного студента у Порталі Студента:**
    - Додано відображення профілю студента `👤 Дмитро Стеценко (student@example.com)` у шапку веб-кабінету у [page.tsx](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/web/src/app/page.tsx).
-4. **Усунення двозначності у відображенні відкритих тест-кейсах:**
-   - Модифіковано парсинг та форматування тест-кейсів у [page.tsx](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/web/src/app/page.tsx). Тепер замість сирого JSON-масиву аргументів контролеру `[4]` або `[2, 3]` відображаються чисті значення аргументів функції (`4` або `2, 3`), що усуває плутанину між числом та масивом.
+4. **Виправлення відображення масивів у відкритих тест-кейсах:**
+   - Оновлено структури даних тест-кейсів у [seed.ts](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/packages/database/prisma/seed.ts) та парсер аргументів бекенду VM Runner у [bkt.controller.ts](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/api/src/adapters/inbound/http/bkt.controller.ts).
+   - Тепер якщо функція `filterEvens(numbers)` приймає масив як 1 аргумент, у тест-кейсі показується саме масив `[1, 2, 3, 4, 5, 6]`, а для банальних змінних (наприклад `isEven(n)`) — скалярне значення `4`.
 
 ---
 

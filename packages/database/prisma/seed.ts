@@ -187,9 +187,9 @@ async function main() {
       difficulty: TaskDifficulty.MEDIUM,
       testCases: {
         create: [
-          { input: '[1, 2, 3, 4, 5, 6]', expectedOutput: '[2,4,6]', isSecret: false },
-          { input: '[1, 3, 5]', expectedOutput: '[]', isSecret: false },
-          { input: '[10, 21, 32]', expectedOutput: '[10,32]', isSecret: true },
+          { input: '[[1, 2, 3, 4, 5, 6]]', expectedOutput: '[2,4,6]', isSecret: false },
+          { input: '[[1, 3, 5]]', expectedOutput: '[]', isSecret: false },
+          { input: '[[10, 21, 32]]', expectedOutput: '[10,32]', isSecret: true },
         ],
       },
     },
@@ -204,9 +204,9 @@ async function main() {
       difficulty: TaskDifficulty.MEDIUM,
       testCases: {
         create: [
-          { input: '[{"price": 10}, {"price": 20}]', expectedOutput: '30', isSecret: false },
-          { input: '[]', expectedOutput: '0', isSecret: false },
-          { input: '[{"price": 100}]', expectedOutput: '100', isSecret: true },
+          { input: '[[{"price": 10}, {"price": 20}]]', expectedOutput: '30', isSecret: false },
+          { input: '[[]]', expectedOutput: '0', isSecret: false },
+          { input: '[[{"price": 100}]]', expectedOutput: '100', isSecret: true },
         ],
       },
     },

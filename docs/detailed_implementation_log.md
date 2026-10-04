@@ -210,9 +210,9 @@
 - **Відображення Нерозпочатого Стан ("UNSTARTED"):**
   - Оновлено адаптацію порожніх відповідей `getStudentState` у [SkillDagMap.tsx](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/web/src/features/skill-graph/ui/SkillDagMap.tsx) та [page.tsx](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/web/src/app/page.tsx).
   - При відсутності запису $P(L_t)$ у БД відображається точний показник `0.0%` зі статусом `UNSTARTED` (замість введеного в оману 50.0%), що забезпечує прозорість після анулювання.
-- **Форматування Відкритих Тест-Кейсів у Студентському Порталі:**
-  - Оновлено компонент [page.tsx](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/web/src/app/page.tsx) для наочного розпарсингу внутрішнього списку аргументів контролера.
-  - Замість відображення внутрішньої структури масиву VM runner (`Input: [4]`) інтерфейс трансформує аргументи у зрозумілий вигляд `Аргументи: 4` для одинарних параметрів або `2, 3` для багатопараметричних функцій.
+- **Форматування Відкритих Тест-Кейсів та Передача Аргументів у VM Runner:**
+  - Налаштовано коректне збереження аргументів у [seed.ts](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/packages/database/prisma/seed.ts) та спрощено розгортання масивів у [bkt.controller.ts](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/api/src/adapters/inbound/http/bkt.controller.ts).
+  - Завдання з масивами (`filterEvens(numbers)`, `calcTotal(items)`) передають свій єдиний масив як елемент внутрішнього масиву виклику (`[[1, 2, 3, 4, 5, 6]]`), завдяки чому у Студентському Порталі у розділі тест-кейсів відображається справжній квадратний масив `[1, 2, 3, 4, 5, 6]`, а для простих чисел — скаляр `4`.
 
 
 

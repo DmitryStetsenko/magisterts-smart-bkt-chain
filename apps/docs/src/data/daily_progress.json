@@ -61,12 +61,17 @@
             },
             {
               "type": "text",
-              "raw_text": "**Усунення двозначності у відображенні відкритих тест-кейсах:**",
+              "raw_text": "**Виправлення відображення масивів у відкритих тест-кейсах:**",
               "subitems": []
             },
             {
               "type": "text",
-              "raw_text": "Модифіковано парсинг та форматування тест-кейсів у [page.tsx](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/web/src/app/page.tsx). Тепер замість сирого JSON-масиву аргументів контролеру `[4]` або `[2, 3]` відображаються чисті значення аргументів функції (`4` або `2, 3`), що усуває плутанину між числом та масивом.",
+              "raw_text": "Оновлено структури даних тест-кейсів у [seed.ts](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/packages/database/prisma/seed.ts) та парсер аргументів бекенду VM Runner у [bkt.controller.ts](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/api/src/adapters/inbound/http/bkt.controller.ts).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Тепер якщо функція `filterEvens(numbers)` приймає масив як 1 аргумент, у тест-кейсі показується саме масив `[1, 2, 3, 4, 5, 6]`, а для банальних змінних (наприклад `isEven(n)`) — скалярне значення `4`.",
               "subitems": []
             },
             {
