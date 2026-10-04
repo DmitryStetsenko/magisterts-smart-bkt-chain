@@ -31,6 +31,8 @@
 9. **Обнулення показників телеметрії після анулювання результатів:**
    - Оновлено дефолтні значення у [bkt.controller.ts](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/api/src/adapters/inbound/http/bkt.controller.ts): за відсутності логів аналітика видає `WPM = 0`, `Copy-Paste Ratio = 0%`, `Індекс втоми = 0%` та стан `Нерозпочато`.
    - Впроваджено миттєве оновлення аналітики у [page.tsx](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/admin/src/app/page.tsx) після натискання кнопки «Анулювати».
+10. **Гарантоване перехоплення подій вставки коду у Monaco Editor:**
+   - Інтегровано подвійне перехоплення вставок у [MonacoCodeEditor.tsx](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/web/src/features/code-editor/ui/MonacoCodeEditor.tsx): через підписку `onDidPaste` та резервний детектор стрибків довжини символів `onDidChangeModelContent`.
 
 ---
 
