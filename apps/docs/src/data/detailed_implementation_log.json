@@ -939,6 +939,16 @@
               "type": "text",
               "raw_text": "Оновлено головну сторінку [page.tsx](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/admin/src/app/page.tsx): додано автоматичний фетчинг аналітики з бекенду при завантаженні та синхронізацію даних Heatmap.",
               "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Видалено початковий mock-масив студентів зі стану React `useState`, що повністю усунуло миготіння 3 демо-студентів при перезавантаженні сторінки.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Синхронізовано `seed.ts` для підтягування імені `Дмитро Стеценко` для тестового облікового запису `student@example.com` у БД PostgreSQL.",
+              "subitems": []
             }
           ]
         }

@@ -13,15 +13,29 @@ async function main() {
   // 1. Create initial Admin & Student Users
   const student = await prisma.user.upsert({
     where: { email: 'student@example.com' },
-    update: {},
+    update: {
+      profile: {
+        upsert: {
+          create: {
+            firstName: 'Дмитро',
+            lastName: 'Стеценко',
+            bio: 'Студент магістратури, вивчає адаптивні системи',
+          },
+          update: {
+            firstName: 'Дмитро',
+            lastName: 'Стеценко',
+          },
+        },
+      },
+    },
     create: {
       email: 'student@example.com',
       passwordHash: '$2b$10$Epq9L4.8/aB8xQk/6Qj1yeFw3aEaU5vN1/2v3b4c5d6e7f8g9h0i', // mock hash
       role: UserRole.STUDENT,
       profile: {
         create: {
-          firstName: 'Олександр',
-          lastName: 'Коваленко',
+          firstName: 'Дмитро',
+          lastName: 'Стеценко',
           bio: 'Студент магістратури, вивчає адаптивні системи',
         },
       },
