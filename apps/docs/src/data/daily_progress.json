@@ -41,18 +41,11 @@
             },
             {
               "type": "text",
-              "raw_text": "**Мікро-Крок 6.3 (Аналітична Таблиця Студентів & BKT Heatmap):**",
+              "raw_text": "**Усунено баг передачі аргументів у NestJS VM (`BktController`):**",
               "subitems": [
-                "Розроблено компонент [StudentAnalyticsTable.tsx](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/admin/src/features/analytics/ui/StudentAnalyticsTable.tsx) для наочного аналізу прогресу групи студентів.",
-                "Реалізовано теплову карту (Heatmap) рівнів засвоєння $P(L_t)$ по кожному вузлу навичок із кольоровою дифференціацією."
-              ]
-            },
-            {
-              "type": "text",
-              "raw_text": "**Прийнято рішення щодо оптимізації та аудиту системи:**",
-              "subitems": [
-                "Крок 7 Master Plan (Web3 Smart Credentials) відтерміновано до фази розширення.",
-                "Фокус розробки переведено на суворий технічний аудит, тестування та перевірку стабільності реалізованих компонентів (NestJS API, BKT Engine, Telemetry, Student/Admin Portals)."
+                "Виправлено неоднозначність відображення подвійних дужок `Input: [[...]]` у тест-кейсах завдань.",
+                "Додано коректне визначення arity функції `fn.length` у `bkt.controller.ts` для прозорої підтримки одномірних та багатовимірних масивів.",
+                "Оновлено `packages/database/prisma/seed.ts` та проведено повторний сидинг БД (`npm run db:seed`)."
               ]
             },
             {
