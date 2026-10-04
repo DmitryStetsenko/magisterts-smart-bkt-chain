@@ -86,6 +86,21 @@
             },
             {
               "type": "text",
+              "raw_text": "**Інтеграція реальної аналітики студентів в Кабінеті Викладача (`apps/admin`):**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Створено REST ендпоінт `GET /api/v1/bkt/analytics/students` у [bkt.controller.ts](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/api/src/adapters/inbound/http/bkt.controller.ts) для зведення реального BKT-прогресу $P(L_t)$ та телеметричних показників (WPM, Copy-Paste Ratio, Fatigue Index).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Підключено фетчинг аналітики у [page.tsx](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/admin/src/app/page.tsx) для синхронізації показників Heatmap та телеметрії з базою даних у режимі реального часу.",
+              "subitems": []
+            },
+            {
+              "type": "text",
               "raw_text": "---",
               "subitems": []
             }

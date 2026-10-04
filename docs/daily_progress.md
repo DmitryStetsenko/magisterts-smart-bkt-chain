@@ -19,6 +19,9 @@
    - Тепер якщо функція `filterEvens(numbers)` приймає масив як 1 аргумент, у тест-кейсі показується саме масив `[1, 2, 3, 4, 5, 6]`, а для банальних змінних (наприклад `isEven(n)`) — скалярне значення `4`.
 5. **Автоматична перехідна навігація після успішного розв'язання завдання:**
    - У [page.tsx](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/web/src/app/page.tsx) додано виклики `fetchRecommendedTask()` у разі отримання статусу `ACCEPTED`. Студент автоматично отримує наступну навичку/завдання за алгоритмом BKT Task Sequencing без потреби вручну тиснути «Оновити рекомендоване».
+6. **Інтеграція реальної аналітики студентів в Кабінеті Викладача (`apps/admin`):**
+   - Створено REST ендпоінт `GET /api/v1/bkt/analytics/students` у [bkt.controller.ts](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/api/src/adapters/inbound/http/bkt.controller.ts) для зведення реального BKT-прогресу $P(L_t)$ та телеметричних показників (WPM, Copy-Paste Ratio, Fatigue Index).
+   - Підключено фетчинг аналітики у [page.tsx](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/admin/src/app/page.tsx) для синхронізації показників Heatmap та телеметрії з базою даних у режимі реального часу.
 
 ---
 

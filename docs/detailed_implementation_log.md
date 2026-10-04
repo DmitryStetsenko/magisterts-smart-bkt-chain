@@ -214,6 +214,13 @@
   - Оновлено [page.tsx](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/web/src/app/page.tsx): після відправки та успішної перевірки рішення (`status === 'ACCEPTED'`) фронтенд автоматично робить виклик `fetchRecommendedTask()`.
   - Завдяки цьому студент відразу переходить до наступного нерозв'язаного завдання або до наступного модуля графа знань без потреби натискання кнопки «Оновити рекомендоване».
 
+### 6.5 Жива Інтеграція Аналітики Студентів & BKT Heatmap (Мікро-Крок 6.5)
+- **REST API Ендпоінт `GET /api/v1/bkt/analytics/students`:**
+  - Розроблено метод `getStudentsAnalytics` у [bkt.controller.ts](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/api/src/adapters/inbound/http/bkt.controller.ts).
+  - Здійснюється агрегація реальних BKT-станів $P(L_t)$ з БД для кожного студента за кожною навичкою, а також обчислення живих показників телеметрії (середній WPM, Copy-Paste Ratio, Fatigue Index).
+- **Підключення Кабінету Викладача (`apps/admin`):**
+  - Оновлено головну сторінку [page.tsx](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/admin/src/app/page.tsx): додано автоматичний фетчинг аналітики з бекенду при завантаженні та синхронізацію даних Heatmap.
+
 
 
 
