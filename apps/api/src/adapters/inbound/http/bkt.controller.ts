@@ -218,15 +218,8 @@ export class BktController {
 
     if (!student) throw new NotFoundException('No student found for reset');
 
-    // Reset BKT states to initial P(L0) = 0.5
-    await this.prisma.bktState.updateMany({
-      where: { userId: student.id },
-      data: {
-        pMastery: 0.5,
-        isMastered: false,
-        masteredAt: null,
-      },
-    });
+    // Delete BKT states, submissions, history and telemetry logs for full reset
+    await this.prisma.bktState.deleteMany({ where: { userId: student.id } });
 
     // Delete submission history and BKT logs
     await this.prisma.submission.deleteMany({ where: { userId: student.id } });

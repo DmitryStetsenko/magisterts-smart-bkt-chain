@@ -40,7 +40,7 @@ export default function StudentPortalPage() {
       slug: 'js-basics',
       title: 'Основи JavaScript',
       description: 'Типи даних, змінне та оператори',
-      pMastery: 0.5,
+      pMastery: 0.0,
       status: 'IN_PROGRESS',
       parentSkillIds: [],
     },
