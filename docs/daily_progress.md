@@ -25,6 +25,9 @@
 7. **Синхронізація імені студента у БД та виправлення моргання демо-даних:**
    - Оновлено `seed.ts` для автоматичного оновлення профілю `student@example.com` ім'ям `Дмитро Стеценко` у базі даних PostgreSQL.
    - Видалено початковий hardcoded масив студентів у `apps/admin/src/app/page.tsx`, усунено короткочасне миготіння 3 демо-студентів при завантаженні сторінки.
+8. **Виправлення виявлення Copy-Paste в аналітиці викладача:**
+   - Налаштовано миттєве випромінювання WebSocket-пакета `telemetry_data` при події `onDidPaste` у [useTelemetry.ts](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/web/src/features/code-editor/lib/useTelemetry.ts).
+   - Оновлено зчитування поля `pasteEvents` у [bkt.controller.ts](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/api/src/adapters/inbound/http/bkt.controller.ts), завдяки чому при вставці коду `Copy-Paste Ratio` тепер виставляється у `100%`.
 
 ---
 

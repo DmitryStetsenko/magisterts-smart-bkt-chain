@@ -93,8 +93,27 @@ export function useTelemetry(userId: string, taskId: string) {
 
   const handlePaste = useCallback(() => {
     pasteEventsRef.current += 1;
-    setMetrics((prev) => ({ ...prev, pasteEvents: pasteEventsRef.current }));
-  }, []);
+    const currentPastes = pasteEventsRef.current;
+    
+    setMetrics((prev) => ({
+      ...prev,
+      pasteEvents: currentPastes,
+      wpm: Math.max(prev.wpm, 180), // Reflect paste instant speed spike
+    }));
+
+    if (socketRef.current && socketRef.current.connected) {
+      const payload: TelemetrySocketPayload = {
+        sessionId: sessionIdRef.current || undefined,
+        userId,
+        taskId,
+        keystrokePauseMs: 0,
+        wpm: 180,
+        deleteCount: deleteCountRef.current,
+        pasteEvents: currentPastes,
+      };
+      socketRef.current.emit('telemetry_data', payload);
+    }
+  }, [userId, taskId]);
 
   return {
     metrics,
