@@ -22,6 +22,9 @@
 6. **Інтеграція реальної аналітики студентів в Кабінеті Викладача (`apps/admin`):**
    - Створено REST ендпоінт `GET /api/v1/bkt/analytics/students` у [bkt.controller.ts](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/api/src/adapters/inbound/http/bkt.controller.ts) для зведення реального BKT-прогресу $P(L_t)$ та телеметричних показників (WPM, Copy-Paste Ratio, Fatigue Index).
    - Підключено фетчинг аналітики у [page.tsx](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/admin/src/app/page.tsx) для синхронізації показників Heatmap та телеметрії з базою даних у режимі реального часу.
+7. **Синхронізація імені студента у БД та виправлення моргання демо-даних:**
+   - Оновлено `seed.ts` для автоматичного оновлення профілю `student@example.com` ім'ям `Дмитро Стеценко` у базі даних PostgreSQL.
+   - Видалено початковий hardcoded масив студентів у `apps/admin/src/app/page.tsx`, усунено короткочасне миготіння 3 демо-студентів при завантаженні сторінки.
 
 ---
 

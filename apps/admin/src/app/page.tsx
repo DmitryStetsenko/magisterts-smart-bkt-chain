@@ -50,50 +50,7 @@ export default function AdminDashboardPage() {
     },
   ]);
 
-  const [students, setStudents] = useState<StudentAnalyticsItem[]>([
-    {
-      studentId: 'student-1',
-      name: 'Дмитро Стеценко',
-      email: 'student.demo@smartbkt.edu',
-      skillMastery: {
-        'js-basics': 0.9227,
-        'js-arrays': 0.15,
-        'js-async': 0.0,
-      },
-      avgWpm: 52,
-      copyPasteRatio: 0.05,
-      fatigueIndex: 0.18,
-      lastActive: 'Щойно',
-    },
-    {
-      studentId: 'student-2',
-      name: 'Олена Коваленко',
-      email: 'olena.k@smartbkt.edu',
-      skillMastery: {
-        'js-basics': 0.965,
-        'js-arrays': 0.88,
-        'js-async': 0.42,
-      },
-      avgWpm: 68,
-      copyPasteRatio: 0.12,
-      fatigueIndex: 0.35,
-      lastActive: '12 хв тому',
-    },
-    {
-      studentId: 'student-3',
-      name: 'Олександр Петренко',
-      email: 'alex.p@smartbkt.edu',
-      skillMastery: {
-        'js-basics': 0.45,
-        'js-arrays': 0.0,
-        'js-async': 0.0,
-      },
-      avgWpm: 24,
-      copyPasteRatio: 0.45,
-      fatigueIndex: 0.72,
-      lastActive: '1 год тому',
-    },
-  ]);
+  const [students, setStudents] = useState<StudentAnalyticsItem[]>([]);
 
   const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
 
