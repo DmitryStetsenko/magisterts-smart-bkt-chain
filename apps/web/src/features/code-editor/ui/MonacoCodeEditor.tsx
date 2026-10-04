@@ -28,12 +28,22 @@ export function MonacoCodeEditor({
   const handleEditorDidMount: OnMount = (editor) => {
     editorRef.current = editor;
 
-    editor.onKeyDown(() => {
-      handleKeyDown({ key: '' } as any);
+    editor.onKeyDown((e) => {
+      handleKeyDown(e as any);
     });
 
     editor.onDidPaste(() => {
       handlePaste();
+    });
+
+    // Fallback: detect paste when text length increases by > 10 characters in one change
+    editor.onDidChangeModelContent((e) => {
+      const changes = e.changes;
+      for (const change of changes) {
+        if (change.text.length > 10) {
+          handlePaste();
+        }
+      }
     });
   };
 

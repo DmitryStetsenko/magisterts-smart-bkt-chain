@@ -11,7 +11,9 @@
         {
           "title": "✅ Що зроблено за день:",
           "level": 3,
-          "paragraphs": [],
+          "paragraphs": [
+            "10. **Гарантоване перехоплення подій вставки коду у Monaco Editor:**"
+          ],
           "code_blocks": [],
           "items": [
             {
@@ -142,6 +144,11 @@
             {
               "type": "text",
               "raw_text": "Впроваджено миттєве оновлення аналітики у [page.tsx](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/admin/src/app/page.tsx) після натискання кнопки «Анулювати».",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Інтегровано подвійне перехоплення вставок у [MonacoCodeEditor.tsx](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/web/src/features/code-editor/ui/MonacoCodeEditor.tsx): через підписку `onDidPaste` та резервний детектор стрибків довжини символів `onDidChangeModelContent`.",
               "subitems": []
             },
             {
