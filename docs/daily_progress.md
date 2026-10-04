@@ -16,12 +16,10 @@
      - Написано кастомний хук [useTelemetry.ts](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/web/src/features/code-editor/lib/useTelemetry.ts) для вимірювання пауз (KeystrokePauseMs), темпу набору (WPM), підрахунку видалень та copy-paste подій.
      - Інтегровано `socket.io-client` для трансляції телеметрії по WebSockets (`ws://localhost:3000/telemetry`).
      - Налаштовано з'єднання з REST API (`GET /api/v1/tasks/recommended` та `POST /api/v1/bkt/evaluate`) у [StudentPortalPage](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/web/src/app/page.tsx).
-   - **Мікро-Крок 6.3 (Аналітична Таблиця Студентів & BKT Heatmap):**
-     - Розроблено компонент [StudentAnalyticsTable.tsx](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/admin/src/features/analytics/ui/StudentAnalyticsTable.tsx) для наочного аналізу прогресу групи студентів.
-     - Реалізовано теплову карту (Heatmap) рівнів засвоєння $P(L_t)$ по кожному вузлу навичок із кольоровою дифференціацією.
-   - **Прийнято рішення щодо оптимізації та аудиту системи:**
-     - Крок 7 Master Plan (Web3 Smart Credentials) відтерміновано до фази розширення.
-     - Фокус розробки переведено на суворий технічний аудит, тестування та перевірку стабільності реалізованих компонентів (NestJS API, BKT Engine, Telemetry, Student/Admin Portals).
+   - **Усунено баг передачі аргументів у NestJS VM (`BktController`):**
+     - Виправлено неоднозначність відображення подвійних дужок `Input: [[...]]` у тест-кейсах завдань.
+     - Додано коректне визначення arity функції `fn.length` у `bkt.controller.ts` для прозорої підтримки одномірних та багатовимірних масивів.
+     - Оновлено `packages/database/prisma/seed.ts` та проведено повторний сидинг БД (`npm run db:seed`).
 
 ---
 

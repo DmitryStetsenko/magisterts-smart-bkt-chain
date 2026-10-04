@@ -49,10 +49,11 @@ export class BktController {
         const sandbox = { result: undefined };
         const scriptCode = `
           ${dto.code}
-          const args = ${testCase.input};
-          const fnName = Object.keys(this).find(k => typeof this[k] === 'function') || 'sum';
+          const rawInput = ${testCase.input};
+          const fnName = Object.keys(this).find(k => typeof this[k] === 'function' && k !== 'eval');
           const fn = eval(fnName);
-          result = fn.apply(null, Array.isArray(args) ? args : [args]);
+          const args = (fn.length === 1 && Array.isArray(rawInput)) ? [rawInput] : (Array.isArray(rawInput) ? rawInput : [rawInput]);
+          result = fn.apply(null, args);
         `;
 
         const context = vm.createContext(sandbox);
