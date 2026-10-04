@@ -20,6 +20,7 @@ export function useTelemetry(userId: string, taskId: string) {
   const keystrokeCountRef = useRef<number>(0);
   const deleteCountRef = useRef<number>(0);
   const pasteEventsRef = useRef<number>(0);
+  const lastPasteTimeRef = useRef<number>(0);
 
   // Initialize Socket.io connection to /telemetry namespace
   useEffect(() => {
@@ -97,6 +98,13 @@ export function useTelemetry(userId: string, taskId: string) {
   );
 
   const handlePaste = useCallback(() => {
+    const now = Date.now();
+    // Ignore duplicate paste events within 300ms threshold
+    if (now - lastPasteTimeRef.current < 300) {
+      return;
+    }
+    lastPasteTimeRef.current = now;
+
     pasteEventsRef.current += 1;
     const currentPastes = pasteEventsRef.current;
 
