@@ -131,6 +131,21 @@
             },
             {
               "type": "text",
+              "raw_text": "**Обнулення показників телеметрії після анулювання результатів:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Оновлено дефолтні значення у [bkt.controller.ts](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/api/src/adapters/inbound/http/bkt.controller.ts): за відсутності логів аналітика видає `WPM = 0`, `Copy-Paste Ratio = 0%`, `Індекс втоми = 0%` та стан `Нерозпочато`.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Впроваджено миттєве оновлення аналітики у [page.tsx](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/admin/src/app/page.tsx) після натискання кнопки «Анулювати».",
+              "subitems": []
+            },
+            {
+              "type": "text",
               "raw_text": "---",
               "subitems": []
             }
