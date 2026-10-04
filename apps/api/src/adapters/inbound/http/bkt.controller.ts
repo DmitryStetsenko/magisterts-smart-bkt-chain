@@ -46,21 +46,31 @@ export class BktController {
       let actualOutput = '';
 
       try {
-        const sandbox = { result: undefined };
+        const sandbox = {
+          result: undefined,
+          setTimeout,
+          clearTimeout,
+          Promise,
+          console,
+        };
         const scriptCode = `
           ${dto.code}
           const rawInput = ${testCase.input};
-          const fnName = Object.keys(this).find(k => typeof this[k] === 'function' && k !== 'eval');
+          const fnName = Object.keys(this).find(k => typeof this[k] === 'function' && k !== 'eval' && k !== 'setTimeout' && k !== 'clearTimeout');
           const fn = eval(fnName);
-          const args = (fn.length === 1 && Array.isArray(rawInput)) ? [rawInput] : (Array.isArray(rawInput) ? rawInput : [rawInput]);
+          const args = (fn.length === 1 && Array.isArray(rawInput) && rawInput.length === 1) ? rawInput : (Array.isArray(rawInput) ? rawInput : [rawInput]);
           result = fn.apply(null, args);
         `;
 
         const context = vm.createContext(sandbox);
         const script = new vm.Script(scriptCode);
-        script.runInContext(context, { timeout: 1000 });
+        script.runInContext(context, { timeout: 2000 });
 
-        const rawResult = sandbox.result;
+        let rawResult = sandbox.result;
+        if (rawResult && typeof (rawResult as any).then === 'function') {
+          rawResult = await rawResult;
+        }
+
         actualOutput = typeof rawResult === 'object' ? JSON.stringify(rawResult) : String(rawResult);
 
         // Normalize output for comparison
