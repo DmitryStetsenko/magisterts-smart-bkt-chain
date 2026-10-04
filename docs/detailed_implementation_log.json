@@ -1014,6 +1014,64 @@
               ]
             }
           ]
+        },
+        {
+          "title": "6.6 Усунення Хибних Показників Телеметрії та Дедуплікація (Мікро-Крок 6.6)",
+          "level": 3,
+          "paragraphs": [],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "**Кастомне Tailwind Модальне Вікно Анулювання ([StudentAnalyticsTable.tsx](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/admin/src/features/analytics/ui/StudentAnalyticsTable.tsx)):**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Замінено стандартний `window.confirm()` на компонент діалогового вікна підтвердження з анімацією `animate-in fade-in zoom-in-95`.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Усунено проблему відхилення діалогів у браузерних автотестах Playwright та блокування спливаючих вікон.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Точне Обнулення WPM при Копіюванні ([useTelemetry.ts](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/web/src/features/code-editor/lib/useTelemetry.ts) & [bkt.controller.ts](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/api/src/adapters/inbound/http/bkt.controller.ts)):**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Видалено штучну фіксацію `wpm: 180` при події вставки `handlePaste`.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "У бекенд-контролері додано правило: якщо `copyPasteRatio === 1.0` (тобто 100% коду було вставлено), агрегований `avgWpm` автоматично приймається рівним `0 WPM`.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Дедуплікація Подій Вставки (300ms Deduplication Threshold):**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "У [useTelemetry.ts](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/web/src/features/code-editor/lib/useTelemetry.ts) впроваджено лічильник `lastPasteTimeRef`. Повторні сигнали вставок від Monaco API, DOM `paste` та `onDidChangeModelContent`, що виникають протягом 300 мс, ігноруються, що гарантує лічильник `Pastes: 1` за один Ctrl+V.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Фільтрація Системних Комбінацій Клавіш (Ctrl+V / Cmd+V / Alt):**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Оновлено метод `handleKeyDown` у [useTelemetry.ts](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/web/src/features/code-editor/lib/useTelemetry.ts) з перевіркою прапорців `ctrlKey`, `metaKey`, `altKey` та підтримкою `e.browserEvent` з Monaco Editor. Натискання гарячих клавіш копіювання/вставки більше не нарощують `keystrokeCountRef`.",
+              "subitems": []
+            }
+          ]
         }
       ]
     }
