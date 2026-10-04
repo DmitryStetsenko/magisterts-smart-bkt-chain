@@ -95,6 +95,26 @@ export default function AdminDashboardPage() {
     },
   ]);
 
+  const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+
+  const fetchStudentAnalytics = async () => {
+    try {
+      const res = await fetch(`${API_URL}/api/v1/bkt/analytics/students`);
+      if (res.ok) {
+        const data = await res.json();
+        if (Array.isArray(data) && data.length > 0) {
+          setStudents(data);
+        }
+      }
+    } catch (err) {
+      console.error('Error fetching live student analytics:', err);
+    }
+  };
+
+  React.useEffect(() => {
+    fetchStudentAnalytics();
+  }, []);
+
   const handleSaveNode = (updatedNode: AdminSkillNode) => {
     setNodes((prev) => {
       const exists = prev.some((n) => n.id === updatedNode.id);

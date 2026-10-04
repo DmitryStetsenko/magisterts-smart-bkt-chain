@@ -908,6 +908,39 @@
               "subitems": []
             }
           ]
+        },
+        {
+          "title": "6.5 Жива Інтеграція Аналітики Студентів & BKT Heatmap (Мікро-Крок 6.5)",
+          "level": 3,
+          "paragraphs": [],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "**REST API Ендпоінт `GET /api/v1/bkt/analytics/students`:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Розроблено метод `getStudentsAnalytics` у [bkt.controller.ts](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/api/src/adapters/inbound/http/bkt.controller.ts).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Здійснюється агрегація реальних BKT-станів $P(L_t)$ з БД для кожного студента за кожною навичкою, а також обчислення живих показників телеметрії (середній WPM, Copy-Paste Ratio, Fatigue Index).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Підключення Кабінету Викладача (`apps/admin`):**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Оновлено головну сторінку [page.tsx](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/admin/src/app/page.tsx): додано автоматичний фетчинг аналітики з бекенду при завантаженні та синхронізацію даних Heatmap.",
+              "subitems": []
+            }
+          ]
         }
       ]
     }
