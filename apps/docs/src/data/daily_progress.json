@@ -116,6 +116,21 @@
             },
             {
               "type": "text",
+              "raw_text": "**Виправлення виявлення Copy-Paste в аналітиці викладача:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Налаштовано миттєве випромінювання WebSocket-пакета `telemetry_data` при події `onDidPaste` у [useTelemetry.ts](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/web/src/features/code-editor/lib/useTelemetry.ts).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Оновлено зчитування поля `pasteEvents` у [bkt.controller.ts](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/api/src/adapters/inbound/http/bkt.controller.ts), завдяки чому при вставці коду `Copy-Paste Ratio` тепер виставляється у `100%`.",
+              "subitems": []
+            },
+            {
+              "type": "text",
               "raw_text": "---",
               "subitems": []
             }

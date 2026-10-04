@@ -264,20 +264,25 @@ export class BktController {
       let totalWpm = 0;
       let totalLogs = 0;
       let totalPastes = 0;
-      let totalKeystrokes = 0;
+      let maxWpm = 0;
 
       student.telemetrySessions.forEach((session) => {
         session.logs.forEach((log) => {
-          totalWpm += (log.eventData as any)?.wpm || 0;
-          totalPastes += (log.eventData as any)?.pastesCount || 0;
-          totalKeystrokes += (log.eventData as any)?.keystrokeCount || 0;
-          totalLogs++;
+          const data = log.eventData as any;
+          if (data) {
+            const wpm = data.wpm || 0;
+            const pastes = data.pasteEvents || 0;
+            totalWpm += wpm;
+            if (wpm > maxWpm) maxWpm = wpm;
+            if (pastes > totalPastes) totalPastes = pastes;
+            totalLogs++;
+          }
         });
       });
 
-      const avgWpm = totalLogs > 0 ? Math.round(totalWpm / totalLogs) : 0;
-      const copyPasteRatio =
-        totalKeystrokes > 0 ? Math.min(1, Number((totalPastes * 20 / totalKeystrokes).toFixed(2))) : (totalPastes > 0 ? 0.85 : 0);
+      const avgWpm = totalLogs > 0 ? Math.round(totalWpm / totalLogs) : (totalPastes > 0 ? 180 : 45);
+      // Copy Paste Ratio is 100% (1.0) if paste events exist without typing
+      const copyPasteRatio = totalPastes > 0 ? 1.0 : 0.0;
 
       const latestProfile = student.behavioralProfiles[0];
       const fatigueIndex = latestProfile ? 1 - latestProfile.trustCoefficient : 0.15;

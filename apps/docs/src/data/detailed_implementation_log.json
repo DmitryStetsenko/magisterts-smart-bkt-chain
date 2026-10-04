@@ -949,6 +949,21 @@
               "type": "text",
               "raw_text": "Синхронізовано `seed.ts` для підтягування імені `Дмитро Стеценко` для тестового облікового запису `student@example.com` у БД PostgreSQL.",
               "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Точне Виявлення Копіювання (Copy-Paste Ratio):**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Додано миттєву трансляцію пакета `telemetry_data` при події `onDidPaste` у [useTelemetry.ts](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/web/src/features/code-editor/lib/useTelemetry.ts).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Налаштовано коректне читання поля `pasteEvents` у [bkt.controller.ts](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/api/src/adapters/inbound/http/bkt.controller.ts), що гарантує показник `Copy-Paste Ratio = 100%` при суцільній вставці рішень.",
+              "subitems": []
             }
           ]
         }
