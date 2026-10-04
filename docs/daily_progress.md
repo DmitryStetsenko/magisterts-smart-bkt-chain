@@ -17,6 +17,8 @@
 4. **Виправлення відображення масивів у відкритих тест-кейсах:**
    - Оновлено структури даних тест-кейсів у [seed.ts](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/packages/database/prisma/seed.ts) та парсер аргументів бекенду VM Runner у [bkt.controller.ts](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/api/src/adapters/inbound/http/bkt.controller.ts).
    - Тепер якщо функція `filterEvens(numbers)` приймає масив як 1 аргумент, у тест-кейсі показується саме масив `[1, 2, 3, 4, 5, 6]`, а для банальних змінних (наприклад `isEven(n)`) — скалярне значення `4`.
+5. **Автоматична перехідна навігація після успішного розв'язання завдання:**
+   - У [page.tsx](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/web/src/app/page.tsx) додано виклики `fetchRecommendedTask()` у разі отримання статусу `ACCEPTED`. Студент автоматично отримує наступну навичку/завдання за алгоритмом BKT Task Sequencing без потреби вручну тиснути «Оновити рекомендоване».
 
 ---
 
