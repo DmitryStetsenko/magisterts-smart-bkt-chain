@@ -58,7 +58,7 @@ export class BktController {
           const rawInput = ${testCase.input};
           const fnName = Object.keys(this).find(k => typeof this[k] === 'function' && k !== 'eval' && k !== 'setTimeout' && k !== 'clearTimeout');
           const fn = eval(fnName);
-          const args = (fn.length === 1 && Array.isArray(rawInput) && rawInput.length === 1) ? rawInput : (Array.isArray(rawInput) ? rawInput : [rawInput]);
+          const args = Array.isArray(rawInput) ? rawInput : [rawInput];
           result = fn.apply(null, args);
         `;
 
