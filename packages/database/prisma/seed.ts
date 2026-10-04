@@ -216,14 +216,15 @@ async function main() {
   await prisma.task.create({
     data: {
       skillId: jsAsync.id,
-      title: 'Отримання профілю користувача (Async)',
-      description: 'Напишіть асинхронну функцію `fetchUser(id)`, яка повертає простій обʼєкт `{ id, name: "User_" + id }`.',
-      starterCode: 'async function fetchUser(id) {\n  // Ваш код тут\n}',
+      title: 'Асинхронне отримання профілю користувача',
+      description: 'Напишіть асинхронну функцію `fetchUser(id)`, яка за допомогою `await` симулює асинхронну затримку через Promise (`await new Promise(r => setTimeout(r, 10))`) і повертає обʼєкт `{ id, name: "User_" + id }`.',
+      starterCode: 'async function fetchUser(id) {\n  // Симулюйте асинхронну затримку через await\n  // return { id, name: ... }\n}',
       difficulty: TaskDifficulty.HARD,
       testCases: {
         create: [
           { input: '[1]', expectedOutput: '{"id":1,"name":"User_1"}', isSecret: false },
           { input: '[42]', expectedOutput: '{"id":42,"name":"User_42"}', isSecret: false },
+          { input: '[99]', expectedOutput: '{"id":99,"name":"User_99"}', isSecret: true },
         ],
       },
     },
