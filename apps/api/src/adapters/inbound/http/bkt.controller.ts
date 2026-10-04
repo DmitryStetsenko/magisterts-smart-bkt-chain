@@ -204,4 +204,39 @@ export class BktController {
       updatedAt: s.updatedAt,
     }));
   }
+
+  @Post('reset/:studentId?')
+  @ApiOperation({ summary: 'Experimental: Reset BKT mastery state and submission history for a student' })
+  async resetStudentState(@Param('studentId') studentId?: string) {
+    let student = studentId
+      ? await this.prisma.user.findUnique({ where: { id: studentId } })
+      : await this.prisma.user.findFirst({ where: { role: 'STUDENT' } });
+
+    if (!student) {
+      student = await this.prisma.user.findFirst({ where: { role: 'STUDENT' } });
+    }
+
+    if (!student) throw new NotFoundException('No student found for reset');
+
+    // Reset BKT states to initial P(L0) = 0.5
+    await this.prisma.bktState.updateMany({
+      where: { userId: student.id },
+      data: {
+        pMastery: 0.5,
+        isMastered: false,
+        masteredAt: null,
+      },
+    });
+
+    // Delete submission history and BKT logs
+    await this.prisma.submission.deleteMany({ where: { userId: student.id } });
+    await this.prisma.bktHistory.deleteMany({ where: { userId: student.id } });
+    await this.prisma.telemetryLog.deleteMany({ where: { userId: student.id } });
+
+    return {
+      message: `BKT progress for student ${student.email} has been reset`,
+      userId: student.id,
+      resetAt: new Date(),
+    };
+  }
 }

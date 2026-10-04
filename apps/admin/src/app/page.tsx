@@ -50,7 +50,7 @@ export default function AdminDashboardPage() {
     },
   ]);
 
-  const [students] = useState<StudentAnalyticsItem[]>([
+  const [students, setStudents] = useState<StudentAnalyticsItem[]>([
     {
       studentId: 'student-1',
       name: 'Дмитро Стеценко',
@@ -107,6 +107,28 @@ export default function AdminDashboardPage() {
 
   const handleDeleteNode = (nodeId: string) => {
     setNodes((prev) => prev.filter((n) => n.id !== nodeId));
+  };
+
+  const handleResetStudent = (studentId: string) => {
+    setStudents((prev) =>
+      prev.map((s) => {
+        if (s.studentId === studentId) {
+          return {
+            ...s,
+            skillMastery: {
+              'js-basics': 0.5,
+              'js-arrays': 0.0,
+              'js-async': 0.0,
+            },
+            avgWpm: 0,
+            copyPasteRatio: 0,
+            fatigueIndex: 0,
+            lastActive: 'Анульовано',
+          };
+        }
+        return s;
+      })
+    );
   };
 
   return (
@@ -169,6 +191,7 @@ export default function AdminDashboardPage() {
       <StudentAnalyticsTable
         students={students}
         skillSlugs={nodes.map((n) => n.slug)}
+        onResetStudent={handleResetStudent}
       />
 
       {/* 🗺️ Interactive Skill DAG Editor Component */}
