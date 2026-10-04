@@ -76,6 +76,16 @@
             },
             {
               "type": "text",
+              "raw_text": "**Автоматична перехідна навігація після успішного розв'язання завдання:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "У [page.tsx](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/web/src/app/page.tsx) додано виклики `fetchRecommendedTask()` у разі отримання статусу `ACCEPTED`. Студент автоматично отримує наступну навичку/завдання за алгоритмом BKT Task Sequencing без потреби вручну тиснути «Оновити рекомендоване».",
+              "subitems": []
+            },
+            {
+              "type": "text",
               "raw_text": "---",
               "subitems": []
             }

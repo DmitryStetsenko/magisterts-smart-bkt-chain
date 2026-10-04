@@ -141,6 +141,10 @@ export default function StudentPortalPage() {
         const data = await res.json();
         setEvalResult(data);
         await fetchStudentState();
+        if (data.status === 'ACCEPTED') {
+          // Refresh recommended task so student transitions to next task or skill automatically
+          await fetchRecommendedTask();
+        }
       }
     } catch (err) {
       console.error('Error evaluating code:', err);

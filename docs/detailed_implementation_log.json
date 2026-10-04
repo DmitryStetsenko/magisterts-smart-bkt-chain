@@ -894,17 +894,17 @@
             },
             {
               "type": "text",
-              "raw_text": "**Форматування Відкритих Тест-Кейсів та Передача Аргументів у VM Runner:**",
+              "raw_text": "**Автоматична Повторна Запит-Секвенсація після Успіху:**",
               "subitems": []
             },
             {
               "type": "text",
-              "raw_text": "Налаштовано коректне збереження аргументів у [seed.ts](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/packages/database/prisma/seed.ts) та спрощено розгортання масивів у [bkt.controller.ts](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/api/src/adapters/inbound/http/bkt.controller.ts).",
+              "raw_text": "Оновлено [page.tsx](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/web/src/app/page.tsx): після відправки та успішної перевірки рішення (`status === 'ACCEPTED'`) фронтенд автоматично робить виклик `fetchRecommendedTask()`.",
               "subitems": []
             },
             {
               "type": "text",
-              "raw_text": "Завдання з масивами (`filterEvens(numbers)`, `calcTotal(items)`) передають свій єдиний масив як елемент внутрішнього масиву виклику (`[[1, 2, 3, 4, 5, 6]]`), завдяки чому у Студентському Порталі у розділі тест-кейсів відображається справжній квадратний масив `[1, 2, 3, 4, 5, 6]`, а для простих чисел — скаляр `4`.",
+              "raw_text": "Завдяки цьому студент відразу переходить до наступного нерозв'язаного завдання або до наступного модуля графа знань без потреби натискання кнопки «Оновити рекомендоване».",
               "subitems": []
             }
           ]
