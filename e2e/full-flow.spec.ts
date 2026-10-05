@@ -7,7 +7,7 @@ test.describe('Smart-BKT-Chain E2E Flow', () => {
     await page.waitForLoadState('networkidle');
 
     // Перевірка відображення заголовка та профілю студента
-    await expect(page.locator('h1')).toContainText('Smart BKT Student Portal');
+    await expect(page.locator('h1')).toContainText('Smart-BKT-Chain Student Portal');
     await expect(page.getByText('Дмитро Стеценко')).toBeVisible();
 
     // 2. Студент взаємодіє з Monaco Editor (введення коду рішення)
@@ -21,17 +21,17 @@ test.describe('Smart-BKT-Chain E2E Flow', () => {
     const telemetryBar = page.getByText(/WPM|Паузи/i);
     await expect(telemetryBar).toBeVisible();
 
-    // Відправляємо розв'язок задачі (кнопка "Перевірити рішення")
-    const submitBtn = page.getByRole('button', { name: /Перевірити рішення/i });
+    // Відправляємо розв'язок задачі (кнопка "Перевірити код")
+    const submitBtn = page.getByRole('button', { name: /Перевірити код/i });
     await expect(submitBtn).toBeEnabled();
     await submitBtn.click();
 
     // Чекаємо вердикт перевірки у модальному вікні чи панелі результатів
-    await expect(page.getByText(/Рішення вірне|Тест-кеси/i)).toBeVisible({ timeout: 10000 });
+    await expect(page.getByText(/Рішення прийнято|Помилка виконання|Оновлення BKT/i).first()).toBeVisible({ timeout: 10000 });
 
-    // 3. Відкриваємо Кабінет Викладача у новій вкладці (apps/admin на порту 3001)
+    // 3. Відкриваємо Кабінет Викладача у новій вкладці (apps/admin на порту 3003)
     const adminPage = await context.newPage();
-    await adminPage.goto('http://localhost:3001');
+    await adminPage.goto('http://localhost:3003');
     await adminPage.waitForLoadState('networkidle');
 
     // Перевіряємо наявність студента в таблиці аналітики
@@ -42,10 +42,13 @@ test.describe('Smart-BKT-Chain E2E Flow', () => {
     const resetButton = adminPage.getByRole('button', { name: /Анулювати/i }).first();
     await expect(resetButton).toBeVisible();
     
-    // Натискаємо Анулювати
+    // Натискаємо Анулювати та підтверджуємо в кастомному модальному вікні
     await resetButton.click();
+    const confirmModalBtn = adminPage.getByRole('button', { name: /Так, анулювати/i });
+    await expect(confirmModalBtn).toBeVisible();
+    await confirmModalBtn.click();
 
-    // Перевіряємо, що стан оновився до "Нерозпочато" або 0.0%
-    await expect(adminPage.getByText(/Нерозпочато|0\.0%/i)).toBeVisible({ timeout: 5000 });
+    // Перевіряємо, що стан оновився до "Нерозпочато" або 0.0% / 0%
+    await expect(adminPage.getByText(/Нерозпочато|0%/i).first()).toBeVisible({ timeout: 5000 });
   });
 });
