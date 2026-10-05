@@ -92,6 +92,17 @@ export class BktController {
 
     const isAllPassed = passedCount === totalCount && totalCount > 0;
 
+    // Check if the student previously submitted this EXACT same source code for this task
+    const previousSubmission = await this.prisma.submission.findFirst({
+      where: {
+        userId: user.id,
+        taskId: task.id,
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+
+    const isDuplicateCode = previousSubmission && previousSubmission.code.trim() === dto.code.trim();
+
     // Get or initialize current BKT State
     let bktState = await this.prisma.bktState.findUnique({
       where: {
@@ -115,26 +126,42 @@ export class BktController {
       });
     }
 
-    // Calculate next BKT mastery state using BktEngine
-    const bktResult = BktEngine.calculateNextState(
-      {
-        pMastery: bktState.pMastery,
-        pTransit: bktState.pTransit,
-        pSlip: bktState.pSlip,
-        pGuess: bktState.pGuess,
-      },
-      isAllPassed,
-    );
+    let nextPMastery = bktState.pMastery;
+    let bktResult = {
+      pMasteryPrior: bktState.pMastery,
+      pMasteryPosterior: bktState.pMastery,
+      pObserved: isAllPassed ? 1 : 0,
+    };
 
-    // Save BktState update
-    await this.prisma.bktState.update({
-      where: { id: bktState.id },
-      data: {
-        pMastery: bktResult.pMasteryPosterior,
-        isMastered: BktEngine.isMastered(bktResult.pMasteryPosterior),
-        masteredAt: BktEngine.isMastered(bktResult.pMasteryPosterior) ? new Date() : null,
-      },
-    });
+    // Calculate next BKT mastery state ONLY IF code is NOT a duplicate submission
+    if (!isDuplicateCode) {
+      const calculatedBkt = BktEngine.calculateNextState(
+        {
+          pMastery: bktState.pMastery,
+          pTransit: bktState.pTransit,
+          pSlip: bktState.pSlip,
+          pGuess: bktState.pGuess,
+        },
+        isAllPassed,
+      );
+
+      nextPMastery = calculatedBkt.pMasteryPosterior;
+      bktResult = {
+        pMasteryPrior: calculatedBkt.pMasteryPrior,
+        pMasteryPosterior: calculatedBkt.pMasteryPosterior,
+        pObserved: isAllPassed ? 1 : 0,
+      };
+
+      // Save BktState update
+      await this.prisma.bktState.update({
+        where: { id: bktState.id },
+        data: {
+          pMastery: nextPMastery,
+          isMastered: BktEngine.isMastered(nextPMastery),
+          masteredAt: BktEngine.isMastered(nextPMastery) ? new Date() : null,
+        },
+      });
+    }
 
     // Create Submission record
     const submission = await this.prisma.submission.create({
@@ -153,22 +180,25 @@ export class BktController {
       },
     });
 
-    // Save BktHistory record
-    await this.prisma.bktHistory.create({
-      data: {
-        userId: user.id,
-        skillId: task.skillId,
-        pMasteryBefore: bktResult.pMasteryPrior,
-        pMasteryAfter: bktResult.pMasteryPosterior,
-        isCorrect: isAllPassed,
-      },
-    });
+    // Save BktHistory record only if submission is not duplicate
+    if (!isDuplicateCode) {
+      await this.prisma.bktHistory.create({
+        data: {
+          userId: user.id,
+          skillId: task.skillId,
+          pMasteryBefore: bktResult.pMasteryPrior,
+          pMasteryAfter: bktResult.pMasteryPosterior,
+          isCorrect: isAllPassed,
+        },
+      });
+    }
 
     return {
       submissionId: submission.id,
       status: submission.status,
       passedTestsCount: passedCount,
       totalTestsCount: totalCount,
+      isDuplicate: !!isDuplicateCode,
       bktUpdate: {
         skillSlug: task.skill.slug,
         skillTitle: task.skill.title,
