@@ -44,7 +44,13 @@ export function useTelemetry(userId: string, taskId: string) {
     });
 
     return () => {
-      socket.disconnect();
+      if (socket.connected) {
+        socket.disconnect();
+      } else {
+        socket.once('connect', () => {
+          socket.disconnect();
+        });
+      }
     };
   }, [userId, taskId]);
 

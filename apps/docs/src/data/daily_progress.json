@@ -156,6 +156,26 @@
             },
             {
               "type": "text",
+              "raw_text": "**Оптимізація Телеметрії та Концепція Мультимодальної Нейромережі:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Оновлено `useTelemetry.ts` для виправлення WebSocket з'єднання під час React StrictMode.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Розроблено концепції [telemetry_weighted_bkt.md](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/docs/concepts/telemetry_weighted_bkt.md) та [neural_telemetry_ai.md](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/docs/concepts/neural_telemetry_ai.md) для мультимодальної нейромережі (1D-CNN + BiLSTM, Speech, Reaction Latency, ViT).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Перекомпільовано JSON документацію через `python scripts/compile_docs.py`.",
+              "subitems": []
+            },
+            {
+              "type": "text",
               "raw_text": "---",
               "subitems": []
             }

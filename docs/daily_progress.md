@@ -33,6 +33,10 @@
    - Створено модуль [EvaluationQueueModule](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/api/src/adapters/outbound/queue/evaluation-queue.module.ts) з конфігурацією Redis `code-evaluation`.
    - Реалізовано фоновий процесор [EvaluationProcessor](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/api/src/adapters/outbound/queue/evaluation.processor.ts) для опрацювання черги оцінювання.
    - Написано юніт-тест [evaluation.processor.spec.ts](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/api/src/adapters/outbound/queue/evaluation.processor.spec.ts) та успішно пройдено 100% тестів бекенду (11 passed).
+7. **Оптимізація Телеметрії та Концепція Мультимодальної Нейромережі:**
+   - Оновлено `useTelemetry.ts` для виправлення WebSocket з'єднання під час React StrictMode.
+   - Розроблено концепції [telemetry_weighted_bkt.md](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/docs/concepts/telemetry_weighted_bkt.md) та [neural_telemetry_ai.md](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/docs/concepts/neural_telemetry_ai.md) для мультимодальної нейромережі (1D-CNN + BiLSTM, Speech, Reaction Latency, ViT).
+   - Перекомпільовано JSON документацію через `python scripts/compile_docs.py`.
 
 ---
 
