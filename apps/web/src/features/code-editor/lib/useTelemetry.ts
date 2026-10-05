@@ -27,7 +27,9 @@ export function useTelemetry(userId: string, taskId: string) {
     if (!userId || !taskId) return;
 
     const socket = io(`${SOCKET_URL}/telemetry`, {
-      transports: ['websocket', 'polling'],
+      transports: ['websocket'],
+      upgrade: false,
+      reconnectionAttempts: 5,
       autoConnect: true,
     });
 
