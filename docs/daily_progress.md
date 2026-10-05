@@ -16,6 +16,11 @@
 3. **Створення специфікації аналітичних показників та телеметрії:**
    - Створено деталізовану технічну специфікацію у файлі [docs/telemetry_analytics.md](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/docs/telemetry_analytics.md), яка описує формули та роль BKT-параметрів ($P(L_0), P(T), P(S), P(G), P(L_t)$), клієнтської телеметрії (WPM, pauses, deletes, copy-paste ratio) та поведінкових профілів (Trust Coefficient, Fatigue Index).
    - Оновлено скрипт `scripts/compile_docs.py` для автоматичної компіляції специфікації у JSON-структури порталу документації.
+4. **Розгортання Повноцінного Курсу з JavaScript (5 Модулів, 14 Завдань):**
+   - Розширено структуру навчального курсу у [seed.ts](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/packages/database/prisma/seed.ts) до 5 модулів із суворими DAG залежностями ($P(L_t) \ge 0.95$): `js-basics` $\rightarrow$ `js-functions` $\rightarrow$ `js-collections` $\rightarrow$ `js-async` $\rightarrow$ `js-oop`.
+   - Наповнено базу 14 практичними задачами із відкритими та прихованими тест-кейсами.
+   - Оновлено відображення графа навичок у Кабінеті Студента [page.tsx](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/web/src/app/page.tsx) та Викладача [page.tsx](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/admin/src/app/page.tsx).
+   - Виконано збірку веб-додатків (`npm run build:web` та `npm run build:admin`) без жодної помилки.
 
 ---
 

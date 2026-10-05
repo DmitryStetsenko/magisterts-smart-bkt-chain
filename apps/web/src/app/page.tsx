@@ -33,34 +33,52 @@ export default function StudentPortalPage() {
   const [evalResult, setEvalResult] = useState<any>(null);
   const [graphNodes, setGraphNodes] = useState<SkillGraphNode[]>([]);
 
-  // Default Mini-Course DAG Nodes fallback
+  // Default Full Course DAG Nodes fallback
   const defaultNodes: SkillGraphNode[] = [
     {
       id: '1',
       slug: 'js-basics',
-      title: 'Основи JavaScript',
-      description: 'Типи даних, змінне та оператори',
+      title: '1. Синтаксис & База',
+      description: 'Змінні, типи даних, цикли',
       pMastery: 0.0,
       status: 'IN_PROGRESS',
       parentSkillIds: [],
     },
     {
       id: '2',
-      slug: 'js-arrays',
-      title: 'Масиви та FP',
-      description: 'Методи map, filter, reduce',
+      slug: 'js-functions',
+      title: '2. Функції & Closures',
+      description: 'Arrow functions, замикання',
       pMastery: 0.0,
       status: 'LOCKED',
       parentSkillIds: ['js-basics'],
     },
     {
       id: '3',
-      slug: 'js-async',
-      title: 'Асинхронність',
-      description: 'Promises та async/await',
+      slug: 'js-collections',
+      title: '3. Масиви & Обʼєкти',
+      description: 'map, filter, reduce',
       pMastery: 0.0,
       status: 'LOCKED',
-      parentSkillIds: ['js-arrays'],
+      parentSkillIds: ['js-functions'],
+    },
+    {
+      id: '4',
+      slug: 'js-async',
+      title: '4. Асинхронність',
+      description: 'Promises, async/await',
+      pMastery: 0.0,
+      status: 'LOCKED',
+      parentSkillIds: ['js-collections'],
+    },
+    {
+      id: '5',
+      slug: 'js-oop',
+      title: '5. ООП & Прототипи',
+      description: 'Класи, extends, протипи',
+      pMastery: 0.0,
+      status: 'LOCKED',
+      parentSkillIds: ['js-async'],
     },
   ];
 
