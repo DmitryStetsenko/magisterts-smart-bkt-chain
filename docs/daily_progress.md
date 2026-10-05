@@ -10,6 +10,9 @@
    - Створено конфігураційний файл [playwright.config.ts](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/playwright.config.ts) для налаштування базової URL-адреси (`http://localhost:3002`), таймаутів та звітів.
    - Створено файл наскрізного інтеграційного тесту [e2e/full-flow.spec.ts](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/e2e/full-flow.spec.ts), що покриває повний сценарій взаємодії: Студент (`apps/web`) $\rightarrow$ Monaco Editor $\rightarrow$ WebSocket телеметрія $\rightarrow$ Викладач (`apps/admin`) $\rightarrow$ Анулювання BKT-стану.
    - Додано команду `"test:e2e": "playwright test"` у кореневий [package.json](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/package.json).
+2. **Скрізна перевірка та успішний запуск E2E тестів у реальному Headless Chromium:**
+   - Піднято локальні мікросервіси та PostgreSQL 16 через Docker Compose.
+   - Проведено успішний прогін `npm run test:e2e`: повністю підтверджено працездатність наскрізного ланцюжка передачі телеметрії, оцінювання VM runner та швидкого анулювання BKT-результатів у кабінеті викладача (1 passed у 10.5с).
 
 ---
 
