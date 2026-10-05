@@ -28,6 +28,11 @@
    - **`apps/admin` (порт 3004):** Сформовано системну CMS панель для управління графом знань Skill DAG та курсами.
    - **`apps/landing` (порт 3001):** Створено публічний промо-сайт для візуальної презентації платформи.
    - Усі 4 веб-додатки успішно скомпільовано (`build:student`, `build:teacher`, `build:admin`, `build:landing`), а Playwright E2E тест пройшов на 100%.
+6. **Інтеграція Асинхронних Черг BullMQ & Redis у `apps/api` (Мікро-Крок 3.1):**
+   - Встановлено пакети `@nestjs/bullmq` та `bullmq` у бекенд NestJS.
+   - Створено модуль [EvaluationQueueModule](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/api/src/adapters/outbound/queue/evaluation-queue.module.ts) з конфігурацією Redis `code-evaluation`.
+   - Реалізовано фоновий процесор [EvaluationProcessor](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/api/src/adapters/outbound/queue/evaluation.processor.ts) для опрацювання черги оцінювання.
+   - Написано юніт-тест [evaluation.processor.spec.ts](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/api/src/adapters/outbound/queue/evaluation.processor.spec.ts) та успішно пройдено 100% тестів бекенду (11 passed).
 
 ---
 

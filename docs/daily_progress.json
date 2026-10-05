@@ -131,6 +131,31 @@
             },
             {
               "type": "text",
+              "raw_text": "**Інтеграція Асинхронних Черг BullMQ & Redis у `apps/api` (Мікро-Крок 3.1):**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Встановлено пакети `@nestjs/bullmq` та `bullmq` у бекенд NestJS.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Створено модуль [EvaluationQueueModule](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/api/src/adapters/outbound/queue/evaluation-queue.module.ts) з конфігурацією Redis `code-evaluation`.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Реалізовано фоновий процесор [EvaluationProcessor](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/api/src/adapters/outbound/queue/evaluation.processor.ts) для опрацювання черги оцінювання.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Написано юніт-тест [evaluation.processor.spec.ts](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/api/src/adapters/outbound/queue/evaluation.processor.spec.ts) та успішно пройдено 100% тестів бекенду (11 passed).",
+              "subitems": []
+            },
+            {
+              "type": "text",
               "raw_text": "---",
               "subitems": []
             }
