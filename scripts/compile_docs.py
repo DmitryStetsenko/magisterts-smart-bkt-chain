@@ -184,6 +184,7 @@ def main():
     compile_file("docs/project_management.md", "docs/project_management.json", "apps/docs/src/data/project_management.json")
     compile_file("docs/daily_progress.md", "docs/daily_progress.json", "apps/docs/src/data/daily_progress.json")
     compile_file("docs/detailed_implementation_log.md", "docs/detailed_implementation_log.json", "apps/docs/src/data/detailed_implementation_log.json")
+    compile_file("docs/telemetry_analytics.md", "docs/telemetry_analytics.json", "apps/docs/src/data/telemetry_analytics.json")
 
 if __name__ == "__main__":
     main()

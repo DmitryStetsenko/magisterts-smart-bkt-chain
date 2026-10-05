@@ -56,6 +56,21 @@
             },
             {
               "type": "text",
+              "raw_text": "**Створення специфікації аналітичних показників та телеметрії:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Створено деталізовану технічну специфікацію у файлі [docs/telemetry_analytics.md](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/docs/telemetry_analytics.md), яка описує формули та роль BKT-параметрів ($P(L_0), P(T), P(S), P(G), P(L_t)$), клієнтської телеметрії (WPM, pauses, deletes, copy-paste ratio) та поведінкових профілів (Trust Coefficient, Fatigue Index).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Оновлено скрипт `scripts/compile_docs.py` для автоматичної компіляції специфікації у JSON-структури порталу документації.",
+              "subitems": []
+            },
+            {
+              "type": "text",
               "raw_text": "---",
               "subitems": []
             }
