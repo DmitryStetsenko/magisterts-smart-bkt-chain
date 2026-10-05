@@ -12,10 +12,12 @@
 | :--- | :--- | :--- | :--- |
 | **`INF`** | `DevOps-Infra` | Конфігурація монорепозиторію, Docker, CI/CD, хмарний деплой | `/`, `/.github/`, `/docker/` |
 | **`BK`** | `Backend-API` | Ядро NestJS бекенду, авторизація, робота з базою даних | `/apps/api/` |
-| **`BKT`** | `BKT-Engine-AI` | Математичний рушій BKT, оцінювання коду (LLM Judge), черги | `/apps/api/src/bkt/` |
+| **`BKT`** | `BKT-Engine-AI` | Математичний рушій BKT, оцінювання коду (LLM Judge), черги | `/apps/api/src/domain/` |
 | **`W3`** | `Web3-Blockchain` | Смарт-контракти Solidity, Hardhat/Foundry, релейєр транзакцій | `/packages/contracts/` |
-| **`CF`** | `Client-Frontend` | Клієнтська частина Next.js (кабінет студента, викладача, граф знань) | `/apps/web/` |
-| **`AF`** | `Admin-Frontend` | Панель адміністрування Next.js (CMS для контенту, CRM аналітика) | `/apps/admin/` |
+| **`ST`** | `Student-Frontend` | Кабінет Студента Next.js (Monaco Editor, Skill DAG Map, телеметрія) | `/apps/student/` |
+| **`TC`** | `Teacher-Frontend` | Кабінет Викладача Next.js (BKT Heatmap, CRM аналітика, анулювання) | `/apps/teacher/` |
+| **`AD`** | `Admin-CMS` | Панель Адміністратора Next.js (Skill DAG Builder, CMS курсів/задач) | `/apps/admin/` |
+| **`LD`** | `Landing-Web` | Публічний промо-сайт Next.js (Landing page, Web3 Auth) | `/apps/landing/` |
 | **`SH`** | `Shared-Packages` | Спільні пакети монорепозиторію (Prisma schema, E2E типи) | `/packages/` |
 
 ---
