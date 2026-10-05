@@ -258,6 +258,49 @@
 - **Інтеграційний Сценарій ([e2e/full-flow.spec.ts](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/e2e/full-flow.spec.ts)):**
   - Реалізовано наскрізний тест, який відкриває Кабінет Студента (`http://localhost:3002`), перевіряє роботу Monaco Editor, надсилає розв'язок, переходить у Кабінет Викладача (`http://localhost:3001`), перевіряє аналітику та тестує анулювання BKT-стану.
 
+---
+
+## 🤖 Крок 7: Фаза 3 — ШІ-оцінювання та Асинхронний Пайплайн (LLM Judge, BullMQ & Telemetry Trust)
+
+### 7.1 Архітектурна Концепція Фази 3
+Фаза 3 розширює базове BKT-оцінювання двома ключовими інтелектуальними інструментами:
+1. **Асинхронний фоновий воркер BullMQ + Redis:** Вирішення проблеми масштабованості при одночасному надсиланні сотень студентських розв'язків. Замість блокуючого виконання у Node.js VM під час HTTP-запиту, завдання постановляється у чергу `code-evaluation`.
+2. **LLM-Judge на базі Google Gemini API (`gemini-2.5-flash`):** Семантична перевірка коду, визначення дотримування патернів та генерування асистентських підказок.
+3. **Розрахунок Коефіцієнта Довіри ($C_{\text{trust}}$) та Коригування $P(S)$ / $P(G)$:**
+   - Інтеграція телеметрії у математичне ядро BKT:
+     $$C_{\text{trust}} = 1.0 - (0.5 \cdot \text{CopyPasteRatio} + 0.3 \cdot \text{FatigueIndex} + 0.2 \cdot \text{WpmAnomaly})$$
+   - Якщо $C_{\text{trust}} < 0.5$, параметри помилки $P(S)$ та вгадування $P(G)$ тимчасово коригуються для зниження довіри до поточного результату:
+     $$P(G') = P(G) + (1 - C_{\text{trust}}) \cdot 0.3$$
+
+### 7.2 Схема Асинхронного Пайплайну Оцінювання
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Student as Студент (apps/student)
+    participant API as NestJS REST API
+    participant Queue as Redis (BullMQ Queue)
+    participant Worker as Evaluation Processor
+    participant Gemini as Google Gemini API
+    participant WS as WebSocket Gateway
+    participant DB as PostgreSQL (Prisma)
+
+    Student->>API: POST /api/v1/bkt/evaluate (SourceCode, TaskId)
+    API->>DB: Створення Submission (Status: IN_PROGRESS)
+    API->>Queue: Push Job (submissionId, code, tests)
+    API-->>Student: 202 Accepted (jobId, status: IN_PROGRESS)
+    
+    Queue->>Worker: Pop Job
+    Worker->>Worker: 1. VM Test Execution (Pass/Fail)
+    Worker->>Gemini: 2. Semantic Analysis (prompt: code + task)
+    Gemini-->>Worker: JSON (qualityScore, hint, refactoringTip)
+    Worker->>Worker: 3. Calculate C_trust from Telemetry
+    Worker->>Worker: 4. BKT Update P(L_t) with adjusted P(S)/P(G)
+    Worker->>DB: Save EvaluationResult, BktState, Submission Status
+    Worker->>WS: Emit 'evaluation_completed' (jobId, P(L_t), feedback)
+    WS-->>Student: Live Toast / UI Update
+```
+
+
 
 
 

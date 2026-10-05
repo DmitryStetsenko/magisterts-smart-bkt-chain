@@ -1113,8 +1113,73 @@
               "type": "text",
               "raw_text": "Реалізовано наскрізний тест, який відкриває Кабінет Студента (`http://localhost:3002`), перевіряє роботу Monaco Editor, надсилає розв'язок, переходить у Кабінет Викладача (`http://localhost:3001`), перевіряє аналітику та тестує анулювання BKT-стану.",
               "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "---",
+              "subitems": []
             }
           ]
+        }
+      ]
+    },
+    {
+      "title": "🤖 Крок 7: Фаза 3 — ШІ-оцінювання та Асинхронний Пайплайн (LLM Judge, BullMQ & Telemetry Trust)",
+      "level": 2,
+      "paragraphs": [],
+      "code_blocks": [],
+      "items": [],
+      "subsections": [
+        {
+          "title": "7.1 Архітектурна Концепція Фази 3",
+          "level": 3,
+          "paragraphs": [
+            "Фаза 3 розширює базове BKT-оцінювання двома ключовими інтелектуальними інструментами:"
+          ],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "**Асинхронний фоновий воркер BullMQ + Redis:** Вирішення проблеми масштабованості при одночасному надсиланні сотень студентських розв'язків. Замість блокуючого виконання у Node.js VM під час HTTP-запиту, завдання постановляється у чергу `code-evaluation`.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**LLM-Judge на базі Google Gemini API (`gemini-2.5-flash`):** Семантична перевірка коду, визначення дотримування патернів та генерування асистентських підказок.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Розрахунок Коефіцієнта Довіри ($C_{\\text{trust}}$) та Коригування $P(S)$ / $P(G)$:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Інтеграція телеметрії у математичне ядро BKT:",
+              "subitems": [
+                "$$C_{\\text{trust}} = 1.0 - (0.5 \\cdot \\text{CopyPasteRatio} + 0.3 \\cdot \\text{FatigueIndex} + 0.2 \\cdot \\text{WpmAnomaly})$$"
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "Якщо $C_{\\text{trust}} < 0.5$, параметри помилки $P(S)$ та вгадування $P(G)$ тимчасово коригуються для зниження довіри до поточного результату:",
+              "subitems": [
+                "$$P(G') = P(G) + (1 - C_{\\text{trust}}) \\cdot 0.3$$"
+              ]
+            }
+          ]
+        },
+        {
+          "title": "7.2 Схема Асинхронного Пайплайну Оцінювання",
+          "level": 3,
+          "paragraphs": [],
+          "code_blocks": [
+            {
+              "lang": "mermaid",
+              "content": "sequenceDiagram\n    autonumber\n    actor Student as Студент (apps/student)\n    participant API as NestJS REST API\n    participant Queue as Redis (BullMQ Queue)\n    participant Worker as Evaluation Processor\n    participant Gemini as Google Gemini API\n    participant WS as WebSocket Gateway\n    participant DB as PostgreSQL (Prisma)\n\n    Student->>API: POST /api/v1/bkt/evaluate (SourceCode, TaskId)\n    API->>DB: Створення Submission (Status: IN_PROGRESS)\n    API->>Queue: Push Job (submissionId, code, tests)\n    API-->>Student: 202 Accepted (jobId, status: IN_PROGRESS)\n    \n    Queue->>Worker: Pop Job\n    Worker->>Worker: 1. VM Test Execution (Pass/Fail)\n    Worker->>Gemini: 2. Semantic Analysis (prompt: code + task)\n    Gemini-->>Worker: JSON (qualityScore, hint, refactoringTip)\n    Worker->>Worker: 3. Calculate C_trust from Telemetry\n    Worker->>Worker: 4. BKT Update P(L_t) with adjusted P(S)/P(G)\n    Worker->>DB: Save EvaluationResult, BktState, Submission Status\n    Worker->>WS: Emit 'evaluation_completed' (jobId, P(L_t), feedback)\n    WS-->>Student: Live Toast / UI Update"
+            }
+          ],
+          "items": []
         }
       ]
     }
