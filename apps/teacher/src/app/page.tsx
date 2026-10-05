@@ -126,10 +126,10 @@ export default function AdminDashboardPage() {
           </div>
           <div>
             <h1 className="text-2xl font-bold text-white flex items-center gap-2">
-              <span>Smart-BKT-Chain Admin Portal</span>
+              <span>Smart-BKT-Chain Teacher Portal</span>
             </h1>
             <p className="text-sm text-slate-400">
-              Панель викладача: управління графом знань (DAG) та аналітика BKT студентів
+              Кабінет викладача: аналітика BKT студентів, жива телеметрія та Heatmap
             </p>
           </div>
         </div>

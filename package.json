@@ -15,6 +15,8 @@
     "build:docs": "npm run build --workspace=apps/docs",
     "dev:student": "npm run dev --workspace=apps/student",
     "build:student": "npm run build --workspace=apps/student",
+    "dev:teacher": "npm run dev --workspace=apps/teacher",
+    "build:teacher": "npm run build --workspace=apps/teacher",
     "dev:admin": "npm run dev --workspace=apps/admin",
     "build:admin": "npm run build --workspace=apps/admin",
     "test:e2e": "playwright test",
