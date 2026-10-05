@@ -249,6 +249,16 @@
 - **Фільтрація Системних Комбінацій Клавіш (Ctrl+V / Cmd+V / Alt):**
   - Оновлено метод `handleKeyDown` у [useTelemetry.ts](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/web/src/features/code-editor/lib/useTelemetry.ts) з перевіркою прапорців `ctrlKey`, `metaKey`, `altKey` та підтримкою `e.browserEvent` з Monaco Editor. Натискання гарячих клавіш копіювання/вставки більше не нарощують `keystrokeCountRef`.
 
+### 6.7 Інтеграція та Конфігурація Playwright E2E Тестування (Мікро-Крок 6.7)
+- **Інсталяція Playwright Test Environment:**
+  - Встановлено залежність `@playwright/test` v1.63.0 та завантажено Chromium Headless браузер.
+  - Додано команду `"test:e2e": "playwright test"` у кореневий `package.json`.
+- **Файл Конфігурації ([playwright.config.ts](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/playwright.config.ts)):**
+  - Налаштовано запуск Headless Chrome з baseURL `http://localhost:3002`.
+- **Інтеграційний Сценарій ([e2e/full-flow.spec.ts](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/e2e/full-flow.spec.ts)):**
+  - Реалізовано наскрізний тест, який відкриває Кабінет Студента (`http://localhost:3002`), перевіряє роботу Monaco Editor, надсилає розв'язок, переходить у Кабінет Викладача (`http://localhost:3001`), перевіряє аналітику та тестує анулювання BKT-стану.
+
+
 
 
 

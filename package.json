@@ -17,6 +17,10 @@
     "build:web": "npm run build --workspace=apps/web",
     "dev:admin": "npm run dev --workspace=apps/admin",
     "build:admin": "npm run build --workspace=apps/admin",
+    "test:e2e": "playwright test",
     "compile:docs": "python scripts/compile_docs.py"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.63.0"
   }
 }

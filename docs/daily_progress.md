@@ -2,6 +2,17 @@
 
 Цей документ фіксує щоденний прогрес розробки, архітектурні рішення та планування наступних кроків для системи «Smart-BKT-Chain».
 
+## 📅 05 жовтня 2026 року
+
+### ✅ Що зроблено за день:
+1. **Налаштування та конфігурація Playwright E2E тестування:**
+   - Встановлено пакети `@playwright/test` та завантажено Chrome/Chromium Headless браузер.
+   - Створено конфігураційний файл [playwright.config.ts](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/playwright.config.ts) для налаштування базової URL-адреси (`http://localhost:3002`), таймаутів та звітів.
+   - Створено файл наскрізного інтеграційного тесту [e2e/full-flow.spec.ts](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/e2e/full-flow.spec.ts), що покриває повний сценарій взаємодії: Студент (`apps/web`) $\rightarrow$ Monaco Editor $\rightarrow$ WebSocket телеметрія $\rightarrow$ Викладач (`apps/admin`) $\rightarrow$ Анулювання BKT-стану.
+   - Додано команду `"test:e2e": "playwright test"` у кореневий [package.json](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/package.json).
+
+---
+
 ## 📅 04 жовтня 2026 року
 
 ### ✅ Що зроблено за день:

@@ -2,6 +2,53 @@
   "project_title": "📅 Журнал розробки та прогресу проєкту (Daily Progress Log)",
   "sections": [
     {
+      "title": "📅 05 жовтня 2026 року",
+      "level": 2,
+      "paragraphs": [],
+      "code_blocks": [],
+      "items": [],
+      "subsections": [
+        {
+          "title": "✅ Що зроблено за день:",
+          "level": 3,
+          "paragraphs": [],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "**Налаштування та конфігурація Playwright E2E тестування:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Встановлено пакети `@playwright/test` та завантажено Chrome/Chromium Headless браузер.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Створено конфігураційний файл [playwright.config.ts](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/playwright.config.ts) для налаштування базової URL-адреси (`http://localhost:3002`), таймаутів та звітів.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Створено файл наскрізного інтеграційного тесту [e2e/full-flow.spec.ts](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/e2e/full-flow.spec.ts), що покриває повний сценарій взаємодії: Студент (`apps/web`) $\\rightarrow$ Monaco Editor $\\rightarrow$ WebSocket телеметрія $\\rightarrow$ Викладач (`apps/admin`) $\\rightarrow$ Анулювання BKT-стану.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Додано команду `\"test:e2e\": \"playwright test\"` у кореневий [package.json](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/package.json).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "---",
+              "subitems": []
+            }
+          ]
+        }
+      ]
+    },
+    {
       "title": "📅 04 жовтня 2026 року",
       "level": 2,
       "paragraphs": [],

@@ -1072,6 +1072,49 @@
               "subitems": []
             }
           ]
+        },
+        {
+          "title": "6.7 Інтеграція та Конфігурація Playwright E2E Тестування (Мікро-Крок 6.7)",
+          "level": 3,
+          "paragraphs": [],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "**Інсталяція Playwright Test Environment:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Встановлено залежність `@playwright/test` v1.63.0 та завантажено Chromium Headless браузер.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Додано команду `\"test:e2e\": \"playwright test\"` у кореневий `package.json`.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Файл Конфігурації ([playwright.config.ts](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/playwright.config.ts)):**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Налаштовано запуск Headless Chrome з baseURL `http://localhost:3002`.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Інтеграційний Сценарій ([e2e/full-flow.spec.ts](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/e2e/full-flow.spec.ts)):**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Реалізовано наскрізний тест, який відкриває Кабінет Студента (`http://localhost:3002`), перевіряє роботу Monaco Editor, надсилає розв'язок, переходить у Кабінет Викладача (`http://localhost:3001`), перевіряє аналітику та тестує анулювання BKT-стану.",
+              "subitems": []
+            }
+          ]
         }
       ]
     }
