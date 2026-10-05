@@ -77,8 +77,8 @@ export class TaskController {
       completedTaskIds: submissions.map((s) => s.taskId),
     });
 
-    if (!recommendation) {
-      throw new NotFoundException('No tasks available');
+    if (!recommendation || !recommendation.recommendedTask) {
+      throw new NotFoundException('No recommended tasks available');
     }
 
     const fullTask = await this.prisma.task.findUnique({

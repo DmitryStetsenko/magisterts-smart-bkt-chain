@@ -67,7 +67,7 @@ export class TaskSequencer {
       // Find tasks for current active skill
       const skillTasks = tasks.filter((t) => t.skillId === currentActiveSkill.id);
       const uncompletedTask = skillTasks.find((t) => !completedSet.has(t.id));
-      const targetTask = uncompletedTask || skillTasks[0];
+      const targetTask = uncompletedTask || skillTasks[0] || tasks.find((t) => !completedSet.has(t.id)) || tasks[0];
 
       return {
         recommendedSkill: currentActiveSkill,
@@ -81,7 +81,7 @@ export class TaskSequencer {
     const nextMasteredSkill = unlockedSkills[unlockedSkills.length - 1] || skills[0];
     const skillTasks = tasks.filter((t) => t.skillId === nextMasteredSkill.id);
     const uncompletedTask = skillTasks.find((t) => !completedSet.has(t.id));
-    const targetTask = uncompletedTask || skillTasks[0];
+    const targetTask = uncompletedTask || skillTasks[0] || tasks.find((t) => !completedSet.has(t.id)) || tasks[0];
 
     return {
       recommendedSkill: nextMasteredSkill,
