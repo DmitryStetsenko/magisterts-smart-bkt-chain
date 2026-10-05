@@ -13,6 +13,8 @@
     "test:api": "npm run test --workspace=apps/api",
     "dev:docs": "npm run dev --workspace=apps/docs",
     "build:docs": "npm run build --workspace=apps/docs",
+    "dev:landing": "npm run dev --workspace=apps/landing",
+    "build:landing": "npm run build --workspace=apps/landing",
     "dev:student": "npm run dev --workspace=apps/student",
     "build:student": "npm run build --workspace=apps/student",
     "dev:teacher": "npm run dev --workspace=apps/teacher",
