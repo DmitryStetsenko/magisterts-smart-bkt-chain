@@ -60,21 +60,51 @@ export function useTelemetry(userId: string, taskId: string) {
       const metaKey = e.metaKey || (e as any).browserEvent?.metaKey || false;
       const altKey = e.altKey || (e as any).browserEvent?.altKey || false;
 
-      // Ignore control & modifier keys as well as Ctrl/Cmd/Alt key combinations (Ctrl+V, Ctrl+C, Ctrl+A, etc.)
+      // Track Deletes from KeyDown (Backspace = keyCode 8, Delete = keyCode 46)
+      const keyCode = (e as any).keyCode || (e as any).browserEvent?.keyCode || 0;
+      const isDeleteKey =
+        key === 'Backspace' ||
+        key === 'Delete' ||
+        keyCode === 8 ||
+        keyCode === 46;
+
+      if (isDeleteKey) {
+        deleteCountRef.current += 1;
+      }
+
+      // Ignore control & modifier keys (Control, Alt, Shift, Meta, etc.)
       if (
         ['Control', 'Alt', 'Shift', 'Meta', 'CapsLock', 'Tab', 'Escape'].includes(key) ||
-        ctrlKey ||
-        metaKey ||
+        (ctrlKey && !isDeleteKey) ||
+        (metaKey && !isDeleteKey) ||
         altKey
       ) {
+        // Still update deleteCount metrics if it was a delete key (e.g. Ctrl+Backspace or Cmd+Backspace)
+        if (isDeleteKey) {
+          const currentMetrics: TelemetryMetrics = {
+            wpm: metrics.wpm,
+            lastPauseMs: pauseDuration < 30000 ? pauseDuration : 0,
+            deleteCount: deleteCountRef.current,
+            pasteEvents: pasteEventsRef.current,
+            totalKeystrokes: keystrokeCountRef.current,
+          };
+          setMetrics(currentMetrics);
+          if (socketRef.current && socketRef.current.connected) {
+            socketRef.current.emit('telemetry_data', {
+              sessionId: sessionIdRef.current || undefined,
+              userId,
+              taskId,
+              keystrokePauseMs: currentMetrics.lastPauseMs,
+              wpm: currentMetrics.wpm,
+              deleteCount: currentMetrics.deleteCount,
+              pasteEvents: currentMetrics.pasteEvents,
+            });
+          }
+        }
         return;
       }
 
       keystrokeCountRef.current += 1;
-
-      if (e.key === 'Backspace' || e.key === 'Delete') {
-        deleteCountRef.current += 1;
-      }
 
       // Calculate WPM: (characters / 5) / elapsed minutes
       const elapsedMinutes = (now - startTimeRef.current) / 60000;
@@ -106,8 +136,31 @@ export function useTelemetry(userId: string, taskId: string) {
         socketRef.current.emit('telemetry_data', payload);
       }
     },
-    [userId, taskId],
+    [userId, taskId, metrics.wpm],
   );
+
+  const handleDelete = useCallback((count: number = 1) => {
+    deleteCountRef.current += count;
+    const currentDeletes = deleteCountRef.current;
+
+    setMetrics((prev) => ({
+      ...prev,
+      deleteCount: currentDeletes,
+    }));
+
+    if (socketRef.current && socketRef.current.connected) {
+      const payload: TelemetrySocketPayload = {
+        sessionId: sessionIdRef.current || undefined,
+        userId,
+        taskId,
+        keystrokePauseMs: 0,
+        wpm: metrics.wpm,
+        deleteCount: currentDeletes,
+        pasteEvents: pasteEventsRef.current,
+      };
+      socketRef.current.emit('telemetry_data', payload);
+    }
+  }, [userId, taskId, metrics.wpm]);
 
   const handlePaste = useCallback(() => {
     const now = Date.now();
@@ -142,6 +195,7 @@ export function useTelemetry(userId: string, taskId: string) {
   return {
     metrics,
     handleKeyDown,
+    handleDelete,
     handlePaste,
   };
 }

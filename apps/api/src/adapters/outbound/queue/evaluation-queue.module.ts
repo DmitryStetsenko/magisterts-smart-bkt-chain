@@ -8,8 +8,10 @@ export const EVALUATION_QUEUE_NAME = 'code-evaluation';
     BullModule.forRootAsync({
       useFactory: () => ({
         connection: {
-          host: process.env.REDIS_HOST || 'localhost',
+          host: process.env.REDIS_HOST || '127.0.0.1',
           port: parseInt(process.env.REDIS_PORT || '6379', 10),
+          family: 4,
+          maxRetriesPerRequest: null,
         },
       }),
     }),

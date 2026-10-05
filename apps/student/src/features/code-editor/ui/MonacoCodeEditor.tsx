@@ -22,7 +22,7 @@ export function MonacoCodeEditor({
   onSubmit,
   isSubmitting = false,
 }: MonacoCodeEditorProps) {
-  const { metrics, handleKeyDown, handlePaste } = useTelemetry(userId, taskId);
+  const { metrics, handleKeyDown, handleDelete, handlePaste } = useTelemetry(userId, taskId);
   const editorRef = useRef<any>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -37,12 +37,17 @@ export function MonacoCodeEditor({
       handlePaste();
     });
 
-    // Detect paste when inserted text length is > 3 characters in a single change
+    // Detect text deletions or pastes from model content changes
     editor.onDidChangeModelContent((e) => {
       const changes = e.changes;
       for (const change of changes) {
+        // If inserted text length is > 3 characters in a single change -> Paste event
         if (change.text.length > 3) {
           handlePaste();
+        }
+        // If removed text length (rangeLength) > 0 and added text is empty -> Delete event
+        else if (change.rangeLength > 0 && change.text.length === 0) {
+          handleDelete(1);
         }
       }
     });
