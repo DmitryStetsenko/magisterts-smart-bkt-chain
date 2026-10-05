@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 
 test.describe('Smart-BKT-Chain E2E Flow', () => {
   test('Full student journey: Solve task, collect telemetry, view analytics in admin, and reset state', async ({ page, context }) => {
-    // 1. Студент відкриває Кабінет Студента (apps/web на порту 3002)
+    // 1. Студент відкриває Кабінет Студента (apps/student на порту 3002)
     await page.goto('http://localhost:3002');
     await page.waitForLoadState('networkidle');
 
@@ -29,26 +29,26 @@ test.describe('Smart-BKT-Chain E2E Flow', () => {
     // Чекаємо вердикт перевірки у модальному вікні чи панелі результатів
     await expect(page.getByText(/Рішення прийнято|Помилка виконання|Оновлення BKT/i).first()).toBeVisible({ timeout: 10000 });
 
-    // 3. Відкриваємо Кабінет Викладача у новій вкладці (apps/admin на порту 3003)
-    const adminPage = await context.newPage();
-    await adminPage.goto('http://localhost:3003');
-    await adminPage.waitForLoadState('networkidle');
+    // 3. Відкриваємо Кабінет Викладача у новій вкладці (apps/teacher на порту 3003)
+    const teacherPage = await context.newPage();
+    await teacherPage.goto('http://localhost:3003');
+    await teacherPage.waitForLoadState('networkidle');
 
     // Перевіряємо наявність студента в таблиці аналітики
-    await expect(adminPage.getByText('Дмитро Стеценко')).toBeVisible();
-    await expect(adminPage.getByText('student@example.com')).toBeVisible();
+    await expect(teacherPage.getByText('Дмитро Стеценко')).toBeVisible();
+    await expect(teacherPage.getByText('student@example.com')).toBeVisible();
 
     // 4. Тестуємо функціонал анулювання результатів (кнопка "Анулювати")
-    const resetButton = adminPage.getByRole('button', { name: /Анулювати/i }).first();
+    const resetButton = teacherPage.getByRole('button', { name: /Анулювати/i }).first();
     await expect(resetButton).toBeVisible();
     
     // Натискаємо Анулювати та підтверджуємо в кастомному модальному вікні
     await resetButton.click();
-    const confirmModalBtn = adminPage.getByRole('button', { name: /Так, анулювати/i });
+    const confirmModalBtn = teacherPage.getByRole('button', { name: /Так, анулювати/i });
     await expect(confirmModalBtn).toBeVisible();
     await confirmModalBtn.click();
 
     // Перевіряємо, що стан оновився до "Нерозпочато" або 0.0% / 0%
-    await expect(adminPage.getByText(/Нерозпочато|0%/i).first()).toBeVisible({ timeout: 5000 });
+    await expect(teacherPage.getByText(/Нерозпочато|0%/i).first()).toBeVisible({ timeout: 5000 });
   });
 });

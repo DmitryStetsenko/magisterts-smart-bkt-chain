@@ -86,12 +86,47 @@
             },
             {
               "type": "text",
-              "raw_text": "Оновлено відображення графа навичок у Кабінеті Студента [page.tsx](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/web/src/app/page.tsx) та Викладача [page.tsx](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/admin/src/app/page.tsx).",
+              "raw_text": "Оновлено відображення графа навичок у Кабінеті Студента та Викладача.",
               "subitems": []
             },
             {
               "type": "text",
-              "raw_text": "Виконано збірку веб-додатків (`npm run build:web` та `npm run build:admin`) без жодної помилки.",
+              "raw_text": "Виконано збірку веб-додатків без жодної помилки.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Архітектурний Рефакторинг Монорепозиторію за Ролями у Гілці `dev`:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Створено окрему Git-гілку `dev`.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**`apps/student` (порт 3002):** Перейменовано `apps/web` на `apps/student` (Кабінет Студента з Monaco Editor).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**`apps/teacher` (порт 3003):** Виділено аналітику студентів та BKT Heatmap в окремий веб-застосунок `apps/teacher`.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**`apps/admin` (порт 3004):** Сформовано системну CMS панель для управління графом знань Skill DAG та курсами.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**`apps/landing` (порт 3001):** Створено публічний промо-сайт для візуальної презентації платформи.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Усі 4 веб-додатки успішно скомпільовано (`build:student`, `build:teacher`, `build:admin`, `build:landing`), а Playwright E2E тест пройшов на 100%.",
               "subitems": []
             },
             {

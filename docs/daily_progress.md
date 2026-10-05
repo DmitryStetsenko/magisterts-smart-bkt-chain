@@ -19,8 +19,15 @@
 4. **Розгортання Повноцінного Курсу з JavaScript (5 Модулів, 14 Завдань):**
    - Розширено структуру навчального курсу у [seed.ts](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/packages/database/prisma/seed.ts) до 5 модулів із суворими DAG залежностями ($P(L_t) \ge 0.95$): `js-basics` $\rightarrow$ `js-functions` $\rightarrow$ `js-collections` $\rightarrow$ `js-async` $\rightarrow$ `js-oop`.
    - Наповнено базу 14 практичними задачами із відкритими та прихованими тест-кейсами.
-   - Оновлено відображення графа навичок у Кабінеті Студента [page.tsx](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/web/src/app/page.tsx) та Викладача [page.tsx](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/admin/src/app/page.tsx).
-   - Виконано збірку веб-додатків (`npm run build:web` та `npm run build:admin`) без жодної помилки.
+   - Оновлено відображення графа навичок у Кабінеті Студента та Викладача.
+   - Виконано збірку веб-додатків без жодної помилки.
+5. **Архітектурний Рефакторинг Монорепозиторію за Ролями у Гілці `dev`:**
+   - Створено окрему Git-гілку `dev`.
+   - **`apps/student` (порт 3002):** Перейменовано `apps/web` на `apps/student` (Кабінет Студента з Monaco Editor).
+   - **`apps/teacher` (порт 3003):** Виділено аналітику студентів та BKT Heatmap в окремий веб-застосунок `apps/teacher`.
+   - **`apps/admin` (порт 3004):** Сформовано системну CMS панель для управління графом знань Skill DAG та курсами.
+   - **`apps/landing` (порт 3001):** Створено публічний промо-сайт для візуальної презентації платформи.
+   - Усі 4 веб-додатки успішно скомпільовано (`build:student`, `build:teacher`, `build:admin`, `build:landing`), а Playwright E2E тест пройшов на 100%.
 
 ---
 
