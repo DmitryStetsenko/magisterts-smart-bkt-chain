@@ -15,7 +15,7 @@
         "| **`ST`** | `Student-Frontend` | Кабінет Студента Next.js (Monaco Editor, Skill DAG Map, телеметрія) | `/apps/student/` |",
         "| **`TC`** | `Teacher-Frontend` | Кабінет Викладача Next.js (BKT Heatmap, CRM аналітика, анулювання) | `/apps/teacher/` |",
         "| **`AD`** | `Admin-CMS` | Панель Адміністратора Next.js (Skill DAG Builder, CMS курсів/задач) | `/apps/admin/` |",
-        "| **`LD`** | `Landing-Web` | Публічний промо-сайт Next.js (Landing page, Web3 Auth) | `/apps/landing/` |",
+        "| **`LD`** | `Landing-Web` | Публічний промо-сайт Next.js (Landing page, Web3 Auth) | `/apps/web/` |",
         "| **`SH`** | `Shared-Packages` | Спільні пакети монорепозиторію (Prisma schema, E2E типи) | `/packages/` |"
       ],
       "code_blocks": [],
