@@ -19,8 +19,11 @@ test.describe('Smart-BKT-Chain Multi-Discipline E2E Suite', () => {
   });
 
   test('Student & Teacher Multi-Discipline UI Flow', async ({ page, context }) => {
-    // 1. Open Student Portal
-    await page.goto('http://localhost:3002', { waitUntil: 'domcontentloaded' });
+    // 1. Open Student Portal (with retry for dev server compilation)
+    await page.goto('http://localhost:3002', { waitUntil: 'domcontentloaded', timeout: 30000 }).catch(async () => {
+      await page.waitForTimeout(2000);
+      await page.goto('http://localhost:3002', { waitUntil: 'domcontentloaded' });
+    });
     await expect(page.locator('h1')).toContainText('Smart-BKT-Chain Student Portal');
     await expect(page.getByText('Дмитро Стеценко')).toBeVisible();
 
