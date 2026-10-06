@@ -5,17 +5,53 @@ import { ShieldCheck, Network, Users, BarChart3, ArrowLeft, Code2, BookOpen, Sca
 import { StudentAnalyticsTable } from '../features/analytics/ui/StudentAnalyticsTable';
 import { StudentAnalyticsItem } from '../features/analytics/model/analytics.types';
 
-const COURSES = [
+interface CourseItem {
+  slug: string;
+  title: string;
+  description?: string;
+  icon?: any;
+  skillSlugs: string[];
+}
+
+const DEFAULT_COURSES: CourseItem[] = [
   { slug: 'js-dev', title: 'JavaScript & Web Dev', icon: Code2, skillSlugs: ['js-basics', 'js-functions', 'js-collections', 'js-async', 'js-oop'] },
   { slug: 'english-b2', title: 'Business English (B2)', icon: BookOpen, skillSlugs: ['eng-grammar', 'eng-vocab', 'eng-writing'] },
   { slug: 'ukraine-law', title: 'Правознавство України', icon: Scale, skillSlugs: ['law-basics', 'law-constitutional', 'law-case-analysis'] },
 ];
 
 export default function TeacherDashboardPage() {
+  const [courses, setCourses] = useState<CourseItem[]>(DEFAULT_COURSES);
   const [activeCourseSlug, setActiveCourseSlug] = useState<string>('js-dev');
   const [students, setStudents] = useState<StudentAnalyticsItem[]>([]);
 
   const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+
+  useEffect(() => {
+    const fetchCourses = async () => {
+      try {
+        const res = await fetch(`${API_URL}/api/v1/courses`);
+        if (res.ok) {
+          const data = await res.json();
+          if (Array.isArray(data) && data.length > 0) {
+            const mapped: CourseItem[] = data.map((c: any) => ({
+              slug: c.slug,
+              title: c.title,
+              description: c.description,
+              icon: BookOpen,
+              skillSlugs: Array.isArray(c.skills) ? c.skills.map((s: any) => s.slug) : [],
+            }));
+            setCourses(mapped);
+            if (!mapped.some((c) => c.slug === activeCourseSlug)) {
+              setActiveCourseSlug(mapped[0].slug);
+            }
+          }
+        }
+      } catch (err) {
+        console.error('Error fetching courses:', err);
+      }
+    };
+    fetchCourses();
+  }, []);
 
   const fetchStudentAnalytics = async () => {
     try {
@@ -39,7 +75,7 @@ export default function TeacherDashboardPage() {
     fetchStudentAnalytics();
   };
 
-  const activeCourse = COURSES.find((c) => c.slug === activeCourseSlug) || COURSES[0];
+  const activeCourse = courses.find((c) => c.slug === activeCourseSlug) || courses[0] || DEFAULT_COURSES[0];
 
   return (
     <main className="min-h-screen p-6 max-w-7xl mx-auto flex flex-col gap-6 font-sans">
@@ -83,8 +119,8 @@ export default function TeacherDashboardPage() {
 
       {/* Course Switcher Filter */}
       <div className="flex items-center gap-3 bg-slate-900/90 p-2 border border-slate-800 rounded-2xl overflow-x-auto shadow-lg">
-        {COURSES.map((course) => {
-          const Icon = course.icon;
+        {courses.map((course) => {
+          const Icon = course.icon || BookOpen;
           const isActive = activeCourseSlug === course.slug;
           return (
             <button

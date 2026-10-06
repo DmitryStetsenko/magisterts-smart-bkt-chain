@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { ShieldCheck, Network, Settings, BookOpen, Database, ArrowRight } from 'lucide-react';
 import { SkillDagEditor } from '../features/skill-editor/ui/SkillDagEditor';
 import { AdminSkillNode } from '../features/skill-editor/model/skill-editor.types';
+import { CourseManager } from '../features/course-manager/ui/CourseManager';
 
 export default function AdminCMSDashboard() {
   const [activeTab, setActiveTab] = useState<'dag' | 'courses' | 'system'>('dag');
@@ -183,13 +184,7 @@ export default function AdminCMSDashboard() {
         )}
 
         {activeTab === 'courses' && (
-          <div className="flex flex-col gap-4 items-center justify-center py-12 text-center">
-            <Database className="w-12 h-12 text-slate-600 animate-pulse" />
-            <h3 className="text-lg font-bold text-white">CMS Модуль Задач та Тест-Кейсів</h3>
-            <p className="text-xs text-slate-400 max-w-md">
-              Тут розгортається візуальний конструктор практичних завдань із можливістю додавання відкритих та секретних тест-кейси прямо в БД PostgreSQL.
-            </p>
-          </div>
+          <CourseManager />
         )}
 
         {activeTab === 'system' && (

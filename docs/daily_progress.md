@@ -18,6 +18,11 @@
    - **Інтерфейси Студента та Викладача (`apps/student`, `apps/teacher`):** Реалізовано шапку перемикання курсів (**[ 💻 JavaScript ] [ 🇬🇧 English B2 ] [ ⚖️ Правознавство ]**), компоненти `QuizTaskEditor.tsx` та `EssayTaskEditor.tsx` для візуалізації опитувальників і текстових есе з відстеженням телеметрії, а також мультикурсну фільтрацію аналітики у Кабінеті Викладача.
    - **Playwright E2E Скрізна Верифікація (`playwright.config.ts`, `e2e/full-flow.spec.ts`):** Проведено скрізне тестування REST API та UI-потоків у Кабінеті Студента та Викладача (2 passed у 3.9с).
 
+3. **Розробка Модуля Динамічного Управління Курсами (Dynamic Course CMS):**
+   - **`apps/api` (`CourseController.ts`):** Додано ендпоінт `POST /api/v1/courses` для створення нових курсів з генерацією унікального `slug`, опису та іконки.
+   - **`apps/teacher` (`page.tsx`):** Переведено завантаження курсів у Кабінеті Викладача з дефолтного масиву на динамічний виклик `GET /api/v1/courses`.
+   - **`apps/admin` (`CourseManager.tsx`):** Розроблено та інтегровано інтерактивний модуль управління курсами [CourseManager.tsx](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/admin/src/features/course-manager/ui/CourseManager.tsx) із модальним вікном створення довільної кількості нових навчальних дисциплін.
+
 
 ---
 

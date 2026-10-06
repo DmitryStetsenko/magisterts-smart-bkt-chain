@@ -1,4 +1,4 @@
-import { Controller, Get, Param, NotFoundException } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, NotFoundException } from '@nestjs/common';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { PrismaService } from '../../outbound/persistence/prisma.service';
 
@@ -47,5 +47,21 @@ export class CourseController {
     }
 
     return course;
+  }
+
+  @Post()
+  @ApiOperation({ summary: 'Create a new course' })
+  async createCourse(
+    @Body() body: { title: string; slug?: string; description?: string; icon?: string }
+  ) {
+    const slug = body.slug || body.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+    return this.prisma.course.create({
+      data: {
+        title: body.title,
+        slug,
+        description: body.description || '',
+        icon: body.icon || 'BookOpen',
+      },
+    });
   }
 }

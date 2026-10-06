@@ -71,6 +71,26 @@
             },
             {
               "type": "text",
+              "raw_text": "**Розробка Модуля Динамічного Управління Курсами (Dynamic Course CMS):**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**`apps/api` (`CourseController.ts`):** Додано ендпоінт `POST /api/v1/courses` для створення нових курсів з генерацією унікального `slug`, опису та іконки.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**`apps/teacher` (`page.tsx`):** Переведено завантаження курсів у Кабінеті Викладача з дефолтного масиву на динамічний виклик `GET /api/v1/courses`.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**`apps/admin` (`CourseManager.tsx`):** Розроблено та інтегровано інтерактивний модуль управління курсами [CourseManager.tsx](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/admin/src/features/course-manager/ui/CourseManager.tsx) із модальним вікном створення довільної кількості нових навчальних дисциплін.",
+              "subitems": []
+            },
+            {
+              "type": "text",
               "raw_text": "---",
               "subitems": []
             }
