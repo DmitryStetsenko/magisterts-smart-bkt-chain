@@ -24,10 +24,9 @@ test.describe('Smart-BKT-Chain Multi-Discipline E2E Suite', () => {
     await expect(page.locator('h1')).toContainText('Smart-BKT-Chain Student Portal');
     await expect(page.getByText('Дмитро Стеценко')).toBeVisible();
 
-    // 2. Verify Course Switcher Bar
-    await expect(page.getByText('JavaScript & Web Dev')).toBeVisible();
-    await expect(page.getByText('Business & Tech English (B2)')).toBeVisible();
-    await expect(page.getByText('Правознавство України')).toBeVisible();
+    // 2. Verify Dynamic Course Switcher Dropdown
+    await expect(page.locator('#student-course-select')).toBeVisible();
+    await expect(page.locator('#student-course-select')).toHaveValue('js-dev');
 
     // 3. Open Teacher Portal
     const teacherPage = await context.newPage();
@@ -35,5 +34,6 @@ test.describe('Smart-BKT-Chain Multi-Discipline E2E Suite', () => {
     await expect(teacherPage.locator('h1')).toContainText('Smart-BKT-Chain Teacher Portal');
     await expect(teacherPage.getByText('Панель Адміністратора (CMS DAG)')).toBeVisible();
     await expect(teacherPage.getByText('Аналітика Студентів & BKT Heatmap')).toBeVisible();
+    await expect(teacherPage.locator('#teacher-course-select')).toBeVisible();
   });
 });

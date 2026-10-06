@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Brain, Sparkles, CheckCircle, AlertCircle, RefreshCw, User, Code2, BookOpen, Scale } from 'lucide-react';
+import { Brain, Sparkles, CheckCircle, AlertCircle, RefreshCw, User, Code2, BookOpen, Scale, ChevronDown } from 'lucide-react';
 import { MonacoCodeEditor } from '../features/code-editor/ui/MonacoCodeEditor';
 import { QuizTaskEditor } from '../features/quiz-editor/ui/QuizTaskEditor';
 import { EssayTaskEditor } from '../features/essay-editor/ui/EssayTaskEditor';
@@ -27,17 +27,45 @@ interface TaskDetail {
   }>;
 }
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+interface CourseItem {
+  slug: string;
+  title: string;
+  description?: string;
+  category?: string;
+}
 
-const COURSES = [
-  { slug: 'js-dev', title: 'JavaScript & Web Dev', icon: Code2, badge: 'Code' },
-  { slug: 'english-b2', title: 'Business & Tech English (B2)', icon: BookOpen, badge: 'English' },
-  { slug: 'ukraine-law', title: 'Правознавство України', icon: Scale, badge: 'Law' },
+const DEFAULT_COURSES: CourseItem[] = [
+  { slug: 'js-dev', title: 'JavaScript & Web Dev', category: 'Programming' },
+  { slug: 'english-b2', title: 'Business & Tech English (B2)', category: 'Languages' },
+  { slug: 'ukraine-law', title: 'Правознавство України', category: 'Jurisprudence' },
 ];
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+
 export default function StudentPortalPage() {
+  const [courses, setCourses] = useState<CourseItem[]>(DEFAULT_COURSES);
   const [activeCourseSlug, setActiveCourseSlug] = useState<string>('js-dev');
   const [task, setTask] = useState<TaskDetail | null>(null);
+
+  useEffect(() => {
+    const fetchCourses = async () => {
+      try {
+        const res = await fetch(`${API_URL}/api/v1/courses`);
+        if (res.ok) {
+          const data = await res.json();
+          if (Array.isArray(data) && data.length > 0) {
+            setCourses(data);
+            if (!data.some((c: any) => c.slug === activeCourseSlug)) {
+              setActiveCourseSlug(data[0].slug);
+            }
+          }
+        }
+      } catch (err) {
+        console.error('Error fetching courses list:', err);
+      }
+    };
+    fetchCourses();
+  }, []);
   const [recommendation, setRecommendation] = useState<any>(null);
   const [code, setCode] = useState<string>('');
   const [essayAnswer, setEssayAnswer] = useState<string>('');
@@ -171,31 +199,37 @@ export default function StudentPortalPage() {
         </div>
       </header>
 
-      {/* Course Switcher Tabs */}
-      <div className="flex items-center gap-3 bg-slate-900/90 p-2 border border-slate-800 rounded-2xl overflow-x-auto shadow-lg">
-        {COURSES.map((course) => {
-          const Icon = course.icon;
-          const isActive = activeCourseSlug === course.slug;
-          return (
-            <button
-              key={course.slug}
-              onClick={() => setActiveCourseSlug(course.slug)}
-              className={`flex items-center gap-2.5 px-4 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
-                isActive
-                  ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-950/60'
-                  : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
-              }`}
-            >
-              <Icon className="w-4 h-4" />
-              <span>{course.title}</span>
-              <span className={`px-2 py-0.5 rounded text-[10px] uppercase font-mono ${
-                isActive ? 'bg-indigo-700 text-white' : 'bg-slate-800 text-slate-400'
-              }`}>
-                {course.badge}
-              </span>
-            </button>
-          );
-        })}
+      {/* Dynamic Course Switcher Dropdown */}
+      <div className="flex flex-wrap items-center justify-between gap-4 bg-slate-900/90 p-4 border border-slate-800 rounded-2xl shadow-lg">
+        <div className="flex items-center gap-3">
+          <div className="p-2 bg-indigo-500/10 border border-indigo-500/20 rounded-lg text-indigo-400">
+            <BookOpen className="w-5 h-5" />
+          </div>
+          <div>
+            <label htmlFor="student-course-select" className="block text-xs font-bold text-slate-300 uppercase tracking-wider">
+              Навчальний Предмет ({courses.length} в базі):
+            </label>
+            <span className="text-[11px] text-slate-400">Оберіть дисципліну для завантаження графа BKT та рекомендацій</span>
+          </div>
+        </div>
+
+        <div className="relative min-w-[280px] sm:min-w-[360px]">
+          <select
+            id="student-course-select"
+            value={activeCourseSlug}
+            onChange={(e) => setActiveCourseSlug(e.target.value)}
+            className="w-full appearance-none px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-sm font-semibold text-white focus:outline-none focus:border-indigo-500 cursor-pointer pr-10 shadow-inner"
+          >
+            {courses.map((course) => (
+              <option key={course.slug} value={course.slug} className="bg-slate-900 text-white py-1">
+                📚 {course.title} ({course.category || course.slug})
+              </option>
+            ))}
+          </select>
+          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-indigo-400">
+            <ChevronDown className="w-4 h-4" />
+          </div>
+        </div>
       </div>
 
       {/* Skill DAG Graph Section */}

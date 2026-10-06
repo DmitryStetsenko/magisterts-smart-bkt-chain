@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { ShieldCheck, Network, Users, BarChart3, ArrowLeft, Code2, BookOpen, Scale } from 'lucide-react';
+import { ShieldCheck, Network, Users, BarChart3, ArrowLeft, Code2, BookOpen, Scale, ChevronDown } from 'lucide-react';
 import { StudentAnalyticsTable } from '../features/analytics/ui/StudentAnalyticsTable';
 import { StudentAnalyticsItem } from '../features/analytics/model/analytics.types';
 
@@ -117,26 +117,37 @@ export default function TeacherDashboardPage() {
         </div>
       </header>
 
-      {/* Course Switcher Filter */}
-      <div className="flex items-center gap-3 bg-slate-900/90 p-2 border border-slate-800 rounded-2xl overflow-x-auto shadow-lg">
-        {courses.map((course) => {
-          const Icon = course.icon || BookOpen;
-          const isActive = activeCourseSlug === course.slug;
-          return (
-            <button
-              key={course.slug}
-              onClick={() => setActiveCourseSlug(course.slug)}
-              className={`flex items-center gap-2.5 px-4 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
-                isActive
-                  ? 'bg-purple-600 text-white shadow-lg shadow-purple-950/60'
-                  : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
-              }`}
-            >
-              <Icon className="w-4 h-4" />
-              <span>{course.title}</span>
-            </button>
-          );
-        })}
+      {/* Dynamic Course Switcher Dropdown */}
+      <div className="flex flex-wrap items-center justify-between gap-4 bg-slate-900/90 p-4 border border-slate-800 rounded-2xl shadow-lg">
+        <div className="flex items-center gap-3">
+          <div className="p-2 bg-purple-500/10 border border-purple-500/20 rounded-lg text-purple-400">
+            <BookOpen className="w-5 h-5" />
+          </div>
+          <div>
+            <label htmlFor="teacher-course-select" className="block text-xs font-bold text-slate-300 uppercase tracking-wider">
+              Фільтр Курсу у BKT Heatmap ({courses.length} курсів):
+            </label>
+            <span className="text-[11px] text-slate-400">Оберіть курс для фільтрації аналітики студентів та навичок</span>
+          </div>
+        </div>
+
+        <div className="relative min-w-[280px] sm:min-w-[360px]">
+          <select
+            id="teacher-course-select"
+            value={activeCourseSlug}
+            onChange={(e) => setActiveCourseSlug(e.target.value)}
+            className="w-full appearance-none px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-700 text-sm font-semibold text-white focus:outline-none focus:border-purple-500 cursor-pointer pr-10 shadow-inner"
+          >
+            {courses.map((course) => (
+              <option key={course.slug} value={course.slug} className="bg-slate-900 text-white py-1">
+                🎓 {course.title} ({course.slug})
+              </option>
+            ))}
+          </select>
+          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-purple-400">
+            <ChevronDown className="w-4 h-4" />
+          </div>
+        </div>
       </div>
 
       {/* Metrics Row */}

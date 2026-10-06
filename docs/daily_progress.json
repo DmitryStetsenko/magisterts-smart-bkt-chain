@@ -86,7 +86,17 @@
             },
             {
               "type": "text",
-              "raw_text": "**`apps/admin` (`CourseManager.tsx`):** Розроблено та інтегровано інтерактивний модуль управління курсами [CourseManager.tsx](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/admin/src/features/course-manager/ui/CourseManager.tsx) із модальним вікном створення довільної кількості нових навчальних дисциплін.",
+              "raw_text": "**Рефакторинг UI Селектора Курсів у Випадаючий Список (Dropdown Selector):**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**`apps/student` та `apps/teacher`:** Замінено горизонційні кнопки-вкладки на компактний стилізований випадаючий список (`#student-course-select` та `#teacher-course-select`) з відображенням категорії та загальної кількості доступних у БД курсів. Це гарантує безперешкодне масштабування інтерфейсів при додаванні десятків і сотень нових дисциплін.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**E2E Тестування:** Оновлено інтеграційні Playwright специфікації, прогони успішно підтверджено у Headless Chromium (**2 passed у 3.9с**).",
               "subitems": []
             },
             {
