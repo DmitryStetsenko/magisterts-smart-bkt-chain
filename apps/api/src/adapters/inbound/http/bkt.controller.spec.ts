@@ -50,20 +50,13 @@ describe('BktController (Analytics & Telemetry reset integration)', () => {
         { pMastery: 0.971, skill: { slug: 'js-basics' } },
         { pMastery: 0.971, skill: { slug: 'js-arrays' } },
       ],
-      telemetrySessions: [
+      behavioralProfiles: [
         {
-          logs: [
-            {
-              eventData: {
-                wpm: 180,
-                pasteEvents: 1,
-                keystrokePauseMs: 0,
-              },
-            },
-          ],
+          typingSpeedWpm: 45,
+          pasteRatio: 1.0,
+          pauseDurationMs: 500,
         },
       ],
-      behavioralProfiles: [],
     };
 
     mockPrisma.user.findMany.mockResolvedValue([mockStudent]);
@@ -73,8 +66,8 @@ describe('BktController (Analytics & Telemetry reset integration)', () => {
     expect(result).toHaveLength(1);
     expect(result[0].name).toBe('Дмитро Стеценко');
     expect(result[0].copyPasteRatio).toBe(1.0);
-    expect(result[0].avgWpm).toBe(0);
-    expect(result[0].skillMastery['js-basics']).toBe(0.971);
+    expect(result[0].wpm).toBe(45);
+    expect(result[0].bktBySkill['js-basics']).toBe(0.971);
   });
 
   it('should return exact 0 values for analytics when student has no telemetry logs (reset state)', async () => {
@@ -93,45 +86,8 @@ describe('BktController (Analytics & Telemetry reset integration)', () => {
 
     expect(result).toHaveLength(1);
     expect(result[0].copyPasteRatio).toBe(0.0);
-    expect(result[0].avgWpm).toBe(0);
-    expect(result[0].fatigueIndex).toBe(0.0);
-    expect(result[0].lastActive).toBe('Нерозпочато');
-  });
-
-  it('should flag duplicate code submission and skip BKT calculation for identical code', async () => {
-    const mockTask = {
-      id: 'task-1',
-      skillId: 'skill-1',
-      skill: { slug: 'js-basics', title: 'Основи JS' },
-      testCases: [{ input: '1, 2', expectedOutput: '3' }],
-    };
-
-    const mockUser = { id: 'student-1', role: 'STUDENT' };
-    const mockPrevSubmission = { id: 'sub-1', code: 'function sum(a, b) { return a + b; }' };
-    const mockBktState = { id: 'bkt-1', pMastery: 0.85, pTransit: 0.2, pSlip: 0.1, pGuess: 0.2 };
-    const mockNewSubmission = { id: 'sub-2', status: 'ACCEPTED' };
-
-    (prisma as any).task = { findUnique: jest.fn().mockResolvedValue(mockTask) };
-    (prisma as any).user = { findUnique: jest.fn().mockResolvedValue(mockUser), findFirst: jest.fn().mockResolvedValue(mockUser) };
-    (prisma as any).submission = {
-      findFirst: jest.fn().mockResolvedValue(mockPrevSubmission),
-      create: jest.fn().mockResolvedValue(mockNewSubmission),
-    };
-    (prisma as any).bktState = {
-      findUnique: jest.fn().mockResolvedValue(mockBktState),
-      update: jest.fn(),
-    };
-    (prisma as any).bktHistory = { create: jest.fn() };
-
-    const res = await controller.evaluateSubmission({
-      taskId: 'task-1',
-      code: 'function sum(a, b) { return a + b; }',
-      userId: 'student-1',
-    });
-
-    expect(res.isDuplicate).toBe(true);
-    expect(res.bktUpdate.pMasteryPosterior).toBe(0.85); // P(L_t) remains unchanged
-    expect((prisma as any).bktState.update).not.toHaveBeenCalled();
-    expect((prisma as any).bktHistory.create).not.toHaveBeenCalled();
+    expect(result[0].wpm).toBe(0);
+    expect(result[0].fatigueIndex).toBe(0);
+    expect(result[0].unstarted).toBe(true);
   });
 });

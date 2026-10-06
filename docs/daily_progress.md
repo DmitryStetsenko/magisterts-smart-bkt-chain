@@ -4,12 +4,19 @@
 
 ## 📅 06 жовтня 2026 року
 
-### ✅ Що зроблено за день:
+### ✅ Що зроведено за день:
 1. **Перенесення Конструктора Графа Навичок (Skill DAG Editor) в Адмін-панель (`apps/admin`):**
    - Перенесено модуль `skill-editor` із `apps/teacher` у `apps/admin/src/features/skill-editor`.
    - Інтегровано інтерактивний [SkillDagEditor.tsx](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/admin/src/features/skill-editor/ui/SkillDagEditor.tsx) у вкладку «Skill DAG Builder» системи `apps/admin`.
    - Очищено `apps/teacher`: тепер Кабінет Викладача повністю сфокусовано на аналітиці студентів, телеметрії, BKT Heatmap та скиданні результатів.
-   - Оновлено навігацію та посилання між додаткам. Упішно пройшли статичні збірки `build:teacher` та `build:admin`.
+   - Оновлено навігацію та посилання між додаткам. Успішно пройшли статичні збірки `build:teacher` та `build:admin`.
+
+2. **Розробка Мультидисциплінарної Архітектури та Мультиформатного Двигуна Перевірки:**
+   - **Prisma Schema (`packages/database/prisma/schema.prisma`):** Створено модель `Course`, перерахування `TaskType` (`CODE`, `SINGLE_CHOICE`, `MULTIPLE_CHOICE`, `TEXT_ESSAY`), зв'язки `courseId` у `SkillNode` & `Task`, додаткове JSON-поле `options`. Проведено міграцію та автогенерацію Prisma Client (`v6.19.3`).
+   - **Мультидисциплінарне Сидування (`seed.ts`):** Сформовано 3 реалістичні навчальні курси (`js-dev` JavaScript, `english-b2` Business & Tech English, `ukraine-law` Правознавство України) з 11 вузлами графа знань та 12 різнотипними завданнями.
+   - **Polyglot Evaluation Engine (`apps/api`):** Створено `CourseController` (`/api/v1/courses`), розширено `TaskController` з фільтрацією за `courseSlug`, інтегровано єдиний універсальний механізм оцінювання BKT у `BktController` (з підрахунком штрафів за імпульсивне вгадування $<2.0\text{с}$ $P(G_{\text{dyn}}) \to 0.85$, частковим балом для чекбокс-тестів та аналізом WPM/пауз для есе).
+   - **Інтерфейси Студента та Викладача (`apps/student`, `apps/teacher`):** Реалізовано шапку перемикання курсів (**[ 💻 JavaScript ] [ 🇬🇧 English B2 ] [ ⚖️ Правознавство ]**), компоненти `QuizTaskEditor.tsx` та `EssayTaskEditor.tsx` для візуалізації опитувальників і текстових есе з відстеженням телеметрії, а також мультикурсну фільтрацію аналітики у Кабінеті Викладача.
+
 
 ---
 

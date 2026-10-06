@@ -11,8 +11,18 @@ export class TaskController {
 
   @Get()
   @ApiOperation({ summary: 'Get all available tasks grouped by skill' })
-  async getAllTasks() {
+  @ApiQuery({ name: 'courseSlug', required: false })
+  async getAllTasks(@Query('courseSlug') courseSlug?: string) {
+    let whereCondition = {};
+    if (courseSlug) {
+      const course = await this.prisma.course.findUnique({ where: { slug: courseSlug } });
+      if (course) {
+        whereCondition = { skill: { courseId: course.id } };
+      }
+    }
+
     return this.prisma.task.findMany({
+      where: whereCondition,
       include: {
         skill: true,
         testCases: {
@@ -26,7 +36,11 @@ export class TaskController {
   @Get('recommended')
   @ApiOperation({ summary: 'Get adaptive next recommended task for a student based on BKT mastery' })
   @ApiQuery({ name: 'userId', required: false, description: 'Student User ID' })
-  async getRecommendedTask(@Query('userId') userId?: string) {
+  @ApiQuery({ name: 'courseSlug', required: false, description: 'Course slug filter (js-dev, english-b2, ukraine-law)' })
+  async getRecommendedTask(
+    @Query('userId') userId?: string,
+    @Query('courseSlug') courseSlug?: string,
+  ) {
     let targetUserId = userId;
     if (!targetUserId) {
       const student = await this.prisma.user.findFirst({ where: { role: 'STUDENT' } });
@@ -34,13 +48,28 @@ export class TaskController {
       targetUserId = student.id;
     }
 
+    let courseIdCondition: string | undefined = undefined;
+    if (courseSlug) {
+      const course = await this.prisma.course.findUnique({ where: { slug: courseSlug } });
+      if (course) {
+        courseIdCondition = course.id;
+      }
+    }
+
     const skills = await this.prisma.skillNode.findMany({
+      where: courseIdCondition ? { courseId: courseIdCondition } : {},
       include: {
         parentDependencies: true,
       },
     });
 
-    const tasks = await this.prisma.task.findMany();
+    const tasks = await this.prisma.task.findMany({
+      where: courseIdCondition ? { skill: { courseId: courseIdCondition } } : {},
+    });
+
+    if (tasks.length === 0) {
+      throw new NotFoundException(`No tasks found for course ${courseSlug || 'all'}`);
+    }
 
     const studentStates = await this.prisma.bktState.findMany({
       where: { userId: targetUserId },
@@ -77,20 +106,34 @@ export class TaskController {
       completedTaskIds: submissions.map((s) => s.taskId),
     });
 
-    if (!recommendation || !recommendation.recommendedTask) {
+    let fullTask = null;
+    if (recommendation && recommendation.recommendedTask) {
+      fullTask = await this.prisma.task.findUnique({
+        where: { id: recommendation.recommendedTask.id },
+        include: {
+          skill: true,
+          testCases: { where: { isSecret: false } },
+        },
+      });
+    }
+
+    // Fallback if all recommended tasks completed or no sequencing match
+    if (!fullTask && tasks.length > 0) {
+      fullTask = await this.prisma.task.findFirst({
+        where: courseIdCondition ? { skill: { courseId: courseIdCondition } } : {},
+        include: {
+          skill: true,
+          testCases: { where: { isSecret: false } },
+        },
+      });
+    }
+
+    if (!fullTask) {
       throw new NotFoundException('No recommended tasks available');
     }
 
-    const fullTask = await this.prisma.task.findUnique({
-      where: { id: recommendation.recommendedTask.id },
-      include: {
-        skill: true,
-        testCases: { where: { isSecret: false } },
-      },
-    });
-
     return {
-      recommendation,
+      recommendation: recommendation || { targetSkillSlug: fullTask.skill.slug, reason: 'First task in course' },
       task: fullTask,
     };
   }

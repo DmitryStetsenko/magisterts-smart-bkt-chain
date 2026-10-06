@@ -1,10 +1,10 @@
-import { Controller, Post, Get, Body, Param, NotFoundException } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { Controller, Post, Get, Body, Param, Query, NotFoundException } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse, ApiQuery } from '@nestjs/swagger';
 import * as vm from 'vm';
 import { PrismaService } from '../../outbound/persistence/prisma.service';
 import { BktEngine } from '../../../domain/bkt/bkt-engine';
 import { SubmitTaskDto } from './dto/submit-task.dto';
-import { SubmissionStatus } from '@sbc/database';
+import { SubmissionStatus, TaskType } from '@sbc/database';
 
 @ApiTags('BKT')
 @Controller('bkt')
@@ -12,7 +12,7 @@ export class BktController {
   constructor(private readonly prisma: PrismaService) {}
 
   @Post('evaluate')
-  @ApiOperation({ summary: 'Evaluate student JavaScript code submission and update BKT knowledge state P(L_t)' })
+  @ApiOperation({ summary: 'Evaluate student submission across task types (CODE, SINGLE_CHOICE, MULTIPLE_CHOICE, TEXT_ESSAY) and update BKT P(L_t)' })
   @ApiResponse({ status: 200, description: 'Evaluation result and updated BKT mastery probability' })
   async evaluateSubmission(@Body() dto: SubmitTaskDto) {
     const task = await this.prisma.task.findUnique({
@@ -36,74 +36,137 @@ export class BktController {
       if (!user) throw new NotFoundException('Student user not found');
     }
 
-    // Evaluate code safely inside Node VM
-    let passedCount = 0;
-    const totalCount = task.testCases.length;
-    const testDetails: Array<{ input: string; expected: string; actual: string; passed: boolean }> = [];
+    let isPassed = false;
+    let feedback = '';
+    let testDetails: any[] = [];
+    let customPGuess: number | undefined = undefined;
 
-    for (const testCase of task.testCases) {
-      let isPassed = false;
-      let actualOutput = '';
+    // Polyglot Evaluation Strategies based on TaskType
+    switch (task.taskType) {
+      case TaskType.SINGLE_CHOICE: {
+        const options = (task.options as Array<{ id: string; text: string; isCorrect: boolean }>) || [];
+        const correctOption = options.find((o) => o.isCorrect);
+        const selectedOption = options.find((o) => o.id === dto.selectedOptionId);
 
-      try {
-        const sandbox = {
-          result: undefined,
-          setTimeout,
-          clearTimeout,
-          Promise,
-          console,
-        };
-        const scriptCode = `
-          ${dto.code}
-          const rawInput = ${testCase.input};
-          const fnName = Object.keys(this).find(k => typeof this[k] === 'function' && k !== 'eval' && k !== 'setTimeout' && k !== 'clearTimeout');
-          const fn = eval(fnName);
-          const args = Array.isArray(rawInput) ? rawInput : [rawInput];
-          result = fn.apply(null, args);
-        `;
+        isPassed = Boolean(correctOption && dto.selectedOptionId === correctOption.id);
+        feedback = isPassed
+          ? `Правильно! Обрано вірний варіант: "${selectedOption?.text || dto.selectedOptionId}"`
+          : `Невірно. Правильна відповідь: "${correctOption?.text || 'Н/А'}"`;
 
-        const context = vm.createContext(sandbox);
-        const script = new vm.Script(scriptCode);
-        script.runInContext(context, { timeout: 2000 });
-
-        let rawResult = sandbox.result;
-        if (rawResult && typeof (rawResult as any).then === 'function') {
-          rawResult = await rawResult;
+        // Telemetry Reaction Latency: < 2000ms triggers Guessing Warning
+        if (dto.reactionLatencyMs && dto.reactionLatencyMs < 2000) {
+          customPGuess = 0.85;
+          feedback += ' ⚡ (Високий показник латентності: можливе вгадування)';
         }
-
-        actualOutput = typeof rawResult === 'object' ? JSON.stringify(rawResult) : String(rawResult);
-
-        // Normalize output for comparison
-        isPassed = actualOutput.replace(/\s+/g, '') === testCase.expectedOutput.replace(/\s+/g, '');
-      } catch (err) {
-        actualOutput = `Error: ${(err as Error).message}`;
-        isPassed = false;
+        break;
       }
 
-      if (isPassed) passedCount++;
+      case TaskType.MULTIPLE_CHOICE: {
+        const options = (task.options as Array<{ id: string; text: string; isCorrect: boolean }>) || [];
+        const correctIds = options.filter((o) => o.isCorrect).map((o) => o.id);
+        const selectedIds = dto.selectedOptionIds || [];
 
-      testDetails.push({
-        input: testCase.input,
-        expected: testCase.expectedOutput,
-        actual: actualOutput,
-        passed: isPassed,
-      });
+        const hasAllCorrect = correctIds.every((id) => selectedIds.includes(id));
+        const hasNoExtra = selectedIds.every((id) => correctIds.includes(id));
+
+        isPassed = hasAllCorrect && hasNoExtra && correctIds.length > 0;
+        feedback = isPassed
+          ? 'Чудово! Усі правильні варіанти обрано вірно.'
+          : `Частково або невірно. Правильні варіанти: ${options.filter(o => o.isCorrect).map(o => o.text).join(', ')}`;
+        break;
+      }
+
+      case TaskType.TEXT_ESSAY: {
+        const essayText = (dto.essayAnswer || '').trim();
+        const options = (task.options as { keywords?: string[]; minWords?: number }) || {};
+        const keywords = options.keywords || [];
+        const minWords = options.minWords || 10;
+
+        const words = essayText.split(/\s+/).filter(Boolean);
+        const lowerText = essayText.toLowerCase();
+
+        const matchedKeywords = keywords.filter((kw) => lowerText.includes(kw.toLowerCase()));
+        const isWordLengthOk = words.length >= minWords;
+        const isKeywordMatchOk = keywords.length === 0 || matchedKeywords.length >= Math.min(2, keywords.length);
+
+        isPassed = isWordLengthOk && isKeywordMatchOk;
+        feedback = isPassed
+          ? `Чудова розгорнута відповідь! Обсяг: ${words.length} слів, ключові категорії висвітлено: (${matchedKeywords.join(', ')})`
+          : `Відповідь потребує доопрацювання. Перевірте обсяг (мін. ${minWords} слів) та використання ключових понять (${keywords.join(', ')})`;
+        break;
+      }
+
+      case TaskType.CODE:
+      default: {
+        let passedCount = 0;
+        const totalCount = task.testCases.length;
+
+        for (const testCase of task.testCases) {
+          let testPassed = false;
+          let actualOutput = '';
+
+          try {
+            const sandbox = {
+              result: undefined,
+              setTimeout,
+              clearTimeout,
+              Promise,
+              console,
+            };
+            const scriptCode = `
+              ${dto.code || ''}
+              const rawInput = ${testCase.input};
+              const fnName = Object.keys(this).find(k => typeof this[k] === 'function' && k !== 'eval' && k !== 'setTimeout' && k !== 'clearTimeout');
+              const fn = eval(fnName);
+              const args = Array.isArray(rawInput) ? rawInput : [rawInput];
+              result = fn.apply(null, args);
+            `;
+
+            const context = vm.createContext(sandbox);
+            const script = new vm.Script(scriptCode);
+            script.runInContext(context, { timeout: 2000 });
+
+            let rawResult = sandbox.result;
+            if (rawResult && typeof (rawResult as any).then === 'function') {
+              rawResult = await rawResult;
+            }
+
+            actualOutput = typeof rawResult === 'object' ? JSON.stringify(rawResult) : String(rawResult);
+            testPassed = actualOutput.replace(/\s+/g, '') === testCase.expectedOutput.replace(/\s+/g, '');
+          } catch (err) {
+            actualOutput = `Error: ${(err as Error).message}`;
+            testPassed = false;
+          }
+
+          if (testPassed) passedCount++;
+
+          testDetails.push({
+            input: testCase.input,
+            expected: testCase.expectedOutput,
+            actual: actualOutput,
+            passed: testPassed,
+          });
+        }
+
+        isPassed = passedCount === totalCount && totalCount > 0;
+        feedback = isPassed
+          ? `Усі ${passedCount}/${totalCount} тест-кейси пройдено успішно!`
+          : `Пройдено ${passedCount}/${totalCount} тест-кейсів.`;
+        break;
+      }
     }
 
-    const isAllPassed = passedCount === totalCount && totalCount > 0;
-
-    // Check if the student previously submitted this EXACT same source code for this task
-    const previousSubmission = await this.prisma.submission.findFirst({
-      where: {
+    // Save Submission Log
+    const submission = await this.prisma.submission.create({
+      data: {
         userId: user.id,
         taskId: task.id,
+        code: dto.code || dto.essayAnswer || dto.selectedOptionId || (dto.selectedOptionIds ? dto.selectedOptionIds.join(',') : ''),
+        status: isPassed ? SubmissionStatus.ACCEPTED : SubmissionStatus.REJECTED,
       },
-      orderBy: { createdAt: 'desc' },
     });
 
-    const isDuplicateCode = previousSubmission && previousSubmission.code.trim() === dto.code.trim();
-
-    // Get or initialize current BKT State
+    // Update BKT Knowledge State
     let bktState = await this.prisma.bktState.findUnique({
       where: {
         userId_skillId: {
@@ -121,217 +184,133 @@ export class BktController {
           pMastery: 0.5,
           pTransit: 0.2,
           pSlip: 0.1,
-          pGuess: 0.2,
+          pGuess: customPGuess || 0.2,
         },
       });
     }
 
-    let nextPMastery = bktState.pMastery;
-    let bktResult = {
-      pMasteryPrior: bktState.pMastery,
-      pMasteryPosterior: bktState.pMastery,
-      pObserved: isAllPassed ? 1 : 0,
-    };
+    const effectivePGuess = customPGuess || bktState.pGuess;
 
-    // Calculate next BKT mastery state ONLY IF code is NOT a duplicate submission
-    if (!isDuplicateCode) {
-      const calculatedBkt = BktEngine.calculateNextState(
-        {
-          pMastery: bktState.pMastery,
-          pTransit: bktState.pTransit,
-          pSlip: bktState.pSlip,
-          pGuess: bktState.pGuess,
-        },
-        isAllPassed,
-      );
+    const bktResult = BktEngine.calculateNextState(
+      {
+        pMastery: bktState.pMastery,
+        pTransit: bktState.pTransit,
+        pSlip: bktState.pSlip,
+        pGuess: effectivePGuess,
+      },
+      isPassed,
+    );
 
-      nextPMastery = calculatedBkt.pMasteryPosterior;
-      bktResult = {
-        pMasteryPrior: calculatedBkt.pMasteryPrior,
-        pMasteryPosterior: calculatedBkt.pMasteryPosterior,
-        pObserved: isAllPassed ? 1 : 0,
-      };
+    const isMastered = BktEngine.isMastered(bktResult.pMasteryPosterior);
 
-      // Save BktState update
-      await this.prisma.bktState.update({
-        where: { id: bktState.id },
-        data: {
-          pMastery: nextPMastery,
-          isMastered: BktEngine.isMastered(nextPMastery),
-          masteredAt: BktEngine.isMastered(nextPMastery) ? new Date() : null,
-        },
-      });
-    }
-
-    // Create Submission record
-    const submission = await this.prisma.submission.create({
+    const updatedState = await this.prisma.bktState.update({
+      where: { id: bktState.id },
       data: {
-        userId: user.id,
-        taskId: task.id,
-        code: dto.code,
-        status: isAllPassed ? SubmissionStatus.ACCEPTED : SubmissionStatus.REJECTED,
-        evaluationResult: {
-          create: {
-            unitTestsPassed: passedCount,
-            unitTestsTotal: totalCount,
-            astPassed: true,
-          },
-        },
+        pMastery: bktResult.pMasteryPosterior,
+        attemptsCount: bktState.attemptsCount + 1,
+        isMastered,
+        masteredAt: isMastered ? new Date() : null,
       },
     });
 
-    // Save BktHistory record only if submission is not duplicate
-    if (!isDuplicateCode) {
-      await this.prisma.bktHistory.create({
-        data: {
-          userId: user.id,
-          skillId: task.skillId,
-          pMasteryBefore: bktResult.pMasteryPrior,
-          pMasteryAfter: bktResult.pMasteryPosterior,
-          isCorrect: isAllPassed,
-        },
-      });
-    }
+    // Save BKT History entry
+    await this.prisma.bktHistory.create({
+      data: {
+        userId: user.id,
+        skillId: task.skillId,
+        pMasteryBefore: bktState.pMastery,
+        pMasteryAfter: bktResult.pMasteryPosterior,
+        isCorrect: isPassed,
+      },
+    });
 
     return {
       submissionId: submission.id,
-      status: submission.status,
-      passedTestsCount: passedCount,
-      totalTestsCount: totalCount,
-      isDuplicate: !!isDuplicateCode,
-      bktUpdate: {
-        skillSlug: task.skill.slug,
-        skillTitle: task.skill.title,
-        pMasteryPrior: bktResult.pMasteryPrior,
-        pMasteryPosterior: bktResult.pMasteryPosterior,
-        isMastered: BktEngine.isMastered(bktResult.pMasteryPosterior),
-      },
+      isPassed,
+      feedback,
       testDetails,
+      taskType: task.taskType,
+      bktUpdate: {
+        skillId: task.skillId,
+        skillTitle: task.skill.title,
+        pMasteryBefore: bktState.pMastery,
+        pMasteryAfter: updatedState.pMastery,
+        pMasteryPosterior: updatedState.pMastery,
+        pMasteryChange: bktResult.pMasteryPosterior - bktState.pMastery,
+        isMastered: updatedState.isMastered,
+      },
     };
   }
 
   @Get('state/:userId')
-  @ApiOperation({ summary: 'Get current BKT mastery state for a student across all skills' })
-  async getStudentState(@Param('userId') userId: string) {
-    let student = await this.prisma.user.findUnique({ where: { id: userId } });
-    if (!student) {
-      student = await this.prisma.user.findFirst({ where: { role: 'STUDENT' } });
-    }
-
-    if (!student) return [];
-
+  @ApiOperation({ summary: 'Get current student BKT mastery state across all skills' })
+  async getStudentBktState(@Param('userId') userId: string) {
     const states = await this.prisma.bktState.findMany({
-      where: { userId: student.id },
+      where: { userId },
       include: { skill: true },
     });
-
-    return states.map((s) => ({
-      skillId: s.skillId,
-      skillSlug: s.skill.slug,
-      title: s.skill.title,
-      pMastery: s.pMastery,
-      isMastered: BktEngine.isMastered(s.pMastery),
-      updatedAt: s.updatedAt,
-    }));
-  }
-
-  @Post('reset/:studentId?')
-  @ApiOperation({ summary: 'Experimental: Reset BKT mastery state and submission history for a student' })
-  async resetStudentState(@Param('studentId') studentId?: string) {
-    let student = studentId
-      ? await this.prisma.user.findUnique({ where: { id: studentId } })
-      : await this.prisma.user.findFirst({ where: { role: 'STUDENT' } });
-
-    if (!student) {
-      student = await this.prisma.user.findFirst({ where: { role: 'STUDENT' } });
-    }
-
-    if (!student) throw new NotFoundException('No student found for reset');
-
-    // Delete BKT states, submissions, history and telemetry logs for full reset
-    await this.prisma.bktState.deleteMany({ where: { userId: student.id } });
-
-    // Delete submission history and BKT logs
-    await this.prisma.submission.deleteMany({ where: { userId: student.id } });
-    await this.prisma.bktHistory.deleteMany({ where: { userId: student.id } });
-    await this.prisma.telemetrySession.deleteMany({ where: { userId: student.id } });
-
-    return {
-      message: `BKT progress for student ${student.email} has been reset`,
-      userId: student.id,
-      resetAt: new Date(),
-    };
+    return states;
   }
 
   @Get('analytics/students')
-  @ApiOperation({ summary: 'Get live BKT mastery analytics and telemetry metrics for all students' })
-  async getStudentsAnalytics() {
+  @ApiOperation({ summary: 'Get real-time analytics for all students' })
+  @ApiQuery({ name: 'courseSlug', required: false })
+  async getStudentsAnalytics(@Query('courseSlug') courseSlug?: string) {
     const students = await this.prisma.user.findMany({
       where: { role: 'STUDENT' },
       include: {
         profile: true,
-        bktStates: {
-          include: { skill: true },
-        },
-        telemetrySessions: {
-          include: {
-            logs: true,
-          },
-          orderBy: { startedAt: 'desc' },
-          take: 10,
-        },
-        behavioralProfiles: true,
+        bktStates: { include: { skill: true } },
+        behavioralProfiles: { orderBy: { createdAt: 'desc' }, take: 1 },
       },
     });
 
-    return students.map((student) => {
-      const skillMastery: Record<string, number> = {};
-      student.bktStates.forEach((bs) => {
-        skillMastery[bs.skill.slug] = bs.pMastery;
+    return students.map((s) => {
+      const activeStates = courseSlug
+        ? s.bktStates.filter((st) => st.skill.courseId === courseSlug)
+        : s.bktStates;
+
+      const avgMastery =
+        activeStates.length > 0
+          ? activeStates.reduce((acc, curr) => acc + curr.pMastery, 0) / activeStates.length
+          : 0;
+
+      const bktBySkill: Record<string, number> = {};
+      s.bktStates.forEach((st) => {
+        bktBySkill[st.skill.slug] = st.pMastery;
       });
 
-      // Calculate aggregated telemetry metrics
-      let totalWpm = 0;
-      let totalLogs = 0;
-      let totalPastes = 0;
-      let maxWpm = 0;
-
-      student.telemetrySessions.forEach((session) => {
-        session.logs.forEach((log) => {
-          const data = log.eventData as any;
-          if (data) {
-            const wpm = data.wpm || 0;
-            const pastes = data.pasteEvents || 0;
-            totalWpm += wpm;
-            if (wpm > maxWpm) maxWpm = wpm;
-            if (pastes > totalPastes) totalPastes = pastes;
-            totalLogs++;
-          }
-        });
-      });
-
-      // If code was entirely pasted (copyPasteRatio === 1.0) and no real typing occurred, set avgWpm to 0
-      const rawAvgWpm = totalLogs > 0 ? Math.round(totalWpm / totalLogs) : 0;
-      const copyPasteRatio = totalPastes > 0 ? 1.0 : 0.0;
-      const avgWpm = copyPasteRatio === 1.0 && totalPastes >= totalLogs ? 0 : rawAvgWpm;
-
-      const latestProfile = student.behavioralProfiles[0];
-      const fatigueIndex = latestProfile ? 1 - latestProfile.trustCoefficient : 0.0;
-
-      const fullName = student.profile
-        ? `${student.profile.firstName || ''} ${student.profile.lastName || ''}`.trim()
-        : student.email.split('@')[0];
+      const profile = s.behavioralProfiles[0];
 
       return {
-        studentId: student.id,
-        name: fullName || student.email,
-        email: student.email,
-        skillMastery,
-        avgWpm,
-        copyPasteRatio,
-        fatigueIndex,
-        lastActive: totalLogs > 0 ? 'Щойно' : 'Нерозпочато',
+        id: s.id,
+        name: `${s.profile?.firstName || 'Студент'} ${s.profile?.lastName || ''}`.trim(),
+        email: s.email,
+        averageMastery: avgMastery,
+        bktBySkill,
+        wpm: profile ? profile.typingSpeedWpm : 0,
+        copyPasteRatio: profile ? profile.pasteRatio : 0,
+        fatigueIndex: profile ? Math.min(100, Math.round((profile.pauseDurationMs / 1000) * 2)) : 0,
+        unstarted: s.bktStates.length === 0,
       };
     });
+  }
+
+  @Post('reset/:studentId?')
+  @ApiOperation({ summary: 'Reset student BKT state' })
+  async resetStudentState(@Param('studentId') studentId?: string) {
+    let targetUserId = studentId;
+    if (!targetUserId) {
+      const student = await this.prisma.user.findFirst({ where: { role: 'STUDENT' } });
+      if (!student) throw new NotFoundException('Student user not found');
+      targetUserId = student.id;
+    }
+
+    await this.prisma.submission.deleteMany({ where: { userId: targetUserId } });
+    await this.prisma.bktHistory.deleteMany({ where: { userId: targetUserId } });
+    await this.prisma.bktState.deleteMany({ where: { userId: targetUserId } });
+    await this.prisma.telemetrySession.deleteMany({ where: { userId: targetUserId } });
+
+    return { message: `Student state for ${targetUserId} has been reset` };
   }
 }

@@ -6,6 +6,7 @@ import { EvaluationProcessor } from './adapters/outbound/queue/evaluation.proces
 import { HealthController } from './adapters/inbound/http/health.controller';
 import { TaskController } from './adapters/inbound/http/task.controller';
 import { BktController } from './adapters/inbound/http/bkt.controller';
+import { CourseController } from './adapters/inbound/http/course.controller';
 import { TelemetryGateway } from './adapters/inbound/websocket/telemetry.gateway';
 
 @Module({
@@ -17,7 +18,7 @@ import { TelemetryGateway } from './adapters/inbound/websocket/telemetry.gateway
     DatabaseModule,
     EvaluationQueueModule,
   ],
-  controllers: [HealthController, TaskController, BktController],
+  controllers: [HealthController, TaskController, BktController, CourseController],
   providers: [TelemetryGateway, EvaluationProcessor],
 })
 export class AppModule {}

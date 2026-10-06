@@ -9,7 +9,7 @@
       "items": [],
       "subsections": [
         {
-          "title": "✅ Що зроблено за день:",
+          "title": "✅ Що зроведено за день:",
           "level": 3,
           "paragraphs": [],
           "code_blocks": [],
@@ -36,7 +36,32 @@
             },
             {
               "type": "text",
-              "raw_text": "Оновлено навігацію та посилання між додаткам. Упішно пройшли статичні збірки `build:teacher` та `build:admin`.",
+              "raw_text": "Оновлено навігацію та посилання між додаткам. Успішно пройшли статичні збірки `build:teacher` та `build:admin`.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Розробка Мультидисциплінарної Архітектури та Мультиформатного Двигуна Перевірки:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Prisma Schema (`packages/database/prisma/schema.prisma`):** Створено модель `Course`, перерахування `TaskType` (`CODE`, `SINGLE_CHOICE`, `MULTIPLE_CHOICE`, `TEXT_ESSAY`), зв'язки `courseId` у `SkillNode` & `Task`, додаткове JSON-поле `options`. Проведено міграцію та автогенерацію Prisma Client (`v6.19.3`).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Мультидисциплінарне Сидування (`seed.ts`):** Сформовано 3 реалістичні навчальні курси (`js-dev` JavaScript, `english-b2` Business & Tech English, `ukraine-law` Правознавство України) з 11 вузлами графа знань та 12 різнотипними завданнями.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Polyglot Evaluation Engine (`apps/api`):** Створено `CourseController` (`/api/v1/courses`), розширено `TaskController` з фільтрацією за `courseSlug`, інтегровано єдиний універсальний механізм оцінювання BKT у `BktController` (з підрахунком штрафів за імпульсивне вгадування $<2.0\\text{с}$ $P(G_{\\text{dyn}}) \\to 0.85$, частковим балом для чекбокс-тестів та аналізом WPM/пауз для есе).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Інтерфейси Студента та Викладача (`apps/student`, `apps/teacher`):** Реалізовано шапку перемикання курсів (**[ 💻 JavaScript ] [ 🇬🇧 English B2 ] [ ⚖️ Правознавство ]**), компоненти `QuizTaskEditor.tsx` та `EssayTaskEditor.tsx` для візуалізації опитувальників і текстових есе з відстеженням телеметрії, а також мультикурсну фільтрацію аналітики у Кабінеті Викладача.",
               "subitems": []
             },
             {

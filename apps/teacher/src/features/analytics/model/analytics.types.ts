@@ -1,10 +1,15 @@
 export interface StudentAnalyticsItem {
-  studentId: string;
+  id?: string;
+  studentId?: string;
   name: string;
   email: string;
-  skillMastery: Record<string, number>; // skillSlug -> pMastery
-  avgWpm: number;
+  averageMastery?: number;
+  bktBySkill?: Record<string, number>;
+  skillMastery?: Record<string, number>;
+  wpm?: number;
+  avgWpm?: number;
   copyPasteRatio: number;
-  fatigueIndex: number; // 0.0 to 1.0
-  lastActive: string;
+  fatigueIndex: number;
+  unstarted?: boolean;
+  lastActive?: string;
 }

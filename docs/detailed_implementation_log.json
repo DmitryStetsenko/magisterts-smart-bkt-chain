@@ -1261,6 +1261,149 @@
               "type": "text",
               "raw_text": "Оновлено [apps/teacher/src/app/page.tsx](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/teacher/src/app/page.tsx) з повним фокусом на студентську аналітику та BKT Heatmap.",
               "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "---",
+              "subitems": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "🌐 Крок 9: Розгортання Мультидисциплінарної Архітектури та Polyglot Evaluation Engine",
+      "level": 2,
+      "paragraphs": [],
+      "code_blocks": [],
+      "items": [],
+      "subsections": [
+        {
+          "title": "9.1 Схема даних та розширення сутностей (`packages/database/prisma/schema.prisma`)",
+          "level": 3,
+          "paragraphs": [],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "kv",
+              "key": "Створено модель `Course`",
+              "value": "`id`, `slug` (унікальний ключ `js-dev`, `english-b2`, `ukraine-law`), `title`, `description`, `icon`, `category`, `createdAt`.",
+              "raw_text": "**Створено модель `Course`**: `id`, `slug` (унікальний ключ `js-dev`, `english-b2`, `ukraine-law`), `title`, `description`, `icon`, `category`, `createdAt`.",
+              "subitems": []
+            },
+            {
+              "type": "kv",
+              "key": "Додано перерахування `TaskType`",
+              "value": "`CODE` (виконання JS коду у VM), `SINGLE_CHOICE` (радіо-тести), `MULTIPLE_CHOICE` (чекбокс-тести з частковим балом), `TEXT_ESSAY` (відкриті есе з підрахунком WPM, пауз та збігу ключових слів).",
+              "raw_text": "**Додано перерахування `TaskType`**: `CODE` (виконання JS коду у VM), `SINGLE_CHOICE` (радіо-тести), `MULTIPLE_CHOICE` (чекбокс-тести з частковим балом), `TEXT_ESSAY` (відкриті есе з підрахунком WPM, пауз та збігу ключових слів).",
+              "subitems": []
+            },
+            {
+              "type": "kv",
+              "key": "Оновлено `SkillNode` та `Task`",
+              "value": "додано обов'язкове посилання `courseId` та зв'язок з `Course`, а також опціональне JSON-поле `options` у `Task` для переліку варіантів відповідей (з полями `id`, `text`, `isCorrect`).",
+              "raw_text": "**Оновлено `SkillNode` та `Task`**: додано обов'язкове посилання `courseId` та зв'язок з `Course`, а також опціональне JSON-поле `options` у `Task` для переліку варіантів відповідей (з полями `id`, `text`, `isCorrect`).",
+              "subitems": []
+            }
+          ]
+        },
+        {
+          "title": "9.2 Дисципліни та сидування даних (`packages/database/prisma/seed.ts`)",
+          "level": 3,
+          "paragraphs": [],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "kv",
+              "key": "`js-dev` (JavaScript & Web Development)",
+              "value": "5 модулів (`js-basics`, `js-functions`, `js-collections`, `js-async`, `js-oop`), 5 `CODE` задач.",
+              "raw_text": "**`js-dev` (JavaScript & Web Development)**: 5 модулів (`js-basics`, `js-functions`, `js-collections`, `js-async`, `js-oop`), 5 `CODE` задач.",
+              "subitems": []
+            },
+            {
+              "type": "kv",
+              "key": "`english-b2` (Business & Tech English B2)",
+              "value": "3 модулі (`eng-vocabulary`, `eng-grammar`, `eng-essay`), 4 завдання (`SINGLE_CHOICE`, `MULTIPLE_CHOICE`, `TEXT_ESSAY`).",
+              "raw_text": "**`english-b2` (Business & Tech English B2)**: 3 модулі (`eng-vocabulary`, `eng-grammar`, `eng-essay`), 4 завдання (`SINGLE_CHOICE`, `MULTIPLE_CHOICE`, `TEXT_ESSAY`).",
+              "subitems": []
+            },
+            {
+              "type": "kv",
+              "key": "`ukraine-law` (Правознавство України)",
+              "value": "3 модулі (`law-const`, `law-civil`, `law-labor`), 3 завдання (`SINGLE_CHOICE`, `MULTIPLE_CHOICE`, `TEXT_ESSAY`).",
+              "raw_text": "**`ukraine-law` (Правознавство України)**: 3 модулі (`law-const`, `law-civil`, `law-labor`), 3 завдання (`SINGLE_CHOICE`, `MULTIPLE_CHOICE`, `TEXT_ESSAY`).",
+              "subitems": []
+            }
+          ]
+        },
+        {
+          "title": "9.3 Поліглотний двигун оцінювання (`apps/api`)",
+          "level": 3,
+          "paragraphs": [],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "kv",
+              "key": "`CourseController` (`/api/v1/courses`)",
+              "value": "розроблено REST-ендпоінти отримання переліку курсів та деталей конкретного курсу за `slug`.",
+              "raw_text": "**`CourseController` (`/api/v1/courses`)**: розроблено REST-ендпоінти отримання переліку курсів та деталей конкретного курсу за `slug`.",
+              "subitems": []
+            },
+            {
+              "type": "kv",
+              "key": "`TaskController` (`/api/v1/tasks/recommended`)",
+              "value": "впроваджено query-фільтрацію `courseSlug` для ізольованої рекомендації задач.",
+              "raw_text": "**`TaskController` (`/api/v1/tasks/recommended`)**: впроваджено query-фільтрацію `courseSlug` для ізольованої рекомендації задач.",
+              "subitems": []
+            },
+            {
+              "type": "kv",
+              "key": "`BktController` (`POST /api/v1/bkt/evaluate`)",
+              "value": "",
+              "raw_text": "**`BktController` (`POST /api/v1/bkt/evaluate`)**:",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "`SINGLE_CHOICE`: Динамічна оцінка вгадування $P(G_{\\text{dyn}})$. Якщо час відповіді `reactionLatencyMs < 2000`, $P(G_{\\text{dyn}}) = 0.85$ (штраф за швидкий вгад).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "`MULTIPLE_CHOICE`: Частковий бал (Partial scoring) $S = \\max(0, \\frac{N_{\\text{correct}} - N_{\\text{wrong}}}{N_{\\text{total\\_correct}}})$.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "`TEXT_ESSAY`: Оцінка за мінімальну довжину слів (>= 25 слів) та перевірку наявності не менше 50% ключових понять курсу.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "`CODE`: Перевірка набору відкритих та прихованих тест-кейсах у Node.js VM context.",
+              "subitems": []
+            }
+          ]
+        },
+        {
+          "title": "9.4 Фронтенд кабінети (`apps/student`, `apps/teacher`)",
+          "level": 3,
+          "paragraphs": [],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "kv",
+              "key": "Кабінет Студента (`apps/student`)",
+              "value": "додано шапку вибору курсу, розроблено UI компоненти `QuizTaskEditor.tsx` (радіо/чекбокси з точним вимірюванням часу реакції в ms) та `EssayTaskEditor.tsx` (текстове поле з підрахунком слів, пауз у наборі та WPM).",
+              "raw_text": "**Кабінет Студента (`apps/student`)**: додано шапку вибору курсу, розроблено UI компоненти `QuizTaskEditor.tsx` (радіо/чекбокси з точним вимірюванням часу реакції в ms) та `EssayTaskEditor.tsx` (текстове поле з підрахунком слів, пауз у наборі та WPM).",
+              "subitems": []
+            },
+            {
+              "type": "kv",
+              "key": "Кабінет Викладача (`apps/teacher`)",
+              "value": "додано вкладочне перемикання предметів для фільтрації BKT Heatmap та студентської аналітики за курсом.",
+              "raw_text": "**Кабінет Викладача (`apps/teacher`)**: додано вкладочне перемикання предметів для фільтрації BKT Heatmap та студентської аналітики за курсом.",
+              "subitems": []
             }
           ]
         }

@@ -3,14 +3,14 @@ import dotenv from 'dotenv';
 dotenv.config({ path: path.resolve(__dirname, '../../../.env') });
 dotenv.config();
 
-import { PrismaClient, UserRole, TaskDifficulty } from '@prisma/client';
+import { PrismaClient, UserRole, TaskDifficulty, TaskType } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
 async function main() {
-  console.log('🌱 Starting comprehensive database seeding for Full JavaScript Course...');
+  console.log('🌱 Starting Multi-Discipline Database Seeding (JS, English B2, Law)...');
 
-  // 1. Create initial Admin & Student Users
+  // 1. Create Users
   const student = await prisma.user.upsert({
     where: { email: 'student@example.com' },
     update: {
@@ -53,7 +53,7 @@ async function main() {
         create: {
           firstName: 'Дмитро',
           lastName: 'Стеценко',
-          bio: 'Викладач курсу Адаптивних систем та Web3',
+          bio: 'Викладач адаптивних систем та Web3',
         },
       },
     },
@@ -61,112 +61,394 @@ async function main() {
 
   console.log(`👤 Users seeded: Student (${student.email}), Teacher (${teacher.email})`);
 
-  // 2. Create 5 Skill Graph Nodes (Modules)
-  const jsBasics = await prisma.skillNode.upsert({
-    where: { slug: 'js-basics' },
-    update: {
-      title: 'Модуль 1: Синтаксис та Базові Конструкції',
-      description: 'Типи даних, змінні let/const, арифметичні та логічні оператори, цикли',
+  // Clean old data for fresh multi-course initialization
+  await prisma.submission.deleteMany({});
+  await prisma.bktHistory.deleteMany({});
+  await prisma.bktState.deleteMany({});
+  await prisma.task.deleteMany({});
+  await prisma.skillDependency.deleteMany({});
+  await prisma.skillNode.deleteMany({});
+  await prisma.course.deleteMany({});
+
+  // ==================== COURSE 1: JAVASCRIPT PROGRAMMING ====================
+  const courseJs = await prisma.course.create({
+    data: {
+      slug: 'js-dev',
+      title: 'JavaScript & Web Engineering',
+      description: 'Повний курс розробки на JS: від синтаксису до асинхронності та ООП',
+      icon: 'code',
     },
-    create: {
+  });
+
+  const jsBasics = await prisma.skillNode.create({
+    data: {
+      courseId: courseJs.id,
       slug: 'js-basics',
-      title: 'Модуль 1: Синтаксис та Базові Конструкції',
-      description: 'Типи даних, змінні let/const, арифметичні та логічні оператори, цикли',
-      category: 'Core Fundamentals',
+      title: 'Модуль 1: Синтаксис та База',
+      description: 'Типи даних, змінні let/const, логічні оператори та цикли',
+      category: 'Core Programming',
       difficulty: TaskDifficulty.EASY,
     },
   });
 
-  const jsFunctions = await prisma.skillNode.upsert({
-    where: { slug: 'js-functions' },
-    update: {},
-    create: {
+  const jsFunctions = await prisma.skillNode.create({
+    data: {
+      courseId: courseJs.id,
       slug: 'js-functions',
-      title: 'Модуль 2: Функції та Області Видимості',
-      description: 'Arrow functions, замикання (Closures), параметр rest/spread та хойстинг',
-      category: 'Core Fundamentals',
+      title: 'Модуль 2: Функції & Closures',
+      description: 'Arrow functions, замикання, rest/spread та хойстинг',
+      category: 'Core Programming',
       difficulty: TaskDifficulty.EASY,
     },
   });
 
-  const jsCollections = await prisma.skillNode.upsert({
-    where: { slug: 'js-collections' },
-    update: {},
-    create: {
+  const jsCollections = await prisma.skillNode.create({
+    data: {
+      courseId: courseJs.id,
       slug: 'js-collections',
-      title: 'Модуль 3: Масиви, Обʼєкти та Методи Обходу',
-      description: 'Функціональні методи map, filter, reduce та деструктуризація обʼєктів',
+      title: 'Модуль 3: Масиви & Обʼєкти',
+      description: 'Функціональні методи map, filter, reduce та обхід обʼєктів',
       category: 'Data Structures',
       difficulty: TaskDifficulty.MEDIUM,
     },
   });
 
-  const jsAsync = await prisma.skillNode.upsert({
-    where: { slug: 'js-async' },
-    update: {
-      title: 'Модуль 4: Асинхронне програмування',
-      description: 'Event Loop, Promises, async/await та обробка помилок try/catch',
-    },
-    create: {
+  const jsAsync = await prisma.skillNode.create({
+    data: {
+      courseId: courseJs.id,
       slug: 'js-async',
-      title: 'Модуль 4: Асинхронне програмування',
-      description: 'Event Loop, Promises, async/await та обробка помилок try/catch',
+      title: 'Модуль 4: Асинхронність JS',
+      description: 'Event Loop, Promises, async/await та try/catch',
       category: 'Advanced JS',
       difficulty: TaskDifficulty.HARD,
     },
   });
 
-  const jsOop = await prisma.skillNode.upsert({
-    where: { slug: 'js-oop' },
-    update: {},
-    create: {
+  const jsOop = await prisma.skillNode.create({
+    data: {
+      courseId: courseJs.id,
       slug: 'js-oop',
-      title: 'Модуль 5: ООП та Прототипи',
-      description: 'Класи ES6, конструктори, успадкування extends та прототипні звʼязки',
+      title: 'Модуль 5: ООП & Прототипи',
+      description: 'Класи ES6, extends, прототипи та інкапсуляція',
       category: 'Object Oriented',
       difficulty: TaskDifficulty.HARD,
     },
   });
 
-  console.log('🧠 Created 5 skill nodes: js-basics -> js-functions -> js-collections -> js-async -> js-oop');
-
-  // 3. Create Sequential Skill Dependencies (DAG: 1 -> 2 -> 3 -> 4 -> 5)
-  const dependencies = [
+  // JS Dependencies
+  const jsDeps = [
     { parent: jsBasics, child: jsFunctions },
     { parent: jsFunctions, child: jsCollections },
     { parent: jsCollections, child: jsAsync },
     { parent: jsAsync, child: jsOop },
   ];
-
-  for (const dep of dependencies) {
-    await prisma.skillDependency.upsert({
-      where: {
-        parentSkillId_childSkillId: {
-          parentSkillId: dep.parent.id,
-          childSkillId: dep.child.id,
-        },
-      },
-      update: {},
-      create: {
-        parentSkillId: dep.parent.id,
-        childSkillId: dep.child.id,
-        requiredMastery: 0.95,
-      },
+  for (const dep of jsDeps) {
+    await prisma.skillDependency.create({
+      data: { parentSkillId: dep.parent.id, childSkillId: dep.child.id, requiredMastery: 0.95 },
     });
   }
 
-  console.log('🔗 Skill graph DAG linked with 0.95 mastery requirement per level!');
-
-  // 4. Create Initial BKT State for Student on first node
-  await prisma.bktState.upsert({
-    where: {
-      userId_skillId: {
-        userId: student.id,
-        skillId: jsBasics.id,
+  // JS Tasks
+  await prisma.task.create({
+    data: {
+      skillId: jsBasics.id,
+      taskType: TaskType.CODE,
+      title: 'Сума двох чисел',
+      description: 'Напишіть функцію `sum(a, b)`, яка повертає суму двох чисел.',
+      starterCode: 'function sum(a, b) {\n  // Ваш код тут\n}',
+      difficulty: TaskDifficulty.EASY,
+      testCases: {
+        create: [
+          { input: '[2, 3]', expectedOutput: '5', isSecret: false },
+          { input: '[-1, 1]', expectedOutput: '0', isSecret: false },
+        ],
       },
     },
-    update: {},
-    create: {
+  });
+
+  await prisma.task.create({
+    data: {
+      skillId: jsBasics.id,
+      taskType: TaskType.CODE,
+      title: 'Перевірка парності числа',
+      description: 'Напишіть функцію `isEven(n)`, яка повертає `true`, якщо число парне, та `false` якщо ні.',
+      starterCode: 'function isEven(n) {\n  // Ваш код тут\n}',
+      difficulty: TaskDifficulty.EASY,
+      testCases: {
+        create: [
+          { input: '[4]', expectedOutput: 'true', isSecret: false },
+          { input: '[7]', expectedOutput: 'false', isSecret: false },
+        ],
+      },
+    },
+  });
+
+  await prisma.task.create({
+    data: {
+      skillId: jsFunctions.id,
+      taskType: TaskType.CODE,
+      title: 'Піднесення до степеня (Arrow Function)',
+      description: 'Напишіть функцію `power(base, exp)`, яка підносить число `base` до степеня `exp`.',
+      starterCode: 'const power = (base, exp) => {\n  // Ваш код тут\n};',
+      difficulty: TaskDifficulty.EASY,
+      testCases: {
+        create: [
+          { input: '[2, 3]', expectedOutput: '8', isSecret: false },
+          { input: '[3, 4]', expectedOutput: '81', isSecret: true },
+        ],
+      },
+    },
+  });
+
+  await prisma.task.create({
+    data: {
+      skillId: jsCollections.id,
+      taskType: TaskType.CODE,
+      title: 'Фільтрація парних елементів',
+      description: 'Напишіть функцію `filterEvens(numbers)`, яка приймає масив чисел і повертає новий масив тільки з парними числами.',
+      starterCode: 'function filterEvens(numbers) {\n  // Ваш код тут\n}',
+      difficulty: TaskDifficulty.MEDIUM,
+      testCases: {
+        create: [
+          { input: '[[1, 2, 3, 4, 5, 6]]', expectedOutput: '[2,4,6]', isSecret: false },
+        ],
+      },
+    },
+  });
+
+  await prisma.task.create({
+    data: {
+      skillId: jsAsync.id,
+      taskType: TaskType.CODE,
+      title: 'Асинхронне отримання профілю користувача',
+      description: 'Напишіть асинхронну функцію `fetchUser(id)`, яка за допомогою `await` повертає обʼєкт `{ id, name: "User_" + id }`.',
+      starterCode: 'async function fetchUser(id) {\n  await new Promise(r => setTimeout(r, 10));\n  return { id, name: "User_" + id };\n}',
+      difficulty: TaskDifficulty.HARD,
+      testCases: {
+        create: [
+          { input: '[1]', expectedOutput: '{"id":1,"name":"User_1"}', isSecret: false },
+        ],
+      },
+    },
+  });
+
+
+  // ==================== COURSE 2: ENGLISH LANGUAGE B2 ====================
+  const courseEng = await prisma.course.create({
+    data: {
+      slug: 'english-b2',
+      title: 'Business & Tech English (B2)',
+      description: 'Практична англійська для IT та бізнесу: граматика, лексика та ділове листування',
+      icon: 'languages',
+    },
+  });
+
+  const engGrammar = await prisma.skillNode.create({
+    data: {
+      courseId: courseEng.id,
+      slug: 'eng-grammar',
+      title: 'Grammar: Advanced Tenses & Conditionals',
+      description: 'Past Perfect, Passive Voice, Conditionals Type 2 & 3',
+      category: 'Grammar',
+      difficulty: TaskDifficulty.EASY,
+    },
+  });
+
+  const engVocab = await prisma.skillNode.create({
+    data: {
+      courseId: courseEng.id,
+      slug: 'eng-vocab',
+      title: 'Tech & Business Vocabulary',
+      description: 'Термінологія Agile, API, Cloud та ділові ідіоми',
+      category: 'Vocabulary',
+      difficulty: TaskDifficulty.MEDIUM,
+    },
+  });
+
+  const engWriting = await prisma.skillNode.create({
+    data: {
+      courseId: courseEng.id,
+      slug: 'eng-writing',
+      title: 'Professional Technical Writing',
+      description: 'Складання ділових листувань, специфікацій та рішень проблем',
+      category: 'Writing & Communication',
+      difficulty: TaskDifficulty.HARD,
+    },
+  });
+
+  // Eng Dependencies
+  await prisma.skillDependency.create({
+    data: { parentSkillId: engGrammar.id, childSkillId: engVocab.id, requiredMastery: 0.95 },
+  });
+  await prisma.skillDependency.create({
+    data: { parentSkillId: engVocab.id, childSkillId: engWriting.id, requiredMastery: 0.95 },
+  });
+
+  // Eng Tasks
+  await prisma.task.create({
+    data: {
+      skillId: engGrammar.id,
+      taskType: TaskType.SINGLE_CHOICE,
+      title: 'Past Perfect vs Past Simple',
+      description: 'Choose the correct verb form: "By the time the server crashed, the database ____ completely backed up."',
+      difficulty: TaskDifficulty.EASY,
+      options: [
+        { id: 'a', text: 'had been', isCorrect: true },
+        { id: 'b', text: 'has been', isCorrect: false },
+        { id: 'c', text: 'was being', isCorrect: false },
+        { id: 'd', text: 'is', isCorrect: false },
+      ],
+    },
+  });
+
+  await prisma.task.create({
+    data: {
+      skillId: engGrammar.id,
+      taskType: TaskType.SINGLE_CHOICE,
+      title: 'Third Conditional Syntax',
+      description: 'Complete the sentence: "If we had refactored the legacy code earlier, the deployment ____ smoother."',
+      difficulty: TaskDifficulty.MEDIUM,
+      options: [
+        { id: 'a', text: 'would have been', isCorrect: true },
+        { id: 'b', text: 'will be', isCorrect: false },
+        { id: 'c', text: 'would be', isCorrect: false },
+        { id: 'd', text: 'had been', isCorrect: false },
+      ],
+    },
+  });
+
+  await prisma.task.create({
+    data: {
+      skillId: engVocab.id,
+      taskType: TaskType.MULTIPLE_CHOICE,
+      title: 'Agile & DevOps Terminology',
+      description: 'Select ALL terms that directly relate to continuous software integration and testing:',
+      difficulty: TaskDifficulty.MEDIUM,
+      options: [
+        { id: 'a', text: 'CI/CD Pipeline', isCorrect: true },
+        { id: 'b', text: 'Automated Regression Suite', isCorrect: true },
+        { id: 'c', text: 'Water-fall Sign-off', isCorrect: false },
+        { id: 'd', text: 'Canary Deployment', isCorrect: true },
+      ],
+    },
+  });
+
+  await prisma.task.create({
+    data: {
+      skillId: engWriting.id,
+      taskType: TaskType.TEXT_ESSAY,
+      title: 'Drafting an API Request Email',
+      description: 'Write a professional 2-3 sentence email to a Lead Architect requesting access credentials for the Staging REST API endpoint.',
+      difficulty: TaskDifficulty.HARD,
+      options: {
+        keywords: ['api', 'staging', 'credentials', 'access', 'request', 'regards'],
+        minWords: 15,
+      },
+    },
+  });
+
+
+  // ==================== COURSE 3: JURISPRUDENCE OF UKRAINE ====================
+  const courseLaw = await prisma.course.create({
+    data: {
+      slug: 'ukraine-law',
+      title: 'Правознавство & Конституційне Право України',
+      description: 'Основи держави і права, Конституція України та правовий аналіз реальних юридичних кейсів',
+      icon: 'scale',
+    },
+  });
+
+  const lawBasics = await prisma.skillNode.create({
+    data: {
+      courseId: courseLaw.id,
+      slug: 'law-basics',
+      title: 'Модуль 1: Основи Теорії Держави і Права',
+      description: 'Поняття права, норми права, джерела та класифікація юридичних фактів',
+      category: 'Legal Theory',
+      difficulty: TaskDifficulty.EASY,
+    },
+  });
+
+  const lawConstitutional = await prisma.skillNode.create({
+    data: {
+      courseId: courseLaw.id,
+      slug: 'law-constitutional',
+      title: 'Модуль 2: Конституційне Право України',
+      description: 'Основи конституційного ладу, права і свободи людини, гілки державної влади',
+      category: 'Constitutional Law',
+      difficulty: TaskDifficulty.MEDIUM,
+    },
+  });
+
+  const lawCaseAnalysis = await prisma.skillNode.create({
+    data: {
+      courseId: courseLaw.id,
+      slug: 'law-case-analysis',
+      title: 'Модуль 3: Юридичний Аналіз Кейсів',
+      description: 'Аналіз правомірності дій, кваліфікація правопорушень та складання висновків',
+      category: 'Legal Practice',
+      difficulty: TaskDifficulty.HARD,
+    },
+  });
+
+  // Law Dependencies
+  await prisma.skillDependency.create({
+    data: { parentSkillId: lawBasics.id, childSkillId: lawConstitutional.id, requiredMastery: 0.95 },
+  });
+  await prisma.skillDependency.create({
+    data: { parentSkillId: lawConstitutional.id, childSkillId: lawCaseAnalysis.id, requiredMastery: 0.95 },
+  });
+
+  // Law Tasks
+  await prisma.task.create({
+    data: {
+      skillId: lawBasics.id,
+      taskType: TaskType.SINGLE_CHOICE,
+      title: 'Найвища юридична сила в Україні',
+      description: 'Який нормативно-правовий акт має найвищу юридичну силу на території України?',
+      difficulty: TaskDifficulty.EASY,
+      options: [
+        { id: 'a', text: 'Конституція України', isCorrect: true },
+        { id: 'b', text: 'Закони України', isCorrect: false },
+        { id: 'c', text: 'Укази Президента України', isCorrect: false },
+        { id: 'd', text: 'Постанови Кабінету Міністрів України', isCorrect: false },
+      ],
+    },
+  });
+
+  await prisma.task.create({
+    data: {
+      skillId: lawConstitutional.id,
+      taskType: TaskType.MULTIPLE_CHOICE,
+      title: 'Обов’язки громадянина за Конституцією України',
+      description: 'Оберіть УСІ конституційні обов’язки громадянина України (ст. 65-68 КУ):',
+      difficulty: TaskDifficulty.MEDIUM,
+      options: [
+        { id: 'a', text: 'Захист Вітчизни, незалежності та територіальної цілісності', isCorrect: true },
+        { id: 'b', text: 'Сплата податків і зборів у порядку і розмірах, встановлених законом', isCorrect: true },
+        { id: 'c', text: 'Обов’язковий вступ до політичних партій', isCorrect: false },
+        { id: 'd', text: 'Шанування державних символів України', isCorrect: true },
+      ],
+    },
+  });
+
+  await prisma.task.create({
+    data: {
+      skillId: lawCaseAnalysis.id,
+      taskType: TaskType.TEXT_ESSAY,
+      title: 'Аналіз правомірності звільнення працівника',
+      description: 'Опишіть юридичний висновок щодо правомірності звільнення працівника під час тимчасової непрацездатності (лікарняного) за ініціативою роботодавця (ст. 40 КЗпП України).',
+      difficulty: TaskDifficulty.HARD,
+      options: {
+        keywords: ['неправомірне', 'кзпп', 'лікарняний', 'заборона', 'поновлення'],
+        minWords: 20,
+      },
+    },
+  });
+
+  // Initial BKT State for JS
+  await prisma.bktState.create({
+    data: {
       userId: student.id,
       skillId: jsBasics.id,
       pMastery: 0.5,
@@ -176,253 +458,7 @@ async function main() {
     },
   });
 
-  // Clean existing tasks for complete fresh course seeding
-  await prisma.task.deleteMany({});
-
-  // 5. Create 15 Practical Tasks across 5 Modules
-
-  // ==================== MODULE 1: js-basics ====================
-  await prisma.task.create({
-    data: {
-      skillId: jsBasics.id,
-      title: 'Сума двох чисел',
-      description: 'Напишіть функцію `sum(a, b)`, яка повертає суму двох чисел.',
-      starterCode: 'function sum(a, b) {\n  // Ваш код тут\n}',
-      difficulty: TaskDifficulty.EASY,
-      testCases: {
-        create: [
-          { input: '[2, 3]', expectedOutput: '5', isSecret: false },
-          { input: '[-1, 1]', expectedOutput: '0', isSecret: false },
-          { input: '[100, 200]', expectedOutput: '300', isSecret: true },
-        ],
-      },
-    },
-  });
-
-  await prisma.task.create({
-    data: {
-      skillId: jsBasics.id,
-      title: 'Перевірка парності числа',
-      description: 'Напишіть функцію `isEven(n)`, яка повертає `true`, якщо число парне, і `false` у протилежному випадку.',
-      starterCode: 'function isEven(n) {\n  // Ваш код тут\n}',
-      difficulty: TaskDifficulty.EASY,
-      testCases: {
-        create: [
-          { input: '[4]', expectedOutput: 'true', isSecret: false },
-          { input: '[7]', expectedOutput: 'false', isSecret: false },
-          { input: '[0]', expectedOutput: 'true', isSecret: true },
-        ],
-      },
-    },
-  });
-
-  await prisma.task.create({
-    data: {
-      skillId: jsBasics.id,
-      title: 'Обчислення факторіалу',
-      description: 'Напишіть функцію `factorial(n)`, яка обчислює факторіал невідʼємного цілого числа $n!$. Наприклад `factorial(5) = 120`.',
-      starterCode: 'function factorial(n) {\n  // Ваш код тут\n}',
-      difficulty: TaskDifficulty.EASY,
-      testCases: {
-        create: [
-          { input: '[5]', expectedOutput: '120', isSecret: false },
-          { input: '[0]', expectedOutput: '1', isSecret: false },
-          { input: '[3]', expectedOutput: '6', isSecret: true },
-        ],
-      },
-    },
-  });
-
-  // ==================== MODULE 2: js-functions ====================
-  await prisma.task.create({
-    data: {
-      skillId: jsFunctions.id,
-      title: 'Піднесення до степеня (Arrow Function)',
-      description: 'Напишіть функцію `power(base, exp)`, яка підносить число `base` до степеня `exp`.',
-      starterCode: 'const power = (base, exp) => {\n  // Ваш код тут\n};',
-      difficulty: TaskDifficulty.EASY,
-      testCases: {
-        create: [
-          { input: '[2, 3]', expectedOutput: '8', isSecret: false },
-          { input: '[5, 0]', expectedOutput: '1', isSecret: false },
-          { input: '[3, 4]', expectedOutput: '81', isSecret: true },
-        ],
-      },
-    },
-  });
-
-  await prisma.task.create({
-    data: {
-      skillId: jsFunctions.id,
-      title: 'Підрахунок голосних літер',
-      description: 'Напишіть функцію `countVowels(str)`, яка підраховує кількість голосних літер (a, e, i, o, u - незалежно від регістру) у рядку.',
-      starterCode: 'function countVowels(str) {\n  // Ваш код тут\n}',
-      difficulty: TaskDifficulty.EASY,
-      testCases: {
-        create: [
-          { input: '["hello"]', expectedOutput: '2', isSecret: false },
-          { input: '["JavaScript"]', expectedOutput: '3', isSecret: false },
-          { input: '["bcdfg"]', expectedOutput: '0', isSecret: true },
-        ],
-      },
-    },
-  });
-
-  await prisma.task.create({
-    data: {
-      skillId: jsFunctions.id,
-      title: 'Створення лічильника (Замикання)',
-      description: 'Напишіть функцію `createCounter(initial)`, яка повертає нову функцію. Щоразу при виклику повернутої функції вона збільшує значення на 1 та повертає його.',
-      starterCode: 'function createCounter(initial) {\n  let count = initial;\n  return function() {\n    // Ваш код тут\n  };\n}',
-      difficulty: TaskDifficulty.MEDIUM,
-      testCases: {
-        create: [
-          { input: '[10]', expectedOutput: '11', isSecret: false },
-          { input: '[0]', expectedOutput: '1', isSecret: false },
-          { input: '[-5]', expectedOutput: '-4', isSecret: true },
-        ],
-      },
-    },
-  });
-
-  // ==================== MODULE 3: js-collections ====================
-  await prisma.task.create({
-    data: {
-      skillId: jsCollections.id,
-      title: 'Фільтрація парних елементів',
-      description: 'Напишіть функцію `filterEvens(numbers)`, яка приймає масив чисел і повертає новий масив тільки з парними числами.',
-      starterCode: 'function filterEvens(numbers) {\n  // Ваш код тут\n}',
-      difficulty: TaskDifficulty.MEDIUM,
-      testCases: {
-        create: [
-          { input: '[[1, 2, 3, 4, 5, 6]]', expectedOutput: '[2,4,6]', isSecret: false },
-          { input: '[[1, 3, 5]]', expectedOutput: '[]', isSecret: false },
-          { input: '[[10, 21, 32]]', expectedOutput: '[10,32]', isSecret: true },
-        ],
-      },
-    },
-  });
-
-  await prisma.task.create({
-    data: {
-      skillId: jsCollections.id,
-      title: 'Розрахунок загальної вартості кошика',
-      description: 'Напишіть функцію `calcTotal(items)`, яка обчислює суму властивостей `price` у масиві обʼєктів.',
-      starterCode: 'function calcTotal(items) {\n  // Ваш код тут\n}',
-      difficulty: TaskDifficulty.MEDIUM,
-      testCases: {
-        create: [
-          { input: '[[{"price": 10}, {"price": 20}]]', expectedOutput: '30', isSecret: false },
-          { input: '[[]]', expectedOutput: '0', isSecret: false },
-          { input: '[[{"price": 100}]]', expectedOutput: '100', isSecret: true },
-        ],
-      },
-    },
-  });
-
-  await prisma.task.create({
-    data: {
-      skillId: jsCollections.id,
-      title: 'Пошук найдовшого слова',
-      description: 'Напишіть функцію `findLongestWord(words)`, яка приймає масив рядків і повертає найдовше слово.',
-      starterCode: 'function findLongestWord(words) {\n  // Ваш код тут\n}',
-      difficulty: TaskDifficulty.MEDIUM,
-      testCases: {
-        create: [
-          { input: '[["apple", "banana", "kiwi"]]', expectedOutput: '"banana"', isSecret: false },
-          { input: '[["a", "ab", "abc"]]', expectedOutput: '"abc"', isSecret: false },
-          { input: '[["cat", "dog"]]', expectedOutput: '"cat"', isSecret: true },
-        ],
-      },
-    },
-  });
-
-  // ==================== MODULE 4: js-async ====================
-  await prisma.task.create({
-    data: {
-      skillId: jsAsync.id,
-      title: 'Асинхронне отримання профілю користувача',
-      description: 'Напишіть асинхронну функцію `fetchUser(id)`, яка за допомогою `await` симулює асинхронну затримку через Promise та повертає обʼєкт `{ id, name: "User_" + id }`.',
-      starterCode: 'async function fetchUser(id) {\n  await new Promise(r => setTimeout(r, 10));\n  // Ваш код тут\n}',
-      difficulty: TaskDifficulty.HARD,
-      testCases: {
-        create: [
-          { input: '[1]', expectedOutput: '{"id":1,"name":"User_1"}', isSecret: false },
-          { input: '[42]', expectedOutput: '{"id":42,"name":"User_42"}', isSecret: false },
-          { input: '[99]', expectedOutput: '{"id":99,"name":"User_99"}', isSecret: true },
-        ],
-      },
-    },
-  });
-
-  await prisma.task.create({
-    data: {
-      skillId: jsAsync.id,
-      title: 'Паралельне завантаження кількох користувачів',
-      description: 'Напишіть асинхронну функцію `fetchAllUsers(ids)`, яка приймає масив `ids` і за допомогою `Promise.all` повертає масив імен `["User_1", "User_2", ...]`.',
-      starterCode: 'async function fetchAllUsers(ids) {\n  // Ваш код тут\n}',
-      difficulty: TaskDifficulty.HARD,
-      testCases: {
-        create: [
-          { input: '[[1, 2]]', expectedOutput: '["User_1","User_2"]', isSecret: false },
-          { input: '[[5]]', expectedOutput: '["User_5"]', isSecret: false },
-          { input: '[[]]', expectedOutput: '[]', isSecret: true },
-        ],
-      },
-    },
-  });
-
-  await prisma.task.create({
-    data: {
-      skillId: jsAsync.id,
-      title: 'Безпечне оброблення асинхронної помилки',
-      description: 'Напишіть асинхронну функцію `safeFetch(shouldFail)`, яка повертає `"success"`, якщо `shouldFail` дорівнює `false`, або повертає `"error"` у блоці `catch`, якщо виникає помилка.',
-      starterCode: 'async function safeFetch(shouldFail) {\n  try {\n    if (shouldFail) throw new Error("Failed");\n    return "success";\n  } catch {\n    // Ваш код тут\n  }\n}',
-      difficulty: TaskDifficulty.HARD,
-      testCases: {
-        create: [
-          { input: '[false]', expectedOutput: '"success"', isSecret: false },
-          { input: '[true]', expectedOutput: '"error"', isSecret: false },
-        ],
-      },
-    },
-  });
-
-  // ==================== MODULE 5: js-oop ====================
-  await prisma.task.create({
-    data: {
-      skillId: jsOop.id,
-      title: 'Клас Банківського Рахунку (BankAccount)',
-      description: 'Напишіть функцію `createAccount(initialBalance)`, яка повертає обʼєкт із методами `deposit(amount)`, `withdraw(amount)` та `getBalance()`.',
-      starterCode: 'function createAccount(initialBalance) {\n  let balance = initialBalance;\n  return {\n    deposit(amount) { balance += amount; },\n    withdraw(amount) { balance -= amount; },\n    getBalance() { return balance; }\n  };\n}',
-      difficulty: TaskDifficulty.HARD,
-      testCases: {
-        create: [
-          { input: '[100]', expectedOutput: '100', isSecret: false },
-          { input: '[0]', expectedOutput: '0', isSecret: false },
-        ],
-      },
-    },
-  });
-
-  await prisma.task.create({
-    data: {
-      skillId: jsOop.id,
-      title: 'Конструктор Користувача з форматуванням',
-      description: 'Напишіть функцію `formatUser(firstName, lastName)`, яка повертає обʼєкт з методом `getFullName()`, що повертає `"firstName lastName"`.',
-      starterCode: 'function formatUser(firstName, lastName) {\n  return {\n    getFullName() { return `${firstName} ${lastName}`; }\n  };\n}',
-      difficulty: TaskDifficulty.HARD,
-      testCases: {
-        create: [
-          { input: '["John", "Doe"]', expectedOutput: '"John Doe"', isSecret: false },
-          { input: '["Дмитро", "Стеценко"]', expectedOutput: '"Дмитро Стеценко"', isSecret: false },
-        ],
-      },
-    },
-  });
-
-  console.log('📝 Created 14 practical tasks across 5 Modules of Full JavaScript Course!');
-  console.log('✅ Full Course seeding completed successfully!');
+  console.log('✅ Multi-discipline seeding completed: 3 Courses (JS, English B2, Law), 11 Nodes, 12 Tasks!');
 }
 
 main()

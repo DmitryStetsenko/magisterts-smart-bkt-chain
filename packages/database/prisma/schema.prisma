@@ -28,9 +28,29 @@ enum SubmissionStatus {
   ERROR
 }
 
+enum TaskType {
+  CODE
+  SINGLE_CHOICE
+  MULTIPLE_CHOICE
+  TEXT_ESSAY
+}
+
 enum CredentialType {
   SBT_ERC5192
   DNFT_ERC721
+}
+
+model Course {
+  id          String      @id @default(uuid())
+  slug        String      @unique
+  title       String
+  description String
+  icon        String?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  skills      SkillNode[]
+
+  @@map("courses")
 }
 
 model User {
@@ -68,6 +88,8 @@ model UserProfile {
 
 model SkillNode {
   id                 String            @id @default(uuid())
+  courseId           String?
+  course             Course?           @relation(fields: [courseId], references: [id], onDelete: SetNull)
   slug               String            @unique
   title              String
   description        String
@@ -101,9 +123,11 @@ model Task {
   id                String             @id @default(uuid())
   skillId           String
   skill             SkillNode          @relation(fields: [skillId], references: [id], onDelete: Cascade)
+  taskType          TaskType           @default(CODE)
   title             String
   description       String
-  starterCode       String
+  starterCode       String?
+  options           Json?
   difficulty        TaskDifficulty     @default(EASY)
   timeLimitMs       Int                @default(5000)
   memoryLimitMb     Int                @default(128)

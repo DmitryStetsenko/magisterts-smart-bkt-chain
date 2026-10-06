@@ -75,35 +75,40 @@ export const StudentAnalyticsTable: React.FC<StudentAnalyticsTableProps> = ({
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-800/60 font-mono">
-            {students.map((student) => (
-              <tr key={student.studentId} className="hover:bg-slate-800/40 transition-colors">
-                <td className="p-3 font-sans">
-                  <div className="font-bold text-white">{student.name}</div>
-                  <div className="text-[11px] text-slate-400">{student.email}</div>
-                </td>
+            {students.map((student) => {
+              const studentId = student.id || student.studentId || student.email;
+              const wpmVal = student.wpm ?? student.avgWpm ?? 0;
+              const masteryMap = student.bktBySkill || student.skillMastery || {};
 
-                {/* Skill Mastery Heatmap Cells */}
-                {skillSlugs.map((slug) => {
-                  const p = student.skillMastery[slug] ?? 0;
-                  return (
-                    <td key={slug} className="p-3 text-center">
-                      <span
-                        className={`inline-block px-2.5 py-1 rounded-lg border text-xs font-bold ${getMasteryColor(
-                          p
-                        )}`}
-                      >
-                        {(p * 100).toFixed(0)}%
-                      </span>
-                    </td>
-                  );
-                })}
+              return (
+                <tr key={studentId} className="hover:bg-slate-800/40 transition-colors">
+                  <td className="p-3 font-sans">
+                    <div className="font-bold text-white">{student.name}</div>
+                    <div className="text-[11px] text-slate-400">{student.email}</div>
+                  </td>
 
-                <td className="p-3 text-center font-bold text-indigo-300">
-                  <div className="flex items-center justify-center gap-1">
-                    <Zap className="w-3.5 h-3.5 text-indigo-400" />
-                    <span>{student.avgWpm} WPM</span>
-                  </div>
-                </td>
+                  {/* Skill Mastery Heatmap Cells */}
+                  {skillSlugs.map((slug) => {
+                    const p = masteryMap[slug] ?? 0;
+                    return (
+                      <td key={slug} className="p-3 text-center">
+                        <span
+                          className={`inline-block px-2.5 py-1 rounded-lg border text-xs font-bold ${getMasteryColor(
+                            p
+                          )}`}
+                        >
+                          {(p * 100).toFixed(0)}%
+                        </span>
+                      </td>
+                    );
+                  })}
+
+                  <td className="p-3 text-center font-bold text-indigo-300">
+                    <div className="flex items-center justify-center gap-1">
+                      <Zap className="w-3.5 h-3.5 text-indigo-400" />
+                      <span>{wpmVal} WPM</span>
+                    </div>
+                  </td>
 
                 <td className="p-3 text-center font-bold">
                   <span
@@ -134,17 +139,18 @@ export const StudentAnalyticsTable: React.FC<StudentAnalyticsTableProps> = ({
 
                 <td className="p-3 text-right">
                   <button
-                    onClick={() => setConfirmTargetId(student.studentId)}
-                    disabled={resettingId === student.studentId}
+                    onClick={() => setConfirmTargetId(studentId)}
+                    disabled={resettingId === studentId}
                     className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 text-xs font-semibold border border-rose-500/20 transition-all cursor-pointer disabled:opacity-50"
                     title="Анулювати всі результати BKT та історію спроб"
                   >
-                    <RotateCcw className={`w-3.5 h-3.5 ${resettingId === student.studentId ? 'animate-spin' : ''}`} />
+                    <RotateCcw className={`w-3.5 h-3.5 ${resettingId === studentId ? 'animate-spin' : ''}`} />
                     <span>Анулювати</span>
                   </button>
                 </td>
               </tr>
-            ))}
+            );
+          })}
           </tbody>
         </table>
       </div>

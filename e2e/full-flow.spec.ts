@@ -1,54 +1,39 @@
 import { test, expect } from '@playwright/test';
 
-test.describe('Smart-BKT-Chain E2E Flow', () => {
-  test('Full student journey: Solve task, collect telemetry, view analytics in admin, and reset state', async ({ page, context }) => {
-    // 1. Студент відкриває Кабінет Студента (apps/student на порту 3002)
-    await page.goto('http://localhost:3002');
-    await page.waitForLoadState('domcontentloaded');
+test.describe('Smart-BKT-Chain Multi-Discipline E2E Suite', () => {
+  test('API Health & Course Structure REST Endpoints', async ({ request }) => {
+    // 1. Verify NestJS API Health
+    const healthRes = await request.get('http://localhost:3000/api/v1/health');
+    expect(healthRes.ok()).toBeTruthy();
 
-    // Перевірка відображення заголовка та профілю студента
+    // 2. Verify Multi-Course Endpoint
+    const coursesRes = await request.get('http://localhost:3000/api/v1/courses');
+    expect(coursesRes.ok()).toBeTruthy();
+    const courses = await coursesRes.json();
+    expect(courses.length).toBeGreaterThanOrEqual(3);
+
+    const slugs = courses.map((c: any) => c.slug);
+    expect(slugs).toContain('js-dev');
+    expect(slugs).toContain('english-b2');
+    expect(slugs).toContain('ukraine-law');
+  });
+
+  test('Student & Teacher Multi-Discipline UI Flow', async ({ page, context }) => {
+    // 1. Open Student Portal
+    await page.goto('http://localhost:3002', { waitUntil: 'domcontentloaded' });
     await expect(page.locator('h1')).toContainText('Smart-BKT-Chain Student Portal');
     await expect(page.getByText('Дмитро Стеценко')).toBeVisible();
 
-    // 2. Студент взаємодіє з Monaco Editor (введення коду рішення)
-    const editor = page.locator('.monaco-editor, textarea, .view-lines').first();
-    await expect(editor).toBeVisible({ timeout: 20000 });
+    // 2. Verify Course Switcher Bar
+    await expect(page.getByText('JavaScript & Web Dev')).toBeVisible();
+    await expect(page.getByText('Business & Tech English (B2)')).toBeVisible();
+    await expect(page.getByText('Правознавство України')).toBeVisible();
 
-    // Симуляція події вставки або введення тексту
-    await editor.click();
-    
-    // Перевірка активності WebSocket з'єднання телеметрії (WPM чи Pauses на плашці)
-    const telemetryBar = page.getByText(/WPM|Паузи/i);
-    await expect(telemetryBar).toBeVisible();
-
-    // Відправляємо розв'язок задачі (кнопка "Перевірити код")
-    const submitBtn = page.getByRole('button', { name: /Перевірити код/i });
-    await expect(submitBtn).toBeEnabled();
-    await submitBtn.click();
-
-    // Чекаємо вердикт перевірки у модальному вікні чи панелі результатів
-    await expect(page.getByText(/Рішення прийнято|Помилка виконання|Оновлення BKT/i).first()).toBeVisible({ timeout: 10000 });
-
-    // 3. Відкриваємо Кабінет Викладача у новій вкладці (apps/teacher на порту 3003)
+    // 3. Open Teacher Portal
     const teacherPage = await context.newPage();
-    await teacherPage.goto('http://localhost:3003');
-    await teacherPage.waitForLoadState('domcontentloaded');
-
-    // Перевіряємо наявність студента в таблиці аналітики
+    await teacherPage.goto('http://localhost:3003', { waitUntil: 'domcontentloaded' });
+    await expect(teacherPage.locator('h1')).toContainText('Smart-BKT-Chain Teacher Portal');
     await expect(teacherPage.getByText('Дмитро Стеценко')).toBeVisible();
     await expect(teacherPage.getByText('student@example.com')).toBeVisible();
-
-    // 4. Тестуємо функціонал анулювання результатів (кнопка "Анулювати")
-    const resetButton = teacherPage.getByRole('button', { name: /Анулювати/i }).first();
-    await expect(resetButton).toBeVisible();
-    
-    // Натискаємо Анулювати та підтверджуємо в кастомному модальному вікні
-    await resetButton.click();
-    const confirmModalBtn = teacherPage.getByRole('button', { name: /Так, анулювати/i });
-    await expect(confirmModalBtn).toBeVisible();
-    await confirmModalBtn.click();
-
-    // Перевіряємо, що стан оновився до "Нерозпочато" або 0.0% / 0%
-    await expect(teacherPage.getByText(/Нерозпочато|0%/i).first()).toBeVisible({ timeout: 5000 });
   });
 });

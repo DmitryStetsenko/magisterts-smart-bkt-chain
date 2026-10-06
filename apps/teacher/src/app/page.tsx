@@ -1,18 +1,25 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { ShieldCheck, Network, Users, BarChart3, ArrowLeft } from 'lucide-react';
+import { ShieldCheck, Network, Users, BarChart3, ArrowLeft, Code2, BookOpen, Scale } from 'lucide-react';
 import { StudentAnalyticsTable } from '../features/analytics/ui/StudentAnalyticsTable';
 import { StudentAnalyticsItem } from '../features/analytics/model/analytics.types';
 
+const COURSES = [
+  { slug: 'js-dev', title: 'JavaScript & Web Dev', icon: Code2, skillSlugs: ['js-basics', 'js-functions', 'js-collections', 'js-async', 'js-oop'] },
+  { slug: 'english-b2', title: 'Business English (B2)', icon: BookOpen, skillSlugs: ['eng-grammar', 'eng-vocab', 'eng-writing'] },
+  { slug: 'ukraine-law', title: 'Правознавство України', icon: Scale, skillSlugs: ['law-basics', 'law-constitutional', 'law-case-analysis'] },
+];
+
 export default function TeacherDashboardPage() {
+  const [activeCourseSlug, setActiveCourseSlug] = useState<string>('js-dev');
   const [students, setStudents] = useState<StudentAnalyticsItem[]>([]);
 
   const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
 
   const fetchStudentAnalytics = async () => {
     try {
-      const res = await fetch(`${API_URL}/api/v1/bkt/analytics/students`);
+      const res = await fetch(`${API_URL}/api/v1/bkt/analytics/students?courseSlug=${activeCourseSlug}`);
       if (res.ok) {
         const data = await res.json();
         if (Array.isArray(data)) {
@@ -26,16 +33,16 @@ export default function TeacherDashboardPage() {
 
   useEffect(() => {
     fetchStudentAnalytics();
-  }, []);
+  }, [activeCourseSlug]);
 
   const handleResetStudent = () => {
     fetchStudentAnalytics();
   };
 
-  const skillSlugs = ['js-basics', 'js-functions', 'js-collections', 'js-async', 'js-oop'];
+  const activeCourse = COURSES.find((c) => c.slug === activeCourseSlug) || COURSES[0];
 
   return (
-    <main className="min-h-screen p-6 max-w-7xl mx-auto flex flex-col gap-6">
+    <main className="min-h-screen p-6 max-w-7xl mx-auto flex flex-col gap-6 font-sans">
       {/* Header Bar */}
       <header className="flex flex-wrap items-center justify-between gap-4 p-6 bg-slate-900 border border-slate-800 rounded-2xl shadow-xl">
         <div className="flex items-center gap-3">
@@ -47,7 +54,7 @@ export default function TeacherDashboardPage() {
               <span>Smart-BKT-Chain Teacher Portal</span>
             </h1>
             <p className="text-sm text-slate-400">
-              Кабінет викладача: аналітика BKT студентів, жива телеметрія та Heatmap
+              Кабінет викладача: мультидисциплінарна аналітика BKT студентів, жива телеметрія та Heatmap
             </p>
           </div>
         </div>
@@ -74,13 +81,35 @@ export default function TeacherDashboardPage() {
         </div>
       </header>
 
+      {/* Course Switcher Filter */}
+      <div className="flex items-center gap-3 bg-slate-900/90 p-2 border border-slate-800 rounded-2xl overflow-x-auto shadow-lg">
+        {COURSES.map((course) => {
+          const Icon = course.icon;
+          const isActive = activeCourseSlug === course.slug;
+          return (
+            <button
+              key={course.slug}
+              onClick={() => setActiveCourseSlug(course.slug)}
+              className={`flex items-center gap-2.5 px-4 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
+                isActive
+                  ? 'bg-purple-600 text-white shadow-lg shadow-purple-950/60'
+                  : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+              }`}
+            >
+              <Icon className="w-4 h-4" />
+              <span>{course.title}</span>
+            </button>
+          );
+        })}
+      </div>
+
       {/* Metrics Row */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="p-6 bg-slate-900 border border-slate-800 rounded-2xl flex items-center gap-4">
           <Network className="w-8 h-8 text-indigo-400" />
           <div>
-            <span className="text-xs text-slate-400 font-semibold uppercase">Навчальні Модулі</span>
-            <h3 className="text-2xl font-bold text-white">{skillSlugs.length} Модулів (DAG)</h3>
+            <span className="text-xs text-slate-400 font-semibold uppercase">Навчальні Модулі Курсу</span>
+            <h3 className="text-2xl font-bold text-white">{activeCourse.skillSlugs.length} Модулів (DAG)</h3>
           </div>
         </div>
 
@@ -96,7 +125,11 @@ export default function TeacherDashboardPage() {
           <BarChart3 className="w-8 h-8 text-amber-400" />
           <div>
             <span className="text-xs text-slate-400 font-semibold uppercase">Середня Майстерність P(L)</span>
-            <h3 className="text-2xl font-bold text-white">77.9%</h3>
+            <h3 className="text-2xl font-bold text-white">
+              {students.length > 0 && students[0].averageMastery !== undefined
+                ? `${(students[0].averageMastery * 100).toFixed(1)}%`
+                : '0.0%'}
+            </h3>
           </div>
         </div>
       </div>
@@ -104,7 +137,7 @@ export default function TeacherDashboardPage() {
       {/* 📊 Student Analytics & BKT Heatmap */}
       <StudentAnalyticsTable
         students={students}
-        skillSlugs={skillSlugs}
+        skillSlugs={activeCourse.skillSlugs}
         onResetStudent={handleResetStudent}
       />
     </main>
