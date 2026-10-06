@@ -38,10 +38,10 @@ export function SkillDagMap({ nodes, activeSkillSlug, onSelectSkill }: SkillDagM
                 className={`flex-1 p-4 rounded-xl border transition-all duration-300 flex flex-col gap-2 relative ${
                   isLocked
                     ? 'bg-slate-950/40 border-slate-800/60 opacity-60 cursor-not-allowed'
+                    : isActive
+                    ? 'bg-indigo-950/40 border-indigo-500 shadow-lg shadow-indigo-950/50 ring-2 ring-indigo-500/50 cursor-pointer'
                     : isMastered
                     ? 'bg-emerald-950/30 border-emerald-500/50 shadow-lg shadow-emerald-950/40 cursor-pointer hover:border-emerald-400'
-                    : isActive
-                    ? 'bg-indigo-950/40 border-indigo-500 shadow-lg shadow-indigo-950/50 cursor-pointer'
                     : 'bg-slate-950/80 border-slate-800 hover:border-slate-700 cursor-pointer'
                 }`}
               >

@@ -86,18 +86,21 @@
             },
             {
               "type": "text",
-              "raw_text": "**Виправлення Помилки Виконання Коду з Оголошенням `const`/`let` у Node.js VM Runner:**",
+              "raw_text": "**Виправлення Синхронізації Активного Модуля та Резолвінгу Студента у BKT State:**",
               "subitems": []
             },
             {
               "type": "text",
-              "raw_text": "**Виявлення проблеми:** На скріншоті рішення `const power = (base, exp) => ...` падало з помилкою `0/2 тест-кейси пройдено`. Згідно з специфікацією JS VM `runInContext`, змінні `const` та `let` є block-scoped і не прив'язуються до об'єкта глобального контексту `this`, через що `Object.keys(this)` повертав `undefined`.",
+              "raw_text": "**Виявлення проблеми:** На UI показувався Модуль 1 як active/0.0% в графі, проте картка завдання завантажувала Модуль 2. Причина полягала в тому, що `GET /api/v1/bkt/state/demo-student` шукав literal-рядок `'demo-student'`, повертав порожній масив BKT стану, тому граф показував 0% для Модуля 1, тоді як `TaskSequencer` на бекенді вже отримував реальний BKT стан для `student.id` (де Модуль 1 було засвоєно) та пропонував завдання з Модуля 2.",
               "subitems": []
             },
             {
               "type": "text",
-              "raw_text": "**Рішення (`bkt.controller.ts`):** Додано нормалізацію верхньорівневих `const`/`let` у `var` перед запуском у VM sandbox та покращено сортування аргументів арності функції. Тепер розв'язки з `const power = ...` проходять тест-кейси на 100% (**2/2 passed**).",
-              "subitems": []
+              "raw_text": "**Рішення (`bkt.controller.ts`, `task.controller.ts`, `SkillDagMap.tsx`):**",
+              "subitems": [
+                "Реалізовано універсальний резолвінг ID студента у `getStudentBktState`, `getRecommendedTask` та `resetStudentState` (якщо за запитом `'demo-student'` або переданим ID не знайдено запис, автоматично вибирається актуальний UUID користувача з роллю `STUDENT`).",
+                "Оновлено пріоритет стилів у [SkillDagMap.tsx](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/student/src/features/skill-graph/ui/SkillDagMap.tsx): прапор `isActive` має найвищий пріоритет та додає акцентну рамку `ring-2 ring-indigo-500/50`."
+              ]
             },
             {
               "type": "text",

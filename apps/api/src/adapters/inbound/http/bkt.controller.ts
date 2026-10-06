@@ -263,8 +263,15 @@ export class BktController {
   @Get('state/:userId')
   @ApiOperation({ summary: 'Get current student BKT mastery state across all skills' })
   async getStudentBktState(@Param('userId') userId: string) {
+    let targetUserId = userId;
+    let user = await this.prisma.user.findUnique({ where: { id: targetUserId } });
+    if (!user) {
+      user = await this.prisma.user.findFirst({ where: { role: 'STUDENT' } });
+      if (user) targetUserId = user.id;
+    }
+
     const states = await this.prisma.bktState.findMany({
-      where: { userId },
+      where: { userId: targetUserId },
       include: { skill: true },
     });
     return states;
@@ -318,10 +325,11 @@ export class BktController {
   @ApiOperation({ summary: 'Reset student BKT state' })
   async resetStudentState(@Param('studentId') studentId?: string) {
     let targetUserId = studentId;
-    if (!targetUserId) {
-      const student = await this.prisma.user.findFirst({ where: { role: 'STUDENT' } });
-      if (!student) throw new NotFoundException('Student user not found');
-      targetUserId = student.id;
+    let user = targetUserId ? await this.prisma.user.findUnique({ where: { id: targetUserId } }) : null;
+    if (!user) {
+      user = await this.prisma.user.findFirst({ where: { role: 'STUDENT' } });
+      if (!user) throw new NotFoundException('Student user not found');
+      targetUserId = user.id;
     }
 
     await this.prisma.submission.deleteMany({ where: { userId: targetUserId } });
