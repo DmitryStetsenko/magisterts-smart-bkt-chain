@@ -148,7 +148,49 @@ async function main() {
     });
   }
 
-  // JS Tasks
+  // JS Tasks (Mixed Types: SINGLE_CHOICE, MULTIPLE_CHOICE, TEXT_ESSAY, CODE)
+  await prisma.task.create({
+    data: {
+      skillId: jsBasics.id,
+      taskType: TaskType.SINGLE_CHOICE,
+      title: 'Теорія JS: Оголошення змінних `const`',
+      description: 'Що відбудеться при спробі повторного присвоєння значення змінній, оголошеній через `const x = 10`?',
+      difficulty: TaskDifficulty.EASY,
+      options: [
+        { id: 'opt1', text: 'Значення успішно зміниться', isCorrect: false },
+        { id: 'opt2', text: 'Виникне помилка TypeError: Assignment to constant variable', isCorrect: true },
+        { id: 'opt3', text: 'Змінна стане undefined', isCorrect: false },
+      ],
+    },
+  });
+
+  await prisma.task.create({
+    data: {
+      skillId: jsBasics.id,
+      taskType: TaskType.MULTIPLE_CHOICE,
+      title: 'Теорія JS: Примітивні типи даних',
+      description: 'Оберіть УСІ примітивні типи даних у мові JavaScript:',
+      difficulty: TaskDifficulty.EASY,
+      options: [
+        { id: 'opt1', text: 'number', isCorrect: true },
+        { id: 'opt2', text: 'string', isCorrect: true },
+        { id: 'opt3', text: 'boolean', isCorrect: true },
+        { id: 'opt4', text: 'Array', isCorrect: false },
+        { id: 'opt5', text: 'symbol', isCorrect: true },
+      ],
+    },
+  });
+
+  await prisma.task.create({
+    data: {
+      skillId: jsBasics.id,
+      taskType: TaskType.TEXT_ESSAY,
+      title: 'Аналіз концепції: Event Loop та асинхронність',
+      description: 'Поясніть своїми словами принцип роботи Event Loop та різницю між Microtasks (Promises) і Macrotasks (setTimeout) у JavaScript.',
+      difficulty: TaskDifficulty.MEDIUM,
+    },
+  });
+
   await prisma.task.create({
     data: {
       skillId: jsBasics.id,
