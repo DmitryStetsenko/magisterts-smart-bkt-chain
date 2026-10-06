@@ -1179,7 +1179,90 @@
               "content": "sequenceDiagram\n    autonumber\n    actor Student as Студент (apps/student)\n    participant API as NestJS REST API\n    participant Queue as Redis (BullMQ Queue)\n    participant Worker as Evaluation Processor\n    participant Gemini as Google Gemini API\n    participant WS as WebSocket Gateway\n    participant DB as PostgreSQL (Prisma)\n\n    Student->>API: POST /api/v1/bkt/evaluate (SourceCode, TaskId)\n    API->>DB: Створення Submission (Status: IN_PROGRESS)\n    API->>Queue: Push Job (submissionId, code, tests)\n    API-->>Student: 202 Accepted (jobId, status: IN_PROGRESS)\n    \n    Queue->>Worker: Pop Job\n    Worker->>Worker: 1. VM Test Execution (Pass/Fail)\n    Worker->>Gemini: 2. Semantic Analysis (prompt: code + task)\n    Gemini-->>Worker: JSON (qualityScore, hint, refactoringTip)\n    Worker->>Worker: 3. Calculate C_trust from Telemetry\n    Worker->>Worker: 4. BKT Update P(L_t) with adjusted P(S)/P(G)\n    Worker->>DB: Save EvaluationResult, BktState, Submission Status\n    Worker->>WS: Emit 'evaluation_completed' (jobId, P(L_t), feedback)\n    WS-->>Student: Live Toast / UI Update"
             }
           ],
-          "items": []
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "---",
+              "subitems": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "🏛️ Крок 8: Розділення відповідальностей порталів та міграція Skill DAG Editor в Адмін-панель (`apps/admin`)",
+      "level": 2,
+      "paragraphs": [],
+      "code_blocks": [],
+      "items": [],
+      "subsections": [
+        {
+          "title": "8.1 Архітектурне розмежування ролей",
+          "level": 3,
+          "paragraphs": [
+            "У рамках рефакторингу ролей користувачів виконано розмежування функцій між додатками:"
+          ],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "**`apps/admin` (Системне управління & CMS):**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Управління структурою курсу та графа знань Skill DAG (додавання, редагування назв, опису, складності та параметрів $P(L_0), P(T), P(S), P(G)$).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Модулі задач, відкритих та прихованих тест-кейси, конфігурація Web3 релейєра.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**`apps/teacher` (Аналітика & Педагогічний контроль):**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Візуалізація живого BKT Heatmap усіх студентів.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Телеметричні метрики (WPM, Copy-Paste ratio, Fatigue Index, Keystroke Pauses).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Швидке анулювання стану $P(L_0) = 0.0$ для проведения повторного зрізу знань.",
+              "subitems": []
+            }
+          ]
+        },
+        {
+          "title": "8.2 Зміни у файловій структурі",
+          "level": 3,
+          "paragraphs": [],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "Модуль `features/skill-editor` перенесено з `apps/teacher/src/features/skill-editor` у [apps/admin/src/features/skill-editor](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/admin/src/features/skill-editor).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Компонент [SkillDagEditor.tsx](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/admin/src/features/skill-editor/ui/SkillDagEditor.tsx) інтегровано у головну сторінку [apps/admin/src/app/page.tsx](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/admin/src/app/page.tsx) у вкладці «Skill DAG Builder».",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Оновлено [apps/teacher/src/app/page.tsx](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/teacher/src/app/page.tsx) з повним фокусом на студентську аналітику та BKT Heatmap.",
+              "subitems": []
+            }
+          ]
         }
       ]
     }

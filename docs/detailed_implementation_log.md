@@ -300,10 +300,21 @@ sequenceDiagram
     WS-->>Student: Live Toast / UI Update
 ```
 
+---
 
+## 🏛️ Крок 8: Розділення відповідальностей порталів та міграція Skill DAG Editor в Адмін-панель (`apps/admin`)
 
+### 8.1 Архітектурне розмежування ролей
+У рамках рефакторингу ролей користувачів виконано розмежування функцій між додатками:
+1. **`apps/admin` (Системне управління & CMS):**
+   - Управління структурою курсу та графа знань Skill DAG (додавання, редагування назв, опису, складності та параметрів $P(L_0), P(T), P(S), P(G)$).
+   - Модулі задач, відкритих та прихованих тест-кейси, конфігурація Web3 релейєра.
+2. **`apps/teacher` (Аналітика & Педагогічний контроль):**
+   - Візуалізація живого BKT Heatmap усіх студентів.
+   - Телеметричні метрики (WPM, Copy-Paste ratio, Fatigue Index, Keystroke Pauses).
+   - Швидке анулювання стану $P(L_0) = 0.0$ для проведения повторного зрізу знань.
 
-
-
-
-
+### 8.2 Зміни у файловій структурі
+- Модуль `features/skill-editor` перенесено з `apps/teacher/src/features/skill-editor` у [apps/admin/src/features/skill-editor](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/admin/src/features/skill-editor).
+- Компонент [SkillDagEditor.tsx](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/admin/src/features/skill-editor/ui/SkillDagEditor.tsx) інтегровано у головну сторінку [apps/admin/src/app/page.tsx](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/admin/src/app/page.tsx) у вкладці «Skill DAG Builder».
+- Оновлено [apps/teacher/src/app/page.tsx](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/teacher/src/app/page.tsx) з повним фокусом на студентську аналітику та BKT Heatmap.

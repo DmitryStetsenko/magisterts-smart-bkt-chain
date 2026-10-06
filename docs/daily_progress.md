@@ -2,6 +2,17 @@
 
 Цей документ фіксує щоденний прогрес розробки, архітектурні рішення та планування наступних кроків для системи «Smart-BKT-Chain».
 
+## 📅 06 жовтня 2026 року
+
+### ✅ Що зроблено за день:
+1. **Перенесення Конструктора Графа Навичок (Skill DAG Editor) в Адмін-панель (`apps/admin`):**
+   - Перенесено модуль `skill-editor` із `apps/teacher` у `apps/admin/src/features/skill-editor`.
+   - Інтегровано інтерактивний [SkillDagEditor.tsx](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/admin/src/features/skill-editor/ui/SkillDagEditor.tsx) у вкладку «Skill DAG Builder» системи `apps/admin`.
+   - Очищено `apps/teacher`: тепер Кабінет Викладача повністю сфокусовано на аналітиці студентів, телеметрії, BKT Heatmap та скиданні результатів.
+   - Оновлено навігацію та посилання між додаткам. Упішно пройшли статичні збірки `build:teacher` та `build:admin`.
+
+---
+
 ## 📅 05 жовтня 2026 року
 
 ### ✅ Що зроблено за день:

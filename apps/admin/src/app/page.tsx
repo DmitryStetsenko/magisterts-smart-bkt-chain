@@ -1,10 +1,94 @@
 'use client';
 
 import React, { useState } from 'react';
-import { ShieldCheck, Network, Layers, Settings, BookOpen, Plus, Database, ArrowRight } from 'lucide-react';
+import { ShieldCheck, Network, Settings, BookOpen, Database, ArrowRight } from 'lucide-react';
+import { SkillDagEditor } from '../features/skill-editor/ui/SkillDagEditor';
+import { AdminSkillNode } from '../features/skill-editor/model/skill-editor.types';
 
 export default function AdminCMSDashboard() {
   const [activeTab, setActiveTab] = useState<'dag' | 'courses' | 'system'>('dag');
+
+  const [nodes, setNodes] = useState<AdminSkillNode[]>([
+    {
+      id: '1',
+      slug: 'js-basics',
+      title: 'Модуль 1: Синтаксис & База',
+      description: 'Базові типи даних, змінні let/const та цикли',
+      category: 'Core Fundamentals',
+      difficulty: 'EASY',
+      parentSkillIds: [],
+      pInit: 0.5,
+      pTransit: 0.2,
+      pSlip: 0.1,
+      pGuess: 0.2,
+    },
+    {
+      id: '2',
+      slug: 'js-functions',
+      title: 'Модуль 2: Функції & Closures',
+      description: 'Arrow functions, замикання та rest/spread',
+      category: 'Core Fundamentals',
+      difficulty: 'EASY',
+      parentSkillIds: ['js-basics'],
+      pInit: 0.4,
+      pTransit: 0.2,
+      pSlip: 0.1,
+      pGuess: 0.2,
+    },
+    {
+      id: '3',
+      slug: 'js-collections',
+      title: 'Модуль 3: Масиви & Обʼєкти',
+      description: 'Методи map, filter, reduce та обхід обʼєктів',
+      category: 'Data Structures',
+      difficulty: 'MEDIUM',
+      parentSkillIds: ['js-functions'],
+      pInit: 0.3,
+      pTransit: 0.2,
+      pSlip: 0.1,
+      pGuess: 0.2,
+    },
+    {
+      id: '4',
+      slug: 'js-async',
+      title: 'Модуль 4: Асинхронність',
+      description: 'Promises, async/await та обробка помилок',
+      category: 'Advanced JS',
+      difficulty: 'HARD',
+      parentSkillIds: ['js-collections'],
+      pInit: 0.2,
+      pTransit: 0.2,
+      pSlip: 0.1,
+      pGuess: 0.2,
+    },
+    {
+      id: '5',
+      slug: 'js-oop',
+      title: 'Модуль 5: ООП & Прототипи',
+      description: 'Класи ES6, extends та прототипи',
+      category: 'Object Oriented',
+      difficulty: 'HARD',
+      parentSkillIds: ['js-async'],
+      pInit: 0.1,
+      pTransit: 0.2,
+      pSlip: 0.1,
+      pGuess: 0.2,
+    },
+  ]);
+
+  const handleSaveNode = (updatedNode: AdminSkillNode) => {
+    setNodes((prev) => {
+      const exists = prev.some((n) => n.id === updatedNode.id);
+      if (exists) {
+        return prev.map((n) => (n.id === updatedNode.id ? updatedNode : n));
+      }
+      return [...prev, updatedNode];
+    });
+  };
+
+  const handleDeleteNode = (nodeId: string) => {
+    setNodes((prev) => prev.filter((n) => n.id !== nodeId));
+  };
 
   return (
     <main className="min-h-screen p-6 max-w-7xl mx-auto flex flex-col gap-6 text-slate-100 font-sans">
@@ -19,7 +103,7 @@ export default function AdminCMSDashboard() {
               <span>Smart-BKT-Chain System Admin & CMS</span>
             </h1>
             <p className="text-sm text-slate-400">
-              Адміністративна панель: управління курсами, задачником, DAG-графом та Web3 релейєром
+              Адміністративна панель: управління вузлами графа знань (Skill DAG), курсами та Web3 релейєром
             </p>
           </div>
         </div>
@@ -79,36 +163,22 @@ export default function AdminCMSDashboard() {
       {/* Main CMS Body Panel */}
       <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl min-h-[400px]">
         {activeTab === 'dag' && (
-          <div className="flex flex-col gap-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                  <Network className="w-5 h-5 text-indigo-400" />
-                  <span>Конструктор Графа Навичок (Skill DAG Editor)</span>
-                </h3>
-                <p className="text-xs text-slate-400 mt-1">
-                  Налаштування початкових BKT-параметрів ($P(L_0), P(T), P(S), P(G)$) та топологічних залежностей
-                </p>
-              </div>
-
-              <button className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold shadow-lg transition-all cursor-pointer">
-                <Plus className="w-4 h-4" />
-                <span>Створити Новий Вузол</span>
-              </button>
+          <div className="flex flex-col gap-6">
+            <div>
+              <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                <Network className="w-5 h-5 text-indigo-400" />
+                <span>Конструктор Графа Навичок (Skill DAG Editor)</span>
+              </h3>
+              <p className="text-xs text-slate-400 mt-1">
+                Налаштування початкових BKT-параметрів ($P(L_0), P(T), P(S), P(G)$) та додавання/редагування/видалення вузлів графа
+              </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
-              {['js-basics', 'js-functions', 'js-collections', 'js-async', 'js-oop'].map((slug, idx) => (
-                <div key={slug} className="p-4 bg-slate-950/70 border border-slate-800 rounded-xl flex flex-col gap-2">
-                  <span className="text-[10px] uppercase font-mono text-indigo-400 font-bold">Модуль {idx + 1}</span>
-                  <h4 className="text-sm font-bold text-white">{slug}</h4>
-                  <div className="flex items-center justify-between text-xs text-slate-400 font-mono mt-2">
-                    <span>Prior P(L0): 0.5</span>
-                    <span>Transit P(T): 0.2</span>
-                  </div>
-                </div>
-              ))}
-            </div>
+            <SkillDagEditor
+              nodes={nodes}
+              onSaveNode={handleSaveNode}
+              onDeleteNode={handleDeleteNode}
+            />
           </div>
         )}
 

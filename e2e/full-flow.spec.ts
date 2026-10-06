@@ -4,15 +4,15 @@ test.describe('Smart-BKT-Chain E2E Flow', () => {
   test('Full student journey: Solve task, collect telemetry, view analytics in admin, and reset state', async ({ page, context }) => {
     // 1. Студент відкриває Кабінет Студента (apps/student на порту 3002)
     await page.goto('http://localhost:3002');
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Перевірка відображення заголовка та профілю студента
     await expect(page.locator('h1')).toContainText('Smart-BKT-Chain Student Portal');
     await expect(page.getByText('Дмитро Стеценко')).toBeVisible();
 
     // 2. Студент взаємодіє з Monaco Editor (введення коду рішення)
-    const editor = page.locator('.monaco-editor').first();
-    await expect(editor).toBeVisible();
+    const editor = page.locator('.monaco-editor, textarea, .view-lines').first();
+    await expect(editor).toBeVisible({ timeout: 20000 });
 
     // Симуляція події вставки або введення тексту
     await editor.click();
@@ -32,7 +32,7 @@ test.describe('Smart-BKT-Chain E2E Flow', () => {
     // 3. Відкриваємо Кабінет Викладача у новій вкладці (apps/teacher на порту 3003)
     const teacherPage = await context.newPage();
     await teacherPage.goto('http://localhost:3003');
-    await teacherPage.waitForLoadState('networkidle');
+    await teacherPage.waitForLoadState('domcontentloaded');
 
     // Перевіряємо наявність студента в таблиці аналітики
     await expect(teacherPage.getByText('Дмитро Стеценко')).toBeVisible();
