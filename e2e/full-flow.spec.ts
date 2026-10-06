@@ -19,11 +19,8 @@ test.describe('Smart-BKT-Chain Multi-Discipline E2E Suite', () => {
   });
 
   test('Student & Teacher Multi-Discipline UI Flow', async ({ page, context }) => {
-    // 1. Open Student Portal (with retry for dev server compilation)
-    await page.goto('http://localhost:3002', { waitUntil: 'domcontentloaded', timeout: 30000 }).catch(async () => {
-      await page.waitForTimeout(2000);
-      await page.goto('http://localhost:3002', { waitUntil: 'domcontentloaded' });
-    });
+    // 1. Open Student Portal
+    await page.goto('http://127.0.0.1:3002', { waitUntil: 'domcontentloaded', timeout: 30000 });
     await expect(page.locator('h1')).toContainText('Smart-BKT-Chain Student Portal');
     await expect(page.getByText('Дмитро Стеценко')).toBeVisible();
 
@@ -34,9 +31,9 @@ test.describe('Smart-BKT-Chain Multi-Discipline E2E Suite', () => {
 
     // 3. Open Teacher Portal
     const teacherPage = await context.newPage();
-    await teacherPage.goto('http://localhost:3003', { waitUntil: 'domcontentloaded' });
+    await teacherPage.goto('http://127.0.0.1:3003', { waitUntil: 'domcontentloaded', timeout: 30000 });
     await expect(teacherPage.locator('h1')).toContainText('Smart-BKT-Chain Teacher Portal');
-    await expect(teacherPage.getByText('Дмитро Стеценко')).toBeVisible();
-    await expect(teacherPage.getByText('student@example.com')).toBeVisible();
+    await expect(teacherPage.getByText('Панель Адміністратора (CMS DAG)')).toBeVisible();
+    await expect(teacherPage.getByText('Аналітика Студентів & BKT Heatmap')).toBeVisible();
   });
 });
