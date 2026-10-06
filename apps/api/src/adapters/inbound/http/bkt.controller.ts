@@ -184,6 +184,18 @@ export class BktController {
       },
     });
 
+    // Check if task was already accepted before this submission
+    const previousAcceptedCount = await this.prisma.submission.count({
+      where: {
+        userId: user.id,
+        taskId: task.id,
+        status: SubmissionStatus.ACCEPTED,
+        id: { not: submission.id },
+      },
+    });
+
+    const isAlreadyPassedBefore = previousAcceptedCount > 0;
+
     // Update BKT Knowledge State
     let bktState = await this.prisma.bktState.findUnique({
       where: {
@@ -207,40 +219,52 @@ export class BktController {
       });
     }
 
-    const effectivePGuess = customPGuess || bktState.pGuess;
+    let updatedState = bktState;
+    let bktResult: any = {
+      pMasteryPosterior: bktState.pMastery,
+      isMastered: BktEngine.isMastered(bktState.pMastery),
+    };
 
-    const bktResult = BktEngine.calculateNextState(
-      {
-        pMastery: bktState.pMastery,
-        pTransit: bktState.pTransit,
-        pSlip: bktState.pSlip,
-        pGuess: effectivePGuess,
-      },
-      isPassed,
-    );
+    if (isPassed && isAlreadyPassedBefore) {
+      feedback += ' ℹ️ (Завдання вже було зараховано раніше. BKT рівень збережено)';
+    } else {
+      const effectivePGuess = customPGuess || bktState.pGuess;
 
-    const isMastered = BktEngine.isMastered(bktResult.pMasteryPosterior);
+      const calcResult = BktEngine.calculateNextState(
+        {
+          pMastery: bktState.pMastery,
+          pTransit: bktState.pTransit,
+          pSlip: bktState.pSlip,
+          pGuess: effectivePGuess,
+        },
+        isPassed,
+      );
 
-    const updatedState = await this.prisma.bktState.update({
-      where: { id: bktState.id },
-      data: {
-        pMastery: bktResult.pMasteryPosterior,
-        attemptsCount: bktState.attemptsCount + 1,
-        isMastered,
-        masteredAt: isMastered ? new Date() : null,
-      },
-    });
+      const isMastered = BktEngine.isMastered(calcResult.pMasteryPosterior);
 
-    // Save BKT History entry
-    await this.prisma.bktHistory.create({
-      data: {
-        userId: user.id,
-        skillId: task.skillId,
-        pMasteryBefore: bktState.pMastery,
-        pMasteryAfter: bktResult.pMasteryPosterior,
-        isCorrect: isPassed,
-      },
-    });
+      updatedState = await this.prisma.bktState.update({
+        where: { id: bktState.id },
+        data: {
+          pMastery: calcResult.pMasteryPosterior,
+          attemptsCount: bktState.attemptsCount + 1,
+          isMastered,
+          masteredAt: isMastered ? new Date() : null,
+        },
+      });
+
+      bktResult = calcResult;
+
+      // Save BKT History entry
+      await this.prisma.bktHistory.create({
+        data: {
+          userId: user.id,
+          skillId: task.skillId,
+          pMasteryBefore: bktState.pMastery,
+          pMasteryAfter: calcResult.pMasteryPosterior,
+          isCorrect: isPassed,
+        },
+      });
+    }
 
     return {
       submissionId: submission.id,

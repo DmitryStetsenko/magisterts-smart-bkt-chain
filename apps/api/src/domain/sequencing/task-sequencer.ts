@@ -61,33 +61,54 @@ export class TaskSequencer {
     const currentActiveSkill = unlockedSkills.find((skill) => {
       const mastery = studentStates[skill.id] ?? 0;
       return !BktEngine.isMastered(mastery);
-    });
+    }) || unlockedSkills[unlockedSkills.length - 1] || skills[0];
 
-    if (currentActiveSkill) {
-      // Find tasks for current active skill
-      const skillTasks = tasks.filter((t) => t.skillId === currentActiveSkill.id);
-      const uncompletedTask = skillTasks.find((t) => !completedSet.has(t.id));
-      const targetTask = uncompletedTask || skillTasks[0] || tasks.find((t) => !completedSet.has(t.id)) || tasks[0];
+    // Try finding an uncompleted task in the current active skill
+    const activeSkillTasks = tasks.filter((t) => t.skillId === currentActiveSkill.id);
+    const uncompletedInActive = activeSkillTasks.find((t) => !completedSet.has(t.id));
 
+    if (uncompletedInActive) {
       return {
         recommendedSkill: currentActiveSkill,
-        recommendedTask: targetTask,
-        reason: uncompletedTask ? 'PRACTICE_CURRENT_SKILL' : 'REVIEW_COMPLETED',
+        recommendedTask: uncompletedInActive,
+        reason: 'PRACTICE_CURRENT_SKILL',
         currentMastery: studentStates[currentActiveSkill.id] ?? 0,
       };
     }
 
-    // 3. If all unlocked skills are mastered, pick the next unlocked skill in DAG order
-    const nextMasteredSkill = unlockedSkills[unlockedSkills.length - 1] || skills[0];
-    const skillTasks = tasks.filter((t) => t.skillId === nextMasteredSkill.id);
-    const uncompletedTask = skillTasks.find((t) => !completedSet.has(t.id));
-    const targetTask = uncompletedTask || skillTasks[0] || tasks.find((t) => !completedSet.has(t.id)) || tasks[0];
+    // If all tasks in currentActiveSkill are completed, search across all unlocked skills for any uncompleted task
+    for (const unlockedSkill of unlockedSkills) {
+      const sTasks = tasks.filter((t) => t.skillId === unlockedSkill.id);
+      const uncompleted = sTasks.find((t) => !completedSet.has(t.id));
+      if (uncompleted) {
+        return {
+          recommendedSkill: unlockedSkill,
+          recommendedTask: uncompleted,
+          reason: 'ADVANCE_NEXT_SKILL',
+          currentMastery: studentStates[unlockedSkill.id] ?? 0,
+        };
+      }
+    }
 
+    // Search across ALL skills in course for any uncompleted task
+    const anyUncompleted = tasks.find((t) => !completedSet.has(t.id));
+    if (anyUncompleted) {
+      const targetSkill = skills.find((s) => s.id === anyUncompleted.skillId) || currentActiveSkill;
+      return {
+        recommendedSkill: targetSkill,
+        recommendedTask: anyUncompleted,
+        reason: 'ADVANCE_NEXT_SKILL',
+        currentMastery: studentStates[targetSkill.id] ?? 0,
+      };
+    }
+
+    // Fallback: All tasks in the course are completed
+    const fallbackTask = activeSkillTasks[0] || tasks[0];
     return {
-      recommendedSkill: nextMasteredSkill,
-      recommendedTask: targetTask,
-      reason: 'ADVANCE_NEXT_SKILL',
-      currentMastery: studentStates[nextMasteredSkill.id] ?? 0,
+      recommendedSkill: currentActiveSkill,
+      recommendedTask: fallbackTask,
+      reason: 'REVIEW_COMPLETED',
+      currentMastery: studentStates[currentActiveSkill.id] ?? 0,
     };
   }
 }
