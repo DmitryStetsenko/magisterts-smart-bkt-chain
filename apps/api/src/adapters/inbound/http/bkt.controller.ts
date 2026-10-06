@@ -113,12 +113,30 @@ export class BktController {
               Promise,
               console,
             };
+            const normalizedCode = (dto.code || '')
+              .replace(/^const\s+/gm, 'var ')
+              .replace(/^let\s+/gm, 'var ');
+
             const scriptCode = `
-              ${dto.code || ''}
+              ${normalizedCode}
               const rawInput = ${testCase.input};
-              const fnName = Object.keys(this).find(k => typeof this[k] === 'function' && k !== 'eval' && k !== 'setTimeout' && k !== 'clearTimeout');
-              const fn = eval(fnName);
-              const args = Array.isArray(rawInput) ? rawInput : [rawInput];
+              const fnName = Object.keys(this).find(k => typeof this[k] === 'function' && !['eval', 'setTimeout', 'clearTimeout', 'Promise', 'console'].includes(k));
+              if (!fnName) {
+                throw new Error("Функція не знайдена. Визначте функцію у рішення.");
+              }
+              const fn = this[fnName];
+              let args;
+              if (Array.isArray(rawInput)) {
+                if (fn.length === 1 && rawInput.length > 0 && Array.isArray(rawInput[0])) {
+                  args = rawInput;
+                } else if (fn.length === 1 && rawInput.length > 1) {
+                  args = [rawInput];
+                } else {
+                  args = rawInput;
+                }
+              } else {
+                args = [rawInput];
+              }
               result = fn.apply(null, args);
             `;
 
