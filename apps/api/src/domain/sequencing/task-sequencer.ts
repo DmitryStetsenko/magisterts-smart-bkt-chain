@@ -22,8 +22,9 @@ export interface StudentSkillState {
 export interface SequencingRecommendation {
   recommendedSkill: SkillNodeDomain;
   recommendedTask: TaskDomain;
-  reason: 'PRACTICE_CURRENT_SKILL' | 'ADVANCE_NEXT_SKILL' | 'REVIEW_COMPLETED';
+  reason: 'PRACTICE_CURRENT_SKILL' | 'ADVANCE_NEXT_SKILL' | 'REVIEW_COMPLETED' | 'MODULE_TASKS_EXHAUSTED';
   currentMastery: number;
+  isExhausted?: boolean;
 }
 
 export class TaskSequencer {
@@ -61,22 +62,35 @@ export class TaskSequencer {
     const currentActiveSkill = unlockedSkills.find((skill) => {
       const mastery = studentStates[skill.id] ?? 0;
       return !BktEngine.isMastered(mastery);
-    }) || unlockedSkills[unlockedSkills.length - 1] || skills[0];
+    });
 
-    // Try finding an uncompleted task in the current active skill
-    const activeSkillTasks = tasks.filter((t) => t.skillId === currentActiveSkill.id);
-    const uncompletedInActive = activeSkillTasks.find((t) => !completedSet.has(t.id));
+    if (currentActiveSkill) {
+      const activeSkillTasks = tasks.filter((t) => t.skillId === currentActiveSkill.id);
+      if (activeSkillTasks.length > 0) {
+        const uncompletedInActive = activeSkillTasks.find((t) => !completedSet.has(t.id));
 
-    if (uncompletedInActive) {
-      return {
-        recommendedSkill: currentActiveSkill,
-        recommendedTask: uncompletedInActive,
-        reason: 'PRACTICE_CURRENT_SKILL',
-        currentMastery: studentStates[currentActiveSkill.id] ?? 0,
-      };
+        if (!uncompletedInActive) {
+          // All tasks in active module completed, but mastery is still < 0.95
+          return {
+            recommendedSkill: currentActiveSkill,
+            recommendedTask: activeSkillTasks[0],
+            reason: 'MODULE_TASKS_EXHAUSTED',
+            currentMastery: studentStates[currentActiveSkill.id] ?? 0,
+            isExhausted: true,
+          };
+        }
+
+        return {
+          recommendedSkill: currentActiveSkill,
+          recommendedTask: uncompletedInActive,
+          reason: 'PRACTICE_CURRENT_SKILL',
+          currentMastery: studentStates[currentActiveSkill.id] ?? 0,
+          isExhausted: false,
+        };
+      }
     }
 
-    // If all tasks in currentActiveSkill are completed, search across all unlocked skills for any uncompleted task
+    // 3. Fallback: If all unlocked skills are mastered, check if any remaining unlocked skills have uncompleted tasks
     for (const unlockedSkill of unlockedSkills) {
       const sTasks = tasks.filter((t) => t.skillId === unlockedSkill.id);
       const uncompleted = sTasks.find((t) => !completedSet.has(t.id));
@@ -84,31 +98,22 @@ export class TaskSequencer {
         return {
           recommendedSkill: unlockedSkill,
           recommendedTask: uncompleted,
-          reason: 'ADVANCE_NEXT_SKILL',
+          reason: 'PRACTICE_CURRENT_SKILL',
           currentMastery: studentStates[unlockedSkill.id] ?? 0,
         };
       }
     }
 
-    // Search across ALL skills in course for any uncompleted task
-    const anyUncompleted = tasks.find((t) => !completedSet.has(t.id));
-    if (anyUncompleted) {
-      const targetSkill = skills.find((s) => s.id === anyUncompleted.skillId) || currentActiveSkill;
-      return {
-        recommendedSkill: targetSkill,
-        recommendedTask: anyUncompleted,
-        reason: 'ADVANCE_NEXT_SKILL',
-        currentMastery: studentStates[targetSkill.id] ?? 0,
-      };
-    }
+    // 4. Ultimate Fallback: All unlocked skills are mastered. Review completed tasks from unlocked skills.
+    const lastUnlocked = unlockedSkills[unlockedSkills.length - 1] || skills[0];
+    const lastSkillTasks = tasks.filter((t) => t.skillId === lastUnlocked.id);
+    const fallbackTask = lastSkillTasks[0] || tasks[0];
 
-    // Fallback: All tasks in the course are completed
-    const fallbackTask = activeSkillTasks[0] || tasks[0];
     return {
-      recommendedSkill: currentActiveSkill,
+      recommendedSkill: lastUnlocked,
       recommendedTask: fallbackTask,
       reason: 'REVIEW_COMPLETED',
-      currentMastery: studentStates[currentActiveSkill.id] ?? 0,
+      currentMastery: studentStates[lastUnlocked.id] ?? 0,
     };
   }
 }

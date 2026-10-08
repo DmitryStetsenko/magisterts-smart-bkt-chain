@@ -2,7 +2,7 @@
 
 import React, { useRef } from 'react';
 import Editor, { OnMount } from '@monaco-editor/react';
-import { Activity, Zap, Trash2, Clipboard, Play } from 'lucide-react';
+import { Activity, Zap, Trash2, Clipboard, Play, ArrowRight } from 'lucide-react';
 import { useTelemetry } from '../lib/useTelemetry';
 
 interface MonacoCodeEditorProps {
@@ -12,6 +12,8 @@ interface MonacoCodeEditorProps {
   onChange: (value: string) => void;
   onSubmit: () => void;
   isSubmitting?: boolean;
+  onNextTask?: () => void;
+  isPassed?: boolean;
 }
 
 export function MonacoCodeEditor({
@@ -21,6 +23,8 @@ export function MonacoCodeEditor({
   onChange,
   onSubmit,
   isSubmitting = false,
+  onNextTask,
+  isPassed = false,
 }: MonacoCodeEditorProps) {
   const { metrics, handleKeyDown, handleDelete, handlePaste } = useTelemetry(userId, taskId);
   const editorRef = useRef<any>(null);
@@ -87,14 +91,29 @@ export function MonacoCodeEditor({
           </div>
         </div>
 
-        <button
-          onClick={onSubmit}
-          disabled={isSubmitting}
-          className="inline-flex items-center gap-2 px-4 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white text-xs font-semibold shadow-lg shadow-emerald-900/30 transition-all cursor-pointer"
-        >
-          <Play className="w-3.5 h-3.5 fill-current" />
-          <span>{isSubmitting ? 'Оцінювання...' : 'Перевірити код'}</span>
-        </button>
+        <div className="flex items-center gap-2.5">
+          <button
+            onClick={onNextTask}
+            disabled={!isPassed}
+            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+              isPassed
+                ? 'bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-500 hover:to-teal-400 text-white shadow-md shadow-emerald-900/40 cursor-pointer border border-emerald-400/30'
+                : 'bg-slate-950 text-slate-600 border border-slate-800/80 cursor-not-allowed opacity-50'
+            }`}
+          >
+            <span>Наступне завдання</span>
+            <ArrowRight className="w-3.5 h-3.5" />
+          </button>
+
+          <button
+            onClick={onSubmit}
+            disabled={isSubmitting}
+            className="inline-flex items-center gap-2 px-4 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white text-xs font-semibold shadow-lg shadow-emerald-900/30 transition-all cursor-pointer"
+          >
+            <Play className="w-3.5 h-3.5 fill-current" />
+            <span>{isSubmitting ? 'Оцінювання...' : 'Перевірити код'}</span>
+          </button>
+        </div>
       </div>
 
       {/* 💻 Monaco Code Editor */}

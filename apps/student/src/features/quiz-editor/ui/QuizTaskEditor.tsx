@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { HelpCircle, CheckCircle2, Clock, Send } from 'lucide-react';
+import { HelpCircle, CheckCircle2, Clock, Send, ArrowRight } from 'lucide-react';
 
 export interface QuizOption {
   id: string;
@@ -16,6 +16,8 @@ interface QuizTaskEditorProps {
   options: QuizOption[];
   onSubmit: (payload: { selectedOptionId?: string; selectedOptionIds?: string[]; reactionLatencyMs: number }) => void;
   isSubmitting?: boolean;
+  onNextTask?: () => void;
+  isPassed?: boolean;
 }
 
 export function QuizTaskEditor({
@@ -23,6 +25,8 @@ export function QuizTaskEditor({
   options = [],
   onSubmit,
   isSubmitting = false,
+  onNextTask,
+  isPassed = false,
 }: QuizTaskEditorProps) {
   const [selectedSingleId, setSelectedSingleId] = useState<string>('');
   const [selectedMultipleIds, setSelectedMultipleIds] = useState<string[]>([]);
@@ -110,7 +114,20 @@ export function QuizTaskEditor({
         })}
       </div>
 
-      <div className="flex justify-end pt-2">
+      <div className="flex items-center justify-end gap-3 pt-2">
+        <button
+          onClick={onNextTask}
+          disabled={!isPassed}
+          className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-xs transition-all ${
+            isPassed
+              ? 'bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-500 hover:from-emerald-500 hover:to-teal-400 text-white shadow-lg shadow-emerald-900/40 cursor-pointer border border-emerald-400/40 ring-2 ring-emerald-500/30'
+              : 'bg-slate-950 text-slate-600 border border-slate-800/80 cursor-not-allowed opacity-50'
+          }`}
+        >
+          <span>Наступне завдання</span>
+          <ArrowRight className="w-4 h-4" />
+        </button>
+
         <button
           onClick={handleSubmit}
           disabled={!canSubmit || isSubmitting}

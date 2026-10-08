@@ -225,46 +225,42 @@ export class BktController {
       isMastered: BktEngine.isMastered(bktState.pMastery),
     };
 
-    if (isPassed && isAlreadyPassedBefore) {
-      feedback += ' ℹ️ (Завдання вже було зараховано раніше. BKT рівень збережено)';
-    } else {
-      const effectivePGuess = customPGuess || bktState.pGuess;
+    const effectivePGuess = customPGuess || bktState.pGuess;
 
-      const calcResult = BktEngine.calculateNextState(
-        {
-          pMastery: bktState.pMastery,
-          pTransit: bktState.pTransit,
-          pSlip: bktState.pSlip,
-          pGuess: effectivePGuess,
-        },
-        isPassed,
-      );
+    const calcResult = BktEngine.calculateNextState(
+      {
+        pMastery: bktState.pMastery,
+        pTransit: bktState.pTransit,
+        pSlip: bktState.pSlip,
+        pGuess: effectivePGuess,
+      },
+      isPassed,
+    );
 
-      const isMastered = BktEngine.isMastered(calcResult.pMasteryPosterior);
+    const isMastered = BktEngine.isMastered(calcResult.pMasteryPosterior);
 
-      updatedState = await this.prisma.bktState.update({
-        where: { id: bktState.id },
-        data: {
-          pMastery: calcResult.pMasteryPosterior,
-          attemptsCount: bktState.attemptsCount + 1,
-          isMastered,
-          masteredAt: isMastered ? new Date() : null,
-        },
-      });
+    updatedState = await this.prisma.bktState.update({
+      where: { id: bktState.id },
+      data: {
+        pMastery: calcResult.pMasteryPosterior,
+        attemptsCount: bktState.attemptsCount + 1,
+        isMastered,
+        masteredAt: isMastered ? new Date() : null,
+      },
+    });
 
-      bktResult = calcResult;
+    bktResult = calcResult;
 
-      // Save BKT History entry
-      await this.prisma.bktHistory.create({
-        data: {
-          userId: user.id,
-          skillId: task.skillId,
-          pMasteryBefore: bktState.pMastery,
-          pMasteryAfter: calcResult.pMasteryPosterior,
-          isCorrect: isPassed,
-        },
-      });
-    }
+    // Save BKT History entry
+    await this.prisma.bktHistory.create({
+      data: {
+        userId: user.id,
+        skillId: task.skillId,
+        pMasteryBefore: bktState.pMastery,
+        pMasteryAfter: calcResult.pMasteryPosterior,
+        isCorrect: isPassed,
+      },
+    });
 
     return {
       submissionId: submission.id,
@@ -343,6 +339,47 @@ export class BktController {
         unstarted: s.bktStates.length === 0,
       };
     });
+  }
+
+  @Post('reset-skill')
+  @ApiOperation({ summary: 'Reset student BKT state and submissions for a specific skill node' })
+  async resetStudentSkillState(@Body() dto: { userId?: string; skillId: string }) {
+    let targetUserId = dto.userId;
+    let user = targetUserId ? await this.prisma.user.findUnique({ where: { id: targetUserId } }) : null;
+    if (!user) {
+      user = await this.prisma.user.findFirst({ where: { role: 'STUDENT' } });
+      if (!user) throw new NotFoundException('Student user not found');
+      targetUserId = user.id;
+    }
+
+    const tasksInSkill = await this.prisma.task.findMany({
+      where: { skillId: dto.skillId },
+      select: { id: true },
+    });
+    const taskIds = tasksInSkill.map((t) => t.id);
+
+    await this.prisma.submission.deleteMany({
+      where: {
+        userId: targetUserId,
+        taskId: { in: taskIds },
+      },
+    });
+
+    await this.prisma.bktHistory.deleteMany({
+      where: {
+        userId: targetUserId,
+        skillId: dto.skillId,
+      },
+    });
+
+    await this.prisma.bktState.deleteMany({
+      where: {
+        userId: targetUserId,
+        skillId: dto.skillId,
+      },
+    });
+
+    return { message: `Progress for skill ${dto.skillId} has been reset` };
   }
 
   @Post('reset/:studentId?')

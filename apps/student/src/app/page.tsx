@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Brain, Sparkles, CheckCircle, AlertCircle, RefreshCw, User, Code2, BookOpen, Scale, ChevronDown } from 'lucide-react';
+import { Brain, Sparkles, CheckCircle, AlertCircle, RefreshCw, User, Code2, BookOpen, Scale, ChevronDown, ArrowRight, AlertTriangle } from 'lucide-react';
 import { MonacoCodeEditor } from '../features/code-editor/ui/MonacoCodeEditor';
 import { QuizTaskEditor } from '../features/quiz-editor/ui/QuizTaskEditor';
 import { EssayTaskEditor } from '../features/essay-editor/ui/EssayTaskEditor';
@@ -46,6 +46,7 @@ export default function StudentPortalPage() {
   const [courses, setCourses] = useState<CourseItem[]>(DEFAULT_COURSES);
   const [activeCourseSlug, setActiveCourseSlug] = useState<string>('js-dev');
   const [task, setTask] = useState<TaskDetail | null>(null);
+  const [exhaustedModalData, setExhaustedModalData] = useState<{ skillId: string; skillTitle: string } | null>(null);
 
   useEffect(() => {
     const fetchCourses = async () => {
@@ -126,6 +127,13 @@ export default function StudentPortalPage() {
         setRecommendation(data.recommendation);
         setCode(data.task.starterCode || '');
         setEssayAnswer('');
+
+        if (data.recommendation?.isExhausted || data.recommendation?.reason === 'MODULE_TASKS_EXHAUSTED') {
+          setExhaustedModalData({
+            skillId: data.recommendation.recommendedSkill.id,
+            skillTitle: data.recommendation.recommendedSkill.title,
+          });
+        }
       } else {
         setTask(null);
       }
@@ -134,6 +142,25 @@ export default function StudentPortalPage() {
       setTask(null);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleConfirmSkillReset = async () => {
+    if (!exhaustedModalData) return;
+    try {
+      await fetch(`${API_URL}/api/v1/bkt/reset-skill`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId: 'demo-student',
+          skillId: exhaustedModalData.skillId,
+        }),
+      });
+    } catch (err) {
+      console.error('Error resetting skill progress:', err);
+    } finally {
+      setExhaustedModalData(null);
+      await fetchRecommendedTask(activeCourseSlug);
     }
   };
 
@@ -303,6 +330,8 @@ export default function StudentPortalPage() {
                 options={task.options || []}
                 onSubmit={(payload) => handleEvaluate(payload)}
                 isSubmitting={isSubmitting}
+                onNextTask={() => fetchRecommendedTask(activeCourseSlug)}
+                isPassed={Boolean(evalResult?.isPassed)}
               />
             ) : task.taskType === 'TEXT_ESSAY' ? (
               <EssayTaskEditor
@@ -311,6 +340,8 @@ export default function StudentPortalPage() {
                 onChange={setEssayAnswer}
                 onSubmit={() => handleEvaluate({ essayAnswer })}
                 isSubmitting={isSubmitting}
+                onNextTask={() => fetchRecommendedTask(activeCourseSlug)}
+                isPassed={Boolean(evalResult?.isPassed)}
               />
             ) : (
               <MonacoCodeEditor
@@ -320,6 +351,8 @@ export default function StudentPortalPage() {
                 onChange={setCode}
                 onSubmit={() => handleEvaluate({ code })}
                 isSubmitting={isSubmitting}
+                onNextTask={() => fetchRecommendedTask(activeCourseSlug)}
+                isPassed={Boolean(evalResult?.isPassed)}
               />
             )}
 
@@ -365,6 +398,29 @@ export default function StudentPortalPage() {
       ) : (
         <div className="p-12 bg-slate-900/50 border border-slate-800 rounded-2xl text-center text-slate-400 text-sm">
           Завдань у даному курсі не знайдено.
+        </div>
+      )}
+      {/* Exhausted Module Tasks Modal Popup */}
+      {exhaustedModalData && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-md animate-fadeIn">
+          <div className="max-w-md w-full p-6 bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl flex flex-col gap-5 text-center transform transition-all scale-100">
+            <div className="mx-auto p-3.5 bg-amber-500/10 border border-amber-500/30 rounded-full text-amber-400">
+              <AlertTriangle className="w-8 h-8 animate-pulse" />
+            </div>
+            <div className="flex flex-col gap-2">
+              <h3 className="text-lg font-bold text-white">Завдання модуля закінчилися</h3>
+              <p className="text-xs text-slate-300 leading-relaxed">
+                Завдання даного модуля (<strong className="text-indigo-400">"{exhaustedModalData.skillTitle}"</strong>) закінчилися, і ви не набрали необхідну кількість балів (&ge;95%).
+                Ваш прогрес на цьому модулі буде анульований для повторної спроби.
+              </p>
+            </div>
+            <button
+              onClick={handleConfirmSkillReset}
+              className="w-full py-3 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs uppercase tracking-wider shadow-lg shadow-indigo-600/30 transition-all cursor-pointer border border-indigo-400/30"
+            >
+              ОК, анулювати прогрес модуля
+            </button>
+          </div>
         </div>
       )}
     </main>

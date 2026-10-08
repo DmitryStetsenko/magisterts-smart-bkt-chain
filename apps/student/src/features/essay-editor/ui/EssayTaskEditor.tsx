@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { FileText, Send, Activity, Zap, Clipboard } from 'lucide-react';
+import { FileText, Send, Activity, Zap, Clipboard, ArrowRight } from 'lucide-react';
 import { useTelemetry } from '../../code-editor/lib/useTelemetry';
 
 interface EssayTaskEditorProps {
@@ -10,6 +10,8 @@ interface EssayTaskEditorProps {
   onChange: (value: string) => void;
   onSubmit: () => void;
   isSubmitting?: boolean;
+  onNextTask?: () => void;
+  isPassed?: boolean;
 }
 
 export function EssayTaskEditor({
@@ -18,6 +20,8 @@ export function EssayTaskEditor({
   onChange,
   onSubmit,
   isSubmitting = false,
+  onNextTask,
+  isPassed = false,
 }: EssayTaskEditorProps) {
   const [essayText, setEssayText] = useState<string>('');
   const { metrics, handleKeyDown, handleDelete, handlePaste } = useTelemetry(userId, taskId);
@@ -89,7 +93,20 @@ export function EssayTaskEditor({
         </div>
       </div>
 
-      <div className="flex justify-end">
+      <div className="flex items-center justify-end gap-3">
+        <button
+          onClick={onNextTask}
+          disabled={!isPassed}
+          className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-xs transition-all ${
+            isPassed
+              ? 'bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-500 hover:from-emerald-500 hover:to-teal-400 text-white shadow-lg shadow-emerald-900/40 cursor-pointer border border-emerald-400/40 ring-2 ring-emerald-500/30'
+              : 'bg-slate-950 text-slate-600 border border-slate-800/80 cursor-not-allowed opacity-50'
+          }`}
+        >
+          <span>Наступне завдання</span>
+          <ArrowRight className="w-4 h-4" />
+        </button>
+
         <button
           onClick={onSubmit}
           disabled={wordCount === 0 || isSubmitting}
