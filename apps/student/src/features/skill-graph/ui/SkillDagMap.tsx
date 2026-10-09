@@ -10,13 +10,13 @@ interface SkillDagMapProps {
 
 export function SkillDagMap({ nodes, activeSkillSlug, onSelectSkill }: SkillDagMapProps) {
   return (
-    <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 shadow-xl flex flex-col gap-4">
-      <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-        <h3 className="text-sm font-bold text-slate-100 flex items-center gap-2">
-          <Sparkles className="w-4 h-4 text-emerald-400" />
-          <span>Карта Навичок (Skill DAG Graph)</span>
-        </h3>
-        <span className="text-[11px] font-mono text-slate-400">
+    <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 shadow-xl flex flex-col gap-3">
+      {/* Sub-header info bar */}
+      <div className="flex items-center justify-between border-b border-slate-800/80 pb-2.5 px-1">
+        <span className="text-[11px] text-slate-400 font-semibold">
+          Оцінювання майстерності BKT
+        </span>
+        <span className="text-[10px] font-mono text-emerald-400/90 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
           Поріг: P(L) ≥ 0.95
         </span>
       </div>
