@@ -473,133 +473,119 @@ export default function TeacherDashboardPage() {
                 </div>
               </div>
 
-              {/* Student Metrics Grid with Icons & Metric Explanations */}
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              {/* Compact Student Metrics Grid with Icons & Metric Explanations */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
                 {/* Metric 1: P(L) Mastery */}
-                <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col gap-2 shadow-lg relative group">
-                  <div className="flex items-center justify-between">
-                    <span className="text-[11px] font-semibold uppercase text-slate-400">Середня Майстерність P(L)</span>
-                    <div className="p-2 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                      <Sparkles className="w-4 h-4" />
+                <div className="bg-slate-900 border border-slate-800 rounded-xl p-3 flex flex-col justify-between gap-2 shadow-md relative group">
+                  <div className="flex items-start justify-between gap-1">
+                    <span className="text-[10px] font-semibold uppercase text-slate-400 leading-tight">Середня Майстерність P(L)</span>
+                    <div className="p-1.5 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 shrink-0">
+                      <Sparkles className="w-3.5 h-3.5" />
                     </div>
                   </div>
-                  <div className="text-2xl font-bold text-emerald-400 font-mono">
-                    {selectedStudent.averageMastery !== undefined ? `${(selectedStudent.averageMastery * 100).toFixed(1)}%` : '0.0%'}
-                  </div>
-                  
-                  {/* Info Button & Hover Card Explanation */}
-                  <div className="pt-2 border-t border-slate-800/80 flex items-center justify-between text-[10px] text-slate-400">
-                    <span className="flex items-center gap-1 text-slate-400">
-                      <Info className="w-3 h-3 text-emerald-400" />
-                      Байєсівське оцінення
-                    </span>
+                  <div className="flex items-baseline justify-between mt-0.5">
+                    <div className="text-xl font-bold text-emerald-400 font-mono">
+                      {selectedStudent.averageMastery !== undefined ? `${(selectedStudent.averageMastery * 100).toFixed(1)}%` : '0.0%'}
+                    </div>
                     <button
                       onClick={() => setMetricModal('bkt')}
-                      className="text-indigo-400 hover:text-indigo-300 font-semibold cursor-pointer underline"
+                      className="text-[10px] text-indigo-400 hover:text-indigo-300 font-semibold cursor-pointer underline flex items-center gap-0.5"
                     >
-                      Формула ➔
+                      <Info className="w-3 h-3" />
+                      <span>Формула ➔</span>
                     </button>
                   </div>
                 </div>
 
                 {/* Metric 2: WPM */}
-                <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col gap-2 shadow-lg relative group">
-                  <div className="flex items-center justify-between">
-                    <span className="text-[11px] font-semibold uppercase text-slate-400">Швидкість Набору WPM</span>
-                    <div className="p-2 rounded-xl bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
-                      <Keyboard className="w-4 h-4" />
+                <div className="bg-slate-900 border border-slate-800 rounded-xl p-3 flex flex-col justify-between gap-2 shadow-md relative group">
+                  <div className="flex items-start justify-between gap-1">
+                    <span className="text-[10px] font-semibold uppercase text-slate-400 leading-tight">Швидкість Набору WPM</span>
+                    <div className="p-1.5 rounded-lg bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 shrink-0">
+                      <Keyboard className="w-3.5 h-3.5" />
                     </div>
                   </div>
-                  <div className="text-2xl font-bold text-indigo-400 font-mono">
-                    {selectedStudent.wpm ?? selectedStudent.avgWpm ?? 0} <span className="text-xs font-normal text-slate-400">WPM</span>
-                  </div>
-                  <div className="pt-2 border-t border-slate-800/80 flex items-center justify-between text-[10px] text-slate-400">
-                    <span className="flex items-center gap-1 text-slate-400">
-                      <Info className="w-3 h-3 text-indigo-400" />
-                      Слів на хвилину
-                    </span>
+                  <div className="flex items-baseline justify-between mt-0.5">
+                    <div className="text-xl font-bold text-indigo-400 font-mono">
+                      {selectedStudent.wpm ?? selectedStudent.avgWpm ?? 0} <span className="text-[10px] font-normal text-slate-400">WPM</span>
+                    </div>
                     <button
                       onClick={() => setMetricModal('wpm')}
-                      className="text-indigo-400 hover:text-indigo-300 font-semibold cursor-pointer underline"
+                      className="text-[10px] text-indigo-400 hover:text-indigo-300 font-semibold cursor-pointer underline flex items-center gap-0.5"
                     >
-                      Розрахунок ➔
+                      <Info className="w-3 h-3" />
+                      <span>Розрахунок ➔</span>
                     </button>
                   </div>
                 </div>
 
                 {/* Metric 3: Copy-Paste Ratio */}
-                <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col gap-2 shadow-lg relative group">
-                  <div className="flex items-center justify-between">
-                    <span className="text-[11px] font-semibold uppercase text-slate-400">Copy-Paste Ratio</span>
-                    <div className="p-2 rounded-xl bg-amber-500/10 text-amber-400 border border-amber-500/20">
-                      <Copy className="w-4 h-4" />
+                <div className="bg-slate-900 border border-slate-800 rounded-xl p-3 flex flex-col justify-between gap-2 shadow-md relative group">
+                  <div className="flex items-start justify-between gap-1">
+                    <span className="text-[10px] font-semibold uppercase text-slate-400 leading-tight">Copy-Paste Ratio</span>
+                    <div className="p-1.5 rounded-lg bg-amber-500/10 text-amber-400 border border-amber-500/20 shrink-0">
+                      <Copy className="w-3.5 h-3.5" />
                     </div>
                   </div>
-                  <div className="text-2xl font-bold text-amber-400 font-mono">
-                    {selectedStudent.copyPasteRatio !== undefined ? `${(selectedStudent.copyPasteRatio * 100).toFixed(0)}%` : '0%'}
-                  </div>
-                  <div className="pt-2 border-t border-slate-800/80 flex items-center justify-between text-[10px] text-slate-400">
-                    <span className="flex items-center gap-1 text-slate-400">
-                      <Info className="w-3 h-3 text-amber-400" />
-                      Частка вставки
-                    </span>
+                  <div className="flex items-baseline justify-between mt-0.5">
+                    <div className="text-xl font-bold text-amber-400 font-mono">
+                      {selectedStudent.copyPasteRatio !== undefined ? `${(selectedStudent.copyPasteRatio * 100).toFixed(0)}%` : '0%'}
+                    </div>
                     <button
                       onClick={() => setMetricModal('copypaste')}
-                      className="text-indigo-400 hover:text-indigo-300 font-semibold cursor-pointer underline"
+                      className="text-[10px] text-indigo-400 hover:text-indigo-300 font-semibold cursor-pointer underline flex items-center gap-0.5"
                     >
-                      Аналіз ➔
+                      <Info className="w-3 h-3" />
+                      <span>Аналіз ➔</span>
                     </button>
                   </div>
                 </div>
 
                 {/* Metric 4: Fatigue Index */}
-                <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col gap-2 shadow-lg relative group">
-                  <div className="flex items-center justify-between">
-                    <span className="text-[11px] font-semibold uppercase text-slate-400">Індекс Втоми (Idle Pauses)</span>
-                    <div className="p-2 rounded-xl bg-purple-500/10 text-purple-400 border border-purple-500/20">
-                      <Activity className="w-4 h-4" />
+                <div className="bg-slate-900 border border-slate-800 rounded-xl p-3 flex flex-col justify-between gap-2 shadow-md relative group">
+                  <div className="flex items-start justify-between gap-1">
+                    <span className="text-[10px] font-semibold uppercase text-slate-400 leading-tight">Індекс Втоми (Idle Pauses)</span>
+                    <div className="p-1.5 rounded-lg bg-purple-500/10 text-purple-400 border border-purple-500/20 shrink-0">
+                      <Activity className="w-3.5 h-3.5" />
                     </div>
                   </div>
-                  <div className="text-2xl font-bold text-purple-400 font-mono">
-                    {selectedStudent.fatigueIndex ?? 0}
-                  </div>
-                  <div className="pt-2 border-t border-slate-800/80 flex items-center justify-between text-[10px] text-slate-400">
-                    <span className="flex items-center gap-1 text-slate-400">
-                      <Info className="w-3 h-3 text-purple-400" />
-                      Паузи бездіяльності
-                    </span>
+                  <div className="flex items-baseline justify-between mt-0.5">
+                    <div className="text-xl font-bold text-purple-400 font-mono">
+                      {selectedStudent.fatigueIndex ?? 0}
+                    </div>
                     <button
                       onClick={() => setMetricModal('fatigue')}
-                      className="text-indigo-400 hover:text-indigo-300 font-semibold cursor-pointer underline"
+                      className="text-[10px] text-indigo-400 hover:text-indigo-300 font-semibold cursor-pointer underline flex items-center gap-0.5"
                     >
-                      Пояснення ➔
+                      <Info className="w-3 h-3" />
+                      <span>Пояснення ➔</span>
                     </button>
                   </div>
                 </div>
               </div>
 
-              {/* BKT Skill Mastery Heatmap Table */}
-              <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl flex flex-col gap-4">
-                <h3 className="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
-                  <BarChart3 className="w-4 h-4 text-purple-400" />
+              {/* Compact BKT Skill Mastery Heatmap Table */}
+              <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-xl flex flex-col gap-3">
+                <h3 className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-2">
+                  <BarChart3 className="w-3.5 h-3.5 text-purple-400" />
                   <span>BKT Mastery Breakdown За Модулями</span>
                 </h3>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
                   {activeCourse.skillSlugs.map((slug) => {
                     const masteryMap = selectedStudent.bktBySkill || selectedStudent.skillMastery || {};
                     const p = masteryMap[slug] ?? 0;
                     const isMastered = p >= 0.95;
 
                     return (
-                      <div key={slug} className="p-3.5 bg-slate-950 border border-slate-800 rounded-xl flex flex-col gap-2">
-                        <div className="flex items-center justify-between text-xs">
-                          <span className="font-mono text-slate-300 font-bold uppercase">{slug}</span>
-                          <span className={`font-mono font-bold ${isMastered ? 'text-emerald-400' : 'text-amber-400'}`}>
+                      <div key={slug} className="p-2.5 bg-slate-950 border border-slate-800/80 rounded-lg flex flex-col gap-1.5">
+                        <div className="flex items-center justify-between text-[11px]">
+                          <span className="font-mono text-slate-300 font-bold uppercase truncate">{slug}</span>
+                          <span className={`font-mono font-bold text-xs ${isMastered ? 'text-emerald-400' : 'text-amber-400'}`}>
                             {(p * 100).toFixed(1)}%
                           </span>
                         </div>
-                        <div className="w-full h-2 bg-slate-900 rounded-full overflow-hidden border border-slate-800">
+                        <div className="w-full h-1.5 bg-slate-900 rounded-full overflow-hidden border border-slate-800">
                           <div
                             className={`h-full transition-all duration-500 ${isMastered ? 'bg-emerald-400' : 'bg-amber-400'}`}
                             style={{ width: `${Math.min(100, p * 100)}%` }}
