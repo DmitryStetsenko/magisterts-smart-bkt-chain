@@ -149,6 +149,42 @@
               "type": "text",
               "raw_text": "**Центральний екран (Main Canvas):** При виборі студента показує детальну аналітичну картку (WPM, Copy-Paste, Fatigue Index), BKT Heatmap по модулях та кнопку скидання. При виборі модуля/завдання показує повний інспектор умови завдання, тест-кейсів та ключів відповідей.",
               "subitems": []
+            }
+          ]
+        },
+        {
+          "title": "0.4 Концепт та Архітектура Модульної Телеметрії (Per-Module Telemetry & Course-Level Median)",
+          "level": 3,
+          "paragraphs": [
+            "$$\\text{Course } CopyPaste_{\\text{median}} = \\text{Median}\\Big( \\big\\{ CopyPaste_{skill_1}, CopyPaste_{skill_2}, \\dots, CopyPaste_{skill_N} \\big\\} \\Big)$$",
+            "$$\\text{Peak Anomaly} = \\max_{i} \\Big( CopyPaste_{skill_i} \\Big) \\quad \\text{при } CopyPaste_{skill_i} \\ge 0.60$$"
+          ],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "**Проблематика:** При загальному підрахунку телеметрії (WPM, Copy-Paste Ratio, Fatigue Index) по всьому курсу списування чи когнітивне перевантаження на окремому модулі \"змащується\" середніми значеннями.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Концепція Модульної Телеметрії:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Модульний рівень ($WPM_{skill}, CopyPaste_{skill}, Fatigue_{skill}$):** Кожен вузол графа $Skill_i$ зберігає власні параметри телеметрії. Якщо студент вставив 90% коду під час проходження складного Модуля 3, цей показник зберігається суворо у контексті Модуля 3.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Курсовий рівень (Медіана + Peak Anomaly):** На верхніх картках загальної аналітики студента розраховується **Медіана ($\\text{Median}$)** для виключення спотворень, а поруч виводиться індикатор **Пікової Аномалії (Peak Anomaly)** з вказівкою проблемного модуля.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Математична модель агрегації:**",
+              "subitems": []
             },
             {
               "type": "text",
