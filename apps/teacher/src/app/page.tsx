@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { ShieldCheck, Network, Users, BarChart3, Code2, BookOpen, Scale, ChevronDown, X, Search, RotateCcw, AlertTriangle, CheckCircle2, Lock, HelpCircle, Code, FileText, CheckSquare } from 'lucide-react';
+import { ShieldCheck, Network, Users, BarChart3, Code2, BookOpen, Scale, ChevronDown, X, Search, RotateCcw, AlertTriangle, CheckCircle2, Lock, HelpCircle, Code, FileText, CheckSquare, Sparkles, Keyboard, Copy, Activity, Info } from 'lucide-react';
 import { StudentAnalyticsItem } from '../features/analytics/model/analytics.types';
 
 interface CourseItem {
@@ -33,6 +33,9 @@ export default function TeacherDashboardPage() {
   // Search & Filter state inside side drawers
   const [studentSearch, setStudentSearch] = useState<string>('');
   const [dagSearch, setDagSearch] = useState<string>('');
+
+  // Modal explanation state for BKT/WPM/CopyPaste/Fatigue metrics
+  const [metricModal, setMetricModal] = useState<'bkt' | 'wpm' | 'copypaste' | 'fatigue' | null>(null);
 
   const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
 
@@ -470,33 +473,107 @@ export default function TeacherDashboardPage() {
                 </div>
               </div>
 
-              {/* Student Metrics Grid */}
+              {/* Student Metrics Grid with Icons & Metric Explanations */}
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col gap-1 shadow-lg">
-                  <span className="text-[11px] font-semibold uppercase text-slate-400">Середня Майстерність P(L)</span>
-                  <div className="text-xl font-bold text-emerald-400 font-mono">
+                {/* Metric 1: P(L) Mastery */}
+                <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col gap-2 shadow-lg relative group">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[11px] font-semibold uppercase text-slate-400">Середня Майстерність P(L)</span>
+                    <div className="p-2 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                      <Sparkles className="w-4 h-4" />
+                    </div>
+                  </div>
+                  <div className="text-2xl font-bold text-emerald-400 font-mono">
                     {selectedStudent.averageMastery !== undefined ? `${(selectedStudent.averageMastery * 100).toFixed(1)}%` : '0.0%'}
                   </div>
+                  
+                  {/* Info Button & Hover Card Explanation */}
+                  <div className="pt-2 border-t border-slate-800/80 flex items-center justify-between text-[10px] text-slate-400">
+                    <span className="flex items-center gap-1 text-slate-400">
+                      <Info className="w-3 h-3 text-emerald-400" />
+                      Байєсівське оцінення
+                    </span>
+                    <button
+                      onClick={() => setMetricModal('bkt')}
+                      className="text-indigo-400 hover:text-indigo-300 font-semibold cursor-pointer underline"
+                    >
+                      Формула ➔
+                    </button>
+                  </div>
                 </div>
 
-                <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col gap-1 shadow-lg">
-                  <span className="text-[11px] font-semibold uppercase text-slate-400">Швидкість Набору WPM</span>
-                  <div className="text-xl font-bold text-indigo-400 font-mono">
+                {/* Metric 2: WPM */}
+                <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col gap-2 shadow-lg relative group">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[11px] font-semibold uppercase text-slate-400">Швидкість Набору WPM</span>
+                    <div className="p-2 rounded-xl bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
+                      <Keyboard className="w-4 h-4" />
+                    </div>
+                  </div>
+                  <div className="text-2xl font-bold text-indigo-400 font-mono">
                     {selectedStudent.wpm ?? selectedStudent.avgWpm ?? 0} <span className="text-xs font-normal text-slate-400">WPM</span>
                   </div>
-                </div>
-
-                <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col gap-1 shadow-lg">
-                  <span className="text-[11px] font-semibold uppercase text-slate-400">Copy-Paste Ratio</span>
-                  <div className="text-xl font-bold text-amber-400 font-mono">
-                    {selectedStudent.copyPasteRatio !== undefined ? `${(selectedStudent.copyPasteRatio * 100).toFixed(0)}%` : '0%'}
+                  <div className="pt-2 border-t border-slate-800/80 flex items-center justify-between text-[10px] text-slate-400">
+                    <span className="flex items-center gap-1 text-slate-400">
+                      <Info className="w-3 h-3 text-indigo-400" />
+                      Слів на хвилину
+                    </span>
+                    <button
+                      onClick={() => setMetricModal('wpm')}
+                      className="text-indigo-400 hover:text-indigo-300 font-semibold cursor-pointer underline"
+                    >
+                      Розрахунок ➔
+                    </button>
                   </div>
                 </div>
 
-                <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col gap-1 shadow-lg">
-                  <span className="text-[11px] font-semibold uppercase text-slate-400">Індекс Втоми (Idle Pauses)</span>
-                  <div className="text-xl font-bold text-purple-400 font-mono">
+                {/* Metric 3: Copy-Paste Ratio */}
+                <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col gap-2 shadow-lg relative group">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[11px] font-semibold uppercase text-slate-400">Copy-Paste Ratio</span>
+                    <div className="p-2 rounded-xl bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                      <Copy className="w-4 h-4" />
+                    </div>
+                  </div>
+                  <div className="text-2xl font-bold text-amber-400 font-mono">
+                    {selectedStudent.copyPasteRatio !== undefined ? `${(selectedStudent.copyPasteRatio * 100).toFixed(0)}%` : '0%'}
+                  </div>
+                  <div className="pt-2 border-t border-slate-800/80 flex items-center justify-between text-[10px] text-slate-400">
+                    <span className="flex items-center gap-1 text-slate-400">
+                      <Info className="w-3 h-3 text-amber-400" />
+                      Частка вставки
+                    </span>
+                    <button
+                      onClick={() => setMetricModal('copypaste')}
+                      className="text-indigo-400 hover:text-indigo-300 font-semibold cursor-pointer underline"
+                    >
+                      Аналіз ➔
+                    </button>
+                  </div>
+                </div>
+
+                {/* Metric 4: Fatigue Index */}
+                <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col gap-2 shadow-lg relative group">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[11px] font-semibold uppercase text-slate-400">Індекс Втоми (Idle Pauses)</span>
+                    <div className="p-2 rounded-xl bg-purple-500/10 text-purple-400 border border-purple-500/20">
+                      <Activity className="w-4 h-4" />
+                    </div>
+                  </div>
+                  <div className="text-2xl font-bold text-purple-400 font-mono">
                     {selectedStudent.fatigueIndex ?? 0}
+                  </div>
+                  <div className="pt-2 border-t border-slate-800/80 flex items-center justify-between text-[10px] text-slate-400">
+                    <span className="flex items-center gap-1 text-slate-400">
+                      <Info className="w-3 h-3 text-purple-400" />
+                      Паузи бездіяльності
+                    </span>
+                    <button
+                      onClick={() => setMetricModal('fatigue')}
+                      className="text-indigo-400 hover:text-indigo-300 font-semibold cursor-pointer underline"
+                    >
+                      Пояснення ➔
+                    </button>
                   </div>
                 </div>
               </div>
@@ -670,6 +747,122 @@ export default function TeacherDashboardPage() {
           )}
         </main>
       </div>
+
+      {/* 🧮 Interactive Metric Explanation Modal */}
+      {metricModal && (
+        <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 animate-fadeIn">
+          <div className="bg-slate-900 border border-slate-800 rounded-2xl max-w-lg w-full p-6 shadow-2xl flex flex-col gap-4 relative">
+            <button
+              onClick={() => setMetricModal(null)}
+              className="absolute top-4 right-4 p-1 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-all"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            {metricModal === 'bkt' && (
+              <>
+                <div className="flex items-center gap-3 text-emerald-400">
+                  <div className="p-2 bg-emerald-500/10 border border-emerald-500/20 rounded-xl">
+                    <Sparkles className="w-5 h-5" />
+                  </div>
+                  <h3 className="text-base font-bold text-white">Середня Майстерність P(L) — Bayesian Knowledge Tracing</h3>
+                </div>
+                <div className="text-xs text-slate-300 flex flex-col gap-3 leading-relaxed">
+                  <p>
+                    Параметр <span className="font-mono text-emerald-400 font-bold">P(L)</span> визначає ймовірність того, що студент повністю засвоїв концепцію конкретного модуля.
+                  </p>
+                  <div className="p-3 bg-slate-950 border border-slate-800 rounded-xl font-mono text-[11px] text-slate-200">
+                    P(L_t | obs) = [ P(L_t-1) * (1 - P(S)) ] / [ P(L_t-1) * (1 - P(S)) + (1 - P(L_t-1)) * P(G) ]
+                  </div>
+                  <ul className="list-disc pl-4 space-y-1 text-slate-400">
+                    <li><strong className="text-slate-200">P(G) = 0.20:</strong> Ймовірність вгадування (Guessing).</li>
+                    <li><strong className="text-slate-200">P(S) = 0.10:</strong> Ймовірність описки/вислизання (Slip).</li>
+                    <li><strong className="text-slate-200">P(T) = 0.15:</strong> Ймовірність засвоєння після спроби (Transition).</li>
+                  </ul>
+                  <p className="text-[11px] text-slate-400 italic">
+                    При досягненні P(L) ≥ 0.95 (95%) модуль вважається успішно засвоєним, і студенту відкривається доступ до наступних вузлів DAG.
+                  </p>
+                </div>
+              </>
+            )}
+
+            {metricModal === 'wpm' && (
+              <>
+                <div className="flex items-center gap-3 text-indigo-400">
+                  <div className="p-2 bg-indigo-500/10 border border-indigo-500/20 rounded-xl">
+                    <Keyboard className="w-5 h-5" />
+                  </div>
+                  <h3 className="text-base font-bold text-white">Швидкість Набору Коду (WPM)</h3>
+                </div>
+                <div className="text-xs text-slate-300 flex flex-col gap-3 leading-relaxed">
+                  <p>
+                    <span className="font-mono text-indigo-400 font-bold">WPM (Words Per Minute)</span> розраховується в реальному часі на основі натискань клавіш у Monaco Editor.
+                  </p>
+                  <div className="p-3 bg-slate-950 border border-slate-800 rounded-xl font-mono text-[11px] text-slate-200">
+                    WPM = (Всього символів / 5) / (Час введення в хвилинах)
+                  </div>
+                  <p className="text-[11px] text-slate-400">
+                    Нормальний темп розробника: 35–65 WPM. Аномально високі стрибки (&gt;150 WPM) вказують на автодоповнення або масовий paste коду.
+                  </p>
+                </div>
+              </>
+            )}
+
+            {metricModal === 'copypaste' && (
+              <>
+                <div className="flex items-center gap-3 text-amber-400">
+                  <div className="p-2 bg-amber-500/10 border border-amber-500/20 rounded-xl">
+                    <Copy className="w-5 h-5" />
+                  </div>
+                  <h3 className="text-base font-bold text-white">Copy-Paste Ratio (Частка Вставленого Коду)</h3>
+                </div>
+                <div className="text-xs text-slate-300 flex flex-col gap-3 leading-relaxed">
+                  <p>
+                    <span className="font-mono text-amber-400 font-bold">Copy-Paste Ratio</span> визначає співвідношення символів, доданих через комбінації Ctrl+V / Command+V, до загального обсягу коду.
+                  </p>
+                  <div className="p-3 bg-slate-950 border border-slate-800 rounded-xl font-mono text-[11px] text-slate-200">
+                    CopyPasteRatio = Символів з Clipboard / Загальна кількість символів рішення
+                  </div>
+                  <p className="text-[11px] text-slate-400">
+                    Показник &gt; 60% може свідчити про списування чи використання сторонніх генераторів коду без самостійного введення.
+                  </p>
+                </div>
+              </>
+            )}
+
+            {metricModal === 'fatigue' && (
+              <>
+                <div className="flex items-center gap-3 text-purple-400">
+                  <div className="p-2 bg-purple-500/10 border border-purple-500/20 rounded-xl">
+                    <Activity className="w-5 h-5" />
+                  </div>
+                  <h3 className="text-base font-bold text-white">Індекс Втоми (Idle Pauses & Cognitive Load)</h3>
+                </div>
+                <div className="text-xs text-slate-300 flex flex-col gap-3 leading-relaxed">
+                  <p>
+                    <span className="font-mono text-purple-400 font-bold">Індекс Втоми</span> відстежує аномально тривалі зупинки редагування (&gt; 15 секунд) та часті видалення великих блоків (Backspace / Delete).
+                  </p>
+                  <div className="p-3 bg-slate-950 border border-slate-800 rounded-xl font-mono text-[11px] text-slate-200">
+                    FatigueIndex = Кількість_Пауз_&gt;15с + (Видалено_Символів / 50)
+                  </div>
+                  <p className="text-[11px] text-slate-400">
+                    Високий показник свідчить про виникнення труднощів, замішання або когнітивного перевантаження під час виконання задачі.
+                  </p>
+                </div>
+              </>
+            )}
+
+            <div className="pt-2 flex justify-end">
+              <button
+                onClick={() => setMetricModal(null)}
+                className="px-4 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold transition-all cursor-pointer"
+              >
+                Зрозуміло
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
