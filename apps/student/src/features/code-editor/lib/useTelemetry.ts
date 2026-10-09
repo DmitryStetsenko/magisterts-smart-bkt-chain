@@ -54,6 +54,16 @@ export function useTelemetry(userId: string, taskId: string) {
     };
   }, [userId, taskId]);
 
+  const subscribeBktReset = useCallback((callback: (data: { userId: string; skillId?: string }) => void) => {
+    const socket = socketRef.current;
+    if (!socket) return () => {};
+
+    socket.on('bkt_state_reset', callback);
+    return () => {
+      socket.off('bkt_state_reset', callback);
+    };
+  }, []);
+
   // Handle keypress & telemetry tracking
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent | KeyboardEvent) => {
@@ -203,5 +213,7 @@ export function useTelemetry(userId: string, taskId: string) {
     handleKeyDown,
     handleDelete,
     handlePaste,
+    subscribeBktReset,
+    socket: socketRef.current,
   };
 }

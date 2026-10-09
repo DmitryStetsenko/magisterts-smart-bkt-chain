@@ -2,6 +2,7 @@ import { Controller, Post, Get, Body, Param, Query, NotFoundException } from '@n
 import { ApiTags, ApiOperation, ApiResponse, ApiQuery } from '@nestjs/swagger';
 import * as vm from 'vm';
 import { PrismaService } from '../../outbound/persistence/prisma.service';
+import { TelemetryGateway } from '../websocket/telemetry.gateway';
 import { BktEngine } from '../../../domain/bkt/bkt-engine';
 import { SubmitTaskDto } from './dto/submit-task.dto';
 import { SubmissionStatus, TaskType } from '@sbc/database';
@@ -9,7 +10,10 @@ import { SubmissionStatus, TaskType } from '@sbc/database';
 @ApiTags('BKT')
 @Controller('bkt')
 export class BktController {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly telemetryGateway: TelemetryGateway,
+  ) {}
 
   @Post('evaluate')
   @ApiOperation({ summary: 'Evaluate student submission across task types (CODE, SINGLE_CHOICE, MULTIPLE_CHOICE, TEXT_ESSAY) and update BKT P(L_t)' })
@@ -379,6 +383,8 @@ export class BktController {
       },
     });
 
+    this.telemetryGateway.notifyBktReset(targetUserId, dto.skillId);
+
     return { message: `Progress for skill ${dto.skillId} has been reset` };
   }
 
@@ -397,6 +403,8 @@ export class BktController {
     await this.prisma.bktHistory.deleteMany({ where: { userId: targetUserId } });
     await this.prisma.bktState.deleteMany({ where: { userId: targetUserId } });
     await this.prisma.telemetrySession.deleteMany({ where: { userId: targetUserId } });
+
+    this.telemetryGateway.notifyBktReset(targetUserId);
 
     return { message: `Student state for ${targetUserId} has been reset` };
   }

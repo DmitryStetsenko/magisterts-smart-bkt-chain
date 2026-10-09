@@ -2,6 +2,59 @@
   "project_title": "📅 Журнал розробки та прогресу проєкту (Daily Progress Log)",
   "sections": [
     {
+      "title": "📅 09 жовтня 2026 року",
+      "level": 2,
+      "paragraphs": [],
+      "code_blocks": [],
+      "items": [],
+      "subsections": [
+        {
+          "title": "✅ Що зроблено за день:",
+          "level": 3,
+          "paragraphs": [],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "**Реалізація WebSocket-Синхронізації Скидання BKT-Прогресу у Реальному Часі:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Бізнес-контекст:** Викладачам та адміністраторам надано можливість точково або повністю скидати BKT-прогрес студента. За умови закритого або відкритого інтерфейсу студента стан мав синхронізуватися без перезавантаження сторінки.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Бекенд WebSocket (`TelemetryGateway.ts` & `BktController.ts`):**",
+              "subitems": [
+                "Додано вхід клієнтів у персональні WebSocket кімнати (`user_${userId}` та `user_demo-student`).",
+                "Розроблено метод `notifyBktReset(userId, skillId)` для миттєвого відправлення події `bkt_state_reset` під час виклику ендпоінтів `POST /api/v1/bkt/reset-skill` та `POST /api/v1/bkt/reset`."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Фронтенд Студента (`apps/student/src/app/page.tsx` & `useTelemetry.ts`):**",
+              "subitems": [
+                "Налаштовано підписку на подію `bkt_state_reset`.",
+                "При отриманні сигналу кабінет студента автоматично оновлює граф навичок (`fetchCourseStructureAndState`) та без перезавантаження завантажує актуальну рекомендовану задачу (`fetchRecommendedTask`)."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Перевірка:** Проведено статичну збірку `build:api` та `build:student` — 100% успішно.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "---",
+              "subitems": []
+            }
+          ]
+        }
+      ]
+    },
+    {
       "title": "📅 08 жовтня 2026 року",
       "level": 2,
       "paragraphs": [],

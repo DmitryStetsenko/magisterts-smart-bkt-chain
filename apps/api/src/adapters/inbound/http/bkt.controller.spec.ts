@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { BktController } from './bkt.controller';
 import { PrismaService } from '../../outbound/persistence/prisma.service';
+import { TelemetryGateway } from '../websocket/telemetry.gateway';
 
 describe('BktController (Analytics & Telemetry reset integration)', () => {
   let controller: BktController;
@@ -26,6 +27,10 @@ describe('BktController (Analytics & Telemetry reset integration)', () => {
     },
   };
 
+  const mockTelemetryGateway = {
+    notifyBktReset: jest.fn(),
+  };
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [BktController],
@@ -33,6 +38,10 @@ describe('BktController (Analytics & Telemetry reset integration)', () => {
         {
           provide: PrismaService,
           useValue: mockPrisma,
+        },
+        {
+          provide: TelemetryGateway,
+          useValue: mockTelemetryGateway,
         },
       ],
     }).compile();

@@ -48,7 +48,6 @@ export class TelemetryGateway implements OnGatewayConnection, OnGatewayDisconnec
   ) {
     const room = `session_${payload.userId}_${payload.taskId}`;
     client.join(room);
-    this.logger.log(`Client ${client.id} joined room ${room}`);
 
     let targetUserId = payload.userId;
     let user = await this.prisma.user.findUnique({ where: { id: targetUserId } });
@@ -57,7 +56,14 @@ export class TelemetryGateway implements OnGatewayConnection, OnGatewayDisconnec
       if (user) targetUserId = user.id;
     }
 
-    if (!user) return;
+    if (user) {
+      const userRoom = `user_${user.id}`;
+      client.join(userRoom);
+      client.join('user_demo-student');
+      this.logger.log(`Client ${client.id} joined user room ${userRoom}`);
+    }
+
+    this.logger.log(`Client ${client.id} joined room ${room}`);
 
     let session = await this.prisma.telemetrySession.findFirst({
       where: {
@@ -125,5 +131,11 @@ export class TelemetryGateway implements OnGatewayConnection, OnGatewayDisconnec
 
     const room = `session_${payload.userId}_${payload.taskId}`;
     this.server.to(room).emit('telemetry_updated', payload);
+  }
+
+  notifyBktReset(userId: string, skillId?: string) {
+    this.logger.log(`Emitting bkt_state_reset event for user ${userId}, skill: ${skillId || 'ALL'}`);
+    this.server.to(`user_${userId}`).emit('bkt_state_reset', { userId, skillId });
+    this.server.to('user_demo-student').emit('bkt_state_reset', { userId, skillId });
   }
 }

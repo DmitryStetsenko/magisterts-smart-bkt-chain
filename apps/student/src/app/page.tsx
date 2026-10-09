@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { io } from 'socket.io-client';
 import { Brain, Sparkles, CheckCircle, AlertCircle, RefreshCw, User, Code2, BookOpen, Scale, ChevronDown, ArrowRight, AlertTriangle } from 'lucide-react';
 import { MonacoCodeEditor } from '../features/code-editor/ui/MonacoCodeEditor';
 import { QuizTaskEditor } from '../features/quiz-editor/ui/QuizTaskEditor';
@@ -167,6 +168,28 @@ export default function StudentPortalPage() {
   useEffect(() => {
     fetchRecommendedTask(activeCourseSlug);
   }, [activeCourseSlug]);
+
+  useEffect(() => {
+    const socket = io(`${API_URL}/telemetry`, {
+      transports: ['websocket'],
+      autoConnect: true,
+    });
+
+    if (socket) {
+      socket.on('connect', () => {
+        socket.emit('join_session', { userId: 'demo-student', taskId: task?.id || 'default' });
+      });
+
+      socket.on('bkt_state_reset', (data: { userId: string; skillId?: string }) => {
+        console.log('⚡ Received bkt_state_reset via WebSocket:', data);
+        fetchRecommendedTask(activeCourseSlug);
+      });
+    }
+
+    return () => {
+      if (socket) socket.disconnect();
+    };
+  }, [activeCourseSlug, task?.id]);
 
   const handleEvaluate = async (customPayload?: any) => {
     if (!task) return;
