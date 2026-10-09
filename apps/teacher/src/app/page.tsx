@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { ShieldCheck, Network, Users, BarChart3, ArrowLeft, Code2, BookOpen, Scale, ChevronDown } from 'lucide-react';
 import { StudentAnalyticsTable } from '../features/analytics/ui/StudentAnalyticsTable';
 import { StudentAnalyticsItem } from '../features/analytics/model/analytics.types';
+import { CourseOverviewWidget } from '../features/course-map/ui/CourseOverviewWidget';
 
 interface CourseItem {
   slug: string;
@@ -187,6 +188,9 @@ export default function TeacherDashboardPage() {
         skillSlugs={activeCourse.skillSlugs}
         onResetStudent={handleResetStudent}
       />
+
+      {/* 🗺️ Course Overview Map Widget (Hierarchy & Questions Inspection) */}
+      <CourseOverviewWidget courseSlug={activeCourseSlug} />
     </main>
   );
 }
