@@ -222,30 +222,34 @@ export default function StudentPortalPage() {
     }
   };
 
-  const [isLeftPanelOpen, setIsLeftPanelOpen] = useState<boolean>(true);
-  const [isRightPanelOpen, setIsRightPanelOpen] = useState<boolean>(true);
+  // Opera-Style Sidebar Drawer State: null = closed, 'task' | 'bkt' | 'analytics' | 'settings'
+  const [activeDrawer, setActiveDrawer] = useState<'task' | 'bkt' | 'analytics' | 'settings' | null>('task');
+
+  const toggleDrawer = (tab: 'task' | 'bkt' | 'analytics' | 'settings') => {
+    setActiveDrawer((prev) => (prev === tab ? null : tab));
+  };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans">
+    <div className="h-screen w-screen bg-slate-950 text-slate-100 flex flex-col font-sans overflow-hidden">
       {/* 📌 Sticky Top Navigation Bar */}
-      <header className="sticky top-0 z-40 w-full h-16 bg-slate-900/95 border-b border-slate-800/80 px-4 sm:px-6 flex items-center justify-between backdrop-blur-md shadow-md">
+      <header className="h-14 w-full bg-slate-900 border-b border-slate-800/90 px-4 flex items-center justify-between shrink-0 z-30 shadow-md">
         <div className="flex items-center gap-3">
-          <div className="p-2 bg-indigo-600/20 border border-indigo-500/30 rounded-xl text-indigo-400">
+          <div className="p-1.5 bg-indigo-600/20 border border-indigo-500/30 rounded-lg text-indigo-400">
             <Brain className="w-5 h-5" />
           </div>
           <div>
-            <h1 className="text-base font-bold text-white leading-tight flex items-center gap-2">
+            <h1 className="text-sm font-bold text-white flex items-center gap-2">
               <span>Smart-BKT-Chain</span>
-              <span className="hidden sm:inline-block px-2 py-0.5 text-[10px] font-mono bg-indigo-500/20 text-indigo-300 rounded border border-indigo-500/30">
-                Student Workspace
+              <span className="px-2 py-0.5 text-[10px] font-mono bg-indigo-500/20 text-indigo-300 rounded border border-indigo-500/30">
+                v2.0 Shell
               </span>
             </h1>
           </div>
         </div>
 
-        {/* Dynamic Course Switcher Selector in Top Bar */}
+        {/* Top Controls: Course Selector & User Profile */}
         <div className="flex items-center gap-3">
-          <div className="relative min-w-[200px] sm:min-w-[280px]">
+          <div className="relative min-w-[200px] sm:min-w-[260px]">
             <select
               id="student-course-select"
               value={activeCourseSlug}
@@ -263,112 +267,204 @@ export default function StudentPortalPage() {
             </div>
           </div>
 
-          {/* Sidebar Toggle Controls */}
-          <button
-            onClick={() => setIsLeftPanelOpen(!isLeftPanelOpen)}
-            className={`p-2 rounded-xl border text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
-              isLeftPanelOpen
-                ? 'bg-indigo-600/20 border-indigo-500/40 text-indigo-300'
-                : 'bg-slate-800 border-slate-700 text-slate-400 hover:text-white'
-            }`}
-            title="Переключити Панель Умови Завдання"
-          >
-            <BookOpen className="w-4 h-4" />
-            <span className="hidden md:inline">Умова</span>
-          </button>
-
-          <button
-            onClick={() => setIsRightPanelOpen(!isRightPanelOpen)}
-            className={`p-2 rounded-xl border text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
-              isRightPanelOpen
-                ? 'bg-indigo-600/20 border-indigo-500/40 text-indigo-300'
-                : 'bg-slate-800 border-slate-700 text-slate-400 hover:text-white'
-            }`}
-            title="Переключити Карусель Графа Навичок"
-          >
-            <Sparkles className="w-4 h-4" />
-            <span className="hidden md:inline">Граф BKT</span>
-          </button>
-
-          {/* User Badge */}
-          <div className="hidden lg:flex items-center gap-2 bg-slate-950 px-3 py-1.5 rounded-xl border border-slate-800 text-xs">
+          <div className="flex items-center gap-2 bg-slate-950 px-3 py-1.5 rounded-xl border border-slate-800 text-xs">
             <User className="w-3.5 h-3.5 text-indigo-400" />
-            <span className="font-medium text-slate-200">Дмитро Стеценко</span>
+            <span className="font-semibold text-slate-200">Дмитро Стеценко</span>
           </div>
         </div>
       </header>
 
-      {/* 🗺️ Collapsible Top Banner for Skill DAG Map */}
-      {isRightPanelOpen && (
-        <div className="w-full bg-slate-900/90 border-b border-slate-800 p-4 transition-all">
-          <div className="max-w-7xl mx-auto">
-            <SkillDagMap nodes={graphNodes} activeSkillSlug={task?.skill?.slug} />
-          </div>
-        </div>
-      )}
-
-      {/* 🎛️ Workspace Body: Collapsible Left Panel + Main Editor Canvas */}
+      {/* 🧭 Main Workspace Area with Left Opera Icon Rail + Expandable Drawer */}
       <div className="flex-1 flex overflow-hidden">
-        {/* Left Collapsible Sidebar: Task Details & Instructions */}
-        {isLeftPanelOpen && task && (
-          <aside className="w-full lg:w-[380px] xl:w-[420px] bg-slate-900/90 border-r border-slate-800 p-5 flex flex-col gap-5 overflow-y-auto shrink-0 shadow-2xl">
-            <div className="flex items-center justify-between">
-              <span className="px-2.5 py-1 rounded-full text-xs font-mono font-bold uppercase tracking-wider bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
-                {task.skill.title}
-              </span>
-              <span className="px-2.5 py-1 rounded-full text-xs font-mono font-bold uppercase bg-slate-800 text-slate-300 border border-slate-700">
-                {task.difficulty}
-              </span>
-            </div>
+        {/* 🎨 Opera-Style Vertical Icon Rail (Slim Left Bar) */}
+        <nav className="w-14 bg-slate-900 border-r border-slate-800 flex flex-col items-center py-4 gap-3 shrink-0 z-20 shadow-xl">
+          {/* Main Action Tabs */}
+          <button
+            onClick={() => toggleDrawer('task')}
+            className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all cursor-pointer relative ${
+              activeDrawer === 'task'
+                ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/40'
+                : 'bg-slate-800/60 text-slate-400 hover:bg-slate-800 hover:text-white'
+            }`}
+            title="Умова Завдання та Критерії"
+          >
+            <BookOpen className="w-5 h-5" />
+            {activeDrawer === 'task' && <span className="absolute -left-1 w-1 h-5 bg-indigo-400 rounded-r-full"></span>}
+          </button>
 
-            <div>
-              <h2 className="text-lg font-bold text-white mb-2">{task.title}</h2>
-              <p className="text-xs text-slate-300 leading-relaxed">{task.description}</p>
-            </div>
+          <button
+            onClick={() => toggleDrawer('bkt')}
+            className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all cursor-pointer relative ${
+              activeDrawer === 'bkt'
+                ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/40'
+                : 'bg-slate-800/60 text-slate-400 hover:bg-slate-800 hover:text-white'
+            }`}
+            title="Карта Навичок BKT (DAG)"
+          >
+            <Sparkles className="w-5 h-5" />
+            {activeDrawer === 'bkt' && <span className="absolute -left-1 w-1 h-5 bg-indigo-400 rounded-r-full"></span>}
+          </button>
 
-            {/* AI Recommendation Context */}
-            {recommendation && (
-              <div className="p-3.5 bg-indigo-950/40 border border-indigo-500/30 rounded-xl flex items-start gap-2.5">
-                <Sparkles className="w-4 h-4 text-indigo-400 shrink-0 mt-0.5" />
-                <div className="text-[11px] text-indigo-200">
-                  <span className="font-bold text-indigo-300 block mb-0.5">Рекомендація BKT Engine:</span>
-                  {recommendation.reason || 'Завдання обрано відповідно до вашого розрахованого уровня засвоєння навичок.'}
-                </div>
-              </div>
-            )}
+          <div className="w-8 h-[1px] bg-slate-800 my-1"></div>
 
-            {/* Dynamic Task Type Indicators */}
-            {task.taskType === 'CODE' && task.testCases.length > 0 && (
-              <div className="flex flex-col gap-2 pt-2 border-t border-slate-800">
-                <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Відкриті Тест-Кейси</span>
-                {task.testCases.map((tc, idx) => (
-                  <div key={idx} className="p-2.5 bg-slate-950/70 border border-slate-800 rounded-lg text-xs font-mono flex flex-col gap-0.5">
-                    <span className="text-slate-400 text-[11px]">Вхідні дані: <code className="text-indigo-300">{tc.input}</code></span>
-                    <span className="text-slate-400 text-[11px]">Очікуваний вивід: <code className="text-emerald-300">{tc.expectedOutput}</code></span>
-                  </div>
-                ))}
-              </div>
-            )}
+          {/* External Portals & Tools */}
+          <a
+            href="http://localhost:3003"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-10 h-10 rounded-xl bg-purple-600/20 text-purple-400 border border-purple-500/30 flex items-center justify-center hover:bg-purple-600/30 transition-all"
+            title="Кабінет Викладача (Teacher Portal)"
+          >
+            <User className="w-5 h-5" />
+          </a>
 
+          <a
+            href="http://localhost:3004"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-10 h-10 rounded-xl bg-emerald-600/20 text-emerald-400 border border-emerald-500/30 flex items-center justify-center hover:bg-emerald-600/30 transition-all"
+            title="Панель Адміністратора (CMS DAG)"
+          >
+            <Code2 className="w-5 h-5" />
+          </a>
+
+          <div className="mt-auto flex flex-col gap-3">
             <button
-              onClick={() => fetchRecommendedTask(activeCourseSlug)}
-              className="inline-flex items-center justify-center gap-2 px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold border border-slate-700 transition-all cursor-pointer mt-auto"
+              onClick={() => toggleDrawer('settings')}
+              className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all cursor-pointer ${
+                activeDrawer === 'settings'
+                  ? 'bg-indigo-600 text-white'
+                  : 'bg-slate-800/60 text-slate-400 hover:bg-slate-800 hover:text-white'
+              }`}
+              title="Налаштування Workspace"
             >
-              <RefreshCw className="w-3.5 h-3.5" />
-              <span>Оновити рекомендоване завдання</span>
+              <RefreshCw className="w-5 h-5" />
             </button>
+          </div>
+        </nav>
+
+        {/* 📂 Expandable Side Drawer Panel */}
+        {activeDrawer && (
+          <aside className="w-full sm:w-[380px] lg:w-[420px] bg-slate-900/95 border-r border-slate-800 p-5 flex flex-col gap-5 overflow-y-auto shrink-0 shadow-2xl backdrop-blur-xl animate-fadeIn z-10">
+            {/* Drawer Header */}
+            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+              <h2 className="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
+                {activeDrawer === 'task' && (
+                  <>
+                    <BookOpen className="w-4 h-4 text-indigo-400" />
+                    <span>Умова та Контекст Завдання</span>
+                  </>
+                )}
+                {activeDrawer === 'bkt' && (
+                  <>
+                    <Sparkles className="w-4 h-4 text-emerald-400" />
+                    <span>Карта Навичок (Skill DAG)</span>
+                  </>
+                )}
+                {activeDrawer === 'settings' && (
+                  <>
+                    <RefreshCw className="w-4 h-4 text-amber-400" />
+                    <span>Налаштування Студента</span>
+                  </>
+                )}
+              </h2>
+              <button
+                onClick={() => setActiveDrawer(null)}
+                className="text-slate-400 hover:text-white text-xs font-mono px-2 py-1 bg-slate-800 rounded-lg cursor-pointer"
+              >
+                ✕ Закрити
+              </button>
+            </div>
+
+            {/* Content Drawer 1: Task Condition */}
+            {activeDrawer === 'task' && task && (
+              <div className="flex flex-col gap-5">
+                <div className="flex items-center justify-between">
+                  <span className="px-2.5 py-1 rounded-full text-xs font-mono font-bold uppercase tracking-wider bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
+                    {task.skill.title}
+                  </span>
+                  <span className="px-2.5 py-1 rounded-full text-xs font-mono font-bold uppercase bg-slate-800 text-slate-300 border border-slate-700">
+                    {task.difficulty}
+                  </span>
+                </div>
+
+                <div>
+                  <h3 className="text-base font-bold text-white mb-2">{task.title}</h3>
+                  <p className="text-xs text-slate-300 leading-relaxed">{task.description}</p>
+                </div>
+
+                {recommendation && (
+                  <div className="p-3.5 bg-indigo-950/40 border border-indigo-500/30 rounded-xl flex items-start gap-2.5">
+                    <Sparkles className="w-4 h-4 text-indigo-400 shrink-0 mt-0.5" />
+                    <div className="text-[11px] text-indigo-200">
+                      <span className="font-bold text-indigo-300 block mb-0.5">Рекомендація BKT Engine:</span>
+                      {recommendation.reason || 'Завдання обрано відповідно до вашого рівня засвоєння.'}
+                    </div>
+                  </div>
+                )}
+
+                {task.taskType === 'CODE' && task.testCases.length > 0 && (
+                  <div className="flex flex-col gap-2 pt-2 border-t border-slate-800">
+                    <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
+                      Відкриті Тест-Кейси
+                    </span>
+                    {task.testCases.map((tc, idx) => (
+                      <div
+                        key={idx}
+                        className="p-2.5 bg-slate-950/70 border border-slate-800 rounded-lg text-xs font-mono flex flex-col gap-0.5"
+                      >
+                        <span className="text-slate-400 text-[11px]">
+                          Вхідні дані: <code className="text-indigo-300">{tc.input}</code>
+                        </span>
+                        <span className="text-slate-400 text-[11px]">
+                          Очікуваний вивід: <code className="text-emerald-300">{tc.expectedOutput}</code>
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                <button
+                  onClick={() => fetchRecommendedTask(activeCourseSlug)}
+                  className="inline-flex items-center justify-center gap-2 px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold border border-slate-700 transition-all cursor-pointer mt-auto"
+                >
+                  <RefreshCw className="w-3.5 h-3.5" />
+                  <span>Оновити рекомендоване завдання</span>
+                </button>
+              </div>
+            )}
+
+            {/* Content Drawer 2: Skill DAG Map */}
+            {activeDrawer === 'bkt' && (
+              <div className="flex flex-col gap-4">
+                <SkillDagMap nodes={graphNodes} activeSkillSlug={task?.skill?.slug} />
+              </div>
+            )}
+
+            {/* Content Drawer 3: Settings */}
+            {activeDrawer === 'settings' && (
+              <div className="flex flex-col gap-4 text-xs text-slate-300">
+                <p>Налаштування робочого середовища та відображення Monaco Editor.</p>
+                <button
+                  onClick={() => fetchRecommendedTask(activeCourseSlug)}
+                  className="w-full py-2.5 bg-indigo-600 text-white rounded-xl font-bold cursor-pointer hover:bg-indigo-500 transition-all"
+                >
+                  Перезавантажити стан BKT
+                </button>
+              </div>
+            )}
           </aside>
         )}
 
-        {/* Center Main Canvas: Editor & Evaluation Result */}
-        <main className="flex-1 p-4 lg:p-6 overflow-y-auto flex flex-col gap-4">
+        {/* 💻 Center Main Canvas: Editor & Evaluation Result */}
+        <main className="flex-1 p-4 lg:p-6 overflow-y-auto flex flex-col gap-4 bg-slate-950">
           {isLoading ? (
             <div className="p-12 bg-slate-900/50 border border-slate-800 rounded-2xl flex flex-col items-center justify-center gap-4 text-slate-400 my-auto">
               <RefreshCw className="w-8 h-8 animate-spin text-indigo-500" />
               <p className="text-sm font-medium">Завантаження адаптивного завдання з BKT графа...</p>
             </div>
           ) : task ? (
-            <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-4 h-full">
               {task.taskType === 'SINGLE_CHOICE' || task.taskType === 'MULTIPLE_CHOICE' ? (
                 <QuizTaskEditor
                   taskId={task.id}
@@ -407,7 +503,7 @@ export default function StudentPortalPage() {
               {/* Evaluation Result Toast Panel */}
               {evalResult && (
                 <div
-                  className={`p-5 rounded-2xl border flex flex-col gap-3 transition-all shadow-xl ${
+                  className={`p-4 rounded-2xl border flex flex-col gap-3 transition-all shadow-xl shrink-0 ${
                     evalResult.isPassed
                       ? 'bg-emerald-950/40 border-emerald-500/40 text-emerald-100'
                       : 'bg-rose-950/40 border-rose-500/40 text-rose-100'
