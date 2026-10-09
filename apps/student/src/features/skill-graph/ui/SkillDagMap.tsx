@@ -1,7 +1,5 @@
-'use client';
-
 import React from 'react';
-import { CheckCircle2, Lock, Sparkles, ArrowRight } from 'lucide-react';
+import { CheckCircle2, Lock, Sparkles, ArrowDown } from 'lucide-react';
 import { SkillGraphNode } from '../model/skill-graph.types';
 
 interface SkillDagMapProps {
@@ -12,19 +10,19 @@ interface SkillDagMapProps {
 
 export function SkillDagMap({ nodes, activeSkillSlug, onSelectSkill }: SkillDagMapProps) {
   return (
-    <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-6 shadow-xl flex flex-col gap-4">
-      <div className="flex items-center justify-between">
-        <h3 className="text-base font-bold text-slate-100 flex items-center gap-2">
+    <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 shadow-xl flex flex-col gap-4">
+      <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+        <h3 className="text-sm font-bold text-slate-100 flex items-center gap-2">
           <Sparkles className="w-4 h-4 text-emerald-400" />
           <span>Карта Навичок (Skill DAG Graph)</span>
         </h3>
-        <span className="text-xs font-mono text-slate-400">
-          Поріг засвоєння: P(L) ≥ 0.95
+        <span className="text-[11px] font-mono text-slate-400">
+          Поріг: P(L) ≥ 0.95
         </span>
       </div>
 
-      {/* DAG Nodes Flow Container */}
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 py-2">
+      {/* Vertical DAG Nodes Flow Container */}
+      <div className="flex flex-col items-stretch gap-3 py-1">
         {nodes.map((node, idx) => {
           const isMastered = node.pMastery >= 0.95;
           const isLocked = node.status === 'LOCKED';
@@ -32,10 +30,10 @@ export function SkillDagMap({ nodes, activeSkillSlug, onSelectSkill }: SkillDagM
 
           return (
             <React.Fragment key={node.id}>
-              {/* Node Card */}
+              {/* Vertical Node Card */}
               <div
                 onClick={() => !isLocked && onSelectSkill?.(node.slug)}
-                className={`flex-1 p-4 rounded-xl border transition-all duration-300 flex flex-col gap-2 relative ${
+                className={`p-3.5 rounded-xl border transition-all duration-300 flex flex-col gap-2 relative ${
                   isLocked
                     ? 'bg-slate-950/40 border-slate-800/60 opacity-60 cursor-not-allowed'
                     : isActive
@@ -45,33 +43,33 @@ export function SkillDagMap({ nodes, activeSkillSlug, onSelectSkill }: SkillDagM
                     : 'bg-slate-950/80 border-slate-800 hover:border-slate-700 cursor-pointer'
                 }`}
               >
-                {/* Status Badge */}
+                {/* Header Row */}
                 <div className="flex items-center justify-between gap-2">
                   <span className="text-[11px] font-mono text-slate-400 font-semibold uppercase">
                     Модуль {idx + 1}
                   </span>
                   {isMastered ? (
-                    <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/30">
+                    <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/30">
                       <CheckCircle2 className="w-3 h-3" />
                       Засвоєно
                     </span>
                   ) : isLocked ? (
-                    <span className="inline-flex items-center gap-1 text-[11px] font-bold text-slate-400 bg-slate-800/50 px-2 py-0.5 rounded-full border border-slate-700">
+                    <span className="inline-flex items-center gap-1 text-[10px] font-bold text-slate-400 bg-slate-800/50 px-2 py-0.5 rounded-full border border-slate-700">
                       <Lock className="w-3 h-3" />
                       Заблоковано
                     </span>
                   ) : (
-                    <span className="inline-flex items-center gap-1 text-[11px] font-bold text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded-full border border-amber-500/30">
+                    <span className="inline-flex items-center gap-1 text-[10px] font-bold text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded-full border border-amber-500/30">
                       В процесі
                     </span>
                   )}
                 </div>
 
                 {/* Node Title */}
-                <h4 className="text-sm font-bold text-slate-100 line-clamp-1">{node.title}</h4>
+                <h4 className="text-xs font-bold text-slate-100">{node.title}</h4>
 
                 {/* P(L) Progress Bar */}
-                <div className="flex flex-col gap-1 mt-1">
+                <div className="flex flex-col gap-1 mt-0.5">
                   <div className="flex items-center justify-between text-[11px] font-mono">
                     <span className="text-slate-400">P(L) Mastery:</span>
                     <span
@@ -101,10 +99,10 @@ export function SkillDagMap({ nodes, activeSkillSlug, onSelectSkill }: SkillDagM
                 </div>
               </div>
 
-              {/* Arrow Connector between nodes */}
+              {/* Vertical Arrow Connector between nodes */}
               {idx < nodes.length - 1 && (
-                <div className="hidden sm:flex items-center justify-center text-slate-600">
-                  <ArrowRight className="w-5 h-5" />
+                <div className="flex items-center justify-center text-slate-600 py-0.5">
+                  <ArrowDown className="w-4 h-4 text-slate-600" />
                 </div>
               )}
             </React.Fragment>
