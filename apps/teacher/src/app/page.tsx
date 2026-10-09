@@ -1,10 +1,8 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { ShieldCheck, Network, Users, BarChart3, ArrowLeft, Code2, BookOpen, Scale, ChevronDown, X } from 'lucide-react';
-import { StudentAnalyticsTable } from '../features/analytics/ui/StudentAnalyticsTable';
+import { ShieldCheck, Network, Users, BarChart3, Code2, BookOpen, Scale, ChevronDown, X, Search, RotateCcw, AlertTriangle, CheckCircle2, Lock, HelpCircle, Code, FileText, CheckSquare } from 'lucide-react';
 import { StudentAnalyticsItem } from '../features/analytics/model/analytics.types';
-import { CourseOverviewWidget } from '../features/course-map/ui/CourseOverviewWidget';
 
 interface CourseItem {
   slug: string;
@@ -24,6 +22,17 @@ export default function TeacherDashboardPage() {
   const [courses, setCourses] = useState<CourseItem[]>(DEFAULT_COURSES);
   const [activeCourseSlug, setActiveCourseSlug] = useState<string>('js-dev');
   const [students, setStudents] = useState<StudentAnalyticsItem[]>([]);
+  const [courseDetails, setCourseDetails] = useState<any>(null);
+  const [allTasks, setAllTasks] = useState<any[]>([]);
+
+  // Selected item states for Main Canvas Detail views
+  const [selectedStudentId, setSelectedStudentId] = useState<string | null>(null);
+  const [selectedSkillSlug, setSelectedSkillSlug] = useState<string | null>(null);
+  const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
+
+  // Search & Filter state inside side drawers
+  const [studentSearch, setStudentSearch] = useState<string>('');
+  const [dagSearch, setDagSearch] = useState<string>('');
 
   const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
 
@@ -61,6 +70,10 @@ export default function TeacherDashboardPage() {
         const data = await res.json();
         if (Array.isArray(data)) {
           setStudents(data);
+          if (data.length > 0 && !selectedStudentId) {
+            const firstId = data[0].id || data[0].studentId || data[0].email;
+            setSelectedStudentId(firstId);
+          }
         }
       }
     } catch (err) {
@@ -68,13 +81,29 @@ export default function TeacherDashboardPage() {
     }
   };
 
+  const fetchCourseStructure = async () => {
+    try {
+      const [courseRes, tasksRes] = await Promise.all([
+        fetch(`${API_URL}/api/v1/courses/${activeCourseSlug}`),
+        fetch(`${API_URL}/api/v1/tasks?courseSlug=${activeCourseSlug}`),
+      ]);
+      if (courseRes.ok) {
+        const data = await courseRes.json();
+        setCourseDetails(data);
+      }
+      if (tasksRes.ok) {
+        const tasksData = await tasksRes.json();
+        setAllTasks(tasksData);
+      }
+    } catch (err) {
+      console.error('Error fetching course structure:', err);
+    }
+  };
+
   useEffect(() => {
     fetchStudentAnalytics();
+    fetchCourseStructure();
   }, [activeCourseSlug]);
-
-  const handleResetStudent = () => {
-    fetchStudentAnalytics();
-  };
 
   const [activeDrawer, setActiveDrawer] = useState<'analytics' | 'coursemap' | 'settings' | null>('analytics');
 
@@ -83,6 +112,37 @@ export default function TeacherDashboardPage() {
   };
 
   const activeCourse = courses.find((c) => c.slug === activeCourseSlug) || courses[0] || DEFAULT_COURSES[0];
+  const selectedStudent = students.find((s) => (s.id || s.studentId || s.email) === selectedStudentId) || students[0];
+
+  const handleResetStudent = async (studentId: string) => {
+    try {
+      const res = await fetch(`${API_URL}/api/v1/bkt/reset/${studentId}`, { method: 'POST' });
+      if (res.ok) {
+        fetchStudentAnalytics();
+      }
+    } catch (err) {
+      console.error('Error resetting student BKT:', err);
+    }
+  };
+
+  const filteredStudents = students.filter(
+    (s) =>
+      s.name.toLowerCase().includes(studentSearch.toLowerCase()) ||
+      s.email.toLowerCase().includes(studentSearch.toLowerCase())
+  );
+
+  const getTaskTypeBadge = (taskType: string) => {
+    switch (taskType) {
+      case 'SINGLE_CHOICE':
+        return <span className="px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 text-[10px] font-bold">Single Test</span>;
+      case 'MULTIPLE_CHOICE':
+        return <span className="px-2 py-0.5 rounded bg-purple-500/10 text-purple-400 text-[10px] font-bold">Multi Test</span>;
+      case 'TEXT_ESSAY':
+        return <span className="px-2 py-0.5 rounded bg-amber-500/10 text-amber-400 text-[10px] font-bold">Essay</span>;
+      default:
+        return <span className="px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 text-[10px] font-bold">Code VM</span>;
+    }
+  };
 
   return (
     <div className="h-screen w-screen bg-slate-950 text-slate-100 flex flex-col font-sans overflow-hidden">
@@ -102,7 +162,7 @@ export default function TeacherDashboardPage() {
           </div>
         </div>
 
-        {/* Top Controls: Course Filter Selector & Profile */}
+        {/* Top Controls: Course Selector & Profile */}
         <div className="flex items-center gap-3">
           <div className="relative min-w-[200px] sm:min-w-[280px]">
             <select
@@ -133,7 +193,6 @@ export default function TeacherDashboardPage() {
       <div className="flex-1 flex overflow-hidden">
         {/* 🎨 Opera-Style Vertical Icon Rail (Slim Left Bar) */}
         <nav className="w-14 bg-slate-900 border-r border-slate-800 flex flex-col items-center py-4 gap-3 shrink-0 z-20 shadow-xl">
-          {/* Main Action Tabs */}
           <button
             onClick={() => toggleDrawer('analytics')}
             className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all cursor-pointer relative ${
@@ -141,9 +200,9 @@ export default function TeacherDashboardPage() {
                 ? 'bg-purple-600 text-white shadow-lg shadow-purple-600/40'
                 : 'bg-slate-800/60 text-slate-400 hover:bg-slate-800 hover:text-white'
             }`}
-            title="Аналітика та BKT Heatmap"
+            title="Список Студентів & Аналітика"
           >
-            <BarChart3 className="w-5 h-5" />
+            <Users className="w-5 h-5" />
             {activeDrawer === 'analytics' && <span className="absolute -left-1 w-1 h-5 bg-purple-400 rounded-r-full"></span>}
           </button>
 
@@ -154,7 +213,7 @@ export default function TeacherDashboardPage() {
                 ? 'bg-purple-600 text-white shadow-lg shadow-purple-600/40'
                 : 'bg-slate-800/60 text-slate-400 hover:bg-slate-800 hover:text-white'
             }`}
-            title="Інспекція Курсу та Завдань"
+            title="Граф Навичок & Завдання"
           >
             <Network className="w-5 h-5" />
             {activeDrawer === 'coursemap' && <span className="absolute -left-1 w-1 h-5 bg-purple-400 rounded-r-full"></span>}
@@ -200,22 +259,22 @@ export default function TeacherDashboardPage() {
           </div>
         </nav>
 
-        {/* 📂 Expandable Side Drawer Panel */}
+        {/* 📂 Expandable Side Drawer Panel (List View) */}
         {activeDrawer && (
-          <aside className="w-full sm:w-[380px] lg:w-[440px] bg-slate-900/95 border-r border-slate-800 flex flex-col shrink-0 shadow-2xl backdrop-blur-xl animate-fadeIn z-10 overflow-hidden">
-            {/* 📌 Fixed Drawer Header (Does not scroll) */}
+          <aside className="w-full sm:w-[340px] lg:w-[380px] bg-slate-900/95 border-r border-slate-800 flex flex-col shrink-0 shadow-2xl backdrop-blur-xl animate-fadeIn z-10 overflow-hidden">
+            {/* 📌 Fixed Drawer Header */}
             <div className="p-4 border-b border-slate-800 flex items-center justify-between shrink-0 bg-slate-900/90 backdrop-blur-md">
               <h2 className="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
                 {activeDrawer === 'analytics' && (
                   <>
-                    <BarChart3 className="w-4 h-4 text-purple-400" />
-                    <span>Показники BKT Курсу</span>
+                    <Users className="w-4 h-4 text-purple-400" />
+                    <span>Список Студентів ({students.length})</span>
                   </>
                 )}
                 {activeDrawer === 'coursemap' && (
                   <>
                     <Network className="w-4 h-4 text-indigo-400" />
-                    <span>Інспекція Графа Навичок</span>
+                    <span>Дерево Модулів & Завдань</span>
                   </>
                 )}
                 {activeDrawer === 'settings' && (
@@ -234,66 +293,384 @@ export default function TeacherDashboardPage() {
               </button>
             </div>
 
-            {/* 📜 Scrollable Drawer Body Content */}
-            <div className="flex-1 p-5 overflow-y-auto flex flex-col gap-5">
+            {/* 📜 Scrollable Drawer Body Content (Lists) */}
+            <div className="flex-1 p-4 overflow-y-auto flex flex-col gap-3">
+              {/* Drawer 1: Students List */}
+              {activeDrawer === 'analytics' && (
+                <div className="flex flex-col gap-3">
+                  <div className="relative">
+                    <Search className="w-3.5 h-3.5 absolute left-3 top-2.5 text-slate-500" />
+                    <input
+                      type="text"
+                      placeholder="Пошук студента..."
+                      value={studentSearch}
+                      onChange={(e) => setStudentSearch(e.target.value)}
+                      className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-3 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-purple-500"
+                    />
+                  </div>
 
-            {/* Metrics Breakdown */}
-            {activeDrawer === 'analytics' && (
-              <div className="flex flex-col gap-4">
-                <div className="p-4 bg-slate-950 border border-slate-800 rounded-xl flex items-center gap-3">
-                  <Network className="w-6 h-6 text-indigo-400" />
-                  <div>
-                    <span className="text-[10px] text-slate-400 font-semibold uppercase block">Модулів Курсу</span>
-                    <h3 className="text-lg font-bold text-white">{activeCourse.skillSlugs.length} Модулів (DAG)</h3>
+                  <div className="flex flex-col gap-2 mt-1">
+                    {filteredStudents.map((st) => {
+                      const stId = st.id || st.studentId || st.email;
+                      const isSelected = selectedStudentId === stId;
+                      const avgMastery = st.averageMastery !== undefined ? (st.averageMastery * 100).toFixed(0) : '0';
+
+                      return (
+                        <div
+                          key={stId}
+                          onClick={() => setSelectedStudentId(stId)}
+                          className={`p-3 rounded-xl border transition-all cursor-pointer flex items-center justify-between gap-3 ${
+                            isSelected
+                              ? 'bg-purple-950/40 border-purple-500 shadow-md shadow-purple-950/50 ring-1 ring-purple-500/50'
+                              : 'bg-slate-950/80 border-slate-800/80 hover:bg-slate-800/50 hover:border-slate-700'
+                          }`}
+                        >
+                          <div className="overflow-hidden">
+                            <div className="text-xs font-bold text-white truncate">{st.name}</div>
+                            <div className="text-[11px] text-slate-400 truncate font-mono">{st.email}</div>
+                          </div>
+                          <div className="flex flex-col items-end shrink-0">
+                            <span className="text-xs font-mono font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
+                              {avgMastery}% P(L)
+                            </span>
+                            <span className="text-[10px] text-slate-400 font-mono mt-0.5">
+                              WPM: {st.wpm ?? st.avgWpm ?? 0}
+                            </span>
+                          </div>
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
+              )}
 
-                <div className="p-4 bg-slate-950 border border-slate-800 rounded-xl flex items-center gap-3">
-                  <Users className="w-6 h-6 text-emerald-400" />
-                  <div>
-                    <span className="text-[10px] text-slate-400 font-semibold uppercase block">Активні Студенти</span>
-                    <h3 className="text-lg font-bold text-white">{students.length} Студенти</h3>
+              {/* Drawer 2: Course Modules & Tasks List */}
+              {activeDrawer === 'coursemap' && courseDetails && (
+                <div className="flex flex-col gap-3">
+                  <div className="relative">
+                    <Search className="w-3.5 h-3.5 absolute left-3 top-2.5 text-slate-500" />
+                    <input
+                      type="text"
+                      placeholder="Пошук модуля чи завдання..."
+                      value={dagSearch}
+                      onChange={(e) => setDagSearch(e.target.value)}
+                      className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-3 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-indigo-500"
+                    />
+                  </div>
+
+                  <div className="flex flex-col gap-2 mt-1">
+                    {courseDetails.skills?.map((skill: any, sIdx: number) => {
+                      const isSkillSelected = selectedSkillSlug === skill.slug;
+                      const skillTasks = allTasks.filter((t) => t.skillId === skill.id || t.skill?.id === skill.id);
+
+                      return (
+                        <div key={skill.id} className="flex flex-col gap-1.5">
+                          {/* Skill Node Card Header in List */}
+                          <div
+                            onClick={() => {
+                              setSelectedSkillSlug(skill.slug);
+                              setSelectedTaskId(null);
+                            }}
+                            className={`p-3 rounded-xl border transition-all cursor-pointer flex items-center justify-between ${
+                              isSkillSelected
+                                ? 'bg-indigo-950/40 border-indigo-500 shadow-md ring-1 ring-indigo-500/50'
+                                : 'bg-slate-950/80 border-slate-800 hover:bg-slate-800/50'
+                            }`}
+                          >
+                            <div className="flex items-center gap-2">
+                              <span className="text-[10px] font-mono text-indigo-400 font-bold bg-indigo-500/10 px-2 py-0.5 rounded border border-indigo-500/20">
+                                M{sIdx + 1}
+                              </span>
+                              <span className="text-xs font-bold text-white">{skill.title}</span>
+                            </div>
+                            <span className="text-[10px] font-mono text-slate-400">
+                              {skillTasks.length} задач
+                            </span>
+                          </div>
+
+                          {/* Tasks Sub-list under Skill */}
+                          <div className="pl-3 flex flex-col gap-1 border-l-2 border-slate-800 ml-3">
+                            {skillTasks.map((tk: any) => {
+                              const isTaskSelected = selectedTaskId === tk.id;
+                              return (
+                                <div
+                                  key={tk.id}
+                                  onClick={() => {
+                                    setSelectedTaskId(tk.id);
+                                    setSelectedSkillSlug(skill.slug);
+                                  }}
+                                  className={`p-2 rounded-lg text-xs transition-all cursor-pointer flex items-center justify-between ${
+                                    isTaskSelected
+                                      ? 'bg-purple-950/60 text-purple-200 border border-purple-500/40 font-semibold'
+                                      : 'bg-slate-950/50 text-slate-300 hover:bg-slate-800/40 border border-slate-800/40'
+                                  }`}
+                                >
+                                  <span className="truncate pr-2">{tk.title}</span>
+                                  {getTaskTypeBadge(tk.taskType)}
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
+              )}
 
-                <div className="p-4 bg-slate-950 border border-slate-800 rounded-xl flex items-center gap-3">
-                  <BarChart3 className="w-6 h-6 text-amber-400" />
-                  <div>
-                    <span className="text-[10px] text-slate-400 font-semibold uppercase block">Середня Майстерність P(L)</span>
-                    <h3 className="text-lg font-bold text-white">
-                      {students.length > 0 && students[0].averageMastery !== undefined
-                        ? `${(students[0].averageMastery * 100).toFixed(1)}%`
-                        : '0.0%'}
-                    </h3>
+              {/* Drawer 3: Settings */}
+              {activeDrawer === 'settings' && (
+                <div className="flex flex-col gap-3 text-xs text-slate-300">
+                  <div className="p-3 bg-slate-950 border border-slate-800 rounded-xl">
+                    <span className="font-bold text-white block mb-1">Поріг Майстерності BKT</span>
+                    <p className="text-[11px] text-slate-400">Поточний поріг переходу між модулями: P(L) ≥ 0.95</p>
+                  </div>
+                  <div className="p-3 bg-slate-950 border border-slate-800 rounded-xl">
+                    <span className="font-bold text-white block mb-1">Параметри Штрафу за Згадування</span>
+                    <p className="text-[11px] text-slate-400">Динамічне підвищення P(G) при відповіді &lt; 2.0 сек</p>
                   </div>
                 </div>
-              </div>
-            )}
-
-            {activeDrawer === 'coursemap' && (
-              <div className="flex flex-col gap-4">
-                <CourseOverviewWidget courseSlug={activeCourseSlug} />
-              </div>
-            )}
-
-            {activeDrawer === 'settings' && (
-              <div className="flex flex-col gap-3 text-xs text-slate-300">
-                <p>Налаштування порогів оновлення BKT та алгоритму секвенвування.</p>
-              </div>
-            )}
+              )}
             </div>
           </aside>
         )}
 
-        {/* 💻 Center Main Canvas: Student Analytics Table & Heatmap */}
+        {/* 💻 Center Main Canvas: Detailed Inspector View */}
         <main className="flex-1 p-4 lg:p-6 overflow-y-auto flex flex-col gap-6 bg-slate-950">
-          <StudentAnalyticsTable
-            students={students}
-            skillSlugs={activeCourse.skillSlugs}
-            onResetStudent={handleResetStudent}
-          />
+          {/* Main View 1: Student Detailed Analytics & Heatmap */}
+          {activeDrawer === 'analytics' && selectedStudent && (
+            <div className="flex flex-col gap-6">
+              {/* Student Header Summary Card */}
+              <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-2xl bg-purple-600/20 border border-purple-500/30 flex items-center justify-center text-purple-400 text-lg font-bold">
+                    {selectedStudent.name ? selectedStudent.name.charAt(0) : 'S'}
+                  </div>
+                  <div>
+                    <h2 className="text-lg font-bold text-white flex items-center gap-2">
+                      <span>{selectedStudent.name}</span>
+                      <span className="px-2 py-0.5 text-[10px] font-mono bg-purple-500/10 text-purple-300 rounded border border-purple-500/20">
+                        {selectedStudent.email}
+                      </span>
+                    </h2>
+                    <p className="text-xs text-slate-400 mt-0.5">
+                      Курс: <span className="text-slate-200 font-semibold">{activeCourse.title}</span>
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={() => handleResetStudent(selectedStudent.id || selectedStudent.studentId || selectedStudent.email)}
+                    className="px-3 py-2 rounded-xl bg-rose-600/20 text-rose-300 border border-rose-500/30 hover:bg-rose-600/30 transition-all text-xs font-bold flex items-center gap-2 cursor-pointer shadow-md"
+                  >
+                    <RotateCcw className="w-3.5 h-3.5" />
+                    <span>Скинути BKT Прогрес</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Student Metrics Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col gap-1 shadow-lg">
+                  <span className="text-[11px] font-semibold uppercase text-slate-400">Середня Майстерність P(L)</span>
+                  <div className="text-xl font-bold text-emerald-400 font-mono">
+                    {selectedStudent.averageMastery !== undefined ? `${(selectedStudent.averageMastery * 100).toFixed(1)}%` : '0.0%'}
+                  </div>
+                </div>
+
+                <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col gap-1 shadow-lg">
+                  <span className="text-[11px] font-semibold uppercase text-slate-400">Швидкість Набору WPM</span>
+                  <div className="text-xl font-bold text-indigo-400 font-mono">
+                    {selectedStudent.wpm ?? selectedStudent.avgWpm ?? 0} <span className="text-xs font-normal text-slate-400">WPM</span>
+                  </div>
+                </div>
+
+                <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col gap-1 shadow-lg">
+                  <span className="text-[11px] font-semibold uppercase text-slate-400">Copy-Paste Ratio</span>
+                  <div className="text-xl font-bold text-amber-400 font-mono">
+                    {selectedStudent.copyPasteRatio !== undefined ? `${(selectedStudent.copyPasteRatio * 100).toFixed(0)}%` : '0%'}
+                  </div>
+                </div>
+
+                <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col gap-1 shadow-lg">
+                  <span className="text-[11px] font-semibold uppercase text-slate-400">Індекс Втоми (Idle Pauses)</span>
+                  <div className="text-xl font-bold text-purple-400 font-mono">
+                    {selectedStudent.fatigueIndex ?? 0}
+                  </div>
+                </div>
+              </div>
+
+              {/* BKT Skill Mastery Heatmap Table */}
+              <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl flex flex-col gap-4">
+                <h3 className="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
+                  <BarChart3 className="w-4 h-4 text-purple-400" />
+                  <span>BKT Mastery Breakdown За Модулями</span>
+                </h3>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+                  {activeCourse.skillSlugs.map((slug) => {
+                    const masteryMap = selectedStudent.bktBySkill || selectedStudent.skillMastery || {};
+                    const p = masteryMap[slug] ?? 0;
+                    const isMastered = p >= 0.95;
+
+                    return (
+                      <div key={slug} className="p-3.5 bg-slate-950 border border-slate-800 rounded-xl flex flex-col gap-2">
+                        <div className="flex items-center justify-between text-xs">
+                          <span className="font-mono text-slate-300 font-bold uppercase">{slug}</span>
+                          <span className={`font-mono font-bold ${isMastered ? 'text-emerald-400' : 'text-amber-400'}`}>
+                            {(p * 100).toFixed(1)}%
+                          </span>
+                        </div>
+                        <div className="w-full h-2 bg-slate-900 rounded-full overflow-hidden border border-slate-800">
+                          <div
+                            className={`h-full transition-all duration-500 ${isMastered ? 'bg-emerald-400' : 'bg-amber-400'}`}
+                            style={{ width: `${Math.min(100, p * 100)}%` }}
+                          />
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Main View 2: Course & Tasks Detail Inspector */}
+          {activeDrawer === 'coursemap' && (
+            <div className="flex flex-col gap-6">
+              {selectedTaskId ? (
+                // Task Details Canvas View
+                (() => {
+                  const task = allTasks.find((t) => t.id === selectedTaskId);
+                  if (!task) return null;
+                  return (
+                    <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl flex flex-col gap-5">
+                      <div className="flex items-center justify-between border-b border-slate-800 pb-4">
+                        <div>
+                          <span className="text-[10px] font-mono uppercase bg-purple-500/10 text-purple-400 px-2 py-0.5 rounded border border-purple-500/20">
+                            Деталізація Завдання ({task.difficulty})
+                          </span>
+                          <h2 className="text-xl font-bold text-white mt-1">{task.title}</h2>
+                        </div>
+                        {getTaskTypeBadge(task.taskType)}
+                      </div>
+
+                      <div className="flex flex-col gap-2">
+                        <h4 className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Умова завдання:</h4>
+                        <div className="p-4 bg-slate-950 border border-slate-800 rounded-xl text-xs text-slate-200 font-mono leading-relaxed whitespace-pre-wrap">
+                          {task.description}
+                        </div>
+                      </div>
+
+                      {/* Options / Answers if Quiz */}
+                      {task.options && (
+                        <div className="flex flex-col gap-2">
+                          <h4 className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Варіанти відповідей та Ключі:</h4>
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                            {Array.isArray(task.options.choices) &&
+                              task.options.choices.map((c: any, i: number) => {
+                                const isCorrect =
+                                  task.options.correctAnswer === c.id ||
+                                  (Array.isArray(task.options.correctAnswers) && task.options.correctAnswers.includes(c.id));
+                                return (
+                                  <div
+                                    key={i}
+                                    className={`p-3 rounded-xl border text-xs flex items-center justify-between ${
+                                      isCorrect
+                                        ? 'bg-emerald-950/40 border-emerald-500/50 text-emerald-300 font-semibold'
+                                        : 'bg-slate-950 border-slate-800 text-slate-400'
+                                    }`}
+                                  >
+                                    <span>{c.text || c.label}</span>
+                                    {isCorrect && <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />}
+                                  </div>
+                                );
+                              })}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Test cases if Code task */}
+                      {task.testCases && (
+                        <div className="flex flex-col gap-2">
+                          <h4 className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Автоматичні Тест-кейси (VM Runner):</h4>
+                          <div className="flex flex-col gap-2">
+                            {task.testCases.map((tc: any, idx: number) => (
+                              <div key={idx} className="p-3 bg-slate-950 border border-slate-800 rounded-xl font-mono text-xs flex items-center justify-between">
+                                <span className="text-slate-400">Input: <code className="text-white">{tc.input}</code></span>
+                                <span className="text-slate-400">Expected: <code className="text-emerald-400">{tc.expectedOutput}</code></span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })()
+              ) : (
+                // Skill Node Details Canvas View
+                (() => {
+                  const skill = courseDetails?.skills?.find((s: any) => s.slug === selectedSkillSlug) || courseDetails?.skills?.[0];
+                  if (!skill) return <div className="text-slate-400 text-sm">Оберіть модуль зі списку для перегляду.</div>;
+                  const skillTasks = allTasks.filter((t) => t.skillId === skill.id || t.skill?.id === skill.id);
+
+                  return (
+                    <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl flex flex-col gap-6">
+                      <div className="flex items-center justify-between border-b border-slate-800 pb-4">
+                        <div>
+                          <span className="text-[10px] font-mono uppercase bg-indigo-500/10 text-indigo-400 px-2 py-0.5 rounded border border-indigo-500/20">
+                            Вузол Графа Навичок (DAG Node)
+                          </span>
+                          <h2 className="text-xl font-bold text-white mt-1">{skill.title}</h2>
+                          <p className="text-xs text-slate-400 mt-1">{skill.description || 'Модуль роз розширеного курсу.'}</p>
+                        </div>
+                        <div className="text-right">
+                          <span className="text-xs font-mono text-slate-400 block">Завдань у модулі</span>
+                          <span className="text-lg font-bold text-indigo-400 font-mono">{skillTasks.length}</span>
+                        </div>
+                      </div>
+
+                      <div className="flex flex-col gap-3">
+                        <h4 className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Список Завдань Модуля:</h4>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                          {skillTasks.map((tk: any) => (
+                            <div
+                              key={tk.id}
+                              onClick={() => setSelectedTaskId(tk.id)}
+                              className="p-4 rounded-xl bg-slate-950 border border-slate-800 hover:border-indigo-500/50 cursor-pointer transition-all flex flex-col justify-between gap-3 shadow-md"
+                            >
+                              <div className="flex items-center justify-between">
+                                <span className="text-xs font-bold text-white">{tk.title}</span>
+                                {getTaskTypeBadge(tk.taskType)}
+                              </div>
+                              <p className="text-[11px] text-slate-400 line-clamp-2">{tk.description}</p>
+                              <span className="text-[10px] text-indigo-400 font-semibold self-end">
+                                Детальніше ➔
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })()
+              )}
+            </div>
+          )}
+
+          {/* Main View 3: Settings Details */}
+          {activeDrawer === 'settings' && (
+            <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl flex flex-col gap-4">
+              <h2 className="text-lg font-bold text-white">Параметри Оцінювання та Алгоритму BKT</h2>
+              <p className="text-xs text-slate-400 leading-relaxed">
+                Тут показуються загальні параметри сітки оцінювання BKT: ймовірності вгадування $P(G)$, вислизання $P(S)$, та поріг майстерності $P(L) \ge 0.95$.
+              </p>
+            </div>
+          )}
         </main>
       </div>
     </div>
   );
 }
+
