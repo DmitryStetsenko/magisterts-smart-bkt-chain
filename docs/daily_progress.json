@@ -169,6 +169,31 @@
             },
             {
               "type": "text",
+              "raw_text": "**Повернення Іконок Метрик та Інтеграція Інтерактивного Вікна Математичного/Телеметричного Роз'яснення:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Дизайн картки метрики (`apps/teacher/src/app/page.tsx`):** Повернуто кольорові іконки для кожної з 4 метрик:",
+              "subitems": [
+                "<span className=\"text-emerald-400\">`Sparkles`</span> — Середня Майстерність $P(L)$.",
+                "<span className=\"text-indigo-400\">`Keyboard`</span> — Швидкість Набору WPM.",
+                "<span className=\"text-amber-400\">`Copy`</span> — Copy-Paste Ratio.",
+                "<span className=\"text-purple-400\">`Activity`</span> — Індекс Втоми (Idle Pauses & Cognitive Load)."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Інтерактивні Модальні Вікна («Формула ➔»):** При кліку на кнопку «Формула ➔» розгортається модальне вікно з поясненням математичних алгоритмів BKT, параметрів $P(G)$, $P(S)$, $P(T)$, формули підрахунку WPM, процентного співвідношення буфера обміну та виявлення аномальних пауз втоми.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Перевірка:** Виконано збірку `build:teacher` (100% pass).",
+              "subitems": []
+            },
+            {
+              "type": "text",
               "raw_text": "---",
               "subitems": []
             }
