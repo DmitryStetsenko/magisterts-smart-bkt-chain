@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { io } from 'socket.io-client';
-import { Brain, Sparkles, CheckCircle, AlertCircle, RefreshCw, User, Code2, BookOpen, Scale, ChevronDown, ArrowRight, AlertTriangle } from 'lucide-react';
+import { Brain, Sparkles, CheckCircle, AlertCircle, RefreshCw, User, Code2, BookOpen, Scale, ChevronDown, ArrowRight, AlertTriangle, X } from 'lucide-react';
 import { MonacoCodeEditor } from '../features/code-editor/ui/MonacoCodeEditor';
 import { QuizTaskEditor } from '../features/quiz-editor/ui/QuizTaskEditor';
 import { EssayTaskEditor } from '../features/essay-editor/ui/EssayTaskEditor';
@@ -370,9 +370,10 @@ export default function StudentPortalPage() {
               </h2>
               <button
                 onClick={() => setActiveDrawer(null)}
-                className="text-slate-400 hover:text-white text-xs font-mono px-2 py-1 bg-slate-800 rounded-lg cursor-pointer"
+                className="p-1.5 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-all cursor-pointer"
+                title="Закрити панель"
               >
-                ✕ Закрити
+                <X className="w-4 h-4" />
               </button>
             </div>
 
