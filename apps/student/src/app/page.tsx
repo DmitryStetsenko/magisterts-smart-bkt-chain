@@ -305,8 +305,24 @@ export default function StudentPortalPage() {
             {activeDrawer === 'bkt' && <span className="absolute -left-1 w-1 h-5 bg-indigo-400 rounded-r-full"></span>}
           </button>
 
-          {/* Bottom App Block (External Applications & Workspace Settings) */}
+          {/* Bottom App Block (Workspace Settings & External Applications) */}
           <div className="mt-auto flex flex-col items-center gap-2.5">
+            <div className="w-8 h-[1px] bg-slate-800/80 my-1"></div>
+
+            {/* Workspace Settings Button (Gear Icon) */}
+            <button
+              onClick={() => toggleDrawer('settings')}
+              className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all cursor-pointer ${
+                activeDrawer === 'settings'
+                  ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/40'
+                  : 'bg-slate-800/60 text-slate-400 hover:bg-slate-800 hover:text-white'
+              }`}
+              title="Налаштування Workspace"
+            >
+              <Settings className="w-5 h-5" />
+            </button>
+
+            {/* Horizontal Separator after Settings block */}
             <div className="w-8 h-[1px] bg-slate-800/80 my-1"></div>
 
             {/* External App Shortcut 1: Teacher Portal */}
@@ -330,19 +346,6 @@ export default function StudentPortalPage() {
             >
               <Code2 className="w-4 h-4" />
             </a>
-
-            {/* Workspace Settings Button (Gear Icon) */}
-            <button
-              onClick={() => toggleDrawer('settings')}
-              className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all cursor-pointer ${
-                activeDrawer === 'settings'
-                  ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/40'
-                  : 'bg-slate-800/60 text-slate-400 hover:bg-slate-800 hover:text-white'
-              }`}
-              title="Налаштування Workspace"
-            >
-              <Settings className="w-5 h-5" />
-            </button>
           </div>
         </nav>
 
