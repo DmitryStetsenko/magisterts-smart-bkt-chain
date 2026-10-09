@@ -91,21 +91,27 @@ export default function AdminCMSDashboard() {
     setNodes((prev) => prev.filter((n) => n.id !== nodeId));
   };
 
+  const [activeDrawer, setActiveDrawer] = useState<'dag' | 'courses' | 'system' | null>('dag');
+
+  const toggleDrawer = (tab: 'dag' | 'courses' | 'system') => {
+    setActiveDrawer((prev) => (prev === tab ? null : tab));
+  };
+
   return (
-    <main className="min-h-screen p-6 max-w-7xl mx-auto flex flex-col gap-6 text-slate-100 font-sans">
-      {/* Header Bar */}
-      <header className="flex flex-wrap items-center justify-between gap-4 p-6 bg-slate-900 border border-slate-800 rounded-2xl shadow-xl">
+    <div className="h-screen w-screen bg-slate-950 text-slate-100 flex flex-col font-sans overflow-hidden">
+      {/* 📌 Sticky Top Navigation Bar */}
+      <header className="h-14 w-full bg-slate-900 border-b border-slate-800/90 px-4 flex items-center justify-between shrink-0 z-30 shadow-md">
         <div className="flex items-center gap-3">
-          <div className="p-3 bg-indigo-600/20 border border-indigo-500/30 rounded-xl text-indigo-400">
-            <ShieldCheck className="w-6 h-6" />
+          <div className="p-1.5 bg-indigo-600/20 border border-indigo-500/30 rounded-lg text-indigo-400">
+            <ShieldCheck className="w-5 h-5" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-white flex items-center gap-2">
-              <span>Smart-BKT-Chain System Admin & CMS</span>
+            <h1 className="text-sm font-bold text-white flex items-center gap-2">
+              <span>Smart-BKT-Chain</span>
+              <span className="px-2 py-0.5 text-[10px] font-mono bg-indigo-500/20 text-indigo-300 rounded border border-indigo-500/30">
+                Admin CMS Shell v2.0
+              </span>
             </h1>
-            <p className="text-sm text-slate-400">
-              Адміністративна панель: управління вузлами графа знань (Skill DAG), курсами та Web3 релейєром
-            </p>
           </div>
         </div>
 
@@ -114,7 +120,7 @@ export default function AdminCMSDashboard() {
             href="http://localhost:3003"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold border border-slate-700 transition-all"
+            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold border border-slate-700 transition-all"
           >
             <span>Кабінет Викладача</span>
             <ArrowRight className="w-3.5 h-3.5" />
@@ -122,83 +128,104 @@ export default function AdminCMSDashboard() {
         </div>
       </header>
 
-      {/* Navigation Tabs */}
-      <div className="flex items-center gap-3 bg-slate-900/80 p-1.5 border border-slate-800 rounded-2xl w-fit">
-        <button
-          onClick={() => setActiveTab('dag')}
-          className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-            activeTab === 'dag'
-              ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-950/50'
-              : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
-          }`}
-        >
-          <Network className="w-4 h-4" />
-          <span>Skill DAG Builder</span>
-        </button>
+      {/* 🧭 Main Workspace Area with Left Opera Icon Rail */}
+      <div className="flex-1 flex overflow-hidden">
+        {/* 🎨 Opera-Style Vertical Icon Rail */}
+        <nav className="w-14 bg-slate-900 border-r border-slate-800 flex flex-col items-center py-4 gap-3 shrink-0 z-20 shadow-xl">
+          <button
+            onClick={() => toggleDrawer('dag')}
+            className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all cursor-pointer relative ${
+              activeDrawer === 'dag'
+                ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/40'
+                : 'bg-slate-800/60 text-slate-400 hover:bg-slate-800 hover:text-white'
+            }`}
+            title="Skill DAG Builder"
+          >
+            <Network className="w-5 h-5" />
+            {activeDrawer === 'dag' && <span className="absolute -left-1 w-1 h-5 bg-indigo-400 rounded-r-full"></span>}
+          </button>
 
-        <button
-          onClick={() => setActiveTab('courses')}
-          className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-            activeTab === 'courses'
-              ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-950/50'
-              : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
-          }`}
-        >
-          <BookOpen className="w-4 h-4" />
-          <span>CMS Курсів та Задач</span>
-        </button>
+          <button
+            onClick={() => toggleDrawer('courses')}
+            className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all cursor-pointer relative ${
+              activeDrawer === 'courses'
+                ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/40'
+                : 'bg-slate-800/60 text-slate-400 hover:bg-slate-800 hover:text-white'
+            }`}
+            title="CMS Курсів та Задач"
+          >
+            <BookOpen className="w-5 h-5" />
+            {activeDrawer === 'courses' && <span className="absolute -left-1 w-1 h-5 bg-indigo-400 rounded-r-full"></span>}
+          </button>
 
-        <button
-          onClick={() => setActiveTab('system')}
-          className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-            activeTab === 'system'
-              ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-950/50'
-              : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
-          }`}
-        >
-          <Settings className="w-4 h-4" />
-          <span>Системні Налаштування & Web3</span>
-        </button>
-      </div>
+          <div className="mt-auto flex flex-col items-center gap-2.5">
+            <div className="w-8 h-[1px] bg-slate-800/80 my-1"></div>
 
-      {/* Main CMS Body Panel */}
-      <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl min-h-[400px]">
-        {activeTab === 'dag' && (
-          <div className="flex flex-col gap-6">
-            <div>
-              <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                <Network className="w-5 h-5 text-indigo-400" />
-                <span>Конструктор Графа Навичок (Skill DAG Editor)</span>
-              </h3>
-              <p className="text-xs text-slate-400 mt-1">
-                Налаштування початкових BKT-параметрів ($P(L_0), P(T), P(S), P(G)$) та додавання/редагування/видалення вузлів графа
-              </p>
-            </div>
+            <a
+              href="http://localhost:3002"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-10 h-10 rounded-xl bg-indigo-600/15 text-indigo-400 border border-indigo-500/20 flex items-center justify-center hover:bg-indigo-600/30 hover:border-indigo-500/40 transition-all"
+              title="Кабінет Студента"
+            >
+              <Database className="w-4 h-4" />
+            </a>
 
-            <SkillDagEditor
-              nodes={nodes}
-              onSaveNode={handleSaveNode}
-              onDeleteNode={handleDeleteNode}
-            />
+            <div className="w-8 h-[1px] bg-slate-800/80 my-1"></div>
+
+            <button
+              onClick={() => toggleDrawer('system')}
+              className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all cursor-pointer ${
+                activeDrawer === 'system'
+                  ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/40'
+                  : 'bg-slate-800/60 text-slate-400 hover:bg-slate-800 hover:text-white'
+              }`}
+              title="Системні Налаштування & Web3"
+            >
+              <Settings className="w-5 h-5" />
+            </button>
           </div>
-        )}
+        </nav>
 
-        {activeTab === 'courses' && (
-          <CourseManager />
-        )}
+        {/* 💻 Center Main Canvas */}
+        <main className="flex-1 p-4 lg:p-6 overflow-y-auto flex flex-col gap-6 bg-slate-950">
+          <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl min-h-[400px]">
+            {activeDrawer === 'dag' && (
+              <div className="flex flex-col gap-6">
+                <div>
+                  <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                    <Network className="w-5 h-5 text-indigo-400" />
+                    <span>Конструктор Графа Навичок (Skill DAG Editor)</span>
+                  </h3>
+                  <p className="text-xs text-slate-400 mt-1">
+                    Налаштування початкових BKT-параметрів ($P(L_0), P(T), P(S), P(G)$) та управління вузлами графа
+                  </p>
+                </div>
 
-        {activeTab === 'system' && (
-          <div className="flex flex-col gap-4">
-            <h3 className="text-lg font-bold text-white flex items-center gap-2">
-              <Settings className="w-5 h-5 text-purple-400" />
-              <span>Конфігурація Релейєра Web3 & Смарт-Контрактів</span>
-            </h3>
-            <p className="text-xs text-slate-400">
-              Статус підключення Hardhat/Foundry, гаманців релейєра для Gasless SBT мінтингу.
-            </p>
+                <SkillDagEditor
+                  nodes={nodes}
+                  onSaveNode={handleSaveNode}
+                  onDeleteNode={handleDeleteNode}
+                />
+              </div>
+            )}
+
+            {activeDrawer === 'courses' && <CourseManager />}
+
+            {activeDrawer === 'system' && (
+              <div className="flex flex-col gap-4">
+                <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                  <Settings className="w-5 h-5 text-purple-400" />
+                  <span>Конфігурація Релейєра Web3 & Смарт-Контрактів</span>
+                </h3>
+                <p className="text-xs text-slate-400">
+                  Статус підключення Hardhat/Foundry, гаманців релейєра для Gasless SBT мінтингу.
+                </p>
+              </div>
+            )}
           </div>
-        )}
+        </main>
       </div>
-    </main>
+    </div>
   );
 }
