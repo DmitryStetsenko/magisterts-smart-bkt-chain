@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { ShieldCheck, Network, Users, BarChart3, ArrowLeft, Code2, BookOpen, Scale, ChevronDown } from 'lucide-react';
+import { ShieldCheck, Network, Users, BarChart3, ArrowLeft, Code2, BookOpen, Scale, ChevronDown, X } from 'lucide-react';
 import { StudentAnalyticsTable } from '../features/analytics/ui/StudentAnalyticsTable';
 import { StudentAnalyticsItem } from '../features/analytics/model/analytics.types';
 import { CourseOverviewWidget } from '../features/course-map/ui/CourseOverviewWidget';
@@ -202,8 +202,9 @@ export default function TeacherDashboardPage() {
 
         {/* 📂 Expandable Side Drawer Panel */}
         {activeDrawer && (
-          <aside className="w-full sm:w-[380px] lg:w-[440px] bg-slate-900/95 border-r border-slate-800 p-5 flex flex-col gap-5 overflow-y-auto shrink-0 shadow-2xl backdrop-blur-xl animate-fadeIn z-10">
-            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+          <aside className="w-full sm:w-[380px] lg:w-[440px] bg-slate-900/95 border-r border-slate-800 flex flex-col shrink-0 shadow-2xl backdrop-blur-xl animate-fadeIn z-10 overflow-hidden">
+            {/* 📌 Fixed Drawer Header (Does not scroll) */}
+            <div className="p-4 border-b border-slate-800 flex items-center justify-between shrink-0 bg-slate-900/90 backdrop-blur-md">
               <h2 className="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
                 {activeDrawer === 'analytics' && (
                   <>
@@ -229,9 +230,12 @@ export default function TeacherDashboardPage() {
                 className="p-1.5 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-all cursor-pointer"
                 title="Закрити панель"
               >
-                ✕
+                <X className="w-4 h-4" />
               </button>
             </div>
+
+            {/* 📜 Scrollable Drawer Body Content */}
+            <div className="flex-1 p-5 overflow-y-auto flex flex-col gap-5">
 
             {/* Metrics Breakdown */}
             {activeDrawer === 'analytics' && (
@@ -277,6 +281,7 @@ export default function TeacherDashboardPage() {
                 <p>Налаштування порогів оновлення BKT та алгоритму секвенвування.</p>
               </div>
             )}
+            </div>
           </aside>
         )}
 

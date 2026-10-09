@@ -350,9 +350,9 @@ export default function StudentPortalPage() {
 
         {/* 📂 Expandable Side Drawer Panel */}
         {activeDrawer && (
-          <aside className="w-full sm:w-[380px] lg:w-[420px] bg-slate-900/95 border-r border-slate-800 p-5 flex flex-col gap-5 overflow-y-auto shrink-0 shadow-2xl backdrop-blur-xl animate-fadeIn z-10">
-            {/* Drawer Header */}
-            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+          <aside className="w-full sm:w-[380px] lg:w-[420px] bg-slate-900/95 border-r border-slate-800 flex flex-col shrink-0 shadow-2xl backdrop-blur-xl animate-fadeIn z-10 overflow-hidden">
+            {/* 📌 Fixed Drawer Header (Does not scroll) */}
+            <div className="p-4 border-b border-slate-800 flex items-center justify-between shrink-0 bg-slate-900/90 backdrop-blur-md">
               <h2 className="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
                 {activeDrawer === 'task' && (
                   <>
@@ -368,7 +368,7 @@ export default function StudentPortalPage() {
                 )}
                 {activeDrawer === 'settings' && (
                   <>
-                    <RefreshCw className="w-4 h-4 text-amber-400" />
+                    <Settings className="w-4 h-4 text-amber-400" />
                     <span>Налаштування Студента</span>
                   </>
                 )}
@@ -382,83 +382,86 @@ export default function StudentPortalPage() {
               </button>
             </div>
 
-            {/* Content Drawer 1: Task Condition */}
-            {activeDrawer === 'task' && task && (
-              <div className="flex flex-col gap-5">
-                <div className="flex items-center justify-between">
-                  <span className="px-2.5 py-1 rounded-full text-xs font-mono font-bold uppercase tracking-wider bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
-                    {task.skill.title}
-                  </span>
-                  <span className="px-2.5 py-1 rounded-full text-xs font-mono font-bold uppercase bg-slate-800 text-slate-300 border border-slate-700">
-                    {task.difficulty}
-                  </span>
-                </div>
-
-                <div>
-                  <h3 className="text-base font-bold text-white mb-2">{task.title}</h3>
-                  <p className="text-xs text-slate-300 leading-relaxed">{task.description}</p>
-                </div>
-
-                {recommendation && (
-                  <div className="p-3.5 bg-indigo-950/40 border border-indigo-500/30 rounded-xl flex items-start gap-2.5">
-                    <Sparkles className="w-4 h-4 text-indigo-400 shrink-0 mt-0.5" />
-                    <div className="text-[11px] text-indigo-200">
-                      <span className="font-bold text-indigo-300 block mb-0.5">Рекомендація BKT Engine:</span>
-                      {recommendation.reason || 'Завдання обрано відповідно до вашого рівня засвоєння.'}
-                    </div>
-                  </div>
-                )}
-
-                {task.taskType === 'CODE' && task.testCases.length > 0 && (
-                  <div className="flex flex-col gap-2 pt-2 border-t border-slate-800">
-                    <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
-                      Відкриті Тест-Кейси
+            {/* 📜 Scrollable Drawer Body Content */}
+            <div className="flex-1 p-5 overflow-y-auto flex flex-col gap-5">
+              {/* Content Drawer 1: Task Condition */}
+              {activeDrawer === 'task' && task && (
+                <div className="flex flex-col gap-5 flex-1">
+                  <div className="flex items-center justify-between">
+                    <span className="px-2.5 py-1 rounded-full text-xs font-mono font-bold uppercase tracking-wider bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
+                      {task.skill.title}
                     </span>
-                    {task.testCases.map((tc, idx) => (
-                      <div
-                        key={idx}
-                        className="p-2.5 bg-slate-950/70 border border-slate-800 rounded-lg text-xs font-mono flex flex-col gap-0.5"
-                      >
-                        <span className="text-slate-400 text-[11px]">
-                          Вхідні дані: <code className="text-indigo-300">{tc.input}</code>
-                        </span>
-                        <span className="text-slate-400 text-[11px]">
-                          Очікуваний вивід: <code className="text-emerald-300">{tc.expectedOutput}</code>
-                        </span>
-                      </div>
-                    ))}
+                    <span className="px-2.5 py-1 rounded-full text-xs font-mono font-bold uppercase bg-slate-800 text-slate-300 border border-slate-700">
+                      {task.difficulty}
+                    </span>
                   </div>
-                )}
 
-                <button
-                  onClick={() => fetchRecommendedTask(activeCourseSlug)}
-                  className="inline-flex items-center justify-center gap-2 px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold border border-slate-700 transition-all cursor-pointer mt-auto"
-                >
-                  <RefreshCw className="w-3.5 h-3.5" />
-                  <span>Оновити рекомендоване завдання</span>
-                </button>
-              </div>
-            )}
+                  <div>
+                    <h3 className="text-base font-bold text-white mb-2">{task.title}</h3>
+                    <p className="text-xs text-slate-300 leading-relaxed">{task.description}</p>
+                  </div>
 
-            {/* Content Drawer 2: Skill DAG Map */}
-            {activeDrawer === 'bkt' && (
-              <div className="flex flex-col gap-4">
-                <SkillDagMap nodes={graphNodes} activeSkillSlug={task?.skill?.slug} />
-              </div>
-            )}
+                  {recommendation && (
+                    <div className="p-3.5 bg-indigo-950/40 border border-indigo-500/30 rounded-xl flex items-start gap-2.5">
+                      <Sparkles className="w-4 h-4 text-indigo-400 shrink-0 mt-0.5" />
+                      <div className="text-[11px] text-indigo-200">
+                        <span className="font-bold text-indigo-300 block mb-0.5">Рекомендація BKT Engine:</span>
+                        {recommendation.reason || 'Завдання обрано відповідно до вашого рівня засвоєння.'}
+                      </div>
+                    </div>
+                  )}
 
-            {/* Content Drawer 3: Settings */}
-            {activeDrawer === 'settings' && (
-              <div className="flex flex-col gap-4 text-xs text-slate-300">
-                <p>Налаштування робочого середовища та відображення Monaco Editor.</p>
-                <button
-                  onClick={() => fetchRecommendedTask(activeCourseSlug)}
-                  className="w-full py-2.5 bg-indigo-600 text-white rounded-xl font-bold cursor-pointer hover:bg-indigo-500 transition-all"
-                >
-                  Перезавантажити стан BKT
-                </button>
-              </div>
-            )}
+                  {task.taskType === 'CODE' && task.testCases.length > 0 && (
+                    <div className="flex flex-col gap-2 pt-2 border-t border-slate-800">
+                      <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
+                        Відкриті Тест-Кейси
+                      </span>
+                      {task.testCases.map((tc, idx) => (
+                        <div
+                          key={idx}
+                          className="p-2.5 bg-slate-950/70 border border-slate-800 rounded-lg text-xs font-mono flex flex-col gap-0.5"
+                        >
+                          <span className="text-slate-400 text-[11px]">
+                            Вхідні дані: <code className="text-indigo-300">{tc.input}</code>
+                          </span>
+                          <span className="text-slate-400 text-[11px]">
+                            Очікуваний вивід: <code className="text-emerald-300">{tc.expectedOutput}</code>
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  <button
+                    onClick={() => fetchRecommendedTask(activeCourseSlug)}
+                    className="inline-flex items-center justify-center gap-2 px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold border border-slate-700 transition-all cursor-pointer mt-auto"
+                  >
+                    <RefreshCw className="w-3.5 h-3.5" />
+                    <span>Оновити рекомендоване завдання</span>
+                  </button>
+                </div>
+              )}
+
+              {/* Content Drawer 2: Skill DAG Map */}
+              {activeDrawer === 'bkt' && (
+                <div className="flex flex-col gap-4">
+                  <SkillDagMap nodes={graphNodes} activeSkillSlug={task?.skill?.slug} />
+                </div>
+              )}
+
+              {/* Content Drawer 3: Settings */}
+              {activeDrawer === 'settings' && (
+                <div className="flex flex-col gap-4 text-xs text-slate-300">
+                  <p>Налаштування робочого середовища та відображення Monaco Editor.</p>
+                  <button
+                    onClick={() => fetchRecommendedTask(activeCourseSlug)}
+                    className="w-full py-2.5 bg-indigo-600 text-white rounded-xl font-bold cursor-pointer hover:bg-indigo-500 transition-all"
+                  >
+                    Перезавантажити стан BKT
+                  </button>
+                </div>
+              )}
+            </div>
           </aside>
         )}
 
