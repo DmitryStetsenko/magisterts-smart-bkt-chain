@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { io } from 'socket.io-client';
-import { Brain, Sparkles, CheckCircle, AlertCircle, RefreshCw, User, Code2, BookOpen, Scale, ChevronDown, ArrowRight, AlertTriangle, X } from 'lucide-react';
+import { Brain, Sparkles, CheckCircle, AlertCircle, RefreshCw, User, Code2, BookOpen, Scale, ChevronDown, ArrowRight, AlertTriangle, X, Settings } from 'lucide-react';
 import { MonacoCodeEditor } from '../features/code-editor/ui/MonacoCodeEditor';
 import { QuizTaskEditor } from '../features/quiz-editor/ui/QuizTaskEditor';
 import { EssayTaskEditor } from '../features/essay-editor/ui/EssayTaskEditor';
@@ -305,40 +305,43 @@ export default function StudentPortalPage() {
             {activeDrawer === 'bkt' && <span className="absolute -left-1 w-1 h-5 bg-indigo-400 rounded-r-full"></span>}
           </button>
 
-          <div className="w-8 h-[1px] bg-slate-800 my-1"></div>
+          {/* Bottom App Block (External Applications & Workspace Settings) */}
+          <div className="mt-auto flex flex-col items-center gap-2.5">
+            <div className="w-8 h-[1px] bg-slate-800/80 my-1"></div>
 
-          {/* External Portals & Tools */}
-          <a
-            href="http://localhost:3003"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="w-10 h-10 rounded-xl bg-purple-600/20 text-purple-400 border border-purple-500/30 flex items-center justify-center hover:bg-purple-600/30 transition-all"
-            title="Кабінет Викладача (Teacher Portal)"
-          >
-            <User className="w-5 h-5" />
-          </a>
+            {/* External App Shortcut 1: Teacher Portal */}
+            <a
+              href="http://localhost:3003"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-10 h-10 rounded-xl bg-purple-600/15 text-purple-400 border border-purple-500/20 flex items-center justify-center hover:bg-purple-600/30 hover:border-purple-500/40 transition-all"
+              title="Кабінет Викладача (Teacher Portal)"
+            >
+              <User className="w-4 h-4" />
+            </a>
 
-          <a
-            href="http://localhost:3004"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="w-10 h-10 rounded-xl bg-emerald-600/20 text-emerald-400 border border-emerald-500/30 flex items-center justify-center hover:bg-emerald-600/30 transition-all"
-            title="Панель Адміністратора (CMS DAG)"
-          >
-            <Code2 className="w-5 h-5" />
-          </a>
+            {/* External App Shortcut 2: Admin CMS */}
+            <a
+              href="http://localhost:3004"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-10 h-10 rounded-xl bg-emerald-600/15 text-emerald-400 border border-emerald-500/20 flex items-center justify-center hover:bg-emerald-600/30 hover:border-emerald-500/40 transition-all"
+              title="Панель Адміністратора (CMS DAG)"
+            >
+              <Code2 className="w-4 h-4" />
+            </a>
 
-          <div className="mt-auto flex flex-col gap-3">
+            {/* Workspace Settings Button (Gear Icon) */}
             <button
               onClick={() => toggleDrawer('settings')}
               className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all cursor-pointer ${
                 activeDrawer === 'settings'
-                  ? 'bg-indigo-600 text-white'
+                  ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/40'
                   : 'bg-slate-800/60 text-slate-400 hover:bg-slate-800 hover:text-white'
               }`}
               title="Налаштування Workspace"
             >
-              <RefreshCw className="w-5 h-5" />
+              <Settings className="w-5 h-5" />
             </button>
           </div>
         </nav>
