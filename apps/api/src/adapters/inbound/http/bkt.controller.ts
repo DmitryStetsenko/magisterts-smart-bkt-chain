@@ -305,18 +305,54 @@ export class BktController {
   @ApiOperation({ summary: 'Get real-time analytics for all students' })
   @ApiQuery({ name: 'courseSlug', required: false })
   async getStudentsAnalytics(@Query('courseSlug') courseSlug?: string) {
+    let courseSkillIds: string[] = [];
+    let courseSkillSlugs: string[] = [];
+    if (courseSlug) {
+      const course = await this.prisma.course.findFirst({
+        where: { OR: [{ slug: courseSlug }, { id: courseSlug }] },
+        include: { skills: true },
+      });
+      if (course) {
+        courseSkillIds = course.skills.map((sk) => sk.id);
+        courseSkillSlugs = course.skills.map((sk) => sk.slug);
+      }
+    }
+
     const students = await this.prisma.user.findMany({
       where: { role: 'STUDENT' },
       include: {
         profile: true,
         bktStates: { include: { skill: true } },
-        behavioralProfiles: { orderBy: { createdAt: 'desc' }, take: 1 },
+        behavioralProfiles: {
+          include: {
+            session: {
+              include: {
+                task: {
+                  include: { skill: true },
+                },
+              },
+            },
+          },
+          orderBy: { createdAt: 'desc' },
+        },
       },
     });
 
+    const calcMedian = (arr: number[]): number => {
+      if (arr.length === 0) return 0;
+      const sorted = [...arr].sort((a, b) => a - b);
+      const mid = Math.floor(sorted.length / 2);
+      return sorted.length % 2 !== 0 ? sorted[mid] : (sorted[mid - 1] + sorted[mid]) / 2;
+    };
+
     return students.map((s) => {
-      const activeStates = courseSlug
-        ? s.bktStates.filter((st) => st.skill.courseId === courseSlug)
+      const activeStates = courseSlug && (courseSkillIds.length > 0 || courseSkillSlugs.length > 0)
+        ? s.bktStates.filter(
+            (st) =>
+              courseSkillIds.includes(st.skillId) ||
+              courseSkillSlugs.includes(st.skill.slug) ||
+              st.skill.courseId === courseSlug
+          )
         : s.bktStates;
 
       const avgMastery =
@@ -329,7 +365,89 @@ export class BktController {
         bktBySkill[st.skill.slug] = st.pMastery;
       });
 
-      const profile = s.behavioralProfiles[0];
+      // Per-Module Telemetry aggregation
+      const telemetryBySkill: Record<string, { wpm: number; copyPasteRatio: number; fatigueIndex: number }> = {};
+
+      s.behavioralProfiles.forEach((bp) => {
+        const skillSlug = bp.session?.task?.skill?.slug;
+        if (skillSlug) {
+          if (!telemetryBySkill[skillSlug]) {
+            const fatigue = Math.min(100, Math.round((bp.pauseDurationMs / 1000) * 2));
+            telemetryBySkill[skillSlug] = {
+              wpm: bp.typingSpeedWpm,
+              copyPasteRatio: bp.pasteRatio,
+              fatigueIndex: fatigue,
+            };
+          }
+        } else if (bp.pasteRatio > 0 || bp.typingSpeedWpm > 0) {
+          const fatigue = Math.min(100, Math.round((bp.pauseDurationMs / 1000) * 2));
+          activeStates.forEach((st) => {
+            const slug = st.skill.slug;
+            if (!telemetryBySkill[slug] || telemetryBySkill[slug].copyPasteRatio === 0) {
+              telemetryBySkill[slug] = {
+                wpm: bp.typingSpeedWpm,
+                copyPasteRatio: bp.pasteRatio,
+                fatigueIndex: fatigue,
+              };
+            }
+          });
+        }
+      });
+
+      // Collect telemetry arrays across active course skills for median calculation
+      const wpms: number[] = [];
+      const copyPastes: number[] = [];
+      const fatigues: number[] = [];
+
+      let peakAnomaly = {
+        hasAnomaly: false,
+        peakSkillSlug: '',
+        peakSkillTitle: '',
+        copyPasteRatio: 0,
+      };
+
+      activeStates.forEach((st) => {
+        const slug = st.skill.slug;
+        if (!telemetryBySkill[slug]) {
+          telemetryBySkill[slug] = { wpm: 0, copyPasteRatio: 0, fatigueIndex: 0 };
+        }
+      });
+
+      const targetSkills = courseSlug && courseSkillSlugs.length > 0
+        ? courseSkillSlugs
+        : Object.keys(telemetryBySkill);
+
+      targetSkills.forEach((slug) => {
+        const item = telemetryBySkill[slug] || { wpm: 0, copyPasteRatio: 0, fatigueIndex: 0 };
+        if (item.wpm > 0 || item.copyPasteRatio > 0 || item.fatigueIndex > 0) {
+          wpms.push(item.wpm);
+          copyPastes.push(item.copyPasteRatio);
+          fatigues.push(item.fatigueIndex);
+        }
+
+        if (item.copyPasteRatio >= 0.60 && item.copyPasteRatio >= peakAnomaly.copyPasteRatio) {
+          const skillObj = s.bktStates.find((st) => st.skill.slug === slug)?.skill;
+          peakAnomaly = {
+            hasAnomaly: true,
+            peakSkillSlug: slug,
+            peakSkillTitle: skillObj?.title || slug,
+            copyPasteRatio: item.copyPasteRatio,
+          };
+        }
+      });
+
+      // Fallback if behavioral profile exists without skill reference
+      if (wpms.length === 0 && s.behavioralProfiles.length > 0) {
+        const bp = s.behavioralProfiles[0];
+        const fatigue = Math.min(100, Math.round((bp.pauseDurationMs / 1000) * 2));
+        wpms.push(bp.typingSpeedWpm);
+        copyPastes.push(bp.pasteRatio);
+        fatigues.push(fatigue);
+      }
+
+      const medianWpm = Math.round(calcMedian(wpms));
+      const medianCopyPasteRatio = calcMedian(copyPastes);
+      const medianFatigueIndex = Math.round(calcMedian(fatigues));
 
       return {
         id: s.id,
@@ -337,9 +455,11 @@ export class BktController {
         email: s.email,
         averageMastery: avgMastery,
         bktBySkill,
-        wpm: profile ? profile.typingSpeedWpm : 0,
-        copyPasteRatio: profile ? profile.pasteRatio : 0,
-        fatigueIndex: profile ? Math.min(100, Math.round((profile.pauseDurationMs / 1000) * 2)) : 0,
+        telemetryBySkill,
+        wpm: medianWpm,
+        copyPasteRatio: medianCopyPasteRatio,
+        fatigueIndex: medianFatigueIndex,
+        peakAnomaly,
         unstarted: s.bktStates.length === 0,
       };
     });

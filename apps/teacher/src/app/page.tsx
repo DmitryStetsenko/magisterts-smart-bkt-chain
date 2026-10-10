@@ -497,10 +497,10 @@ export default function TeacherDashboardPage() {
                   </div>
                 </div>
 
-                {/* Metric 2: WPM */}
+                {/* Metric 2: WPM (Course Median) */}
                 <div className="bg-slate-900 border border-slate-800 rounded-xl p-3 flex flex-col justify-between gap-2 shadow-md relative group">
                   <div className="flex items-start justify-between gap-1">
-                    <span className="text-[10px] font-semibold uppercase text-slate-400 leading-tight">Швидкість Набору WPM</span>
+                    <span className="text-[10px] font-semibold uppercase text-slate-400 leading-tight">Медіана WPM (Курс)</span>
                     <div className="p-1.5 rounded-lg bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 shrink-0">
                       <Keyboard className="w-3.5 h-3.5" />
                     </div>
@@ -519,10 +519,18 @@ export default function TeacherDashboardPage() {
                   </div>
                 </div>
 
-                {/* Metric 3: Copy-Paste Ratio */}
+                {/* Metric 3: Copy-Paste Ratio (Course Median & Peak Anomaly) */}
                 <div className="bg-slate-900 border border-slate-800 rounded-xl p-3 flex flex-col justify-between gap-2 shadow-md relative group">
                   <div className="flex items-start justify-between gap-1">
-                    <span className="text-[10px] font-semibold uppercase text-slate-400 leading-tight">Copy-Paste Ratio</span>
+                    <div className="flex flex-col">
+                      <span className="text-[10px] font-semibold uppercase text-slate-400 leading-tight">Медіана Copy-Paste (Курс)</span>
+                      {selectedStudent.peakAnomaly?.hasAnomaly && (
+                        <span className="text-[9px] font-bold text-red-400 bg-red-500/10 px-1.5 py-0.5 rounded border border-red-500/30 mt-1 flex items-center gap-1 animate-pulse">
+                          <AlertTriangle className="w-2.5 h-2.5 shrink-0" />
+                          <span>Пік: {selectedStudent.peakAnomaly.peakSkillTitle || selectedStudent.peakAnomaly.peakSkillSlug} ({(selectedStudent.peakAnomaly.copyPasteRatio * 100).toFixed(0)}%)</span>
+                        </span>
+                      )}
+                    </div>
                     <div className="p-1.5 rounded-lg bg-amber-500/10 text-amber-400 border border-amber-500/20 shrink-0">
                       <Copy className="w-3.5 h-3.5" />
                     </div>
@@ -541,10 +549,10 @@ export default function TeacherDashboardPage() {
                   </div>
                 </div>
 
-                {/* Metric 4: Fatigue Index */}
+                {/* Metric 4: Fatigue Index (Course Median) */}
                 <div className="bg-slate-900 border border-slate-800 rounded-xl p-3 flex flex-col justify-between gap-2 shadow-md relative group">
                   <div className="flex items-start justify-between gap-1">
-                    <span className="text-[10px] font-semibold uppercase text-slate-400 leading-tight">Індекс Втоми (Idle Pauses)</span>
+                    <span className="text-[10px] font-semibold uppercase text-slate-400 leading-tight">Медіана Втоми (Курс)</span>
                     <div className="p-1.5 rounded-lg bg-purple-500/10 text-purple-400 border border-purple-500/20 shrink-0">
                       <Activity className="w-3.5 h-3.5" />
                     </div>
@@ -564,32 +572,61 @@ export default function TeacherDashboardPage() {
                 </div>
               </div>
 
-              {/* Compact BKT Skill Mastery Heatmap Table */}
+              {/* Compact BKT Skill Mastery Heatmap Table with Per-Module Telemetry */}
               <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-xl flex flex-col gap-3">
-                <h3 className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-2">
-                  <BarChart3 className="w-3.5 h-3.5 text-purple-400" />
-                  <span>BKT Mastery Breakdown За Модулями</span>
-                </h3>
+                <div className="flex items-center justify-between">
+                  <h3 className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-2">
+                    <BarChart3 className="w-3.5 h-3.5 text-purple-400" />
+                    <span>BKT Mastery Breakdown & Модульна Телеметрія</span>
+                  </h3>
+                  <span className="text-[10px] font-mono text-slate-400 bg-slate-950 px-2 py-0.5 rounded border border-slate-800">
+                    Per-Module Telemetry Level
+                  </span>
+                </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
                   {activeCourse.skillSlugs.map((slug) => {
                     const masteryMap = selectedStudent.bktBySkill || selectedStudent.skillMastery || {};
                     const p = masteryMap[slug] ?? 0;
                     const isMastered = p >= 0.95;
+                    const skillTelemetry = selectedStudent.telemetryBySkill?.[slug];
+                    const isPeakAnomaly = skillTelemetry && skillTelemetry.copyPasteRatio >= 0.60;
 
                     return (
-                      <div key={slug} className="p-2.5 bg-slate-950 border border-slate-800/80 rounded-lg flex flex-col gap-1.5">
+                      <div
+                        key={slug}
+                        className={`p-2.5 bg-slate-950 border rounded-lg flex flex-col gap-1.5 transition-all ${
+                          isPeakAnomaly
+                            ? 'border-red-500/60 bg-red-950/20 shadow-md shadow-red-950/30'
+                            : 'border-slate-800/80'
+                        }`}
+                      >
                         <div className="flex items-center justify-between text-[11px]">
-                          <span className="font-mono text-slate-300 font-bold uppercase truncate">{slug}</span>
+                          <span className="font-mono text-slate-300 font-bold uppercase truncate flex items-center gap-1">
+                            <span>{slug}</span>
+                            {isPeakAnomaly && (
+                              <span className="text-[8px] font-bold text-red-400 bg-red-500/20 px-1 rounded border border-red-500/30">
+                                ⚠️ Списування
+                              </span>
+                            )}
+                          </span>
                           <span className={`font-mono font-bold text-xs ${isMastered ? 'text-emerald-400' : 'text-amber-400'}`}>
                             {(p * 100).toFixed(1)}%
                           </span>
                         </div>
+
+                        {/* Progress bar */}
                         <div className="w-full h-1.5 bg-slate-900 rounded-full overflow-hidden border border-slate-800">
                           <div
                             className={`h-full transition-all duration-500 ${isMastered ? 'bg-emerald-400' : 'bg-amber-400'}`}
                             style={{ width: `${Math.min(100, p * 100)}%` }}
                           />
+                        </div>
+
+                        {/* Per-Module Telemetry Badge */}
+                        <div className="flex items-center justify-between text-[9px] font-mono text-slate-400 pt-0.5 border-t border-slate-800/50 mt-0.5">
+                          <span>WPM: <strong className="text-slate-200">{skillTelemetry ? skillTelemetry.wpm : 0}</strong></span>
+                          <span>Copy-Paste: <strong className={isPeakAnomaly ? 'text-red-400 font-bold' : 'text-slate-200'}>{skillTelemetry ? `${(skillTelemetry.copyPasteRatio * 100).toFixed(0)}%` : '0%'}</strong></span>
                         </div>
                       </div>
                     );

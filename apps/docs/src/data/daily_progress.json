@@ -2,6 +2,52 @@
   "project_title": "📅 Журнал розробки та прогресу проєкту (Daily Progress Log)",
   "sections": [
     {
+      "title": "📅 10 жовтня 2026 року",
+      "level": 2,
+      "paragraphs": [],
+      "code_blocks": [],
+      "items": [],
+      "subsections": [
+        {
+          "title": "✅ Що зроблено за день:",
+          "level": 3,
+          "paragraphs": [],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "**Реалізація Агрегації Модульної Телеметрії (Per-Module Telemetry), Курсової Медіани та Детекції Пікових Аномалій:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Бекенд REST API (`apps/api/src/adapters/inbound/http/bkt.controller.ts`):**",
+              "subitems": [
+                "Розширено метод `GET /api/v1/bkt/analytics/students` для групування показників WPM, Copy-Paste Ratio та Fatigue Index у контексті конкретних вузлів знань (`telemetryBySkill`).",
+                "Реалізовано обчислення курсової **Медіани ($\\text{Median}$)** для WPM, Copy-Paste Ratio та Індексу Втоми, щоб виключити викривлення від поодиноких сплесків.",
+                "Додано алгоритм визначення **Пікової Аномалії (Peak Anomaly)**: при $CopyPaste_{skill} \\ge 0.60$ формується попереджувальний об'єкт `peakAnomaly` з вказівкою назви проблемного модуля та відсотка копіпасту.",
+                "Додано юніт-тести в `bkt.controller.spec.ts` для перевірки розрахунку медіани та роботи з незв'язаними профілями (100% pass, 11/11 tests)."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Кабінет Викладача (`apps/teacher/src/app/page.tsx` & `analytics.types.ts`):**",
+              "subitems": [
+                "Оновлено топові картки аналітики: переведено відображення на `Медіана WPM (Курс)`, `Медіана Copy-Paste (Курс)` та `Медіана Втоми (Курс)`.",
+                "Інтегровано бейдж **Пікової Аномалії (`Peak Anomaly`)** в картку Copy-Paste, який пульсує та вказує точну назву модуля зі списуванням.",
+                "Розширено Heatmap таблицю BKT breakdown: на кожній картці модуля тепер відображаються локальні метрики модуля ($WPM_{\\text{skill}}$ та $CopyPaste_{\\text{skill}}$) із червоною плашкою `⚠️ Списування` при $CopyPaste \\ge 60\\%$."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Перевірка:** Успішно пройшли всі статичні збірки `build:api`, `build:student`, `build:teacher` та unit-тести `test:api`.",
+              "subitems": []
+            }
+          ]
+        }
+      ]
+    },
+    {
       "title": "📅 09 жовтня 2026 року",
       "level": 2,
       "paragraphs": [],

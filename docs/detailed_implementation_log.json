@@ -168,7 +168,7 @@
             },
             {
               "type": "text",
-              "raw_text": "**Концепція Модульної Телеметрії:**",
+              "raw_text": "**Концепція та Практична Реалізація Модульної Телеметрії:**",
               "subitems": []
             },
             {
@@ -184,6 +184,21 @@
             {
               "type": "text",
               "raw_text": "**Математична модель агрегації:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Реалізація у Коді:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**`BktController.ts` (`GET /api/v1/bkt/analytics/students`):** Обчислення `telemetryBySkill`, `medianWpm`, `medianCopyPasteRatio`, `medianFatigueIndex` та об'єкта `peakAnomaly`.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**`Teacher Dashboard` (`apps/teacher/src/app/page.tsx`):** Відображення курс-медіанних метрик, попереджувального бейджа пікової аномалії в картці Copy-Paste та локальної модульної телеметрії в картках BKT Heatmap.",
               "subitems": []
             },
             {

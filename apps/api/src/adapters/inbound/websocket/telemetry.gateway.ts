@@ -127,6 +127,28 @@ export class TelemetryGateway implements OnGatewayConnection, OnGatewayDisconnec
           ),
         },
       });
+
+      let targetUserId = payload.userId;
+      let user = await this.prisma.user.findUnique({ where: { id: targetUserId } });
+      if (!user) user = await this.prisma.user.findFirst({ where: { role: 'STUDENT' } });
+      if (user) targetUserId = user.id;
+
+      const pasteRatio = payload.pasteEvents > 0 ? 1.0 : 0.0;
+      await this.prisma.behavioralProfile.upsert({
+        where: { sessionId },
+        create: {
+          userId: targetUserId,
+          sessionId,
+          typingSpeedWpm: payload.wpm || 0,
+          pasteRatio,
+          pauseDurationMs: payload.keystrokePauseMs || 0,
+        },
+        update: {
+          typingSpeedWpm: payload.wpm || 0,
+          pasteRatio: pasteRatio > 0 ? pasteRatio : undefined,
+          pauseDurationMs: payload.keystrokePauseMs || 0,
+        },
+      });
     }
 
     const room = `session_${payload.userId}_${payload.taskId}`;

@@ -39,12 +39,15 @@
 
 ### 0.4 Концепт та Архітектура Модульної Телеметрії (Per-Module Telemetry & Course-Level Median)
 - **Проблематика:** При загальному підрахунку телеметрії (WPM, Copy-Paste Ratio, Fatigue Index) по всьому курсу списування чи когнітивне перевантаження на окремому модулі "змащується" середніми значеннями.
-- **Концепція Модульної Телеметрії:**
+- **Концепція та Практична Реалізація Модульної Телеметрії:**
   1. **Модульний рівень ($WPM_{skill}, CopyPaste_{skill}, Fatigue_{skill}$):** Кожен вузол графа $Skill_i$ зберігає власні параметри телеметрії. Якщо студент вставив 90% коду під час проходження складного Модуля 3, цей показник зберігається суворо у контексті Модуля 3.
   2. **Курсовий рівень (Медіана + Peak Anomaly):** На верхніх картках загальної аналітики студента розраховується **Медіана ($\text{Median}$)** для виключення спотворень, а поруч виводиться індикатор **Пікової Аномалії (Peak Anomaly)** з вказівкою проблемного модуля.
 - **Математична модель агрегації:**
   $$\text{Course } CopyPaste_{\text{median}} = \text{Median}\Big( \big\{ CopyPaste_{skill_1}, CopyPaste_{skill_2}, \dots, CopyPaste_{skill_N} \big\} \Big)$$
   $$\text{Peak Anomaly} = \max_{i} \Big( CopyPaste_{skill_i} \Big) \quad \text{при } CopyPaste_{skill_i} \ge 0.60$$
+- **Реалізація у Коді:**
+  - **`BktController.ts` (`GET /api/v1/bkt/analytics/students`):** Обчислення `telemetryBySkill`, `medianWpm`, `medianCopyPasteRatio`, `medianFatigueIndex` та об'єкта `peakAnomaly`.
+  - **`Teacher Dashboard` (`apps/teacher/src/app/page.tsx`):** Відображення курс-медіанних метрик, попереджувального бейджа пікової аномалії в картці Copy-Paste та локальної модульної телеметрії в картках BKT Heatmap.
 
 ---
 
