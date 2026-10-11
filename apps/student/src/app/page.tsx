@@ -300,25 +300,36 @@ export default function StudentPortalPage() {
 
           <button
             onClick={() => {
-              toggleDrawer('bkt');
+              if (mainView === 'tree') {
+                setMainView('editor');
+                setActiveDrawer('bkt');
+              } else {
+                toggleDrawer('bkt');
+              }
             }}
             className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all cursor-pointer relative ${
-              activeDrawer === 'bkt'
+              mainView === 'editor' && activeDrawer === 'bkt'
                 ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/40'
                 : 'bg-slate-800/60 text-slate-400 hover:bg-slate-800 hover:text-white'
             }`}
-            title="Карта Навичок BKT (DAG)"
+            title="Карта Навичок BKT (DAG у бічній панелі)"
           >
             <Sparkles className="w-5 h-5" />
-            {activeDrawer === 'bkt' && <span className="absolute -left-1 w-1 h-5 bg-indigo-400 rounded-r-full"></span>}
+            {mainView === 'editor' && activeDrawer === 'bkt' && <span className="absolute -left-1 w-1 h-5 bg-indigo-400 rounded-r-full"></span>}
           </button>
 
           <button
             onClick={() => {
-              setMainView('tree');
-              setActiveDrawer('node-detail');
-              if (!inspectedSkill && graphNodes.length > 0) {
-                setInspectedSkill(graphNodes.find((n) => n.slug === task?.skill?.slug) || graphNodes[0]);
+              if (mainView === 'tree') {
+                // If already on tree view, clicking toggle returns to editor
+                setMainView('editor');
+                setActiveDrawer('task');
+              } else {
+                setMainView('tree');
+                setActiveDrawer('node-detail');
+                if (!inspectedSkill && graphNodes.length > 0) {
+                  setInspectedSkill(graphNodes.find((n) => n.slug === task?.skill?.slug) || graphNodes[0]);
+                }
               }
             }}
             className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all cursor-pointer relative ${
