@@ -223,12 +223,12 @@ export default function StudentPortalPage() {
     }
   };
 
-  // Opera-Style Sidebar Drawer State: null = closed, 'task' | 'bkt' | 'analytics' | 'settings'
-  const [activeDrawer, setActiveDrawer] = useState<'task' | 'bkt' | 'analytics' | 'settings' | null>('task');
-  const [bktViewMode, setBktViewMode] = useState<'list' | 'tree'>('list');
-  const [showSkillTreeModal, setShowSkillTreeModal] = useState<boolean>(false);
+  // Opera-Style Sidebar Drawer State: null = closed, 'task' | 'bkt' | 'settings' | 'node-detail'
+  const [activeDrawer, setActiveDrawer] = useState<'task' | 'bkt' | 'settings' | 'node-detail' | null>('task');
+  const [mainView, setMainView] = useState<'editor' | 'tree'>('editor');
+  const [inspectedSkill, setInspectedSkill] = useState<SkillGraphNode | null>(null);
 
-  const toggleDrawer = (tab: 'task' | 'bkt' | 'analytics' | 'settings') => {
+  const toggleDrawer = (tab: 'task' | 'bkt' | 'settings' | 'node-detail') => {
     setActiveDrawer((prev) => (prev === tab ? null : tab));
   };
 
@@ -283,20 +283,25 @@ export default function StudentPortalPage() {
         <nav className="w-14 bg-slate-900 border-r border-slate-800 flex flex-col items-center py-4 gap-3 shrink-0 z-20 shadow-xl">
           {/* Main Action Tabs */}
           <button
-            onClick={() => toggleDrawer('task')}
+            onClick={() => {
+              setMainView('editor');
+              setActiveDrawer('task');
+            }}
             className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all cursor-pointer relative ${
-              activeDrawer === 'task'
+              mainView === 'editor' && activeDrawer === 'task'
                 ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/40'
                 : 'bg-slate-800/60 text-slate-400 hover:bg-slate-800 hover:text-white'
             }`}
-            title="Умова Завдання та Критерії"
+            title="Умова Завдання та Редактор"
           >
             <BookOpen className="w-5 h-5" />
-            {activeDrawer === 'task' && <span className="absolute -left-1 w-1 h-5 bg-indigo-400 rounded-r-full"></span>}
+            {mainView === 'editor' && activeDrawer === 'task' && <span className="absolute -left-1 w-1 h-5 bg-indigo-400 rounded-r-full"></span>}
           </button>
 
           <button
-            onClick={() => toggleDrawer('bkt')}
+            onClick={() => {
+              toggleDrawer('bkt');
+            }}
             className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all cursor-pointer relative ${
               activeDrawer === 'bkt'
                 ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/40'
@@ -309,11 +314,22 @@ export default function StudentPortalPage() {
           </button>
 
           <button
-            onClick={() => setShowSkillTreeModal(true)}
-            className="w-10 h-10 rounded-xl flex items-center justify-center transition-all cursor-pointer relative bg-gradient-to-br from-indigo-500/20 to-purple-600/30 text-indigo-300 border border-indigo-500/40 hover:bg-indigo-600 hover:text-white hover:scale-105 shadow-md shadow-indigo-500/20"
-            title="RPG Дерево Знань (Game Skill Tree)"
+            onClick={() => {
+              setMainView('tree');
+              setActiveDrawer('node-detail');
+              if (!inspectedSkill && graphNodes.length > 0) {
+                setInspectedSkill(graphNodes.find((n) => n.slug === task?.skill?.slug) || graphNodes[0]);
+              }
+            }}
+            className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all cursor-pointer relative ${
+              mainView === 'tree'
+                ? 'bg-gradient-to-br from-indigo-600 to-purple-600 text-white shadow-lg shadow-indigo-600/40 border border-indigo-400'
+                : 'bg-slate-800/60 text-slate-400 hover:bg-slate-800 hover:text-white'
+            }`}
+            title="Дерево Знань (Game Skill Tree у Головному Вікні)"
           >
             <Network className="w-5 h-5" />
+            {mainView === 'tree' && <span className="absolute -left-1 w-1 h-5 bg-purple-400 rounded-r-full"></span>}
           </button>
 
           {/* Bottom Area (External Apps & Settings at very bottom) */}
@@ -375,6 +391,12 @@ export default function StudentPortalPage() {
                   <>
                     <Sparkles className="w-4 h-4 text-emerald-400" />
                     <span>Карта Навичок (Skill DAG)</span>
+                  </>
+                )}
+                {activeDrawer === 'node-detail' && (
+                  <>
+                    <Network className="w-4 h-4 text-purple-400" />
+                    <span>Деталізація Вузла Дерева</span>
                   </>
                 )}
                 {activeDrawer === 'settings' && (
@@ -456,36 +478,137 @@ export default function StudentPortalPage() {
               {/* Content Drawer 2: Skill DAG Map */}
               {activeDrawer === 'bkt' && (
                 <div className="flex flex-col gap-3">
-                  {/* View Mode Switcher */}
-                  <div className="flex items-center justify-between p-1 bg-slate-950 rounded-xl border border-slate-800">
-                    <button
-                      onClick={() => setBktViewMode('list')}
-                      className={`flex-1 py-1 px-2.5 rounded-lg text-[11px] font-bold transition-all cursor-pointer ${
-                        bktViewMode === 'list'
-                          ? 'bg-slate-800 text-white shadow-sm'
-                          : 'text-slate-400 hover:text-slate-200'
-                      }`}
-                    >
-                      📜 Список Модулів
-                    </button>
-                    <button
-                      onClick={() => setShowSkillTreeModal(true)}
-                      className={`flex-1 py-1 px-2.5 rounded-lg text-[11px] font-bold transition-all cursor-pointer bg-gradient-to-r from-indigo-600/30 to-purple-600/30 text-indigo-300 hover:text-white border border-indigo-500/30 flex items-center justify-center gap-1`}
-                    >
-                      <Sparkles className="w-3 h-3 text-indigo-400" />
-                      <span>🌳 RPG Дерево</span>
-                    </button>
-                  </div>
-
                   <SkillDagMap nodes={graphNodes} activeSkillSlug={task?.skill?.slug} />
 
                   <button
-                    onClick={() => setShowSkillTreeModal(true)}
+                    onClick={() => {
+                      setMainView('tree');
+                      setActiveDrawer('node-detail');
+                      if (graphNodes.length > 0) {
+                        setInspectedSkill(graphNodes.find((n) => n.slug === task?.skill?.slug) || graphNodes[0]);
+                      }
+                    }}
                     className="w-full py-2.5 px-3 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-lg shadow-indigo-600/30 transition-all cursor-pointer"
                   >
                     <Network className="w-4 h-4" />
-                    <span>Відкрити Повне Дерево Скілів</span>
+                    <span>Відкрити Дерево Знань на Екрані</span>
                   </button>
+                </div>
+              )}
+
+              {/* Content Drawer: Node Detail (Inspector for Tree) */}
+              {activeDrawer === 'node-detail' && (
+                <div className="flex flex-col gap-4">
+                  {inspectedSkill ? (
+                    <div className="flex flex-col gap-4">
+                      {/* Node Status Badge */}
+                      <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+                        <span className="px-2.5 py-1 rounded-full text-[10px] font-mono font-bold uppercase tracking-wider bg-purple-500/10 text-purple-400 border border-purple-500/30 flex items-center gap-1.5">
+                          <Network className="w-3.5 h-3.5" />
+                          Модуль Дерева Знань
+                        </span>
+                        <span
+                          className={`text-[10px] font-bold font-mono px-2 py-0.5 rounded-full border ${
+                            inspectedSkill.pMastery >= 0.95
+                              ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30'
+                              : inspectedSkill.status === 'LOCKED'
+                              ? 'bg-rose-500/10 text-rose-400 border-rose-500/30'
+                              : 'bg-indigo-500/10 text-indigo-300 border-indigo-500/30'
+                          }`}
+                        >
+                          {inspectedSkill.pMastery >= 0.95
+                            ? '✨ Опановано'
+                            : inspectedSkill.status === 'LOCKED'
+                            ? '🔒 Заблоковано'
+                            : '⚔️ У процесі'}
+                        </span>
+                      </div>
+
+                      {/* Title & Description */}
+                      <div>
+                        <h3 className="text-base font-bold text-white">{inspectedSkill.title}</h3>
+                        <p className="text-xs text-slate-300 mt-2 leading-relaxed">
+                          {inspectedSkill.description || 'Ключовий модуль курсу для набуття практичних навичок.'}
+                        </p>
+                      </div>
+
+                      {/* Locked Warning Notice if node is locked */}
+                      {inspectedSkill.status === 'LOCKED' && (
+                        <div className="p-3 bg-rose-950/30 border border-rose-500/40 rounded-xl flex items-start gap-2.5">
+                          <AlertTriangle className="w-4 h-4 text-rose-400 shrink-0 mt-0.5" />
+                          <div className="text-[11px] text-rose-200">
+                            <strong className="text-rose-300 block mb-0.5">Вузол Наразі Заблоковано!</strong>
+                            Для розблокування цього модуля необхідно спершу засвоїти попередні залежні модулі до рівня майстерності P(L) ≥ 0.95.
+                          </div>
+                        </div>
+                      )}
+
+                      {/* BKT Mastery Breakdown */}
+                      <div className="bg-slate-950/80 border border-slate-800 rounded-xl p-3.5 flex flex-col gap-2.5">
+                        <div className="flex justify-between items-center text-xs">
+                          <span className="text-slate-400 font-semibold">Рівень Майстерності P(L):</span>
+                          <span className={`font-mono font-bold text-sm ${
+                            inspectedSkill.pMastery >= 0.95 ? 'text-emerald-400' : 'text-indigo-400'
+                          }`}>
+                            {(inspectedSkill.pMastery * 100).toFixed(1)}%
+                          </span>
+                        </div>
+                        <div className="w-full h-2 bg-slate-900 rounded-full overflow-hidden border border-slate-800">
+                          <div
+                            className={`h-full transition-all duration-500 ${
+                              inspectedSkill.pMastery >= 0.95
+                                ? 'bg-emerald-400'
+                                : inspectedSkill.status === 'LOCKED'
+                                ? 'bg-slate-700'
+                                : 'bg-gradient-to-r from-amber-500 to-indigo-500'
+                            }`}
+                            style={{ width: `${Math.min(100, inspectedSkill.pMastery * 100)}%` }}
+                          />
+                        </div>
+                        <div className="flex justify-between text-[10px] text-slate-500 font-mono">
+                          <span>0%</span>
+                          <span className="text-emerald-400">Поріг: ≥ 95.0%</span>
+                        </div>
+                      </div>
+
+                      {/* Prerequisites info */}
+                      <div className="flex flex-col gap-1.5 text-xs">
+                        <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                          Вимоги до Розблокування:
+                        </span>
+                        <div className="text-[11px] text-slate-300 bg-slate-950/70 p-2.5 rounded-lg border border-slate-800">
+                          {inspectedSkill.parentSkillIds.length === 0
+                            ? '🟢 Базовий стартовий вузол курсу.'
+                            : inspectedSkill.status === 'LOCKED'
+                            ? '🔒 Потребує опанування попередніх навичок.'
+                            : '✨ Усі пререквізити виконано! Модуль відкрито.'}
+                        </div>
+                      </div>
+
+                      {/* Action Button */}
+                      <button
+                        disabled={inspectedSkill.status === 'LOCKED'}
+                        onClick={() => {
+                          setMainView('editor');
+                          setActiveDrawer('task');
+                          fetchRecommendedTask(activeCourseSlug);
+                        }}
+                        className={`w-full py-2.5 px-4 rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer shadow-lg mt-2 ${
+                          inspectedSkill.status === 'LOCKED'
+                            ? 'bg-slate-800 text-slate-500 cursor-not-allowed shadow-none'
+                            : inspectedSkill.pMastery >= 0.95
+                            ? 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-emerald-600/30'
+                            : 'bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white shadow-indigo-600/40'
+                        }`}
+                      >
+                        <span>{inspectedSkill.status === 'LOCKED' ? '🔒 Заблоковано' : inspectedSkill.pMastery >= 0.95 ? 'Тренувати знову' : 'Розпочати квест модуля ➔'}</span>
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="text-slate-400 text-xs p-4 text-center">
+                      Оберіть вузол на дереві знань для перегляду деталей.
+                    </div>
+                  )}
                 </div>
               )}
 
@@ -506,14 +629,35 @@ export default function StudentPortalPage() {
         )}
 
         {/* 💻 Center Main Canvas: Editor & Evaluation Result */}
-        <main className="flex-1 p-4 lg:p-6 overflow-y-auto flex flex-col gap-4 bg-slate-950">
-          {isLoading ? (
-            <div className="p-12 bg-slate-900/50 border border-slate-800 rounded-2xl flex flex-col items-center justify-center gap-4 text-slate-400 my-auto">
+        <main className="flex-1 overflow-hidden flex flex-col bg-slate-950">
+          {mainView === 'tree' ? (
+            <div className="w-full h-full p-4 lg:p-6 overflow-hidden flex flex-col">
+              <GameSkillTreeWidget
+                nodes={graphNodes}
+                activeSkillSlug={task?.skill?.slug}
+                selectedSkillSlug={inspectedSkill?.slug}
+                courseTitle={courses.find((c) => c.slug === activeCourseSlug)?.title || 'Курс'}
+                showInspector={false}
+                onInspectSkill={(node) => {
+                  setInspectedSkill(node);
+                  setActiveDrawer('node-detail');
+                }}
+                onSelectSkill={(slug) => {
+                  const node = graphNodes.find((n) => n.slug === slug);
+                  if (node) {
+                    setInspectedSkill(node);
+                    setActiveDrawer('node-detail');
+                  }
+                }}
+              />
+            </div>
+          ) : isLoading ? (
+            <div className="p-12 bg-slate-900/50 border border-slate-800 rounded-2xl flex flex-col items-center justify-center gap-4 text-slate-400 my-auto mx-auto">
               <RefreshCw className="w-8 h-8 animate-spin text-indigo-500" />
               <p className="text-sm font-medium">Завантаження адаптивного завдання з BKT графа...</p>
             </div>
           ) : task ? (
-            <div className="flex flex-col gap-4 h-full">
+            <div className="flex-1 p-4 lg:p-6 overflow-y-auto flex flex-col gap-4">
               {task.taskType === 'SINGLE_CHOICE' || task.taskType === 'MULTIPLE_CHOICE' ? (
                 <QuizTaskEditor
                   taskId={task.id}
@@ -615,23 +759,6 @@ export default function StudentPortalPage() {
             >
               ОК, анулювати прогрес модуля
             </button>
-          </div>
-        </div>
-      )}
-      {/* 🌳 Fullscreen RPG Game Skill Tree Modal Widget */}
-      {showSkillTreeModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-slate-950/90 backdrop-blur-xl animate-fadeIn">
-          <div className="w-full max-w-6xl h-[92vh] flex flex-col bg-slate-900 border border-indigo-500/30 rounded-2xl shadow-2xl overflow-hidden relative">
-            <GameSkillTreeWidget
-              nodes={graphNodes}
-              activeSkillSlug={task?.skill?.slug}
-              courseTitle={courses.find((c) => c.slug === activeCourseSlug)?.title || 'Курс'}
-              onClose={() => setShowSkillTreeModal(false)}
-              onSelectSkill={(slug) => {
-                setShowSkillTreeModal(false);
-                fetchRecommendedTask(activeCourseSlug);
-              }}
-            />
           </div>
         </div>
       )}

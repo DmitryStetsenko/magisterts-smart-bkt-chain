@@ -22,7 +22,10 @@ interface GameSkillTreeWidgetProps {
   nodes: SkillGraphNode[];
   activeSkillSlug?: string;
   courseTitle?: string;
+  selectedSkillSlug?: string;
+  showInspector?: boolean;
   onSelectSkill?: (slug: string) => void;
+  onInspectSkill?: (node: SkillGraphNode) => void;
   onClose?: () => void;
 }
 
@@ -30,7 +33,10 @@ export function GameSkillTreeWidget({
   nodes,
   activeSkillSlug,
   courseTitle = 'Навчальний Курс',
+  selectedSkillSlug,
+  showInspector = true,
   onSelectSkill,
+  onInspectSkill,
   onClose,
 }: GameSkillTreeWidgetProps) {
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
@@ -45,7 +51,9 @@ export function GameSkillTreeWidget({
   const playerLevel = Math.max(1, Math.floor(masteredSkills * 2.5) + 1);
   const totalExp = Math.round(nodes.reduce((acc, n) => acc + n.pMastery * 1000, 0));
 
-  const selectedNode = nodes.find((n) => n.id === selectedNodeId) || 
+  const selectedNode = 
+    (selectedNodeId ? nodes.find((n) => n.id === selectedNodeId) : null) || 
+    (selectedSkillSlug ? nodes.find((n) => n.slug === selectedSkillSlug) : null) || 
     nodes.find((n) => n.slug === activeSkillSlug) || 
     nodes[0];
 
@@ -218,7 +226,10 @@ export function GameSkillTreeWidget({
                   key={node.id}
                   onClick={() => {
                     setSelectedNodeId(node.id);
-                    if (!isLocked && onSelectSkill) {
+                    if (onInspectSkill) {
+                      onInspectSkill(node);
+                    }
+                    if (onSelectSkill) {
                       onSelectSkill(node.slug);
                     }
                   }}
@@ -229,7 +240,7 @@ export function GameSkillTreeWidget({
                     zIndex: 10,
                   }}
                   className={`absolute group cursor-pointer transition-all duration-300 flex flex-col items-center ${
-                    isLocked ? 'cursor-not-allowed opacity-60' : 'hover:scale-110'
+                    isLocked ? 'opacity-70 hover:opacity-100 hover:scale-105' : 'hover:scale-110'
                   }`}
                 >
                   {/* Hexagon / Circular Crystal Node */}
@@ -315,7 +326,7 @@ export function GameSkillTreeWidget({
         </div>
 
         {/* Right: RPG Skill Inspector & Quest Card */}
-        {selectedNode && (
+        {showInspector && selectedNode && (
           <aside className="w-80 bg-slate-900/95 border-l border-indigo-500/20 p-5 flex flex-col justify-between shrink-0 shadow-2xl backdrop-blur-xl z-20">
             <div className="flex flex-col gap-4">
               {/* Header Badge */}
