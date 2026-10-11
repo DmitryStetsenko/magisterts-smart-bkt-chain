@@ -1,8 +1,10 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { ShieldCheck, Network, Users, BarChart3, Code2, BookOpen, Scale, ChevronDown, X, Search, RotateCcw, AlertTriangle, CheckCircle2, Lock, HelpCircle, Code, FileText, CheckSquare, Sparkles, Keyboard, Copy, Activity, Info } from 'lucide-react';
+import { ShieldCheck, Network, Users, BarChart3, Code2, BookOpen, Scale, ChevronDown, X, Search, RotateCcw, AlertTriangle, CheckCircle2, Lock, HelpCircle, Code, FileText, CheckSquare, Sparkles, Keyboard, Copy, Activity, Info, GitBranch, Layers } from 'lucide-react';
 import { StudentAnalyticsItem } from '../features/analytics/model/analytics.types';
+import { GameSkillTreeWidget } from '../features/skill-graph/ui/GameSkillTreeWidget';
+import { SkillGraphNode } from '../features/skill-graph/model/skill-graph.types';
 
 interface CourseItem {
   slug: string;
@@ -109,6 +111,7 @@ export default function TeacherDashboardPage() {
   }, [activeCourseSlug]);
 
   const [activeDrawer, setActiveDrawer] = useState<'analytics' | 'coursemap' | 'settings' | null>('analytics');
+  const [activeStudentView, setActiveStudentView] = useState<'metrics' | 'tree'>('metrics');
 
   const toggleDrawer = (tab: 'analytics' | 'coursemap' | 'settings') => {
     setActiveDrawer((prev) => (prev === tab ? null : tab));
@@ -116,6 +119,39 @@ export default function TeacherDashboardPage() {
 
   const activeCourse = courses.find((c) => c.slug === activeCourseSlug) || courses[0] || DEFAULT_COURSES[0];
   const selectedStudent = students.find((s) => (s.id || s.studentId || s.email) === selectedStudentId) || students[0];
+
+  // Calculate RPG Skill Graph nodes specifically for the selected student
+  const studentGraphNodes: SkillGraphNode[] = React.useMemo(() => {
+    if (!courseDetails?.skills || !Array.isArray(courseDetails.skills)) return [];
+    const masteryMap = selectedStudent?.bktBySkill || selectedStudent?.skillMastery || {};
+
+    return courseDetails.skills.map((skill: any) => {
+      const p = masteryMap[skill.slug] ?? masteryMap[skill.id] ?? 0.0;
+      const isMastered = p >= 0.95;
+      const parentIds = Array.isArray(skill.parentDependencies)
+        ? skill.parentDependencies.map((d: any) => d.parentSkillId)
+        : [];
+      const parentMastered =
+        parentIds.length === 0 ||
+        parentIds.every((pid: string) => {
+          const parentSkill = courseDetails.skills.find((s: any) => s.id === pid);
+          const parentP = parentSkill
+            ? (masteryMap[parentSkill.slug] ?? masteryMap[parentSkill.id] ?? 0)
+            : (masteryMap[pid] ?? 0);
+          return parentP >= 0.95;
+        });
+
+      return {
+        id: skill.id,
+        slug: skill.slug,
+        title: skill.title,
+        description: skill.description || '',
+        pMastery: p,
+        status: isMastered ? 'MASTERED' : parentMastered ? 'IN_PROGRESS' : 'LOCKED',
+        parentSkillIds: parentIds,
+      };
+    });
+  }, [courseDetails, selectedStudent]);
 
   const handleResetStudent = async (studentId: string) => {
     try {
@@ -463,6 +499,32 @@ export default function TeacherDashboardPage() {
                 </div>
 
                 <div className="flex items-center gap-3">
+                  {/* View Mode Toggle: Metrics Heatmap vs RPG Skill Tree */}
+                  <div className="bg-slate-950 p-1 rounded-xl border border-slate-800 flex items-center gap-1 shadow-inner">
+                    <button
+                      onClick={() => setActiveStudentView('metrics')}
+                      className={`px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
+                        activeStudentView === 'metrics'
+                          ? 'bg-purple-600 text-white shadow-md shadow-purple-600/30'
+                          : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                      }`}
+                    >
+                      <BarChart3 className="w-3.5 h-3.5" />
+                      <span>Аналітика</span>
+                    </button>
+                    <button
+                      onClick={() => setActiveStudentView('tree')}
+                      className={`px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
+                        activeStudentView === 'tree'
+                          ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-md shadow-purple-600/30'
+                          : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                      }`}
+                    >
+                      <GitBranch className="w-3.5 h-3.5" />
+                      <span>Дерево Знань Студента</span>
+                    </button>
+                  </div>
+
                   <button
                     onClick={() => handleResetStudent(selectedStudent.id || selectedStudent.studentId || selectedStudent.email)}
                     className="px-3 py-2 rounded-xl bg-rose-600/20 text-rose-300 border border-rose-500/30 hover:bg-rose-600/30 transition-all text-xs font-bold flex items-center gap-2 cursor-pointer shadow-md"
@@ -473,8 +535,24 @@ export default function TeacherDashboardPage() {
                 </div>
               </div>
 
-              {/* Compact Student Metrics Grid with Icons & Metric Explanations */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+              {/* 🌟 Dynamic View Mode: RPG Game Skill Tree vs Traditional Metrics */}
+              {activeStudentView === 'tree' ? (
+                <div className="w-full h-[680px] rounded-2xl overflow-hidden border border-purple-500/30 shadow-2xl">
+                  <GameSkillTreeWidget
+                    nodes={studentGraphNodes}
+                    courseTitle={activeCourse.title}
+                    studentName={selectedStudent.name}
+                    showInspector={true}
+                    onSelectSkill={(slug) => {
+                      toggleDrawer('coursemap');
+                      setSelectedSkillSlug(slug);
+                    }}
+                  />
+                </div>
+              ) : (
+                <>
+                  {/* Compact Student Metrics Grid with Icons & Metric Explanations */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
                 {/* Metric 1: P(L) Mastery */}
                 <div className="bg-slate-900 border border-slate-800 rounded-xl p-3 flex flex-col justify-between gap-2 shadow-md relative group">
                   <div className="flex items-start justify-between gap-1">
@@ -633,8 +711,10 @@ export default function TeacherDashboardPage() {
                   })}
                 </div>
               </div>
-            </div>
+            </>
           )}
+        </div>
+      )}
 
           {/* Main View 2: Course & Tasks Detail Inspector */}
           {activeDrawer === 'coursemap' && (
