@@ -82,11 +82,10 @@ export function GameSkillTreeWidget({
       <div className="h-16 bg-slate-900/90 border-b border-indigo-500/20 px-5 flex items-center justify-between shrink-0 z-20 backdrop-blur-md">
         <div className="flex items-center gap-4">
           {/* Level Crest Badge */}
-          <div className="relative group flex items-center gap-2">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 p-0.5 shadow-lg shadow-indigo-500/30 flex items-center justify-center">
-              <div className="w-full h-full bg-slate-950 rounded-[10px] flex items-center justify-center font-black font-mono text-indigo-300 text-sm">
-                LVL {playerLevel}
-              </div>
+          <div className="relative group flex items-center gap-2.5">
+            <div className="px-3 py-1.5 rounded-xl bg-gradient-to-br from-indigo-500/20 via-purple-500/20 to-pink-500/20 border border-indigo-500/40 shadow-lg shadow-indigo-500/20 flex items-center gap-1.5">
+              <span className="text-[10px] font-black font-mono text-indigo-400 uppercase tracking-wider">LVL</span>
+              <span className="text-base font-black font-mono text-white leading-none">{playerLevel}</span>
             </div>
             <div>
               <div className="flex items-center gap-2">
