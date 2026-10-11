@@ -185,20 +185,67 @@
               "type": "text",
               "raw_text": "**Математична модель агрегації:**",
               "subitems": []
-            },
+            }
+          ]
+        },
+        {
+          "title": "0.5 Автономний RPG-Віджет «Дерево Знань» (`GameSkillTreeWidget`)",
+          "level": 3,
+          "paragraphs": [],
+          "code_blocks": [],
+          "items": [
             {
               "type": "text",
-              "raw_text": "**Реалізація у Коді:**",
+              "raw_text": "**Концепція та Гейміфікація:** Перетворення класичного орієнтованого графа залежностей навичок DAG у повноцінне інтерактивне RPG Дерево Прокачування (Skill Tree / Skyrim & Path of Exile visual design).",
               "subitems": []
             },
             {
               "type": "text",
-              "raw_text": "**`BktController.ts` (`GET /api/v1/bkt/analytics/students`):** Обчислення `telemetryBySkill`, `medianWpm`, `medianCopyPasteRatio`, `medianFatigueIndex` та об'єкта `peakAnomaly`.",
+              "raw_text": "**Архітектурні складові (`apps/student/src/features/skill-graph/ui/GameSkillTreeWidget.tsx`):**",
               "subitems": []
             },
             {
               "type": "text",
-              "raw_text": "**`Teacher Dashboard` (`apps/teacher/src/app/page.tsx`):** Відображення курс-медіанних метрик, попереджувального бейджа пікової аномалії в картці Copy-Paste та локальної модульної телеметрії в картках BKT Heatmap.",
+              "raw_text": "**Ігрове поле з неоновою кіберпанк-сіткою:** Органічний зигзагоподібний лейаут сузір'їв знань з векторними Bezier-кривими (Power Rays), що з'єднують навички.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Стани вузлів-рунічних кристалів:**",
+              "subitems": [
+                "🔒 **Locked:** Напівпрозорий, контур замка, неактивний до виконання пререквізитів ($P(L) \\ge 0.95$).",
+                "⚔️ **In Progress:** Пульсуюче синє сяйво, живий відсоток майстерності $P(L_t)$, кнопка «Розпочати квест».",
+                "✨ **Mastered:** Золотисто-смарагдовий ореол (`bg-emerald-950/60 border-emerald-400`), позначка засвоєння та розблокування енергетичного променя до наступного рівня."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**RPG Інспектор Навички (Side Quest Card):** Картка модуля з умовами квесту, пререквізитами та прогрес-баром BKT.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Гейміфікована прогресія:** Підрахунок рівня гравця (`LVL`), очок досвіду (`EXP`) та загального відсотка відкриття дерева знань курсу.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Інтеграція в Кабінет Студента:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Акцентна іконка `Network` у лівому вертикальному навігаційному рейлі (`w-14`).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Перемикач режимів `[ 📜 Список Модулів | 🌳 RPG Дерево ]` у бічній панелі.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Повноекранне модальне вікно огляду та взаємодії з деревом знань.",
               "subitems": []
             },
             {

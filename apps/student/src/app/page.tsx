@@ -2,11 +2,12 @@
 
 import React, { useState, useEffect } from 'react';
 import { io } from 'socket.io-client';
-import { Brain, Sparkles, CheckCircle, AlertCircle, RefreshCw, User, Code2, BookOpen, Scale, ChevronDown, ArrowRight, AlertTriangle, X, Settings } from 'lucide-react';
+import { Brain, Sparkles, CheckCircle, AlertCircle, RefreshCw, User, Code2, BookOpen, Scale, ChevronDown, ArrowRight, AlertTriangle, X, Settings, Network, Compass, Flame } from 'lucide-react';
 import { MonacoCodeEditor } from '../features/code-editor/ui/MonacoCodeEditor';
 import { QuizTaskEditor } from '../features/quiz-editor/ui/QuizTaskEditor';
 import { EssayTaskEditor } from '../features/essay-editor/ui/EssayTaskEditor';
 import { SkillDagMap } from '../features/skill-graph/ui/SkillDagMap';
+import { GameSkillTreeWidget } from '../features/skill-graph/ui/GameSkillTreeWidget';
 import { SkillGraphNode } from '../features/skill-graph/model/skill-graph.types';
 
 interface TaskDetail {
@@ -224,6 +225,8 @@ export default function StudentPortalPage() {
 
   // Opera-Style Sidebar Drawer State: null = closed, 'task' | 'bkt' | 'analytics' | 'settings'
   const [activeDrawer, setActiveDrawer] = useState<'task' | 'bkt' | 'analytics' | 'settings' | null>('task');
+  const [bktViewMode, setBktViewMode] = useState<'list' | 'tree'>('list');
+  const [showSkillTreeModal, setShowSkillTreeModal] = useState<boolean>(false);
 
   const toggleDrawer = (tab: 'task' | 'bkt' | 'analytics' | 'settings') => {
     setActiveDrawer((prev) => (prev === tab ? null : tab));
@@ -303,6 +306,14 @@ export default function StudentPortalPage() {
           >
             <Sparkles className="w-5 h-5" />
             {activeDrawer === 'bkt' && <span className="absolute -left-1 w-1 h-5 bg-indigo-400 rounded-r-full"></span>}
+          </button>
+
+          <button
+            onClick={() => setShowSkillTreeModal(true)}
+            className="w-10 h-10 rounded-xl flex items-center justify-center transition-all cursor-pointer relative bg-gradient-to-br from-indigo-500/20 to-purple-600/30 text-indigo-300 border border-indigo-500/40 hover:bg-indigo-600 hover:text-white hover:scale-105 shadow-md shadow-indigo-500/20"
+            title="RPG Дерево Знань (Game Skill Tree)"
+          >
+            <Network className="w-5 h-5" />
           </button>
 
           {/* Bottom Area (External Apps & Settings at very bottom) */}
@@ -444,8 +455,37 @@ export default function StudentPortalPage() {
 
               {/* Content Drawer 2: Skill DAG Map */}
               {activeDrawer === 'bkt' && (
-                <div className="flex flex-col gap-4">
+                <div className="flex flex-col gap-3">
+                  {/* View Mode Switcher */}
+                  <div className="flex items-center justify-between p-1 bg-slate-950 rounded-xl border border-slate-800">
+                    <button
+                      onClick={() => setBktViewMode('list')}
+                      className={`flex-1 py-1 px-2.5 rounded-lg text-[11px] font-bold transition-all cursor-pointer ${
+                        bktViewMode === 'list'
+                          ? 'bg-slate-800 text-white shadow-sm'
+                          : 'text-slate-400 hover:text-slate-200'
+                      }`}
+                    >
+                      📜 Список Модулів
+                    </button>
+                    <button
+                      onClick={() => setShowSkillTreeModal(true)}
+                      className={`flex-1 py-1 px-2.5 rounded-lg text-[11px] font-bold transition-all cursor-pointer bg-gradient-to-r from-indigo-600/30 to-purple-600/30 text-indigo-300 hover:text-white border border-indigo-500/30 flex items-center justify-center gap-1`}
+                    >
+                      <Sparkles className="w-3 h-3 text-indigo-400" />
+                      <span>🌳 RPG Дерево</span>
+                    </button>
+                  </div>
+
                   <SkillDagMap nodes={graphNodes} activeSkillSlug={task?.skill?.slug} />
+
+                  <button
+                    onClick={() => setShowSkillTreeModal(true)}
+                    className="w-full py-2.5 px-3 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-lg shadow-indigo-600/30 transition-all cursor-pointer"
+                  >
+                    <Network className="w-4 h-4" />
+                    <span>Відкрити Повне Дерево Скілів</span>
+                  </button>
                 </div>
               )}
 
@@ -575,6 +615,23 @@ export default function StudentPortalPage() {
             >
               ОК, анулювати прогрес модуля
             </button>
+          </div>
+        </div>
+      )}
+      {/* 🌳 Fullscreen RPG Game Skill Tree Modal Widget */}
+      {showSkillTreeModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-slate-950/90 backdrop-blur-xl animate-fadeIn">
+          <div className="w-full max-w-6xl h-[92vh] flex flex-col bg-slate-900 border border-indigo-500/30 rounded-2xl shadow-2xl overflow-hidden relative">
+            <GameSkillTreeWidget
+              nodes={graphNodes}
+              activeSkillSlug={task?.skill?.slug}
+              courseTitle={courses.find((c) => c.slug === activeCourseSlug)?.title || 'Курс'}
+              onClose={() => setShowSkillTreeModal(false)}
+              onSelectSkill={(slug) => {
+                setShowSkillTreeModal(false);
+                fetchRecommendedTask(activeCourseSlug);
+              }}
+            />
           </div>
         </div>
       )}
