@@ -55,6 +55,26 @@
               "subitems": [
                 "Успішно зібрано всі три клієнтські проєкти монорепозиторію: `npm run build:student`, `npm run build:teacher`, `npm run build:admin` (100% проходження перевірок типів TypeScript та турбо-збірки Next.js)."
               ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Створення Бази Архітектурних Дискусій та Мозкових Штурмів (`docs/brainstorm/`):**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Створено каталог `docs/brainstorm/` та головний індекс `docs/brainstorm/README.md`.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Зафіксовано **Сесію 01** (`docs/brainstorm/01_evaluating_mastery_across_task_types.md`):",
+              "subitems": [
+                "Системний аналіз оцінювання знань студента за різними типами завдань (`SINGLE_CHOICE`, `MULTIPLE_CHOICE`, `CODE`, `TEXT_ESSAY`).",
+                "Математична концепція динамічних $P(G)$ та $P(S)$ із часовим штрафом за надшвидкі відповіді ($T < 3\\text{ с}$).",
+                "Концепція індексу достовірності коду ($\\alpha$-Score) на основі телеметрії Monaco Editor ($WPM$ та $CopyPaste$).",
+                "Метод триангуляції знань (комбінований мінімум: концептуальний тест + самостійний код для досягнення `MASTERED` $P(L) \\ge 0.95$)."
+              ]
             }
           ]
         }

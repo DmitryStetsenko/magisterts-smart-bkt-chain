@@ -138,6 +138,39 @@
           ]
         },
         {
+          "title": "0.7 База Архітектурних Дискусій та Мозкових Штурмів (`docs/brainstorm/`)",
+          "level": 3,
+          "paragraphs": [],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "**Концепція:** Централізоване сховище для накопичення теоретичних, алгоритмічних та бізнес-ідей проекту.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Сесія 01 (`docs/brainstorm/01_evaluating_mastery_across_task_types.md`):**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Динамічний BKT ($P(G) / P(S)$):** Введення залежності $P(G)$ від часу здачі завдання $T_{\\text{submit}}$: якщо $T < 3.0\\text{ с}$, ймовірність вгадування $P(G)$ зростає до $0.85$, мінімізуючи ріст знання від випадкового вибору в тестах.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Когнітивна достовірність ($\\alpha$-Score):** Мультиплікатор достовірності $\\alpha = (1 - CopyPasteRatio) \\cdot \\text{Penalty}(WPM)$ як коригувальний коефіцієнт BKT.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Мульти-критеріальна триангуляція статусу `MASTERED`:** Опанування теми вимагає зв'язки «Теоретичний тест + Практичний код + Автентична телеметрія».",
+              "subitems": []
+            }
+          ]
+        },
+        {
           "title": "0.3 Модульний Opera-Style UI Shell, Компактні DAG-Вузли та Патерн «List-in-Drawer / Detail-on-Canvas»",
           "level": 3,
           "paragraphs": [],
