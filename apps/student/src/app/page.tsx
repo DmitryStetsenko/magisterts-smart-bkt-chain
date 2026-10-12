@@ -292,14 +292,14 @@ export default function StudentPortalPage() {
               }
             }}
             className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all cursor-pointer relative ${
-              mainView === 'editor' && activeDrawer === 'task'
+              mainView === 'editor' && activeDrawer !== 'bkt'
                 ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/40'
                 : 'bg-slate-800/60 text-slate-400 hover:bg-slate-800 hover:text-white'
             }`}
-            title="Умова Завдання та Редактор"
+            title="Умова Завдання та Редактор (Повторний клік ховає/відкриває бічну панель)"
           >
             <BookOpen className="w-5 h-5" />
-            {mainView === 'editor' && activeDrawer === 'task' && <span className="absolute -left-1 w-1 h-5 bg-indigo-400 rounded-r-full"></span>}
+            {mainView === 'editor' && activeDrawer !== 'bkt' && <span className="absolute -left-1 w-1 h-5 bg-indigo-400 rounded-r-full"></span>}
           </button>
 
           <button
@@ -325,9 +325,8 @@ export default function StudentPortalPage() {
           <button
             onClick={() => {
               if (mainView === 'tree') {
-                // If already on tree view, clicking toggle returns to editor
-                setMainView('editor');
-                setActiveDrawer('task');
+                // Toggle node-detail sidebar on/off while staying on Tree view!
+                toggleDrawer('node-detail');
               } else {
                 setMainView('tree');
                 setActiveDrawer('node-detail');
@@ -341,7 +340,7 @@ export default function StudentPortalPage() {
                 ? 'bg-gradient-to-br from-indigo-600 to-purple-600 text-white shadow-lg shadow-indigo-600/40 border border-indigo-400'
                 : 'bg-slate-800/60 text-slate-400 hover:bg-slate-800 hover:text-white'
             }`}
-            title="Дерево Знань (Game Skill Tree у Головному Вікні)"
+            title="Дерево Знань (Game Skill Tree у Головному Вікні; повторний клік ховає/відкриває бічну панель)"
           >
             <Network className="w-5 h-5" />
             {mainView === 'tree' && <span className="absolute -left-1 w-1 h-5 bg-purple-400 rounded-r-full"></span>}
