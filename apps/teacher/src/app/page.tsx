@@ -124,6 +124,7 @@ export default function TeacherDashboardPage() {
   const studentGraphNodes: SkillGraphNode[] = React.useMemo(() => {
     if (!courseDetails?.skills || !Array.isArray(courseDetails.skills)) return [];
     const masteryMap = selectedStudent?.bktBySkill || selectedStudent?.skillMastery || {};
+    const telemetryMap = selectedStudent?.telemetryBySkill || {};
 
     return courseDetails.skills.map((skill: any) => {
       const p = masteryMap[skill.slug] ?? masteryMap[skill.id] ?? 0.0;
@@ -141,6 +142,9 @@ export default function TeacherDashboardPage() {
           return parentP >= 0.95;
         });
 
+      const skillTasks = allTasks.filter((t) => t.skillId === skill.id || t.skill?.id === skill.id);
+      const telemetry = telemetryMap[skill.slug] || telemetryMap[skill.id];
+
       return {
         id: skill.id,
         slug: skill.slug,
@@ -149,9 +153,15 @@ export default function TeacherDashboardPage() {
         pMastery: p,
         status: isMastered ? 'MASTERED' : parentMastered ? 'IN_PROGRESS' : 'LOCKED',
         parentSkillIds: parentIds,
+        tasksCount: skillTasks.length,
+        telemetry: telemetry ? {
+          wpm: telemetry.wpm ?? 0,
+          copyPasteRatio: telemetry.copyPasteRatio ?? 0,
+          fatigueIndex: telemetry.fatigueIndex ?? 0,
+        } : undefined,
       };
     });
-  }, [courseDetails, selectedStudent]);
+  }, [courseDetails, selectedStudent, allTasks]);
 
   const handleResetStudent = async (studentId: string) => {
     try {
@@ -544,8 +554,9 @@ export default function TeacherDashboardPage() {
                     studentName={selectedStudent.name}
                     showInspector={true}
                     onSelectSkill={(slug) => {
-                      toggleDrawer('coursemap');
+                      setActiveDrawer('coursemap');
                       setSelectedSkillSlug(slug);
+                      setSelectedTaskId(null);
                     }}
                   />
                 </div>

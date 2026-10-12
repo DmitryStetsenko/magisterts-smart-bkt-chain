@@ -14,7 +14,14 @@ import {
   Flame,
   Award,
   Layers,
-  ArrowRight
+  ArrowRight,
+  Keyboard,
+  Copy,
+  Activity,
+  AlertTriangle,
+  ExternalLink,
+  BookOpen,
+  BarChart3
 } from 'lucide-react';
 import { SkillGraphNode } from '../model/skill-graph.types';
 
@@ -326,7 +333,7 @@ export function GameSkillTreeWidget({
 
         {/* Right: RPG Skill Inspector & Node Card */}
         {showInspector && selectedNode && (
-          <aside className="w-80 bg-slate-900/95 border-l border-purple-500/20 p-5 flex flex-col justify-between shrink-0 shadow-2xl backdrop-blur-xl z-20">
+          <aside className="w-88 bg-slate-900/95 border-l border-purple-500/20 p-5 flex flex-col justify-between shrink-0 shadow-2xl backdrop-blur-xl z-20 overflow-y-auto">
             <div className="flex flex-col gap-4">
               {/* Header Badge */}
               <div className="flex items-center justify-between border-b border-slate-800 pb-3">
@@ -356,9 +363,12 @@ export function GameSkillTreeWidget({
               </div>
 
               {/* RPG BKT Mastery Metrics */}
-              <div className="bg-slate-950/80 border border-slate-800 rounded-xl p-3.5 flex flex-col gap-2.5">
+              <div className="bg-slate-950/80 border border-slate-800 rounded-xl p-3 flex flex-col gap-2">
                 <div className="flex justify-between items-center text-xs">
-                  <span className="text-slate-400 font-semibold">Рівень Майстерності P(L):</span>
+                  <span className="text-slate-400 font-semibold flex items-center gap-1.5">
+                    <Sparkles className="w-3.5 h-3.5 text-purple-400" />
+                    <span>Майстерність P(L):</span>
+                  </span>
                   <span className="font-mono font-bold text-sm text-purple-400">
                     {(selectedNode.pMastery * 100).toFixed(1)}%
                   </span>
@@ -380,13 +390,84 @@ export function GameSkillTreeWidget({
                 </div>
               </div>
 
-              {/* Prerequisites */}
+              {/* 📊 Модульна Телеметрія Студента (Per-Module Telemetry Stats) */}
+              <div className="bg-slate-950/90 border border-slate-800 rounded-xl p-3 flex flex-col gap-2.5">
+                <div className="flex items-center justify-between border-b border-slate-800/80 pb-2">
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-slate-300 flex items-center gap-1.5">
+                    <BarChart3 className="w-3.5 h-3.5 text-indigo-400" />
+                    <span>Телеметрія Модуля</span>
+                  </span>
+                  <span className="text-[9px] font-mono text-slate-500 bg-slate-900 px-1.5 py-0.5 rounded border border-slate-800">
+                    Live Session
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-3 gap-2 text-center">
+                  {/* WPM */}
+                  <div className="bg-slate-900/80 p-2 rounded-lg border border-slate-800/80 flex flex-col items-center">
+                    <div className="flex items-center gap-1 text-[9px] text-slate-400 font-semibold mb-0.5">
+                      <Keyboard className="w-3 h-3 text-blue-400" />
+                      <span>WPM</span>
+                    </div>
+                    <span className="text-xs font-mono font-bold text-blue-400">
+                      {selectedNode.telemetry?.wpm ?? 0}
+                    </span>
+                  </div>
+
+                  {/* Copy-Paste Ratio */}
+                  <div className={`p-2 rounded-lg border flex flex-col items-center ${
+                    (selectedNode.telemetry?.copyPasteRatio ?? 0) >= 0.60
+                      ? 'bg-red-950/30 border-red-500/40'
+                      : 'bg-slate-900/80 border-slate-800/80'
+                  }`}>
+                    <div className="flex items-center gap-1 text-[9px] text-slate-400 font-semibold mb-0.5">
+                      <Copy className="w-3 h-3 text-amber-400" />
+                      <span>Копіпаст</span>
+                    </div>
+                    <span className={`text-xs font-mono font-bold ${
+                      (selectedNode.telemetry?.copyPasteRatio ?? 0) >= 0.60
+                        ? 'text-red-400'
+                        : 'text-amber-400'
+                    }`}>
+                      {selectedNode.telemetry ? `${(selectedNode.telemetry.copyPasteRatio * 100).toFixed(0)}%` : '0%'}
+                    </span>
+                  </div>
+
+                  {/* Fatigue Index */}
+                  <div className="bg-slate-900/80 p-2 rounded-lg border border-slate-800/80 flex flex-col items-center">
+                    <div className="flex items-center gap-1 text-[9px] text-slate-400 font-semibold mb-0.5">
+                      <Activity className="w-3 h-3 text-purple-400" />
+                      <span>Втома</span>
+                    </div>
+                    <span className="text-xs font-mono font-bold text-purple-400">
+                      {selectedNode.telemetry?.fatigueIndex ?? 0}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Anomaly banner if copy-paste ratio >= 60% */}
+                {(selectedNode.telemetry?.copyPasteRatio ?? 0) >= 0.60 && (
+                  <div className="p-2 rounded-lg bg-red-950/40 border border-red-500/40 flex items-center gap-2 text-[10px] text-red-300">
+                    <AlertTriangle className="w-3.5 h-3.5 text-red-400 shrink-0" />
+                    <span>Увага: Зафіксовано високий рівень вставки коду/тексту (&ge; 60%).</span>
+                  </div>
+                )}
+              </div>
+
+              {/* Prerequisites & Requirements */}
               <div className="flex flex-col gap-1.5 text-xs">
-                <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1">
-                  <Target className="w-3.5 h-3.5 text-purple-400" />
-                  Вимоги до Розблокування:
-                </span>
-                <p className="text-[11px] text-slate-400 bg-slate-950/60 p-2.5 rounded-lg border border-slate-800/80">
+                <div className="flex items-center justify-between">
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1">
+                    <Target className="w-3.5 h-3.5 text-purple-400" />
+                    Вимоги до Розблокування:
+                  </span>
+                  {selectedNode.tasksCount !== undefined && (
+                    <span className="text-[10px] font-mono text-slate-400">
+                      Завдань: <strong className="text-white">{selectedNode.tasksCount}</strong>
+                    </span>
+                  )}
+                </div>
+                <p className="text-[11px] text-slate-400 bg-slate-950/60 p-2.5 rounded-lg border border-slate-800/80 leading-relaxed">
                   {selectedNode.parentSkillIds.length === 0
                     ? '🟢 Базовий вузол курсу. Доступний одразу.'
                     : selectedNode.status === 'LOCKED'
@@ -396,15 +477,17 @@ export function GameSkillTreeWidget({
               </div>
             </div>
 
-            {/* Action / Inspect Button for Teacher */}
+            {/* Action / Navigation Buttons for Teacher */}
             {onSelectSkill && (
-              <div className="pt-4 border-t border-slate-800/80 flex flex-col gap-2">
+              <div className="pt-4 border-t border-slate-800/80 flex flex-col gap-2 mt-4">
                 <button
                   onClick={() => onSelectSkill(selectedNode.slug)}
-                  className="w-full py-2.5 px-4 rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer shadow-lg bg-slate-800 hover:bg-slate-700 text-white border border-slate-700"
+                  className="w-full py-2.5 px-4 rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer shadow-lg bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white shadow-purple-600/30"
+                  title="Перейти до детального опису та списку завдань модуля"
                 >
-                  <span>Переглянути завдання модуля</span>
-                  <ArrowRight className="w-4 h-4 text-purple-400" />
+                  <BookOpen className="w-4 h-4" />
+                  <span>Детальний опис та завдання модуля</span>
+                  <ArrowRight className="w-4 h-4 ml-auto" />
                 </button>
               </div>
             )}
