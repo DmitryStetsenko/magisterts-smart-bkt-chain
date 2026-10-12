@@ -33,6 +33,14 @@
      - Інженерні Boss Fights та RPG-метафора дерева талантів.
      - Live Classroom Heatmap & Teacher Co-Pilot для моніторингу когнітивного навантаження аудиторії в реальному часі.
      - Telemetry-based Proof-of-Competence (захист від списування через ChatGPT на технічних інтерв'ю).
+   - Зафіксовано **Сесію 03** (`docs/brainstorm/03_technical_edtech_platform_architecture.md`):
+     - Суто технічна декомпозиція реалізації EdTech-платформи у монорепозиторії.
+     - `LearningSessionEngine` (FSM кінцевий автомат навчальної сесії).
+     - `InterventionRouter` з тригерним предикатом ($\Delta t_{\text{idle}} > 45\text{ с}$, $P(Slip) > 0.65$, `failedRuns` $\ge 2$).
+     - `SocraticScaffoldingService` (контекстний AI-тьютор на базі LLM із забороною видачі робочого коду).
+     - `TelemetryIntegrityEngine` (розрахунок $WPM_{\text{instant}}$, $\text{Burstiness}$ та $\alpha$-Score).
+     - Схема БД Prisma: `TheorySnippet`, `SocraticDialogue`, `CompetenceCredential`.
+     - Split-Screen Workspace у `apps/student` та Live Classroom WebSocket Heatmap у `apps/teacher`.
 
 ## 📅 11 жовтня 2026 року
 

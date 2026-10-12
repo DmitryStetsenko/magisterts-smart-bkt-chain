@@ -13,3 +13,7 @@
 2. [02. Трансформація у Повноцінну EdTech-Екосистему](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/docs/brainstorm/02_edtech_ecosystem_vision.md)
    - *Дата:* 13 жовтня 2026
    - *Ключові теми:* Just-in-Time теорія та інтервенції, Socratic AI-тьютор, RPG Skill Tree гейміфікація, Teacher Co-Pilot (пульс аудиторії), Proof-of-Competence без списування.
+
+3. [03. Суто Технічна Архітектура EdTech-Платформи](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/docs/brainstorm/03_technical_edtech_platform_architecture.md)
+   - *Дата:* 13 жовтня 2026
+   - *Ключові теми:* Реалізація у монорепозиторії, LearningSessionEngine (FSM), InterventionRouter, SocraticScaffoldingService, TelemetryIntegrityEngine (WPM/Burstiness), Prisma схема, Split-Screen Monaco, Live Classroom WebSocket.

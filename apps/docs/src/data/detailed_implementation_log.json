@@ -1832,6 +1832,74 @@
               "subitems": []
             }
           ]
+        },
+        {
+          "title": "9.11 Суто Технічна Архітектура Платформи у Монорепозиторії (`docs/brainstorm/03_technical_edtech_platform_architecture.md`)",
+          "level": 3,
+          "paragraphs": [],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "**Hexagonal Backend Core (`apps/api`):**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "`LearningSessionEngine`: Кінцевий автомат (FSM) сесії: $\\text{DIAGNOSTIC} \\to \\text{PRACTICE} \\to \\text{INTERVENTION} \\to \\text{SCAFFOLDED} \\to \\text{MASTERY}$.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "`InterventionRouter`: Реактивний тригер інтервенцій ($\\Delta t_{\\text{idle}} > 45\\text{ с} \\land P(Slip) > 0.65 \\land \\text{failedRuns} \\ge 2$) без очікування сабміту.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "`SocraticScaffoldingService`: LLM-агент з забороною прямого коду та ін'єкцією AST контексту та телеметрії.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "`TelemetryIntegrityEngine`: Обчислення $WPM_{\\text{instant}}$, $\\text{Burstiness}$ та $\\alpha$-Score проти читерства.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Розширення Моделі Даних (`packages/database`):**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "`TheorySnippet` (інтерактивна мікро-теорія, visualizers, 45-сек читання).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "`SocraticDialogue` (історія запитань/відповідей, tier рівень підказок).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "`CompetenceCredential` (верифіковані $P(L) \\ge 0.95$ та $\\alpha$-Score для Soulbound NFT).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Клієнтські Інтерфейси (`apps/student`, `apps/teacher`):**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "`apps/student`: Split-Screen Workspace (Code IDE + Micro-Theory + AST Call Stack Visualizer) та Socratic Drawer.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "`apps/teacher`: Підписка на кімнату WebSocket `ws://api/telemetry/classroom/:courseId` для живої теплової карти когнітивного стану групи (Flow, Pause, Cognitive Block).",
+              "subitems": []
+            }
+          ]
         }
       ]
     }
