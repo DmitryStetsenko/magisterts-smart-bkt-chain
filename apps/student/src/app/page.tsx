@@ -284,8 +284,12 @@ export default function StudentPortalPage() {
           {/* Main Action Tabs */}
           <button
             onClick={() => {
-              setMainView('editor');
-              setActiveDrawer('task');
+              if (mainView === 'editor') {
+                toggleDrawer('task');
+              } else {
+                setMainView('editor');
+                setActiveDrawer('task');
+              }
             }}
             className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all cursor-pointer relative ${
               mainView === 'editor' && activeDrawer === 'task'
