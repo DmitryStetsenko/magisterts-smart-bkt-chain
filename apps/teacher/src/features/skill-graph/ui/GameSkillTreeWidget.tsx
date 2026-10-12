@@ -235,9 +235,6 @@ export function GameSkillTreeWidget({
                     if (onInspectSkill) {
                       onInspectSkill(node);
                     }
-                    if (onSelectSkill) {
-                      onSelectSkill(node.slug);
-                    }
                   }}
                   style={{
                     left: `${pos.x}px`,
