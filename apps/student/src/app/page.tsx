@@ -223,13 +223,32 @@ export default function StudentPortalPage() {
     }
   };
 
-  // Opera-Style Sidebar Drawer State: null = closed, 'task' | 'bkt' | 'settings' | 'node-detail'
-  const [activeDrawer, setActiveDrawer] = useState<'task' | 'bkt' | 'settings' | 'node-detail' | null>('task');
+  // Unified Navigation State:
+  // activeTab defines which workspace / module is active.
+  // isDrawerOpen controls whether its companion sidebar drawer is visible.
+  type StudentTab = 'task' | 'bkt' | 'tree' | 'settings';
+  const [activeTab, setActiveTab] = useState<StudentTab>('task');
+  const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(true);
   const [mainView, setMainView] = useState<'editor' | 'tree'>('editor');
   const [inspectedSkill, setInspectedSkill] = useState<SkillGraphNode | null>(null);
 
-  const toggleDrawer = (tab: 'task' | 'bkt' | 'settings' | 'node-detail') => {
-    setActiveDrawer((prev) => (prev === tab ? null : tab));
+  const handleTabClick = (tab: StudentTab) => {
+    if (activeTab === tab) {
+      // Toggle sidebar open/collapsed without changing active workspace
+      setIsDrawerOpen((prev) => !prev);
+    } else {
+      // Switch workspace & ensure drawer is open
+      setActiveTab(tab);
+      setIsDrawerOpen(true);
+      if (tab === 'tree') {
+        setMainView('tree');
+        if (!inspectedSkill && graphNodes.length > 0) {
+          setInspectedSkill(graphNodes.find((n) => n.slug === task?.skill?.slug) || graphNodes[0]);
+        }
+      } else {
+        setMainView('editor');
+      }
+    }
   };
 
   return (
@@ -281,95 +300,84 @@ export default function StudentPortalPage() {
       <div className="flex-1 flex overflow-hidden">
         {/* 🎨 Opera-Style Vertical Icon Rail (Slim Left Bar) */}
         <nav className="w-14 bg-slate-900 border-r border-slate-800 flex flex-col items-center py-4 gap-3 shrink-0 z-20 shadow-xl">
-          {/* Main Action Tabs */}
+          {/* Tab 1: Task / Editor */}
           <button
-            onClick={() => {
-              if (mainView !== 'editor') {
-                setMainView('editor');
-                setActiveDrawer('task');
-              } else {
-                setActiveDrawer((prev) => (prev === 'task' ? null : 'task'));
-              }
-            }}
+            onClick={() => handleTabClick('task')}
             className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all cursor-pointer relative ${
-              mainView === 'editor'
-                ? activeDrawer === 'task'
+              activeTab === 'task'
+                ? isDrawerOpen
                   ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/40 ring-1 ring-indigo-400/50'
                   : 'bg-indigo-950/80 text-indigo-300 border border-indigo-500/30 hover:bg-indigo-900/90 hover:text-white'
                 : 'bg-slate-800/60 text-slate-400 hover:bg-slate-800 hover:text-white'
             }`}
             title={
-              mainView === 'editor'
-                ? activeDrawer === 'task'
-                  ? 'Редактор відкритий (клік згорне сайдбар на весь екран)'
-                  : 'Редактор на весь екран (клік відкриє сайдбар умови)'
+              activeTab === 'task'
+                ? isDrawerOpen
+                  ? 'Редактор відкритий із панеллю умови (клік розгорне редактор на весь екран)'
+                  : 'Редактор на весь екран (клік поверне бічну панель умови)'
                 : 'Перейти до Редактора та завдання'
             }
           >
             <BookOpen className="w-5 h-5" />
-            {mainView === 'editor' && activeDrawer === 'task' && (
+            {activeTab === 'task' && isDrawerOpen && (
               <span className="absolute -left-1 w-1 h-5 bg-indigo-400 rounded-r-full shadow-sm shadow-indigo-400"></span>
             )}
-            {mainView === 'editor' && activeDrawer === null && (
-              <span className="absolute -left-1 w-1 h-2 bg-indigo-400/60 rounded-r-full"></span>
+            {activeTab === 'task' && !isDrawerOpen && (
+              <span className="absolute -left-1 w-1 h-2 bg-indigo-400/70 rounded-r-full"></span>
             )}
           </button>
 
+          {/* Tab 2: BKT Skill Map */}
           <button
-            onClick={() => {
-              if (mainView !== 'editor') {
-                setMainView('editor');
-                setActiveDrawer('bkt');
-              } else {
-                setActiveDrawer((prev) => (prev === 'bkt' ? null : 'bkt'));
-              }
-            }}
+            onClick={() => handleTabClick('bkt')}
             className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all cursor-pointer relative ${
-              mainView === 'editor' && activeDrawer === 'bkt'
-                ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/40 ring-1 ring-indigo-400/50'
+              activeTab === 'bkt'
+                ? isDrawerOpen
+                  ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-600/40 ring-1 ring-emerald-400/50'
+                  : 'bg-emerald-950/80 text-emerald-300 border border-emerald-500/30 hover:bg-emerald-900/90 hover:text-white'
                 : 'bg-slate-800/60 text-slate-400 hover:bg-slate-800 hover:text-white'
             }`}
-            title="Карта Навичок BKT (DAG у бічній панелі)"
+            title={
+              activeTab === 'bkt'
+                ? isDrawerOpen
+                  ? 'Карта навичок відкрита (клік розгорне редактор на весь екран)'
+                  : 'Редактор на весь екран (клік поверне карту BKT)'
+                : 'Карта Навичок BKT (DAG у бічній панелі)'
+            }
           >
             <Sparkles className="w-5 h-5" />
-            {mainView === 'editor' && activeDrawer === 'bkt' && (
-              <span className="absolute -left-1 w-1 h-5 bg-indigo-400 rounded-r-full shadow-sm shadow-indigo-400"></span>
+            {activeTab === 'bkt' && isDrawerOpen && (
+              <span className="absolute -left-1 w-1 h-5 bg-emerald-400 rounded-r-full shadow-sm shadow-emerald-400"></span>
+            )}
+            {activeTab === 'bkt' && !isDrawerOpen && (
+              <span className="absolute -left-1 w-1 h-2 bg-emerald-400/70 rounded-r-full"></span>
             )}
           </button>
 
+          {/* Tab 3: Knowledge Tree */}
           <button
-            onClick={() => {
-              if (mainView !== 'tree') {
-                setMainView('tree');
-                setActiveDrawer('node-detail');
-                if (!inspectedSkill && graphNodes.length > 0) {
-                  setInspectedSkill(graphNodes.find((n) => n.slug === task?.skill?.slug) || graphNodes[0]);
-                }
-              } else {
-                setActiveDrawer((prev) => (prev === 'node-detail' ? null : 'node-detail'));
-              }
-            }}
+            onClick={() => handleTabClick('tree')}
             className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all cursor-pointer relative ${
-              mainView === 'tree'
-                ? activeDrawer === 'node-detail'
+              activeTab === 'tree'
+                ? isDrawerOpen
                   ? 'bg-gradient-to-br from-indigo-600 to-purple-600 text-white shadow-lg shadow-indigo-600/40 border border-indigo-400'
                   : 'bg-purple-950/80 text-purple-300 border border-purple-500/40 shadow-md hover:bg-purple-900/90 hover:text-white'
                 : 'bg-slate-800/60 text-slate-400 hover:bg-slate-800 hover:text-white'
             }`}
             title={
-              mainView === 'tree'
-                ? activeDrawer === 'node-detail'
-                  ? 'Дерево відкрите із сайдбаром (клік згорне сайдбар на весь екран)'
-                  : 'Дерево на весь екран (клік відкриє сайдбар деталей)'
+              activeTab === 'tree'
+                ? isDrawerOpen
+                  ? 'Дерево відкрите із сайдбаром (клік розгорне дерево на весь екран)'
+                  : 'Дерево на весь екран (клік поверне сайдбар деталей вузла)'
                 : 'Перейти до Дерева Знань'
             }
           >
             <Network className="w-5 h-5" />
-            {mainView === 'tree' && activeDrawer === 'node-detail' && (
+            {activeTab === 'tree' && isDrawerOpen && (
               <span className="absolute -left-1 w-1 h-5 bg-purple-400 rounded-r-full shadow-sm shadow-purple-400"></span>
             )}
-            {mainView === 'tree' && activeDrawer === null && (
-              <span className="absolute -left-1 w-1 h-2 bg-purple-400/60 rounded-r-full"></span>
+            {activeTab === 'tree' && !isDrawerOpen && (
+              <span className="absolute -left-1 w-1 h-2 bg-purple-400/70 rounded-r-full"></span>
             )}
           </button>
 
@@ -403,44 +411,52 @@ export default function StudentPortalPage() {
 
             {/* Workspace Settings Block (At the very bottom) */}
             <button
-              onClick={() => toggleDrawer('settings')}
-              className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all cursor-pointer ${
-                activeDrawer === 'settings'
-                  ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/40'
+              onClick={() => handleTabClick('settings')}
+              className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all cursor-pointer relative ${
+                activeTab === 'settings'
+                  ? isDrawerOpen
+                    ? 'bg-amber-600 text-white shadow-lg shadow-amber-600/40 ring-1 ring-amber-400/50'
+                    : 'bg-amber-950/80 text-amber-300 border border-amber-500/30 hover:bg-amber-900/90 hover:text-white'
                   : 'bg-slate-800/60 text-slate-400 hover:bg-slate-800 hover:text-white'
               }`}
               title="Налаштування Workspace"
             >
               <Settings className="w-5 h-5" />
+              {activeTab === 'settings' && isDrawerOpen && (
+                <span className="absolute -left-1 w-1 h-5 bg-amber-400 rounded-r-full shadow-sm shadow-amber-400"></span>
+              )}
+              {activeTab === 'settings' && !isDrawerOpen && (
+                <span className="absolute -left-1 w-1 h-2 bg-amber-400/70 rounded-r-full"></span>
+              )}
             </button>
           </div>
         </nav>
 
         {/* 📂 Expandable Side Drawer Panel */}
-        {activeDrawer && (
+        {isDrawerOpen && (
           <aside className="w-full sm:w-[380px] lg:w-[420px] bg-slate-900/95 border-r border-slate-800 flex flex-col shrink-0 shadow-2xl backdrop-blur-xl animate-fadeIn z-10 overflow-hidden">
             {/* 📌 Fixed Drawer Header (Does not scroll) */}
             <div className="p-4 border-b border-slate-800 flex items-center justify-between shrink-0 bg-slate-900/90 backdrop-blur-md">
               <h2 className="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
-                {activeDrawer === 'task' && (
+                {activeTab === 'task' && (
                   <>
                     <BookOpen className="w-4 h-4 text-indigo-400" />
                     <span>Умова та Контекст Завдання</span>
                   </>
                 )}
-                {activeDrawer === 'bkt' && (
+                {activeTab === 'bkt' && (
                   <>
                     <Sparkles className="w-4 h-4 text-emerald-400" />
                     <span>Карта Навичок (Skill DAG)</span>
                   </>
                 )}
-                {activeDrawer === 'node-detail' && (
+                {activeTab === 'tree' && (
                   <>
                     <Network className="w-4 h-4 text-purple-400" />
                     <span>Деталізація Вузла Дерева</span>
                   </>
                 )}
-                {activeDrawer === 'settings' && (
+                {activeTab === 'settings' && (
                   <>
                     <Settings className="w-4 h-4 text-amber-400" />
                     <span>Налаштування Студента</span>
@@ -448,9 +464,9 @@ export default function StudentPortalPage() {
                 )}
               </h2>
               <button
-                onClick={() => setActiveDrawer(null)}
+                onClick={() => setIsDrawerOpen(false)}
                 className="p-1.5 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-all cursor-pointer"
-                title="Закрити панель"
+                title="Закрити панель (розгорнути вікно на весь екран)"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -459,7 +475,7 @@ export default function StudentPortalPage() {
             {/* 📜 Scrollable Drawer Body Content */}
             <div className="flex-1 p-5 overflow-y-auto flex flex-col gap-5">
               {/* Content Drawer 1: Task Condition */}
-              {activeDrawer === 'task' && task && (
+              {activeTab === 'task' && task && (
                 <div className="flex flex-col gap-5 flex-1">
                   <div className="flex items-center justify-between">
                     <span className="px-2.5 py-1 rounded-full text-xs font-mono font-bold uppercase tracking-wider bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
@@ -517,17 +533,13 @@ export default function StudentPortalPage() {
               )}
 
               {/* Content Drawer 2: Skill DAG Map */}
-              {activeDrawer === 'bkt' && (
+              {activeTab === 'bkt' && (
                 <div className="flex flex-col gap-3">
                   <SkillDagMap nodes={graphNodes} activeSkillSlug={task?.skill?.slug} />
 
                   <button
                     onClick={() => {
-                      setMainView('tree');
-                      setActiveDrawer('node-detail');
-                      if (graphNodes.length > 0) {
-                        setInspectedSkill(graphNodes.find((n) => n.slug === task?.skill?.slug) || graphNodes[0]);
-                      }
+                      handleTabClick('tree');
                     }}
                     className="w-full py-2.5 px-3 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-lg shadow-indigo-600/30 transition-all cursor-pointer"
                   >
@@ -538,7 +550,7 @@ export default function StudentPortalPage() {
               )}
 
               {/* Content Drawer: Node Detail (Inspector for Tree) */}
-              {activeDrawer === 'node-detail' && (
+              {activeTab === 'tree' && (
                 <div className="flex flex-col gap-4">
                   {inspectedSkill ? (
                     <div className="flex flex-col gap-4">
@@ -630,8 +642,9 @@ export default function StudentPortalPage() {
                       <button
                         disabled={inspectedSkill.status === 'LOCKED'}
                         onClick={() => {
+                          setActiveTab('task');
                           setMainView('editor');
-                          setActiveDrawer('task');
+                          setIsDrawerOpen(true);
                           fetchRecommendedTask(activeCourseSlug);
                         }}
                         className={`w-full py-2.5 px-4 rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer shadow-lg mt-2 ${
@@ -654,7 +667,7 @@ export default function StudentPortalPage() {
               )}
 
               {/* Content Drawer 3: Settings */}
-              {activeDrawer === 'settings' && (
+              {activeTab === 'settings' && (
                 <div className="flex flex-col gap-4 text-xs text-slate-300">
                   <p>Налаштування робочого середовища та відображення Monaco Editor.</p>
                   <button
@@ -681,13 +694,15 @@ export default function StudentPortalPage() {
                 showInspector={false}
                 onInspectSkill={(node) => {
                   setInspectedSkill(node);
-                  setActiveDrawer('node-detail');
+                  setActiveTab('tree');
+                  setIsDrawerOpen(true);
                 }}
                 onSelectSkill={(slug) => {
                   const node = graphNodes.find((n) => n.slug === slug);
                   if (node) {
                     setInspectedSkill(node);
-                    setActiveDrawer('node-detail');
+                    setActiveTab('tree');
+                    setIsDrawerOpen(true);
                   }
                 }}
               />

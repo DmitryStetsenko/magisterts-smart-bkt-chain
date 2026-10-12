@@ -90,6 +90,54 @@
           ]
         },
         {
+          "title": "0.6 Стандарт Уніфікованого Стану Навігації (`activeTab` + `isDrawerOpen`)",
+          "level": 3,
+          "paragraphs": [],
+          "code_blocks": [
+            {
+              "lang": "typescript",
+              "content": "type StudentTab = 'task' | 'bkt' | 'tree' | 'settings';\n  const [activeTab, setActiveTab] = useState<StudentTab>('task');\n  const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(true);"
+            }
+          ],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "**Проблематика:** Раніше підсвічування кнопок навігаційного рейлу розраховувалося за композитними умовами виду `mainView === 'editor' && activeDrawer !== 'bkt'`. При приховуванні бічної панелі (`activeDrawer = null`) активна кнопка Дерева, BKT або Налаштувань втрачала активний стан і стилі перемикалися на першу кнопку («Умова завдання»).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Архітектурний стандарт:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Стани інтерфейсу:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "`activeTab === tab && isDrawerOpen`: Повне активне підсвічування кнопки + розгорнута бічна панель відповідного розділу.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "`activeTab === tab && !isDrawerOpen`: Тоноване підсвічування кнопки з міні-індикатором, сайдбар прихований, центральний холст розтягнуто на 100% простору (`flex-1`).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Повторний клік по активній кнопці або `✕` в сайдбарі: `setIsDrawerOpen(prev => !prev)` без зміни `activeTab`.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Клік по іншій іконці: перемикає `activeTab` та гарантовано встановлює `isDrawerOpen(true)`.",
+              "subitems": []
+            }
+          ]
+        },
+        {
           "title": "0.3 Модульний Opera-Style UI Shell, Компактні DAG-Вузли та Патерн «List-in-Drawer / Detail-on-Canvas»",
           "level": 3,
           "paragraphs": [],

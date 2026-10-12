@@ -24,6 +24,20 @@
   - Відображення типів завдань (`CODE`, `SINGLE_CHOICE`, `MULTIPLE_CHOICE`, `TEXT_ESSAY`), складності та правильних відповідей для викладацького аудиту.
   - Швидкий пошук та фільтрація завдань у реальному часі.
 
+### 0.6 Стандарт Уніфікованого Стану Навігації (`activeTab` + `isDrawerOpen`)
+- **Проблематика:** Раніше підсвічування кнопок навігаційного рейлу розраховувалося за композитними умовами виду `mainView === 'editor' && activeDrawer !== 'bkt'`. При приховуванні бічної панелі (`activeDrawer = null`) активна кнопка Дерева, BKT або Налаштувань втрачала активний стан і стилі перемикалися на першу кнопку («Умова завдання»).
+- **Архітектурний стандарт:**
+  ```typescript
+  type StudentTab = 'task' | 'bkt' | 'tree' | 'settings';
+  const [activeTab, setActiveTab] = useState<StudentTab>('task');
+  const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(true);
+  ```
+- **Стани інтерфейсу:**
+  1. `activeTab === tab && isDrawerOpen`: Повне активне підсвічування кнопки + розгорнута бічна панель відповідного розділу.
+  2. `activeTab === tab && !isDrawerOpen`: Тоноване підсвічування кнопки з міні-індикатором, сайдбар прихований, центральний холст розтягнуто на 100% простору (`flex-1`).
+  3. Повторний клік по активній кнопці або `✕` в сайдбарі: `setIsDrawerOpen(prev => !prev)` без зміни `activeTab`.
+  4. Клік по іншій іконці: перемикає `activeTab` та гарантовано встановлює `isDrawerOpen(true)`.
+
 ### 0.3 Модульний Opera-Style UI Shell, Компактні DAG-Вузли та Патерн «List-in-Drawer / Detail-on-Canvas»
 - **Уніфікація UI Shell (`apps/student`, `apps/teacher`, `apps/admin`):**
   - Верхня фіксована навігаційна панель (`h-14 bg-slate-900 border-b border-slate-800`).
