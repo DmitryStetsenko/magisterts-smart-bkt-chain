@@ -90,39 +90,39 @@
           ]
         },
         {
-          "title": "0.6 Стандарт Уніфікованого Стану Навігації (`activeTab` + `isDrawerOpen`)",
+          "title": "0.6 Глобальний Стандарт Уніфікованого Стану Навігації (`activeTab` + `isDrawerOpen`)",
           "level": 3,
           "paragraphs": [],
           "code_blocks": [
             {
               "lang": "typescript",
-              "content": "type StudentTab = 'task' | 'bkt' | 'tree' | 'settings';\n  const [activeTab, setActiveTab] = useState<StudentTab>('task');\n  const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(true);"
+              "content": "// Приклад реалізації (Student, Teacher, Admin):\n  type PortalTab = 'analytics' | 'coursemap' | 'settings'; // або 'task' | 'bkt' | 'tree'\n  const [activeTab, setActiveTab] = useState<PortalTab>('analytics');\n  const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(true);\n\n  const handleTabClick = (tab: PortalTab) => {\n    if (activeTab === tab) {\n      setIsDrawerOpen((prev) => !prev);\n    } else {\n      setActiveTab(tab);\n      setIsDrawerOpen(true);\n    }\n  };"
             }
           ],
           "items": [
             {
               "type": "text",
-              "raw_text": "**Проблематика:** Раніше підсвічування кнопок навігаційного рейлу розраховувалося за композитними умовами виду `mainView === 'editor' && activeDrawer !== 'bkt'`. При приховуванні бічної панелі (`activeDrawer = null`) активна кнопка Дерева, BKT або Налаштувань втрачала активний стан і стилі перемикалися на першу кнопку («Умова завдання»).",
+              "raw_text": "**Проблематика:** Раніше у кабінетах стан навігації спирався на тимчасовий `activeDrawer = null`, через що при згортанні сайдбара або закритті хрестиком `✕` втрачався фокус обраної вкладки та скидався до першого елемента списку.",
               "subitems": []
             },
             {
               "type": "text",
-              "raw_text": "**Архітектурний стандарт:**",
+              "raw_text": "**Архітектурний стандарт для всіх порталів (`apps/student`, `apps/teacher`, `apps/admin`):**",
               "subitems": []
             },
             {
               "type": "text",
-              "raw_text": "**Стани інтерфейсу:**",
+              "raw_text": "**Уніфіковані стани інтерфейсу:**",
               "subitems": []
             },
             {
               "type": "text",
-              "raw_text": "`activeTab === tab && isDrawerOpen`: Повне активне підсвічування кнопки + розгорнута бічна панель відповідного розділу.",
+              "raw_text": "`activeTab === tab && isDrawerOpen`: Повне активне підсвічування кнопки + розгорнута бічна панель відповідного розділу (`w-[380px]`).",
               "subitems": []
             },
             {
               "type": "text",
-              "raw_text": "`activeTab === tab && !isDrawerOpen`: Тоноване підсвічування кнопки з міні-індикатором, сайдбар прихований, центральний холст розтягнуто на 100% простору (`flex-1`).",
+              "raw_text": "`activeTab === tab && !isDrawerOpen`: Тоноване підсвічування кнопки з міні-індикатором `h-2`, сайдбар прихований, центральний холст автоматично розтягнуто на 100% ширини (`flex-1`).",
               "subitems": []
             },
             {

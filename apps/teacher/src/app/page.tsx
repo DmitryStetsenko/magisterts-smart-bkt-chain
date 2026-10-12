@@ -110,11 +110,23 @@ export default function TeacherDashboardPage() {
     fetchCourseStructure();
   }, [activeCourseSlug]);
 
-  const [activeDrawer, setActiveDrawer] = useState<'analytics' | 'coursemap' | 'settings' | null>('analytics');
+  // Unified Navigation State:
+  // activeTab defines which workspace / module is active.
+  // isDrawerOpen controls whether its companion sidebar drawer is visible.
+  type TeacherTab = 'analytics' | 'coursemap' | 'settings';
+  const [activeTab, setActiveTab] = useState<TeacherTab>('analytics');
+  const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(true);
   const [activeStudentView, setActiveStudentView] = useState<'metrics' | 'tree'>('metrics');
 
-  const toggleDrawer = (tab: 'analytics' | 'coursemap' | 'settings') => {
-    setActiveDrawer((prev) => (prev === tab ? null : tab));
+  const handleTabClick = (tab: TeacherTab) => {
+    if (activeTab === tab) {
+      // Toggle sidebar open/collapsed without changing active workspace
+      setIsDrawerOpen((prev) => !prev);
+    } else {
+      // Switch workspace & ensure drawer is open
+      setActiveTab(tab);
+      setIsDrawerOpen(true);
+    }
   };
 
   const activeCourse = courses.find((c) => c.slug === activeCourseSlug) || courses[0] || DEFAULT_COURSES[0];
@@ -243,29 +255,55 @@ export default function TeacherDashboardPage() {
         {/* 🎨 Opera-Style Vertical Icon Rail (Slim Left Bar) */}
         <nav className="w-14 bg-slate-900 border-r border-slate-800 flex flex-col items-center py-4 gap-3 shrink-0 z-20 shadow-xl">
           <button
-            onClick={() => toggleDrawer('analytics')}
+            onClick={() => handleTabClick('analytics')}
             className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all cursor-pointer relative ${
-              activeDrawer === 'analytics'
-                ? 'bg-purple-600 text-white shadow-lg shadow-purple-600/40'
+              activeTab === 'analytics'
+                ? isDrawerOpen
+                  ? 'bg-purple-600 text-white shadow-lg shadow-purple-600/40 ring-1 ring-purple-400/50'
+                  : 'bg-purple-950/80 text-purple-300 border border-purple-500/30 hover:bg-purple-900/90 hover:text-white'
                 : 'bg-slate-800/60 text-slate-400 hover:bg-slate-800 hover:text-white'
             }`}
-            title="Список Студентів & Аналітика"
+            title={
+              activeTab === 'analytics'
+                ? isDrawerOpen
+                  ? 'Список студентів відкритий (клік згорне сайдбар на весь екран)'
+                  : 'Аналітика на весь екран (клік відкриє список студентів)'
+                : 'Список Студентів & Аналітика'
+            }
           >
             <Users className="w-5 h-5" />
-            {activeDrawer === 'analytics' && <span className="absolute -left-1 w-1 h-5 bg-purple-400 rounded-r-full"></span>}
+            {activeTab === 'analytics' && isDrawerOpen && (
+              <span className="absolute -left-1 w-1 h-5 bg-purple-400 rounded-r-full shadow-sm shadow-purple-400"></span>
+            )}
+            {activeTab === 'analytics' && !isDrawerOpen && (
+              <span className="absolute -left-1 w-1 h-2 bg-purple-400/70 rounded-r-full"></span>
+            )}
           </button>
 
           <button
-            onClick={() => toggleDrawer('coursemap')}
+            onClick={() => handleTabClick('coursemap')}
             className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all cursor-pointer relative ${
-              activeDrawer === 'coursemap'
-                ? 'bg-purple-600 text-white shadow-lg shadow-purple-600/40'
+              activeTab === 'coursemap'
+                ? isDrawerOpen
+                  ? 'bg-purple-600 text-white shadow-lg shadow-purple-600/40 ring-1 ring-purple-400/50'
+                  : 'bg-purple-950/80 text-purple-300 border border-purple-500/30 hover:bg-purple-900/90 hover:text-white'
                 : 'bg-slate-800/60 text-slate-400 hover:bg-slate-800 hover:text-white'
             }`}
-            title="Граф Навичок & Завдання"
+            title={
+              activeTab === 'coursemap'
+                ? isDrawerOpen
+                  ? 'Граф навичок відкритий (клік згорне сайдбар на весь екран)'
+                  : 'Інспектор на весь екран (клік відкриє дерево модулів)'
+                : 'Граф Навичок & Завдання'
+            }
           >
             <Network className="w-5 h-5" />
-            {activeDrawer === 'coursemap' && <span className="absolute -left-1 w-1 h-5 bg-purple-400 rounded-r-full"></span>}
+            {activeTab === 'coursemap' && isDrawerOpen && (
+              <span className="absolute -left-1 w-1 h-5 bg-purple-400 rounded-r-full shadow-sm shadow-purple-400"></span>
+            )}
+            {activeTab === 'coursemap' && !isDrawerOpen && (
+              <span className="absolute -left-1 w-1 h-2 bg-purple-400/70 rounded-r-full"></span>
+            )}
           </button>
 
           {/* Bottom Area (External Shortcuts & Settings) */}
@@ -295,38 +333,46 @@ export default function TeacherDashboardPage() {
             <div className="w-8 h-[1px] bg-slate-800/80 my-1"></div>
 
             <button
-              onClick={() => toggleDrawer('settings')}
-              className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all cursor-pointer ${
-                activeDrawer === 'settings'
-                  ? 'bg-purple-600 text-white shadow-lg shadow-purple-600/40'
+              onClick={() => handleTabClick('settings')}
+              className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all cursor-pointer relative ${
+                activeTab === 'settings'
+                  ? isDrawerOpen
+                    ? 'bg-amber-600 text-white shadow-lg shadow-amber-600/40 ring-1 ring-amber-400/50'
+                    : 'bg-amber-950/80 text-amber-300 border border-amber-500/30 hover:bg-amber-900/90 hover:text-white'
                   : 'bg-slate-800/60 text-slate-400 hover:bg-slate-800 hover:text-white'
               }`}
               title="Налаштування"
             >
               <ShieldCheck className="w-5 h-5" />
+              {activeTab === 'settings' && isDrawerOpen && (
+                <span className="absolute -left-1 w-1 h-5 bg-amber-400 rounded-r-full shadow-sm shadow-amber-400"></span>
+              )}
+              {activeTab === 'settings' && !isDrawerOpen && (
+                <span className="absolute -left-1 w-1 h-2 bg-amber-400/70 rounded-r-full"></span>
+              )}
             </button>
           </div>
         </nav>
 
         {/* 📂 Expandable Side Drawer Panel (List View) */}
-        {activeDrawer && (
+        {isDrawerOpen && (
           <aside className="w-full sm:w-[340px] lg:w-[380px] bg-slate-900/95 border-r border-slate-800 flex flex-col shrink-0 shadow-2xl backdrop-blur-xl animate-fadeIn z-10 overflow-hidden">
             {/* 📌 Fixed Drawer Header */}
             <div className="p-4 border-b border-slate-800 flex items-center justify-between shrink-0 bg-slate-900/90 backdrop-blur-md">
               <h2 className="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
-                {activeDrawer === 'analytics' && (
+                {activeTab === 'analytics' && (
                   <>
                     <Users className="w-4 h-4 text-purple-400" />
                     <span>Список Студентів ({students.length})</span>
                   </>
                 )}
-                {activeDrawer === 'coursemap' && (
+                {activeTab === 'coursemap' && (
                   <>
                     <Network className="w-4 h-4 text-indigo-400" />
                     <span>Дерево Модулів & Завдань</span>
                   </>
                 )}
-                {activeDrawer === 'settings' && (
+                {activeTab === 'settings' && (
                   <>
                     <ShieldCheck className="w-4 h-4 text-amber-400" />
                     <span>Параметри Оцінювання</span>
@@ -334,9 +380,9 @@ export default function TeacherDashboardPage() {
                 )}
               </h2>
               <button
-                onClick={() => setActiveDrawer(null)}
+                onClick={() => setIsDrawerOpen(false)}
                 className="p-1.5 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-all cursor-pointer"
-                title="Закрити панель"
+                title="Закрити панель (розгорнути вікно на весь екран)"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -345,7 +391,7 @@ export default function TeacherDashboardPage() {
             {/* 📜 Scrollable Drawer Body Content (Lists) */}
             <div className="flex-1 p-4 overflow-y-auto flex flex-col gap-3">
               {/* Drawer 1: Students List */}
-              {activeDrawer === 'analytics' && (
+              {activeTab === 'analytics' && (
                 <div className="flex flex-col gap-3">
                   <div className="relative">
                     <Search className="w-3.5 h-3.5 absolute left-3 top-2.5 text-slate-500" />
@@ -394,7 +440,7 @@ export default function TeacherDashboardPage() {
               )}
 
               {/* Drawer 2: Course Modules & Tasks List */}
-              {activeDrawer === 'coursemap' && courseDetails && (
+              {activeTab === 'coursemap' && courseDetails && (
                 <div className="flex flex-col gap-3">
                   <div className="relative">
                     <Search className="w-3.5 h-3.5 absolute left-3 top-2.5 text-slate-500" />
@@ -468,7 +514,7 @@ export default function TeacherDashboardPage() {
               )}
 
               {/* Drawer 3: Settings */}
-              {activeDrawer === 'settings' && (
+              {activeTab === 'settings' && (
                 <div className="flex flex-col gap-3 text-xs text-slate-300">
                   <div className="p-3 bg-slate-950 border border-slate-800 rounded-xl">
                     <span className="font-bold text-white block mb-1">Поріг Майстерності BKT</span>
@@ -487,7 +533,7 @@ export default function TeacherDashboardPage() {
         {/* 💻 Center Main Canvas: Detailed Inspector View */}
         <main className="flex-1 p-4 lg:p-6 overflow-y-auto flex flex-col gap-6 bg-slate-950">
           {/* Main View 1: Student Detailed Analytics & Heatmap */}
-          {activeDrawer === 'analytics' && selectedStudent && (
+          {activeTab === 'analytics' && selectedStudent && (
             <div className="flex flex-col gap-6">
               {/* Student Header Summary Card */}
               <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
@@ -554,7 +600,8 @@ export default function TeacherDashboardPage() {
                     studentName={selectedStudent.name}
                     showInspector={true}
                     onSelectSkill={(slug) => {
-                      setActiveDrawer('coursemap');
+                      setActiveTab('coursemap');
+                      setIsDrawerOpen(true);
                       setSelectedSkillSlug(slug);
                       setSelectedTaskId(null);
                     }}
@@ -728,7 +775,7 @@ export default function TeacherDashboardPage() {
       )}
 
           {/* Main View 2: Course & Tasks Detail Inspector */}
-          {activeDrawer === 'coursemap' && (
+          {activeTab === 'coursemap' && (
             <div className="flex flex-col gap-6">
               {selectedTaskId ? (
                 // Task Details Canvas View
@@ -851,7 +898,7 @@ export default function TeacherDashboardPage() {
           )}
 
           {/* Main View 3: Settings Details */}
-          {activeDrawer === 'settings' && (
+          {activeTab === 'settings' && (
             <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl flex flex-col gap-4">
               <h2 className="text-lg font-bold text-white">Параметри Оцінювання та Алгоритму BKT</h2>
               <p className="text-xs text-slate-400 leading-relaxed">

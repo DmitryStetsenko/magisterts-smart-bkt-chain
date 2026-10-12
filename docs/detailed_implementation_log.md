@@ -24,17 +24,27 @@
   - Відображення типів завдань (`CODE`, `SINGLE_CHOICE`, `MULTIPLE_CHOICE`, `TEXT_ESSAY`), складності та правильних відповідей для викладацького аудиту.
   - Швидкий пошук та фільтрація завдань у реальному часі.
 
-### 0.6 Стандарт Уніфікованого Стану Навігації (`activeTab` + `isDrawerOpen`)
-- **Проблематика:** Раніше підсвічування кнопок навігаційного рейлу розраховувалося за композитними умовами виду `mainView === 'editor' && activeDrawer !== 'bkt'`. При приховуванні бічної панелі (`activeDrawer = null`) активна кнопка Дерева, BKT або Налаштувань втрачала активний стан і стилі перемикалися на першу кнопку («Умова завдання»).
-- **Архітектурний стандарт:**
+### 0.6 Глобальний Стандарт Уніфікованого Стану Навігації (`activeTab` + `isDrawerOpen`)
+- **Проблематика:** Раніше у кабінетах стан навігації спирався на тимчасовий `activeDrawer = null`, через що при згортанні сайдбара або закритті хрестиком `✕` втрачався фокус обраної вкладки та скидався до першого елемента списку.
+- **Архітектурний стандарт для всіх порталів (`apps/student`, `apps/teacher`, `apps/admin`):**
   ```typescript
-  type StudentTab = 'task' | 'bkt' | 'tree' | 'settings';
-  const [activeTab, setActiveTab] = useState<StudentTab>('task');
+  // Приклад реалізації (Student, Teacher, Admin):
+  type PortalTab = 'analytics' | 'coursemap' | 'settings'; // або 'task' | 'bkt' | 'tree'
+  const [activeTab, setActiveTab] = useState<PortalTab>('analytics');
   const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(true);
+
+  const handleTabClick = (tab: PortalTab) => {
+    if (activeTab === tab) {
+      setIsDrawerOpen((prev) => !prev);
+    } else {
+      setActiveTab(tab);
+      setIsDrawerOpen(true);
+    }
+  };
   ```
-- **Стани інтерфейсу:**
-  1. `activeTab === tab && isDrawerOpen`: Повне активне підсвічування кнопки + розгорнута бічна панель відповідного розділу.
-  2. `activeTab === tab && !isDrawerOpen`: Тоноване підсвічування кнопки з міні-індикатором, сайдбар прихований, центральний холст розтягнуто на 100% простору (`flex-1`).
+- **Уніфіковані стани інтерфейсу:**
+  1. `activeTab === tab && isDrawerOpen`: Повне активне підсвічування кнопки + розгорнута бічна панель відповідного розділу (`w-[380px]`).
+  2. `activeTab === tab && !isDrawerOpen`: Тоноване підсвічування кнопки з міні-індикатором `h-2`, сайдбар прихований, центральний холст автоматично розтягнуто на 100% ширини (`flex-1`).
   3. Повторний клік по активній кнопці або `✕` в сайдбарі: `setIsDrawerOpen(prev => !prev)` без зміни `activeTab`.
   4. Клік по іншій іконці: перемикає `activeTab` та гарантовано встановлює `isDrawerOpen(true)`.
 

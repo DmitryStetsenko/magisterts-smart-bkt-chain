@@ -7,8 +7,6 @@ import { AdminSkillNode } from '../features/skill-editor/model/skill-editor.type
 import { CourseManager } from '../features/course-manager/ui/CourseManager';
 
 export default function AdminCMSDashboard() {
-  const [activeTab, setActiveTab] = useState<'dag' | 'courses' | 'system'>('dag');
-
   const [nodes, setNodes] = useState<AdminSkillNode[]>([
     {
       id: '1',
@@ -91,10 +89,22 @@ export default function AdminCMSDashboard() {
     setNodes((prev) => prev.filter((n) => n.id !== nodeId));
   };
 
-  const [activeDrawer, setActiveDrawer] = useState<'dag' | 'courses' | 'system' | null>('dag');
+  // Unified Navigation State:
+  // activeTab defines which workspace / module is active.
+  // isDrawerOpen controls whether its companion sidebar drawer is visible.
+  type AdminTab = 'dag' | 'courses' | 'system';
+  const [activeTab, setActiveTab] = useState<AdminTab>('dag');
+  const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(true);
 
-  const toggleDrawer = (tab: 'dag' | 'courses' | 'system') => {
-    setActiveDrawer((prev) => (prev === tab ? null : tab));
+  const handleTabClick = (tab: AdminTab) => {
+    if (activeTab === tab) {
+      // Toggle sidebar open/collapsed without changing active workspace
+      setIsDrawerOpen((prev) => !prev);
+    } else {
+      // Switch workspace & ensure drawer is open
+      setActiveTab(tab);
+      setIsDrawerOpen(true);
+    }
   };
 
   return (
@@ -133,29 +143,55 @@ export default function AdminCMSDashboard() {
         {/* 🎨 Opera-Style Vertical Icon Rail */}
         <nav className="w-14 bg-slate-900 border-r border-slate-800 flex flex-col items-center py-4 gap-3 shrink-0 z-20 shadow-xl">
           <button
-            onClick={() => toggleDrawer('dag')}
+            onClick={() => handleTabClick('dag')}
             className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all cursor-pointer relative ${
-              activeDrawer === 'dag'
-                ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/40'
+              activeTab === 'dag'
+                ? isDrawerOpen
+                  ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/40 ring-1 ring-indigo-400/50'
+                  : 'bg-indigo-950/80 text-indigo-300 border border-indigo-500/30 hover:bg-indigo-900/90 hover:text-white'
                 : 'bg-slate-800/60 text-slate-400 hover:bg-slate-800 hover:text-white'
             }`}
-            title="Skill DAG Builder"
+            title={
+              activeTab === 'dag'
+                ? isDrawerOpen
+                  ? 'Конструктор DAG відкритий (клік згорне сайдбар на весь екран)'
+                  : 'Конструктор DAG на весь екран (клік відкриє сайдбар)'
+                : 'Skill DAG Builder'
+            }
           >
             <Network className="w-5 h-5" />
-            {activeDrawer === 'dag' && <span className="absolute -left-1 w-1 h-5 bg-indigo-400 rounded-r-full"></span>}
+            {activeTab === 'dag' && isDrawerOpen && (
+              <span className="absolute -left-1 w-1 h-5 bg-indigo-400 rounded-r-full shadow-sm shadow-indigo-400"></span>
+            )}
+            {activeTab === 'dag' && !isDrawerOpen && (
+              <span className="absolute -left-1 w-1 h-2 bg-indigo-400/70 rounded-r-full"></span>
+            )}
           </button>
 
           <button
-            onClick={() => toggleDrawer('courses')}
+            onClick={() => handleTabClick('courses')}
             className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all cursor-pointer relative ${
-              activeDrawer === 'courses'
-                ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/40'
+              activeTab === 'courses'
+                ? isDrawerOpen
+                  ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/40 ring-1 ring-indigo-400/50'
+                  : 'bg-indigo-950/80 text-indigo-300 border border-indigo-500/30 hover:bg-indigo-900/90 hover:text-white'
                 : 'bg-slate-800/60 text-slate-400 hover:bg-slate-800 hover:text-white'
             }`}
-            title="CMS Курсів та Задач"
+            title={
+              activeTab === 'courses'
+                ? isDrawerOpen
+                  ? 'CMS курсів відкрита (клік згорне сайдбар на весь екран)'
+                  : 'CMS курсів на весь екран (клік відкриє сайдбар)'
+                : 'CMS Курсів та Задач'
+            }
           >
             <BookOpen className="w-5 h-5" />
-            {activeDrawer === 'courses' && <span className="absolute -left-1 w-1 h-5 bg-indigo-400 rounded-r-full"></span>}
+            {activeTab === 'courses' && isDrawerOpen && (
+              <span className="absolute -left-1 w-1 h-5 bg-indigo-400 rounded-r-full shadow-sm shadow-indigo-400"></span>
+            )}
+            {activeTab === 'courses' && !isDrawerOpen && (
+              <span className="absolute -left-1 w-1 h-2 bg-indigo-400/70 rounded-r-full"></span>
+            )}
           </button>
 
           <div className="mt-auto flex flex-col items-center gap-2.5">
@@ -174,15 +210,23 @@ export default function AdminCMSDashboard() {
             <div className="w-8 h-[1px] bg-slate-800/80 my-1"></div>
 
             <button
-              onClick={() => toggleDrawer('system')}
-              className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all cursor-pointer ${
-                activeDrawer === 'system'
-                  ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/40'
+              onClick={() => handleTabClick('system')}
+              className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all cursor-pointer relative ${
+                activeTab === 'system'
+                  ? isDrawerOpen
+                    ? 'bg-amber-600 text-white shadow-lg shadow-amber-600/40 ring-1 ring-amber-400/50'
+                    : 'bg-amber-950/80 text-amber-300 border border-amber-500/30 hover:bg-amber-900/90 hover:text-white'
                   : 'bg-slate-800/60 text-slate-400 hover:bg-slate-800 hover:text-white'
               }`}
               title="Системні Налаштування & Web3"
             >
               <Settings className="w-5 h-5" />
+              {activeTab === 'system' && isDrawerOpen && (
+                <span className="absolute -left-1 w-1 h-5 bg-amber-400 rounded-r-full shadow-sm shadow-amber-400"></span>
+              )}
+              {activeTab === 'system' && !isDrawerOpen && (
+                <span className="absolute -left-1 w-1 h-2 bg-amber-400/70 rounded-r-full"></span>
+              )}
             </button>
           </div>
         </nav>
@@ -190,7 +234,7 @@ export default function AdminCMSDashboard() {
         {/* 💻 Center Main Canvas */}
         <main className="flex-1 p-4 lg:p-6 overflow-y-auto flex flex-col gap-6 bg-slate-950">
           <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl min-h-[400px]">
-            {activeDrawer === 'dag' && (
+            {activeTab === 'dag' && (
               <div className="flex flex-col gap-6">
                 <div>
                   <h3 className="text-lg font-bold text-white flex items-center gap-2">
@@ -210,9 +254,9 @@ export default function AdminCMSDashboard() {
               </div>
             )}
 
-            {activeDrawer === 'courses' && <CourseManager />}
+            {activeTab === 'courses' && <CourseManager />}
 
-            {activeDrawer === 'system' && (
+            {activeTab === 'system' && (
               <div className="flex flex-col gap-4">
                 <h3 className="text-lg font-bold text-white flex items-center gap-2">
                   <Settings className="w-5 h-5 text-purple-400" />
