@@ -284,66 +284,93 @@ export default function StudentPortalPage() {
           {/* Main Action Tabs */}
           <button
             onClick={() => {
-              if (mainView === 'editor') {
-                toggleDrawer('task');
-              } else {
+              if (mainView !== 'editor') {
                 setMainView('editor');
                 setActiveDrawer('task');
+              } else {
+                setActiveDrawer((prev) => (prev === 'task' ? null : 'task'));
               }
             }}
             className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all cursor-pointer relative ${
-              mainView === 'editor' && activeDrawer !== 'bkt'
-                ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/40'
+              mainView === 'editor'
+                ? activeDrawer === 'task'
+                  ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/40 ring-1 ring-indigo-400/50'
+                  : 'bg-indigo-950/80 text-indigo-300 border border-indigo-500/30 hover:bg-indigo-900/90 hover:text-white'
                 : 'bg-slate-800/60 text-slate-400 hover:bg-slate-800 hover:text-white'
             }`}
-            title="Умова Завдання та Редактор (Повторний клік ховає/відкриває бічну панель)"
+            title={
+              mainView === 'editor'
+                ? activeDrawer === 'task'
+                  ? 'Редактор відкритий (клік згорне сайдбар на весь екран)'
+                  : 'Редактор на весь екран (клік відкриє сайдбар умови)'
+                : 'Перейти до Редактора та завдання'
+            }
           >
             <BookOpen className="w-5 h-5" />
-            {mainView === 'editor' && activeDrawer !== 'bkt' && <span className="absolute -left-1 w-1 h-5 bg-indigo-400 rounded-r-full"></span>}
+            {mainView === 'editor' && activeDrawer === 'task' && (
+              <span className="absolute -left-1 w-1 h-5 bg-indigo-400 rounded-r-full shadow-sm shadow-indigo-400"></span>
+            )}
+            {mainView === 'editor' && activeDrawer === null && (
+              <span className="absolute -left-1 w-1 h-2 bg-indigo-400/60 rounded-r-full"></span>
+            )}
           </button>
 
           <button
             onClick={() => {
-              if (mainView === 'tree') {
+              if (mainView !== 'editor') {
                 setMainView('editor');
                 setActiveDrawer('bkt');
               } else {
-                toggleDrawer('bkt');
+                setActiveDrawer((prev) => (prev === 'bkt' ? null : 'bkt'));
               }
             }}
             className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all cursor-pointer relative ${
               mainView === 'editor' && activeDrawer === 'bkt'
-                ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/40'
+                ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/40 ring-1 ring-indigo-400/50'
                 : 'bg-slate-800/60 text-slate-400 hover:bg-slate-800 hover:text-white'
             }`}
             title="Карта Навичок BKT (DAG у бічній панелі)"
           >
             <Sparkles className="w-5 h-5" />
-            {mainView === 'editor' && activeDrawer === 'bkt' && <span className="absolute -left-1 w-1 h-5 bg-indigo-400 rounded-r-full"></span>}
+            {mainView === 'editor' && activeDrawer === 'bkt' && (
+              <span className="absolute -left-1 w-1 h-5 bg-indigo-400 rounded-r-full shadow-sm shadow-indigo-400"></span>
+            )}
           </button>
 
           <button
             onClick={() => {
-              if (mainView === 'tree') {
-                // Toggle node-detail sidebar on/off while staying on Tree view!
-                toggleDrawer('node-detail');
-              } else {
+              if (mainView !== 'tree') {
                 setMainView('tree');
                 setActiveDrawer('node-detail');
                 if (!inspectedSkill && graphNodes.length > 0) {
                   setInspectedSkill(graphNodes.find((n) => n.slug === task?.skill?.slug) || graphNodes[0]);
                 }
+              } else {
+                setActiveDrawer((prev) => (prev === 'node-detail' ? null : 'node-detail'));
               }
             }}
             className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all cursor-pointer relative ${
               mainView === 'tree'
-                ? 'bg-gradient-to-br from-indigo-600 to-purple-600 text-white shadow-lg shadow-indigo-600/40 border border-indigo-400'
+                ? activeDrawer === 'node-detail'
+                  ? 'bg-gradient-to-br from-indigo-600 to-purple-600 text-white shadow-lg shadow-indigo-600/40 border border-indigo-400'
+                  : 'bg-purple-950/80 text-purple-300 border border-purple-500/40 shadow-md hover:bg-purple-900/90 hover:text-white'
                 : 'bg-slate-800/60 text-slate-400 hover:bg-slate-800 hover:text-white'
             }`}
-            title="Дерево Знань (Game Skill Tree у Головному Вікні; повторний клік ховає/відкриває бічну панель)"
+            title={
+              mainView === 'tree'
+                ? activeDrawer === 'node-detail'
+                  ? 'Дерево відкрите із сайдбаром (клік згорне сайдбар на весь екран)'
+                  : 'Дерево на весь екран (клік відкриє сайдбар деталей)'
+                : 'Перейти до Дерева Знань'
+            }
           >
             <Network className="w-5 h-5" />
-            {mainView === 'tree' && <span className="absolute -left-1 w-1 h-5 bg-purple-400 rounded-r-full"></span>}
+            {mainView === 'tree' && activeDrawer === 'node-detail' && (
+              <span className="absolute -left-1 w-1 h-5 bg-purple-400 rounded-r-full shadow-sm shadow-purple-400"></span>
+            )}
+            {mainView === 'tree' && activeDrawer === null && (
+              <span className="absolute -left-1 w-1 h-2 bg-purple-400/60 rounded-r-full"></span>
+            )}
           </button>
 
           {/* Bottom Area (External Apps & Settings at very bottom) */}
