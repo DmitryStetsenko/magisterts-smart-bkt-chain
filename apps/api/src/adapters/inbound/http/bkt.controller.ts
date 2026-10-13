@@ -344,6 +344,11 @@ export class BktController {
       include: {
         profile: true,
         bktStates: { include: { skill: true } },
+        bktHistories: {
+          include: { skill: true },
+          orderBy: { createdAt: 'desc' },
+          take: 10,
+        },
         behavioralProfiles: {
           include: {
             session: {
@@ -470,6 +475,20 @@ export class BktController {
       const medianCopyPasteRatio = calcMedian(copyPastes);
       const medianFatigueIndex = Math.round(calcMedian(fatigues));
 
+      const recentAdjustments = s.bktHistories.map((h) => ({
+        skillSlug: h.skill.slug,
+        skillTitle: h.skill.title,
+        pSlipUsed: h.pSlipUsed,
+        pGuessUsed: h.pGuessUsed,
+        adjustReasons: h.adjustReasons,
+        isCorrect: h.isCorrect,
+        createdAt: h.createdAt,
+      }));
+
+      const hasGuessAlert = s.bktHistories.some(
+        (h) => h.pGuessUsed && h.pGuessUsed > 0.3
+      );
+
       return {
         id: s.id,
         name: `${s.profile?.firstName || 'Студент'} ${s.profile?.lastName || ''}`.trim(),
@@ -481,6 +500,8 @@ export class BktController {
         copyPasteRatio: medianCopyPasteRatio,
         fatigueIndex: medianFatigueIndex,
         peakAnomaly,
+        hasGuessAlert,
+        recentAdjustments,
         unstarted: s.bktStates.length === 0,
       };
     });

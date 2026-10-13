@@ -34,7 +34,7 @@ export interface AdjustedSlipGuess extends BaseSlipGuess {
 }
 
 export const ADJUSTER_CONFIG = {
-  FAST_CHOICE_LATENCY_MS: 2000,
+  FAST_CHOICE_LATENCY_MS: 3500,
   GUESS_ON_FAST_CHOICE: 0.85,
   HIGH_MASTERY: 0.7,
   LOW_MASTERY: 0.3,

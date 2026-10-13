@@ -71,9 +71,9 @@ export function QuizTaskEditor({
           </h3>
         </div>
 
-        <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-800 border border-slate-700 text-xs font-mono text-slate-400">
-          <Clock className="w-3.5 h-3.5 text-amber-400" />
-          <span>Латентність реакції активна</span>
+        <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-800/80 border border-slate-700/60 text-xs font-mono text-slate-400">
+          <Clock className="w-3.5 h-3.5 text-indigo-400" />
+          <span>Телеметрія активна</span>
         </div>
       </div>
 

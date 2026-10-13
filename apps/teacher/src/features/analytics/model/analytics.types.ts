@@ -17,6 +17,16 @@ export interface StudentAnalyticsItem {
     peakSkillTitle?: string;
     copyPasteRatio: number;
   };
+  hasGuessAlert?: boolean;
+  recentAdjustments?: Array<{
+    skillSlug: string;
+    skillTitle: string;
+    pSlipUsed?: number | null;
+    pGuessUsed?: number | null;
+    adjustReasons: string[];
+    isCorrect: boolean;
+    createdAt: string;
+  }>;
   unstarted?: boolean;
   lastActive?: string;
 }

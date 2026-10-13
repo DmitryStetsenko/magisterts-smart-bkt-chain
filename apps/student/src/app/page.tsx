@@ -774,7 +774,7 @@ export default function StudentPortalPage() {
 
                   {evalResult.bktUpdate && (
                     <div className="p-2.5 bg-slate-950/60 rounded-xl border border-slate-800/80 flex items-center justify-between text-xs font-mono">
-                      <span>Оновлення BKT P(Lₜ) для "{evalResult.bktUpdate.skillTitle}":</span>
+                      <span>Оновлення рівня засвоєння для "{evalResult.bktUpdate.skillTitle}":</span>
                       <div className="flex items-center gap-2 font-bold">
                         <span className="text-slate-400">{(evalResult.bktUpdate.pMasteryBefore * 100).toFixed(1)}%</span>
                         <span>➔</span>
