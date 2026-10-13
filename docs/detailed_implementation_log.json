@@ -2170,11 +2170,6 @@
           "items": [
             {
               "type": "text",
-              "raw_text": "**Інтерфейсна інтеграція у `GameSkillTreeWidget` (`apps/student/src/features/skill-graph/ui/GameSkillTreeWidget.tsx`):**",
-              "subitems": []
-            },
-            {
-              "type": "text",
               "raw_text": "Додано перемикач режимів `[ 🌿 Дерево Знань | ⚡ Дерево Аномалій ]` безпосередньо у верхню статус-панель віджета (поруч із рівнем гравця LVL та прогрес-баром).",
               "subitems": []
             },
@@ -2190,37 +2185,69 @@
             },
             {
               "type": "text",
-              "raw_text": "**Постачання даних телеметрії в студентському додатку (`apps/student/src/app/page.tsx`):**",
+              "raw_text": "Під час завантаження структури курсу функція `fetchCourseStructureAndState` викликає `GET /api/v1/bkt/analytics/students?courseSlug=${courseSlug}` та збагачує вузли інцидентами `recentAdjustments`.",
+              "subitems": []
+            }
+          ]
+        },
+        {
+          "title": "10.8 Phase 2 · Уніфікація `GameSkillTreeWidget` та `AnomalyTreeWidget` у Пакеті `@sbc/ui`",
+          "level": 3,
+          "paragraphs": [],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "**Проблематика та ліквідація дублювання:**",
               "subitems": []
             },
             {
               "type": "text",
-              "raw_text": "Під час завантаження структури курсу функція `fetchCourseStructureAndState` викликає `GET /api/v1/bkt/analytics/students?courseSlug=${courseSlug}`.",
+              "raw_text": "Раніше обидва портали (`apps/student` та `apps/teacher`) містили локальні копії `GameSkillTreeWidget.tsx` та `AnomalyTreeWidget.tsx`. Будь-яке оновлення розмітки дерева знань або логіки аномалій вимагало ручного копіювання коду.",
               "subitems": []
             },
             {
               "type": "text",
-              "raw_text": "З результатів витягуються `recentAdjustments` та `telemetryBySkill` для поточного студента (`demo-student`).",
+              "raw_text": "**Єдина архітектурна реалізація (`packages/ui/src/skill-graph/GameSkillTreeWidget.tsx`):**",
               "subitems": []
             },
             {
               "type": "text",
-              "raw_text": "Кожен вузол `graphNodes` збагачується метаданими: `tasks`, `tasksCount`, `telemetry`, `recentAdjustments`, `hasGuessAnomaly`, `hasCopyPasteAnomaly`.",
+              "raw_text": "Віджет перенесено в бібліотеку `@sbc/ui` разом з спільними типами (`skill-graph.types.ts`) та `AnomalyTreeWidget.tsx`.",
               "subitems": []
             },
             {
               "type": "text",
-              "raw_text": "Масив інцидентів передається у пропс `adjustments` віджета `GameSkillTreeWidget`.",
+              "raw_text": "Введено єдиний інтерфейс з параметром `role?: 'student' | 'teacher'`:",
+              "subitems": [
+                "**`role === 'teacher'`:** Сайдкартка показує live-телеметрію (WPM, копіпаст, втома), банери аномалій, журнал BKT-коригувань та кнопку переходу до списку завдань модуля.",
+                "**`role === 'student'`:** Сайдкартка оптимізована під проходження квестів (без стресу від показників швидкості друку), з динамічною кнопкою «Розпочати квест модуля ➔» або «Тренувати знову».",
+                "**Спільна навігація:** Обидва портали отримують верхній статусний перемикач `[ 🌿 Дерево Знань | ⚡ Дерево Аномалій ]` за наявності аномалій у студента."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Інтеграція в додатки:**",
               "subitems": []
             },
             {
               "type": "text",
-              "raw_text": "**Безшовне перемикання:**",
+              "raw_text": "У `apps/student/package.json` та `apps/teacher/package.json` додано залежність `@sbc/ui: \"*\"`.",
               "subitems": []
             },
             {
               "type": "text",
-              "raw_text": "Студент або викладач під час налагодження може в 1 клік перемикатися між гейміфікованим RPG-прогресом і детальним деревом когнітивних відхилень з можливістю інспекції кожного питання в модальному вікні.",
+              "raw_text": "У обох порталах імпорти оновлено на чистий `import { GameSkillTreeWidget, SkillGraphNode } from '@sbc/ui'`.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Контроль якості:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Виконано перевірку компіляції: `npm run build:student` ✅ та `npm run build:teacher` ✅ (0 помилок типізації).",
               "subitems": []
             }
           ]

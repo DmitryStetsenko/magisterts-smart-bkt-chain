@@ -3,9 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { ShieldCheck, Network, Users, BarChart3, Code2, BookOpen, Scale, ChevronDown, X, Search, RotateCcw, AlertTriangle, CheckCircle2, Lock, HelpCircle, Code, FileText, CheckSquare, Sparkles, Keyboard, Copy, Activity, Info, GitBranch, Layers } from 'lucide-react';
 import { StudentAnalyticsItem } from '../features/analytics/model/analytics.types';
-import { AnomalyTreeWidget } from '../features/analytics/ui/AnomalyTreeWidget';
-import { GameSkillTreeWidget } from '../features/skill-graph/ui/GameSkillTreeWidget';
-import { SkillGraphNode } from '../features/skill-graph/model/skill-graph.types';
+import { AnomalyTreeWidget, GameSkillTreeWidget, SkillGraphNode } from '@sbc/ui';
 
 interface CourseItem {
   slug: string;
@@ -613,6 +611,8 @@ export default function TeacherDashboardPage() {
                     nodes={studentGraphNodes}
                     courseTitle={activeCourse.title}
                     studentName={selectedStudent.name}
+                    role="teacher"
+                    adjustments={selectedStudent.recentAdjustments || []}
                     showInspector={true}
                     onSelectSkill={(slug) => {
                       setActiveTab('coursemap');

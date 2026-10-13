@@ -7,8 +7,7 @@ import { MonacoCodeEditor } from '../features/code-editor/ui/MonacoCodeEditor';
 import { QuizTaskEditor } from '../features/quiz-editor/ui/QuizTaskEditor';
 import { EssayTaskEditor } from '../features/essay-editor/ui/EssayTaskEditor';
 import { SkillDagMap } from '../features/skill-graph/ui/SkillDagMap';
-import { GameSkillTreeWidget } from '../features/skill-graph/ui/GameSkillTreeWidget';
-import { SkillGraphNode } from '../features/skill-graph/model/skill-graph.types';
+import { GameSkillTreeWidget, SkillGraphNode } from '@sbc/ui';
 
 interface TaskDetail {
   id: string;
