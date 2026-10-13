@@ -309,19 +309,14 @@ export function GameSkillTreeWidget({
                   }}
                   className="flex flex-col items-center cursor-pointer group"
                 >
-                  {/* Floating Selection Beacon Halo */}
-                  {isSelected && (
-                    <div className="absolute -inset-3 rounded-full bg-gradient-to-r from-purple-500 to-indigo-500 opacity-40 blur-md animate-pulse pointer-events-none" />
-                  )}
-
                   {/* Hexagon / Circular Crystal Node */}
                   <div className="relative">
                     {/* Outer Glowing Energy Halo for Mastered / Active */}
                     {isMastered && (
-                      <div className="absolute -inset-2 bg-emerald-500/20 rounded-full blur-md animate-pulse pointer-events-none" />
+                      <div className="absolute -inset-1 bg-emerald-500/20 rounded-2xl blur-sm animate-pulse pointer-events-none" />
                     )}
                     {isCurrentActive && !isMastered && (
-                      <div className="absolute -inset-2.5 bg-indigo-500/30 rounded-full blur-lg animate-pulse pointer-events-none" />
+                      <div className="absolute -inset-1 bg-indigo-500/25 rounded-2xl blur-sm animate-pulse pointer-events-none" />
                     )}
 
                     {/* Circular Rune Body */}
