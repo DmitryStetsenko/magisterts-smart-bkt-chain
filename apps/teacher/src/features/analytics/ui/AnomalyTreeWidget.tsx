@@ -47,7 +47,7 @@ export interface AnomalyItem {
   createdAt: string;
 }
 
-export type AnomalyViewMode = 'tree' | 'graph' | 'rpg';
+export type AnomalyViewMode = 'module_tree' | 'tree' | 'graph' | 'rpg';
 
 interface AnomalyTreeWidgetProps {
   adjustments: AnomalyItem[];
@@ -62,16 +62,16 @@ export function AnomalyTreeWidget({
   adjustments,
   nodes = [],
   title = 'Дерево Аномалій та Когнітивних Відхилень',
-  subtitle = 'Багатовимірний радар: Ієрархічне Дерево | Топологічний Граф DAG | RPG Матриця',
+  subtitle = 'Багатовимірний радар: Дерево Модулів Аномалій | Дерево за Категоріями | Топологічний Граф DAG | RPG Матриця',
   onNavigateToTask,
-  defaultMode = 'tree',
+  defaultMode = 'module_tree',
 }: AnomalyTreeWidgetProps) {
   const [viewMode, setViewMode] = useState<AnomalyViewMode>(defaultMode);
   const [selectedItem, setSelectedItem] = useState<AnomalyItem | null>(null);
   const [selectedNodeSlug, setSelectedNodeSlug] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState<string>('');
   
-  // Track open/collapsed tree nodes in 'tree' mode
+  // Track open/collapsed tree nodes in 'tree' and 'module_tree' mode
   const [expandedNodes, setExpandedNodes] = useState<Record<string, boolean>>({
     'category-guess': true,
     'category-slip': true,
@@ -80,7 +80,7 @@ export function AnomalyTreeWidget({
   const toggleNode = (nodeKey: string) => {
     setExpandedNodes((prev) => ({
       ...prev,
-      [nodeKey]: !prev[nodeKey],
+      [nodeKey]: !(prev[nodeKey] ?? true),
     }));
   };
 
@@ -112,6 +112,104 @@ export function AnomalyTreeWidget({
   const activeSkillItems = adjustments.filter(
     (a) => a.skillSlug === selectedNodeSlug
   );
+
+  // Group all anomalies by module/skill slug
+  const allAnomalyItems = adjustments.filter(
+    (a) => Boolean((a.pGuessUsed && a.pGuessUsed > 0.3) || (a.pSlipUsed && a.pSlipUsed > 0.2))
+  );
+
+  // Group anomalies by module
+  const anomaliesByModule: Record<string, AnomalyItem[]> = {};
+  allAnomalyItems.forEach((item) => {
+    const slug = item.skillSlug || 'other';
+    if (!anomaliesByModule[slug]) {
+      anomaliesByModule[slug] = [];
+    }
+    anomaliesByModule[slug].push(item);
+  });
+
+  // Determine module hierarchy based on DAG nodes or chronological order
+  // If nodes are passed, we find root modules (those with no parent among affected modules)
+  // and construct the hierarchical branch tree: Parent Module -> Child Module (or siblings if at same level)
+  interface ModuleTreeNode {
+    slug: string;
+    title: string;
+    node?: SkillGraphNode;
+    items: AnomalyItem[];
+    children: ModuleTreeNode[];
+    level: number;
+  }
+
+  const buildModuleTree = (): ModuleTreeNode[] => {
+    const affectedSlugs = Object.keys(anomaliesByModule);
+    if (affectedSlugs.length === 0) return [];
+
+    // Map of nodes
+    const nodeMap = new Map<string, SkillGraphNode>();
+    nodes.forEach((n) => {
+      nodeMap.set(n.slug, n);
+      nodeMap.set(n.id, n);
+    });
+
+    // Helper to find parent slugs within affectedSlugs
+    const getParentSlugsInAffected = (slug: string): string[] => {
+      const n = nodeMap.get(slug);
+      if (!n || !n.parentSkillIds) return [];
+      const parents: string[] = [];
+      n.parentSkillIds.forEach((pid) => {
+        const pNode = nodeMap.get(pid);
+        if (pNode && affectedSlugs.includes(pNode.slug)) {
+          parents.push(pNode.slug);
+        }
+      });
+      return parents;
+    };
+
+    // Identify roots among affected modules (those that have 0 parents in affectedSlugs)
+    const rootSlugs = affectedSlugs.filter((slug) => getParentSlugsInAffected(slug).length === 0);
+
+    // If no explicit roots found (or no nodes data), treat all as top-level roots/siblings
+    const rootsToUse = rootSlugs.length > 0 ? rootSlugs : affectedSlugs;
+
+    const visited = new Set<string>();
+
+    const createTreeNode = (slug: string, level: number): ModuleTreeNode => {
+      visited.add(slug);
+      const n = nodeMap.get(slug);
+      const items = anomaliesByModule[slug] || [];
+
+      // Find children: any affected slug whose parent is this slug
+      const childrenSlugs = affectedSlugs.filter((otherSlug) => {
+        if (visited.has(otherSlug)) return false;
+        const otherParents = getParentSlugsInAffected(otherSlug);
+        return otherParents.includes(slug);
+      });
+
+      const children = childrenSlugs.map((cSlug) => createTreeNode(cSlug, level + 1));
+
+      return {
+        slug,
+        title: n?.title || items[0]?.skillTitle || slug,
+        node: n,
+        items,
+        children,
+        level,
+      };
+    };
+
+    const tree = rootsToUse.map((rSlug) => createTreeNode(rSlug, 0));
+
+    // Add any remaining unvisited affected modules (disconnected sub-trees)
+    affectedSlugs.forEach((slug) => {
+      if (!visited.has(slug)) {
+        tree.push(createTreeNode(slug, 0));
+      }
+    });
+
+    return tree;
+  };
+
+  const moduleTreeRoots = buildModuleTree();
 
   return (
     <div className="w-full bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-2xl flex flex-col gap-5 text-slate-100">
@@ -149,6 +247,18 @@ export function AnomalyTreeWidget({
           {/* View Mode Switcher */}
           <div className="bg-slate-950 p-1 rounded-xl border border-slate-800 flex items-center gap-1 text-xs font-bold font-mono">
             <button
+              onClick={() => setViewMode('module_tree')}
+              className={`px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-all cursor-pointer ${
+                viewMode === 'module_tree'
+                  ? 'bg-purple-600 text-white shadow-md shadow-purple-600/30'
+                  : 'text-slate-400 hover:text-white hover:bg-slate-900'
+              }`}
+            >
+              <GitBranch className="w-3.5 h-3.5" />
+              <span>Дерево Модулів</span>
+            </button>
+
+            <button
               onClick={() => setViewMode('tree')}
               className={`px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-all cursor-pointer ${
                 viewMode === 'tree'
@@ -157,7 +267,7 @@ export function AnomalyTreeWidget({
               }`}
             >
               <FolderTree className="w-3.5 h-3.5" />
-              <span>Дерево Списком</span>
+              <span>За Категоріями</span>
             </button>
 
             <button
@@ -185,8 +295,8 @@ export function AnomalyTreeWidget({
             </button>
           </div>
 
-          {/* Search box for tree view */}
-          {viewMode === 'tree' && (
+          {/* Search box for tree and module_tree views */}
+          {(viewMode === 'module_tree' || viewMode === 'tree') && (
             <div className="relative w-full sm:w-56">
               <Search className="w-3.5 h-3.5 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
               <input
@@ -202,7 +312,158 @@ export function AnomalyTreeWidget({
       </div>
 
       {/* ───────────────────────────────────────────────────────────── */}
-      {/* 🌳 РЕЖИМ 1: Ієрархічне Дерево (Collapsible Tree View)          */}
+      {/* 🌿 РЕЖИМ 0: Дерево Модулів Аномалій (DAG Module Hierarchy)      */}
+      {/* ───────────────────────────────────────────────────────────── */}
+      {viewMode === 'module_tree' && (
+        <div className="flex flex-col gap-3 font-mono text-xs">
+          {totalAnomalies === 0 ? (
+            <div className="p-8 rounded-xl bg-slate-950/40 border border-slate-800/60 text-center text-slate-500 flex flex-col items-center gap-2">
+              <CheckCircle2 className="w-6 h-6 text-emerald-500/60" />
+              <p className="text-xs text-slate-400">Усі поточні відповіді пройшли в межах нормальної поведінкової телеметрії.</p>
+            </div>
+          ) : (
+            <div className="flex flex-col gap-4">
+              <div className="text-[11px] text-slate-400 flex items-center justify-between px-1">
+                <span>Ієрархія курсів: кореневі та дочірні модулі з аномаліями</span>
+                <span className="text-slate-500">Сусіди одного рівня розташовані поруч</span>
+              </div>
+
+              {/* Recursive renderer for ModuleTreeNode */}
+              {(() => {
+                const renderTreeNode = (mNode: ModuleTreeNode) => {
+                  const nodeKey = `module-${mNode.slug}`;
+                  const isExpanded = expandedNodes[nodeKey] ?? true;
+
+                  const filteredItems = mNode.items.filter((item) =>
+                    !searchTerm ||
+                    (item.taskTitle && item.taskTitle.toLowerCase().includes(searchTerm.toLowerCase())) ||
+                    mNode.title.toLowerCase().includes(searchTerm.toLowerCase())
+                  );
+
+                  const guessCount = mNode.items.filter((a) => Boolean(a.pGuessUsed && a.pGuessUsed > 0.3)).length;
+                  const slipCount = mNode.items.filter((a) => Boolean(a.pSlipUsed && a.pSlipUsed > 0.2)).length;
+
+                  return (
+                    <div key={mNode.slug} className="flex flex-col gap-2">
+                      {/* Module Box */}
+                      <div className="bg-slate-950/80 border border-purple-500/30 rounded-xl overflow-hidden shadow-lg shadow-purple-950/10">
+                        <div
+                          onClick={() => toggleNode(nodeKey)}
+                          className="px-4 py-3 bg-purple-950/20 hover:bg-purple-950/30 flex items-center justify-between cursor-pointer border-b border-purple-500/20 transition-all select-none"
+                        >
+                          <div className="flex items-center gap-2.5">
+                            {isExpanded ? (
+                              <ChevronDown className="w-4 h-4 text-purple-400" />
+                            ) : (
+                              <ChevronRight className="w-4 h-4 text-purple-400" />
+                            )}
+                            <FolderOpen className="w-4 h-4 text-purple-400" />
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <span className="font-bold text-white text-sm">{mNode.title}</span>
+                              <span className="text-[10px] text-purple-300 font-mono px-1.5 py-0.5 rounded bg-purple-500/20 border border-purple-500/30">
+                                {mNode.slug}
+                              </span>
+                              {mNode.level > 0 && (
+                                <span className="text-[10px] text-slate-400 font-mono">
+                                  (Рівень DAG: {mNode.level})
+                                </span>
+                              )}
+                            </div>
+                          </div>
+
+                          <div className="flex items-center gap-2">
+                            {guessCount > 0 && (
+                              <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40 flex items-center gap-1">
+                                <Zap className="w-3 h-3" />
+                                {guessCount} вгадувань
+                              </span>
+                            )}
+                            {slipCount > 0 && (
+                              <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 flex items-center gap-1">
+                                <AlertTriangle className="w-3 h-3" />
+                                {slipCount} описок
+                              </span>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Questions list inside module */}
+                        {isExpanded && (
+                          <div className="p-3 pl-6 flex flex-col gap-2 border-l-2 border-purple-500/40 ml-4 my-2">
+                            {filteredItems.length === 0 ? (
+                              <div className="text-slate-500 py-1 text-xs">Немає запитань, що відповідають пошуку.</div>
+                            ) : (
+                              filteredItems.map((item, idx) => {
+                                const isGuess = Boolean(item.pGuessUsed && item.pGuessUsed > 0.3);
+                                return (
+                                  <div
+                                    key={item.id || idx}
+                                    onClick={() => setSelectedItem(item)}
+                                    className="p-2.5 rounded-lg bg-slate-900/70 hover:bg-purple-950/40 border border-slate-800/80 hover:border-purple-500/40 flex items-center justify-between gap-3 cursor-pointer group transition-all"
+                                  >
+                                    <div className="flex items-center gap-2 truncate">
+                                      <div className={`w-2 h-2 rounded-full shrink-0 ${isGuess ? 'bg-amber-400 animate-ping' : 'bg-indigo-400'}`} />
+                                      <span className="text-white font-medium group-hover:text-purple-300 truncate">
+                                        {item.taskTitle || 'Тестове Запитання'}
+                                      </span>
+                                      {item.taskType && (
+                                        <span className="text-[9px] uppercase px-1.5 py-0.2 rounded bg-slate-800 text-slate-400 border border-slate-700">
+                                          {item.taskType}
+                                        </span>
+                                      )}
+                                    </div>
+
+                                    <div className="flex items-center gap-2 shrink-0 text-[10px]">
+                                      <span className="text-slate-500">
+                                        {new Date(item.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+                                      </span>
+                                      {isGuess && (
+                                        <span className="px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 font-bold border border-amber-500/30">
+                                          G={item.pGuessUsed}
+                                        </span>
+                                      )}
+                                      {item.pSlipUsed !== undefined && item.pSlipUsed !== null && item.pSlipUsed > 0.2 && (
+                                        <span className="px-1.5 py-0.5 rounded bg-indigo-500/20 text-indigo-300 font-bold border border-indigo-500/30">
+                                          S={item.pSlipUsed}
+                                        </span>
+                                      )}
+                                      <ChevronRight className="w-3.5 h-3.5 text-slate-600 group-hover:text-purple-400" />
+                                    </div>
+                                  </div>
+                                );
+                              })
+                            )}
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Nested Children Modules (Branching deeper in DAG) */}
+                      {mNode.children && mNode.children.length > 0 && (
+                        <div className="pl-6 border-l-2 border-dashed border-purple-500/30 ml-4 flex flex-col gap-3 my-1">
+                          <div className="text-[10px] uppercase font-bold text-purple-400/80 tracking-wider flex items-center gap-1.5 pt-1">
+                            <GitBranch className="w-3 h-3" />
+                            <span>Дочірні модулі в ланцюгу BKT:</span>
+                          </div>
+                          {mNode.children.map((child) => renderTreeNode(child))}
+                        </div>
+                      )}
+                    </div>
+                  );
+                };
+
+                return (
+                  <div className="flex flex-col gap-4">
+                    {moduleTreeRoots.map((rootNode) => renderTreeNode(rootNode))}
+                  </div>
+                );
+              })()}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* ───────────────────────────────────────────────────────────── */}
+      {/* 🌳 РЕЖИМ 1: Ієрархічне Дерево за Категоріями                   */}
       {/* ───────────────────────────────────────────────────────────── */}
       {viewMode === 'tree' && (
         <div className="flex flex-col gap-3 font-mono text-xs">
