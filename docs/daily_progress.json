@@ -2,6 +2,61 @@
   "project_title": "📅 Журнал розробки та прогресу проєкту (Daily Progress Log)",
   "sections": [
     {
+      "title": "📅 13 жовтня 2026 року",
+      "level": 2,
+      "paragraphs": [],
+      "code_blocks": [],
+      "items": [],
+      "subsections": [
+        {
+          "title": "✅ Що зроблено за день:",
+          "level": 3,
+          "paragraphs": [],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "**Phase 2 · Крок 1: Доменний модуль `BehavioralAdjuster` (динамічні Slip/Guess):**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Створено `apps/api/src/domain/bkt/behavioral-adjuster.ts` — чистий доменний модуль корекції $P(S)$ та $P(G)$ для однієї відповіді на основі поведінкової телеметрії.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Перенесено правило «швидка відповідь < 2 с → $P(G)=0.85$» та додано нові правила для $P(S)$ (описка сильного студента, промах на граничному тест-кейсі, справжнє незнання при хаотичних правках).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Кожна корекція повертає людинозрозуміле пояснення (`reasons`) для подальшого запису в `bkt_histories`.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Unit-тести `behavioral-adjuster.spec.ts`: 8/8 ✅ (разом з `bkt-engine.spec.ts` — 12/12).",
+              "subitems": []
+            }
+          ]
+        },
+        {
+          "title": "🎯 Наступні кроки:",
+          "level": 3,
+          "paragraphs": [],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "Підключити `BehavioralAdjuster` у `bkt.controller.ts` та прибрати перманентне збереження скоригованого $P(G)$ у `bkt_states`.",
+              "subitems": []
+            }
+          ]
+        }
+      ]
+    },
+    {
       "title": "📅 12 жовтня 2026 року",
       "level": 2,
       "paragraphs": [],
