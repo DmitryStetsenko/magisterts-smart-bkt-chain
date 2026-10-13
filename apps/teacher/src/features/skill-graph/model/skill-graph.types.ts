@@ -7,6 +7,12 @@ export interface SkillTelemetryStats {
 }
 
 export interface SkillAdjustmentSummary {
+  id?: string;
+  taskId?: string;
+  taskTitle?: string;
+  taskType?: string;
+  taskDescription?: string;
+  taskOptions?: any;
   pSlipUsed?: number | null;
   pGuessUsed?: number | null;
   adjustReasons: string[];

@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { ShieldCheck, Network, Users, BarChart3, Code2, BookOpen, Scale, ChevronDown, X, Search, RotateCcw, AlertTriangle, CheckCircle2, Lock, HelpCircle, Code, FileText, CheckSquare, Sparkles, Keyboard, Copy, Activity, Info, GitBranch, Layers } from 'lucide-react';
 import { StudentAnalyticsItem } from '../features/analytics/model/analytics.types';
+import { AnomalyRadarWidget } from '../features/analytics/ui/AnomalyRadarWidget';
 import { GameSkillTreeWidget } from '../features/skill-graph/ui/GameSkillTreeWidget';
 import { SkillGraphNode } from '../features/skill-graph/model/skill-graph.types';
 
@@ -723,85 +724,17 @@ export default function TeacherDashboardPage() {
 
               {/* Dynamic Behavioral Telemetry & Adjustments Panel (Teacher Only) */}
               {selectedStudent.recentAdjustments && selectedStudent.recentAdjustments.length > 0 && (
-                <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-xl flex flex-col gap-3">
-                  <div className="flex items-center justify-between">
-                    <h3 className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-2">
-                      <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-                      <span>Журнал Адаптацій BKT та Поведінкової Телеметрії</span>
-                    </h3>
-                    {selectedStudent.hasGuessAlert && (
-                      <span className="text-[10px] font-mono font-bold text-amber-300 bg-amber-500/10 border border-amber-500/30 px-2 py-0.5 rounded-full flex items-center gap-1 animate-pulse">
-                        ⚡ Виявлено підозру на вгадування (P(Guess) &gt; 0.3)
-                      </span>
-                    )}
-                  </div>
-
-                  <div className="flex flex-col gap-2">
-                    {selectedStudent.recentAdjustments.map((adj, idx) => (
-                      <div
-                        key={idx}
-                        className={`p-3 rounded-xl border flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs ${
-                          adj.pGuessUsed && adj.pGuessUsed > 0.3
-                            ? 'bg-amber-950/20 border-amber-500/30'
-                            : adj.pSlipUsed && adj.pSlipUsed > 0.2
-                            ? 'bg-indigo-950/20 border-indigo-500/30'
-                            : 'bg-slate-950 border-slate-800'
-                        }`}
-                      >
-                        <div className="flex items-center gap-2.5">
-                          <span
-                            className={`w-2 h-2 rounded-full ${
-                              adj.isCorrect ? 'bg-emerald-400' : 'bg-rose-400'
-                            }`}
-                          />
-                          <span className="font-bold text-white">{adj.skillTitle}</span>
-                          <span className="text-[10px] font-mono text-slate-500">
-                            {new Date(adj.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
-                          </span>
-                        </div>
-
-                        <div className="flex items-center gap-2 flex-wrap">
-                          {adj.pGuessUsed !== undefined && adj.pGuessUsed !== null && (
-                            <span
-                              className={`px-2 py-0.5 rounded text-[11px] font-mono font-bold ${
-                                adj.pGuessUsed > 0.3
-                                  ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
-                                  : 'bg-slate-800 text-slate-400'
-                              }`}
-                            >
-                              P(Guess)={adj.pGuessUsed}
-                            </span>
-                          )}
-
-                          {adj.pSlipUsed !== undefined && adj.pSlipUsed !== null && (
-                            <span
-                              className={`px-2 py-0.5 rounded text-[11px] font-mono font-bold ${
-                                adj.pSlipUsed > 0.2
-                                  ? 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/40'
-                                  : 'bg-slate-800 text-slate-400'
-                              }`}
-                            >
-                              P(Slip)={adj.pSlipUsed}
-                            </span>
-                          )}
-
-                          {adj.adjustReasons && adj.adjustReasons.length > 0 && (
-                            <div className="flex items-center gap-1">
-                              {adj.adjustReasons.map((r, rIdx) => (
-                                <span
-                                  key={rIdx}
-                                  className="text-[10px] text-amber-300 bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20"
-                                >
-                                  {r}
-                                </span>
-                              ))}
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
+                <AnomalyRadarWidget
+                  adjustments={selectedStudent.recentAdjustments}
+                  title="Радар Аномалій та Поведінкової Телеметрії"
+                  subtitle="Хронологічне дерево підозрілих дій, вгадувань та коригувань BKT для студента"
+                  onNavigateToTask={(taskId, skillSlug) => {
+                    setActiveTab('coursemap');
+                    setIsDrawerOpen(true);
+                    if (skillSlug) setSelectedSkillSlug(skillSlug);
+                    setSelectedTaskId(taskId);
+                  }}
+                />
               )}
 
               {/* Compact BKT Skill Mastery Heatmap Table with Per-Module Telemetry */}

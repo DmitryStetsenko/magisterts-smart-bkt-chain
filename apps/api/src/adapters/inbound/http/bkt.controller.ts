@@ -275,6 +275,7 @@ export class BktController {
       data: {
         userId: user.id,
         skillId: task.skillId,
+        taskId: task.id,
         pMasteryBefore: bktState.pMastery,
         pMasteryAfter: calcResult.pMasteryPosterior,
         isCorrect: isPassed,
@@ -345,9 +346,9 @@ export class BktController {
         profile: true,
         bktStates: { include: { skill: true } },
         bktHistories: {
-          include: { skill: true },
+          include: { skill: true, task: true },
           orderBy: { createdAt: 'desc' },
-          take: 10,
+          take: 20,
         },
         behavioralProfiles: {
           include: {
@@ -476,8 +477,14 @@ export class BktController {
       const medianFatigueIndex = Math.round(calcMedian(fatigues));
 
       const recentAdjustments = s.bktHistories.map((h) => ({
+        id: h.id,
         skillSlug: h.skill.slug,
         skillTitle: h.skill.title,
+        taskId: h.taskId || undefined,
+        taskTitle: h.task?.title || undefined,
+        taskType: h.task?.taskType || undefined,
+        taskDescription: h.task?.description || undefined,
+        taskOptions: h.task?.options || undefined,
         pSlipUsed: h.pSlipUsed,
         pGuessUsed: h.pGuessUsed,
         adjustReasons: h.adjustReasons,

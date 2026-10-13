@@ -494,7 +494,14 @@ export function GameSkillTreeWidget({
                       {selectedNode.recentAdjustments.map((adj, aIdx) => (
                         <div
                           key={aIdx}
-                          className={`p-2 rounded-lg border text-[10px] font-mono flex items-center justify-between gap-2 ${
+                          onClick={() => {
+                            if (adj.taskId && onSelectSkill) {
+                              onSelectSkill(selectedNode.slug);
+                            }
+                          }}
+                          className={`p-2 rounded-lg border text-[10px] font-mono flex items-center justify-between gap-2 transition-all ${
+                            adj.taskId ? 'cursor-pointer hover:border-amber-400/60' : ''
+                          } ${
                             adj.pGuessUsed && adj.pGuessUsed > 0.3
                               ? 'bg-amber-950/30 border-amber-500/30 text-amber-200'
                               : adj.pSlipUsed && adj.pSlipUsed > 0.2
@@ -502,16 +509,19 @@ export function GameSkillTreeWidget({
                               : 'bg-slate-900 border-slate-800 text-slate-400'
                           }`}
                         >
-                          <div className="flex items-center gap-1.5">
-                            <span className={`w-1.5 h-1.5 rounded-full ${adj.isCorrect ? 'bg-emerald-400' : 'bg-rose-400'}`} />
-                            <span>{new Date(adj.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                          <div className="flex items-center gap-1.5 truncate">
+                            <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${adj.isCorrect ? 'bg-emerald-400' : 'bg-rose-400'}`} />
+                            <span className="truncate">{adj.taskTitle || new Date(adj.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                           </div>
-                          <div className="flex items-center gap-1.5">
+                          <div className="flex items-center gap-1.5 shrink-0">
                             {adj.pGuessUsed !== undefined && adj.pGuessUsed !== null && (
                               <span className="font-bold">G={adj.pGuessUsed}</span>
                             )}
                             {adj.pSlipUsed !== undefined && adj.pSlipUsed !== null && (
                               <span className="font-bold">S={adj.pSlipUsed}</span>
+                            )}
+                            {adj.taskId && (
+                              <ExternalLink className="w-2.5 h-2.5 text-slate-500 hover:text-amber-400" />
                             )}
                           </div>
                         </div>

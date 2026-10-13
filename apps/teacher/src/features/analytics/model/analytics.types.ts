@@ -19,8 +19,14 @@ export interface StudentAnalyticsItem {
   };
   hasGuessAlert?: boolean;
   recentAdjustments?: Array<{
+    id?: string;
     skillSlug: string;
     skillTitle: string;
+    taskId?: string;
+    taskTitle?: string;
+    taskType?: string;
+    taskDescription?: string;
+    taskOptions?: any;
     pSlipUsed?: number | null;
     pGuessUsed?: number | null;
     adjustReasons: string[];

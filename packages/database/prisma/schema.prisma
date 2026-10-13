@@ -136,6 +136,7 @@ model Task {
   testCases         TestCase[]
   submissions       Submission[]
   telemetrySessions TelemetrySession[]
+  bktHistories      BktHistory[]
 
   @@map("tasks")
 }
@@ -176,6 +177,8 @@ model BktHistory {
   user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   skillId        String
   skill          SkillNode @relation(fields: [skillId], references: [id], onDelete: Cascade)
+  taskId         String?
+  task           Task?     @relation(fields: [taskId], references: [id], onDelete: SetNull)
   pMasteryBefore Float
   pMasteryAfter  Float
   isCorrect      Boolean
