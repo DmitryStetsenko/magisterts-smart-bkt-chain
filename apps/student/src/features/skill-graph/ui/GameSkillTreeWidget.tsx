@@ -18,12 +18,15 @@ import {
 } from 'lucide-react';
 import { SkillGraphNode } from '../model/skill-graph.types';
 
+import { AnomalyTreeWidget, AnomalyItem } from '../../analytics/ui/AnomalyTreeWidget';
+
 interface GameSkillTreeWidgetProps {
   nodes: SkillGraphNode[];
   activeSkillSlug?: string;
   courseTitle?: string;
   selectedSkillSlug?: string;
   showInspector?: boolean;
+  adjustments?: AnomalyItem[];
   onSelectSkill?: (slug: string) => void;
   onInspectSkill?: (node: SkillGraphNode) => void;
   onClose?: () => void;
@@ -35,11 +38,13 @@ export function GameSkillTreeWidget({
   courseTitle = 'Навчальний Курс',
   selectedSkillSlug,
   showInspector = true,
+  adjustments = [],
   onSelectSkill,
   onInspectSkill,
   onClose,
 }: GameSkillTreeWidgetProps) {
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
+  const [treeDisplayMode, setTreeDisplayMode] = useState<'skills' | 'anomalies'>('skills');
 
   // Compute stats
   const totalSkills = nodes.length;
@@ -112,6 +117,42 @@ export function GameSkillTreeWidget({
           </div>
         </div>
 
+        {/* Mode Switcher: Knowledge Tree vs Anomaly Tree */}
+        <div className="flex items-center gap-1 bg-slate-950/80 p-1 rounded-xl border border-indigo-500/30">
+          <button
+            onClick={() => setTreeDisplayMode('skills')}
+            className={`px-3 py-1.5 rounded-lg text-xs font-bold font-mono flex items-center gap-1.5 transition-all cursor-pointer ${
+              treeDisplayMode === 'skills'
+                ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-md shadow-indigo-600/30'
+                : 'text-slate-400 hover:text-white hover:bg-slate-900'
+            }`}
+          >
+            <Layers className="w-3.5 h-3.5" />
+            <span>🌿 Дерево Знань</span>
+          </button>
+
+          <button
+            onClick={() => setTreeDisplayMode('anomalies')}
+            className={`px-3 py-1.5 rounded-lg text-xs font-bold font-mono flex items-center gap-1.5 transition-all cursor-pointer ${
+              treeDisplayMode === 'anomalies'
+                ? 'bg-amber-600 text-white shadow-md shadow-amber-600/30'
+                : 'text-slate-400 hover:text-white hover:bg-slate-900'
+            }`}
+          >
+            <Zap className="w-3.5 h-3.5 text-amber-400" />
+            <span>⚡ Дерево Аномалій</span>
+            {adjustments.length > 0 && (
+              <span className={`px-1.5 py-0.2 text-[9px] rounded-full font-black ${
+                treeDisplayMode === 'anomalies'
+                  ? 'bg-white text-amber-900'
+                  : 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
+              }`}>
+                {adjustments.length}
+              </span>
+            )}
+          </button>
+        </div>
+
         {/* Global Progress Bar */}
         <div className="hidden sm:flex items-center gap-3 min-w-[220px]">
           <div className="flex-1 flex flex-col gap-1">
@@ -138,7 +179,18 @@ export function GameSkillTreeWidget({
         </div>
       </div>
 
-      {/* 🧭 Main Interactive Area: Canvas Skill Tree & Details Sidecard */}
+      {/* 🧭 Main Interactive Area: Either Anomaly Tree Radar OR RPG Canvas Skill Tree */}
+      {treeDisplayMode === 'anomalies' ? (
+        <div className="flex-1 overflow-y-auto p-4 lg:p-6 bg-slate-950/70 z-10">
+          <AnomalyTreeWidget
+            adjustments={adjustments}
+            nodes={nodes}
+            title={`Аномалії студента: ${courseTitle}`}
+            subtitle="Повний зріз поведінкових інцидентів, швидких вгадувань та описок за всіма модулями даного курсу"
+            defaultMode="module_tree"
+          />
+        </div>
+      ) : (
       <div className="flex-1 flex overflow-hidden relative z-10">
         {/* Left: Scrollable Visual Tree Canvas */}
         <div className="flex-1 overflow-y-auto overflow-x-hidden relative p-4 flex justify-center">
@@ -414,6 +466,7 @@ export function GameSkillTreeWidget({
           </aside>
         )}
       </div>
+      )}
     </div>
   );
 }

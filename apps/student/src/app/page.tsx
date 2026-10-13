@@ -76,11 +76,13 @@ export default function StudentPortalPage() {
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [evalResult, setEvalResult] = useState<any>(null);
   const [graphNodes, setGraphNodes] = useState<SkillGraphNode[]>([]);
+  const [studentAdjustments, setStudentAdjustments] = useState<any[]>([]);
 
   const fetchCourseStructureAndState = async (courseSlug: string) => {
     try {
       const courseRes = await fetch(`${API_URL}/api/v1/courses/${courseSlug}`);
       const bktRes = await fetch(`${API_URL}/api/v1/bkt/state/demo-student`);
+      const analyticsRes = await fetch(`${API_URL}/api/v1/bkt/analytics/students?courseSlug=${courseSlug}`);
 
       let bktMap: Record<string, number> = {};
       if (bktRes.ok) {
@@ -90,14 +92,32 @@ export default function StudentPortalPage() {
         });
       }
 
+      let adjustments: any[] = [];
+      let telemetryBySkill: Record<string, any> = {};
+      if (analyticsRes.ok) {
+        const studentsList: any[] = await analyticsRes.json();
+        const demoStudent = studentsList.find((s) => s.id === 'demo-student' || s.email?.includes('demo') || s.name?.includes('Demo')) || studentsList[0];
+        if (demoStudent) {
+          adjustments = demoStudent.recentAdjustments || [];
+          telemetryBySkill = demoStudent.telemetryBySkill || {};
+          setStudentAdjustments(adjustments);
+        }
+      }
+
       if (courseRes.ok) {
         const courseData = await courseRes.json();
         const mappedNodes: SkillGraphNode[] = courseData.skills.map((skill: any) => {
           const p = bktMap[skill.id] ?? 0.0;
           const isMastered = p >= 0.95;
-          const parentIds = skill.parentDependencies.map((d: any) => d.parentSkillId);
+          const parentIds = skill.parentDependencies?.map((d: any) => d.parentSkillId) || [];
           const parentMastered =
             parentIds.length === 0 || parentIds.every((pid: string) => (bktMap[pid] ?? 0) >= 0.95);
+
+          const skillAdjustments = adjustments.filter(
+            (a) => a.skillSlug === skill.slug || a.skillTitle === skill.title
+          );
+          const hasGuess = skillAdjustments.some((a) => Boolean(a.pGuessUsed && a.pGuessUsed > 0.3));
+          const hasSlip = skillAdjustments.some((a) => Boolean(a.pSlipUsed && a.pSlipUsed > 0.2));
 
           return {
             id: skill.id,
@@ -107,6 +127,12 @@ export default function StudentPortalPage() {
             pMastery: p,
             status: isMastered ? 'MASTERED' : parentMastered ? 'IN_PROGRESS' : 'LOCKED',
             parentSkillIds: parentIds,
+            tasks: skill.tasks || [],
+            tasksCount: skill.tasks?.length || 0,
+            telemetry: telemetryBySkill[skill.slug] || undefined,
+            recentAdjustments: skillAdjustments,
+            hasGuessAnomaly: hasGuess,
+            hasCopyPasteAnomaly: (telemetryBySkill[skill.slug]?.copyPasteRatio || 0) >= 0.6,
           };
         });
 
@@ -688,6 +714,7 @@ export default function StudentPortalPage() {
             <div className="w-full h-full p-4 lg:p-6 overflow-hidden flex flex-col">
               <GameSkillTreeWidget
                 nodes={graphNodes}
+                adjustments={studentAdjustments}
                 activeSkillSlug={task?.skill?.slug}
                 selectedSkillSlug={inspectedSkill?.slug}
                 courseTitle={courses.find((c) => c.slug === activeCourseSlug)?.title || 'Курс'}
