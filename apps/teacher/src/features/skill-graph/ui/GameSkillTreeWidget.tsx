@@ -300,6 +300,25 @@ export function GameSkillTreeWidget({
                       <div className="absolute -top-2 -left-2 w-5 h-5 rounded-full bg-slate-950 border border-slate-700 text-[9px] font-mono font-bold text-slate-400 flex items-center justify-center">
                         {idx + 1}
                       </div>
+
+                      {/* Anomaly Indicator Badge on Rune (Guessing or Copypaste) */}
+                      {(node.hasGuessAnomaly || node.hasCopyPasteAnomaly) && (
+                        <div 
+                          title={node.hasGuessAnomaly ? 'Аномалія вгадування' : 'Аномалія копіпасту'}
+                          className={`absolute -top-2.5 -right-2.5 px-1 py-0.5 rounded-full border shadow-lg flex items-center gap-0.5 text-[8px] font-bold animate-pulse z-20 ${
+                            node.hasGuessAnomaly 
+                              ? 'bg-amber-500 text-slate-950 border-amber-300 shadow-amber-500/50' 
+                              : 'bg-red-500 text-white border-red-300 shadow-red-500/50'
+                          }`}
+                        >
+                          {node.hasGuessAnomaly ? (
+                            <Zap className="w-2.5 h-2.5 fill-slate-950" />
+                          ) : (
+                            <AlertTriangle className="w-2.5 h-2.5" />
+                          )}
+                          <span>!</span>
+                        </div>
+                      )}
                     </div>
                   </div>
 
@@ -443,10 +462,61 @@ export function GameSkillTreeWidget({
                 </div>
 
                 {/* Anomaly banner if copy-paste ratio >= 60% */}
-                {(selectedNode.telemetry?.copyPasteRatio ?? 0) >= 0.60 && (
-                  <div className="p-2 rounded-lg bg-red-950/40 border border-red-500/40 flex items-center gap-2 text-[10px] text-red-300">
-                    <AlertTriangle className="w-3.5 h-3.5 text-red-400 shrink-0" />
-                    <span>Увага: Зафіксовано високий рівень вставки коду/тексту (&ge; 60%).</span>
+                {(selectedNode.hasCopyPasteAnomaly || (selectedNode.telemetry?.copyPasteRatio ?? 0) >= 0.60) && (
+                  <div className="p-2.5 rounded-lg bg-red-950/40 border border-red-500/40 flex items-start gap-2 text-[11px] text-red-200">
+                    <AlertTriangle className="w-4 h-4 text-red-400 shrink-0 mt-0.5" />
+                    <div>
+                      <strong className="text-red-300 block font-semibold">Аномалія Копіпасту (&ge; 60%):</strong>
+                      Зафіксовано високу частку прямої вставки коду/тексту. Можливе списування або використання зовнішніх генераторів.
+                    </div>
+                  </div>
+                )}
+
+                {/* Anomaly banner if Guessing was detected (P(Guess) > 0.3) */}
+                {selectedNode.hasGuessAnomaly && (
+                  <div className="p-2.5 rounded-lg bg-amber-950/40 border border-amber-500/40 flex items-start gap-2 text-[11px] text-amber-200 animate-pulse">
+                    <Zap className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+                    <div>
+                      <strong className="text-amber-300 block font-semibold">Аномалія Вгадування (P(Guess) &gt; 0.3):</strong>
+                      Телеметрія зафіксувала аномально швидку відповідь на тест. Застосовано коригувальний штраф BKT для запобігання штучному завищенню майстерності.
+                    </div>
+                  </div>
+                )}
+
+                {/* Recent Skill-Specific Behavioral Adjustments Log */}
+                {selectedNode.recentAdjustments && selectedNode.recentAdjustments.length > 0 && (
+                  <div className="flex flex-col gap-1.5 pt-2 border-t border-slate-800/80">
+                    <span className="text-[10px] font-mono uppercase text-slate-400 font-bold flex items-center gap-1">
+                      <Sparkles className="w-3 h-3 text-amber-400" />
+                      <span>Останні телеметричні коригування:</span>
+                    </span>
+                    <div className="flex flex-col gap-1">
+                      {selectedNode.recentAdjustments.map((adj, aIdx) => (
+                        <div
+                          key={aIdx}
+                          className={`p-2 rounded-lg border text-[10px] font-mono flex items-center justify-between gap-2 ${
+                            adj.pGuessUsed && adj.pGuessUsed > 0.3
+                              ? 'bg-amber-950/30 border-amber-500/30 text-amber-200'
+                              : adj.pSlipUsed && adj.pSlipUsed > 0.2
+                              ? 'bg-indigo-950/30 border-indigo-500/30 text-indigo-200'
+                              : 'bg-slate-900 border-slate-800 text-slate-400'
+                          }`}
+                        >
+                          <div className="flex items-center gap-1.5">
+                            <span className={`w-1.5 h-1.5 rounded-full ${adj.isCorrect ? 'bg-emerald-400' : 'bg-rose-400'}`} />
+                            <span>{new Date(adj.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                          </div>
+                          <div className="flex items-center gap-1.5">
+                            {adj.pGuessUsed !== undefined && adj.pGuessUsed !== null && (
+                              <span className="font-bold">G={adj.pGuessUsed}</span>
+                            )}
+                            {adj.pSlipUsed !== undefined && adj.pSlipUsed !== null && (
+                              <span className="font-bold">S={adj.pSlipUsed}</span>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 )}
               </div>

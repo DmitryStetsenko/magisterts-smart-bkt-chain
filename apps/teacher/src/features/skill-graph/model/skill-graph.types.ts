@@ -6,6 +6,14 @@ export interface SkillTelemetryStats {
   fatigueIndex: number;
 }
 
+export interface SkillAdjustmentSummary {
+  pSlipUsed?: number | null;
+  pGuessUsed?: number | null;
+  adjustReasons: string[];
+  isCorrect: boolean;
+  createdAt: string;
+}
+
 export interface SkillGraphNode {
   id: string;
   slug: string;
@@ -16,5 +24,8 @@ export interface SkillGraphNode {
   parentSkillIds: string[];
   tasksCount?: number;
   telemetry?: SkillTelemetryStats;
+  recentAdjustments?: SkillAdjustmentSummary[];
+  hasGuessAnomaly?: boolean;
+  hasCopyPasteAnomaly?: boolean;
 }
 

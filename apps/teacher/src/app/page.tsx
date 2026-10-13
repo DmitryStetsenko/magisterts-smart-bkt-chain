@@ -157,6 +157,16 @@ export default function TeacherDashboardPage() {
       const skillTasks = allTasks.filter((t) => t.skillId === skill.id || t.skill?.id === skill.id);
       const telemetry = telemetryMap[skill.slug] || telemetryMap[skill.id];
 
+      // Skill-specific adjustments from student history
+      const skillAdjustments = selectedStudent?.recentAdjustments?.filter(
+        (a) => a.skillSlug === skill.slug || a.skillTitle === skill.title
+      ) || [];
+
+      const hasGuessAnomaly = skillAdjustments.some(
+        (a) => a.pGuessUsed !== undefined && a.pGuessUsed !== null && a.pGuessUsed > 0.3
+      );
+      const hasCopyPasteAnomaly = (telemetry?.copyPasteRatio ?? 0) >= 0.60;
+
       return {
         id: skill.id,
         slug: skill.slug,
@@ -171,6 +181,9 @@ export default function TeacherDashboardPage() {
           copyPasteRatio: telemetry.copyPasteRatio ?? 0,
           fatigueIndex: telemetry.fatigueIndex ?? 0,
         } : undefined,
+        recentAdjustments: skillAdjustments,
+        hasGuessAnomaly,
+        hasCopyPasteAnomaly,
       };
     });
   }, [courseDetails, selectedStudent, allTasks]);
