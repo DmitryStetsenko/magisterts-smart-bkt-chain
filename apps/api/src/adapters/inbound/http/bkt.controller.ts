@@ -476,7 +476,7 @@ export class BktController {
       const medianCopyPasteRatio = calcMedian(copyPastes);
       const medianFatigueIndex = Math.round(calcMedian(fatigues));
 
-      const recentAdjustments = s.bktHistories.map((h) => ({
+      const recentAdjustments = (s.bktHistories || []).map((h) => ({
         id: h.id,
         skillSlug: h.skill.slug,
         skillTitle: h.skill.title,
@@ -492,7 +492,7 @@ export class BktController {
         createdAt: h.createdAt,
       }));
 
-      const hasGuessAlert = s.bktHistories.some(
+      const hasGuessAlert = (s.bktHistories || []).some(
         (h) => h.pGuessUsed && h.pGuessUsed > 0.3
       );
 

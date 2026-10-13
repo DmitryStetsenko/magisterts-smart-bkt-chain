@@ -726,6 +726,7 @@ export default function TeacherDashboardPage() {
               {selectedStudent.recentAdjustments && selectedStudent.recentAdjustments.length > 0 && (
                 <AnomalyTreeWidget
                   adjustments={selectedStudent.recentAdjustments}
+                  nodes={studentGraphNodes}
                   title="Дерево Аномалій та Когнітивних Відхилень"
                   subtitle="Ієрархічний огляд інцидентів студента за категоріями, навичками та запитаннями"
                   onNavigateToTask={(taskId, skillSlug) => {
