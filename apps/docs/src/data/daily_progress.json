@@ -38,6 +38,36 @@
               "type": "text",
               "raw_text": "Unit-тести `behavioral-adjuster.spec.ts`: 8/8 ✅ (разом з `bkt-engine.spec.ts` — 12/12).",
               "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Phase 2 · Крок 2: Інтеграція `BehavioralAdjuster` у `POST /api/v1/bkt/evaluate`:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "`bkt.controller.ts` делегує корекцію $P(S)/P(G)$ доменному модулю; для `CODE` передається `passedTestsRatio`.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Виправлено баг: скоригований $P(G)=0.85$ більше не зберігається назавжди в `bkt_states` при першій швидкій відповіді.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "`bkt_histories` розширено полями `pSlipUsed`, `pGuessUsed`, `adjustReasons`; ті ж дані повертаються в `bktUpdate`.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "DTO приймає нові необов'язкові сигнали `deletionRatio`, `pauseCount`.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Збірка `build:api` ✅, усі unit-тести API 19/19 ✅.",
+              "subitems": []
             }
           ]
         },
@@ -49,7 +79,7 @@
           "items": [
             {
               "type": "text",
-              "raw_text": "Підключити `BehavioralAdjuster` у `bkt.controller.ts` та прибрати перманентне збереження скоригованого $P(G)$ у `bkt_states`.",
+              "raw_text": "Відобразити пояснення корекцій у кабінетах студента та викладача, надсилати `deletionRatio`/`pauseCount` з Monaco, E2E-тест.",
               "subitems": []
             }
           ]

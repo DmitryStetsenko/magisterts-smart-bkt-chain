@@ -179,6 +179,9 @@ model BktHistory {
   pMasteryBefore Float
   pMasteryAfter  Float
   isCorrect      Boolean
+  pSlipUsed      Float?
+  pGuessUsed     Float?
+  adjustReasons  String[]  @default([])
   createdAt      DateTime  @default(now())
 
   @@map("bkt_histories")

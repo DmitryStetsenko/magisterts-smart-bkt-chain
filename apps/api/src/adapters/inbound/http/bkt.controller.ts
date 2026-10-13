@@ -4,6 +4,7 @@ import * as vm from 'vm';
 import { PrismaService } from '../../outbound/persistence/prisma.service';
 import { TelemetryGateway } from '../websocket/telemetry.gateway';
 import { BktEngine } from '../../../domain/bkt/bkt-engine';
+import { BehavioralAdjuster } from '../../../domain/bkt/behavioral-adjuster';
 import { SubmitTaskDto } from './dto/submit-task.dto';
 import { SubmissionStatus, TaskType } from '@sbc/database';
 
@@ -43,7 +44,7 @@ export class BktController {
     let isPassed = false;
     let feedback = '';
     let testDetails: any[] = [];
-    let customPGuess: number | undefined = undefined;
+    let passedTestsRatio: number | undefined = undefined;
 
     // Polyglot Evaluation Strategies based on TaskType
     switch (task.taskType) {
@@ -57,11 +58,6 @@ export class BktController {
           ? `Правильно! Обрано вірний варіант: "${selectedOption?.text || dto.selectedOptionId}"`
           : `Невірно. Правильна відповідь: "${correctOption?.text || 'Н/А'}"`;
 
-        // Telemetry Reaction Latency: < 2000ms triggers Guessing Warning
-        if (dto.reactionLatencyMs && dto.reactionLatencyMs < 2000) {
-          customPGuess = 0.85;
-          feedback += ' ⚡ (Високий показник латентності: можливе вгадування)';
-        }
         break;
       }
 
@@ -171,6 +167,7 @@ export class BktController {
         }
 
         isPassed = passedCount === totalCount && totalCount > 0;
+        passedTestsRatio = totalCount > 0 ? passedCount / totalCount : undefined;
         feedback = isPassed
           ? `Усі ${passedCount}/${totalCount} тест-кейси пройдено успішно!`
           : `Пройдено ${passedCount}/${totalCount} тест-кейсів.`;
@@ -218,7 +215,7 @@ export class BktController {
           pMastery: 0.5,
           pTransit: 0.2,
           pSlip: 0.1,
-          pGuess: customPGuess || 0.2,
+          pGuess: 0.2,
         },
       });
     }
@@ -229,14 +226,32 @@ export class BktController {
       isMastered: BktEngine.isMastered(bktState.pMastery),
     };
 
-    const effectivePGuess = customPGuess || bktState.pGuess;
+    // Per-answer behavioral adjustment of Slip/Guess (base params in bkt_states stay untouched)
+    const adjusted = BehavioralAdjuster.adjust(
+      { pSlip: bktState.pSlip, pGuess: bktState.pGuess },
+      {
+        taskType: task.taskType,
+        isCorrect: isPassed,
+        currentMastery: bktState.pMastery,
+        reactionLatencyMs: dto.reactionLatencyMs,
+        deletionRatio: dto.deletionRatio,
+        pauseCount: dto.pauseCount,
+        passedTestsRatio,
+      },
+    );
+
+    if (adjusted.pGuess > bktState.pGuess) {
+      feedback += ' ⚡ (Високий показник латентності: можливе вгадування)';
+    } else if (adjusted.pSlip > bktState.pSlip) {
+      feedback += ' 🛡️ (Схоже на випадкову помилку: засвоєння знижено помірно)';
+    }
 
     const calcResult = BktEngine.calculateNextState(
       {
         pMastery: bktState.pMastery,
         pTransit: bktState.pTransit,
-        pSlip: bktState.pSlip,
-        pGuess: effectivePGuess,
+        pSlip: adjusted.pSlip,
+        pGuess: adjusted.pGuess,
       },
       isPassed,
     );
@@ -263,6 +278,9 @@ export class BktController {
         pMasteryBefore: bktState.pMastery,
         pMasteryAfter: calcResult.pMasteryPosterior,
         isCorrect: isPassed,
+        pSlipUsed: adjusted.pSlip,
+        pGuessUsed: adjusted.pGuess,
+        adjustReasons: adjusted.reasons,
       },
     });
 
@@ -280,6 +298,9 @@ export class BktController {
         pMasteryPosterior: updatedState.pMastery,
         pMasteryChange: bktResult.pMasteryPosterior - bktState.pMastery,
         isMastered: updatedState.isMastered,
+        pSlipUsed: adjusted.pSlip,
+        pGuessUsed: adjusted.pGuess,
+        adjustReasons: adjusted.reasons,
       },
     };
   }

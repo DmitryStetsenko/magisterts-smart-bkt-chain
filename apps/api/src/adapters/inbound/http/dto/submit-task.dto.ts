@@ -21,4 +21,10 @@ export class SubmitTaskDto {
 
   @ApiProperty({ description: 'Reaction latency in milliseconds for quiz tasks', required: false })
   reactionLatencyMs?: number;
+
+  @ApiProperty({ description: 'Share of deletion keystrokes among all keystrokes (0..1), from editor telemetry', required: false })
+  deletionRatio?: number;
+
+  @ApiProperty({ description: 'Number of long pauses during solving, from editor telemetry', required: false })
+  pauseCount?: number;
 }
