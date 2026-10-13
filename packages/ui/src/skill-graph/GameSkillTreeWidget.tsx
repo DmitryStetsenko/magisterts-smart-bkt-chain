@@ -291,43 +291,7 @@ export function GameSkillTreeWidget({
               const isMastered = node.pMastery >= 0.95;
               const isLocked = node.status === 'LOCKED';
 
-              // Visual theme depending on state
-              const getRuneVisuals = () => {
-                if (isMastered) {
-                  return {
-                    bg: 'bg-emerald-950/80',
-                    border: 'border-emerald-400',
-                    glow: 'shadow-lg shadow-emerald-500/40 ring-2 ring-emerald-400/50',
-                    icon: <CheckCircle2 className="w-7 h-7 text-emerald-300" />,
-                    runeColor: 'from-emerald-400 to-teal-500',
-                  };
-                }
-                if (isLocked) {
-                  return {
-                    bg: 'bg-slate-900/90',
-                    border: 'border-slate-800',
-                    glow: 'shadow-none',
-                    icon: <Lock className="w-6 h-6 text-slate-600" />,
-                    runeColor: 'from-slate-700 to-slate-800',
-                  };
-                }
-                // IN_PROGRESS / ACTIVE
-                return {
-                  bg: 'bg-indigo-950/90',
-                  border: isCurrentActive ? 'border-amber-400' : 'border-indigo-500',
-                  glow: isCurrentActive
-                    ? 'shadow-xl shadow-amber-500/50 ring-4 ring-amber-400/40 animate-pulse'
-                    : 'shadow-lg shadow-indigo-500/30 ring-2 ring-indigo-400/40',
-                  icon: isCurrentActive ? (
-                    <Swords className="w-7 h-7 text-amber-300" />
-                  ) : (
-                    <Zap className="w-7 h-7 text-indigo-300" />
-                  ),
-                  runeColor: isCurrentActive ? 'from-amber-400 to-orange-500' : 'from-indigo-500 to-purple-600',
-                };
-              };
 
-              const visuals = getRuneVisuals();
 
               return (
                 <div
@@ -350,24 +314,57 @@ export function GameSkillTreeWidget({
                     <div className="absolute -inset-3 rounded-full bg-gradient-to-r from-purple-500 to-indigo-500 opacity-40 blur-md animate-pulse pointer-events-none" />
                   )}
 
-                  {/* Hexagonal / Circular Rune Orb */}
+                  {/* Hexagon / Circular Crystal Node */}
                   <div className="relative">
+                    {/* Outer Glowing Energy Halo for Mastered / Active */}
+                    {isMastered && (
+                      <div className="absolute -inset-2 bg-emerald-500/20 rounded-full blur-md animate-pulse pointer-events-none" />
+                    )}
+                    {isCurrentActive && !isMastered && (
+                      <div className="absolute -inset-2.5 bg-indigo-500/30 rounded-full blur-lg animate-pulse pointer-events-none" />
+                    )}
+
+                    {/* Circular Rune Body */}
                     <div
-                      className={`w-18 h-18 rounded-2xl flex items-center justify-center border-2 transition-all duration-300 transform group-hover:scale-110 ${visuals.bg} ${visuals.border} ${visuals.glow} ${
-                        (isSelected || isCurrentActive) ? 'animate-bounce' : ''
+                      className={`w-16 h-16 rounded-2xl flex items-center justify-center transition-all duration-300 relative border-2 ${
+                        isSelected
+                          ? 'ring-4 ring-purple-500/60 scale-105'
+                          : ''
+                      } ${
+                        isMastered
+                          ? 'bg-gradient-to-br from-emerald-950 via-slate-900 to-emerald-900 border-emerald-400 shadow-lg shadow-emerald-500/30 text-emerald-300'
+                          : isLocked
+                          ? 'bg-slate-950 border-slate-800 text-slate-600 shadow-inner'
+                          : isCurrentActive
+                          ? 'bg-gradient-to-br from-indigo-950 via-slate-900 to-purple-950 border-indigo-500 shadow-xl shadow-indigo-500/40 text-indigo-300'
+                          : 'bg-slate-900 border-slate-700 text-slate-300 hover:border-slate-500'
                       }`}
                     >
-                      {/* Rune Center Icon */}
-                      <div className="relative z-10 flex items-center justify-center">
-                        {visuals.icon}
+                      {/* Inner Node Icon */}
+                      {isMastered ? (
+                        <CheckCircle2 className={`w-7 h-7 text-emerald-400 ${(isSelected || isCurrentActive) ? 'animate-bounce' : ''}`} />
+                      ) : isLocked ? (
+                        <Lock className="w-6 h-6 text-slate-500" />
+                      ) : isCurrentActive ? (
+                        <Swords className={`w-7 h-7 text-indigo-400 ${isSelected ? 'animate-bounce' : ''}`} />
+                      ) : (
+                        <Zap className={`w-6 h-6 text-amber-400 ${isSelected ? 'animate-bounce' : ''}`} />
+                      )}
+
+                      {/* Mastery percentage mini badge in corner */}
+                      <div 
+                        className={`absolute -bottom-2 -right-2 px-1.5 py-0.5 rounded-full text-[9px] font-mono font-bold border shadow-md ${
+                          isMastered
+                            ? 'bg-emerald-500 text-slate-950 border-emerald-300'
+                            : isLocked
+                            ? 'bg-slate-800 text-slate-400 border-slate-700'
+                            : 'bg-indigo-600 text-white border-indigo-400'
+                        }`}
+                      >
+                        {(node.pMastery * 100).toFixed(0)}%
                       </div>
 
-                      {/* Power Progress Ring / Fill Arc */}
-                      <div 
-                        className={`absolute inset-0 rounded-2xl bg-gradient-to-tr ${visuals.runeColor} opacity-15`}
-                      />
-
-                      {/* Small Order Badge */}
+                      {/* Tier / Order number badge in top-left */}
                       <div className="absolute -top-2 -left-2 w-5 h-5 rounded-full bg-slate-950 border border-slate-700 text-[9px] font-mono font-bold text-slate-400 flex items-center justify-center">
                         {idx + 1}
                       </div>
@@ -402,7 +399,7 @@ export function GameSkillTreeWidget({
                           : isLocked
                           ? 'text-slate-500'
                           : isCurrentActive
-                          ? 'text-amber-300 font-extrabold'
+                          ? 'text-indigo-300 font-extrabold'
                           : 'text-slate-300'
                       }`}
                     >
