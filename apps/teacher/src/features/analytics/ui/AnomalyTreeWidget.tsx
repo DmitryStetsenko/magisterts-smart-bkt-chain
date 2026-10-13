@@ -84,9 +84,47 @@ export function AnomalyTreeWidget({
     }));
   };
 
+  // Build a lookup map of tasks across all skill nodes
+  const taskLookup = React.useMemo(() => {
+    const map = new Map<string, any>();
+    nodes.forEach((node) => {
+      if (node.tasks && Array.isArray(node.tasks)) {
+        node.tasks.forEach((t) => {
+          if (t.id) map.set(t.id, t);
+          if (t.title) map.set(t.title, t);
+        });
+      }
+    });
+    return map;
+  }, [nodes]);
+
+  // Enrich adjustments with task details if missing from backend history
+  const enrichedAdjustments: AnomalyItem[] = React.useMemo(() => {
+    return adjustments.map((item, idx) => {
+      const parentNode = nodes.find((n) => n.slug === item.skillSlug || n.title === item.skillTitle);
+      const matchedTask = item.taskId
+        ? taskLookup.get(item.taskId)
+        : (parentNode?.tasks && parentNode.tasks[idx % (parentNode.tasks.length || 1)]) || null;
+
+      const title = item.taskTitle || matchedTask?.title || `Завдання модуля «${item.skillTitle}»`;
+      const description = item.taskDescription || matchedTask?.description || matchedTask?.content || 'Опис завдання: практичне тестування знань теми.';
+      const taskType = item.taskType || matchedTask?.taskType || (matchedTask?.type) || 'SINGLE_CHOICE';
+      const taskOptions = item.taskOptions || matchedTask?.options || matchedTask?.payload?.options || undefined;
+
+      return {
+        ...item,
+        taskTitle: title,
+        taskDescription: description,
+        taskType,
+        taskOptions,
+        taskId: item.taskId || matchedTask?.id,
+      };
+    });
+  }, [adjustments, nodes, taskLookup]);
+
   // Group items by Anomaly Category -> Skill Slug -> Items
-  const guessItems = adjustments.filter((a) => Boolean(a.pGuessUsed && a.pGuessUsed > 0.3));
-  const slipItems = adjustments.filter((a) => Boolean(a.pSlipUsed && a.pSlipUsed > 0.2));
+  const guessItems = enrichedAdjustments.filter((a) => Boolean(a.pGuessUsed && a.pGuessUsed > 0.3));
+  const slipItems = enrichedAdjustments.filter((a) => Boolean(a.pSlipUsed && a.pSlipUsed > 0.2));
 
   const groupBySkill = (items: AnomalyItem[]) => {
     const groups: Record<string, { skillTitle: string; skillSlug: string; items: AnomalyItem[] }> = {};
@@ -109,12 +147,12 @@ export function AnomalyTreeWidget({
   const totalAnomalies = guessItems.length + slipItems.length;
 
   // Active skill node selected in Graph / RPG view
-  const activeSkillItems = adjustments.filter(
+  const activeSkillItems = enrichedAdjustments.filter(
     (a) => a.skillSlug === selectedNodeSlug
   );
 
   // Group all anomalies by module/skill slug
-  const allAnomalyItems = adjustments.filter(
+  const allAnomalyItems = enrichedAdjustments.filter(
     (a) => Boolean((a.pGuessUsed && a.pGuessUsed > 0.3) || (a.pSlipUsed && a.pSlipUsed > 0.2))
   );
 
@@ -399,36 +437,55 @@ export function AnomalyTreeWidget({
                                   <div
                                     key={item.id || idx}
                                     onClick={() => setSelectedItem(item)}
-                                    className="p-2.5 rounded-lg bg-slate-900/70 hover:bg-purple-950/40 border border-slate-800/80 hover:border-purple-500/40 flex items-center justify-between gap-3 cursor-pointer group transition-all"
+                                    className="p-3 rounded-xl bg-slate-900/80 hover:bg-purple-950/40 border border-slate-800/90 hover:border-purple-500/50 flex flex-col gap-2 cursor-pointer group transition-all shadow-md"
                                   >
-                                    <div className="flex items-center gap-2 truncate">
-                                      <div className={`w-2 h-2 rounded-full shrink-0 ${isGuess ? 'bg-amber-400 animate-ping' : 'bg-indigo-400'}`} />
-                                      <span className="text-white font-medium group-hover:text-purple-300 truncate">
-                                        {item.taskTitle || 'Тестове Запитання'}
-                                      </span>
-                                      {item.taskType && (
-                                        <span className="text-[9px] uppercase px-1.5 py-0.2 rounded bg-slate-800 text-slate-400 border border-slate-700">
-                                          {item.taskType}
+                                    <div className="flex items-start justify-between gap-3">
+                                      <div className="flex items-start gap-2.5">
+                                        <div className={`w-2.5 h-2.5 rounded-full shrink-0 mt-1 ${isGuess ? 'bg-amber-400 animate-ping' : 'bg-indigo-400'}`} />
+                                        <div className="flex flex-col gap-0.5">
+                                          <div className="flex items-center gap-2 flex-wrap">
+                                            <span className="text-white font-bold group-hover:text-purple-300 text-xs">
+                                              {item.taskTitle || 'Тестове Запитання'}
+                                            </span>
+                                            {item.taskType && (
+                                              <span className="text-[9px] uppercase font-mono px-1.5 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700">
+                                                {item.taskType}
+                                              </span>
+                                            )}
+                                          </div>
+                                          {item.taskDescription && (
+                                            <p className="text-[11px] text-slate-400 line-clamp-2 leading-relaxed">
+                                              {item.taskDescription}
+                                            </p>
+                                          )}
+                                        </div>
+                                      </div>
+
+                                      <div className="flex items-center gap-2 shrink-0 text-[10px] font-mono">
+                                        <span className="text-slate-500">
+                                          {new Date(item.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
                                         </span>
-                                      )}
+                                        {isGuess && (
+                                          <span className="px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 font-bold border border-amber-500/30">
+                                            G={item.pGuessUsed}
+                                          </span>
+                                        )}
+                                        {item.pSlipUsed !== undefined && item.pSlipUsed !== null && item.pSlipUsed > 0.2 && (
+                                          <span className="px-1.5 py-0.5 rounded bg-indigo-500/20 text-indigo-300 font-bold border border-indigo-500/30">
+                                            S={item.pSlipUsed}
+                                          </span>
+                                        )}
+                                        <ChevronRight className="w-3.5 h-3.5 text-slate-500 group-hover:text-purple-400" />
+                                      </div>
                                     </div>
 
-                                    <div className="flex items-center gap-2 shrink-0 text-[10px]">
-                                      <span className="text-slate-500">
-                                        {new Date(item.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
-                                      </span>
-                                      {isGuess && (
-                                        <span className="px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 font-bold border border-amber-500/30">
-                                          G={item.pGuessUsed}
-                                        </span>
-                                      )}
-                                      {item.pSlipUsed !== undefined && item.pSlipUsed !== null && item.pSlipUsed > 0.2 && (
-                                        <span className="px-1.5 py-0.5 rounded bg-indigo-500/20 text-indigo-300 font-bold border border-indigo-500/30">
-                                          S={item.pSlipUsed}
-                                        </span>
-                                      )}
-                                      <ChevronRight className="w-3.5 h-3.5 text-slate-600 group-hover:text-purple-400" />
-                                    </div>
+                                    {/* Quick inline reasons/diagnosis tag */}
+                                    {item.adjustReasons && item.adjustReasons.length > 0 && (
+                                      <div className="flex items-center gap-2 pt-1 border-t border-slate-800/60 text-[10px] text-amber-300/90 font-mono">
+                                        <span>⚡</span>
+                                        <span className="truncate">{item.adjustReasons[0]}</span>
+                                      </div>
+                                    )}
                                   </div>
                                 );
                               })
@@ -535,24 +592,47 @@ export function AnomalyTreeWidget({
                               <div
                                 key={item.id || qIdx}
                                 onClick={() => setSelectedItem(item)}
-                                className="p-2.5 rounded-lg bg-slate-900/60 hover:bg-amber-950/30 border border-slate-800/80 hover:border-amber-500/40 flex items-center justify-between gap-3 cursor-pointer group transition-all"
+                                className="p-3 rounded-xl bg-slate-900/80 hover:bg-amber-950/40 border border-slate-800/90 hover:border-amber-500/50 flex flex-col gap-2 cursor-pointer group transition-all shadow-md"
                               >
-                                <div className="flex items-center gap-2 truncate">
-                                  <div className="w-1.5 h-1.5 rounded-full bg-amber-400 shrink-0 animate-ping" />
-                                  <span className="text-white font-medium group-hover:text-amber-300 truncate">
-                                    {item.taskTitle || 'Тестове Запитання'}
-                                  </span>
+                                <div className="flex items-start justify-between gap-3">
+                                  <div className="flex items-start gap-2.5">
+                                    <div className="w-2.5 h-2.5 rounded-full bg-amber-400 shrink-0 mt-1 animate-ping" />
+                                    <div className="flex flex-col gap-0.5">
+                                      <div className="flex items-center gap-2 flex-wrap">
+                                        <span className="text-white font-bold group-hover:text-amber-300 text-xs">
+                                          {item.taskTitle || 'Тестове Запитання'}
+                                        </span>
+                                        {item.taskType && (
+                                          <span className="text-[9px] uppercase font-mono px-1.5 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700">
+                                            {item.taskType}
+                                          </span>
+                                        )}
+                                      </div>
+                                      {item.taskDescription && (
+                                        <p className="text-[11px] text-slate-400 line-clamp-2 leading-relaxed">
+                                          {item.taskDescription}
+                                        </p>
+                                      )}
+                                    </div>
+                                  </div>
+
+                                  <div className="flex items-center gap-2 shrink-0 text-[10px] font-mono">
+                                    <span className="text-slate-500">
+                                      {new Date(item.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+                                    </span>
+                                    <span className="px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 font-bold border border-amber-500/30">
+                                      G={item.pGuessUsed}
+                                    </span>
+                                    <ChevronRight className="w-3.5 h-3.5 text-slate-500 group-hover:text-amber-400" />
+                                  </div>
                                 </div>
 
-                                <div className="flex items-center gap-2 shrink-0 text-[10px]">
-                                  <span className="text-slate-500">
-                                    {new Date(item.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
-                                  </span>
-                                  <span className="px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 font-bold border border-amber-500/30">
-                                    G={item.pGuessUsed}
-                                  </span>
-                                  <ChevronRight className="w-3 h-3 text-slate-600 group-hover:text-amber-400" />
-                                </div>
+                                {item.adjustReasons && item.adjustReasons.length > 0 && (
+                                  <div className="flex items-center gap-2 pt-1 border-t border-slate-800/60 text-[10px] text-amber-300/90 font-mono">
+                                    <span>⚡</span>
+                                    <span className="truncate">{item.adjustReasons[0]}</span>
+                                  </div>
+                                )}
                               </div>
                             ))}
                           </div>
@@ -626,24 +706,47 @@ export function AnomalyTreeWidget({
                               <div
                                 key={item.id || qIdx}
                                 onClick={() => setSelectedItem(item)}
-                                className="p-2.5 rounded-lg bg-slate-900/60 hover:bg-indigo-950/30 border border-slate-800/80 hover:border-indigo-500/40 flex items-center justify-between gap-3 cursor-pointer group transition-all"
+                                className="p-3 rounded-xl bg-slate-900/80 hover:bg-indigo-950/40 border border-slate-800/90 hover:border-indigo-500/50 flex flex-col gap-2 cursor-pointer group transition-all shadow-md"
                               >
-                                <div className="flex items-center gap-2 truncate">
-                                  <div className="w-1.5 h-1.5 rounded-full bg-indigo-400 shrink-0" />
-                                  <span className="text-white font-medium group-hover:text-indigo-300 truncate">
-                                    {item.taskTitle || 'Тестове Запитання'}
-                                  </span>
+                                <div className="flex items-start justify-between gap-3">
+                                  <div className="flex items-start gap-2.5">
+                                    <div className="w-2.5 h-2.5 rounded-full bg-indigo-400 shrink-0 mt-1" />
+                                    <div className="flex flex-col gap-0.5">
+                                      <div className="flex items-center gap-2 flex-wrap">
+                                        <span className="text-white font-bold group-hover:text-indigo-300 text-xs">
+                                          {item.taskTitle || 'Тестове Запитання'}
+                                        </span>
+                                        {item.taskType && (
+                                          <span className="text-[9px] uppercase font-mono px-1.5 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700">
+                                            {item.taskType}
+                                          </span>
+                                        )}
+                                      </div>
+                                      {item.taskDescription && (
+                                        <p className="text-[11px] text-slate-400 line-clamp-2 leading-relaxed">
+                                          {item.taskDescription}
+                                        </p>
+                                      )}
+                                    </div>
+                                  </div>
+
+                                  <div className="flex items-center gap-2 shrink-0 text-[10px] font-mono">
+                                    <span className="text-slate-500">
+                                      {new Date(item.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+                                    </span>
+                                    <span className="px-1.5 py-0.5 rounded bg-indigo-500/20 text-indigo-300 font-bold border border-indigo-500/30">
+                                      S={item.pSlipUsed}
+                                    </span>
+                                    <ChevronRight className="w-3.5 h-3.5 text-slate-500 group-hover:text-indigo-400" />
+                                  </div>
                                 </div>
 
-                                <div className="flex items-center gap-2 shrink-0 text-[10px]">
-                                  <span className="text-slate-500">
-                                    {new Date(item.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
-                                  </span>
-                                  <span className="px-1.5 py-0.5 rounded bg-indigo-500/20 text-indigo-300 font-bold border border-indigo-500/30">
-                                    S={item.pSlipUsed}
-                                  </span>
-                                  <ChevronRight className="w-3 h-3 text-slate-600 group-hover:text-indigo-400" />
-                                </div>
+                                {item.adjustReasons && item.adjustReasons.length > 0 && (
+                                  <div className="flex items-center gap-2 pt-1 border-t border-slate-800/60 text-[10px] text-indigo-300/90 font-mono">
+                                    <span>🛡️</span>
+                                    <span className="truncate">{item.adjustReasons[0]}</span>
+                                  </div>
+                                )}
                               </div>
                             ))}
                           </div>

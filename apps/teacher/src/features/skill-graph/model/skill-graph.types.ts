@@ -33,5 +33,6 @@ export interface SkillGraphNode {
   recentAdjustments?: SkillAdjustmentSummary[];
   hasGuessAnomaly?: boolean;
   hasCopyPasteAnomaly?: boolean;
+  tasks?: any[];
 }
 

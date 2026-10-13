@@ -185,6 +185,7 @@ export default function TeacherDashboardPage() {
         recentAdjustments: skillAdjustments,
         hasGuessAnomaly,
         hasCopyPasteAnomaly,
+        tasks: skillTasks,
       };
     });
   }, [courseDetails, selectedStudent, allTasks]);
