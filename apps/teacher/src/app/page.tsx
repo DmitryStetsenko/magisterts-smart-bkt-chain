@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { ShieldCheck, Network, Users, BarChart3, Code2, BookOpen, Scale, ChevronDown, X, Search, RotateCcw, AlertTriangle, CheckCircle2, Lock, HelpCircle, Code, FileText, CheckSquare, Sparkles, Keyboard, Copy, Activity, Info, GitBranch, Layers } from 'lucide-react';
 import { StudentAnalyticsItem } from '../features/analytics/model/analytics.types';
-import { AnomalyRadarWidget } from '../features/analytics/ui/AnomalyRadarWidget';
+import { AnomalyTreeWidget } from '../features/analytics/ui/AnomalyTreeWidget';
 import { GameSkillTreeWidget } from '../features/skill-graph/ui/GameSkillTreeWidget';
 import { SkillGraphNode } from '../features/skill-graph/model/skill-graph.types';
 
@@ -722,12 +722,12 @@ export default function TeacherDashboardPage() {
                 </div>
               </div>
 
-              {/* Dynamic Behavioral Telemetry & Adjustments Panel (Teacher Only) */}
+              {/* Dynamic Behavioral Telemetry & Anomaly Tree (Teacher Only) */}
               {selectedStudent.recentAdjustments && selectedStudent.recentAdjustments.length > 0 && (
-                <AnomalyRadarWidget
+                <AnomalyTreeWidget
                   adjustments={selectedStudent.recentAdjustments}
-                  title="Радар Аномалій та Поведінкової Телеметрії"
-                  subtitle="Хронологічне дерево підозрілих дій, вгадувань та коригувань BKT для студента"
+                  title="Дерево Аномалій та Когнітивних Відхилень"
+                  subtitle="Ієрархічний огляд інцидентів студента за категоріями, навичками та запитаннями"
                   onNavigateToTask={(taskId, skillSlug) => {
                     setActiveTab('coursemap');
                     setIsDrawerOpen(true);
