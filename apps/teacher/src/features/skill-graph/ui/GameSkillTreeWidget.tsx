@@ -274,13 +274,13 @@ export function GameSkillTreeWidget({
                     >
                       {/* Inner Node Icon */}
                       {isMastered ? (
-                        <CheckCircle2 className="w-7 h-7 text-emerald-400 animate-bounce" />
+                        <CheckCircle2 className={`w-7 h-7 text-emerald-400 ${(isSelected || isCurrentActive) ? 'animate-bounce' : ''}`} />
                       ) : isLocked ? (
                         <Lock className="w-6 h-6 text-slate-500" />
                       ) : isCurrentActive ? (
-                        <Swords className="w-7 h-7 text-purple-400" />
+                        <Swords className={`w-7 h-7 text-purple-400 ${isSelected ? 'animate-bounce' : ''}`} />
                       ) : (
-                        <Zap className="w-6 h-6 text-amber-400" />
+                        <Zap className={`w-6 h-6 text-amber-400 ${isSelected ? 'animate-bounce' : ''}`} />
                       )}
 
                       {/* Mastery percentage mini badge in corner */}

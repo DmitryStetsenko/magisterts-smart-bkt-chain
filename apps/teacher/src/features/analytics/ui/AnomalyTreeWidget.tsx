@@ -904,7 +904,9 @@ export function AnomalyTreeWidget({
                 >
                   {/* Floating Anomaly Icon */}
                   {hasGuess && (
-                    <div className="absolute -top-2 -right-2 px-1.5 py-0.5 rounded-full bg-amber-500 text-slate-950 font-bold text-[9px] flex items-center gap-0.5 shadow-md animate-bounce">
+                    <div className={`absolute -top-2 -right-2 px-1.5 py-0.5 rounded-full bg-amber-500 text-slate-950 font-bold text-[9px] flex items-center gap-0.5 shadow-md ${
+                      selectedNodeSlug === node.slug ? 'animate-bounce' : ''
+                    }`}>
                       <Zap className="w-2.5 h-2.5 fill-slate-950" />
                       <span>{nodeAnomalies.length}</span>
                     </div>
