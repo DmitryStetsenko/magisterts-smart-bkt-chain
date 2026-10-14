@@ -719,3 +719,29 @@ eferenceAnswer, критерії options.keywords (microtask|мікротаск|
 - **Тестування та Верифікація:**
   - 33/33 unit-тестів API пройдено (7 тест-сьютів, включно з верифікацією та BKT перерахунком).
   - Повна компіляція `npm run build:teacher` та `npm run build:api` завершується без помилок.
+
+### 11.8 Захист від Keyword Stuffing («Мішка слів») та Передача Телеметрії Відкритої Відповіді
+- **Файли реалізації:**
+  - [`apps/api/src/domain/evaluation/open-text-heuristic-evaluator.ts`](file:///apps/api/src/domain/evaluation/open-text-heuristic-evaluator.ts)
+  - [`apps/api/src/domain/evaluation/open-text-heuristic-evaluator.spec.ts`](file:///apps/api/src/domain/evaluation/open-text-heuristic-evaluator.spec.ts)
+  - [`apps/api/src/domain/evaluation/open-answer-evaluator.service.ts`](file:///apps/api/src/domain/evaluation/open-answer-evaluator.service.ts)
+  - [`apps/student/src/features/essay-editor/ui/EssayTaskEditor.tsx`](file:///apps/student/src/features/essay-editor/ui/EssayTaskEditor.tsx)
+  - [`apps/student/src/app/page.tsx`](file:///apps/student/src/app/page.tsx)
+- **Проблематика та Сценарій Атаки:**
+  - Студент може штучно отримати високий бал ($71\%$), надіславши точні ключові слова з рубрики у стовпчик (`microtask`, `macrotask`, `call stack`), розбавивши їх випадковими короткими словами (`це`, `щось`, `про`, `др`, `дддю`) для подолання порогу слів.
+  - Оскільки слова з рубрики були присутні, а абракадабри було менше порогу, BKT необґрунтовано збільшував рівень знань ($23.5\% \to 66.4\%$).
+- **Алгоритмічний Захист:**
+  1. **Детектор Вертикального Списку (Vertical Word Dump):**
+     - Розраховується середня кількість слів на рядок: $\text{avgWordsPerLine} = \frac{\text{wordCount}}{\text{rawLines.length}}$.
+     - Якщо $\text{rawLines.length} \ge 3$, $\text{avgWordsPerLine} \le 2.2$ та в тексті відсутня синтаксична пунктуація речень (`.`, `!`, `?`) $\implies$ фіксується `isKeywordStuffing = true`.
+  2. **Детектор Сміттєвих Слів-Паразитів:**
+     - Розраховується частка токенів довжиною $\le 2$ літер: якщо вона перевищує $35\%$ при $\ge 6$ токенах $\implies$ ознака заповнення обсягу сміттєвими словами.
+  3. **Штраф та Блокування Зарахування:**
+     - При `isKeywordStuffing = true`: $\text{Score} \le 0.35$, $\text{isPassed} = \text{false}$, $\text{needsTeacherReview} = \text{true}$.
+     - Студент отримує розгорнуту підказку: *«Відповідь виглядає як ізольований перелік слів або тегів без зв’язного пояснення. Будь ласка, викладіть думку повними реченнями та поясніть взаємозв’язок понять»*.
+- **Передача Повної Телеметрії Друку/Вставки:**
+  - `EssayTaskEditor` формує об'єкт телеметрії (`reactionLatencyMs`, `deletionRatio`, `pauseCount`, `pasteEvents`, `typingWpm`) та передає його у `handleEvaluate`.
+  - За наявності $\ge 1$ події копіпасту `BehavioralAdjuster` встановлює $P(G) \to 0.90$, запобігаючи неавтентичному зростанню знань у BKT.
+- **Верифікація:**
+  - 34/34 unit-тестів API пройдено (7 тест-сьютів) ✅.
+  - `npm run build:student` та `npm run build:api` збираються успішно ✅.

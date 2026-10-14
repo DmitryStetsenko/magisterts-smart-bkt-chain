@@ -2850,6 +2850,117 @@
               "subitems": []
             }
           ]
+        },
+        {
+          "title": "11.8 Захист від Keyword Stuffing («Мішка слів») та Передача Телеметрії Відкритої Відповіді",
+          "level": 3,
+          "paragraphs": [],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "**Файли реалізації:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "[`apps/api/src/domain/evaluation/open-text-heuristic-evaluator.ts`](file:///apps/api/src/domain/evaluation/open-text-heuristic-evaluator.ts)",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "[`apps/api/src/domain/evaluation/open-text-heuristic-evaluator.spec.ts`](file:///apps/api/src/domain/evaluation/open-text-heuristic-evaluator.spec.ts)",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "[`apps/api/src/domain/evaluation/open-answer-evaluator.service.ts`](file:///apps/api/src/domain/evaluation/open-answer-evaluator.service.ts)",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "[`apps/student/src/features/essay-editor/ui/EssayTaskEditor.tsx`](file:///apps/student/src/features/essay-editor/ui/EssayTaskEditor.tsx)",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "[`apps/student/src/app/page.tsx`](file:///apps/student/src/app/page.tsx)",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Проблематика та Сценарій Атаки:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Студент може штучно отримати високий бал ($71\\%$), надіславши точні ключові слова з рубрики у стовпчик (`microtask`, `macrotask`, `call stack`), розбавивши їх випадковими короткими словами (`це`, `щось`, `про`, `др`, `дддю`) для подолання порогу слів.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Оскільки слова з рубрики були присутні, а абракадабри було менше порогу, BKT необґрунтовано збільшував рівень знань ($23.5\\% \\to 66.4\\%$).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Алгоритмічний Захист:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Детектор Вертикального Списку (Vertical Word Dump):**",
+              "subitems": [
+                "Розраховується середня кількість слів на рядок: $\\text{avgWordsPerLine} = \\frac{\\text{wordCount}}{\\text{rawLines.length}}$.",
+                "Якщо $\\text{rawLines.length} \\ge 3$, $\\text{avgWordsPerLine} \\le 2.2$ та в тексті відсутня синтаксична пунктуація речень (`.`, `!`, `?`) $\\implies$ фіксується `isKeywordStuffing = true`."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Детектор Сміттєвих Слів-Паразитів:**",
+              "subitems": [
+                "Розраховується частка токенів довжиною $\\le 2$ літер: якщо вона перевищує $35\\%$ при $\\ge 6$ токенах $\\implies$ ознака заповнення обсягу сміттєвими словами."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Штраф та Блокування Зарахування:**",
+              "subitems": [
+                "При `isKeywordStuffing = true`: $\\text{Score} \\le 0.35$, $\\text{isPassed} = \\text{false}$, $\\text{needsTeacherReview} = \\text{true}$.",
+                "Студент отримує розгорнуту підказку: *«Відповідь виглядає як ізольований перелік слів або тегів без зв’язного пояснення. Будь ласка, викладіть думку повними реченнями та поясніть взаємозв’язок понять»*."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Передача Повної Телеметрії Друку/Вставки:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "`EssayTaskEditor` формує об'єкт телеметрії (`reactionLatencyMs`, `deletionRatio`, `pauseCount`, `pasteEvents`, `typingWpm`) та передає його у `handleEvaluate`.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "За наявності $\\ge 1$ події копіпасту `BehavioralAdjuster` встановлює $P(G) \\to 0.90$, запобігаючи неавтентичному зростанню знань у BKT.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Верифікація:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "34/34 unit-тестів API пройдено (7 тест-сьютів) ✅.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "`npm run build:student` та `npm run build:api` збираються успішно ✅.",
+              "subitems": []
+            }
+          ]
         }
       ]
     }
