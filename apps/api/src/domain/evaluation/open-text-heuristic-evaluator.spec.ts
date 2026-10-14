@@ -106,4 +106,24 @@ call stack
     expect(res.needsTeacherReview).toBe(true);
     expect(res.feedback).toContain('ізольований перелік слів');
   });
+
+  it('повинен виявляти циклічний лупінг фраз із злиплими словами (Looping Phrase Spam)', () => {
+    const loopingSpam = `microtask macrotask call stack черга
+microtask macrotask call stack черга
+microtask macrotask call stack чергаmicrotask macrotask call stack черга
+microtask macrotask call stack черга`;
+    const eventLoopConfig: OpenTextRubricConfig = {
+      minWords: 5,
+      keywords: ['microtask', 'macrotask', 'call stack', 'черга'],
+      minCoverageThreshold: 0.5,
+    };
+
+    const res = OpenTextHeuristicEvaluator.evaluate(loopingSpam, eventLoopConfig);
+
+    expect(res.isPassed).toBe(false);
+    expect(res.isKeywordStuffing).toBe(true);
+    expect(res.score).toBeLessThanOrEqual(0.35);
+    expect(res.needsTeacherReview).toBe(true);
+    expect(res.reasons.some((r) => r.includes('циклічне повторення'))).toBe(true);
+  });
 });

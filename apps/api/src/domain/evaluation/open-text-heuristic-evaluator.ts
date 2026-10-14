@@ -51,15 +51,20 @@ export class OpenTextHeuristicEvaluator {
     const minCoverage = config.minCoverageThreshold ?? (keywords.length > 0 ? 0.5 : 1.0);
     const reasons: string[] = [];
 
-    // 1. Токенізація слів (підтримка укр/англ та дефісів)
-    const words = text
+    // 1. Токенізація слів (підтримка укр/англ та розділення склеєних слів)
+    // Якщо студент склеїв слова типу "чергаmicrotask" або "microtaskчерга", розділяємо їх за межею кирилиця/латиниця
+    const normalizedText = text
+      .replace(/([\p{Script=Cyrillic}]+)([\p{Script=Latin}]+)/gu, '$1 $2')
+      .replace(/([\p{Script=Latin}]+)([\p{Script=Cyrillic}]+)/gu, '$1 $2');
+
+    const words = normalizedText
       .toLowerCase()
       .split(/[\s,.;:!?()\[\]"'/\\«»]+/)
       .filter((w) => w.length > 1);
 
     const wordCount = words.length;
 
-    // 2. Аналіз Type-Token Ratio (унікальність слів для відсікання "бла бла бла")
+    // 2. Аналіз Type-Token Ratio (унікальність слів для відсікання повторів)
     const uniqueWords = new Set(words);
     const uniqueWordRatio = wordCount > 0 ? uniqueWords.size / wordCount : 0;
 
@@ -112,10 +117,30 @@ export class OpenTextHeuristicEvaluator {
       const shortWordRatio = allTokens.length > 0 ? shortTokens.length / allTokens.length : 0;
       const isOverwhelmingShortWords = shortWordRatio >= 0.35 && allTokens.length >= 6;
 
-      if (isVerticalWordList || isOverwhelmingShortWords) {
+      // Перевірка на циклічний луп (багаторазовий повтор однієї й тієї самої фрази / термінів)
+      // Рахуємо повтори 3-грам слів: якщо одна 3-грама повторюється 3+ разів
+      let maxNgramRepeats = 0;
+      if (words.length >= 6) {
+        const trigramCounts = new Map<string, number>();
+        for (let i = 0; i <= words.length - 3; i++) {
+          const trigram = `${words[i]} ${words[i + 1]} ${words[i + 2]}`;
+          const cnt = (trigramCounts.get(trigram) || 0) + 1;
+          trigramCounts.set(trigram, cnt);
+          if (cnt > maxNgramRepeats) maxNgramRepeats = cnt;
+        }
+      }
+      const isLoopingSpam = maxNgramRepeats >= 3;
+
+      // Перевірка відсутності предикатів/дієслів та вкрай низької унікальності при великому обсязі
+      // Якщо в тексті понад 15 слів, але унікальних слів менше 6 (зациклений набір 4-5 термінів)
+      const isRepetitiveKeywordLoop = wordCount >= 12 && uniqueWords.size <= 5;
+
+      if (isVerticalWordList || isOverwhelmingShortWords || isLoopingSpam || isRepetitiveKeywordLoop) {
         isKeywordStuffing = true;
         reasons.push(
-          `Виявлено ознаки штучного переліку слів (Keyword Stuffing) без зв'язної граматичної структури речень`,
+          isLoopingSpam || isRepetitiveKeywordLoop
+            ? `Виявлено циклічне повторення одних і тих самих термінів (фразовий спам/looping)`
+            : `Виявлено ознаки штучного переліку слів (Keyword Stuffing) без зв'язної граматичної структури речень`,
         );
       }
     }

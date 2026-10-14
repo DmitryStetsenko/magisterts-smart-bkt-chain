@@ -261,6 +261,28 @@ export class BktController {
       },
     );
 
+    // Безкомпромісна перевірка на аномалії поведінки для есе / відкритого тексту:
+    // Якщо зафіксовано 3+ операцій вставки (paste) або висока ймовірність вгадування/спаму (pGuess >= 0.85),
+    // робота БЕЗУМОВНО відправляється на чергу перевірки викладача (Teacher Review Queue)
+    const isOpenTextTask = task.taskType === TaskType.TEXT_ESSAY || task.taskType === TaskType.OPEN_TEXT;
+    const hasHighPasteAnomaly = (dto.pasteEvents ?? 0) >= 3;
+    const hasHighGuessAnomaly = adjusted.pGuess >= 0.85;
+
+    if (isOpenTextTask && (hasHighPasteAnomaly || hasHighGuessAnomaly)) {
+      teacherReviewStatus = TeacherReviewStatus.PENDING_REVIEW;
+      // Sync submission table status so teacher review queue query finds it immediately
+      await this.prisma.submission.update({
+        where: { id: submission.id },
+        data: { teacherReviewStatus: TeacherReviewStatus.PENDING_REVIEW },
+      });
+
+      if (hasHighPasteAnomaly) {
+        feedback += ` 📋 [Черга викладача: зафіксовано ${dto.pasteEvents} подій вставки з буфера обміну]`;
+      } else {
+        feedback += ` 🕵️ [Черга викладача: виявлено аномалію введення тексту (P(G)=${adjusted.pGuess.toFixed(2)})]`;
+      }
+    }
+
     if (adjusted.pGuess > bktState.pGuess) {
       feedback += ' ⚡ (Високий показник латентності: можливе вгадування)';
     } else if (adjusted.pSlip > bktState.pSlip) {
