@@ -1,9 +1,10 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { ShieldCheck, Network, Users, BarChart3, Code2, BookOpen, Scale, ChevronDown, X, Search, RotateCcw, AlertTriangle, CheckCircle2, Lock, HelpCircle, Code, FileText, CheckSquare, Sparkles, Keyboard, Copy, Activity, Info, GitBranch, Layers } from 'lucide-react';
+import { ShieldCheck, Network, Users, BarChart3, Code2, BookOpen, Scale, ChevronDown, X, Search, RotateCcw, AlertTriangle, CheckCircle2, Lock, HelpCircle, Code, FileText, CheckSquare, Sparkles, Keyboard, Copy, Activity, Info, GitBranch, Layers, ClipboardCheck } from 'lucide-react';
 import { StudentAnalyticsItem } from '../features/analytics/model/analytics.types';
 import { AnomalyTreeWidget, GameSkillTreeWidget, SkillGraphNode } from '@sbc/ui';
+import { ReviewQueueInspector } from '../features/reviews/ui/ReviewQueueInspector';
 
 interface CourseItem {
   slug: string;
@@ -112,10 +113,62 @@ export default function TeacherDashboardPage() {
   // Unified Navigation State:
   // activeTab defines which workspace / module is active.
   // isDrawerOpen controls whether its companion sidebar drawer is visible.
-  type TeacherTab = 'analytics' | 'coursemap' | 'settings';
+  type TeacherTab = 'analytics' | 'reviews' | 'coursemap' | 'settings';
   const [activeTab, setActiveTab] = useState<TeacherTab>('analytics');
   const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(true);
   const [activeStudentView, setActiveStudentView] = useState<'metrics' | 'tree'>('metrics');
+
+  // Teacher Review Queue State
+  const [reviewQueue, setReviewQueue] = useState<any[]>([]);
+  const [selectedReviewId, setSelectedReviewId] = useState<string | null>(null);
+  const [isReviewSubmitting, setIsReviewSubmitting] = useState<boolean>(false);
+  const [reviewComment, setReviewComment] = useState<string>('');
+  const [reviewScoreOverride, setReviewScoreOverride] = useState<number | ''>('');
+
+  const fetchReviewQueue = async () => {
+    try {
+      const res = await fetch(`${API_URL}/api/v1/bkt/reviews/queue?courseSlug=${activeCourseSlug}`);
+      if (res.ok) {
+        const data = await res.json();
+        setReviewQueue(data);
+        if (data.length > 0 && !selectedReviewId) {
+          setSelectedReviewId(data[0].submissionId);
+        }
+      }
+    } catch (err) {
+      console.error('Error fetching teacher review queue:', err);
+    }
+  };
+
+  useEffect(() => {
+    fetchReviewQueue();
+  }, [activeCourseSlug]);
+
+  const handleReviewDecision = async (submissionId: string, decision: 'APPROVE' | 'REJECT') => {
+    setIsReviewSubmitting(true);
+    try {
+      const res = await fetch(`${API_URL}/api/v1/bkt/reviews/${submissionId}/decision`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          decision,
+          comment: reviewComment || undefined,
+          scoreOverride: reviewScoreOverride !== '' ? Number(reviewScoreOverride) : undefined,
+        }),
+      });
+
+      if (res.ok) {
+        setReviewComment('');
+        setReviewScoreOverride('');
+        await fetchReviewQueue();
+        await fetchStudentAnalytics();
+      }
+    } catch (err) {
+      console.error('Error submitting review decision:', err);
+    } finally {
+      setIsReviewSubmitting(false);
+    }
+  };
 
   const handleTabClick = (tab: TeacherTab) => {
     if (activeTab === tab) {
@@ -319,6 +372,31 @@ export default function TeacherDashboardPage() {
             )}
           </button>
 
+          <button
+            onClick={() => handleTabClick('reviews')}
+            className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all cursor-pointer relative ${
+              activeTab === 'reviews'
+                ? isDrawerOpen
+                  ? 'bg-purple-600 text-white shadow-lg shadow-purple-600/40 ring-1 ring-purple-400/50'
+                  : 'bg-purple-950/80 text-purple-300 border border-purple-500/30 hover:bg-purple-900/90 hover:text-white'
+                : 'bg-slate-800/60 text-slate-400 hover:bg-slate-800 hover:text-white'
+            }`}
+            title="Черга Перевірки Відкритих Відповідей (Human-in-the-Loop)"
+          >
+            <ClipboardCheck className="w-5 h-5" />
+            {reviewQueue.length > 0 && (
+              <span className="absolute -top-1 -right-1 px-1.5 py-0.2 rounded-full text-[9px] font-bold bg-amber-500 text-slate-950 font-mono shadow-sm">
+                {reviewQueue.length}
+              </span>
+            )}
+            {activeTab === 'reviews' && isDrawerOpen && (
+              <span className="absolute -left-1 w-1 h-5 bg-purple-400 rounded-r-full shadow-sm shadow-purple-400"></span>
+            )}
+            {activeTab === 'reviews' && !isDrawerOpen && (
+              <span className="absolute -left-1 w-1 h-2 bg-purple-400/70 rounded-r-full"></span>
+            )}
+          </button>
+
           {/* Bottom Area (External Shortcuts & Settings) */}
           <div className="mt-auto flex flex-col items-center gap-2.5">
             <div className="w-8 h-[1px] bg-slate-800/80 my-1"></div>
@@ -383,6 +461,12 @@ export default function TeacherDashboardPage() {
                   <>
                     <Network className="w-4 h-4 text-indigo-400" />
                     <span>Дерево Модулів & Завдань</span>
+                  </>
+                )}
+                {activeTab === 'reviews' && (
+                  <>
+                    <ClipboardCheck className="w-4 h-4 text-amber-400" />
+                    <span>Черга Перевірки ({reviewQueue.length})</span>
                   </>
                 )}
                 {activeTab === 'settings' && (
@@ -523,6 +607,50 @@ export default function TeacherDashboardPage() {
                       );
                     })}
                   </div>
+                </div>
+              )}
+
+              {/* Drawer: Review Queue List */}
+              {activeTab === 'reviews' && (
+                <div className="flex flex-col gap-3">
+                  <div className="text-[11px] text-slate-400">
+                    Відповіді, що потрапили у «сіру зону» або вимагають верифікації викладачем:
+                  </div>
+
+                  {reviewQueue.length === 0 ? (
+                    <div className="p-6 text-center text-xs text-slate-500 bg-slate-950/60 rounded-xl border border-slate-800">
+                      Черга перевірки порожня. Усі відкриті відповіді оцінені.
+                    </div>
+                  ) : (
+                    <div className="flex flex-col gap-2 mt-1">
+                      {reviewQueue.map((item) => {
+                        const isSelected = selectedReviewId === item.submissionId;
+                        return (
+                          <div
+                            key={item.submissionId}
+                            onClick={() => setSelectedReviewId(item.submissionId)}
+                            className={`p-3 rounded-xl border transition-all cursor-pointer flex flex-col gap-1.5 ${
+                              isSelected
+                                ? 'bg-amber-950/40 border-amber-500 shadow-md shadow-amber-950/50 ring-1 ring-amber-500/50'
+                                : 'bg-slate-950/80 border-slate-800/80 hover:bg-slate-800/50 hover:border-slate-700'
+                            }`}
+                          >
+                            <div className="flex items-center justify-between">
+                              <span className="text-xs font-bold text-white truncate">{item.studentName}</span>
+                              <span className="px-1.5 py-0.5 rounded text-[9px] font-mono font-bold bg-amber-500/10 text-amber-300 border border-amber-500/30">
+                                В черзі
+                              </span>
+                            </div>
+                            <div className="text-[11px] text-slate-300 font-semibold truncate">{item.taskTitle}</div>
+                            <div className="text-[10px] text-slate-500 font-mono flex items-center justify-between">
+                              <span>{item.skillTitle}</span>
+                              <span>{new Date(item.submittedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
                 </div>
               )}
 
@@ -926,6 +1054,24 @@ export default function TeacherDashboardPage() {
                 })()
               )}
             </div>
+          )}
+
+          {/* Main View: Teacher Review Queue Inspector */}
+          {activeTab === 'reviews' && (
+            <ReviewQueueInspector
+              currentReview={reviewQueue.find((r) => r.submissionId === selectedReviewId) || reviewQueue[0] || null}
+              isSubmitting={isReviewSubmitting}
+              reviewComment={reviewComment}
+              setReviewComment={setReviewComment}
+              reviewScoreOverride={reviewScoreOverride}
+              setReviewScoreOverride={setReviewScoreOverride}
+              onDecision={(decision) => {
+                const current = reviewQueue.find((r) => r.submissionId === selectedReviewId) || reviewQueue[0];
+                if (current) {
+                  handleReviewDecision(current.submissionId, decision);
+                }
+              }}
+            />
           )}
 
           {/* Main View 3: Settings Details */}

@@ -608,4 +608,149 @@ export class BktController {
 
     return { message: `Student state for ${targetUserId} has been reset` };
   }
+
+  @Get('reviews/queue')
+  @ApiOperation({ summary: 'Get queue of student open-ended submissions awaiting teacher review' })
+  async getTeacherReviewQueue(@Query('courseSlug') courseSlug?: string) {
+    const submissions = await this.prisma.submission.findMany({
+      where: {
+        teacherReviewStatus: TeacherReviewStatus.PENDING_REVIEW,
+        ...(courseSlug
+          ? {
+              task: {
+                skill: {
+                  courseId: courseSlug,
+                },
+              },
+            }
+          : {}),
+      },
+      include: {
+        user: {
+          include: { profile: true },
+        },
+        task: {
+          include: {
+            skill: true,
+          },
+        },
+      },
+      orderBy: { createdAt: 'desc' },
+      take: 50,
+    });
+
+    return submissions.map((sub) => ({
+      submissionId: sub.id,
+      studentId: sub.userId,
+      studentName: `${sub.user.profile?.firstName || 'Студент'} ${sub.user.profile?.lastName || ''}`.trim(),
+      studentEmail: sub.user.email,
+      taskId: sub.taskId,
+      taskTitle: sub.task.title,
+      taskDescription: sub.task.description,
+      skillSlug: sub.task.skill.slug,
+      skillTitle: sub.task.skill.title,
+      answerText: sub.code,
+      referenceAnswer: sub.task.referenceAnswer,
+      rubrics: sub.task.rubrics,
+      misconceptions: sub.task.misconceptions,
+      submittedAt: sub.createdAt,
+      teacherReviewStatus: sub.teacherReviewStatus,
+      teacherComment: sub.teacherComment,
+    }));
+  }
+
+  @Post('reviews/:submissionId/decision')
+  @ApiOperation({ summary: 'Submit teacher review decision (APPROVE / REJECT) with comment and optional score override' })
+  async reviewSubmission(
+    @Param('submissionId') submissionId: string,
+    @Body() dto: { decision: 'APPROVE' | 'REJECT'; comment?: string; scoreOverride?: number },
+  ) {
+    const submission = await this.prisma.submission.findUnique({
+      where: { id: submissionId },
+      include: {
+        task: { include: { skill: true } },
+      },
+    });
+
+    if (!submission) {
+      throw new NotFoundException(`Submission ${submissionId} not found`);
+    }
+
+    const newStatus =
+      dto.decision === 'APPROVE'
+        ? TeacherReviewStatus.APPROVED
+        : TeacherReviewStatus.REJECTED;
+
+    const isCorrect = dto.decision === 'APPROVE';
+
+    // 1. Оновлюємо статус перевірки в submission
+    const updatedSub = await this.prisma.submission.update({
+      where: { id: submissionId },
+      data: {
+        teacherReviewStatus: newStatus,
+        teacherComment: dto.comment || null,
+        status: isCorrect ? SubmissionStatus.ACCEPTED : SubmissionStatus.REJECTED,
+      },
+    });
+
+    // 2. Оновлюємо або створюємо запис у bkt_histories
+    const latestHistory = await this.prisma.bktHistory.findFirst({
+      where: {
+        userId: submission.userId,
+        taskId: submission.taskId,
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+
+    if (latestHistory) {
+      await this.prisma.bktHistory.update({
+        where: { id: latestHistory.id },
+        data: {
+          teacherReviewStatus: newStatus,
+          teacherComment: dto.comment || null,
+          semanticScore: dto.scoreOverride !== undefined ? dto.scoreOverride : latestHistory.semanticScore,
+        },
+      });
+    }
+
+    // 3. Якщо викладач затвердив відповідь, оновлюємо стан знання у bkt_states
+    let bktState = await this.prisma.bktState.findUnique({
+      where: {
+        userId_skillId: {
+          userId: submission.userId,
+          skillId: submission.task.skillId,
+        },
+      },
+    });
+
+    if (bktState) {
+      const calcResult = BktEngine.calculateNextState(
+        {
+          pMastery: bktState.pMastery,
+          pTransit: bktState.pTransit,
+          pSlip: 0.05,
+          pGuess: 0.1,
+        },
+        isCorrect,
+      );
+
+      const isMasteredNow = BktEngine.isMastered(calcResult.pMasteryPosterior);
+      bktState = await this.prisma.bktState.update({
+        where: { id: bktState.id },
+        data: {
+          pMastery: calcResult.pMasteryPosterior,
+          isMastered: isMasteredNow,
+          masteredAt: isMasteredNow && !bktState.isMastered ? new Date() : bktState.masteredAt,
+          attemptsCount: { increment: 1 },
+        },
+      });
+    }
+
+    return {
+      success: true,
+      submissionId: updatedSub.id,
+      teacherReviewStatus: updatedSub.teacherReviewStatus,
+      pMasteryUpdated: bktState?.pMastery,
+    };
+  }
 }

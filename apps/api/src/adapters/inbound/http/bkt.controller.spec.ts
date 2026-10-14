@@ -16,12 +16,19 @@ describe('BktController (Analytics & Telemetry reset integration)', () => {
     },
     bktState: {
       deleteMany: jest.fn(),
+      findUnique: jest.fn(),
+      update: jest.fn(),
     },
     submission: {
       deleteMany: jest.fn(),
+      findMany: jest.fn(),
+      findUnique: jest.fn(),
+      update: jest.fn(),
     },
     bktHistory: {
       deleteMany: jest.fn(),
+      findFirst: jest.fn(),
+      update: jest.fn(),
     },
     telemetrySession: {
       deleteMany: jest.fn(),
@@ -112,5 +119,75 @@ describe('BktController (Analytics & Telemetry reset integration)', () => {
     expect(result[0].wpm).toBe(0);
     expect(result[0].fatigueIndex).toBe(0);
     expect(result[0].unstarted).toBe(true);
+  });
+
+  it('should retrieve pending teacher review submissions from queue', async () => {
+    mockPrisma.submission.findMany.mockResolvedValue([
+      {
+        id: 'sub-1',
+        userId: 'student-1',
+        user: { email: 'student@example.com', profile: { firstName: 'Олена', lastName: 'Коваль' } },
+        taskId: 'task-10',
+        task: {
+          title: 'Event Loop',
+          description: 'Explain microtasks',
+          referenceAnswer: 'Microtasks run before macrotasks',
+          skill: { slug: 'js-async', title: 'Асинхронність' },
+        },
+        code: 'Проміси мають вищий пріоритет',
+        teacherReviewStatus: 'PENDING_REVIEW',
+        createdAt: new Date(),
+      },
+    ]);
+
+    const queue = await controller.getTeacherReviewQueue('js-dev');
+
+    expect(queue).toHaveLength(1);
+    expect(queue[0].studentName).toBe('Олена Коваль');
+    expect(queue[0].taskTitle).toBe('Event Loop');
+    expect(queue[0].teacherReviewStatus).toBe('PENDING_REVIEW');
+  });
+
+  it('should process teacher review decision and update BKT mastery when APPROVED', async () => {
+    mockPrisma.submission.findUnique.mockResolvedValue({
+      id: 'sub-1',
+      userId: 'student-1',
+      taskId: 'task-10',
+      task: { skillId: 'skill-1', skill: { title: 'Async JS' } },
+    });
+    mockPrisma.submission.update.mockResolvedValue({
+      id: 'sub-1',
+      teacherReviewStatus: 'APPROVED',
+    });
+    mockPrisma.bktHistory.findFirst.mockResolvedValue({
+      id: 'hist-1',
+      semanticScore: 0.65,
+    });
+    mockPrisma.bktHistory.update.mockResolvedValue({});
+    mockPrisma.bktState.findUnique.mockResolvedValue({
+      id: 'state-1',
+      pMastery: 0.5,
+      pTransit: 0.1,
+      isMastered: false,
+    });
+    mockPrisma.bktState.update.mockResolvedValue({
+      id: 'state-1',
+      pMastery: 0.85,
+    });
+
+    const res = await controller.reviewSubmission('sub-1', {
+      decision: 'APPROVE',
+      comment: 'Чудове розкриття теми',
+      scoreOverride: 0.9,
+    });
+
+    expect(res.success).toBe(true);
+    expect(res.teacherReviewStatus).toBe('APPROVED');
+    expect(mockPrisma.submission.update).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { id: 'sub-1' },
+        data: expect.objectContaining({ teacherReviewStatus: 'APPROVED' }),
+      }),
+    );
   });
 });
