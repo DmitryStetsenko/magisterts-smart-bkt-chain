@@ -29,6 +29,8 @@ export interface OpenTextEvaluationResult {
   conceptCoverageRatio: number;
   isQuestionCopyPaste: boolean;
   questionOverlapRatio: number;
+  isGibberish: boolean;
+  needsTeacherReview: boolean;
   feedback: string;
   reasons: string[];
 }
@@ -60,7 +62,34 @@ export class OpenTextHeuristicEvaluator {
     const uniqueWords = new Set(words);
     const uniqueWordRatio = wordCount > 0 ? uniqueWords.size / wordCount : 0;
 
-    // 3. Перевірка копіпасту запитання завдання
+    // 3. Аналіз на абракадабру / беззмістовні літеросполучення (Gibberish / Keyboard mashing filter)
+    let isGibberish = false;
+    if (wordCount >= 4) {
+      // Підрахунок слів із нетиповою структурою: відсутність голосних, хаотичні повтори клавіш типу "фіва", "asdf"
+      const vowelsPattern = /[аеєиіїоуюяaeiouy]/i;
+      const suspiciousWords = words.filter((w) => {
+        // Якщо слово довше 2 символів і в ньому немає жодної голосної літери
+        if (w.length >= 3 && !vowelsPattern.test(w)) return true;
+        // Патерни хаотичного набору сусідніх клавіш (QWERTY / ЙЦУКЕН / ФІВАПРОЛ / ASDF)
+        if (/(asdf|qwer|zxcv|йцук|фіва|івап|вапр|апро|прол|ролд|длап|швап|поіш|ячсм)/i.test(w)) return true;
+        // Аномально низьке співвідношення голосних у довгому слові (наприклад, 1 голосна на 6+ приголосних)
+        const vowelCount = (w.match(/[аеєиіїоуюяaeiouy]/gi) || []).length;
+        if (w.length >= 6 && vowelCount / w.length < 0.2) return true;
+        // Повторення одного символу 3+ разів підряд
+        if (/(.)\1\1/.test(w)) return true;
+        return false;
+      });
+
+      const suspiciousRatio = suspiciousWords.length / wordCount;
+      if (suspiciousRatio >= 0.35) {
+        isGibberish = true;
+        reasons.push(
+          `Виявлено ознаки абракадабри або хаотичного набору символів (${Math.round(suspiciousRatio * 100)}% невалідних слів)`,
+        );
+      }
+    }
+
+    // 4. Перевірка копіпасту запитання завдання
     let isQuestionCopyPaste = false;
     let questionOverlapRatio = 0;
 
@@ -85,7 +114,7 @@ export class OpenTextHeuristicEvaluator {
       }
     }
 
-    // 4. Покриття ключових понять (з підтримкою синонімів через "|" або регулярних виразів)
+    // 5. Покриття ключових понять (з підтримкою синонімів через "|" або регулярних виразів)
     const coveredKeywords: string[] = [];
     const missingKeywords: string[] = [];
     const lowerText = text.toLowerCase();
@@ -111,12 +140,12 @@ export class OpenTextHeuristicEvaluator {
     }
 
     const conceptCoverageRatio =
-      keywords.length > 0 ? coveredKeywords.length / keywords.length : 1.0;
+      keywords.length > 0 ? coveredKeywords.length / keywords.length : 0.0;
 
-    // 5. Розрахунок інтегрального скору (0..1)
+    // 6. Розрахунок інтегрального скору (0..1)
     let score = 0;
 
-    // Штрафи за спам / повтори / копіпаст
+    // Штрафи за спам / повтори / копіпаст / абракадабру
     if (wordCount < minWords) {
       reasons.push(`Обсяг відповіді (${wordCount} сл.) менший за мінімальний (${minWords} сл.)`);
     }
@@ -141,11 +170,13 @@ export class OpenTextHeuristicEvaluator {
           `Недостатнє розкриття ключових понять (${coveredKeywords.length}/${keywords.length})`,
         );
       }
+    } else {
+      reasons.push('У завданні не задано ключові критерії — потрібна верифікація викладачем');
     }
 
     // Розрахунок підсумкового балу
-    if (isQuestionCopyPaste) {
-      score = 0.1;
+    if (isGibberish || isQuestionCopyPaste) {
+      score = 0.05;
     } else if (wordCount === 0) {
       score = 0.0;
     } else {
@@ -154,9 +185,10 @@ export class OpenTextHeuristicEvaluator {
       const conceptFactor = conceptCoverageRatio;
 
       if (keywords.length > 0) {
-        score = 0.6 * conceptFactor + 0.25 * lengthFactor + 0.15 * diversityFactor;
+        score = 0.65 * conceptFactor + 0.20 * lengthFactor + 0.15 * diversityFactor;
       } else {
-        score = 0.7 * lengthFactor + 0.3 * diversityFactor;
+        // Якщо рубрики взагалі не були задані, максимальний бал не може перевищувати 0.45 (сіра зона для викладача)
+        score = Math.min(0.45, 0.3 * lengthFactor + 0.15 * diversityFactor);
       }
     }
 
@@ -164,14 +196,17 @@ export class OpenTextHeuristicEvaluator {
 
     // Критерій зарахування (Passed)
     const isLengthOk = wordCount >= minWords;
-    const isCoverageOk = keywords.length === 0 || conceptCoverageRatio >= minCoverage;
-    const isQualityOk = !isQuestionCopyPaste && (wordCount < 6 || uniqueWordRatio >= 0.45);
+    const hasMeaningfulContent = !isGibberish && !isQuestionCopyPaste;
+    const isCoverageOk = keywords.length > 0 ? conceptCoverageRatio >= minCoverage : false;
+    const isQualityOk = hasMeaningfulContent && (wordCount < 6 || uniqueWordRatio >= 0.45);
 
     const isPassed = isLengthOk && isCoverageOk && isQualityOk && score >= 0.6;
 
     // Генерація конструктивного фідбеку
     let feedback = '';
-    if (isQuestionCopyPaste) {
+    if (isGibberish) {
+      feedback = 'Відповідь містить хаотичний набір літер або беззмістовні слова. Будь ласка, напишіть осмислену відповідь українською або англійською мовою.';
+    } else if (isQuestionCopyPaste) {
       feedback =
         'Схоже, відповідь здебільшого дублює саме запитання. Будь ласка, сформулюйте визначення власними словами.';
     } else if (wordCount < minWords) {
@@ -181,7 +216,7 @@ export class OpenTextHeuristicEvaluator {
     } else if (isPassed) {
       feedback = `Чудово! Відповідь змістовна та розкриває ключові концепції (${coveredKeywords.map((k) => `«${k.split('|')[0]}»`).join(', ')}).`;
     } else {
-      feedback = 'Відповідь врахована, проте потребує більшої точності та аргументованості.';
+      feedback = 'Відповідь врахована, проте потребує більшої точності або перевірки викладачем.';
     }
 
     return {
@@ -194,6 +229,8 @@ export class OpenTextHeuristicEvaluator {
       conceptCoverageRatio: Number(conceptCoverageRatio.toFixed(2)),
       isQuestionCopyPaste,
       questionOverlapRatio: Number(questionOverlapRatio.toFixed(2)),
+      isGibberish,
+      needsTeacherReview: !isPassed || isGibberish || keywords.length === 0,
       feedback,
       reasons,
     };

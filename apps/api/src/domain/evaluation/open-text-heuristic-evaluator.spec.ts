@@ -62,4 +62,23 @@ describe('OpenTextHeuristicEvaluator (Domain Unit Tests)', () => {
     );
     expect(res.conceptCoverageRatio).toBeGreaterThanOrEqual(0.6);
   });
+
+  it('повинен відхиляти беззмістовний набір символів (gibberish / keyboard mashing)', () => {
+    const gibberishAnswer = 'івлоапроішвапро івдлапроішвпро йцукенгшщзх ївапролд';
+    const res = OpenTextHeuristicEvaluator.evaluate(gibberishAnswer, sampleConfig);
+
+    expect(res.isPassed).toBe(false);
+    expect(res.isGibberish).toBe(true);
+    expect(res.score).toBeLessThanOrEqual(0.1);
+    expect(res.feedback).toContain('хаотичний набір літер');
+  });
+
+  it('повинен обмежувати бал та вимагати перевірку викладача якщо критерії не налаштовані', () => {
+    const answer = 'Тут написана якась відповідь без налаштованих ключових слів у завданні.';
+    const res = OpenTextHeuristicEvaluator.evaluate(answer, { minWords: 5 });
+
+    expect(res.needsTeacherReview).toBe(true);
+    expect(res.score).toBeLessThanOrEqual(0.45);
+    expect(res.isPassed).toBe(false);
+  });
 });

@@ -188,6 +188,26 @@ async function main() {
       title: 'Аналіз концепції: Event Loop та асинхронність',
       description: 'Поясніть своїми словами принцип роботи Event Loop та різницю між Microtasks (Promises) і Macrotasks (setTimeout) у JavaScript.',
       difficulty: TaskDifficulty.MEDIUM,
+      referenceAnswer:
+        'Event Loop контролює Call Stack та черги Microtasks/Macrotasks. Microtasks (Promises, queueMicrotask) виконуються першочергово після поточного стеку перед оновленням рендеру, а Macrotasks (setTimeout, setInterval) виконуються на наступних ітераціях подій.',
+      options: {
+        keywords: [
+          'microtask|мікротаск|promise|проміс',
+          'macrotask|макротаск|settimeout|таймер',
+          'call stack|стек',
+          'черга|queue',
+        ],
+        minWords: 15,
+      },
+      rubrics: {
+        keywords: [
+          'microtask|мікротаск|promise|проміс',
+          'macrotask|макротаск|settimeout|таймер',
+          'call stack|стек',
+          'черга|queue',
+        ],
+        minWords: 15,
+      },
     },
   });
 
