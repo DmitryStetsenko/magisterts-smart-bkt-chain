@@ -167,6 +167,50 @@
               "type": "text",
               "raw_text": "**Мульти-критеріальна триангуляція статусу `MASTERED`:** Опанування теми вимагає зв'язки «Теоретичний тест + Практичний код + Автентична телеметрія».",
               "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Сесія 02 (`docs/brainstorm/02_edtech_ecosystem_vision.md`):**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Just-in-Time теорія та інтервенції, Сократівський діалог, RPG Skill Tree, Teacher Co-Pilot.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Сесія 03 (`docs/brainstorm/03_technical_edtech_platform_architecture.md`):**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Архітектура монорепозиторію, FSM сесій, InterventionRouter, TelemetryIntegrityEngine (WPM/Burstiness).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Сесія 04 (`docs/brainstorm/04_open_ended_questions_semantic_eval.md`):**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Багаторівневий пайплайн семантичного оцінювання (Multi-Tier Assessment Pipeline):**",
+              "subitems": [
+                "*Tier 1 (Heuristics):* Виявлення обов'язкових коренів понять, перевірка Type-Token Ratio, детекція плагіату умови завдання.",
+                "*Tier 2 (Vector Embeddings):* Косинусна подібність з еталоном $\\text{CosineSimilarity}(\\vec{v}_{stu}, \\vec{v}_{ref})$ та кластеризація типових помилок (misconceptions).",
+                "*Tier 3 (LLM Judge):* Оцінювання за структурованими рубриками (`correctness`, `completeness`, `keyConceptsCovered`, `studentFeedback`)."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Телеметричний BKT зв'язок:** Штраф $P(G) \\to 0.9$ при вставках тексту (`pasteEvents > 0`), фіксація $P(S)$ при когнітивних паузах та видаленнях (`deletionRatio > 0.35`).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Human-in-the-Loop:** Інтеграція черги апеляцій та сумнівних оцінок ($0.45 \\le \\text{Score} \\le 0.70$) у Teacher Portal з можливістю підтвердження/коригування в 1 клік.",
+              "subitems": []
             }
           ]
         },

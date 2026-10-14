@@ -17,3 +17,8 @@
 3. [03. Суто Технічна Архітектура EdTech-Платформи](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/docs/brainstorm/03_technical_edtech_platform_architecture.md)
    - *Дата:* 13 жовтня 2026
    - *Ключові теми:* Реалізація у монорепозиторії, LearningSessionEngine (FSM), InterventionRouter, SocraticScaffoldingService, TelemetryIntegrityEngine (WPM/Burstiness), Prisma схема, Split-Screen Monaco, Live Classroom WebSocket.
+
+4. [04. Семантична Перевірка Відкритих Текстових Відповідей та BKT](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/docs/brainstorm/04_open_ended_questions_semantic_eval.md)
+   - *Дата:* 14 жовтня 2026
+   - *Ключові теми:* Багаторівневий пайплайн (Tier 1 Heuristics → Tier 2 Embeddings → Tier 3 LLM Judge), оцінка рубрик (Rubrics), інтеграція з телеметрією друку (paste events, WPM, hesitation), Soft-BKT зважування, Human-in-the-Loop в кабінеті викладача.
+

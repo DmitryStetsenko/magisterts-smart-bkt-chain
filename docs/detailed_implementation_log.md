@@ -54,6 +54,18 @@
   - **Динамічний BKT ($P(G) / P(S)$):** Введення залежності $P(G)$ від часу здачі завдання $T_{\text{submit}}$: якщо $T < 3.0\text{ с}$, ймовірність вгадування $P(G)$ зростає до $0.85$, мінімізуючи ріст знання від випадкового вибору в тестах.
   - **Когнітивна достовірність ($\alpha$-Score):** Мультиплікатор достовірності $\alpha = (1 - CopyPasteRatio) \cdot \text{Penalty}(WPM)$ як коригувальний коефіцієнт BKT.
   - **Мульти-критеріальна триангуляція статусу `MASTERED`:** Опанування теми вимагає зв'язки «Теоретичний тест + Практичний код + Автентична телеметрія».
+- **Сесія 02 (`docs/brainstorm/02_edtech_ecosystem_vision.md`):**
+  - Just-in-Time теорія та інтервенції, Сократівський діалог, RPG Skill Tree, Teacher Co-Pilot.
+- **Сесія 03 (`docs/brainstorm/03_technical_edtech_platform_architecture.md`):**
+  - Архітектура монорепозиторію, FSM сесій, InterventionRouter, TelemetryIntegrityEngine (WPM/Burstiness).
+- **Сесія 04 (`docs/brainstorm/04_open_ended_questions_semantic_eval.md`):**
+  - **Багаторівневий пайплайн семантичного оцінювання (Multi-Tier Assessment Pipeline):**
+    - *Tier 1 (Heuristics):* Виявлення обов'язкових коренів понять, перевірка Type-Token Ratio, детекція плагіату умови завдання.
+    - *Tier 2 (Vector Embeddings):* Косинусна подібність з еталоном $\text{CosineSimilarity}(\vec{v}_{stu}, \vec{v}_{ref})$ та кластеризація типових помилок (misconceptions).
+    - *Tier 3 (LLM Judge):* Оцінювання за структурованими рубриками (`correctness`, `completeness`, `keyConceptsCovered`, `studentFeedback`).
+  - **Телеметричний BKT зв'язок:** Штраф $P(G) \to 0.9$ при вставках тексту (`pasteEvents > 0`), фіксація $P(S)$ при когнітивних паузах та видаленнях (`deletionRatio > 0.35`).
+  - **Human-in-the-Loop:** Інтеграція черги апеляцій та сумнівних оцінок ($0.45 \le \text{Score} \le 0.70$) у Teacher Portal з можливістю підтвердження/коригування в 1 клік.
+
 
 ### 0.3 Модульний Opera-Style UI Shell, Компактні DAG-Вузли та Патерн «List-in-Drawer / Detail-on-Canvas»
 - **Уніфікація UI Shell (`apps/student`, `apps/teacher`, `apps/admin`):**

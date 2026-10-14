@@ -2,6 +2,52 @@
   "project_title": "📅 Журнал розробки та прогресу проєкту (Daily Progress Log)",
   "sections": [
     {
+      "title": "📅 14 жовтня 2026 року",
+      "level": 2,
+      "paragraphs": [],
+      "code_blocks": [],
+      "items": [],
+      "subsections": [
+        {
+          "title": "✅ Що зроблено за день:",
+          "level": 3,
+          "paragraphs": [],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "**Затверджено Концепцію Багаторівневої Семантичної Перевірки Відкритих Відповідей (`OPEN_TEXT`):**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Проведено глибокий аналіз ризиків валідації за кількістю слів ($P(G)$ інфляція при «воді»/копіпасті та $P(S)$ інфляція при лаконічних точних відповідях).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Розроблено та зафіксовано архітектурну концепцію у [`docs/brainstorm/04_open_ended_questions_semantic_eval.md`](file:///docs/brainstorm/04_open_ended_questions_semantic_eval.md):",
+              "subitems": [
+                "**Tier 1 (Heuristics):** Детерміновані евристики лем/коренів ключових термінів, анти-спам та виявлення копіпасту запитання.",
+                "**Tier 2 (Vector Embeddings):** Косинусна схожість $\\text{CosineSimilarity}(\\vec{v}_{stu}, \\vec{v}_{ref})$ з еталоном та кластеризація поширених місконцепцій ($\\vec{v}_{misc}$).",
+                "**Tier 3 (LLM-as-a-Judge):** Рубрикове оцінювання (`correctness`, `completeness`, `keyConceptsCovered`, `studentFeedback`) зі структурованим JSON виходом."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "Пов'язано семантичний вердикт з поведінковою телеметрією друку (аналіз подій вставки `pasteEvents`, часу відповіді, коефіцієнта видалення `deletionRatio`, пауз вагання) для коригування $P(Guess)$ та $P(Slip)$ у `BehavioralAdjuster`.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Визначено механізм «Human-in-the-Loop» у кабінеті викладача (`apps/teacher`) з чергою апеляцій та сумнівних відповідей для ручного підтвердження/корекції оцінки в один клік.",
+              "subitems": []
+            }
+          ]
+        }
+      ]
+    },
+    {
       "title": "📅 13 жовтня 2026 року",
       "level": 2,
       "paragraphs": [],
