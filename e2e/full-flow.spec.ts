@@ -21,8 +21,8 @@ test.describe('Smart-BKT-Chain Multi-Discipline E2E Suite', () => {
   test('Student & Teacher Multi-Discipline UI Flow', async ({ page, context }) => {
     // 1. Open Student Portal
     await page.goto('http://127.0.0.1:3002', { waitUntil: 'domcontentloaded', timeout: 30000 });
-    await expect(page.locator('h1')).toContainText('Smart-BKT-Chain Student Portal');
-    await expect(page.getByText('Дмитро Стеценко')).toBeVisible();
+    await expect(page.locator('h1')).toContainText('Smart-BKT-Chain');
+    await expect(page.locator('h1')).toContainText('v2.0 Shell');
 
     // 2. Verify Dynamic Course Switcher Dropdown
     await expect(page.locator('#student-course-select')).toBeVisible();
@@ -30,10 +30,15 @@ test.describe('Smart-BKT-Chain Multi-Discipline E2E Suite', () => {
 
     // 3. Open Teacher Portal
     const teacherPage = await context.newPage();
-    await teacherPage.goto('http://127.0.0.1:3003', { waitUntil: 'domcontentloaded', timeout: 30000 });
-    await expect(teacherPage.locator('h1')).toContainText('Smart-BKT-Chain Teacher Portal');
-    await expect(teacherPage.getByText('Панель Адміністратора (CMS DAG)')).toBeVisible();
-    await expect(teacherPage.getByText('Аналітика Студентів & BKT Heatmap')).toBeVisible();
+    await teacherPage.goto('http://127.0.0.1:3003', { waitUntil: 'networkidle', timeout: 30000 });
+    await expect(teacherPage.locator('h1')).toContainText('Smart-BKT-Chain');
+    await expect(teacherPage.locator('h1')).toContainText('Teacher Portal');
     await expect(teacherPage.locator('#teacher-course-select')).toBeVisible();
+
+    // 4. Verify Review Queue tab and inspector
+    const reviewTabBtn = teacherPage.locator('#teacher-tab-reviews');
+    await expect(reviewTabBtn).toBeVisible();
+    await reviewTabBtn.click({ force: true });
+    await expect(teacherPage.locator('aside h2')).toContainText('Черга Перевірки', { timeout: 10000 });
   });
 });

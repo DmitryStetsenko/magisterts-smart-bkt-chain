@@ -81,4 +81,29 @@ describe('OpenTextHeuristicEvaluator (Domain Unit Tests)', () => {
     expect(res.score).toBeLessThanOrEqual(0.45);
     expect(res.isPassed).toBe(false);
   });
+
+  it('повинен відхиляти Keyword Stuffing (ізольований стовпчик слів без зв’язного речення)', () => {
+    const stuffingAnswer = `це
+щось
+про
+чергу
+др
+microtask
+macrotask
+call stack
+дддю`;
+    const eventLoopConfig: OpenTextRubricConfig = {
+      minWords: 5,
+      keywords: ['microtask', 'macrotask', 'call stack', 'черга'],
+      minCoverageThreshold: 0.5,
+    };
+
+    const res = OpenTextHeuristicEvaluator.evaluate(stuffingAnswer, eventLoopConfig);
+
+    expect(res.isPassed).toBe(false);
+    expect(res.isKeywordStuffing).toBe(true);
+    expect(res.score).toBeLessThanOrEqual(0.35);
+    expect(res.needsTeacherReview).toBe(true);
+    expect(res.feedback).toContain('ізольований перелік слів');
+  });
 });

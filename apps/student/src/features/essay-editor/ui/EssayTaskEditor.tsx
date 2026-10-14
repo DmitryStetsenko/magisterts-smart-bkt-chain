@@ -8,7 +8,7 @@ interface EssayTaskEditorProps {
   userId: string;
   taskId: string;
   onChange: (value: string) => void;
-  onSubmit: () => void;
+  onSubmit: (telemetry?: any) => void;
   isSubmitting?: boolean;
   onNextTask?: () => void;
   isPassed?: boolean;
@@ -108,7 +108,19 @@ export function EssayTaskEditor({
         </button>
 
         <button
-          onClick={onSubmit}
+          onClick={() => {
+            const deletionRatio =
+              metrics.totalKeystrokes > 0
+                ? Number((metrics.deleteCount / metrics.totalKeystrokes).toFixed(2))
+                : 0;
+            onSubmit({
+              reactionLatencyMs: metrics.lastPauseMs,
+              deletionRatio,
+              pauseCount: metrics.lastPauseMs > 2000 ? 1 : 0,
+              pasteEvents: metrics.pasteEvents,
+              typingWpm: metrics.wpm,
+            });
+          }}
           disabled={wordCount === 0 || isSubmitting}
           className={`inline-flex items-center gap-2 px-6 py-2.5 rounded-xl font-bold text-xs transition-all ${
             wordCount > 0 && !isSubmitting

@@ -757,7 +757,7 @@ export default function StudentPortalPage() {
                   userId="demo-student"
                   taskId={task.id}
                   onChange={setEssayAnswer}
-                  onSubmit={() => handleEvaluate({ essayAnswer })}
+                  onSubmit={(telemetry) => handleEvaluate({ essayAnswer, ...(telemetry || {}) })}
                   isSubmitting={isSubmitting}
                   onNextTask={() => fetchRecommendedTask(activeCourseSlug)}
                   isPassed={Boolean(evalResult?.isPassed)}

@@ -30,6 +30,7 @@ export interface OpenTextEvaluationResult {
   isQuestionCopyPaste: boolean;
   questionOverlapRatio: number;
   isGibberish: boolean;
+  isKeywordStuffing: boolean;
   needsTeacherReview: boolean;
   feedback: string;
   reasons: string[];
@@ -81,10 +82,40 @@ export class OpenTextHeuristicEvaluator {
       });
 
       const suspiciousRatio = suspiciousWords.length / wordCount;
-      if (suspiciousRatio >= 0.35) {
+      if (suspiciousRatio >= 0.25) {
         isGibberish = true;
         reasons.push(
           `Виявлено ознаки абракадабри або хаотичного набору символів (${Math.round(suspiciousRatio * 100)}% невалідних слів)`,
+        );
+      }
+    }
+
+    // 3.1. Перевірка на "Keyword Stuffing" / беззмістовний перелік слів без синтаксичної структури речення
+    let isKeywordStuffing = false;
+    if (wordCount >= 4) {
+      const rawLines = text
+        .split(/\r?\n/)
+        .map((l) => l.trim())
+        .filter((l) => l.length > 0);
+      const avgWordsPerLine = rawLines.length > 0 ? wordCount / rawLines.length : wordCount;
+
+      // Чи має відповідь крапки або розділові знаки кінця речень
+      const hasProperPunctuation = /[.!?]/.test(text);
+
+      // Якщо студент ввів слова стовпчиком (в середньому <= 2.2 слів на рядок при кількості рядків >= 3)
+      // без крапок і знаків пунктуації
+      const isVerticalWordList = rawLines.length >= 3 && avgWordsPerLine <= 2.2 && !hasProperPunctuation;
+
+      // Перевірка наявності коротких слів-паразитів / сміття (<= 2 літер) що складають понад 30% слів
+      const allTokens = text.toLowerCase().split(/\s+/).filter(Boolean);
+      const shortTokens = allTokens.filter((w) => w.replace(/[^\p{L}\p{N}]/gu, '').length <= 2);
+      const shortWordRatio = allTokens.length > 0 ? shortTokens.length / allTokens.length : 0;
+      const isOverwhelmingShortWords = shortWordRatio >= 0.35 && allTokens.length >= 6;
+
+      if (isVerticalWordList || isOverwhelmingShortWords) {
+        isKeywordStuffing = true;
+        reasons.push(
+          `Виявлено ознаки штучного переліку слів (Keyword Stuffing) без зв'язної граматичної структури речень`,
         );
       }
     }
@@ -177,6 +208,9 @@ export class OpenTextHeuristicEvaluator {
     // Розрахунок підсумкового балу
     if (isGibberish || isQuestionCopyPaste) {
       score = 0.05;
+    } else if (isKeywordStuffing) {
+      // Суттєвий штраф за беззмістовний перелік слів: не більше 0.35, статус PENDING_REVIEW
+      score = Math.min(0.35, 0.4 * conceptCoverageRatio);
     } else if (wordCount === 0) {
       score = 0.0;
     } else {
@@ -196,7 +230,7 @@ export class OpenTextHeuristicEvaluator {
 
     // Критерій зарахування (Passed)
     const isLengthOk = wordCount >= minWords;
-    const hasMeaningfulContent = !isGibberish && !isQuestionCopyPaste;
+    const hasMeaningfulContent = !isGibberish && !isQuestionCopyPaste && !isKeywordStuffing;
     const isCoverageOk = keywords.length > 0 ? conceptCoverageRatio >= minCoverage : false;
     const isQualityOk = hasMeaningfulContent && (wordCount < 6 || uniqueWordRatio >= 0.45);
 
@@ -206,6 +240,9 @@ export class OpenTextHeuristicEvaluator {
     let feedback = '';
     if (isGibberish) {
       feedback = 'Відповідь містить хаотичний набір літер або беззмістовні слова. Будь ласка, напишіть осмислену відповідь українською або англійською мовою.';
+    } else if (isKeywordStuffing) {
+      feedback =
+        'Відповідь виглядає як ізольований перелік слів або тегів без зв’язного пояснення. Будь ласка, викладіть думку повними реченнями та поясніть взаємозв’язок понять.';
     } else if (isQuestionCopyPaste) {
       feedback =
         'Схоже, відповідь здебільшого дублює саме запитання. Будь ласка, сформулюйте визначення власними словами.';
@@ -230,7 +267,8 @@ export class OpenTextHeuristicEvaluator {
       isQuestionCopyPaste,
       questionOverlapRatio: Number(questionOverlapRatio.toFixed(2)),
       isGibberish,
-      needsTeacherReview: !isPassed || isGibberish || keywords.length === 0,
+      isKeywordStuffing,
+      needsTeacherReview: !isPassed || isGibberish || isKeywordStuffing || keywords.length === 0,
       feedback,
       reasons,
     };

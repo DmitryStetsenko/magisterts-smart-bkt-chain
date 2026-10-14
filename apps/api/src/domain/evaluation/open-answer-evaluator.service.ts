@@ -55,20 +55,20 @@ export class OpenAnswerEvaluatorService {
 
     const t1 = OpenTextHeuristicEvaluator.evaluate(text, heuristicConfig);
 
-    // Якщо Tier 1 виявив прямий копіпаст запитання або порожній текст -> миттєвий вердикт
-    if (t1.isQuestionCopyPaste || t1.wordCount === 0) {
+    // Якщо Tier 1 виявив прямий копіпаст запитання, абракадабру, порожній текст або Keyword Stuffing
+    if (t1.isQuestionCopyPaste || t1.isGibberish || t1.isKeywordStuffing || t1.wordCount === 0) {
       return {
         tierUsed: 'TIER_1_HEURISTICS',
         isPassed: false,
         score: t1.score,
-        confidenceScore: 0.95,
+        confidenceScore: 0.90,
         correctness: 0.1,
-        completeness: 0.1,
+        completeness: t1.conceptCoverageRatio,
         keyConceptsCovered: t1.coveredKeywords,
         missingConcepts: t1.missingKeywords,
         detectedMisconceptions: [],
         studentFeedback: t1.feedback,
-        needsTeacherReview: false,
+        needsTeacherReview: t1.isKeywordStuffing || t1.isGibberish,
         reasons: t1.reasons,
       };
     }

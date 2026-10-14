@@ -373,6 +373,7 @@ export default function TeacherDashboardPage() {
           </button>
 
           <button
+            id="teacher-tab-reviews"
             onClick={() => handleTabClick('reviews')}
             className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all cursor-pointer relative ${
               activeTab === 'reviews'
