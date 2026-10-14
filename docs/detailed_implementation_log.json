@@ -2707,6 +2707,51 @@
               "subitems": []
             }
           ]
+        },
+        {
+          "title": "11.6 Візуалізація результатів семантичного оцінювання у Студентському Кабінеті (\u0007pps/student)",
+          "level": 3,
+          "paragraphs": [
+            "pm run build:student успішно компілюється Next.js Turbopack без помилок типів."
+          ],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "**Компоненти реалізації:** [\u0007pps/student/src/app/page.tsx](file:///apps/student/src/app/page.tsx), [\u0007pps/api/src/adapters/inbound/http/bkt.controller.ts](file:///apps/api/src/adapters/inbound/http/bkt.controller.ts).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Архітектурна інтеграція:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "BktController.evaluateSubmission повертає додаткове поле semanticDetails із результатами OpenAnswerEvaluatorService (keyConceptsCovered, missingConcepts, detectedMisconceptions, \tierUsed, confidenceScore).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "В інтерфейсі студента панель підсумків evalResult візуалізує:",
+              "subitems": [
+                "Семантичний бал у відсотках.",
+                "Бейдж викладацького аудиту (TeacherReviewStatus.PENDING_REVIEW або APPROVED).",
+                "Зелені чіпси розкритих понять (keyConceptsCovered) та червоні чіпси упущених понять (missingConcepts).",
+                "Попередження при виявленні відомих місконцепцій (detectedMisconceptions)."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Верифікація:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "-",
+              "subitems": []
+            }
+          ]
         }
       ]
     }

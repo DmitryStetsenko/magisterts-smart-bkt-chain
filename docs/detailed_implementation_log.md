@@ -676,3 +676,16 @@ eferenceAnswer, критерії options.keywords (microtask|мікротаск|
 - **Тестування:**
   - Оновлено тест-сьют open-text-heuristic-evaluator.spec.ts (7 тестів ✅).
   - Усі 31 unit-тест API успішно проходять, збірка uild:api успішна.
+
+### 11.6 Візуалізація результатів семантичного оцінювання у Студентському Кабінеті (pps/student)
+- **Компоненти реалізації:** [pps/student/src/app/page.tsx](file:///apps/student/src/app/page.tsx), [pps/api/src/adapters/inbound/http/bkt.controller.ts](file:///apps/api/src/adapters/inbound/http/bkt.controller.ts).
+- **Архітектурна інтеграція:**
+  1. BktController.evaluateSubmission повертає додаткове поле semanticDetails із результатами OpenAnswerEvaluatorService (keyConceptsCovered, missingConcepts, detectedMisconceptions, 	ierUsed, confidenceScore).
+  2. В інтерфейсі студента панель підсумків evalResult візуалізує:
+     - Семантичний бал у відсотках.
+     - Бейдж викладацького аудиту (TeacherReviewStatus.PENDING_REVIEW або APPROVED).
+     - Зелені чіпси розкритих понять (keyConceptsCovered) та червоні чіпси упущених понять (missingConcepts).
+     - Попередження при виявленні відомих місконцепцій (detectedMisconceptions).
+- **Верифікація:**
+  - 
+pm run build:student успішно компілюється Next.js Turbopack без помилок типів.
