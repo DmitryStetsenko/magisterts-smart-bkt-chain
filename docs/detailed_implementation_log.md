@@ -687,5 +687,35 @@ eferenceAnswer, критерії options.keywords (microtask|мікротаск|
      - Зелені чіпси розкритих понять (keyConceptsCovered) та червоні чіпси упущених понять (missingConcepts).
      - Попередження при виявленні відомих місконцепцій (detectedMisconceptions).
 - **Верифікація:**
-  - 
-pm run build:student успішно компілюється Next.js Turbopack без помилок типів.
+  - `npm run build:student` успішно компілюється Next.js Turbopack без помилок типів.
+
+### 11.7 Human-in-the-Loop Кабінет Викладача та REST API Верифікації (`apps/teacher`, `apps/api`)
+- **Файли реалізації:**
+  - [`apps/api/src/adapters/inbound/http/bkt.controller.ts`](file:///apps/api/src/adapters/inbound/http/bkt.controller.ts)
+  - [`apps/api/src/adapters/inbound/http/bkt.controller.spec.ts`](file:///apps/api/src/adapters/inbound/http/bkt.controller.spec.ts)
+  - [`apps/teacher/src/features/reviews/ui/ReviewQueueInspector.tsx`](file:///apps/teacher/src/features/reviews/ui/ReviewQueueInspector.tsx)
+  - [`apps/teacher/src/app/page.tsx`](file:///apps/teacher/src/app/page.tsx)
+- **REST Ендпоінти Верифікації:**
+  1. `GET /api/v1/bkt/reviews/queue`:
+     - Отримує перелік робіт зі статусом `PENDING_REVIEW` або `REJECTED`, збагачений даними про завдання (назва, умова, `referenceAnswer`, `rubrics`, `misconceptions`), модуль знань та студента.
+  2. `POST /api/v1/bkt/reviews/:submissionId/decision`:
+     - Тіло запиту: `{ decision: 'APPROVE' | 'REJECT', teacherComment?: string, scoreOverride?: number }`.
+     - При рішенні `APPROVE`:
+       - Оновлює запис у `submissions` зі статусом `TeacherReviewStatus.APPROVED`, встановлює фінальний бал `scoreOverride` або збережений `semanticScore`, записує `teacherComment`.
+       - Оновлює запис у таблиці `bkt_histories` (`isCorrect = true`, `teacherReviewStatus = APPROVED`).
+       - Розраховує наступний BKT стан студента для навички: `BktEngine.calculateNextState(currentState, true)`.
+       - Зберігає оновлений рівень майстерності $P(L)$ у таблиці `bkt_states`.
+     - При рішенні `REJECT`:
+       - Оновлює статус на `TeacherReviewStatus.REJECTED` та фіксує коментар викладача.
+- **Frontend Модуль Кабінету Викладача (`ReviewQueueInspector`):**
+  - Створено модульний компонент згідно з **Правилом 6 (Reusability & DRY First)**.
+  - Лічильник черги робіт у навігаційній рейці та бічній панелі.
+  - Повний контекст для оцінювання:
+    - Умова завдання та еталонне пояснення (`Reference Answer`).
+    - Текст відповіді студента з точним підрахунком кількості слів.
+    - Чіпси ключових понять критеріїв оцінювання (рубрик).
+    - Форма введення персонального коментаря викладача та числового перевизначення балу (0.0..1.0).
+    - Кнопки швидкої верифікації «✓ Затвердити відповідь» та «✕ Відхилити відповідь».
+- **Тестування та Верифікація:**
+  - 33/33 unit-тестів API пройдено (7 тест-сьютів, включно з верифікацією та BKT перерахунком).
+  - Повна компіляція `npm run build:teacher` та `npm run build:api` завершується без помилок.

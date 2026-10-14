@@ -13,9 +13,7 @@
           "level": 3,
           "paragraphs": [
             "eferenceAnswer, критерії options.keywords (microtask|мікротаск|promise|проміс, macrotask|макротаск|settimeout|таймер, call stack|стек, черга|queue) та minWords: 15.",
-            "pm run db:seed.",
-            "pm run build:student успішно пройшла компіляцію.",
-            "pm run build:api збирається без помилок."
+            "pm run db:seed."
           ],
           "code_blocks": [],
           "items": [
@@ -257,8 +255,39 @@
             },
             {
               "type": "text",
-              "raw_text": "Збірка",
+              "raw_text": "Збірка `npm run build:student` успішно пройшла компіляцію.",
               "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Збірка `npm run build:api` збирається без помилок.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Phase 3 · Мікро-крок 6: Human-in-the-Loop Кабінет Викладача (`apps/teacher`) та REST API Верифікації:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Backend API (`apps/api`):**",
+              "subitems": [
+                "Додано ендпоінт черги відкритих відповідей `GET /api/v1/bkt/reviews/queue`, що вибирає роботи у статусі `PENDING_REVIEW` разом з умовами завдань, еталонами, рубриками та даними студента.",
+                "Додано ендпоінт верифікації `POST /api/v1/bkt/reviews/:submissionId/decision`.",
+                "При схваленні викладачем (`APPROVE`): оцінка оновлюється (з урахуванням ручного `scoreOverride`), статус переходить в `APPROVED`, фіксується коментар викладача `teacherComment`, та викликається перерахунок BKT майстерності `BktEngine.calculateNextState` для оновлення `bkt_states`.",
+                "При відхиленні (`REJECT`): статус оновлюється до `REJECTED`, а спроба позначається як неуспішна в журналі.",
+                "Додано модульні тести в `bkt.controller.spec.ts` (33/33 тестів пройдено у 7 тест-сьютах)."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Frontend UI (`apps/teacher`):**",
+              "subitems": [
+                "Реалізовано вкладку «Черга перевірки» (Review Queue) з лічильником неперевірених робіт у верхній панелі та бічній навігації.",
+                "Згідно з **Правилом 6 (Reusability & DRY First)** створено окремий модульний компонент `ReviewQueueInspector` (`apps/teacher/src/features/reviews/ui/ReviewQueueInspector.tsx`).",
+                "Інтерфейс викладача містить: умову завдання, еталонне пояснення, текст відповіді студента з підрахунком слів, плашки ключових понять критеріїв (рубрик), форму відгуку/коментаря студенту, поле ручного перевизначення балу (0.0..1.0) та кнопки дій «✓ Затвердити відповідь» / «✕ Відхилити відповідь».",
+                "Збірка `npm run build:teacher` та `npm run build:api` завершуються успішно."
+              ]
             }
           ]
         }

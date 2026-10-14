@@ -2711,9 +2711,7 @@
         {
           "title": "11.6 Візуалізація результатів семантичного оцінювання у Студентському Кабінеті (\u0007pps/student)",
           "level": 3,
-          "paragraphs": [
-            "pm run build:student успішно компілюється Next.js Turbopack без помилок типів."
-          ],
+          "paragraphs": [],
           "code_blocks": [],
           "items": [
             {
@@ -2748,7 +2746,107 @@
             },
             {
               "type": "text",
-              "raw_text": "-",
+              "raw_text": "`npm run build:student` успішно компілюється Next.js Turbopack без помилок типів.",
+              "subitems": []
+            }
+          ]
+        },
+        {
+          "title": "11.7 Human-in-the-Loop Кабінет Викладача та REST API Верифікації (`apps/teacher`, `apps/api`)",
+          "level": 3,
+          "paragraphs": [],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "**Файли реалізації:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "[`apps/api/src/adapters/inbound/http/bkt.controller.ts`](file:///apps/api/src/adapters/inbound/http/bkt.controller.ts)",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "[`apps/api/src/adapters/inbound/http/bkt.controller.spec.ts`](file:///apps/api/src/adapters/inbound/http/bkt.controller.spec.ts)",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "[`apps/teacher/src/features/reviews/ui/ReviewQueueInspector.tsx`](file:///apps/teacher/src/features/reviews/ui/ReviewQueueInspector.tsx)",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "[`apps/teacher/src/app/page.tsx`](file:///apps/teacher/src/app/page.tsx)",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**REST Ендпоінти Верифікації:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "`GET /api/v1/bkt/reviews/queue`:",
+              "subitems": [
+                "Отримує перелік робіт зі статусом `PENDING_REVIEW` або `REJECTED`, збагачений даними про завдання (назва, умова, `referenceAnswer`, `rubrics`, `misconceptions`), модуль знань та студента."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "`POST /api/v1/bkt/reviews/:submissionId/decision`:",
+              "subitems": [
+                "Тіло запиту: `{ decision: 'APPROVE' | 'REJECT', teacherComment?: string, scoreOverride?: number }`.",
+                "При рішенні `APPROVE`:",
+                "Оновлює запис у `submissions` зі статусом `TeacherReviewStatus.APPROVED`, встановлює фінальний бал `scoreOverride` або збережений `semanticScore`, записує `teacherComment`.",
+                "Оновлює запис у таблиці `bkt_histories` (`isCorrect = true`, `teacherReviewStatus = APPROVED`).",
+                "Розраховує наступний BKT стан студента для навички: `BktEngine.calculateNextState(currentState, true)`.",
+                "Зберігає оновлений рівень майстерності $P(L)$ у таблиці `bkt_states`.",
+                "При рішенні `REJECT`:",
+                "Оновлює статус на `TeacherReviewStatus.REJECTED` та фіксує коментар викладача."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Frontend Модуль Кабінету Викладача (`ReviewQueueInspector`):**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Створено модульний компонент згідно з **Правилом 6 (Reusability & DRY First)**.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Лічильник черги робіт у навігаційній рейці та бічній панелі.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Повний контекст для оцінювання:",
+              "subitems": [
+                "Умова завдання та еталонне пояснення (`Reference Answer`).",
+                "Текст відповіді студента з точним підрахунком кількості слів.",
+                "Чіпси ключових понять критеріїв оцінювання (рубрик).",
+                "Форма введення персонального коментаря викладача та числового перевизначення балу (0.0..1.0).",
+                "Кнопки швидкої верифікації «✓ Затвердити відповідь» та «✕ Відхилити відповідь»."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Тестування та Верифікація:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "33/33 unit-тестів API пройдено (7 тест-сьютів, включно з верифікацією та BKT перерахунком).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Повна компіляція `npm run build:teacher` та `npm run build:api` завершується без помилок.",
               "subitems": []
             }
           ]
