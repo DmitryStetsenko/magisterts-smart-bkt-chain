@@ -28,6 +28,14 @@
      - Вагання при частковій відповіді (`conceptCoverageRatio \ge 0.5` та `deletionRatio \ge 0.25`) $\implies P(S) \to 0.35$ (пом'якшення штрафу BKT).
    - Оновлено `SubmitTaskDto` та ендпоінт `POST /api/v1/bkt/evaluate` (замінено старий лічильник слів на `OpenTextHeuristicEvaluator`).
    - Усі unit-тести API: 26/26 ✅, компіляція `build:api` ✅.
+5. **Phase 3 · Мікро-крок 3: Розширення схеми БД Prisma (`packages/database`):**
+   - До моделі `Task` додано поля: `referenceAnswer` (еталонна відповідь), `rubrics` (JSON критерії та ключові сутності), `misconceptions` (JSON типових хибних уявлень).
+   - До моделі `TaskType` додано новий тип `OPEN_TEXT`.
+   - Створено `enum TeacherReviewStatus { NONE, PENDING_REVIEW, APPROVED, REJECTED }`.
+   - До моделей `BktHistory` та `Submission` додано поля `semanticScore`, `feedbackText`, `teacherReviewStatus`, `teacherComment`.
+   - Успішно виконано синхронізацію з БД через `prisma db push` та згенеровано оновлений Prisma Client `prisma generate`.
+   - У `BktController` збереження спроб фіксує `semanticScore` та `feedbackText`, а в ендпоінт аналітики студентів `GET /api/v1/bkt/analytics/students` додано передачу цих полів у `recentAdjustments`.
+   - Збірка `build:api` ✅ та всі unit-тести API 26/26 ✅ успішно пройдені.
 
 ## 📅 13 жовтня 2026 року
 

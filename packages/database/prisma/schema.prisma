@@ -33,6 +33,14 @@ enum TaskType {
   SINGLE_CHOICE
   MULTIPLE_CHOICE
   TEXT_ESSAY
+  OPEN_TEXT
+}
+
+enum TeacherReviewStatus {
+  NONE
+  PENDING_REVIEW
+  APPROVED
+  REJECTED
 }
 
 enum CredentialType {
@@ -128,6 +136,9 @@ model Task {
   description       String
   starterCode       String?
   options           Json?
+  referenceAnswer   String?
+  rubrics           Json?
+  misconceptions    Json?
   difficulty        TaskDifficulty     @default(EASY)
   timeLimitMs       Int                @default(5000)
   memoryLimitMb     Int                @default(128)
@@ -172,20 +183,24 @@ model BktState {
 }
 
 model BktHistory {
-  id             String    @id @default(uuid())
-  userId         String
-  user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  skillId        String
-  skill          SkillNode @relation(fields: [skillId], references: [id], onDelete: Cascade)
-  taskId         String?
-  task           Task?     @relation(fields: [taskId], references: [id], onDelete: SetNull)
-  pMasteryBefore Float
-  pMasteryAfter  Float
-  isCorrect      Boolean
-  pSlipUsed      Float?
-  pGuessUsed     Float?
-  adjustReasons  String[]  @default([])
-  createdAt      DateTime  @default(now())
+  id                  String              @id @default(uuid())
+  userId              String
+  user                User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  skillId             String
+  skill               SkillNode           @relation(fields: [skillId], references: [id], onDelete: Cascade)
+  taskId              String?
+  task                Task?               @relation(fields: [taskId], references: [id], onDelete: SetNull)
+  pMasteryBefore      Float
+  pMasteryAfter       Float
+  isCorrect           Boolean
+  pSlipUsed           Float?
+  pGuessUsed          Float?
+  adjustReasons       String[]            @default([])
+  semanticScore       Float?
+  feedbackText        String?
+  teacherReviewStatus TeacherReviewStatus @default(NONE)
+  teacherComment      String?
+  createdAt           DateTime            @default(now())
 
   @@map("bkt_histories")
 }
@@ -231,15 +246,17 @@ model BehavioralProfile {
 }
 
 model Submission {
-  id               String            @id @default(uuid())
-  userId           String
-  user             User              @relation(fields: [userId], references: [id], onDelete: Cascade)
-  taskId           String
-  task             Task              @relation(fields: [taskId], references: [id], onDelete: Cascade)
-  code             String
-  status           SubmissionStatus  @default(PENDING)
-  createdAt        DateTime          @default(now())
-  evaluationResult EvaluationResult?
+  id                  String              @id @default(uuid())
+  userId              String
+  user                User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  taskId              String
+  task                Task                @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  code                String
+  status              SubmissionStatus    @default(PENDING)
+  teacherReviewStatus TeacherReviewStatus @default(NONE)
+  teacherComment      String?
+  createdAt           DateTime            @default(now())
+  evaluationResult    EvaluationResult?
 
   @@map("submissions")
 }

@@ -47,6 +47,7 @@ export class BktController {
     let testDetails: any[] = [];
     let passedTestsRatio: number | undefined = undefined;
     let conceptCoverageRatio: number | undefined = undefined;
+    let semanticScore: number | undefined = undefined;
 
     // Polyglot Evaluation Strategies based on TaskType
     switch (task.taskType) {
@@ -78,13 +79,14 @@ export class BktController {
         break;
       }
 
-      case TaskType.TEXT_ESSAY: {
+      case TaskType.TEXT_ESSAY:
+      case (TaskType as any).OPEN_TEXT: {
         const essayText = (dto.essayAnswer || '').trim();
         const options = (task.options as { keywords?: string[]; minWords?: number; maxWords?: number }) || {};
 
         // Виклик чистого доменного модуля OpenTextHeuristicEvaluator (Tier 1)
         const evalRes = OpenTextHeuristicEvaluator.evaluate(essayText, {
-          keywords: options.keywords,
+          keywords: (task.rubrics as any)?.keywords || options.keywords,
           minWords: options.minWords ?? 5,
           maxWords: options.maxWords,
           taskQuestion: task.description || task.title,
@@ -93,6 +95,7 @@ export class BktController {
         isPassed = evalRes.isPassed;
         feedback = evalRes.feedback;
         conceptCoverageRatio = evalRes.conceptCoverageRatio;
+        semanticScore = evalRes.score;
         break;
       }
 
@@ -285,6 +288,8 @@ export class BktController {
         pSlipUsed: adjusted.pSlip,
         pGuessUsed: adjusted.pGuess,
         adjustReasons: adjusted.reasons,
+        semanticScore: semanticScore ?? null,
+        feedbackText: feedback,
       },
     });
 
@@ -292,6 +297,7 @@ export class BktController {
       submissionId: submission.id,
       isPassed,
       feedback,
+      semanticScore,
       testDetails,
       taskType: task.taskType,
       bktUpdate: {
@@ -491,6 +497,10 @@ export class BktController {
         pSlipUsed: h.pSlipUsed,
         pGuessUsed: h.pGuessUsed,
         adjustReasons: h.adjustReasons,
+        semanticScore: h.semanticScore ?? undefined,
+        feedbackText: h.feedbackText ?? undefined,
+        teacherReviewStatus: h.teacherReviewStatus,
+        teacherComment: h.teacherComment ?? undefined,
         isCorrect: h.isCorrect,
         createdAt: h.createdAt,
       }));

@@ -612,6 +612,30 @@ sequenceDiagram
   - В `BktController.evaluateSubmission` замінено наївний підрахунок слів на виклик `OpenTextHeuristicEvaluator`.
   - Усі unit-тести API: 26/26 ✅.
 
+### 11.3 Розширення Схеми Даних Prisma (`packages/database`)
+- **Файл схеми:** [`packages/database/prisma/schema.prisma`](file:///packages/database/prisma/schema.prisma).
+- **Зміни в енумах:**
+  - Додано `TaskType.OPEN_TEXT` для явного позначення відкритих письмових запитань.
+  - Створено `enum TeacherReviewStatus`:
+    - `NONE` — стандартний автоматичний вердикт без потреби ручного втручання.
+    - `PENDING_REVIEW` — відповідь потрапила у сіру зону або очікує перевірки викладачем після апеляції студента.
+    - `APPROVED` — викладач підтвердив або підвищив оцінку відповіді.
+    - `REJECTED` — викладач відхилив відповідь із коментарем.
+- **Розширення моделі `Task`:**
+  - `referenceAnswer String?` — еталонна авторська відповідь або приклад для семантичного порівняння.
+  - `rubrics Json?` — конфігурація критеріїв оцінки (`keywords`, `minWords`, `rubricCriteria`).
+  - `misconceptions Json?` — перелік типових когнітивних помилок або хибних тверджень.
+- **Розширення моделей `BktHistory` та `Submission`:**
+  - `semanticScore Float?` — розрахований семантичний бал ($0.0 \dots 1.0$).
+  - `feedbackText String?` — збережений розгорнутий текстовий відгук системи для студента.
+  - `teacherReviewStatus TeacherReviewStatus @default(NONE)` — статус викладацького аудиту.
+  - `teacherComment String?` — персональний коментар викладача.
+- **Синхронізація:**
+  - `npx prisma db push --schema=packages/database/prisma/schema.prisma` виконано успішно.
+  - `npx prisma generate` оновив клієнт Prisma в монорепозиторії.
+  - `recentAdjustments` у `BktController` повертає повний набір семантичних полів для Teacher Analytics Dashboard.
+
+
 
 
 

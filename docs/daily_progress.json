@@ -110,6 +110,46 @@
               "type": "text",
               "raw_text": "Усі unit-тести API: 26/26 ✅, компіляція `build:api` ✅.",
               "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Phase 3 · Мікро-крок 3: Розширення схеми БД Prisma (`packages/database`):**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "До моделі `Task` додано поля: `referenceAnswer` (еталонна відповідь), `rubrics` (JSON критерії та ключові сутності), `misconceptions` (JSON типових хибних уявлень).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "До моделі `TaskType` додано новий тип `OPEN_TEXT`.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Створено `enum TeacherReviewStatus { NONE, PENDING_REVIEW, APPROVED, REJECTED }`.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "До моделей `BktHistory` та `Submission` додано поля `semanticScore`, `feedbackText`, `teacherReviewStatus`, `teacherComment`.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Успішно виконано синхронізацію з БД через `prisma db push` та згенеровано оновлений Prisma Client `prisma generate`.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "У `BktController` збереження спроб фіксує `semanticScore` та `feedbackText`, а в ендпоінт аналітики студентів `GET /api/v1/bkt/analytics/students` додано передачу цих полів у `recentAdjustments`.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Збірка `build:api` ✅ та всі unit-тести API 26/26 ✅ успішно пройдені.",
+              "subitems": []
             }
           ]
         }
