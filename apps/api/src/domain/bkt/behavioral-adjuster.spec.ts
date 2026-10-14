@@ -62,4 +62,29 @@ describe('BehavioralAdjuster (dynamic Slip/Guess)', () => {
     const dynamic = BktEngine.calculateNextState({ pMastery: 0.9, pTransit: 0.1, pSlip: adj.pSlip, pGuess: adj.pGuess }, false);
     expect(dynamic.pMasteryPosterior).toBeGreaterThan(fixed.pMasteryPosterior + 0.2);
   });
+
+  it('raises Guess for OPEN_TEXT when paste events are detected', () => {
+    const r = BehavioralAdjuster.adjust(BASE, {
+      taskType: 'TEXT_ESSAY',
+      isCorrect: true,
+      currentMastery: 0.4,
+      pasteEvents: 2,
+      typingWpm: 150,
+    });
+    expect(r.pGuess).toBe(0.9);
+    expect(r.reasons.some((x) => x.includes('підозра на сторонній копіпаст'))).toBe(true);
+  });
+
+  it('raises Slip for hesitant partial open-text answer with high deletion ratio', () => {
+    const r = BehavioralAdjuster.adjust(BASE, {
+      taskType: 'OPEN_TEXT',
+      isCorrect: false,
+      currentMastery: 0.6,
+      conceptCoverageRatio: 0.55,
+      deletionRatio: 0.3,
+    });
+    expect(r.pSlip).toBe(0.35);
+    expect(r.reasons.some((x) => x.includes('часткове розкриття'))).toBe(true);
+  });
 });
+

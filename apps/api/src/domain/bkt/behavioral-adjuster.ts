@@ -7,7 +7,7 @@
  */
 
 export interface BehavioralSignals {
-  /** Тип завдання (SINGLE_CHOICE, MULTIPLE_CHOICE, CODE, ESSAY, ...) */
+  /** Тип завдання (SINGLE_CHOICE, MULTIPLE_CHOICE, CODE, ESSAY, OPEN_TEXT, ...) */
   taskType: string;
   /** Чи правильна відповідь */
   isCorrect: boolean;
@@ -21,6 +21,12 @@ export interface BehavioralSignals {
   pauseCount?: number;
   /** Частка пройдених тестів для CODE (0..1) */
   passedTestsRatio?: number;
+  /** Кількість подій вставки з буфера обміну (Paste events) */
+  pasteEvents?: number;
+  /** Швидкість набору тексту (WPM) */
+  typingWpm?: number;
+  /** Частка покриття ключових понять для TEXT_ESSAY / OPEN_TEXT (0..1) */
+  conceptCoverageRatio?: number;
 }
 
 export interface BaseSlipGuess {
@@ -36,6 +42,7 @@ export interface AdjustedSlipGuess extends BaseSlipGuess {
 export const ADJUSTER_CONFIG = {
   FAST_CHOICE_LATENCY_MS: 3500,
   GUESS_ON_FAST_CHOICE: 0.85,
+  GUESS_ON_PASTE_OPEN_TEXT: 0.9,
   HIGH_MASTERY: 0.7,
   LOW_MASTERY: 0.3,
   CONFIDENT_DELETION_RATIO: 0.15,
@@ -44,12 +51,14 @@ export const ADJUSTER_CONFIG = {
   NEAR_PASS_TESTS_RATIO: 0.7,
   SLIP_CARELESS: 0.3,
   SLIP_EDGE_CASE: 0.25,
+  SLIP_OPEN_TEXT_HESITATION: 0.35,
   SLIP_TRUE_LACK: 0.05,
   MIN_P: 0.01,
   MAX_P: 0.9,
 } as const;
 
 const CHOICE_TYPES = new Set(['SINGLE_CHOICE', 'MULTIPLE_CHOICE']);
+const OPEN_TEXT_TYPES = new Set(['TEXT_ESSAY', 'OPEN_TEXT']);
 
 export class BehavioralAdjuster {
   static adjust(base: BaseSlipGuess, s: BehavioralSignals): AdjustedSlipGuess {
@@ -69,7 +78,21 @@ export class BehavioralAdjuster {
       reasons.push(`G↑ ${pGuess}: відповідь за ${s.reactionLatencyMs} мс — можливе вгадування`);
     }
 
-    // ── Slip: аналізується лише для неправильних відповідей ──
+    // ── Guess: підозра на копіпаст у відкритих текстових відповідях ──
+    if (
+      s.isCorrect &&
+      OPEN_TEXT_TYPES.has(s.taskType) &&
+      ((s.pasteEvents !== undefined && s.pasteEvents > 0) ||
+        (s.reactionLatencyMs !== undefined && s.reactionLatencyMs < 3000) ||
+        (s.typingWpm !== undefined && s.typingWpm > 120))
+    ) {
+      pGuess = Math.max(pGuess, C.GUESS_ON_PASTE_OPEN_TEXT);
+      reasons.push(
+        `G↑ ${pGuess}: підозра на сторонній копіпаст тексту (paste: ${s.pasteEvents ?? 0}, wpm: ${s.typingWpm ?? 'Н/А'})`,
+      );
+    }
+
+    // ── Slip: аналізується для неправильних або частково зарахованих відповідей ──
     if (!s.isCorrect) {
       const chaotic =
         (s.deletionRatio ?? 0) >= C.CHAOTIC_DELETION_RATIO ||
@@ -88,7 +111,20 @@ export class BehavioralAdjuster {
         s.passedTestsRatio < 1
       ) {
         pSlip = Math.max(pSlip, C.SLIP_EDGE_CASE);
-        reasons.push(`S↑ ${pSlip}: пройдено ${Math.round(s.passedTestsRatio * 100)}% тестів — неуважність на граничному випадку`);
+        reasons.push(
+          `S↑ ${pSlip}: пройдено ${Math.round(s.passedTestsRatio * 100)}% тестів — неуважність на граничному випадку`,
+        );
+      } else if (
+        OPEN_TEXT_TYPES.has(s.taskType) &&
+        s.conceptCoverageRatio !== undefined &&
+        s.conceptCoverageRatio >= 0.5 &&
+        (s.deletionRatio ?? 0) >= 0.25
+      ) {
+        // Учень частково розкрив тему, довго редагував і вагався
+        pSlip = Math.max(pSlip, C.SLIP_OPEN_TEXT_HESITATION);
+        reasons.push(
+          `S↑ ${pSlip}: часткове розкриття (${Math.round(s.conceptCoverageRatio * 100)}%) з ваганням — ймовірні сумніви у формулюванні`,
+        );
       } else if (
         s.currentMastery >= C.HIGH_MASTERY &&
         s.deletionRatio !== undefined &&

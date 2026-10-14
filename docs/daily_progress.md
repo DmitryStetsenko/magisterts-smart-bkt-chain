@@ -13,6 +13,21 @@
      - **Tier 3 (LLM-as-a-Judge):** Рубрикове оцінювання (`correctness`, `completeness`, `keyConceptsCovered`, `studentFeedback`) зі структурованим JSON виходом.
    - Пов'язано семантичний вердикт з поведінковою телеметрією друку (аналіз подій вставки `pasteEvents`, часу відповіді, коефіцієнта видалення `deletionRatio`, пауз вагання) для коригування $P(Guess)$ та $P(Slip)$ у `BehavioralAdjuster`.
    - Визначено механізм «Human-in-the-Loop» у кабінеті викладача (`apps/teacher`) з чергою апеляцій та сумнівних відповідей для ручного підтвердження/корекції оцінки в один клік.
+2. **Закріплення Правила Перевикористання та Модульності ([`.agents/AGENTS.md`](file:///.agents/AGENTS.md)):**
+   - Додано обов'язкове правило №6: «Аудит існуючого коду перед розробкою та проєктування з прицілом на повторне використання (Reusability & DRY First)».
+3. **Phase 3 · Мікро-крок 1: Доменний Модуль `OpenTextHeuristicEvaluator` (Tier 1 Heuristics):**
+   - Створено чистий, ізольований від фреймворків доменний модуль `apps/api/src/domain/evaluation/open-text-heuristic-evaluator.ts`.
+   - Підтримка перевірки ключових понять з групами синонімів (`термін1|термін2`), розрахунок Type-Token Ratio (фільтр тавтологій та сміттєвого тексту).
+   - Алгоритм виявлення копіпасту умови самого завдання за порогом перекриття слів $\ge 60\%$.
+   - Генерація персоналізованого текстового фідбеку студенту (що враховано, а які поняття упущено).
+   - Unit-тести `open-text-heuristic-evaluator.spec.ts`: 5/5 ✅.
+4. **Phase 3 · Мікро-крок 2: Інтеграція Відкритих Відповідей з `BehavioralAdjuster` та `BktController`:**
+   - Розширено `BehavioralSignals` новими телеметричними сигналами: `pasteEvents`, `typingWpm`, `conceptCoverageRatio`.
+   - Додано правила динамічної адаптації:
+     - Детекція копіпасту у відкритих відповідях (`pasteEvents > 0` або швидкість $> 120\text{ WPM}$) $\implies P(G) \to 0.90$.
+     - Вагання при частковій відповіді (`conceptCoverageRatio \ge 0.5` та `deletionRatio \ge 0.25`) $\implies P(S) \to 0.35$ (пом'якшення штрафу BKT).
+   - Оновлено `SubmitTaskDto` та ендпоінт `POST /api/v1/bkt/evaluate` (замінено старий лічильник слів на `OpenTextHeuristicEvaluator`).
+   - Усі unit-тести API: 26/26 ✅, компіляція `build:api` ✅.
 
 ## 📅 13 жовтня 2026 року
 

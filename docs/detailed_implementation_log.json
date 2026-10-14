@@ -2313,6 +2313,158 @@
               "type": "text",
               "raw_text": "Виконано перевірку компіляції: `npm run build:student` ✅ та `npm run build:teacher` ✅ (0 помилок типізації).",
               "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "---",
+              "subitems": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "🔬 11. Phase 3: Багаторівневе Семантичне Оцінювання Відкритих Відповідей та BKT",
+      "level": 2,
+      "paragraphs": [],
+      "code_blocks": [],
+      "items": [],
+      "subsections": [
+        {
+          "title": "11.1 Доменний Модуль `OpenTextHeuristicEvaluator` (Tier 1 Heuristics)",
+          "level": 3,
+          "paragraphs": [],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "**Файл реалізації:** [`apps/api/src/domain/evaluation/open-text-heuristic-evaluator.ts`](file:///apps/api/src/domain/evaluation/open-text-heuristic-evaluator.ts).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Архітектурний принцип:** Повністю чистий доменний модуль без прив'язки до NestJS/Prisma. Може викликатися як на бекенді, так і в клієнтському коді для миттєвої валідації введення.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Ключові алгоритмічні механізми:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Семантичне покриття понять (`conceptCoverageRatio`):**",
+              "subitems": [
+                "Підтримка альтернативних синонімів через розділювач `|` (наприклад, `декоратор|wrapping`, `функція|target`).",
+                "Перевірка входження лем/коренів понять у нормалізований нижній регістр відповіді студента."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Лексична різноманітність (Type-Token Ratio):**",
+              "subitems": [
+                "Розрахунок $\\text{TTR} = \\frac{|\\text{UniqueWords}|}{|\\text{TotalWords}|}$.",
+                "Відсікання сміттєвого тексту або тавтології (якщо $\\text{TTR} < 0.45$ при довжині $\\ge 6$ слів)."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Детекція копіпасту запитання:**",
+              "subitems": [
+                "Розрахунок коефіцієнта перекриття слів із текстом умови запитання (`questionOverlapRatio`).",
+                "Якщо $\\ge 60\\%$ слів студента є словами із самого запитання, відповідь відхиляється як `isQuestionCopyPaste = true` з конструктивним поясненням: *«Відповідь здебільшого дублює саме запитання. Будь ласка, сформулюйте визначення власними словами»*."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Інтегральний бал (Score 0..1):**",
+              "subitems": [
+                "$$\\text{Score} = 0.6 \\cdot \\text{ConceptFactor} + 0.25 \\cdot \\text{LengthFactor} + 0.15 \\cdot \\text{DiversityFactor}$$"
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Конструктивний фідбек:** Автоматичний перелік врахованих і пропущених понять для підказки студенту.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Unit-тести:** [`open-text-heuristic-evaluator.spec.ts`](file:///apps/api/src/domain/evaluation/open-text-heuristic-evaluator.spec.ts) — 5/5 тестів ✅.",
+              "subitems": []
+            }
+          ]
+        },
+        {
+          "title": "11.2 Інтеграція з `BehavioralAdjuster` та `BktController`",
+          "level": 3,
+          "paragraphs": [],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "**Файл реалізації:** [`apps/api/src/domain/bkt/behavioral-adjuster.ts`](file:///apps/api/src/domain/bkt/behavioral-adjuster.ts).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Розширення моделі сигналів `BehavioralSignals`:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "`pasteEvents?: number` — кількість подій вставки з буфера.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "`typingWpm?: number` — швидкість набору тексту (Words Per Minute).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "`conceptCoverageRatio?: number` — ступінь розкриття понять у відкритій відповіді.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Правила адаптації:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Детекція копіпасту у відкритих відповідях:**",
+              "subitems": [
+                "$$(\\text{pasteEvents} > 0 \\lor \\text{latency} < 3000\\text{ms} \\lor \\text{WPM} > 120) \\implies P(Guess) = \\max(P(G), 0.90)$$",
+                "Фіксація причини: *«G↑ 0.9: підозра на сторонній копіпаст тексту»*."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Вагання при частковій відповіді:**",
+              "subitems": [
+                "$$(\\text{conceptCoverageRatio} \\ge 0.5 \\land \\text{deletionRatio} \\ge 0.25) \\implies P(Slip) = \\max(P(S), 0.35)$$",
+                "Студент знає тему, але вагався у формулюванні. Штраф BKT пом'якшується."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Оновлення REST API:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "`SubmitTaskDto` приймає нові параметри телеметрії `pasteEvents` та `typingWpm`.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "В `BktController.evaluateSubmission` замінено наївний підрахунок слів на виклик `OpenTextHeuristicEvaluator`.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Усі unit-тести API: 26/26 ✅.",
+              "subitems": []
             }
           ]
         }

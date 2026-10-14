@@ -5,6 +5,7 @@ import { PrismaService } from '../../outbound/persistence/prisma.service';
 import { TelemetryGateway } from '../websocket/telemetry.gateway';
 import { BktEngine } from '../../../domain/bkt/bkt-engine';
 import { BehavioralAdjuster } from '../../../domain/bkt/behavioral-adjuster';
+import { OpenTextHeuristicEvaluator } from '../../../domain/evaluation/open-text-heuristic-evaluator';
 import { SubmitTaskDto } from './dto/submit-task.dto';
 import { SubmissionStatus, TaskType } from '@sbc/database';
 
@@ -45,6 +46,7 @@ export class BktController {
     let feedback = '';
     let testDetails: any[] = [];
     let passedTestsRatio: number | undefined = undefined;
+    let conceptCoverageRatio: number | undefined = undefined;
 
     // Polyglot Evaluation Strategies based on TaskType
     switch (task.taskType) {
@@ -78,21 +80,19 @@ export class BktController {
 
       case TaskType.TEXT_ESSAY: {
         const essayText = (dto.essayAnswer || '').trim();
-        const options = (task.options as { keywords?: string[]; minWords?: number }) || {};
-        const keywords = options.keywords || [];
-        const minWords = options.minWords || 10;
+        const options = (task.options as { keywords?: string[]; minWords?: number; maxWords?: number }) || {};
 
-        const words = essayText.split(/\s+/).filter(Boolean);
-        const lowerText = essayText.toLowerCase();
+        // Виклик чистого доменного модуля OpenTextHeuristicEvaluator (Tier 1)
+        const evalRes = OpenTextHeuristicEvaluator.evaluate(essayText, {
+          keywords: options.keywords,
+          minWords: options.minWords ?? 5,
+          maxWords: options.maxWords,
+          taskQuestion: task.description || task.title,
+        });
 
-        const matchedKeywords = keywords.filter((kw) => lowerText.includes(kw.toLowerCase()));
-        const isWordLengthOk = words.length >= minWords;
-        const isKeywordMatchOk = keywords.length === 0 || matchedKeywords.length >= Math.min(2, keywords.length);
-
-        isPassed = isWordLengthOk && isKeywordMatchOk;
-        feedback = isPassed
-          ? `Чудова розгорнута відповідь! Обсяг: ${words.length} слів, ключові категорії висвітлено: (${matchedKeywords.join(', ')})`
-          : `Відповідь потребує доопрацювання. Перевірте обсяг (мін. ${minWords} слів) та використання ключових понять (${keywords.join(', ')})`;
+        isPassed = evalRes.isPassed;
+        feedback = evalRes.feedback;
+        conceptCoverageRatio = evalRes.conceptCoverageRatio;
         break;
       }
 
@@ -237,6 +237,9 @@ export class BktController {
         deletionRatio: dto.deletionRatio,
         pauseCount: dto.pauseCount,
         passedTestsRatio,
+        pasteEvents: dto.pasteEvents,
+        typingWpm: dto.typingWpm,
+        conceptCoverageRatio,
       },
     );
 

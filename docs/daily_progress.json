@@ -42,6 +42,74 @@
               "type": "text",
               "raw_text": "Визначено механізм «Human-in-the-Loop» у кабінеті викладача (`apps/teacher`) з чергою апеляцій та сумнівних відповідей для ручного підтвердження/корекції оцінки в один клік.",
               "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Закріплення Правила Перевикористання та Модульності ([`.agents/AGENTS.md`](file:///.agents/AGENTS.md)):**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Додано обов'язкове правило №6: «Аудит існуючого коду перед розробкою та проєктування з прицілом на повторне використання (Reusability & DRY First)».",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Phase 3 · Мікро-крок 1: Доменний Модуль `OpenTextHeuristicEvaluator` (Tier 1 Heuristics):**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Створено чистий, ізольований від фреймворків доменний модуль `apps/api/src/domain/evaluation/open-text-heuristic-evaluator.ts`.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Підтримка перевірки ключових понять з групами синонімів (`термін1|термін2`), розрахунок Type-Token Ratio (фільтр тавтологій та сміттєвого тексту).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Алгоритм виявлення копіпасту умови самого завдання за порогом перекриття слів $\\ge 60\\%$.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Генерація персоналізованого текстового фідбеку студенту (що враховано, а які поняття упущено).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Unit-тести `open-text-heuristic-evaluator.spec.ts`: 5/5 ✅.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Phase 3 · Мікро-крок 2: Інтеграція Відкритих Відповідей з `BehavioralAdjuster` та `BktController`:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Розширено `BehavioralSignals` новими телеметричними сигналами: `pasteEvents`, `typingWpm`, `conceptCoverageRatio`.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Додано правила динамічної адаптації:",
+              "subitems": [
+                "Детекція копіпасту у відкритих відповідях (`pasteEvents > 0` або швидкість $> 120\\text{ WPM}$) $\\implies P(G) \\to 0.90$.",
+                "Вагання при частковій відповіді (`conceptCoverageRatio \\ge 0.5` та `deletionRatio \\ge 0.25`) $\\implies P(S) \\to 0.35$ (пом'якшення штрафу BKT)."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "Оновлено `SubmitTaskDto` та ендпоінт `POST /api/v1/bkt/evaluate` (замінено старий лічильник слів на `OpenTextHeuristicEvaluator`).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Усі unit-тести API: 26/26 ✅, компіляція `build:api` ✅.",
+              "subitems": []
             }
           ]
         }

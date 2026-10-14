@@ -27,4 +27,10 @@ export class SubmitTaskDto {
 
   @ApiProperty({ description: 'Number of long pauses during solving, from editor telemetry', required: false })
   pauseCount?: number;
+
+  @ApiProperty({ description: 'Number of paste events during solving, from editor telemetry', required: false })
+  pasteEvents?: number;
+
+  @ApiProperty({ description: 'Typing speed in words per minute (WPM), from editor telemetry', required: false })
+  typingWpm?: number;
 }

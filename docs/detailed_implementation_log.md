@@ -572,5 +572,46 @@ sequenceDiagram
 - **Контроль якості:**
   - Виконано перевірку компіляції: `npm run build:student` ✅ та `npm run build:teacher` ✅ (0 помилок типізації).
 
+---
+
+## 🔬 11. Phase 3: Багаторівневе Семантичне Оцінювання Відкритих Відповідей та BKT
+
+### 11.1 Доменний Модуль `OpenTextHeuristicEvaluator` (Tier 1 Heuristics)
+- **Файл реалізації:** [`apps/api/src/domain/evaluation/open-text-heuristic-evaluator.ts`](file:///apps/api/src/domain/evaluation/open-text-heuristic-evaluator.ts).
+- **Архітектурний принцип:** Повністю чистий доменний модуль без прив'язки до NestJS/Prisma. Може викликатися як на бекенді, так і в клієнтському коді для миттєвої валідації введення.
+- **Ключові алгоритмічні механізми:**
+  1. **Семантичне покриття понять (`conceptCoverageRatio`):**
+     - Підтримка альтернативних синонімів через розділювач `|` (наприклад, `декоратор|wrapping`, `функція|target`).
+     - Перевірка входження лем/коренів понять у нормалізований нижній регістр відповіді студента.
+  2. **Лексична різноманітність (Type-Token Ratio):**
+     - Розрахунок $\text{TTR} = \frac{|\text{UniqueWords}|}{|\text{TotalWords}|}$.
+     - Відсікання сміттєвого тексту або тавтології (якщо $\text{TTR} < 0.45$ при довжині $\ge 6$ слів).
+  3. **Детекція копіпасту запитання:**
+     - Розрахунок коефіцієнта перекриття слів із текстом умови запитання (`questionOverlapRatio`).
+     - Якщо $\ge 60\%$ слів студента є словами із самого запитання, відповідь відхиляється як `isQuestionCopyPaste = true` з конструктивним поясненням: *«Відповідь здебільшого дублює саме запитання. Будь ласка, сформулюйте визначення власними словами»*.
+  4. **Інтегральний бал (Score 0..1):**
+     $$\text{Score} = 0.6 \cdot \text{ConceptFactor} + 0.25 \cdot \text{LengthFactor} + 0.15 \cdot \text{DiversityFactor}$$
+  5. **Конструктивний фідбек:** Автоматичний перелік врахованих і пропущених понять для підказки студенту.
+- **Unit-тести:** [`open-text-heuristic-evaluator.spec.ts`](file:///apps/api/src/domain/evaluation/open-text-heuristic-evaluator.spec.ts) — 5/5 тестів ✅.
+
+### 11.2 Інтеграція з `BehavioralAdjuster` та `BktController`
+- **Файл реалізації:** [`apps/api/src/domain/bkt/behavioral-adjuster.ts`](file:///apps/api/src/domain/bkt/behavioral-adjuster.ts).
+- **Розширення моделі сигналів `BehavioralSignals`:**
+  - `pasteEvents?: number` — кількість подій вставки з буфера.
+  - `typingWpm?: number` — швидкість набору тексту (Words Per Minute).
+  - `conceptCoverageRatio?: number` — ступінь розкриття понять у відкритій відповіді.
+- **Правила адаптації:**
+  1. **Детекція копіпасту у відкритих відповідях:**
+     $$(\text{pasteEvents} > 0 \lor \text{latency} < 3000\text{ms} \lor \text{WPM} > 120) \implies P(Guess) = \max(P(G), 0.90)$$
+     - Фіксація причини: *«G↑ 0.9: підозра на сторонній копіпаст тексту»*.
+  2. **Вагання при частковій відповіді:**
+     $$(\text{conceptCoverageRatio} \ge 0.5 \land \text{deletionRatio} \ge 0.25) \implies P(Slip) = \max(P(S), 0.35)$$
+     - Студент знає тему, але вагався у формулюванні. Штраф BKT пом'якшується.
+- **Оновлення REST API:**
+  - `SubmitTaskDto` приймає нові параметри телеметрії `pasteEvents` та `typingWpm`.
+  - В `BktController.evaluateSubmission` замінено наївний підрахунок слів на виклик `OpenTextHeuristicEvaluator`.
+  - Усі unit-тести API: 26/26 ✅.
+
+
 
 
