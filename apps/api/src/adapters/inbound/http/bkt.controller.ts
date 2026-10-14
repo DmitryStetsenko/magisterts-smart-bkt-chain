@@ -50,6 +50,7 @@ export class BktController {
     let passedTestsRatio: number | undefined = undefined;
     let conceptCoverageRatio: number | undefined = undefined;
     let semanticScore: number | undefined = undefined;
+    let semanticDetails: any = null;
     let teacherReviewStatus: TeacherReviewStatus = TeacherReviewStatus.NONE;
 
     // Polyglot Evaluation Strategies based on TaskType
@@ -108,6 +109,7 @@ export class BktController {
         teacherReviewStatus = evalRes.needsTeacherReview
           ? TeacherReviewStatus.PENDING_REVIEW
           : TeacherReviewStatus.NONE;
+        semanticDetails = evalRes;
         break;
       }
 
@@ -313,6 +315,7 @@ export class BktController {
       feedback,
       semanticScore,
       teacherReviewStatus,
+      semanticDetails,
       testDetails,
       taskType: task.taskType,
       bktUpdate: {

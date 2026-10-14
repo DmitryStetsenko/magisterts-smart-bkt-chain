@@ -810,6 +810,62 @@ export default function StudentPortalPage() {
                       </div>
                     </div>
                   )}
+
+                  {/* 🔬 Semantic Evaluation & Teacher Review Details */}
+                  {(evalResult.semanticScore !== undefined || evalResult.semanticDetails) && (
+                    <div className="p-3 bg-slate-950/70 rounded-xl border border-slate-800/90 flex flex-col gap-2.5 text-xs">
+                      <div className="flex items-center justify-between border-b border-slate-800/80 pb-2">
+                        <span className="font-semibold text-slate-300 flex items-center gap-1.5">
+                          <span>📊 Семантична оцінка відповіді:</span>
+                          <span className="font-mono font-bold text-indigo-400">
+                            {evalResult.semanticScore !== undefined ? `${Math.round(evalResult.semanticScore * 100)}%` : '—'}
+                          </span>
+                        </span>
+
+                        {evalResult.teacherReviewStatus === 'PENDING_REVIEW' ? (
+                          <span className="px-2 py-0.5 rounded-full text-[10px] font-bold font-mono bg-amber-500/10 text-amber-300 border border-amber-500/30 flex items-center gap-1">
+                            <span>⏳</span> Очікує верифікації викладачем
+                          </span>
+                        ) : evalResult.teacherReviewStatus === 'APPROVED' ? (
+                          <span className="px-2 py-0.5 rounded-full text-[10px] font-bold font-mono bg-emerald-500/10 text-emerald-300 border border-emerald-500/30 flex items-center gap-1">
+                            <span>✓</span> Підтверджено викладачем
+                          </span>
+                        ) : null}
+                      </div>
+
+                      {evalResult.semanticDetails && (
+                        <div className="flex flex-col gap-1.5">
+                          {evalResult.semanticDetails.keyConceptsCovered?.length > 0 && (
+                            <div className="flex flex-wrap items-center gap-1 text-[11px]">
+                              <span className="text-slate-400">Розкрито поняття:</span>
+                              {evalResult.semanticDetails.keyConceptsCovered.map((kw: string, i: number) => (
+                                <span key={i} className="px-1.5 py-0.5 rounded bg-emerald-950/60 border border-emerald-500/30 text-emerald-300 font-mono">
+                                  {kw.split('|')[0]}
+                                </span>
+                              ))}
+                            </div>
+                          )}
+
+                          {evalResult.semanticDetails.missingConcepts?.length > 0 && (
+                            <div className="flex flex-wrap items-center gap-1 text-[11px]">
+                              <span className="text-slate-400">Варто додати:</span>
+                              {evalResult.semanticDetails.missingConcepts.map((kw: string, i: number) => (
+                                <span key={i} className="px-1.5 py-0.5 rounded bg-rose-950/60 border border-rose-500/30 text-rose-300 font-mono">
+                                  {kw.split('|')[0]}
+                                </span>
+                              ))}
+                            </div>
+                          )}
+
+                          {evalResult.semanticDetails.detectedMisconceptions?.length > 0 && (
+                            <div className="p-2 bg-rose-950/30 border border-rose-500/30 rounded text-rose-200 text-[11px]">
+                              ⚠️ Виявлено когнітивну помилку: зверніть увагу на точність формулювання щодо теми.
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
               )}
             </div>
