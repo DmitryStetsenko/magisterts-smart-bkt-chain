@@ -2961,6 +2961,99 @@
               "subitems": []
             }
           ]
+        },
+        {
+          "title": "11.9 Захист від Фразового Лупінгу (Phrase Looping) та Безумовна Маршрутизація у Чергу при Аномаліях Вставки",
+          "level": 3,
+          "paragraphs": [],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "**Файли реалізації:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "[`apps/api/src/domain/evaluation/open-text-heuristic-evaluator.ts`](file:///apps/api/src/domain/evaluation/open-text-heuristic-evaluator.ts)",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "[`apps/api/src/domain/evaluation/open-text-heuristic-evaluator.spec.ts`](file:///apps/api/src/domain/evaluation/open-text-heuristic-evaluator.spec.ts)",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "[`apps/api/src/adapters/inbound/http/bkt.controller.ts`](file:///apps/api/src/adapters/inbound/http/bkt.controller.ts)",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Проблематика та Сценарій Обходу:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Студент спробував скопіювати 5 однакових рядків, що містять 4-5 слів (`microtask macrotask call stack черга`), склеїв токени на стику мов (`чергаmicrotask`), і здійснив 11 операцій вставки (paste).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Оскільки середня кількість слів у рядку була $\\approx 5$ ($> 2.2$), перевірка вертикального списку не спрацьовувала, а склеєне слово створювало фіктивний унікальний токен, через що відповідь набрала $74\\%$ балів та оминула чергу викладача через поріг «сірої зони» ($> 70\\%$).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Алгоритмічні Вдосконалення:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Нормалізація Склеєних Слів (Language Boundary Split):**",
+              "subitems": [
+                "Токенізатор розбиває злиплі слова на межі кирилиці та латини (`/[\\p{Script=Cyrillic}]+|[\\p{Script=Latin}]+/gu`). Таким чином `чергаmicrotask` коректно перетворюється на 2 окремих слова `черга` та `microtask`."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Детекція 3-Грамного Циклічного Лупінгу (Phrase Repeat Counter):**",
+              "subitems": [
+                "Здійснюється ковзне вікно по послідовності слів довжиною 3 токени ($N=3$).",
+                "Якщо будь-яка 3-грама повторюється $\\ge 3$ разів $\\implies$ фіксується циклічний лупінг спаму (`maxNgramRepeats >= 3`)."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Контроль Лексичного Різноманіття при Великому Обсязі:**",
+              "subitems": [
+                "Якщо загальна кількість слів $\\ge 12$, але множина унікальних слів $\\le 5$, фіксується зациклена термінологічна «карусель»."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Безумовна Маршрутизація до Черги Викладача (`TeacherReviewStatus.PENDING_REVIEW`):**",
+              "subitems": [
+                "У `bkt.controller.ts` додано безкомпромісну перевірку: якщо для завдань `TEXT_ESSAY` або `OPEN_TEXT` зафіксовано $\\ge 3$ подій вставки з буфера (`pasteEvents >= 3`) або поведінковий модуль зафіксував високу ймовірність спаму чи вгадування ($P(G) \\ge 0.85$), робота **БЕЗУМОВНО** маркується як `PENDING_REVIEW`.",
+                "Запис у таблиці `Submission` негайно оновлюється у базі даних, щоб робота миттєво з'явилася на панелі викладача `GET /api/v1/bkt/reviews/queue`."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Верифікація:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "35/35 unit-тестів API пройдено (7 тест-сьютів) ✅.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Повна компіляція `npm run build:api` завершується успішно ✅.",
+              "subitems": []
+            }
+          ]
         }
       ]
     }
