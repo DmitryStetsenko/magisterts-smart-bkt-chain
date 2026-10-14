@@ -633,7 +633,29 @@ sequenceDiagram
 - **Синхронізація:**
   - `npx prisma db push --schema=packages/database/prisma/schema.prisma` виконано успішно.
   - `npx prisma generate` оновив клієнт Prisma в монорепозиторії.
-  - `recentAdjustments` у `BktController` повертає повний набір семантичних полів для Teacher Analytics Dashboard.
+### 11.4 Сервіс Багаторівневого Семантичного Оцінювання (`OpenAnswerEvaluatorService`)
+- **Файл реалізації:** [`apps/api/src/domain/evaluation/open-answer-evaluator.service.ts`](file:///apps/api/src/domain/evaluation/open-answer-evaluator.service.ts).
+- **Архітектурне призначення:** Центральний оркестратор оцінки відкритих відповідей, що комбінує детерміновані евристики, векторну схожість та оцінку за рубриками.
+- **Етапи виконання оцінювання:**
+  1. **Tier 1 (Евристики):**
+     - Викликає `OpenTextHeuristicEvaluator`.
+     - Якщо виявлено плагіат умови запитання або нульовий обсяг $\implies$ миттєвий вердикт без подальших обчислень.
+  2. **Tier 2 (Векторна/N-грам Косинусна Схожість):**
+     - Розраховує косинусну схожість за 3-грамами з підтримкою Unicode-символів (українська кирилиця та англійська латиниця):
+       $$\text{Similarity}(\vec{A}, \vec{B}) = \frac{\vec{A} \cdot \vec{B}}{\|\vec{A}\| \|\vec{B}\|}$$
+     - Перевіряє близькість до типових місконцепцій (`misconceptions`). Якщо відповідь ближча до місконцепції, ніж до еталону $\implies$ фіксується попередження для викладача.
+     - Якщо схожість $\ge 0.70$ та базові критерії виконано $\implies$ швидке зарахування за Tier 2.
+  3. **Tier 3 (Синтез Рубрик та Зважений Бал):**
+     - Обчислює інтегральний показник:
+       $$\text{BlendedScore} = 0.5 \cdot \text{Correctness} + 0.3 \cdot \text{Completeness} + 0.2 \cdot \text{DiversityFactor}$$
+     - Детектує «сіру зону» ($0.45 \le \text{BlendedScore} \le 0.70$) або низьку впевненість ($\text{Confidence} < 0.80$) $\implies$ прапорець `needsTeacherReview = true`.
+- **Інтеграція в `BktController`:**
+  - `POST /api/v1/bkt/evaluate` викликає `openAnswerEvaluator.evaluate(...)` для завдань `TEXT_ESSAY` та `OPEN_TEXT`.
+  - Якщо `needsTeacherReview === true`, статус відповіді автоматично маркується як `TeacherReviewStatus.PENDING_REVIEW` як у таблиці `submissions`, так і в `bkt_histories`.
+- **Unit-тести:**
+  - [`apps/api/src/domain/evaluation/open-answer-evaluator.service.spec.ts`](file:///apps/api/src/domain/evaluation/open-answer-evaluator.service.spec.ts) (3/3 тестів ✅).
+  - Повне покриття бекенду API: 29/29 unit-тестів (7 тест-сьютів) ✅.
+
 
 
 

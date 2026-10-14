@@ -2558,10 +2558,85 @@
               "type": "text",
               "raw_text": "`npx prisma generate` оновив клієнт Prisma в монорепозиторії.",
               "subitems": []
+            }
+          ]
+        },
+        {
+          "title": "11.4 Сервіс Багаторівневого Семантичного Оцінювання (`OpenAnswerEvaluatorService`)",
+          "level": 3,
+          "paragraphs": [],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "**Файл реалізації:** [`apps/api/src/domain/evaluation/open-answer-evaluator.service.ts`](file:///apps/api/src/domain/evaluation/open-answer-evaluator.service.ts).",
+              "subitems": []
             },
             {
               "type": "text",
-              "raw_text": "`recentAdjustments` у `BktController` повертає повний набір семантичних полів для Teacher Analytics Dashboard.",
+              "raw_text": "**Архітектурне призначення:** Центральний оркестратор оцінки відкритих відповідей, що комбінує детерміновані евристики, векторну схожість та оцінку за рубриками.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Етапи виконання оцінювання:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Tier 1 (Евристики):**",
+              "subitems": [
+                "Викликає `OpenTextHeuristicEvaluator`.",
+                "Якщо виявлено плагіат умови запитання або нульовий обсяг $\\implies$ миттєвий вердикт без подальших обчислень."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Tier 2 (Векторна/N-грам Косинусна Схожість):**",
+              "subitems": [
+                "Розраховує косинусну схожість за 3-грамами з підтримкою Unicode-символів (українська кирилиця та англійська латиниця):",
+                "$$\\text{Similarity}(\\vec{A}, \\vec{B}) = \\frac{\\vec{A} \\cdot \\vec{B}}{\\|\\vec{A}\\| \\|\\vec{B}\\|}$$",
+                "Перевіряє близькість до типових місконцепцій (`misconceptions`). Якщо відповідь ближча до місконцепції, ніж до еталону $\\implies$ фіксується попередження для викладача.",
+                "Якщо схожість $\\ge 0.70$ та базові критерії виконано $\\implies$ швидке зарахування за Tier 2."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Tier 3 (Синтез Рубрик та Зважений Бал):**",
+              "subitems": [
+                "Обчислює інтегральний показник:",
+                "$$\\text{BlendedScore} = 0.5 \\cdot \\text{Correctness} + 0.3 \\cdot \\text{Completeness} + 0.2 \\cdot \\text{DiversityFactor}$$",
+                "Детектує «сіру зону» ($0.45 \\le \\text{BlendedScore} \\le 0.70$) або низьку впевненість ($\\text{Confidence} < 0.80$) $\\implies$ прапорець `needsTeacherReview = true`."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Інтеграція в `BktController`:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "`POST /api/v1/bkt/evaluate` викликає `openAnswerEvaluator.evaluate(...)` для завдань `TEXT_ESSAY` та `OPEN_TEXT`.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Якщо `needsTeacherReview === true`, статус відповіді автоматично маркується як `TeacherReviewStatus.PENDING_REVIEW` як у таблиці `submissions`, так і в `bkt_histories`.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Unit-тести:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "[`apps/api/src/domain/evaluation/open-answer-evaluator.service.spec.ts`](file:///apps/api/src/domain/evaluation/open-answer-evaluator.service.spec.ts) (3/3 тестів ✅).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Повне покриття бекенду API: 29/29 unit-тестів (7 тест-сьютів) ✅.",
               "subitems": []
             }
           ]

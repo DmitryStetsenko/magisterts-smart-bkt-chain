@@ -9,6 +9,8 @@ import { BktController } from './adapters/inbound/http/bkt.controller';
 import { CourseController } from './adapters/inbound/http/course.controller';
 import { TelemetryGateway } from './adapters/inbound/websocket/telemetry.gateway';
 
+import { OpenAnswerEvaluatorService } from './domain/evaluation/open-answer-evaluator.service';
+
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -19,6 +21,6 @@ import { TelemetryGateway } from './adapters/inbound/websocket/telemetry.gateway
     EvaluationQueueModule,
   ],
   controllers: [HealthController, TaskController, BktController, CourseController],
-  providers: [TelemetryGateway, EvaluationProcessor],
+  providers: [TelemetryGateway, EvaluationProcessor, OpenAnswerEvaluatorService],
 })
 export class AppModule {}

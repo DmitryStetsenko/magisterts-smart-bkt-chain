@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { BktController } from './bkt.controller';
 import { PrismaService } from '../../outbound/persistence/prisma.service';
 import { TelemetryGateway } from '../websocket/telemetry.gateway';
+import { OpenAnswerEvaluatorService } from '../../../domain/evaluation/open-answer-evaluator.service';
 
 describe('BktController (Analytics & Telemetry reset integration)', () => {
   let controller: BktController;
@@ -42,6 +43,19 @@ describe('BktController (Analytics & Telemetry reset integration)', () => {
         {
           provide: TelemetryGateway,
           useValue: mockTelemetryGateway,
+        },
+        {
+          provide: OpenAnswerEvaluatorService,
+          useValue: {
+            evaluate: jest.fn().mockResolvedValue({
+              tierUsed: 'TIER_1_HEURISTICS',
+              isPassed: true,
+              score: 0.85,
+              confidenceScore: 0.9,
+              studentFeedback: 'Тест успішно пройдено',
+              needsTeacherReview: false,
+            }),
+          },
         },
       ],
     }).compile();

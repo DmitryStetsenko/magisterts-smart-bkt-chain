@@ -36,6 +36,16 @@
    - Успішно виконано синхронізацію з БД через `prisma db push` та згенеровано оновлений Prisma Client `prisma generate`.
    - У `BktController` збереження спроб фіксує `semanticScore` та `feedbackText`, а в ендпоінт аналітики студентів `GET /api/v1/bkt/analytics/students` додано передачу цих полів у `recentAdjustments`.
    - Збірка `build:api` ✅ та всі unit-тести API 26/26 ✅ успішно пройдені.
+6. **Phase 3 · Мікро-крок 4: Сервіс Багаторівневого Семантичного Оцінювання (`OpenAnswerEvaluatorService`):**
+   - Створено оркестратор `OpenAnswerEvaluatorService` (`apps/api/src/domain/evaluation/open-answer-evaluator.service.ts`).
+   - Реалізовано 3 рівні оцінювання:
+     - **Tier 1 (Heuristics):** Відсікання копіпасту запитання, спаму та розрахунок покриття ключових термінів.
+     - **Tier 2 (Vector / N-gram Cosine Similarity):** Семантичне порівняння з еталоном (Reference Answer) та виявлення типових когнітивних помилок (Misconceptions).
+     - **Tier 3 (Synthesis & Rubric Judgment):** Зважений розрахунок `correctness`, `completeness`, `blendedScore` та визначення прапорця `needsTeacherReview` для відповідей у «сірій зоні» ($0.45 \le \text{Score} \le 0.70$).
+   - Сервіс зареєстровано у провайдерах `AppModule` та інтегровано в `BktController.evaluateSubmission`.
+   - Автоматичне встановлення статусу `TeacherReviewStatus.PENDING_REVIEW` для сумнівних відповідей у `submissions` та `bkt_histories`.
+   - Unit-тести сервісу `open-answer-evaluator.service.spec.ts`: 3/3 ✅.
+   - Повний набір unit-тестів API: 29/29 ✅ (7 тест-сьютів), збірка `build:api` ✅.
 
 ## 📅 13 жовтня 2026 року
 

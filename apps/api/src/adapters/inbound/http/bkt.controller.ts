@@ -6,8 +6,9 @@ import { TelemetryGateway } from '../websocket/telemetry.gateway';
 import { BktEngine } from '../../../domain/bkt/bkt-engine';
 import { BehavioralAdjuster } from '../../../domain/bkt/behavioral-adjuster';
 import { OpenTextHeuristicEvaluator } from '../../../domain/evaluation/open-text-heuristic-evaluator';
+import { OpenAnswerEvaluatorService } from '../../../domain/evaluation/open-answer-evaluator.service';
 import { SubmitTaskDto } from './dto/submit-task.dto';
-import { SubmissionStatus, TaskType } from '@sbc/database';
+import { SubmissionStatus, TaskType, TeacherReviewStatus } from '@sbc/database';
 
 @ApiTags('BKT')
 @Controller('bkt')
@@ -15,6 +16,7 @@ export class BktController {
   constructor(
     private readonly prisma: PrismaService,
     private readonly telemetryGateway: TelemetryGateway,
+    private readonly openAnswerEvaluator: OpenAnswerEvaluatorService,
   ) {}
 
   @Post('evaluate')
@@ -48,6 +50,7 @@ export class BktController {
     let passedTestsRatio: number | undefined = undefined;
     let conceptCoverageRatio: number | undefined = undefined;
     let semanticScore: number | undefined = undefined;
+    let teacherReviewStatus: TeacherReviewStatus = TeacherReviewStatus.NONE;
 
     // Polyglot Evaluation Strategies based on TaskType
     switch (task.taskType) {
@@ -84,18 +87,27 @@ export class BktController {
         const essayText = (dto.essayAnswer || '').trim();
         const options = (task.options as { keywords?: string[]; minWords?: number; maxWords?: number }) || {};
 
-        // Виклик чистого доменного модуля OpenTextHeuristicEvaluator (Tier 1)
-        const evalRes = OpenTextHeuristicEvaluator.evaluate(essayText, {
-          keywords: (task.rubrics as any)?.keywords || options.keywords,
-          minWords: options.minWords ?? 5,
-          maxWords: options.maxWords,
-          taskQuestion: task.description || task.title,
+        // Багаторівневе оцінювання через OpenAnswerEvaluatorService (Tier 1 -> Tier 2 -> Tier 3)
+        const evalRes = await this.openAnswerEvaluator.evaluate({
+          answerText: essayText,
+          taskTitle: task.title,
+          taskDescription: task.description,
+          referenceAnswer: task.referenceAnswer || undefined,
+          rubrics: {
+            keywords: (task.rubrics as any)?.keywords || options.keywords,
+            minWords: options.minWords ?? 5,
+            maxWords: options.maxWords,
+          },
+          misconceptions: (task.misconceptions as string[]) || undefined,
         });
 
         isPassed = evalRes.isPassed;
-        feedback = evalRes.feedback;
-        conceptCoverageRatio = evalRes.conceptCoverageRatio;
+        feedback = evalRes.studentFeedback;
         semanticScore = evalRes.score;
+        conceptCoverageRatio = evalRes.completeness;
+        teacherReviewStatus = evalRes.needsTeacherReview
+          ? TeacherReviewStatus.PENDING_REVIEW
+          : TeacherReviewStatus.NONE;
         break;
       }
 
@@ -185,6 +197,7 @@ export class BktController {
         taskId: task.id,
         code: dto.code || dto.essayAnswer || dto.selectedOptionId || (dto.selectedOptionIds ? dto.selectedOptionIds.join(',') : ''),
         status: isPassed ? SubmissionStatus.ACCEPTED : SubmissionStatus.REJECTED,
+        teacherReviewStatus,
       },
     });
 
@@ -290,6 +303,7 @@ export class BktController {
         adjustReasons: adjusted.reasons,
         semanticScore: semanticScore ?? null,
         feedbackText: feedback,
+        teacherReviewStatus,
       },
     });
 
@@ -298,6 +312,7 @@ export class BktController {
       isPassed,
       feedback,
       semanticScore,
+      teacherReviewStatus,
       testDetails,
       taskType: task.taskType,
       bktUpdate: {
