@@ -6,17 +6,17 @@
 ## 📊 Зведена статистика
 | Епік | Назва | Кількість завдань |
 | :--- | :--- | :---: |
-| **`SBC-EP-INF`** | Monorepo & CI/CD Setup | 86 |
+| **`SBC-EP-INF`** | Monorepo & CI/CD Setup | 87 |
 | **`SBC-EP-SH`** | Database Modeling & Shared Packages | 17 |
 | **`SBC-EP-BK`** | Authentication & Core API | 14 |
 | **`SBC-EP-BKT`** | Bayesian Knowledge Tracing & Behavioral Telemetry | 24 |
 | **`SBC-EP-LLM`** | Automated Code Assessment & Open-Text Evaluation | 10 |
 | **`SBC-EP-W3`** | Web3 Infrastructure & Smart Contracts | 0 |
 | **`SBC-EP-ST`** | Student Portal & Skill Tree Map | 26 |
-| **`SBC-EP-TC`** | Teacher Portal & Analytics CRM | 15 |
+| **`SBC-EP-TC`** | Teacher Portal & Analytics CRM | 16 |
 | **`SBC-EP-AD`** | Admin Portal & Knowledge DAG Builder | 8 |
 | **`SBC-EP-LD`** | Landing Web Page | 9 |
-| **ВСЬОГО** | - | **209** |
+| **ВСЬОГО** | - | **211** |
 
 ---
 
@@ -110,6 +110,7 @@
 | **SBC-206** | `Task` | `INF` | synchronize architecture docs, 10 epics specification, tech stack apps and roadmap phase statuses | 2026-10-15 | `34a4104` |
 | **SBC-207** | `Task` | `INF` | sync tasks registry and jira import csv with sbc-206 | 2026-10-15 | `baab886` |
 | **SBC-208** | `Bug` | `INF` | update package-lock and enhance github pages workflow for resilient ci | 2026-10-15 | `b11f87b` |
+| **SBC-210** | `Task` | `INF` | sync task registry and jira import csv for sbc-209 | 2026-10-15 | `4994498` |
 
 ---
 
@@ -265,6 +266,7 @@
 | **SBC-196** | `Task` | `TC` | log micro-step 6 teacher review queue and recompile docs portal | 2026-10-14 | `a581cbe` |
 | **SBC-200** | `Task` | `TC` | log micro-step 8 phrase looping spam protection and teacher review routing | 2026-10-14 | `36d68b2` |
 | **SBC-209** | `Bug` | `TC` | filter teacher review queue submissions by course slug relation | 2026-10-15 | `52a8355` |
+| **SBC-211** | `Task` | `TC` | document brainstorm session 05 on review queue deduplication and history | 2026-10-15 | `edcab54` |
 
 ---
 
