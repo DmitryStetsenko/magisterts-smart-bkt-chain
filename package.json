@@ -22,7 +22,8 @@
     "dev:admin": "npm run dev --workspace=apps/admin",
     "build:admin": "npm run build --workspace=apps/admin",
     "test:e2e": "playwright test",
-    "compile:docs": "python scripts/compile_docs.py"
+    "compile:docs": "python scripts/compile_docs.py",
+    "validate:commit": "node scripts/validate_commit_msg.js"
   },
   "devDependencies": {
     "@playwright/test": "^1.63.0"

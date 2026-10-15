@@ -13,6 +13,10 @@
      - [`docs/tasks/jira_import.csv`](file:///docs/tasks/jira_import.csv) — файл прямого імпорту в Jira Cloud / Jira Server.
    - Оновлено стандарт оформлення коммітів у [`docs/project_management.md`](file:///docs/project_management.md) та правила розробки у [`.agents/AGENTS.md`](file:///.agents/AGENTS.md).
    - Скомпільовано оновлені JSON-артефакти порталу документації.
+2. **Впровадження автоматичного валідатора Git Hook `commit-msg`:**
+   - Створено валідатор `scripts/validate_commit_msg.js` та встановлено хук `.git/hooks/commit-msg`.
+   - Заблоковано можливість створення коммітів, що не відповідають шаблону `[SBC-XXX][EP-YYY] <type>: <description>`.
+   - Додано команду `npm run validate:commit` у кореневий `package.json` та задокументовано архітектуру контролю в `docs/project_management.md`.
 
 ## 📅 14 жовтня 2026 року
 

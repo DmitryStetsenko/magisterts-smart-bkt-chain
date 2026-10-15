@@ -140,6 +140,19 @@
 * `[SBC-195][EP-TC] feat: human-in-the-loop review queue for open text answers`
 * `[SBC-202][EP-BKT] docs: add full open-text assessment pipeline and anomaly specification`
 
+### 4.3. Автоматичний захист стандарту коммітів (Git Hook & Scripts)
+Для гарантування дотримання стандарту та виключення людського фактору впроваджено систему трирівневого контролю:
+
+1. **Git Hook `commit-msg` (`.git/hooks/commit-msg`):**
+   - Перехоплює кожен виклик `git commit` локально на рівні робочої станції.
+   - Запускає валідатор `scripts/validate_commit_msg.js`.
+   - Якщо повідомлення не відповідає шаблону `^[SBC-\d+][EP-(INF|SH|BK|BKT|LLM|W3|ST|TC|AD|LD)] (feat|fix|docs|style|refactor|test|chore): .+`, створення комміту негайно блокується з виведенням кольорової інструкції та прикладів.
+2. **Ручна або CI/CD перевірка:**
+   - Команда `npm run validate:commit "<commit message>"` дозволяє протестувати будь-який заголовок.
+3. **Реєстр завдань та експорт у Jira:**
+   - Файл [`docs/tasks/registry.md`](file:///docs/tasks/registry.md) містить структуровану історію за епіками.
+   - Скрипт `scripts/generate_jira_artifacts.js` оновлює реєстр та генерує свіжий [`docs/tasks/jira_import.csv`](file:///docs/tasks/jira_import.csv) для автоматичного імпорту в Jira Cloud/Server.
+
 ---
 
 ## 5. Критерії готовності (Definition of Done - DoD)
