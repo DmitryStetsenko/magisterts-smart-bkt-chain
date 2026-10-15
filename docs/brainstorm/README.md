@@ -22,3 +22,7 @@
    - *Дата:* 14 жовтня 2026
    - *Ключові теми:* Багаторівневий пайплайн (Tier 1 Heuristics → Tier 2 Embeddings → Tier 3 LLM Judge), оцінка рубрик (Rubrics), інтеграція з телеметрією друку (paste events, WPM, hesitation), Soft-BKT зважування, Human-in-the-Loop в кабінеті викладача.
 
+5. [05. Дедуплікація, Історія Версій та Еволюція Спроб у Черзі Перевірки Викладача](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/docs/brainstorm/05_review_queue_deduplication_and_history.md)
+   - *Дата:* 15 жовтня 2026
+   - *Ключові теми:* Дедуплікація черги викладача, авто-заміщення спроб (superseding), таймлайн та семантичний Diff версій у ReviewQueueInspector, захист від спаму повторних відправок студентом.
+
