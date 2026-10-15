@@ -51,6 +51,11 @@
             },
             {
               "type": "text",
+              "raw_text": "**Стандарт коммітів Jira Conventional Commits:** Кожен комміт фіксується у форматі `[SBC-XXX][EP-YYY] <type>: <опис>` з прив'язкою до реєстру завдань [`docs/tasks/registry.md`](file:///docs/tasks/registry.md).",
+              "subitems": []
+            },
+            {
+              "type": "text",
               "raw_text": "**Захист від припущення:** Перевірка повних трасувань помилок перед виправленням коду.",
               "subitems": []
             }

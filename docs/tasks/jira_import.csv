@@ -1,0 +1,203 @@
+Issue Key,Epic Link,Issue Type,Summary,Status,Date,Git Commit Hash
+SBC-1,SBC-EP-INF,Story,"setup monorepo shell, compile script, next.js documentation site, and github actions pipeline",Done,2026-06-16,0d0e791
+SBC-2,SBC-EP-INF,Story,"scaffold monorepo directories and package configurations for apps and packages",Done,2026-06-16,186c739
+SBC-3,SBC-EP-INF,Story,"split evolutionary roadmap into separate block and set as default active tab",Done,2026-06-16,c970901
+SBC-4,SBC-EP-INF,Task,"replace emojis with premium SVG icons in doc portal",Done,2026-06-16,d1f900b
+SBC-5,SBC-EP-INF,Task,"restore text labels for rationale subitems in doc portal",Done,2026-06-16,07a0265
+SBC-6,SBC-EP-INF,Bug,"synchronize active phase states and fix light mode visibility in roadmap",Done,2026-06-17,56329f4
+SBC-7,SBC-EP-INF,Bug,"make roadmap phase cards clickable to activate states",Done,2026-06-17,62b9b86
+SBC-8,SBC-EP-INF,Story,"stretch content to full width and enhance roadmap steps with descriptions and active phase scrolling",Done,2026-06-17,78c7c07
+SBC-9,SBC-EP-INF,Task,"make sidebar wider with w-96 for better readability",Done,2026-06-17,7e4f2cf
+SBC-10,SBC-EP-INF,Task,"remove left indent pl-12 from card contents for cleaner alignment",Done,2026-06-17,d71b1db
+SBC-11,SBC-EP-INF,Story,"improve markdown renderer to support tables, code blocks, italics and custom shorthand labels",Done,2026-06-17,faab2c9
+SBC-12,SBC-EP-INF,Story,"fix light theme styling bugs and improve nested bold markdown rendering",Done,2026-06-17,6b134a7
+SBC-13,SBC-EP-INF,Story,"resolve light/dark text contrast via React-controlled theme variables",Done,2026-06-17,f95d909
+SBC-14,SBC-EP-INF,Task,"Update Next.js base path repository name to magisterts-smart-bkt-chain",Done,2026-06-17,636c48d
+SBC-15,SBC-EP-INF,Task,"Fix ESLint hoisting error and remove unused parameter",Done,2026-06-17,ed6b751
+SBC-16,SBC-EP-INF,Task,"Consolidate to a single root lockfile, removing nested lockfile in apps/docs",Done,2026-06-17,a2cb3a7
+SBC-17,SBC-EP-INF,Bug,"add cross-platform SWC binary optional dependencies for GH Pages build",Done,2026-06-17,7dc2b68
+SBC-18,SBC-EP-INF,Bug,"force webpack for next build on GH Pages",Done,2026-06-17,dfe3a22
+SBC-19,SBC-EP-INF,Bug,"add lightningcss optional dependencies for cross-platform builds",Done,2026-06-17,4963036
+SBC-20,SBC-EP-INF,Bug,"add tailwind oxide optional dependencies for cross-platform builds",Done,2026-06-17,7f90679
+SBC-21,SBC-EP-SH,Story,"add shared UI package with Storybook integration and update tech stack docs",Done,2026-06-17,2b86f4f
+SBC-22,SBC-EP-INF,Task,"update package-lock.json after workspace dependency installation",Done,2026-06-17,70a2b7f
+SBC-23,SBC-EP-INF,Story,"make docs site sidebar responsive on mobile with a toggle button and backdrop",Done,2026-06-17,7e0baaa
+SBC-24,SBC-EP-INF,Bug,"fix mobile layout header issues, update GitHub link, and add root README",Done,2026-06-17,242e50f
+SBC-25,SBC-EP-INF,Task,"perfectly center mobile vertical timeline line and markers",Done,2026-06-17,d68a93b
+SBC-26,SBC-EP-INF,Story,"integrate react-markdown and fix compile_docs.py bold list stripping",Done,2026-06-17,b740533
+SBC-27,SBC-EP-INF,Bug,"resolve markdown table rendering issues and timeline key-value double asterisk bugs",Done,2026-06-17,bffb64b
+SBC-28,SBC-EP-INF,Task,"make sidebar sticky on desktop layout",Done,2026-06-17,e6f1988
+SBC-29,SBC-EP-INF,Bug,"filter out markdown divider items from rendering as empty cards",Done,2026-06-17,d6252eb
+SBC-30,SBC-EP-INF,Story,"migrate tab navigation to native Next.js App Router routes with trailing slash",Done,2026-06-17,93e7340
+SBC-31,SBC-EP-INF,Story,"create minimalist landing page for root route",Done,2026-06-17,bf434a6
+SBC-32,SBC-EP-INF,Bug,"add home link to header logos",Done,2026-06-17,0dd0d79
+SBC-33,SBC-EP-INF,Task,"make navigation buttons uniform and add detailed concept section on landing page",Done,2026-06-17,36ee340
+SBC-34,SBC-EP-INF,Task,"revert card headings 1 & 2 to original and rename heading 3 to 'Захищені Цифрові Сертифікати'",Done,2026-06-17,4472d9c
+SBC-35,SBC-EP-INF,Task,"remove domain names badge from landing page hero",Done,2026-06-17,7d43b8e
+SBC-36,SBC-EP-INF,Task,"restructure docs app to FSD using views layer to avoid Next.js routing conflict",Done,2026-06-17,bf27b76
+SBC-37,SBC-EP-INF,Task,"integrate adaptive BKT and behavioral telemetry to roadmap and architecture",Done,2026-06-17,a63d7e5
+SBC-38,SBC-EP-INF,Task,"update README with detailed capabilities",Done,2026-06-17,a377d96
+SBC-39,SBC-EP-INF,Task,"remove domain name references from headers and descriptions",Done,2026-06-17,279ff47
+SBC-40,SBC-EP-BKT,Task,"document adaptive learning track and task sequencing",Done,2026-06-17,6c9cd68
+SBC-41,SBC-EP-INF,Task,"highlight adaptive task sequencing feature in readme",Done,2026-06-17,2aacbb2
+SBC-42,SBC-EP-INF,Task,"swap features grid and detailed concept sections, update BKT feature to include sequencing",Done,2026-06-17,21e65b7
+SBC-43,SBC-EP-INF,Task,"swap card typography sizes between concept and core features sections",Done,2026-06-17,a32f403
+SBC-44,SBC-EP-BKT,Task,"rewrite first concept card to highlight multi-factor adaptive learning (BKT + telemetry + assessments)",Done,2026-06-17,e96fbcb
+SBC-45,SBC-EP-TC,Task,"soften language in hybrid assessment card to emphasize workload reduction for teachers",Done,2026-06-17,e8a1487
+SBC-46,SBC-EP-TC,Task,"update hybrid assessment card to include latest LLM models and teacher review for controversial cases",Done,2026-06-17,26bc311
+SBC-47,SBC-EP-INF,Task,"elevate concepts block language to academic/scientific level",Done,2026-06-17,3e82ab8
+SBC-48,SBC-EP-INF,Task,"revert section title and description to original wording",Done,2026-06-17,7f8e1b1
+SBC-49,SBC-EP-TC,Task,"revert card 3 to original, update card 2 description to emphasize teacher is only involved when strictly necessary",Done,2026-06-17,a7f850b
+SBC-50,SBC-EP-INF,Task,"create daily progress log and record June 17 entry",Done,2026-06-17,c85bf3f
+SBC-51,SBC-EP-INF,Task,"save detailed 5-step master plan of action to daily progress log",Done,2026-06-17,691fe84
+SBC-52,SBC-EP-SH,Story,"setup PostgreSQL Docker environment, Prisma schema and initial seed script",Done,2026-10-01,12310f8
+SBC-53,SBC-EP-SH,Task,"update daily progress log and root package.json for step 1 database completion",Done,2026-10-01,38cd853
+SBC-54,SBC-EP-SH,Story,"add db:seed root script and auto-load dotenv in database seed script",Done,2026-10-02,06147ee
+SBC-55,SBC-EP-BK,Story,"setup NestJS application frame with hexagonal architecture and Prisma ORM integration",Done,2026-10-02,118186c
+SBC-56,SBC-EP-BK,Story,"configure Swagger OpenAPI documentation UI at /api/v1/docs",Done,2026-10-02,81612e2
+SBC-57,SBC-EP-SH,Bug,"fix TypeScript rootDir output and globalThis type assertion for CJS/NestJS import compatibility",Done,2026-10-02,009117d
+SBC-58,SBC-EP-BK,Story,"implement BKT Core Engine, TaskSequencer domain logic and Mini-Course seed with 100% unit test coverage",Done,2026-10-02,2441c1a
+SBC-59,SBC-EP-BK,Story,"implement REST API, WebSockets Telemetry Gateway and create detailed technical implementation log",Done,2026-10-02,b0735da
+SBC-60,SBC-EP-INF,Task,"sync all documentation source files and compiled JSON data for apps/docs site",Done,2026-10-02,5fd9877
+SBC-61,SBC-EP-INF,Bug,"disable Next.js devIndicators rendering overlay badge in development mode",Done,2026-10-02,cc8b715
+SBC-62,SBC-EP-LD,Story,"initialize Next.js 16 student client frame with TailwindCSS v4 in apps/web (Micro-Step 5.1)",Done,2026-10-03,577a46f
+SBC-63,SBC-EP-INF,Task,"update daily progress and detailed technical log for Micro-Step 5.1 completion",Done,2026-10-03,c46a20e
+SBC-64,SBC-EP-INF,Task,"create workspace agent rules in .agents/AGENTS.md for mandatory progress logging and micro-steps",Done,2026-10-03,09492bc
+SBC-65,SBC-EP-INF,Task,"document workspace agent rules location and mandatory progress logging procedures",Done,2026-10-03,2e3a3f0
+SBC-66,SBC-EP-LD,Story,"implement Monaco Code Editor with behavioral telemetry hook and REST evaluation integration (Micro-Step 5.2)",Done,2026-10-03,90ccf51
+SBC-67,SBC-EP-LD,Story,"implement interactive Skill DAG Graph visualization component (Micro-Step 5.3)",Done,2026-10-03,cebffa0
+SBC-68,SBC-EP-LD,Story,"verify live BKT evaluation and update progress logs",Done,2026-10-03,6e8b2d8
+SBC-69,SBC-EP-AD,Story,"init Next.js 16 admin app and update progress logs",Done,2026-10-03,5cd2a27
+SBC-70,SBC-EP-AD,Story,"build interactive Skill DAG editor and BKT parameters tuning form",Done,2026-10-03,71b32d7
+SBC-71,SBC-EP-AD,Story,"build student analytics table and BKT heatmap",Done,2026-10-03,967772d
+SBC-72,SBC-EP-INF,Task,"postpone Step 7 Web3 and prioritize system audit and testing",Done,2026-10-04,9baf1de
+SBC-73,SBC-EP-BK,Bug,"fix VM test runner argument handling and seed test cases input format",Done,2026-10-04,562e9de
+SBC-74,SBC-EP-BK,Story,"add real Promise/await resolution support to NestJS VM test runner",Done,2026-10-04,d8f64f0
+SBC-75,SBC-EP-BK,Bug,"fallback demo-student userId to active student BKT state in getStudentState",Done,2026-10-04,e288d4f
+SBC-76,SBC-EP-LD,Story,"add active student profile badge in Student Portal header",Done,2026-10-04,ff14967
+SBC-77,SBC-EP-AD,Story,"add experimental BKT state & submission history reset feature",Done,2026-10-04,53e0b3e
+SBC-78,SBC-EP-BK,Bug,"fix TelemetrySession relation in resetStudentState Prisma query",Done,2026-10-04,72806a4
+SBC-79,SBC-EP-INF,Story,"handle unstarted BKT state reset and document progress",Done,2026-10-04,0f6552a
+SBC-80,SBC-EP-LD,Bug,"improve test case arguments display formatting and log changes",Done,2026-10-04,3b1e231
+SBC-81,SBC-EP-INF,Bug,"support exact array parameter display in test cases",Done,2026-10-04,2d9014d
+SBC-82,SBC-EP-LD,Bug,"auto refresh recommended task on ACCEPTED submission status",Done,2026-10-04,0d5fbe7
+SBC-83,SBC-EP-ST,Story,"connect live student analytics endpoint and telemetry calculation",Done,2026-10-04,20e3157
+SBC-84,SBC-EP-ST,Bug,"sync student profile name and eliminate initial mock data flash",Done,2026-10-04,9fb68ab
+SBC-85,SBC-EP-BKT,Bug,"emit instant websocket telemetry on paste to calculate 100 percent copy paste ratio",Done,2026-10-04,14bf3a6
+SBC-86,SBC-EP-ST,Bug,"ensure exact zero values in analytics for reset student state",Done,2026-10-04,2d59d95
+SBC-87,SBC-EP-LD,Bug,"disable automatic task transition on ACCEPTED submission status",Done,2026-10-04,de69587
+SBC-88,SBC-EP-LD,Bug,"add content change fallback for robust monaco paste detection",Done,2026-10-04,e14e1d8
+SBC-89,SBC-EP-BK,Task,"add unit tests for student analytics and telemetry reset state",Done,2026-10-04,bf16ae8
+SBC-90,SBC-EP-INF,Task,"add mandatory E2E testing rule and document Playwright architecture strategy",Done,2026-10-04,d3cd4f2
+SBC-91,SBC-EP-BKT,Bug,"add multi-level paste event detection and WebSocket room fallback",Done,2026-10-04,b80637e
+SBC-92,SBC-EP-AD,Bug,"replace window.confirm with custom React modal for reset action",Done,2026-10-04,5bfb829
+SBC-93,SBC-EP-BKT,Bug,"correct WPM calculation on paste and zero out typing speed for 100% copy-paste ratio",Done,2026-10-04,d7bb852
+SBC-94,SBC-EP-BKT,Bug,"add 300ms deduplication threshold to handlePaste to ensure exact single paste count",Done,2026-10-04,3600bcd
+SBC-95,SBC-EP-BKT,Bug,"filter modifier keys and Ctrl/Cmd/Alt shortcuts from WPM keystroke counter",Done,2026-10-04,7e10ceb
+SBC-96,SBC-EP-BKT,Task,"sync detailed implementation log with latest telemetry deduplication and WPM fixes",Done,2026-10-04,0bc5a06
+SBC-97,SBC-EP-INF,Story,"configure Playwright and implement end-to-end integration test flow",Done,2026-10-05,3379334
+SBC-98,SBC-EP-INF,Bug,"update test locators for admin port and modal confirm button",Done,2026-10-05,397cb63
+SBC-99,SBC-EP-INF,Task,"update daily progress log and compile docs JSON for successful E2E execution",Done,2026-10-05,dfb164d
+SBC-100,SBC-EP-BKT,Task,"add specification for telemetry and analytical metrics",Done,2026-10-05,853b64f
+SBC-101,SBC-EP-INF,Story,"expand JavaScript course to 5 modules with 14 practical tasks and DAG dependencies",Done,2026-10-05,f1202d9
+SBC-102,SBC-EP-BKT,Bug,"optimize socket.io transport to pure websocket to fix devtools console warning",Done,2026-10-05,2d169cc
+SBC-103,SBC-EP-INF,Task,"update roadmap and project management architecture for multi-app role separation (step 1)",Done,2026-10-05,dfe94be
+SBC-104,SBC-EP-ST,Story,"rename apps/web to apps/student and update workspace scripts (step 2)",Done,2026-10-05,cea1c88
+SBC-105,SBC-EP-TC,Story,"extract teacher portal to apps/teacher with port 3003 (step 3)",Done,2026-10-05,12088ba
+SBC-106,SBC-EP-AD,Story,"transform apps/admin into System CMS dashboard on port 3004 (step 4)",Done,2026-10-05,e3c2a02
+SBC-107,SBC-EP-INF,Story,"create public landing page app apps/landing on port 3001 (step 5)",Done,2026-10-05,ad78d09
+SBC-108,SBC-EP-INF,Task,"compile JSON documentation after multi-app portal separation",Done,2026-10-05,b69f542
+SBC-109,SBC-EP-INF,Task,"rename apps/landing to apps/web and update root package scripts and docs",Done,2026-10-05,a20f939
+SBC-110,SBC-EP-INF,Bug,"disable experimental reactCompiler and fix dev script port to 3005",Done,2026-10-05,06bf692
+SBC-111,SBC-EP-LLM,Task,"detail Phase 3 AI evaluation & async queue architecture with Mermaid sequence diagram",Done,2026-10-05,5dccd36
+SBC-112,SBC-EP-BK,Story,"integrate BullMQ and Redis evaluation queue with EvaluationProcessor worker",Done,2026-10-05,2b70b0c
+SBC-113,SBC-EP-ST,Bug,"enhance Deletes telemetry detection for Backspace, Delete keys and selection range removals",Done,2026-10-05,42982a3
+SBC-114,SBC-EP-BK,Story,"add idempotency check to prevent duplicate BKT calculations for identical task code",Done,2026-10-05,e87615c
+SBC-115,SBC-EP-BK,Bug,"fallback to global tasks in TaskSequencer when all active skill tasks are completed",Done,2026-10-05,68ff7ff
+SBC-116,SBC-EP-BKT,Task,"add multi-modal neural telemetry AI concepts and telemetry fix",Done,2026-10-05,20d1689
+SBC-117,SBC-EP-AD,Story,"move Skill DAG Editor to apps/admin and decouple teacher portal analytics",Done,2026-10-06,19f0f4a
+SBC-118,SBC-EP-LLM,Story,"implement universal polyglot BKT evaluation engine and multi-course UI",Done,2026-10-06,c624d2e
+SBC-119,SBC-EP-INF,Bug,"add page navigation fallback wait for dev server compilation",Done,2026-10-06,feb048f
+SBC-120,SBC-EP-INF,Task,"verify multi-discipline UI flow in student and teacher portals with Playwright",Done,2026-10-06,c7270d9
+SBC-121,SBC-EP-INF,Task,"update daily progress log with E2E test verification success",Done,2026-10-06,e9e62bb
+SBC-122,SBC-EP-AD,Story,"implement dynamic course manager CMS and API creation endpoint",Done,2026-10-06,d37c6ef
+SBC-123,SBC-EP-SH,Task,"convert course selection tabs to scalable dropdown selectors in student and teacher portals",Done,2026-10-06,e389796
+SBC-124,SBC-EP-INF,Story,"populate heterogeneous mixed task types (quizzes, essays, code) inside single course",Done,2026-10-06,2ec88d2
+SBC-125,SBC-EP-BK,Bug,"support const and let function declarations in VM runner",Done,2026-10-06,cea2c4c
+SBC-126,SBC-EP-ST,Bug,"sync active module highlighting and fallback student resolution for BKT state",Done,2026-10-06,f21e6bb
+SBC-127,SBC-EP-INF,Bug,"prevent duplicate task recommendation and avoid BKT mastery inflation on repeat submissions",Done,2026-10-06,d08cca1
+SBC-128,SBC-EP-INF,Story,"fix DAG sequencing locks, next task UX & add module task exhaustion reset modal",Done,2026-10-08,2bd0657
+SBC-129,SBC-EP-BKT,Story,"add real-time WebSocket BKT reset synchronization for active student sessions",Done,2026-10-09,8bc54db
+SBC-130,SBC-EP-TC,Story,"add reusable CourseOverviewWidget for course hierarchy & question inspection",Done,2026-10-09,adf67a3
+SBC-131,SBC-EP-ST,Task,"redesign layout into sticky top nav with collapsible task sidebar and skill graph",Done,2026-10-09,3e6f0eb
+SBC-132,SBC-EP-ST,Story,"implement unified Opera-style vertical icon rail and expandable drawers shell",Done,2026-10-09,ea04cec
+SBC-133,SBC-EP-ST,Task,"replace text close button with minimalist X icon in side drawer header",Done,2026-10-09,c971a9c
+SBC-134,SBC-EP-ST,Task,"replace settings icon with gear and move external apps block to bottom of icon rail",Done,2026-10-09,fecbfba
+SBC-135,SBC-EP-ST,Task,"add horizontal separator after settings block in vertical icon rail",Done,2026-10-09,5848ee7
+SBC-136,SBC-EP-ST,Task,"position settings block at very bottom of vertical icon rail with preceding separator",Done,2026-10-09,4d5d9b6
+SBC-137,SBC-EP-SH,Story,"unify teacher & admin apps into modular Opera-style Shell layout",Done,2026-10-09,57ff761
+SBC-138,SBC-EP-ST,Task,"reorient SkillDagMap into clean vertical flow with down arrows inside side drawer",Done,2026-10-09,7316de4
+SBC-139,SBC-EP-SH,Task,"compact SkillDagMap nodes with overlapping connectors and fix non-scrolling drawer headers",Done,2026-10-09,afbda34
+SBC-140,SBC-EP-INF,Task,"update daily_progress log and recompile JSON artifacts",Done,2026-10-09,90da3ee
+SBC-141,SBC-EP-SH,Bug,"remove duplicated header title inside SkillDagMap component",Done,2026-10-09,60b17ff
+SBC-142,SBC-EP-INF,Task,"sync daily progress log for clean SkillDagMap header",Done,2026-10-09,399395c
+SBC-143,SBC-EP-TC,Story,"implement list in drawer and detail on main screen pattern for students and course map",Done,2026-10-09,29d7a88
+SBC-144,SBC-EP-TC,Task,"compile docs JSON for teacher portal list-detail refactor",Done,2026-10-09,1be151b
+SBC-145,SBC-EP-INF,Task,"update detailed technical implementation log and recompile JSON",Done,2026-10-09,0c11767
+SBC-146,SBC-EP-SH,Story,"add icons and formula modal explanations to student metrics grid",Done,2026-10-09,06ebcde
+SBC-147,SBC-EP-INF,Task,"compile docs JSON for metrics icons and explanation modal",Done,2026-10-09,944c634
+SBC-148,SBC-EP-SH,Task,"compact Student Metrics Grid and BKT Heatmap cards",Done,2026-10-09,9a9bb1f
+SBC-149,SBC-EP-INF,Task,"sync daily progress and compile docs JSON for compact metrics UI",Done,2026-10-09,9316c05
+SBC-150,SBC-EP-BKT,Task,"document per-module telemetry concept and update roadmap & implementation log",Done,2026-10-09,e335a87
+SBC-151,SBC-EP-BKT,Story,"implement per-module telemetry aggregation, course median calculation, and real-time behavioral profile upserts",Done,2026-10-10,0e45837
+SBC-152,SBC-EP-ST,Story,"implement RPG-style GameSkillTreeWidget with interactive power rays, player levels, and quest cards",Done,2026-10-11,e8eec6e
+SBC-153,SBC-EP-ST,Bug,"improve RPG Level badge layout and text alignment",Done,2026-10-11,e411d25
+SBC-154,SBC-EP-ST,Story,"display GameSkillTree on main canvas with node details in side drawer including locked status inspection",Done,2026-10-11,d578564
+SBC-155,SBC-EP-ST,Bug,"make rail navigation tabs mutually exclusive to prevent dual active highlight",Done,2026-10-11,630f964
+SBC-156,SBC-EP-TC,Story,"integrate student game skill tree view in teacher portal",Done,2026-10-11,afa7c67
+SBC-157,SBC-EP-TC,Task,"update daily progress and compiled docs json with teacher skill tree",Done,2026-10-11,717cf35
+SBC-158,SBC-EP-TC,Story,"display per-module telemetry stats and navigation button in skill tree inspector panel",Done,2026-10-12,cebcf73
+SBC-159,SBC-EP-BKT,Task,"update daily progress and documentation data with inspector module telemetry",Done,2026-10-12,a07b6c5
+SBC-160,SBC-EP-TC,Bug,"keep skill tree view active on node click and inspect module stats in right sidebar",Done,2026-10-12,442aad9
+SBC-161,SBC-EP-ST,Story,"allow clicking active task icon to toggle close sidebar drawer and stretch main canvas",Done,2026-10-12,3cf08d6
+SBC-162,SBC-EP-INF,Task,"document sidebar toggle-to-collapse standard",Done,2026-10-12,f10ffcd
+SBC-163,SBC-EP-ST,Bug,"keep main view when toggling sidebar drawer on and off",Done,2026-10-12,33655d3
+SBC-164,SBC-EP-ST,Story,"implement full 3-state navigation model (open, collapsed full-width canvas, tab switch)",Done,2026-10-12,67c0b42
+SBC-165,SBC-EP-INF,Task,"document 3-state navigation model in daily progress",Done,2026-10-12,87cc943
+SBC-166,SBC-EP-ST,Bug,"unify activeTab and isDrawerOpen navigation state to preserve selected tab highlight on sidebar collapse",Done,2026-10-12,60fc2f5
+SBC-167,SBC-EP-SH,Story,"unify navigation rail and sidebar state across student, teacher, and admin portals",Done,2026-10-12,05311da
+SBC-168,SBC-EP-LLM,Task,"initialize brainstorm hub and document session 01 on multi-task mastery evaluation and telemetry",Done,2026-10-12,03a0f62
+SBC-169,SBC-EP-INF,Task,"capture EdTech ecosystem vision and add ideation fidelity rule",Done,2026-10-13,58568fa
+SBC-170,SBC-EP-INF,Task,"add technical platform architecture for EdTech ecosystem",Done,2026-10-13,466021b
+SBC-171,SBC-EP-BK,Story,"add BehavioralAdjuster for dynamic Slip/Guess (Phase 2 step 1)",Done,2026-10-13,b4680de
+SBC-172,SBC-EP-BKT,Story,"integrate BehavioralAdjuster into evaluate endpoint and persist used parameters",Done,2026-10-13,9f743ec
+SBC-173,SBC-EP-BKT,Story,"separate telemetry display between student (silent) and teacher (detailed log)",Done,2026-10-13,524a928
+SBC-174,SBC-EP-ST,Story,"display telemetry anomalies and adjustment history in student RPG tree inspector",Done,2026-10-13,7b4eded
+SBC-175,SBC-EP-ST,Task,"document telemetry anomalies, latency thresholds, and skill tree indicators",Done,2026-10-13,ce180a0
+SBC-176,SBC-EP-BKT,Story,"introduce standalone AnomalyRadarWidget with deep dive question audit and task navigation",Done,2026-10-13,1308840
+SBC-177,SBC-EP-BKT,Story,"implement hierarchical interactive AnomalyTreeWidget grouped by anomaly type and skill",Done,2026-10-13,db2e942
+SBC-178,SBC-EP-BKT,Story,"introduce multi-mode AnomalyTreeWidget with tree, graph and rpg views",Done,2026-10-13,0dc8f61
+SBC-179,SBC-EP-BKT,Story,"add DAG module-based anomaly tree mode with hierarchical sibling branches",Done,2026-10-13,1b85386
+SBC-180,SBC-EP-BKT,Story,"render full task titles, descriptions, and telemetry previews in anomaly trees and modal",Done,2026-10-13,91f1b7e
+SBC-181,SBC-EP-SH,Bug,"restrict bouncing icon animation to active or selected node only",Done,2026-10-13,8df9aec
+SBC-182,SBC-EP-ST,Story,"add anomaly tree view toggle to student skill tree widget",Done,2026-10-13,0b9ced9
+SBC-183,SBC-EP-SH,Task,"unify GameSkillTreeWidget and AnomalyTreeWidget in @sbc/ui package",Done,2026-10-13,0eb812f
+SBC-184,SBC-EP-SH,Bug,"restore original crystal node styles and add tailwind source path for shared ui",Done,2026-10-13,dbf3c67
+SBC-185,SBC-EP-SH,Bug,"remove excessive blurred selection halo from skill tree nodes",Done,2026-10-13,99dd052
+SBC-186,SBC-EP-INF,Task,"sync daily progress and implementation logs for UI unification and styling fixes",Done,2026-10-13,3acccd0
+SBC-187,SBC-EP-LLM,Task,"specify multi-tier semantic evaluation pipeline for open-ended questions",Done,2026-10-14,b09695e
+SBC-188,SBC-EP-LLM,Story,"add OpenTextHeuristicEvaluator and integrate open-text telemetry into BehavioralAdjuster",Done,2026-10-14,c792ceb
+SBC-189,SBC-EP-SH,Story,"extend Prisma schema with OPEN_TEXT, TeacherReviewStatus and semantic evaluation fields",Done,2026-10-14,3e37b5b
+SBC-190,SBC-EP-LLM,Story,"implement OpenAnswerEvaluatorService orchestrator and integrate with BktController",Done,2026-10-14,cb383c3
+SBC-191,SBC-EP-LLM,Bug,"reject gibberish input and seed Event Loop rubric",Done,2026-10-14,529db7d
+SBC-192,SBC-EP-LLM,Task,"update daily progress and detailed log for gibberish filter fix",Done,2026-10-14,91833dd
+SBC-193,SBC-EP-ST,Story,"display semantic rubric breakdown and teacher review status",Done,2026-10-14,14ceb67
+SBC-194,SBC-EP-ST,Task,"log micro-step 5 student semantic rubric UI",Done,2026-10-14,a4b16a8
+SBC-195,SBC-EP-TC,Story,"human-in-the-loop review queue for open text answers",Done,2026-10-14,0b70f62
+SBC-196,SBC-EP-TC,Task,"log micro-step 6 teacher review queue and recompile docs portal",Done,2026-10-14,b9420e6
+SBC-197,SBC-EP-LLM,Bug,"prevent keyword stuffing and connect essay telemetry to BKT adjuster",Done,2026-10-14,378a297
+SBC-198,SBC-EP-BKT,Task,"log micro-step 7 keyword stuffing protection and telemetry integration",Done,2026-10-14,ddb56f0
+SBC-199,SBC-EP-LLM,Bug,"block looping phrase spam and route high-paste submissions to teacher review queue",Done,2026-10-14,a64b65f
+SBC-200,SBC-EP-TC,Task,"log micro-step 8 phrase looping spam protection and teacher review routing",Done,2026-10-14,0fd802f
+SBC-201,SBC-EP-INF,Task,"verify review queue navigation in teacher portal",Done,2026-10-14,84d8afa
+SBC-202,SBC-EP-BKT,Task,"add full open-text assessment pipeline and anomaly specification to telemetry_analytics.md",Done,2026-10-14,be545a8

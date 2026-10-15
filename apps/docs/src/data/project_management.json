@@ -301,41 +301,107 @@
           ]
         },
         {
-          "title": "4.2. Правила оформлення коммітів (Conventional Commits)",
+          "title": "4.2. Правила оформлення коммітів (Jira Conventional Commits)",
           "level": 3,
           "paragraphs": [
-            "Усі повідомлення коммітів повинні відповідати стандарту Conventional Commits з обов'язковим вказуванням архітектурного префікса (Scope) та номера завдання з Jira:"
+            "Усі повідомлення коммітів повинні відповідати стандарту із обов'язковим зазначенням номера завдання Jira, короткого коду епіку та типу змін:",
+            "`feat` (нова фіча), `fix` (виправлення дефекту), `docs` (документація), `style` (стилі/форматування), `refactor` (рефакторинг), `test` (тести), `chore` (налаштування білду, конфігів)."
           ],
           "code_blocks": [
             {
               "lang": "text",
-              "content": "<type>(<scope>): <опис англійською мовою> <номер_таски>"
+              "content": "[<номер_таски>][<код_епіку>] <type>: <опис англійською мовою>"
             }
           ],
           "items": [
             {
               "type": "text",
-              "raw_text": "**Дозволені типи (`type`):** `feat` (нова фіча), `fix` (виправлення багу), `docs` (документація), `style` (форматування), `refactor` (рефакторинг), `test` (тести), `chore` (налаштування білду тощо).",
+              "raw_text": "**Дозволені коди епіків (`код_епіку`):**",
               "subitems": []
             },
             {
               "type": "text",
-              "raw_text": "**Приклади:**",
+              "raw_text": "`[EP-INF]` — Monorepo, CI/CD, Docs, E2E Tooling",
               "subitems": []
             },
             {
               "type": "text",
-              "raw_text": "`feat(CF): add interactive ECharts skill graph to dashboard SBC-12`",
+              "raw_text": "`[EP-SH]` — Database Modeling (Prisma), Shared Packages (`@sbc/ui`, `@sbc/types`)",
               "subitems": []
             },
             {
               "type": "text",
-              "raw_text": "`fix(BK): resolve JWT validation crash on expired token SBC-99`",
+              "raw_text": "`[EP-BK]` — Authentication, RBAC, Core NestJS API",
               "subitems": []
             },
             {
               "type": "text",
-              "raw_text": "`test(W3): add foundry fuzz tests for SBT recovery logic SBC-45`",
+              "raw_text": "`[EP-BKT]` — Bayesian Knowledge Tracing Core Engine, Behavioral Telemetry, Anomaly Detection",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "`[EP-LLM]` — Automated Code Assessment & Open-Text Evaluation",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "`[EP-W3]` — Web3 Infrastructure & Smart Contracts (Foundry/Solidity)",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "`[EP-ST]` — Student Portal Next.js (`apps/student`)",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "`[EP-TC]` — Teacher Portal Next.js (`apps/teacher`)",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "`[EP-AD]` — Admin Portal Next.js (`apps/admin`)",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "`[EP-LD]` — Landing Web Page (`apps/web`)",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Дозволені типи (`type`):**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Приклади валідних коммітів:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "`[SBC-12][EP-ST] feat: add interactive ECharts skill graph to dashboard`",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "`[SBC-99][EP-BK] fix: resolve JWT validation crash on expired token`",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "`[SBC-45][EP-W3] test: add foundry fuzz tests for SBT recovery logic`",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "`[SBC-195][EP-TC] feat: human-in-the-loop review queue for open text answers`",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "`[SBC-202][EP-BKT] docs: add full open-text assessment pipeline and anomaly specification`",
               "subitems": []
             },
             {

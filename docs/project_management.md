@@ -111,19 +111,34 @@
 *   `bugfix/BK-99-jwt-expiration`
 *   `spike/BKT-5-cold-start-analysis`
 
-### 4.2. Правила оформлення коммітів (Conventional Commits)
-Усі повідомлення коммітів повинні відповідати стандарту Conventional Commits з обов'язковим вказуванням архітектурного префікса (Scope) та номера завдання з Jira:
+### 4.2. Правила оформлення коммітів (Jira Conventional Commits)
+Усі повідомлення коммітів повинні відповідати стандарту із обов'язковим зазначенням номера завдання Jira, короткого коду епіку та типу змін:
 
 ```text
-<type>(<scope>): <опис англійською мовою> <номер_таски>
+[<номер_таски>][<код_епіку>] <type>: <опис англійською мовою>
 ```
 
-**Дозволені типи (`type`):** `feat` (нова фіча), `fix` (виправлення багу), `docs` (документація), `style` (форматування), `refactor` (рефакторинг), `test` (тести), `chore` (налаштування білду тощо).
+**Дозволені коди епіків (`код_епіку`):**
+* `[EP-INF]` — Monorepo, CI/CD, Docs, E2E Tooling
+* `[EP-SH]` — Database Modeling (Prisma), Shared Packages (`@sbc/ui`, `@sbc/types`)
+* `[EP-BK]` — Authentication, RBAC, Core NestJS API
+* `[EP-BKT]` — Bayesian Knowledge Tracing Core Engine, Behavioral Telemetry, Anomaly Detection
+* `[EP-LLM]` — Automated Code Assessment & Open-Text Evaluation
+* `[EP-W3]` — Web3 Infrastructure & Smart Contracts (Foundry/Solidity)
+* `[EP-ST]` — Student Portal Next.js (`apps/student`)
+* `[EP-TC]` — Teacher Portal Next.js (`apps/teacher`)
+* `[EP-AD]` — Admin Portal Next.js (`apps/admin`)
+* `[EP-LD]` — Landing Web Page (`apps/web`)
 
-**Приклади:**
-*   `feat(CF): add interactive ECharts skill graph to dashboard SBC-12`
-*   `fix(BK): resolve JWT validation crash on expired token SBC-99`
-*   `test(W3): add foundry fuzz tests for SBT recovery logic SBC-45`
+**Дозволені типи (`type`):**
+`feat` (нова фіча), `fix` (виправлення дефекту), `docs` (документація), `style` (стилі/форматування), `refactor` (рефакторинг), `test` (тести), `chore` (налаштування білду, конфігів).
+
+**Приклади валідних коммітів:**
+* `[SBC-12][EP-ST] feat: add interactive ECharts skill graph to dashboard`
+* `[SBC-99][EP-BK] fix: resolve JWT validation crash on expired token`
+* `[SBC-45][EP-W3] test: add foundry fuzz tests for SBT recovery logic`
+* `[SBC-195][EP-TC] feat: human-in-the-loop review queue for open text answers`
+* `[SBC-202][EP-BKT] docs: add full open-text assessment pipeline and anomaly specification`
 
 ---
 
