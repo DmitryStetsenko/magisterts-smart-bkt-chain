@@ -206,4 +206,5 @@ SBC-204,SBC-EP-INF,Story,"install git commit-msg hook and document commit workfl
 SBC-205,SBC-EP-INF,Task,"make jira artifacts generator read dynamically from git log",Done,2026-10-15,529820b
 SBC-206,SBC-EP-INF,Task,"synchronize architecture docs, 10 epics specification, tech stack apps and roadmap phase statuses",Done,2026-10-15,34a4104
 SBC-207,SBC-EP-INF,Task,"sync tasks registry and jira import csv with sbc-206",Done,2026-10-15,baab886
-SBC-208,SBC-EP-INF,Bug,"update package-lock and enhance github pages workflow for resilient ci",Done,2026-10-15,ece8d9d
+SBC-208,SBC-EP-INF,Bug,"update package-lock and enhance github pages workflow for resilient ci",Done,2026-10-15,b11f87b
+SBC-209,SBC-EP-TC,Bug,"filter teacher review queue submissions by course slug relation",Done,2026-10-15,52a8355

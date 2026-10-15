@@ -13,10 +13,10 @@
 | **`SBC-EP-LLM`** | Automated Code Assessment & Open-Text Evaluation | 10 |
 | **`SBC-EP-W3`** | Web3 Infrastructure & Smart Contracts | 0 |
 | **`SBC-EP-ST`** | Student Portal & Skill Tree Map | 26 |
-| **`SBC-EP-TC`** | Teacher Portal & Analytics CRM | 14 |
+| **`SBC-EP-TC`** | Teacher Portal & Analytics CRM | 15 |
 | **`SBC-EP-AD`** | Admin Portal & Knowledge DAG Builder | 8 |
 | **`SBC-EP-LD`** | Landing Web Page | 9 |
-| **ВСЬОГО** | - | **208** |
+| **ВСЬОГО** | - | **209** |
 
 ---
 
@@ -109,7 +109,7 @@
 | **SBC-205** | `Task` | `INF` | make jira artifacts generator read dynamically from git log | 2026-10-15 | `529820b` |
 | **SBC-206** | `Task` | `INF` | synchronize architecture docs, 10 epics specification, tech stack apps and roadmap phase statuses | 2026-10-15 | `34a4104` |
 | **SBC-207** | `Task` | `INF` | sync tasks registry and jira import csv with sbc-206 | 2026-10-15 | `baab886` |
-| **SBC-208** | `Bug` | `INF` | update package-lock and enhance github pages workflow for resilient ci | 2026-10-15 | `ece8d9d` |
+| **SBC-208** | `Bug` | `INF` | update package-lock and enhance github pages workflow for resilient ci | 2026-10-15 | `b11f87b` |
 
 ---
 
@@ -264,6 +264,7 @@
 | **SBC-195** | `Story` | `TC` | human-in-the-loop review queue for open text answers | 2026-10-14 | `9e43565` |
 | **SBC-196** | `Task` | `TC` | log micro-step 6 teacher review queue and recompile docs portal | 2026-10-14 | `a581cbe` |
 | **SBC-200** | `Task` | `TC` | log micro-step 8 phrase looping spam protection and teacher review routing | 2026-10-14 | `36d68b2` |
+| **SBC-209** | `Bug` | `TC` | filter teacher review queue submissions by course slug relation | 2026-10-15 | `52a8355` |
 
 ---
 
