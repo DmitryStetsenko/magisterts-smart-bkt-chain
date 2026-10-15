@@ -1,14 +1,53 @@
 const fs = require('fs');
 const path = require('path');
-
-const issues = JSON.parse(fs.readFileSync('scripts/mapped_issues.json', 'utf-8'));
+const cp = require('child_process');
 
 const tasksDir = path.join(__dirname, '..', 'docs', 'tasks');
 if (!fs.existsSync(tasksDir)) {
   fs.mkdirSync(tasksDir, { recursive: true });
 }
 
-// 1. Generate jira_import.csv
+// 1. Read git log dynamically
+const rawLog = cp.execSync('git log --reverse --format="%h|||%ad|||%s" --date=short', { encoding: 'utf-8' }).trim();
+const lines = rawLog.split('\n');
+
+const issues = [];
+const regex = /^\[(SBC-\d+)\]\[(EP-[A-Z0-9]+)\]\s+([a-z]+):\s+(.+)$/i;
+
+lines.forEach((line, idx) => {
+  const [hash, date, subject] = line.split('|||');
+  const match = subject.match(regex);
+  if (match) {
+    const issueKey = match[1];
+    const epicShort = match[2];
+    const epicKey = `SBC-${epicShort}`;
+    const commitType = match[3].toLowerCase();
+    const summary = match[4].trim();
+
+    let issueType = 'Task';
+    if (commitType === 'feat') issueType = 'Story';
+    else if (commitType === 'fix') issueType = 'Bug';
+    else if (commitType === 'docs') issueType = 'Task';
+    else if (commitType === 'test') issueType = 'Task';
+
+    const scope = epicShort.replace('EP-', '');
+
+    issues.push({
+      issueKey,
+      epicKey,
+      epicShort,
+      scope,
+      type: issueType,
+      summary,
+      commitType,
+      date,
+      hash,
+      subject
+    });
+  }
+});
+
+// 2. Generate jira_import.csv
 const csvHeaders = ['Issue Key', 'Epic Link', 'Issue Type', 'Summary', 'Status', 'Date', 'Git Commit Hash'];
 const csvRows = [csvHeaders.join(',')];
 
@@ -27,7 +66,7 @@ issues.forEach(iss => {
 
 fs.writeFileSync(path.join(tasksDir, 'jira_import.csv'), csvRows.join('\n'), 'utf-8');
 
-// 2. Generate tasks registry Markdown by Epics
+// 3. Generate registry.md
 const epics = {
   'SBC-EP-INF': { name: 'Monorepo & CI/CD Setup', scope: 'INF', items: [] },
   'SBC-EP-SH': { name: 'Database Modeling & Shared Packages', scope: 'SH', items: [] },
@@ -73,4 +112,4 @@ for (const [key, data] of Object.entries(epics)) {
 }
 
 fs.writeFileSync(path.join(tasksDir, 'registry.md'), mdRegistry, 'utf-8');
-console.log('Successfully generated docs/tasks/registry.md and docs/tasks/jira_import.csv');
+console.log(`Successfully synced ${issues.length} tasks from Git log to docs/tasks/registry.md and docs/tasks/jira_import.csv`);
