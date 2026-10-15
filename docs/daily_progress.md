@@ -17,6 +17,11 @@
    - Створено валідатор `scripts/validate_commit_msg.js` та встановлено хук `.git/hooks/commit-msg`.
    - Заблоковано можливість створення коммітів, що не відповідають шаблону `[SBC-XXX][EP-YYY] <type>: <description>`.
    - Додано команду `npm run validate:commit` у кореневий `package.json` та задокументовано архітектуру контролю в `docs/project_management.md`.
+3. **Глобальна синхронізація технічної документації та порталу:**
+   - Оновлено специфікацію 10 епіків та компонентів Jira у [`docs/project_management.md`](file:///docs/project_management.md) (приведено у відповідність до реальних мікрофронтендів `ST`, `TC`, `AD`, `LD`).
+   - Синхронізовано структуру застосунків та портів у [`docs/tech_stack.source.md`](file:///docs/tech_stack.source.md) (`apps/student`, `apps/teacher`, `apps/admin`, `apps/web`, `apps/docs`, `apps/api`).
+   - Актуалізовано фази дорожньої карти у [`docs/roadmap.md`](file:///docs/roadmap.md) зі статусами виконання (Фаза 1 та Фаза 2 — завершено, Фаза 3 — в активній розробці з Open-Text Evaluation та чергою викладача).
+   - Оновлено команди локального запуску розробника.
 
 ## 📅 14 жовтня 2026 року
 
