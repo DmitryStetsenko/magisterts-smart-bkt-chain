@@ -781,3 +781,29 @@ eferenceAnswer, критерії options.keywords (microtask|мікротаск|
 - **Верифікація:**
   - 35/35 unit-тестів API пройдено (7 тест-сьютів) ✅.
   - Повна компіляція `npm run build:api` завершується успішно ✅.
+
+### 11.10 Виправлення Фільтрації за Курсом у Черзі Перевірки Викладача (`getTeacherReviewQueue`)
+- **Файли реалізації:**
+  - [`apps/api/src/adapters/inbound/http/bkt.controller.ts`](file:///apps/api/src/adapters/inbound/http/bkt.controller.ts)
+- **Проблематика:**
+  - Фронтенд кабінету викладача (`apps/teacher`) надсилає запит на отримання черги перевірки з параметром `courseSlug` (наприклад, `GET /api/v1/bkt/reviews/queue?courseSlug=js-dev`).
+  - У вихідному Prisma-запиті контролера умова фільтрації використовувала пряме зіставлення `skill: { courseId: courseSlug }`. Оскільки `courseSlug` є рядковим слагом (`js-dev`), а `courseId` — це UUID запису курсу в таблиці `courses`, запит повертав порожній масив робіт (`[]`), незважаючи на наявність 11 поданих відповідей зі статусом `PENDING_REVIEW`.
+- **Архітектурне Рішення:**
+  - Скориговано умову `where` у Prisma-запиті для фільтрації через зв'язану реляцію курсу:
+    ```typescript
+    ...(courseSlug
+      ? {
+          task: {
+            skill: {
+              course: {
+                slug: courseSlug,
+              },
+            },
+          },
+        }
+      : {}),
+    ```
+- **Результати Верифікації:**
+  - Запит `GET /api/v1/bkt/reviews/queue?courseSlug=js-dev` повертає всі 11 очікуючих перевірки відповідей.
+  - Кабінет викладача на порту 3003 коректно відображає список і картку інспектора відповідей.
+  - Усі 35/35 unit-тестів API пройдено успішно ✅.

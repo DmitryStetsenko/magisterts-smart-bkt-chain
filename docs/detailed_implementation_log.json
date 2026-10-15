@@ -3117,6 +3117,74 @@
               "subitems": []
             }
           ]
+        },
+        {
+          "title": "11.10 Виправлення Фільтрації за Курсом у Черзі Перевірки Викладача (`getTeacherReviewQueue`)",
+          "level": 3,
+          "paragraphs": [],
+          "code_blocks": [
+            {
+              "lang": "typescript",
+              "content": "...(courseSlug\n      ? {\n          task: {\n            skill: {\n              course: {\n                slug: courseSlug,\n              },\n            },\n          },\n        }\n      : {}),"
+            }
+          ],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "**Файли реалізації:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "[`apps/api/src/adapters/inbound/http/bkt.controller.ts`](file:///apps/api/src/adapters/inbound/http/bkt.controller.ts)",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Проблематика:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Фронтенд кабінету викладача (`apps/teacher`) надсилає запит на отримання черги перевірки з параметром `courseSlug` (наприклад, `GET /api/v1/bkt/reviews/queue?courseSlug=js-dev`).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "У вихідному Prisma-запиті контролера умова фільтрації використовувала пряме зіставлення `skill: { courseId: courseSlug }`. Оскільки `courseSlug` є рядковим слагом (`js-dev`), а `courseId` — це UUID запису курсу в таблиці `courses`, запит повертав порожній масив робіт (`[]`), незважаючи на наявність 11 поданих відповідей зі статусом `PENDING_REVIEW`.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Архітектурне Рішення:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Скориговано умову `where` у Prisma-запиті для фільтрації через зв'язану реляцію курсу:",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Результати Верифікації:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Запит `GET /api/v1/bkt/reviews/queue?courseSlug=js-dev` повертає всі 11 очікуючих перевірки відповідей.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Кабінет викладача на порту 3003 коректно відображає список і картку інспектора відповідей.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Усі 35/35 unit-тестів API пройдено успішно ✅.",
+              "subitems": []
+            }
+          ]
         }
       ]
     }

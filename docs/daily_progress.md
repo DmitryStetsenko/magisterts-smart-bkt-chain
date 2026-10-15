@@ -25,6 +25,9 @@
 4. **Виправлення та надійний запуск GitHub Pages CI/CD Pipeline (`deploy-docs.yml`):**
    - Усунено збій команди `npm ci` на раннері GitHub Actions: згенеровано свіжий, узгоджений монорепозиторний `package-lock.json`.
    - Оновлено [`.github/workflows/deploy-docs.yml`](file:///.github/workflows/deploy-docs.yml): додано `package.json` та `package-lock.json` до тригерів `paths`, а також додано надійний fallback `npm ci || npm install`.
+5. **Виправлення фільтрації Черги Перевірки Викладача (`getTeacherReviewQueue`):**
+   - Усунено дефект у [`apps/api/src/adapters/inbound/http/bkt.controller.ts`](file:///apps/api/src/adapters/inbound/http/bkt.controller.ts), де фільтр за курсом використовував неіснуючий прямий зв'язок `courseId: courseSlug` замість зв'язку через сутність `course: { slug: courseSlug }`.
+   - Тепер у кабінеті викладача (`apps/teacher`) в розділі «Черга Перевірки» миттєво відображаються всі відповіді студентів зі статусом `PENDING_REVIEW` за вибраним курсом (наприклад, `js-dev`).
 
 ## 📅 14 жовтня 2026 року
 

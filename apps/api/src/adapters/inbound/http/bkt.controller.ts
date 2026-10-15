@@ -641,7 +641,9 @@ export class BktController {
           ? {
               task: {
                 skill: {
-                  courseId: courseSlug,
+                  course: {
+                    slug: courseSlug,
+                  },
                 },
               },
             }

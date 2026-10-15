@@ -106,6 +106,21 @@
               "type": "text",
               "raw_text": "Оновлено [`.github/workflows/deploy-docs.yml`](file:///.github/workflows/deploy-docs.yml): додано `package.json` та `package-lock.json` до тригерів `paths`, а також додано надійний fallback `npm ci || npm install`.",
               "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Виправлення фільтрації Черги Перевірки Викладача (`getTeacherReviewQueue`):**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Усунено дефект у [`apps/api/src/adapters/inbound/http/bkt.controller.ts`](file:///apps/api/src/adapters/inbound/http/bkt.controller.ts), де фільтр за курсом використовував неіснуючий прямий зв'язок `courseId: courseSlug` замість зв'язку через сутність `course: { slug: courseSlug }`.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Тепер у кабінеті викладача (`apps/teacher`) в розділі «Черга Перевірки» миттєво відображаються всі відповіді студентів зі статусом `PENDING_REVIEW` за вибраним курсом (наприклад, `js-dev`).",
+              "subitems": []
             }
           ]
         }
