@@ -9,6 +9,8 @@ on:
       - 'docs/**'
       - 'apps/docs/**'
       - 'scripts/**'
+      - 'package.json'
+      - 'package-lock.json'
       - '.github/workflows/deploy-docs.yml'
 
   # Allows manual triggering from the Actions tab
@@ -49,7 +51,8 @@ jobs:
           cache: 'npm'
 
       - name: Install Monorepo Dependencies
-        run: npm ci
+        run: |
+          npm ci || npm install
 
       - name: Build Next.js Documentation Site
         env:

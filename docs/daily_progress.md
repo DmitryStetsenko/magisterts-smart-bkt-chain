@@ -22,6 +22,9 @@
    - Синхронізовано структуру застосунків та портів у [`docs/tech_stack.source.md`](file:///docs/tech_stack.source.md) (`apps/student`, `apps/teacher`, `apps/admin`, `apps/web`, `apps/docs`, `apps/api`).
    - Актуалізовано фази дорожньої карти у [`docs/roadmap.md`](file:///docs/roadmap.md) зі статусами виконання (Фаза 1 та Фаза 2 — завершено, Фаза 3 — в активній розробці з Open-Text Evaluation та чергою викладача).
    - Оновлено команди локального запуску розробника.
+4. **Виправлення та надійний запуск GitHub Pages CI/CD Pipeline (`deploy-docs.yml`):**
+   - Усунено збій команди `npm ci` на раннері GitHub Actions: згенеровано свіжий, узгоджений монорепозиторний `package-lock.json`.
+   - Оновлено [`.github/workflows/deploy-docs.yml`](file:///.github/workflows/deploy-docs.yml): додано `package.json` та `package-lock.json` до тригерів `paths`, а також додано надійний fallback `npm ci || npm install`.
 
 ## 📅 14 жовтня 2026 року
 

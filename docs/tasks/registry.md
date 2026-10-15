@@ -6,7 +6,7 @@
 ## 📊 Зведена статистика
 | Епік | Назва | Кількість завдань |
 | :--- | :--- | :---: |
-| **`SBC-EP-INF`** | Monorepo & CI/CD Setup | 84 |
+| **`SBC-EP-INF`** | Monorepo & CI/CD Setup | 86 |
 | **`SBC-EP-SH`** | Database Modeling & Shared Packages | 17 |
 | **`SBC-EP-BK`** | Authentication & Core API | 14 |
 | **`SBC-EP-BKT`** | Bayesian Knowledge Tracing & Behavioral Telemetry | 24 |
@@ -16,7 +16,7 @@
 | **`SBC-EP-TC`** | Teacher Portal & Analytics CRM | 14 |
 | **`SBC-EP-AD`** | Admin Portal & Knowledge DAG Builder | 8 |
 | **`SBC-EP-LD`** | Landing Web Page | 9 |
-| **ВСЬОГО** | - | **206** |
+| **ВСЬОГО** | - | **208** |
 
 ---
 
@@ -108,6 +108,8 @@
 | **SBC-204** | `Story` | `INF` | install git commit-msg hook and document commit workflow in project management docs | 2026-10-15 | `a6b8cb6` |
 | **SBC-205** | `Task` | `INF` | make jira artifacts generator read dynamically from git log | 2026-10-15 | `529820b` |
 | **SBC-206** | `Task` | `INF` | synchronize architecture docs, 10 epics specification, tech stack apps and roadmap phase statuses | 2026-10-15 | `34a4104` |
+| **SBC-207** | `Task` | `INF` | sync tasks registry and jira import csv with sbc-206 | 2026-10-15 | `baab886` |
+| **SBC-208** | `Bug` | `INF` | update package-lock and enhance github pages workflow for resilient ci | 2026-10-15 | `ece8d9d` |
 
 ---
 

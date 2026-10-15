@@ -67,6 +67,59 @@
           ]
         },
         {
+          "title": "0.1.1 Архітектура Автоматичного Деплою Документації на GitHub Pages (`deploy-docs.yml`)",
+          "level": 3,
+          "paragraphs": [],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "**Workflow:** [`.github/workflows/deploy-docs.yml`](file:///.github/workflows/deploy-docs.yml).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Тригери запуску:** `push` у гілки `master` або `main`, зачіпаючи шляхи `docs/**`, `apps/docs/**`, `scripts/**`, `package.json`, `package-lock.json`, або ручний `workflow_dispatch`.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Етапи пайплайну:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "*Checkout Repository* (`actions/checkout@v4`).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "*Setup Python & Compile Docs* (`python scripts/compile_docs.py`) — генерація свіжих JSON-структур у `apps/docs/src/data/`.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "*Setup Node.js 20* з кешуванням `npm`.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "*Install Monorepo Dependencies* (`npm ci || npm install`) — синхронізація робочих просторів монорепозиторію.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "*Build Next.js Documentation Site* (`npm run build:docs`) — збірка статичного експорту (`output: \"export\"`, `trailingSlash: true`, `basePath: \"/magisterts-smart-bkt-chain\"`).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "*Upload Artifact & Deploy Pages* (`actions/upload-pages-artifact@v3` + `actions/deploy-pages@v4`).",
+              "subitems": []
+            }
+          ]
+        },
+        {
           "title": "0.2 Модуль Візуальної Інспекції Графу Курсу (`CourseOverviewWidget`)",
           "level": 3,
           "paragraphs": [],

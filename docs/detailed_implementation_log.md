@@ -19,6 +19,17 @@
 4. **Автоматична валідація Git Hook (`.git/hooks/commit-msg`):** Встановлено локальний перехоплювач та скрипт `scripts/validate_commit_msg.js`, що блокує комміти при відхиленні від стандарту.
 5. **Захист від припущення:** Перевірка повних трасувань помилок перед виправленням коду.
 
+### 0.1.1 Архітектура Автоматичного Деплою Документації на GitHub Pages (`deploy-docs.yml`)
+- **Workflow:** [`.github/workflows/deploy-docs.yml`](file:///.github/workflows/deploy-docs.yml).
+- **Тригери запуску:** `push` у гілки `master` або `main`, зачіпаючи шляхи `docs/**`, `apps/docs/**`, `scripts/**`, `package.json`, `package-lock.json`, або ручний `workflow_dispatch`.
+- **Етапи пайплайну:**
+  1. *Checkout Repository* (`actions/checkout@v4`).
+  2. *Setup Python & Compile Docs* (`python scripts/compile_docs.py`) — генерація свіжих JSON-структур у `apps/docs/src/data/`.
+  3. *Setup Node.js 20* з кешуванням `npm`.
+  4. *Install Monorepo Dependencies* (`npm ci || npm install`) — синхронізація робочих просторів монорепозиторію.
+  5. *Build Next.js Documentation Site* (`npm run build:docs`) — збірка статичного експорту (`output: "export"`, `trailingSlash: true`, `basePath: "/magisterts-smart-bkt-chain"`).
+  6. *Upload Artifact & Deploy Pages* (`actions/upload-pages-artifact@v3` + `actions/deploy-pages@v4`).
+
 ### 0.2 Модуль Візуальної Інспекції Графу Курсу (`CourseOverviewWidget`)
 - **Концепція:** Перевикористовуваний автономний віджет `CourseOverviewWidget` (`apps/teacher/src/features/course-map/ui/CourseOverviewWidget.tsx`), призначений для повного огляду ієрархії курсів, модулів (DAG) та прив'язаних запитань/завдань.
 - **Особливості:**

@@ -91,6 +91,21 @@
               "type": "text",
               "raw_text": "Оновлено команди локального запуску розробника.",
               "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Виправлення та надійний запуск GitHub Pages CI/CD Pipeline (`deploy-docs.yml`):**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Усунено збій команди `npm ci` на раннері GitHub Actions: згенеровано свіжий, узгоджений монорепозиторний `package-lock.json`.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Оновлено [`.github/workflows/deploy-docs.yml`](file:///.github/workflows/deploy-docs.yml): додано `package.json` та `package-lock.json` до тригерів `paths`, а також додано надійний fallback `npm ci || npm install`.",
+              "subitems": []
             }
           ]
         }
