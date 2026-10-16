@@ -41,6 +41,7 @@ enum TeacherReviewStatus {
   PENDING_REVIEW
   APPROVED
   REJECTED
+  SUPERSEDED
 }
 
 enum CredentialType {
@@ -246,17 +247,21 @@ model BehavioralProfile {
 }
 
 model Submission {
-  id                  String              @id @default(uuid())
-  userId              String
-  user                User                @relation(fields: [userId], references: [id], onDelete: Cascade)
-  taskId              String
-  task                Task                @relation(fields: [taskId], references: [id], onDelete: Cascade)
-  code                String
-  status              SubmissionStatus    @default(PENDING)
-  teacherReviewStatus TeacherReviewStatus @default(NONE)
-  teacherComment      String?
-  createdAt           DateTime            @default(now())
-  evaluationResult    EvaluationResult?
+  id                   String              @id @default(uuid())
+  userId               String
+  user                 User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  taskId               String
+  task                 Task                @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  code                 String
+  status               SubmissionStatus    @default(PENDING)
+  teacherReviewStatus  TeacherReviewStatus @default(NONE)
+  teacherComment       String?
+  attemptNumber        Int                 @default(1)
+  previousSubmissionId String?
+  previousSubmission   Submission?         @relation("SubmissionVersions", fields: [previousSubmissionId], references: [id], onDelete: SetNull)
+  nextSubmissions      Submission[]        @relation("SubmissionVersions")
+  createdAt            DateTime            @default(now())
+  evaluationResult     EvaluationResult?
 
   @@map("submissions")
 }

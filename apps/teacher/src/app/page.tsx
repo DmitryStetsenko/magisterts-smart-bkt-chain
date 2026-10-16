@@ -638,9 +638,16 @@ export default function TeacherDashboardPage() {
                           >
                             <div className="flex items-center justify-between">
                               <span className="text-xs font-bold text-white truncate">{item.studentName}</span>
-                              <span className="px-1.5 py-0.5 rounded text-[9px] font-mono font-bold bg-amber-500/10 text-amber-300 border border-amber-500/30">
-                                В черзі
-                              </span>
+                              <div className="flex items-center gap-1">
+                                {(item.attemptNumber || (item.attemptsHistory && item.attemptsHistory.length > 1)) && (
+                                  <span className="px-1.5 py-0.5 rounded text-[9px] font-mono font-bold bg-purple-500/10 text-purple-300 border border-purple-500/30">
+                                    Спроба {item.attemptNumber || item.attemptsHistory?.length}
+                                  </span>
+                                )}
+                                <span className="px-1.5 py-0.5 rounded text-[9px] font-mono font-bold bg-amber-500/10 text-amber-300 border border-amber-500/30">
+                                  В черзі
+                                </span>
+                              </div>
                             </div>
                             <div className="text-[11px] text-slate-300 font-semibold truncate">{item.taskTitle}</div>
                             <div className="text-[10px] text-slate-500 font-mono flex items-center justify-between">

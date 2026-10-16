@@ -2,6 +2,16 @@
 
 import React from 'react';
 
+export interface ReviewAttempt {
+  id: string;
+  attemptNumber: number;
+  answerText: string;
+  status: string;
+  teacherReviewStatus: string;
+  teacherComment?: string | null;
+  submittedAt: string;
+}
+
 export interface ReviewQueueItem {
   submissionId: string;
   studentId: string;
@@ -10,15 +20,19 @@ export interface ReviewQueueItem {
   taskId: string;
   taskTitle: string;
   taskDescription: string;
-  skillId: string;
+  skillId?: string;
+  skillSlug?: string;
   skillTitle: string;
   answerText: string;
+  attemptNumber?: number;
+  totalAttempts?: number;
   submittedAt: string;
-  semanticScore: number;
+  semanticScore?: number;
   teacherReviewStatus: string;
   referenceAnswer: string | null;
   rubrics: any | null;
   misconceptions: any | null;
+  attemptsHistory?: ReviewAttempt[];
 }
 
 interface ReviewQueueInspectorProps {
@@ -40,6 +54,13 @@ export const ReviewQueueInspector: React.FC<ReviewQueueInspectorProps> = ({
   setReviewScoreOverride,
   onDecision,
 }) => {
+  const [selectedAttemptIndex, setSelectedAttemptIndex] = React.useState<number | null>(null);
+
+  // Reset selected attempt index when current review changes
+  React.useEffect(() => {
+    setSelectedAttemptIndex(null);
+  }, [currentReview?.submissionId]);
+
   if (!currentReview) {
     return (
       <div className="bg-slate-900 border border-slate-800 rounded-2xl p-12 text-center text-slate-400 flex flex-col items-center justify-center gap-3">
@@ -54,7 +75,18 @@ export const ReviewQueueInspector: React.FC<ReviewQueueInspectorProps> = ({
     );
   }
 
-  const wordCount = currentReview.answerText ? currentReview.answerText.trim().split(/\s+/).filter(Boolean).length : 0;
+  const history = currentReview.attemptsHistory || [];
+  const activeAttempt =
+    selectedAttemptIndex !== null && history[selectedAttemptIndex]
+      ? history[selectedAttemptIndex]
+      : null;
+
+  const displayedAnswer = activeAttempt ? activeAttempt.answerText : currentReview.answerText;
+  const displayedSubmittedAt = activeAttempt ? activeAttempt.submittedAt : currentReview.submittedAt;
+  const displayedAttemptNumber = activeAttempt ? activeAttempt.attemptNumber : (currentReview.attemptNumber || 1);
+  const isViewingHistoricalAttempt = activeAttempt !== null && activeAttempt.id !== currentReview.submissionId;
+
+  const wordCount = displayedAnswer ? displayedAnswer.trim().split(/\s+/).filter(Boolean).length : 0;
   const keywords = Array.isArray(currentReview.rubrics?.keywords) ? currentReview.rubrics.keywords : [];
 
   return (
@@ -109,16 +141,80 @@ export const ReviewQueueInspector: React.FC<ReviewQueueInspectorProps> = ({
         </div>
       </div>
 
+      {/* Attempts History Version Tabs */}
+      {history.length > 1 && (
+        <div className="flex flex-col gap-2 p-3 bg-slate-950/70 border border-slate-800 rounded-xl">
+          <div className="flex items-center justify-between text-xs">
+            <span className="font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+              <span>🕒 Історія спроб студента:</span>
+              <span className="font-mono text-purple-300">({history.length} версій)</span>
+            </span>
+            <span className="text-[11px] text-slate-500">
+              Попередні спроби автоматично архівовано (Superseded)
+            </span>
+          </div>
+
+          <div className="flex flex-wrap gap-2 pt-1">
+            {history.map((att, idx) => {
+              const isSelected =
+                selectedAttemptIndex === idx ||
+                (selectedAttemptIndex === null && att.id === currentReview.submissionId);
+              const isLatestActive = att.id === currentReview.submissionId;
+
+              return (
+                <button
+                  key={att.id}
+                  onClick={() => setSelectedAttemptIndex(idx)}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-mono transition-all flex items-center gap-2 cursor-pointer ${
+                    isSelected
+                      ? 'bg-purple-600 text-white shadow-md shadow-purple-600/30 border border-purple-400 font-bold'
+                      : 'bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800'
+                  }`}
+                >
+                  <span>
+                    Спроба {att.attemptNumber || idx + 1}
+                    {isLatestActive ? ' • Поточна' : ''}
+                  </span>
+                  <span
+                    className={`text-[9px] px-1 rounded uppercase font-bold ${
+                      isLatestActive
+                        ? 'bg-amber-400/20 text-amber-300'
+                        : 'bg-slate-800 text-slate-400'
+                    }`}
+                  >
+                    {isLatestActive ? 'В черзі' : 'Superseded'}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
       {/* Student's Answer */}
       <div className="flex flex-col gap-2">
         <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider flex items-center justify-between">
-          <span>Письмова відповідь студента:</span>
+          <div className="flex items-center gap-2">
+            <span>Письмова відповідь студента:</span>
+            <span className="px-2 py-0.5 rounded bg-indigo-500/10 border border-indigo-500/20 text-indigo-300 text-[11px] font-mono font-bold">
+              Спроба #{displayedAttemptNumber}
+            </span>
+            {isViewingHistoricalAttempt && (
+              <span className="px-2 py-0.5 rounded bg-slate-800 text-slate-400 text-[10px] font-mono">
+                ⚠️ Перегляд попередньої версії (архів)
+              </span>
+            )}
+          </div>
           <span className="text-[11px] font-mono text-slate-400">
-            Кількість слів: {wordCount}
+            Кількість слів: {wordCount} • Час: {new Date(displayedSubmittedAt).toLocaleTimeString()}
           </span>
         </div>
-        <div className="p-4 bg-slate-950 border border-slate-800 rounded-xl text-slate-100 text-xs font-sans leading-relaxed whitespace-pre-wrap">
-          {currentReview.answerText}
+        <div className={`p-4 rounded-xl text-slate-100 text-xs font-sans leading-relaxed whitespace-pre-wrap ${
+          isViewingHistoricalAttempt
+            ? 'bg-slate-950/60 border border-purple-500/30'
+            : 'bg-slate-950 border border-slate-800'
+        }`}>
+          {displayedAnswer}
         </div>
       </div>
 

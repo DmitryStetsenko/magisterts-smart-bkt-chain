@@ -12,6 +12,7 @@ interface EssayTaskEditorProps {
   isSubmitting?: boolean;
   onNextTask?: () => void;
   isPassed?: boolean;
+  isPendingReview?: boolean;
 }
 
 export function EssayTaskEditor({
@@ -22,6 +23,7 @@ export function EssayTaskEditor({
   isSubmitting = false,
   onNextTask,
   isPassed = false,
+  isPendingReview = false,
 }: EssayTaskEditorProps) {
   const [essayText, setEssayText] = useState<string>('');
   const { metrics, handleKeyDown, handleDelete, handlePaste } = useTelemetry(userId, taskId);
@@ -124,12 +126,20 @@ export function EssayTaskEditor({
           disabled={wordCount === 0 || isSubmitting}
           className={`inline-flex items-center gap-2 px-6 py-2.5 rounded-xl font-bold text-xs transition-all ${
             wordCount > 0 && !isSubmitting
-              ? 'bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-600/30 cursor-pointer'
+              ? isPendingReview
+                ? 'bg-amber-600 hover:bg-amber-500 text-white shadow-lg shadow-amber-600/30 cursor-pointer border border-amber-400/40'
+                : 'bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-600/30 cursor-pointer'
               : 'bg-slate-800 text-slate-500 cursor-not-allowed border border-slate-700'
           }`}
         >
           <Send className="w-4 h-4" />
-          <span>{isSubmitting ? 'Оцінювання есе...' : 'Відправити На Перевірку'}</span>
+          <span>
+            {isSubmitting
+              ? 'Оцінювання есе...'
+              : isPendingReview
+              ? 'Оновити відповідь у викладача (Нова спроба)'
+              : 'Відправити На Перевірку'}
+          </span>
         </button>
       </div>
     </div>

@@ -761,6 +761,7 @@ export default function StudentPortalPage() {
                   isSubmitting={isSubmitting}
                   onNextTask={() => fetchRecommendedTask(activeCourseSlug)}
                   isPassed={Boolean(evalResult?.isPassed)}
+                  isPendingReview={evalResult?.teacherReviewStatus === 'PENDING_REVIEW'}
                 />
               ) : (
                 <MonacoCodeEditor

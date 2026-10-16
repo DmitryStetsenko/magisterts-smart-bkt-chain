@@ -2,6 +2,74 @@
   "project_title": "📅 Журнал розробки та прогресу проєкту (Daily Progress Log)",
   "sections": [
     {
+      "title": "📅 16 жовтня 2026 року",
+      "level": 2,
+      "paragraphs": [],
+      "code_blocks": [],
+      "items": [],
+      "subsections": [
+        {
+          "title": "✅ Що зроблено за день:",
+          "level": 3,
+          "paragraphs": [],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "**Імплементація Архітектурного Рішення Брейншторму 05 (Дедуплікація та Історія Спроб у Черзі Викладача):**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Схема бази даних (`schema.prisma`):**",
+              "subitems": [
+                "Розширено `TeacherReviewStatus` новим значенням `SUPERSEDED` для автоматичного архівування застарілих спроб студента, які ще не були перевірені викладачем.",
+                "Додано у модель `Submission` поля `attemptNumber Int @default(1)` та зв'язок версійності `previousSubmissionId String?` (`previousSubmission` / `nextSubmissions`).",
+                "Згенеровано оновлений Prisma Client та синхронізовано схему з PostgreSQL (`prisma db push`)."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Бекенд (`apps/api` - `bkt.controller.ts`):**",
+              "subitems": [
+                "Реалізовано авто-заміщення (superseding) у `evaluateSubmission`: якщо студент надсилає новий драфт есе за наявності активної заявки `PENDING_REVIEW`, попередня спроба автоматично маркується `SUPERSEDED`, а нова отримує інкрементований `attemptNumber` та лінк на попередній `id`.",
+                "Оновлено `GET /api/v1/bkt/reviews/queue`: черга гарантовано повертає рівно 1 картку на пару `(student, task)`, додаючи повний масив хронології `attemptsHistory` з текстами та мітками часу."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Портал викладача (`apps/teacher`):**",
+              "subitems": [
+                "Сайдбар черги відображає бейдж порядкового номера версії (`Спроба N`).",
+                "В [`ReviewQueueInspector`](file:///apps/teacher/src/features/reviews/ui/ReviewQueueInspector.tsx) додано інтерактивний горизонтальний перемикач версій (`Спроба 1`, `Спроба 2`, `Спроба 3 • Поточна`) зі статусами `Superseded` / `В черзі`.",
+                "Викладач може вільно перемикатися між усіма історичними спробами студента, бачити їхній точний час та порівнювати зміни тексту без захаращення черги."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Портал студента (`apps/student`):**",
+              "subitems": [
+                "[`EssayTaskEditor`](file:///apps/student/src/features/essay-editor/ui/EssayTaskEditor.tsx) отримав проп `isPendingReview`. Якщо поточний варіант уже в черзі викладача, кнопка динамічно змінюється на бурштинову: *«Оновити відповідь у викладача (Нова спроба)»*."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Тестування та валідація:**",
+              "subitems": [
+                "Усі 35 unit-тестів API пройдено успішно (`npm run test:api`).",
+                "Playwright E2E тести успішно підтверджено (`npx playwright test`)."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "---",
+              "subitems": []
+            }
+          ]
+        }
+      ]
+    },
+    {
       "title": "📅 15 жовтня 2026 року",
       "level": 2,
       "paragraphs": [],

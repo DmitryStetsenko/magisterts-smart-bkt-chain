@@ -192,7 +192,42 @@ export class BktController {
       }
     }
 
-    // Save Submission Log
+    // Deduplication & Superseding for Teacher Review Queue:
+    // If student submits a new draft while previous attempts are still PENDING_REVIEW,
+    // supersede previous pending submissions and link attempt history.
+    const latestPending = await this.prisma.submission.findFirst({
+      where: {
+        userId: user.id,
+        taskId: task.id,
+        teacherReviewStatus: TeacherReviewStatus.PENDING_REVIEW,
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+
+    if (latestPending && teacherReviewStatus === TeacherReviewStatus.PENDING_REVIEW) {
+      await this.prisma.submission.updateMany({
+        where: {
+          userId: user.id,
+          taskId: task.id,
+          teacherReviewStatus: TeacherReviewStatus.PENDING_REVIEW,
+        },
+        data: {
+          teacherReviewStatus: TeacherReviewStatus.SUPERSEDED,
+        },
+      });
+    }
+
+    const previousSubmissionsCount = await this.prisma.submission.count({
+      where: {
+        userId: user.id,
+        taskId: task.id,
+      },
+    });
+
+    const attemptNumber = previousSubmissionsCount + 1;
+    const previousSubmissionId = latestPending ? latestPending.id : null;
+
+    // Save Submission Log with Versioning
     const submission = await this.prisma.submission.create({
       data: {
         userId: user.id,
@@ -200,6 +235,8 @@ export class BktController {
         code: dto.code || dto.essayAnswer || dto.selectedOptionId || (dto.selectedOptionIds ? dto.selectedOptionIds.join(',') : ''),
         status: isPassed ? SubmissionStatus.ACCEPTED : SubmissionStatus.REJECTED,
         teacherReviewStatus,
+        attemptNumber,
+        previousSubmissionId,
       },
     });
 
@@ -663,24 +700,59 @@ export class BktController {
       take: 50,
     });
 
-    return submissions.map((sub) => ({
-      submissionId: sub.id,
-      studentId: sub.userId,
-      studentName: `${sub.user.profile?.firstName || 'Студент'} ${sub.user.profile?.lastName || ''}`.trim(),
-      studentEmail: sub.user.email,
-      taskId: sub.taskId,
-      taskTitle: sub.task.title,
-      taskDescription: sub.task.description,
-      skillSlug: sub.task.skill.slug,
-      skillTitle: sub.task.skill.title,
-      answerText: sub.code,
-      referenceAnswer: sub.task.referenceAnswer,
-      rubrics: sub.task.rubrics,
-      misconceptions: sub.task.misconceptions,
-      submittedAt: sub.createdAt,
-      teacherReviewStatus: sub.teacherReviewStatus,
-      teacherComment: sub.teacherComment,
-    }));
+    // Fetch full submission history for each student and task in the queue
+    const results = await Promise.all(
+      submissions.map(async (sub) => {
+        const history = await this.prisma.submission.findMany({
+          where: {
+            userId: sub.userId,
+            taskId: sub.taskId,
+          },
+          orderBy: { createdAt: 'asc' },
+          select: {
+            id: true,
+            attemptNumber: true,
+            code: true,
+            status: true,
+            teacherReviewStatus: true,
+            teacherComment: true,
+            createdAt: true,
+          },
+        });
+
+        return {
+          submissionId: sub.id,
+          studentId: sub.userId,
+          studentName: `${sub.user.profile?.firstName || 'Студент'} ${sub.user.profile?.lastName || ''}`.trim(),
+          studentEmail: sub.user.email,
+          taskId: sub.taskId,
+          taskTitle: sub.task.title,
+          taskDescription: sub.task.description,
+          skillSlug: sub.task.skill.slug,
+          skillTitle: sub.task.skill.title,
+          answerText: sub.code,
+          attemptNumber: sub.attemptNumber || history.length || 1,
+          totalAttempts: history.length,
+          referenceAnswer: sub.task.referenceAnswer,
+          rubrics: sub.task.rubrics,
+          misconceptions: sub.task.misconceptions,
+          submittedAt: sub.createdAt,
+          teacherReviewStatus: sub.teacherReviewStatus,
+          teacherComment: sub.teacherComment,
+          attemptsHistory: history.map((h) => ({
+            id: h.id,
+            attemptNumber: h.attemptNumber,
+            answerText: h.code,
+            status: h.status,
+            teacherReviewStatus: h.teacherReviewStatus,
+            teacherComment: h.teacherComment,
+            submittedAt: h.createdAt,
+          })),
+        };
+      }),
+    );
+
+    return results;
   }
 
   @Post('reviews/:submissionId/decision')

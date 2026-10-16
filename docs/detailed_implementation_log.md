@@ -807,3 +807,34 @@ eferenceAnswer, критерії options.keywords (microtask|мікротаск|
   - Запит `GET /api/v1/bkt/reviews/queue?courseSlug=js-dev` повертає всі 11 очікуючих перевірки відповідей.
   - Кабінет викладача на порту 3003 коректно відображає список і картку інспектора відповідей.
   - Усі 35/35 unit-тестів API пройдено успішно ✅.
+
+### 11.11 Дедуплікація Черги Перевірки Викладача, Версійність `Submission` та Хронологія Спроб
+- **Концептуальний референс:** [`docs/brainstorm/05_review_queue_deduplication_and_history.md`](file:///docs/brainstorm/05_review_queue_deduplication_and_history.md)
+- **Файли реалізації:**
+  - [`packages/database/prisma/schema.prisma`](file:///packages/database/prisma/schema.prisma)
+  - [`apps/api/src/adapters/inbound/http/bkt.controller.ts`](file:///apps/api/src/adapters/inbound/http/bkt.controller.ts)
+  - [`apps/teacher/src/features/reviews/ui/ReviewQueueInspector.tsx`](file:///apps/teacher/src/features/reviews/ui/ReviewQueueInspector.tsx)
+  - [`apps/teacher/src/app/page.tsx`](file:///apps/teacher/src/app/page.tsx)
+  - [`apps/student/src/features/essay-editor/ui/EssayTaskEditor.tsx`](file:///apps/student/src/features/essay-editor/ui/EssayTaskEditor.tsx)
+  - [`apps/student/src/app/page.tsx`](file:///apps/student/src/app/page.tsx)
+
+- **Архітектурні Зміни:**
+  1. **Рівень Бази Даних (Prisma / PostgreSQL):**
+     - Додано статус `SUPERSEDED` у перелік `TeacherReviewStatus`.
+     - У моделі `Submission` додано поля `attemptNumber Int @default(1)` та самопосилання версійності `previousSubmissionId String?` (`previousSubmission` / `nextSubmissions`).
+     - Забезпечено повне збереження (100% Audit Trail) усіх спроб, проміжних текстів та телеметричних сесій студента без жодного фізичного видалення чи перезапису.
+  2. **Рівень Бекенду (`apps/api`):**
+     - **Авто-заміщення при сабміті (`evaluateSubmission`):** Перед записом нової спроби перевіряється наявність активних `PENDING_REVIEW` спроб для пари `(userId, taskId)`. Якщо вони існують, їхній статус переводиться у `SUPERSEDED`, а нова спроба отримує інкрементований `attemptNumber` та `previousSubmissionId`.
+     - **Агрегація черги (`getTeacherReviewQueue`):** Вибирає лише актуальні `PENDING_REVIEW` (по 1 картці на задачу студента). Для кожної картки робиться вибірка повної хронології `attemptsHistory` (`orderBy: { createdAt: 'asc' }`) з відповідями, статусами та часовими мітками.
+  3. **Рівень Кабінету Викладача (`apps/teacher`):**
+     - У сайдбарі черги відображається компактна картка з міткою `Спроба N` та статусом `В черзі`.
+     - В [`ReviewQueueInspector`](file:///apps/teacher/src/features/reviews/ui/ReviewQueueInspector.tsx) реалізовано інтерактивний таймлайн версій `[Спроба 1] [Спроба 2] [Спроба 3 • Поточна]`.
+     - При перемиканні версій викладач бачить текст відповідної спроби, мітку часу та попередження `⚠️ Перегляд попередньої версії (архів)`.
+  4. **Рівень Кабінету Студента (`apps/student`):**
+     - При повторному редагуванні завдання, яке вже надіслано викладачу, кнопка у [`EssayTaskEditor`](file:///apps/student/src/features/essay-editor/ui/EssayTaskEditor.tsx) динамічно інформує студента: *«Оновити відповідь у викладача (Нова спроба)»*.
+
+- **Результати Тестування та Верифікації:**
+  - 35/35 unit-тестів API пройдено успішно ✅.
+  - Повні збірки `npm run build:api`, `npm run build:teacher` та `npm run build:student` завершено без помилок ✅.
+  - Наскрізні E2E тести Playwright `npx playwright test` пройдено успішно ✅.
+
