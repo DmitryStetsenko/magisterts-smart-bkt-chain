@@ -157,7 +157,6 @@ export class TelemetryGateway implements OnGatewayConnection, OnGatewayDisconnec
 
   notifyBktReset(userId: string, skillId?: string) {
     this.logger.log(`Emitting bkt_state_reset event for user ${userId}, skill: ${skillId || 'ALL'}`);
-    this.server.to(`user_${userId}`).emit('bkt_state_reset', { userId, skillId });
-    this.server.to('user_demo-student').emit('bkt_state_reset', { userId, skillId });
+    this.server.emit('bkt_state_reset', { userId, skillId });
   }
 }

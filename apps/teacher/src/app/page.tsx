@@ -132,9 +132,11 @@ export default function TeacherDashboardPage() {
       if (res.ok) {
         const data = await res.json();
         setReviewQueue(data);
-        if (data.length > 0 && !selectedReviewId) {
-          setSelectedReviewId(data[0].submissionId);
-        }
+        setSelectedReviewId((prev) => {
+          if (!data || data.length === 0) return null;
+          const exists = data.some((item: any) => item.submissionId === prev);
+          return exists ? prev : data[0].submissionId;
+        });
       }
     } catch (err) {
       console.error('Error fetching teacher review queue:', err);
@@ -199,6 +201,9 @@ export default function TeacherDashboardPage() {
       // Switch workspace & ensure drawer is open
       setActiveTab(tab);
       setIsDrawerOpen(true);
+      if (tab === 'reviews') {
+        fetchReviewQueue();
+      }
     }
   };
 

@@ -651,12 +651,22 @@ export class BktController {
   @ApiOperation({ summary: 'Reset student BKT state' })
   async resetStudentState(@Param('studentId') studentId?: string) {
     let targetUserId = studentId;
-    let user = targetUserId ? await this.prisma.user.findUnique({ where: { id: targetUserId } }) : null;
+    let user = targetUserId
+      ? await this.prisma.user.findFirst({
+          where: {
+            OR: [
+              { id: targetUserId },
+              { email: targetUserId },
+            ],
+          },
+        })
+      : null;
+
     if (!user) {
       user = await this.prisma.user.findFirst({ where: { role: 'STUDENT' } });
       if (!user) throw new NotFoundException('Student user not found');
-      targetUserId = user.id;
     }
+    targetUserId = user.id;
 
     await this.prisma.submission.deleteMany({ where: { userId: targetUserId } });
     await this.prisma.bktHistory.deleteMany({ where: { userId: targetUserId } });
