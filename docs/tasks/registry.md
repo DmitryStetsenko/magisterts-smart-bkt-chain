@@ -13,10 +13,10 @@
 | **`SBC-EP-LLM`** | Automated Code Assessment & Open-Text Evaluation | 10 |
 | **`SBC-EP-W3`** | Web3 Infrastructure & Smart Contracts | 0 |
 | **`SBC-EP-ST`** | Student Portal & Skill Tree Map | 26 |
-| **`SBC-EP-TC`** | Teacher Portal & Analytics CRM | 17 |
+| **`SBC-EP-TC`** | Teacher Portal & Analytics CRM | 18 |
 | **`SBC-EP-AD`** | Admin Portal & Knowledge DAG Builder | 8 |
 | **`SBC-EP-LD`** | Landing Web Page | 9 |
-| **ВСЬОГО** | - | **212** |
+| **ВСЬОГО** | - | **213** |
 
 ---
 
@@ -267,7 +267,8 @@
 | **SBC-200** | `Task` | `TC` | log micro-step 8 phrase looping spam protection and teacher review routing | 2026-10-14 | `36d68b2` |
 | **SBC-209** | `Bug` | `TC` | filter teacher review queue submissions by course slug relation | 2026-10-15 | `52a8355` |
 | **SBC-211** | `Task` | `TC` | document brainstorm session 05 on review queue deduplication and history | 2026-10-15 | `edcab54` |
-| **SBC-212** | `Story` | `TC` | implement teacher review queue deduplication with submission versioning and attempts history | 2026-10-16 | `pending` |
+| **SBC-212** | `Story` | `TC` | implement teacher review queue deduplication with submission versioning and attempts history | 2026-10-16 | `8e73ef1` |
+| **SBC-213** | `Bug` | `TC` | auto-refresh teacher review queue on student state reset via WebSocket and handler | 2026-10-16 | `pending` |
 
 ---
 

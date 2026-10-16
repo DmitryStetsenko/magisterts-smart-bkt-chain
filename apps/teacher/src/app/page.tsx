@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { io } from 'socket.io-client';
 import { ShieldCheck, Network, Users, BarChart3, Code2, BookOpen, Scale, ChevronDown, X, Search, RotateCcw, AlertTriangle, CheckCircle2, Lock, HelpCircle, Code, FileText, CheckSquare, Sparkles, Keyboard, Copy, Activity, Info, GitBranch, Layers, ClipboardCheck } from 'lucide-react';
 import { StudentAnalyticsItem } from '../features/analytics/model/analytics.types';
 import { AnomalyTreeWidget, GameSkillTreeWidget, SkillGraphNode } from '@sbc/ui';
@@ -144,6 +145,26 @@ export default function TeacherDashboardPage() {
     fetchReviewQueue();
   }, [activeCourseSlug]);
 
+  // Real-time WebSocket listener for state resets and queue updates
+  useEffect(() => {
+    const socket = io(`${API_URL}/telemetry`, {
+      transports: ['websocket'],
+      autoConnect: true,
+    });
+
+    if (socket) {
+      socket.on('bkt_state_reset', () => {
+        fetchStudentAnalytics();
+        fetchReviewQueue();
+        setSelectedReviewId(null);
+      });
+    }
+
+    return () => {
+      if (socket) socket.disconnect();
+    };
+  }, [activeCourseSlug]);
+
   const handleReviewDecision = async (submissionId: string, decision: 'APPROVE' | 'REJECT') => {
     setIsReviewSubmitting(true);
     try {
@@ -245,7 +266,11 @@ export default function TeacherDashboardPage() {
     try {
       const res = await fetch(`${API_URL}/api/v1/bkt/reset/${studentId}`, { method: 'POST' });
       if (res.ok) {
-        fetchStudentAnalytics();
+        await Promise.all([
+          fetchStudentAnalytics(),
+          fetchReviewQueue(),
+        ]);
+        setSelectedReviewId(null);
       }
     } catch (err) {
       console.error('Error resetting student BKT:', err);
