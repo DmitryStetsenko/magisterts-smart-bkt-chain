@@ -3292,6 +3292,106 @@
               "subitems": []
             }
           ]
+        },
+        {
+          "title": "11.12 Двостороння Реактивна Синхронізація Подій у Реальному Часі (Real-time Live Sync via WebSockets)",
+          "level": 3,
+          "paragraphs": [],
+          "code_blocks": [
+            {
+              "lang": "typescript",
+              "content": "socket.on('student_submitted', () => {\n         fetchStudentAnalytics();\n         fetchReviewQueue();\n       });\n       socket.on('student_telemetry_updated', () => {\n         fetchStudentAnalytics();\n       });"
+            }
+          ],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "**Файли реалізації:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "[`apps/api/src/adapters/inbound/websocket/telemetry.gateway.ts`](file:///apps/api/src/adapters/inbound/websocket/telemetry.gateway.ts)",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "[`apps/api/src/adapters/inbound/http/bkt.controller.ts`](file:///apps/api/src/adapters/inbound/http/bkt.controller.ts)",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "[`apps/api/src/adapters/inbound/http/bkt.controller.spec.ts`](file:///apps/api/src/adapters/inbound/http/bkt.controller.spec.ts)",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "[`apps/teacher/src/app/page.tsx`](file:///apps/teacher/src/app/page.tsx)",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "[`apps/student/src/app/page.tsx`](file:///apps/student/src/app/page.tsx)",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Архітектурні Зміни:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Рівень WebSocket Gateway (`apps/api`):**",
+              "subitems": [
+                "Додано метод `notifyStudentSubmission(payload)` у `TelemetryGateway`, що транслює подію `student_submitted` усім підключеним клієнтам (порталам викладача та адміна).",
+                "Розширено метод отримання телеметрії `telemetry_data`: додано глобальне сповіщення `student_telemetry_updated` для оновлення WPM та показників активності на дашборді викладача.",
+                "Додано метод `notifyTeacherReviewDecision(payload)`, що транслює подію `teacher_review_decision` при підтвердженні/відхиленні робіт."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Рівень Бекенд-Контролера (`bkt.controller.ts`):**",
+              "subitems": [
+                "В ендпоінті `evaluateSubmission` після збереження результату викликається `telemetryGateway.notifyStudentSubmission(...)`.",
+                "В ендпоінті `reviewSubmission` після оновлення BKT викликається `telemetryGateway.notifyTeacherReviewDecision(...)`."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Рівень Порталу Викладача (`apps/teacher`):**",
+              "subitems": [
+                "Додано обробники WebSocket-подій:",
+                "Будь-яка активність студента (здача тесту, оновлення есе, введення тексту) миттєво відображається в кабінеті викладача без перезавантаження сторінки."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Рівень Порталу Студента (`apps/student`):**",
+              "subitems": [
+                "Додано підписку на `teacher_review_decision`: при рішенні викладача граф знань автоматично оновлює $P(L)$ та відкриває доступ до наступних модулів."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Результати Тестування та Верифікації:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "35/35 unit-тестів API пройдено успішно ✅.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Повні збірки `npm run build:api`, `npm run build:teacher` та `npm run build:student` завершено без помилок ✅.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Наскрізні E2E тести Playwright `npx playwright test` пройдено успішно ✅.",
+              "subitems": []
+            }
+          ]
         }
       ]
     }

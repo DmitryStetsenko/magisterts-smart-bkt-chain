@@ -839,3 +839,40 @@ eferenceAnswer, критерії options.keywords (microtask|мікротаск|
   - Повні збірки `npm run build:api`, `npm run build:teacher` та `npm run build:student` завершено без помилок ✅.
   - Наскрізні E2E тести Playwright `npx playwright test` пройдено успішно ✅.
 
+### 11.12 Двостороння Реактивна Синхронізація Подій у Реальному Часі (Real-time Live Sync via WebSockets)
+- **Файли реалізації:**
+  - [`apps/api/src/adapters/inbound/websocket/telemetry.gateway.ts`](file:///apps/api/src/adapters/inbound/websocket/telemetry.gateway.ts)
+  - [`apps/api/src/adapters/inbound/http/bkt.controller.ts`](file:///apps/api/src/adapters/inbound/http/bkt.controller.ts)
+  - [`apps/api/src/adapters/inbound/http/bkt.controller.spec.ts`](file:///apps/api/src/adapters/inbound/http/bkt.controller.spec.ts)
+  - [`apps/teacher/src/app/page.tsx`](file:///apps/teacher/src/app/page.tsx)
+  - [`apps/student/src/app/page.tsx`](file:///apps/student/src/app/page.tsx)
+
+- **Архітектурні Зміни:**
+  1. **Рівень WebSocket Gateway (`apps/api`):**
+     - Додано метод `notifyStudentSubmission(payload)` у `TelemetryGateway`, що транслює подію `student_submitted` усім підключеним клієнтам (порталам викладача та адміна).
+     - Розширено метод отримання телеметрії `telemetry_data`: додано глобальне сповіщення `student_telemetry_updated` для оновлення WPM та показників активності на дашборді викладача.
+     - Додано метод `notifyTeacherReviewDecision(payload)`, що транслює подію `teacher_review_decision` при підтвердженні/відхиленні робіт.
+  2. **Рівень Бекенд-Контролера (`bkt.controller.ts`):**
+     - В ендпоінті `evaluateSubmission` після збереження результату викликається `telemetryGateway.notifyStudentSubmission(...)`.
+     - В ендпоінті `reviewSubmission` після оновлення BKT викликається `telemetryGateway.notifyTeacherReviewDecision(...)`.
+  3. **Рівень Порталу Викладача (`apps/teacher`):**
+     - Додано обробники WebSocket-подій:
+       ```typescript
+       socket.on('student_submitted', () => {
+         fetchStudentAnalytics();
+         fetchReviewQueue();
+       });
+       socket.on('student_telemetry_updated', () => {
+         fetchStudentAnalytics();
+       });
+       ```
+     - Будь-яка активність студента (здача тесту, оновлення есе, введення тексту) миттєво відображається в кабінеті викладача без перезавантаження сторінки.
+  4. **Рівень Порталу Студента (`apps/student`):**
+     - Додано підписку на `teacher_review_decision`: при рішенні викладача граф знань автоматично оновлює $P(L)$ та відкриває доступ до наступних модулів.
+
+- **Результати Тестування та Верифікації:**
+  - 35/35 unit-тестів API пройдено успішно ✅.
+  - Повні збірки `npm run build:api`, `npm run build:teacher` та `npm run build:student` завершено без помилок ✅.
+  - Наскрізні E2E тести Playwright `npx playwright test` пройдено успішно ✅.
+
+

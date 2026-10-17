@@ -210,3 +210,7 @@ SBC-208,SBC-EP-INF,Bug,"update package-lock and enhance github pages workflow fo
 SBC-209,SBC-EP-TC,Bug,"filter teacher review queue submissions by course slug relation",Done,2026-10-15,52a8355
 SBC-210,SBC-EP-INF,Task,"sync task registry and jira import csv for sbc-209",Done,2026-10-15,4994498
 SBC-211,SBC-EP-TC,Task,"document brainstorm session 05 on review queue deduplication and history",Done,2026-10-15,edcab54
+SBC-212,SBC-EP-TC,Story,"implement teacher review queue deduplication with submission versioning and attempts history",Done,2026-10-16,8e73ef1
+SBC-213,SBC-EP-TC,Bug,"auto-refresh teacher review queue on student state reset via WebSocket and handler",Done,2026-10-16,b78f44a
+SBC-214,SBC-EP-TC,Story,"real-time bidirectional WebSocket synchronization of student submissions and teacher review decisions",Done,2026-10-17,2ed2cea
+SBC-215,SBC-EP-INF,Task,"update daily progress, detailed technical log and compile docs json for real-time sync",In Progress,2026-10-17,pending

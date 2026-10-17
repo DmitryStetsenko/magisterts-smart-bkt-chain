@@ -268,7 +268,9 @@
 | **SBC-209** | `Bug` | `TC` | filter teacher review queue submissions by course slug relation | 2026-10-15 | `52a8355` |
 | **SBC-211** | `Task` | `TC` | document brainstorm session 05 on review queue deduplication and history | 2026-10-15 | `edcab54` |
 | **SBC-212** | `Story` | `TC` | implement teacher review queue deduplication with submission versioning and attempts history | 2026-10-16 | `8e73ef1` |
-| **SBC-213** | `Bug` | `TC` | auto-refresh teacher review queue on student state reset via WebSocket and handler | 2026-10-16 | `pending` |
+| **SBC-213** | `Bug` | `TC` | auto-refresh teacher review queue on student state reset via WebSocket and handler | 2026-10-16 | `b78f44a` |
+| **SBC-214** | `Story` | `TC` | real-time bidirectional WebSocket synchronization of student submissions and teacher review decisions | 2026-10-17 | `2ed2cea` |
+| **SBC-215** | `Task` | `INF` | update daily progress, detailed technical log and compile docs json for real-time sync | 2026-10-17 | `pending` |
 
 ---
 
