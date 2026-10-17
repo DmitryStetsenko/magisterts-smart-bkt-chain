@@ -153,10 +153,36 @@ export class TelemetryGateway implements OnGatewayConnection, OnGatewayDisconnec
 
     const room = `session_${payload.userId}_${payload.taskId}`;
     this.server.to(room).emit('telemetry_updated', payload);
+    this.server.emit('student_telemetry_updated', payload);
   }
 
   notifyBktReset(userId: string, skillId?: string) {
     this.logger.log(`Emitting bkt_state_reset event for user ${userId}, skill: ${skillId || 'ALL'}`);
     this.server.emit('bkt_state_reset', { userId, skillId });
+  }
+
+  notifyStudentSubmission(payload: {
+    userId: string;
+    taskId: string;
+    skillId: string;
+    isPassed: boolean;
+    teacherReviewStatus: string;
+    submissionId: string;
+  }) {
+    this.logger.log(
+      `Emitting student_submitted event for user ${payload.userId}, task ${payload.taskId}, reviewStatus: ${payload.teacherReviewStatus}`,
+    );
+    this.server.emit('student_submitted', payload);
+  }
+
+  notifyTeacherReviewDecision(payload: {
+    submissionId: string;
+    decision: 'APPROVE' | 'REJECT';
+    userId: string;
+  }) {
+    this.logger.log(
+      `Emitting teacher_review_decision event for submission ${payload.submissionId} (${payload.decision})`,
+    );
+    this.server.emit('teacher_review_decision', payload);
   }
 }

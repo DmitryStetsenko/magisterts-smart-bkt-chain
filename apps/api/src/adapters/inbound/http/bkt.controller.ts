@@ -193,8 +193,10 @@ export class BktController {
     }
 
     // Deduplication & Superseding for Teacher Review Queue:
-    // If student submits a new draft while previous attempts are still PENDING_REVIEW,
-    // supersede previous pending submissions and link attempt history.
+    // When a student submits an open text/essay task, any previous submissions for the same
+    // (userId, taskId) that are currently in PENDING_REVIEW must be superseded so that
+    // only the latest draft remains active in the teacher review queue.
+    const isTextTask = task.taskType === TaskType.TEXT_ESSAY || task.taskType === TaskType.OPEN_TEXT;
     const latestPending = await this.prisma.submission.findFirst({
       where: {
         userId: user.id,
@@ -204,7 +206,7 @@ export class BktController {
       orderBy: { createdAt: 'desc' },
     });
 
-    if (latestPending && teacherReviewStatus === TeacherReviewStatus.PENDING_REVIEW) {
+    if (latestPending && isTextTask) {
       await this.prisma.submission.updateMany({
         where: {
           userId: user.id,
@@ -366,6 +368,15 @@ export class BktController {
         feedbackText: feedback,
         teacherReviewStatus,
       },
+    });
+
+    this.telemetryGateway.notifyStudentSubmission({
+      userId: user.id,
+      taskId: task.id,
+      skillId: task.skillId,
+      isPassed,
+      teacherReviewStatus,
+      submissionId: submission.id,
     });
 
     return {
@@ -710,9 +721,32 @@ export class BktController {
       take: 50,
     });
 
+    // Ensure strict deduplication: at most 1 active review item per (userId, taskId)
+    // Any older drafts that remained PENDING_REVIEW are automatically marked SUPERSEDED
+    const uniqueMap = new Map<string, typeof submissions[0]>();
+    const staleIdsToSupersede: string[] = [];
+
+    for (const sub of submissions) {
+      const key = `${sub.userId}_${sub.taskId}`;
+      if (!uniqueMap.has(key)) {
+        uniqueMap.set(key, sub);
+      } else {
+        staleIdsToSupersede.push(sub.id);
+      }
+    }
+
+    if (staleIdsToSupersede.length > 0) {
+      await this.prisma.submission.updateMany({
+        where: { id: { in: staleIdsToSupersede } },
+        data: { teacherReviewStatus: TeacherReviewStatus.SUPERSEDED },
+      });
+    }
+
+    const uniqueSubmissions = Array.from(uniqueMap.values());
+
     // Fetch full submission history for each student and task in the queue
     const results = await Promise.all(
-      submissions.map(async (sub) => {
+      uniqueSubmissions.map(async (sub) => {
         const history = await this.prisma.submission.findMany({
           where: {
             userId: sub.userId,
@@ -851,6 +885,12 @@ export class BktController {
         },
       });
     }
+
+    this.telemetryGateway.notifyTeacherReviewDecision({
+      submissionId: updatedSub.id,
+      decision: dto.decision,
+      userId: submission.userId,
+    });
 
     return {
       success: true,

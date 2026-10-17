@@ -210,6 +210,11 @@ export default function StudentPortalPage() {
         console.log('⚡ Received bkt_state_reset via WebSocket:', data);
         fetchRecommendedTask(activeCourseSlug);
       });
+
+      socket.on('teacher_review_decision', (data: any) => {
+        console.log('⚡ Received teacher_review_decision via WebSocket:', data);
+        fetchCourseStructureAndState(activeCourseSlug);
+      });
     }
 
     return () => {

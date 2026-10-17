@@ -147,7 +147,7 @@ export default function TeacherDashboardPage() {
     fetchReviewQueue();
   }, [activeCourseSlug]);
 
-  // Real-time WebSocket listener for state resets and queue updates
+  // Real-time WebSocket listener for student submissions, telemetry updates, and state resets
   useEffect(() => {
     const socket = io(`${API_URL}/telemetry`, {
       transports: ['websocket'],
@@ -159,6 +159,16 @@ export default function TeacherDashboardPage() {
         fetchStudentAnalytics();
         fetchReviewQueue();
         setSelectedReviewId(null);
+      });
+
+      socket.on('student_submitted', (data: any) => {
+        console.log('⚡ [TeacherPortal] Real-time student submission detected:', data);
+        fetchStudentAnalytics();
+        fetchReviewQueue();
+      });
+
+      socket.on('student_telemetry_updated', () => {
+        fetchStudentAnalytics();
       });
     }
 

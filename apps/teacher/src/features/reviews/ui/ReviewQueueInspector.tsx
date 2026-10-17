@@ -159,7 +159,8 @@ export const ReviewQueueInspector: React.FC<ReviewQueueInspectorProps> = ({
               const isSelected =
                 selectedAttemptIndex === idx ||
                 (selectedAttemptIndex === null && att.id === currentReview.submissionId);
-              const isLatestActive = att.id === currentReview.submissionId;
+              const isLatestActive = att.teacherReviewStatus === 'PENDING_REVIEW' || att.id === currentReview.submissionId;
+              const isSuperseded = att.teacherReviewStatus === 'SUPERSEDED' || (!isLatestActive && idx < history.length - 1);
 
               return (
                 <button
@@ -173,16 +174,22 @@ export const ReviewQueueInspector: React.FC<ReviewQueueInspectorProps> = ({
                 >
                   <span>
                     Спроба {att.attemptNumber || idx + 1}
-                    {isLatestActive ? ' • Поточна' : ''}
+                    {idx === history.length - 1 ? ' • Остання' : ''}
                   </span>
                   <span
                     className={`text-[9px] px-1 rounded uppercase font-bold ${
-                      isLatestActive
+                      att.teacherReviewStatus === 'PENDING_REVIEW'
                         ? 'bg-amber-400/20 text-amber-300'
-                        : 'bg-slate-800 text-slate-400'
+                        : isSuperseded
+                        ? 'bg-slate-800 text-slate-400'
+                        : 'bg-emerald-400/20 text-emerald-300'
                     }`}
                   >
-                    {isLatestActive ? 'В черзі' : 'Superseded'}
+                    {att.teacherReviewStatus === 'PENDING_REVIEW'
+                      ? 'В черзі'
+                      : isSuperseded
+                      ? 'Superseded'
+                      : att.teacherReviewStatus}
                   </span>
                 </button>
               );

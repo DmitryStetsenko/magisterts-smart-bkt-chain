@@ -37,6 +37,8 @@ describe('BktController (Analytics & Telemetry reset integration)', () => {
 
   const mockTelemetryGateway = {
     notifyBktReset: jest.fn(),
+    notifyStudentSubmission: jest.fn(),
+    notifyTeacherReviewDecision: jest.fn(),
   };
 
   beforeEach(async () => {
