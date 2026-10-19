@@ -203,9 +203,9 @@ export function GameSkillTreeWidget({
           <AnomalyTreeWidget
             adjustments={activeAdjustments}
             nodes={nodes}
+            role={role}
             title={studentName ? `Аномалії студента: ${studentName}` : `Аномалії курсу: ${courseTitle}`}
             subtitle="Повний зріз поведінкових інцидентів, швидких вгадувань та описок за всіма модулями даного курсу"
-            defaultMode="module_tree"
           />
         </div>
       ) : (

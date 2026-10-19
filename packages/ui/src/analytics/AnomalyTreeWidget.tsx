@@ -1,33 +1,26 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { 
   Zap, 
   AlertTriangle, 
   ExternalLink, 
   ChevronRight, 
   ChevronDown,
-  Clock, 
-  Sparkles, 
-  X, 
   CheckCircle2, 
-  XCircle,
-  HelpCircle,
   Code2,
   BookOpen,
-  Folder,
-  FolderOpen,
   FolderTree,
-  ShieldAlert,
   Search,
   Check,
-  Network,
-  Swords,
-  Lock,
-  GitBranch,
-  Layers,
-  Activity,
-  Flame
+  ShieldAlert,
+  ClipboardCopy,
+  Gauge,
+  Repeat,
+  BrainCircuit,
+  MessageSquareQuote,
+  Flame,
+  Info
 } from 'lucide-react';
 import { SkillGraphNode } from '../skill-graph/skill-graph.types';
 
@@ -47,45 +40,121 @@ export interface AnomalyItem {
   createdAt: string;
 }
 
-export type AnomalyViewMode = 'module_tree' | 'tree' | 'graph' | 'rpg';
+export type AnomalyCategoryKey = 'paste' | 'speedrun' | 'semantic' | 'friction';
 
-interface AnomalyTreeWidgetProps {
+export interface AnomalyTreeWidgetProps {
   adjustments: AnomalyItem[];
   nodes?: SkillGraphNode[];
   title?: string;
   subtitle?: string;
   onNavigateToTask?: (taskId: string, skillSlug?: string) => void;
-  defaultMode?: AnomalyViewMode;
+  role?: 'student' | 'teacher';
+  defaultMode?: any; // kept for backwards compatibility
 }
+
+interface CategoryConfig {
+  key: AnomalyCategoryKey;
+  icon: any;
+  titleStudent: string;
+  titleTeacher: string;
+  descStudent: string;
+  descTeacher: string;
+  badgeStudent: string;
+  badgeTeacher: string;
+  accentColor: string;
+  borderColor: string;
+  bgColor: string;
+  textColor: string;
+}
+
+const CATEGORIES: CategoryConfig[] = [
+  {
+    key: 'paste',
+    icon: ClipboardCopy,
+    titleStudent: 'Копіювання коду та буфер обміну',
+    titleTeacher: 'Буфер обміну / Сторонній код (Paste Anomaly)',
+    descStudent: 'Спроби, де значну частину коду або тексту було вставлено без ручного набору.',
+    descTeacher: 'Разова вставка великого фрагмента тексту або pasteRatio > 0.70 (підозра на ШІ або списування).',
+    badgeStudent: '💡 Рекомендація набору',
+    badgeTeacher: '📋 Копіпаст коду',
+    accentColor: 'amber',
+    borderColor: 'border-amber-500/30',
+    bgColor: 'bg-amber-950/20',
+    textColor: 'text-amber-400',
+  },
+  {
+    key: 'speedrun',
+    icon: Gauge,
+    titleStudent: 'Аномально швидкі відповіді',
+    titleTeacher: 'Швидкісна здача / Спідран (Speedrun Anomaly)',
+    descStudent: 'Завдання було вирішено за лічені секунди, швидше за звичайний час прочитання умови.',
+    descTeacher: 'Час рішення нижче когнітивного порогу (< 3.5с або < 5с). Підвищення P(Guess).',
+    badgeStudent: '⚡ Швидка відповідь',
+    badgeTeacher: '⚡ Спідран / Вгадування',
+    accentColor: 'orange',
+    borderColor: 'border-orange-500/30',
+    bgColor: 'bg-orange-950/20',
+    textColor: 'text-orange-400',
+  },
+  {
+    key: 'semantic',
+    icon: Repeat,
+    titleStudent: 'Текстові повтори та семантика',
+    titleTeacher: 'Семантичний спам / Лупінг фраз (Semantic Anomaly)',
+    descStudent: 'У відповіді виявлено повторювані фрази або недостатню аргументацію.',
+    descTeacher: 'Спрацював спам-фільтр циклічного повторення фраз або низький семантичний скор.',
+    badgeStudent: '🔄 Потрібна увага',
+    badgeTeacher: '🔄 Семантичний спам',
+    accentColor: 'rose',
+    borderColor: 'border-rose-500/30',
+    bgColor: 'bg-rose-950/20',
+    textColor: 'text-rose-400',
+  },
+  {
+    key: 'friction',
+    icon: BrainCircuit,
+    titleStudent: 'Когнітивне тертя та боротьба з кодом',
+    titleTeacher: 'Когнітивне тертя / Невпевненість (Cognitive Friction)',
+    descStudent: 'Спроби з великою кількістю виправлень та тривалими паузами. Це природна частина навчання!',
+    descTeacher: 'Висока частка видалень (Backspace/Delete) та високий prior P(L). Пом\'якшення через P(Slip).',
+    badgeStudent: '🤔 Активний пошук',
+    badgeTeacher: '🛡️ Захист P(Slip)',
+    accentColor: 'indigo',
+    borderColor: 'border-indigo-500/30',
+    bgColor: 'bg-indigo-950/20',
+    textColor: 'text-indigo-400',
+  },
+];
 
 export function AnomalyTreeWidget({
   adjustments,
   nodes = [],
-  title = 'Дерево Аномалій та Когнітивних Відхилень',
-  subtitle = 'Багатовимірний радар: Дерево Модулів Аномалій | Дерево за Категоріями | Топологічний Граф DAG | RPG Матриця',
+  title,
+  subtitle,
   onNavigateToTask,
-  defaultMode = 'module_tree',
+  role = 'teacher',
 }: AnomalyTreeWidgetProps) {
-  const [viewMode, setViewMode] = useState<AnomalyViewMode>(defaultMode);
   const [selectedItem, setSelectedItem] = useState<AnomalyItem | null>(null);
-  const [selectedNodeSlug, setSelectedNodeSlug] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState<string>('');
-  
-  // Track open/collapsed tree nodes in 'tree' and 'module_tree' mode
-  const [expandedNodes, setExpandedNodes] = useState<Record<string, boolean>>({
-    'category-guess': true,
-    'category-slip': true,
+  const [activeCategoryFilter, setActiveCategoryFilter] = useState<AnomalyCategoryKey | 'all'>('all');
+
+  // Track open/collapsed categories
+  const [expandedCategories, setExpandedCategories] = useState<Record<string, boolean>>({
+    paste: true,
+    speedrun: true,
+    semantic: true,
+    friction: true,
   });
 
-  const toggleNode = (nodeKey: string) => {
-    setExpandedNodes((prev) => ({
+  const toggleCategory = (catKey: string) => {
+    setExpandedCategories((prev) => ({
       ...prev,
-      [nodeKey]: !(prev[nodeKey] ?? true),
+      [catKey]: !prev[catKey],
     }));
   };
 
   // Build a lookup map of tasks across all skill nodes
-  const taskLookup = React.useMemo(() => {
+  const taskLookup = useMemo(() => {
     const map = new Map<string, any>();
     nodes.forEach((node) => {
       if (node.tasks && Array.isArray(node.tasks)) {
@@ -99,22 +168,22 @@ export function AnomalyTreeWidget({
   }, [nodes]);
 
   // Enrich adjustments with task details if missing from backend history
-  const enrichedAdjustments: AnomalyItem[] = React.useMemo(() => {
+  const enrichedAdjustments: AnomalyItem[] = useMemo(() => {
     return adjustments.map((item, idx) => {
       const parentNode = nodes.find((n) => n.slug === item.skillSlug || n.title === item.skillTitle);
       const matchedTask = item.taskId
         ? taskLookup.get(item.taskId)
         : (parentNode?.tasks && parentNode.tasks[idx % (parentNode.tasks.length || 1)]) || null;
 
-      const title = item.taskTitle || matchedTask?.title || `Завдання модуля «${item.skillTitle}»`;
-      const description = item.taskDescription || matchedTask?.description || matchedTask?.content || 'Опис завдання: практичне тестування знань теми.';
+      const taskTitle = item.taskTitle || matchedTask?.title || `Завдання модуля «${item.skillTitle}»`;
+      const taskDescription = item.taskDescription || matchedTask?.description || matchedTask?.content || 'Опис завдання: практичне тестування знань теми.';
       const taskType = item.taskType || matchedTask?.taskType || (matchedTask?.type) || 'SINGLE_CHOICE';
       const taskOptions = item.taskOptions || matchedTask?.options || matchedTask?.payload?.options || undefined;
 
       return {
         ...item,
-        taskTitle: title,
-        taskDescription: description,
+        taskTitle,
+        taskDescription,
         taskType,
         taskOptions,
         taskId: item.taskId || matchedTask?.id,
@@ -122,919 +191,355 @@ export function AnomalyTreeWidget({
     });
   }, [adjustments, nodes, taskLookup]);
 
-  // Group items by Anomaly Category -> Skill Slug -> Items
-  const guessItems = enrichedAdjustments.filter((a) => Boolean(a.pGuessUsed && a.pGuessUsed > 0.3));
-  const slipItems = enrichedAdjustments.filter((a) => Boolean(a.pSlipUsed && a.pSlipUsed > 0.2));
+  // Classify each anomaly item into one of the 4 clean categories
+  const classifiedItems = useMemo(() => {
+    const paste: AnomalyItem[] = [];
+    const speedrun: AnomalyItem[] = [];
+    const semantic: AnomalyItem[] = [];
+    const friction: AnomalyItem[] = [];
 
-  const groupBySkill = (items: AnomalyItem[]) => {
-    const groups: Record<string, { skillTitle: string; skillSlug: string; items: AnomalyItem[] }> = {};
-    items.forEach((item) => {
-      const slug = item.skillSlug || 'other';
-      if (!groups[slug]) {
-        groups[slug] = {
-          skillSlug: slug,
-          skillTitle: item.skillTitle || slug,
-          items: [],
-        };
-      }
-      groups[slug].items.push(item);
-    });
-    return Object.values(groups);
-  };
+    enrichedAdjustments.forEach((item) => {
+      const reasons = (item.adjustReasons || []).join(' ').toLowerCase();
 
-  const guessGrouped = groupBySkill(guessItems);
-  const slipGrouped = groupBySkill(slipItems);
-  const totalAnomalies = guessItems.length + slipItems.length;
-
-  // Active skill node selected in Graph / RPG view
-  const activeSkillItems = enrichedAdjustments.filter(
-    (a) => a.skillSlug === selectedNodeSlug
-  );
-
-  // Group all anomalies by module/skill slug
-  const allAnomalyItems = enrichedAdjustments.filter(
-    (a) => Boolean((a.pGuessUsed && a.pGuessUsed > 0.3) || (a.pSlipUsed && a.pSlipUsed > 0.2))
-  );
-
-  // Group anomalies by module
-  const anomaliesByModule: Record<string, AnomalyItem[]> = {};
-  allAnomalyItems.forEach((item) => {
-    const slug = item.skillSlug || 'other';
-    if (!anomaliesByModule[slug]) {
-      anomaliesByModule[slug] = [];
-    }
-    anomaliesByModule[slug].push(item);
-  });
-
-  // Determine module hierarchy based on DAG nodes or chronological order
-  // If nodes are passed, we find root modules (those with no parent among affected modules)
-  // and construct the hierarchical branch tree: Parent Module -> Child Module (or siblings if at same level)
-  interface ModuleTreeNode {
-    slug: string;
-    title: string;
-    node?: SkillGraphNode;
-    items: AnomalyItem[];
-    children: ModuleTreeNode[];
-    level: number;
-  }
-
-  const buildModuleTree = (): ModuleTreeNode[] => {
-    const affectedSlugs = Object.keys(anomaliesByModule);
-    if (affectedSlugs.length === 0) return [];
-
-    // Map of nodes
-    const nodeMap = new Map<string, SkillGraphNode>();
-    nodes.forEach((n) => {
-      nodeMap.set(n.slug, n);
-      nodeMap.set(n.id, n);
-    });
-
-    // Helper to find parent slugs within affectedSlugs
-    const getParentSlugsInAffected = (slug: string): string[] => {
-      const n = nodeMap.get(slug);
-      if (!n || !n.parentSkillIds) return [];
-      const parents: string[] = [];
-      n.parentSkillIds.forEach((pid) => {
-        const pNode = nodeMap.get(pid);
-        if (pNode && affectedSlugs.includes(pNode.slug)) {
-          parents.push(pNode.slug);
+      if (reasons.includes('paste') || reasons.includes('вставка') || reasons.includes('копіюв') || reasons.includes('буфер')) {
+        paste.push(item);
+      } else if (reasons.includes('loop') || reasons.includes('зацикл') || reasons.includes('спам') || reasons.includes('повтор') || reasons.includes('семантик')) {
+        semantic.push(item);
+      } else if (item.pGuessUsed && item.pGuessUsed > 0.3) {
+        speedrun.push(item);
+      } else if (item.pSlipUsed && item.pSlipUsed > 0.2) {
+        friction.push(item);
+      } else if (reasons.includes('швидк') || reasons.includes('latency') || reasons.includes('час')) {
+        speedrun.push(item);
+      } else {
+        // Fallback: if pGuess modified -> speedrun, else friction
+        if ((item.pGuessUsed || 0) >= (item.pSlipUsed || 0)) {
+          speedrun.push(item);
+        } else {
+          friction.push(item);
         }
-      });
-      return parents;
-    };
-
-    // Identify roots among affected modules (those that have 0 parents in affectedSlugs)
-    const rootSlugs = affectedSlugs.filter((slug) => getParentSlugsInAffected(slug).length === 0);
-
-    // If no explicit roots found (or no nodes data), treat all as top-level roots/siblings
-    const rootsToUse = rootSlugs.length > 0 ? rootSlugs : affectedSlugs;
-
-    const visited = new Set<string>();
-
-    const createTreeNode = (slug: string, level: number): ModuleTreeNode => {
-      visited.add(slug);
-      const n = nodeMap.get(slug);
-      const items = anomaliesByModule[slug] || [];
-
-      // Find children: any affected slug whose parent is this slug
-      const childrenSlugs = affectedSlugs.filter((otherSlug) => {
-        if (visited.has(otherSlug)) return false;
-        const otherParents = getParentSlugsInAffected(otherSlug);
-        return otherParents.includes(slug);
-      });
-
-      const children = childrenSlugs.map((cSlug) => createTreeNode(cSlug, level + 1));
-
-      return {
-        slug,
-        title: n?.title || items[0]?.skillTitle || slug,
-        node: n,
-        items,
-        children,
-        level,
-      };
-    };
-
-    const tree = rootsToUse.map((rSlug) => createTreeNode(rSlug, 0));
-
-    // Add any remaining unvisited affected modules (disconnected sub-trees)
-    affectedSlugs.forEach((slug) => {
-      if (!visited.has(slug)) {
-        tree.push(createTreeNode(slug, 0));
       }
     });
 
-    return tree;
+    return { paste, speedrun, semantic, friction };
+  }, [enrichedAdjustments]);
+
+  const totalAnomalies = enrichedAdjustments.length;
+
+  // Filter items by category tab and search query
+  const getFilteredItems = (items: AnomalyItem[]) => {
+    if (!searchTerm) return items;
+    const term = searchTerm.toLowerCase();
+    return items.filter(
+      (item) =>
+        (item.taskTitle && item.taskTitle.toLowerCase().includes(term)) ||
+        (item.skillTitle && item.skillTitle.toLowerCase().includes(term)) ||
+        (item.adjustReasons && item.adjustReasons.some((r) => r.toLowerCase().includes(term)))
+    );
   };
 
-  const moduleTreeRoots = buildModuleTree();
+  const defaultTitle = role === 'student' 
+    ? 'Аналіз складнощів та рекомендації навчання' 
+    : 'Аномалії курсу: Категорії поведінкових інцидентів';
+
+  const defaultSubtitle = role === 'student'
+    ? 'Аналітика навчального стилю: формуйте моторну пам\'ять та закріплюйте алгоритми власноруч'
+    : 'Структурований аудит копіпасту, спідранів, семантичних повторів та когнітивних труднощів за категоріями';
 
   return (
-    <div className="w-full bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-2xl flex flex-col gap-5 text-slate-100">
-      {/* 🌲 Header Bar with View Mode Switcher */}
+    <div className="w-full bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-2xl flex flex-col gap-5 text-slate-100 font-sans">
+      {/* 🌲 Clean Header: Title + Incidents Badge + Search */}
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-slate-800 pb-4">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-purple-500/10 border border-purple-500/30 flex items-center justify-center text-purple-400">
-            {viewMode === 'tree' ? (
-              <FolderTree className="w-5 h-5" />
-            ) : viewMode === 'graph' ? (
-              <Network className="w-5 h-5 text-indigo-400" />
-            ) : (
-              <Swords className="w-5 h-5 text-amber-400" />
-            )}
+            <FolderTree className="w-5 h-5" />
           </div>
           <div>
             <h3 className="text-base font-bold text-white flex items-center gap-2">
-              <span>{title}</span>
+              <span>{title || defaultTitle}</span>
               {totalAnomalies > 0 ? (
-                <span className="px-2 py-0.5 text-[11px] font-mono font-bold bg-amber-500/20 text-amber-300 rounded-full border border-amber-500/30 animate-pulse">
-                  {totalAnomalies} інцидентів
+                <span className="px-2.5 py-0.5 text-xs font-mono font-bold bg-amber-500/20 text-amber-300 rounded-full border border-amber-500/30 animate-pulse">
+                  {totalAnomalies} {totalAnomalies === 1 ? 'інцидент' : totalAnomalies < 5 ? 'інциденти' : 'інцидентів'}
                 </span>
               ) : (
-                <span className="px-2 py-0.5 text-[11px] font-mono text-emerald-400 bg-emerald-500/10 rounded-full border border-emerald-500/20">
+                <span className="px-2.5 py-0.5 text-xs font-mono text-emerald-400 bg-emerald-500/10 rounded-full border border-emerald-500/20">
                   Аномалій 0
                 </span>
               )}
             </h3>
-            <p className="text-xs text-slate-400 mt-0.5">{subtitle}</p>
+            <p className="text-xs text-slate-400 mt-0.5">{subtitle || defaultSubtitle}</p>
           </div>
         </div>
 
-        {/* View Mode Controls & Search */}
+        {/* Category Filter Chips & Search Box */}
         <div className="flex items-center gap-3 flex-wrap">
-          {/* View Mode Switcher */}
+          {/* Quick Filter Chips */}
           <div className="bg-slate-950 p-1 rounded-xl border border-slate-800 flex items-center gap-1 text-xs font-bold font-mono">
             <button
-              onClick={() => setViewMode('module_tree')}
-              className={`px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-all cursor-pointer ${
-                viewMode === 'module_tree'
+              onClick={() => setActiveCategoryFilter('all')}
+              className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
+                activeCategoryFilter === 'all'
                   ? 'bg-purple-600 text-white shadow-md shadow-purple-600/30'
                   : 'text-slate-400 hover:text-white hover:bg-slate-900'
               }`}
             >
-              <GitBranch className="w-3.5 h-3.5" />
-              <span>Дерево Модулів</span>
+              Всі ({totalAnomalies})
             </button>
-
-            <button
-              onClick={() => setViewMode('tree')}
-              className={`px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-all cursor-pointer ${
-                viewMode === 'tree'
-                  ? 'bg-purple-600 text-white shadow-md shadow-purple-600/30'
-                  : 'text-slate-400 hover:text-white hover:bg-slate-900'
-              }`}
-            >
-              <FolderTree className="w-3.5 h-3.5" />
-              <span>За Категоріями</span>
-            </button>
-
-            <button
-              onClick={() => setViewMode('graph')}
-              className={`px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-all cursor-pointer ${
-                viewMode === 'graph'
-                  ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30'
-                  : 'text-slate-400 hover:text-white hover:bg-slate-900'
-              }`}
-            >
-              <Network className="w-3.5 h-3.5" />
-              <span>Топологічний Граф DAG</span>
-            </button>
-
-            <button
-              onClick={() => setViewMode('rpg')}
-              className={`px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-all cursor-pointer ${
-                viewMode === 'rpg'
-                  ? 'bg-gradient-to-r from-amber-600 to-purple-600 text-white shadow-md shadow-amber-600/30'
-                  : 'text-slate-400 hover:text-white hover:bg-slate-900'
-              }`}
-            >
-              <Swords className="w-3.5 h-3.5" />
-              <span>RPG Матриця Рун</span>
-            </button>
+            {CATEGORIES.map((cat) => {
+              const count = classifiedItems[cat.key].length;
+              return (
+                <button
+                  key={cat.key}
+                  onClick={() => setActiveCategoryFilter(cat.key)}
+                  className={`px-2.5 py-1.5 rounded-lg flex items-center gap-1.5 transition-all cursor-pointer ${
+                    activeCategoryFilter === cat.key
+                      ? 'bg-purple-600 text-white shadow-md shadow-purple-600/30'
+                      : 'text-slate-400 hover:text-white hover:bg-slate-900'
+                  }`}
+                >
+                  <cat.icon className="w-3.5 h-3.5" />
+                  <span>{cat.key === 'paste' ? 'Копіпаст' : cat.key === 'speedrun' ? 'Швидкість' : cat.key === 'semantic' ? 'Спам' : 'Тертя'} ({count})</span>
+                </button>
+              );
+            })}
           </div>
 
-          {/* Search box for tree and module_tree views */}
-          {(viewMode === 'module_tree' || viewMode === 'tree') && (
-            <div className="relative w-full sm:w-56">
-              <Search className="w-3.5 h-3.5 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
-              <input
-                type="text"
-                placeholder="Пошук інциденту..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-8 pr-3 py-1.5 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-purple-500"
-              />
-            </div>
-          )}
+          {/* Search Box */}
+          <div className="relative w-full sm:w-56">
+            <Search className="w-3.5 h-3.5 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
+            <input
+              type="text"
+              placeholder="Пошук інциденту..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-8 pr-3 py-1.5 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-purple-500 font-mono"
+            />
+          </div>
         </div>
       </div>
 
       {/* ───────────────────────────────────────────────────────────── */}
-      {/* 🌿 РЕЖИМ 0: Дерево Модулів Аномалій (DAG Module Hierarchy)      */}
+      {/* 🗂️ CLEAN CATEGORIES ACCORDION (One Level, Zero Confusion)        */}
       {/* ───────────────────────────────────────────────────────────── */}
-      {viewMode === 'module_tree' && (
-        <div className="flex flex-col gap-3 font-mono text-xs">
-          {totalAnomalies === 0 ? (
-            <div className="p-8 rounded-xl bg-slate-950/40 border border-slate-800/60 text-center text-slate-500 flex flex-col items-center gap-2">
-              <CheckCircle2 className="w-6 h-6 text-emerald-500/60" />
-              <p className="text-xs text-slate-400">Усі поточні відповіді пройшли в межах нормальної поведінкової телеметрії.</p>
+      <div className="flex flex-col gap-4 font-mono text-xs">
+        {totalAnomalies === 0 ? (
+          <div className="p-10 rounded-2xl bg-slate-950/40 border border-slate-800/60 text-center text-slate-400 flex flex-col items-center gap-3">
+            <div className="w-12 h-12 rounded-full bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
+              <CheckCircle2 className="w-6 h-6" />
             </div>
-          ) : (
-            <div className="flex flex-col gap-4">
-              <div className="text-[11px] text-slate-400 flex items-center justify-between px-1">
-                <span>Ієрархія курсів: кореневі та дочірні модулі з аномаліями</span>
-                <span className="text-slate-500">Сусіди одного рівня розташовані поруч</span>
-              </div>
+            <p className="text-sm font-bold text-slate-200">
+              {role === 'student' 
+                ? 'Чудово! Ви розв\'язуєте завдання автентично у природному темпі.' 
+                : 'Усі відповіді пройшли в межах нормальної поведінкової біометрії.'}
+            </p>
+            <p className="text-xs text-slate-500 max-w-md">
+              Жодних копіювань з буфера, аномальних спідранів або семантичних збоїв не зафіксовано.
+            </p>
+          </div>
+        ) : (
+          CATEGORIES.filter((cat) => activeCategoryFilter === 'all' || activeCategoryFilter === cat.key).map((cat) => {
+            const rawItems = classifiedItems[cat.key];
+            const items = getFilteredItems(rawItems);
+            const isExpanded = expandedCategories[cat.key] ?? true;
 
-              {/* Recursive renderer for ModuleTreeNode */}
-              {(() => {
-                const renderTreeNode = (mNode: ModuleTreeNode) => {
-                  const nodeKey = `module-${mNode.slug}`;
-                  const isExpanded = expandedNodes[nodeKey] ?? true;
+            // If empty in this category and not searching, show compact clean card
+            if (rawItems.length === 0) {
+              return (
+                <div
+                  key={cat.key}
+                  className="bg-slate-950/40 border border-slate-800/60 rounded-xl px-4 py-3 flex items-center justify-between opacity-60"
+                >
+                  <div className="flex items-center gap-2.5 text-slate-400">
+                    <cat.icon className="w-4 h-4 text-slate-500" />
+                    <span className="font-bold">{role === 'student' ? cat.titleStudent : cat.titleTeacher}</span>
+                  </div>
+                  <span className="text-[11px] text-slate-500">0 інцидентів</span>
+                </div>
+              );
+            }
 
-                  const filteredItems = mNode.items.filter((item) =>
-                    !searchTerm ||
-                    (item.taskTitle && item.taskTitle.toLowerCase().includes(searchTerm.toLowerCase())) ||
-                    mNode.title.toLowerCase().includes(searchTerm.toLowerCase())
-                  );
+            return (
+              <div
+                key={cat.key}
+                className={`bg-slate-950/80 border ${cat.borderColor} rounded-xl overflow-hidden shadow-lg transition-all`}
+              >
+                {/* Category Header Bar */}
+                <div
+                  onClick={() => toggleCategory(cat.key)}
+                  className={`px-4 py-3 ${cat.bgColor} hover:brightness-110 flex items-center justify-between cursor-pointer border-b ${cat.borderColor} transition-all select-none`}
+                >
+                  <div className="flex items-center gap-2.5">
+                    {isExpanded ? (
+                      <ChevronDown className={`w-4 h-4 ${cat.textColor}`} />
+                    ) : (
+                      <ChevronRight className={`w-4 h-4 ${cat.textColor}`} />
+                    )}
+                    <cat.icon className={`w-4 h-4 ${cat.textColor}`} />
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className={`font-bold text-sm ${cat.textColor}`}>
+                        {role === 'student' ? cat.titleStudent : cat.titleTeacher}
+                      </span>
+                      <span className="text-[11px] text-slate-400 font-sans hidden md:inline">
+                        — {role === 'student' ? cat.descStudent : cat.descTeacher}
+                      </span>
+                    </div>
+                  </div>
 
-                  const guessCount = mNode.items.filter((a) => Boolean(a.pGuessUsed && a.pGuessUsed > 0.3)).length;
-                  const slipCount = mNode.items.filter((a) => Boolean(a.pSlipUsed && a.pSlipUsed > 0.2)).length;
+                  <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold ${cat.bgColor} ${cat.textColor} border ${cat.borderColor}`}>
+                    {items.length} {items.length === 1 ? 'інцидент' : items.length < 5 ? 'інциденти' : 'інцидентів'}
+                  </span>
+                </div>
 
-                  return (
-                    <div key={mNode.slug} className="flex flex-col gap-2">
-                      {/* Module Box */}
-                      <div className="bg-slate-950/80 border border-purple-500/30 rounded-xl overflow-hidden shadow-lg shadow-purple-950/10">
+                {/* Expanded Incident Cards */}
+                {isExpanded && (
+                  <div className="p-3 pl-4 sm:pl-6 flex flex-col gap-2.5 border-l-2 border-slate-700/50 ml-3 my-2">
+                    {items.length === 0 ? (
+                      <p className="text-xs text-slate-500 py-2">Немає інцидентів за пошуковим запитом "{searchTerm}"</p>
+                    ) : (
+                      items.map((item, idx) => (
                         <div
-                          onClick={() => toggleNode(nodeKey)}
-                          className="px-4 py-3 bg-purple-950/20 hover:bg-purple-950/30 flex items-center justify-between cursor-pointer border-b border-purple-500/20 transition-all select-none"
+                          key={item.id || idx}
+                          onClick={() => setSelectedItem(item)}
+                          className="p-3.5 rounded-xl bg-slate-900/90 hover:bg-slate-850 border border-slate-800 hover:border-purple-500/50 flex flex-col gap-2.5 cursor-pointer group transition-all shadow-md"
                         >
-                          <div className="flex items-center gap-2.5">
-                            {isExpanded ? (
-                              <ChevronDown className="w-4 h-4 text-purple-400" />
-                            ) : (
-                              <ChevronRight className="w-4 h-4 text-purple-400" />
-                            )}
-                            <FolderOpen className="w-4 h-4 text-purple-400" />
-                            <div className="flex items-center gap-2 flex-wrap">
-                              <span className="font-bold text-white text-sm">{mNode.title}</span>
-                              <span className="text-[10px] text-purple-300 font-mono px-1.5 py-0.5 rounded bg-purple-500/20 border border-purple-500/30">
-                                {mNode.slug}
+                          <div className="flex items-start justify-between gap-3">
+                            <div className="flex items-start gap-3">
+                              <div className={`w-2.5 h-2.5 rounded-full bg-${cat.accentColor}-400 shrink-0 mt-1`} />
+                              <div className="flex flex-col gap-1">
+                                <div className="flex items-center gap-2 flex-wrap">
+                                  <span className="text-white font-bold group-hover:text-purple-300 text-xs">
+                                    {item.taskTitle || 'Завдання курсу'}
+                                  </span>
+                                  <span className="text-[10px] text-slate-400 bg-slate-800 px-2 py-0.5 rounded border border-slate-700 font-mono">
+                                    {item.skillTitle} ({item.skillSlug})
+                                  </span>
+                                  {item.taskType && (
+                                    <span className="text-[9px] uppercase font-mono px-1.5 py-0.5 rounded bg-slate-800/80 text-slate-300 border border-slate-700">
+                                      {item.taskType}
+                                    </span>
+                                  )}
+                                </div>
+
+                                {item.taskDescription && (
+                                  <p className="text-[11px] text-slate-400 line-clamp-1 font-sans">
+                                    {item.taskDescription}
+                                  </p>
+                                )}
+                              </div>
+                            </div>
+
+                            <div className="flex items-center gap-2 shrink-0 text-[10px] font-mono">
+                              <span className="text-slate-500 hidden sm:inline">
+                                {new Date(item.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
                               </span>
-                              {mNode.level > 0 && (
-                                <span className="text-[10px] text-slate-400 font-mono">
-                                  (Рівень DAG: {mNode.level})
+                              
+                              {role === 'teacher' ? (
+                                <span className={`px-2 py-0.5 rounded ${cat.bgColor} ${cat.textColor} font-bold border ${cat.borderColor}`}>
+                                  {item.pGuessUsed ? `G=${item.pGuessUsed}` : `S=${item.pSlipUsed}`}
+                                </span>
+                              ) : (
+                                <span className={`px-2 py-0.5 rounded ${cat.bgColor} ${cat.textColor} font-sans font-bold border ${cat.borderColor}`}>
+                                  {cat.badgeStudent}
                                 </span>
                               )}
+                              
+                              <ChevronRight className="w-3.5 h-3.5 text-slate-500 group-hover:text-purple-400 transition-all" />
                             </div>
                           </div>
 
-                          <div className="flex items-center gap-2">
-                            {guessCount > 0 && (
-                              <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40 flex items-center gap-1">
-                                <Zap className="w-3 h-3" />
-                                {guessCount} вгадувань
+                          {/* Reason or Guidance Banner */}
+                          {item.adjustReasons && item.adjustReasons.length > 0 && (
+                            <div className={`flex items-center gap-2 pt-2 border-t border-slate-800 text-[11px] ${cat.textColor} font-sans`}>
+                              <span className="font-mono">⚡</span>
+                              <span className="truncate">
+                                {role === 'student' && cat.key === 'paste'
+                                  ? 'Порада: Спробуйте набрати цей алгоритм власноруч для повноцінного опанування навички'
+                                  : item.adjustReasons[0]}
                               </span>
-                            )}
-                            {slipCount > 0 && (
-                              <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 flex items-center gap-1">
-                                <AlertTriangle className="w-3 h-3" />
-                                {slipCount} описок
-                              </span>
-                            )}
-                          </div>
+                            </div>
+                          )}
                         </div>
-
-                        {/* Questions list inside module */}
-                        {isExpanded && (
-                          <div className="p-3 pl-6 flex flex-col gap-2 border-l-2 border-purple-500/40 ml-4 my-2">
-                            {filteredItems.length === 0 ? (
-                              <div className="text-slate-500 py-1 text-xs">Немає запитань, що відповідають пошуку.</div>
-                            ) : (
-                              filteredItems.map((item, idx) => {
-                                const isGuess = Boolean(item.pGuessUsed && item.pGuessUsed > 0.3);
-                                return (
-                                  <div
-                                    key={item.id || idx}
-                                    onClick={() => setSelectedItem(item)}
-                                    className="p-3 rounded-xl bg-slate-900/80 hover:bg-purple-950/40 border border-slate-800/90 hover:border-purple-500/50 flex flex-col gap-2 cursor-pointer group transition-all shadow-md"
-                                  >
-                                    <div className="flex items-start justify-between gap-3">
-                                      <div className="flex items-start gap-2.5">
-                                        <div className={`w-2.5 h-2.5 rounded-full shrink-0 mt-1 ${isGuess ? 'bg-amber-400 animate-ping' : 'bg-indigo-400'}`} />
-                                        <div className="flex flex-col gap-0.5">
-                                          <div className="flex items-center gap-2 flex-wrap">
-                                            <span className="text-white font-bold group-hover:text-purple-300 text-xs">
-                                              {item.taskTitle || 'Тестове Запитання'}
-                                            </span>
-                                            {item.taskType && (
-                                              <span className="text-[9px] uppercase font-mono px-1.5 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700">
-                                                {item.taskType}
-                                              </span>
-                                            )}
-                                          </div>
-                                          {item.taskDescription && (
-                                            <p className="text-[11px] text-slate-400 line-clamp-2 leading-relaxed">
-                                              {item.taskDescription}
-                                            </p>
-                                          )}
-                                        </div>
-                                      </div>
-
-                                      <div className="flex items-center gap-2 shrink-0 text-[10px] font-mono">
-                                        <span className="text-slate-500">
-                                          {new Date(item.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
-                                        </span>
-                                        {isGuess && (
-                                          <span className="px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 font-bold border border-amber-500/30">
-                                            G={item.pGuessUsed}
-                                          </span>
-                                        )}
-                                        {item.pSlipUsed !== undefined && item.pSlipUsed !== null && item.pSlipUsed > 0.2 && (
-                                          <span className="px-1.5 py-0.5 rounded bg-indigo-500/20 text-indigo-300 font-bold border border-indigo-500/30">
-                                            S={item.pSlipUsed}
-                                          </span>
-                                        )}
-                                        <ChevronRight className="w-3.5 h-3.5 text-slate-500 group-hover:text-purple-400" />
-                                      </div>
-                                    </div>
-
-                                    {/* Quick inline reasons/diagnosis tag */}
-                                    {item.adjustReasons && item.adjustReasons.length > 0 && (
-                                      <div className="flex items-center gap-2 pt-1 border-t border-slate-800/60 text-[10px] text-amber-300/90 font-mono">
-                                        <span>⚡</span>
-                                        <span className="truncate">{item.adjustReasons[0]}</span>
-                                      </div>
-                                    )}
-                                  </div>
-                                );
-                              })
-                            )}
-                          </div>
-                        )}
-                      </div>
-
-                      {/* Nested Children Modules (Branching deeper in DAG) */}
-                      {mNode.children && mNode.children.length > 0 && (
-                        <div className="pl-6 border-l-2 border-dashed border-purple-500/30 ml-4 flex flex-col gap-3 my-1">
-                          <div className="text-[10px] uppercase font-bold text-purple-400/80 tracking-wider flex items-center gap-1.5 pt-1">
-                            <GitBranch className="w-3 h-3" />
-                            <span>Дочірні модулі в ланцюгу BKT:</span>
-                          </div>
-                          {mNode.children.map((child) => renderTreeNode(child))}
-                        </div>
-                      )}
-                    </div>
-                  );
-                };
-
-                return (
-                  <div className="flex flex-col gap-4">
-                    {moduleTreeRoots.map((rootNode) => renderTreeNode(rootNode))}
+                      ))
+                    )}
                   </div>
-                );
-              })()}
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* ───────────────────────────────────────────────────────────── */}
-      {/* 🌳 РЕЖИМ 1: Ієрархічне Дерево за Категоріями                   */}
-      {/* ───────────────────────────────────────────────────────────── */}
-      {viewMode === 'tree' && (
-        <div className="flex flex-col gap-3 font-mono text-xs">
-          {totalAnomalies === 0 && (
-            <div className="p-8 rounded-xl bg-slate-950/40 border border-slate-800/60 text-center text-slate-500 flex flex-col items-center gap-2">
-              <CheckCircle2 className="w-6 h-6 text-emerald-500/60" />
-              <p className="text-xs text-slate-400">Усі поточні відповіді пройшли в межах нормальної поведінкової телеметрії.</p>
-            </div>
-          )}
-
-          {/* Branch 1: Аномалії Вгадування */}
-          {guessItems.length > 0 && (
-            <div className="bg-slate-950/80 border border-amber-500/30 rounded-xl overflow-hidden shadow-lg shadow-amber-950/10">
-              <div
-                onClick={() => toggleNode('category-guess')}
-                className="px-4 py-3 bg-amber-950/20 hover:bg-amber-950/30 flex items-center justify-between cursor-pointer border-b border-amber-500/20 transition-all select-none"
-              >
-                <div className="flex items-center gap-2 text-amber-300 font-bold">
-                  {expandedNodes['category-guess'] ? (
-                    <ChevronDown className="w-4 h-4 text-amber-400" />
-                  ) : (
-                    <ChevronRight className="w-4 h-4 text-amber-400" />
-                  )}
-                  <Zap className="w-4 h-4 text-amber-400" />
-                  <span>Гілка: Аномалії Вгадування (Швидка відповідь &lt; 3.5с, P(Guess)=0.85)</span>
-                </div>
-                <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40">
-                  {guessItems.length} {guessItems.length === 1 ? 'інцидент' : 'інциденти'}
-                </span>
+                )}
               </div>
-
-              {expandedNodes['category-guess'] && (
-                <div className="p-3 pl-6 flex flex-col gap-2.5 border-l-2 border-amber-500/40 ml-4 my-2">
-                  {guessGrouped.map((grp) => {
-                    const skillKey = `guess-skill-${grp.skillSlug}`;
-                    const isSkillExpanded = expandedNodes[skillKey] ?? true;
-
-                    const filteredItems = grp.items.filter((item) =>
-                      !searchTerm ||
-                      (item.taskTitle && item.taskTitle.toLowerCase().includes(searchTerm.toLowerCase())) ||
-                      grp.skillTitle.toLowerCase().includes(searchTerm.toLowerCase())
-                    );
-
-                    if (filteredItems.length === 0) return null;
-
-                    return (
-                      <div key={grp.skillSlug} className="flex flex-col gap-1.5">
-                        <div
-                          onClick={() => toggleNode(skillKey)}
-                          className="flex items-center justify-between px-3 py-2 rounded-lg bg-slate-900/90 hover:bg-slate-900 border border-slate-800 cursor-pointer text-slate-300 transition-all"
-                        >
-                          <div className="flex items-center gap-2">
-                            {isSkillExpanded ? (
-                              <FolderOpen className="w-3.5 h-3.5 text-amber-400" />
-                            ) : (
-                              <Folder className="w-3.5 h-3.5 text-amber-400" />
-                            )}
-                            <span className="font-bold text-white text-xs">{grp.skillTitle}</span>
-                            <span className="text-[10px] text-slate-500 uppercase font-mono">({grp.skillSlug})</span>
-                          </div>
-                          <span className="text-[10px] text-amber-400 font-bold">
-                            {filteredItems.length} {filteredItems.length === 1 ? 'питання' : 'питань'}
-                          </span>
-                        </div>
-
-                        {isSkillExpanded && (
-                          <div className="flex flex-col gap-1.5 pl-6 border-l border-slate-800 ml-3 py-1">
-                            {filteredItems.map((item, qIdx) => (
-                              <div
-                                key={item.id || qIdx}
-                                onClick={() => setSelectedItem(item)}
-                                className="p-3 rounded-xl bg-slate-900/80 hover:bg-amber-950/40 border border-slate-800/90 hover:border-amber-500/50 flex flex-col gap-2 cursor-pointer group transition-all shadow-md"
-                              >
-                                <div className="flex items-start justify-between gap-3">
-                                  <div className="flex items-start gap-2.5">
-                                    <div className="w-2.5 h-2.5 rounded-full bg-amber-400 shrink-0 mt-1 animate-ping" />
-                                    <div className="flex flex-col gap-0.5">
-                                      <div className="flex items-center gap-2 flex-wrap">
-                                        <span className="text-white font-bold group-hover:text-amber-300 text-xs">
-                                          {item.taskTitle || 'Тестове Запитання'}
-                                        </span>
-                                        {item.taskType && (
-                                          <span className="text-[9px] uppercase font-mono px-1.5 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700">
-                                            {item.taskType}
-                                          </span>
-                                        )}
-                                      </div>
-                                      {item.taskDescription && (
-                                        <p className="text-[11px] text-slate-400 line-clamp-2 leading-relaxed">
-                                          {item.taskDescription}
-                                        </p>
-                                      )}
-                                    </div>
-                                  </div>
-
-                                  <div className="flex items-center gap-2 shrink-0 text-[10px] font-mono">
-                                    <span className="text-slate-500">
-                                      {new Date(item.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
-                                    </span>
-                                    <span className="px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 font-bold border border-amber-500/30">
-                                      G={item.pGuessUsed}
-                                    </span>
-                                    <ChevronRight className="w-3.5 h-3.5 text-slate-500 group-hover:text-amber-400" />
-                                  </div>
-                                </div>
-
-                                {item.adjustReasons && item.adjustReasons.length > 0 && (
-                                  <div className="flex items-center gap-2 pt-1 border-t border-slate-800/60 text-[10px] text-amber-300/90 font-mono">
-                                    <span>⚡</span>
-                                    <span className="truncate">{item.adjustReasons[0]}</span>
-                                  </div>
-                                )}
-                              </div>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* Branch 2: Описки Сильних Студентів */}
-          {slipItems.length > 0 && (
-            <div className="bg-slate-950/80 border border-indigo-500/30 rounded-xl overflow-hidden shadow-lg shadow-indigo-950/10">
-              <div
-                onClick={() => toggleNode('category-slip')}
-                className="px-4 py-3 bg-indigo-950/20 hover:bg-indigo-950/30 flex items-center justify-between cursor-pointer border-b border-indigo-500/20 transition-all select-none"
-              >
-                <div className="flex items-center gap-2 text-indigo-300 font-bold">
-                  {expandedNodes['category-slip'] ? (
-                    <ChevronDown className="w-4 h-4 text-indigo-400" />
-                  ) : (
-                    <ChevronRight className="w-4 h-4 text-indigo-400" />
-                  )}
-                  <ShieldAlert className="w-4 h-4 text-indigo-400" />
-                  <span>Гілка: Випадкові Описки Сильних Студентів (Захист P(Slip) &gt; 0.2)</span>
-                </div>
-                <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-500/40">
-                  {slipItems.length} {slipItems.length === 1 ? 'інцидент' : 'інциденти'}
-                </span>
-              </div>
-
-              {expandedNodes['category-slip'] && (
-                <div className="p-3 pl-6 flex flex-col gap-2.5 border-l-2 border-indigo-500/40 ml-4 my-2">
-                  {slipGrouped.map((grp) => {
-                    const skillKey = `slip-skill-${grp.skillSlug}`;
-                    const isSkillExpanded = expandedNodes[skillKey] ?? true;
-
-                    const filteredItems = grp.items.filter((item) =>
-                      !searchTerm ||
-                      (item.taskTitle && item.taskTitle.toLowerCase().includes(searchTerm.toLowerCase())) ||
-                      grp.skillTitle.toLowerCase().includes(searchTerm.toLowerCase())
-                    );
-
-                    if (filteredItems.length === 0) return null;
-
-                    return (
-                      <div key={grp.skillSlug} className="flex flex-col gap-1.5">
-                        <div
-                          onClick={() => toggleNode(skillKey)}
-                          className="flex items-center justify-between px-3 py-2 rounded-lg bg-slate-900/90 hover:bg-slate-900 border border-slate-800 cursor-pointer text-slate-300 transition-all"
-                        >
-                          <div className="flex items-center gap-2">
-                            {isSkillExpanded ? (
-                              <FolderOpen className="w-3.5 h-3.5 text-indigo-400" />
-                            ) : (
-                              <Folder className="w-3.5 h-3.5 text-indigo-400" />
-                            )}
-                            <span className="font-bold text-white text-xs">{grp.skillTitle}</span>
-                            <span className="text-[10px] text-slate-500 uppercase font-mono">({grp.skillSlug})</span>
-                          </div>
-                          <span className="text-[10px] text-indigo-400 font-bold">
-                            {filteredItems.length} {filteredItems.length === 1 ? 'питання' : 'питань'}
-                          </span>
-                        </div>
-
-                        {isSkillExpanded && (
-                          <div className="flex flex-col gap-1.5 pl-6 border-l border-slate-800 ml-3 py-1">
-                            {filteredItems.map((item, qIdx) => (
-                              <div
-                                key={item.id || qIdx}
-                                onClick={() => setSelectedItem(item)}
-                                className="p-3 rounded-xl bg-slate-900/80 hover:bg-indigo-950/40 border border-slate-800/90 hover:border-indigo-500/50 flex flex-col gap-2 cursor-pointer group transition-all shadow-md"
-                              >
-                                <div className="flex items-start justify-between gap-3">
-                                  <div className="flex items-start gap-2.5">
-                                    <div className="w-2.5 h-2.5 rounded-full bg-indigo-400 shrink-0 mt-1" />
-                                    <div className="flex flex-col gap-0.5">
-                                      <div className="flex items-center gap-2 flex-wrap">
-                                        <span className="text-white font-bold group-hover:text-indigo-300 text-xs">
-                                          {item.taskTitle || 'Тестове Запитання'}
-                                        </span>
-                                        {item.taskType && (
-                                          <span className="text-[9px] uppercase font-mono px-1.5 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700">
-                                            {item.taskType}
-                                          </span>
-                                        )}
-                                      </div>
-                                      {item.taskDescription && (
-                                        <p className="text-[11px] text-slate-400 line-clamp-2 leading-relaxed">
-                                          {item.taskDescription}
-                                        </p>
-                                      )}
-                                    </div>
-                                  </div>
-
-                                  <div className="flex items-center gap-2 shrink-0 text-[10px] font-mono">
-                                    <span className="text-slate-500">
-                                      {new Date(item.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
-                                    </span>
-                                    <span className="px-1.5 py-0.5 rounded bg-indigo-500/20 text-indigo-300 font-bold border border-indigo-500/30">
-                                      S={item.pSlipUsed}
-                                    </span>
-                                    <ChevronRight className="w-3.5 h-3.5 text-slate-500 group-hover:text-indigo-400" />
-                                  </div>
-                                </div>
-
-                                {item.adjustReasons && item.adjustReasons.length > 0 && (
-                                  <div className="flex items-center gap-2 pt-1 border-t border-slate-800/60 text-[10px] text-indigo-300/90 font-mono">
-                                    <span>🛡️</span>
-                                    <span className="truncate">{item.adjustReasons[0]}</span>
-                                  </div>
-                                )}
-                              </div>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
-          )}
-        </div>
-      )}
+            );
+          })
+        )}
+      </div>
 
       {/* ───────────────────────────────────────────────────────────── */}
-      {/* 🕸️ РЕЖИМ 2: Топологічний Граф Аномалій (DAG Network Topology) */}
+      {/* 🔍 MODAL INSPECTOR: Detailed Incident View                     */}
       {/* ───────────────────────────────────────────────────────────── */}
-      {viewMode === 'graph' && (
-        <div className="flex flex-col lg:flex-row gap-4">
-          {/* Visual Topology Canvas */}
-          <div className="flex-1 bg-slate-950 rounded-xl border border-slate-800 p-4 relative min-h-[360px] flex flex-col justify-between overflow-hidden">
-            <div className="flex items-center justify-between z-10 text-[11px] font-mono text-slate-400 border-b border-slate-800/60 pb-2">
-              <span className="flex items-center gap-1.5">
-                <Network className="w-3.5 h-3.5 text-indigo-400" />
-                <span>Топологічна карта навичок та фокус аномалій</span>
-              </span>
-              <span className="text-slate-500">Клікніть на модуль для перегляду інцидентів</span>
-            </div>
-
-            {/* SVG Connecting Rails between nodes */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 my-auto py-4 z-10">
-              {nodes.map((node, idx) => {
-                const nodeAnomalies = adjustments.filter((a) => a.skillSlug === node.slug);
-                const hasGuess = nodeAnomalies.some((a) => a.pGuessUsed && a.pGuessUsed > 0.3);
-                const hasSlip = nodeAnomalies.some((a) => a.pSlipUsed && a.pSlipUsed > 0.2);
-                const isSelected = selectedNodeSlug === node.slug;
-
-                return (
-                  <div
-                    key={node.id || idx}
-                    onClick={() => setSelectedNodeSlug(node.slug)}
-                    className={`p-3.5 rounded-xl border transition-all cursor-pointer flex flex-col justify-between gap-3 relative ${
-                      isSelected
-                        ? 'ring-2 ring-purple-500 bg-purple-950/30 border-purple-400 shadow-xl shadow-purple-950/50'
-                        : hasGuess
-                        ? 'bg-amber-950/20 border-amber-500/40 hover:border-amber-400 shadow-md shadow-amber-950/20'
-                        : hasSlip
-                        ? 'bg-indigo-950/20 border-indigo-500/40 hover:border-indigo-400'
-                        : 'bg-slate-900 border-slate-800 hover:border-slate-700'
-                    }`}
-                  >
-                    <div className="flex items-start justify-between gap-2">
-                      <div className="flex items-center gap-2">
-                        <span className="w-5 h-5 rounded-md bg-slate-950 border border-slate-800 text-[10px] font-mono font-bold flex items-center justify-center text-slate-400">
-                          {idx + 1}
-                        </span>
-                        <h4 className="font-bold text-white text-xs truncate max-w-[140px]">{node.title}</h4>
-                      </div>
-
-                      {/* Anomaly Badge on node */}
-                      {nodeAnomalies.length > 0 ? (
-                        <span className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold flex items-center gap-1 ${
-                          hasGuess 
-                            ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40 animate-pulse'
-                            : 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/40'
-                        }`}>
-                          <Zap className="w-3 h-3" />
-                          <span>{nodeAnomalies.length}</span>
-                        </span>
-                      ) : (
-                        <span className="text-[10px] font-mono text-emerald-400">0 аномалій</span>
-                      )}
-                    </div>
-
-                    <div className="flex items-center justify-between text-[10px] font-mono pt-2 border-t border-slate-800/80">
-                      <span className="text-slate-400">Майстерність P(L):</span>
-                      <strong className={node.pMastery >= 0.95 ? 'text-emerald-400' : 'text-slate-200'}>
-                        {(node.pMastery * 100).toFixed(1)}%
-                      </strong>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-
-            <div className="text-[10px] font-mono text-slate-500 text-center border-t border-slate-800/60 pt-2">
-              ⚡ Бурштиновий: Підозра на вгадування (G=0.85) • 🛡️ Індиго: Описка сильного студента
-            </div>
-          </div>
-
-          {/* Module Deep Dive Panel for selected node in Graph */}
-          <div className="w-full lg:w-80 bg-slate-950 rounded-xl border border-slate-800 p-4 flex flex-col gap-3">
-            <h4 className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-1.5 border-b border-slate-800 pb-2">
-              <Sparkles className="w-3.5 h-3.5 text-purple-400" />
-              <span>Деталізація Модуля: {selectedNodeSlug || 'Оберіть модуль'}</span>
-            </h4>
-
-            {selectedNodeSlug && activeSkillItems.length > 0 ? (
-              <div className="flex flex-col gap-2 max-h-[300px] overflow-y-auto pr-1">
-                {activeSkillItems.map((item, idx) => (
-                  <div
-                    key={idx}
-                    onClick={() => setSelectedItem(item)}
-                    className="p-2.5 rounded-lg bg-slate-900 border border-slate-800 hover:border-purple-500 cursor-pointer flex flex-col gap-1 transition-all"
-                  >
-                    <span className="text-white text-xs font-medium truncate">{item.taskTitle || 'Питання'}</span>
-                    <div className="flex items-center justify-between text-[10px] font-mono text-slate-400">
-                      <span>{new Date(item.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
-                      <span className="text-amber-300 font-bold">G={item.pGuessUsed ?? 0.2}</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : selectedNodeSlug ? (
-              <p className="text-xs text-slate-500 text-center my-auto">У цьому модулі не зафіксовано аномалій.</p>
-            ) : (
-              <p className="text-xs text-slate-500 text-center my-auto">Клікніть по будь-якому модулю графу зліва для інспекції його інцидентів.</p>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* ───────────────────────────────────────────────────────────── */}
-      {/* 🎮 РЕЖИМ 3: RPG Матриця Рун (Cyber-Rune Mastery & Anomaly View) */}
-      {/* ───────────────────────────────────────────────────────────── */}
-      {viewMode === 'rpg' && (
-        <div className="bg-slate-950 rounded-xl border border-slate-800 p-5 flex flex-col gap-4 relative overflow-hidden">
-          <div className="flex items-center justify-between border-b border-slate-800 pb-2">
-            <span className="text-xs font-mono font-bold text-amber-400 flex items-center gap-1.5 uppercase">
-              <Flame className="w-4 h-4 text-amber-500" />
-              <span>Рунічна матриця когнітивної стійкості (Anti-Cheat Rune Integrity)</span>
-            </span>
-            <span className="text-[10px] font-mono text-slate-400">Рівень чистоти навичок: 100%</span>
-          </div>
-
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3.5 py-2">
-            {nodes.map((node, idx) => {
-              const nodeAnomalies = adjustments.filter((a) => a.skillSlug === node.slug);
-              const hasGuess = nodeAnomalies.some((a) => a.pGuessUsed && a.pGuessUsed > 0.3);
-
-              return (
-                <div
-                  key={node.id || idx}
-                  onClick={() => {
-                    const firstAnomaly = nodeAnomalies[0];
-                    if (firstAnomaly) setSelectedItem(firstAnomaly);
-                  }}
-                  className={`p-4 rounded-2xl border-2 flex flex-col items-center justify-center gap-2.5 transition-all text-center relative select-none ${
-                    hasGuess
-                      ? 'bg-gradient-to-b from-amber-950/40 to-slate-950 border-amber-500 shadow-lg shadow-amber-500/20 cursor-pointer hover:scale-105'
-                      : node.pMastery >= 0.95
-                      ? 'bg-gradient-to-b from-emerald-950/30 to-slate-950 border-emerald-500/40 text-emerald-300'
-                      : 'bg-slate-900/60 border-slate-800 text-slate-500'
-                  }`}
-                >
-                  {/* Floating Anomaly Icon */}
-                  {hasGuess && (
-                    <div className={`absolute -top-2 -right-2 px-1.5 py-0.5 rounded-full bg-amber-500 text-slate-950 font-bold text-[9px] flex items-center gap-0.5 shadow-md ${
-                      selectedNodeSlug === node.slug ? 'animate-bounce' : ''
-                    }`}>
-                      <Zap className="w-2.5 h-2.5 fill-slate-950" />
-                      <span>{nodeAnomalies.length}</span>
-                    </div>
-                  )}
-
-                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-lg font-bold border ${
-                    hasGuess
-                      ? 'bg-amber-500/20 border-amber-400 text-amber-300'
-                      : node.pMastery >= 0.95
-                      ? 'bg-emerald-500/15 border-emerald-400 text-emerald-400'
-                      : 'bg-slate-950 border-slate-800 text-slate-600'
-                  }`}>
-                    {hasGuess ? '⚡' : node.pMastery >= 0.95 ? '✨' : '🔒'}
-                  </div>
-
-                  <div>
-                    <h5 className="font-bold text-white text-xs truncate max-w-[110px]">{node.title}</h5>
-                    <span className="text-[10px] font-mono text-slate-400 block mt-0.5">
-                      P(L)={(node.pMastery * 100).toFixed(0)}%
-                    </span>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      )}
-
-      {/* 🔍 Interactive Deep Dive Modal: Question, Options & Telemetry Reason */}
       {selectedItem && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-md animate-fadeIn">
-          <div className="max-w-xl w-full p-6 bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl flex flex-col gap-4 text-left">
-            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-              <div className="flex items-center gap-2.5">
-                <div className={`p-2 rounded-xl border ${
-                  selectedItem.pGuessUsed && selectedItem.pGuessUsed > 0.3
-                    ? 'bg-amber-500/10 text-amber-400 border-amber-500/30'
-                    : 'bg-indigo-500/10 text-indigo-400 border-indigo-500/30'
-                }`}>
-                  {selectedItem.pGuessUsed && selectedItem.pGuessUsed > 0.3 ? (
-                    <Zap className="w-5 h-5" />
-                  ) : (
-                    <ShieldAlert className="w-5 h-5" />
-                  )}
-                </div>
-                <div>
-                  <h4 className="font-bold text-white text-base">
-                    {selectedItem.pGuessUsed && selectedItem.pGuessUsed > 0.3
-                      ? 'Аудит Аномалії: Підозра на Вгадування'
-                      : 'Аудит Аномалії: Випадковий Промах'}
-                  </h4>
-                  <span className="text-[11px] font-mono text-slate-400">
-                    Модуль: <strong className="text-purple-300">{selectedItem.skillTitle}</strong>
-                  </span>
-                </div>
+        <div 
+          onClick={() => setSelectedItem(null)}
+          className="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4"
+        >
+          <div 
+            onClick={(e) => e.stopPropagation()}
+            className="w-full max-w-xl bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-2xl flex flex-col gap-4 text-slate-200 animate-in fade-in zoom-in-95 duration-150"
+          >
+            <div className="flex items-start justify-between border-b border-slate-800 pb-3">
+              <div>
+                <h4 className="text-sm font-bold text-white flex items-center gap-2">
+                  <span className="text-purple-400">🔍 Деталі інциденту:</span>
+                  <span>{selectedItem.taskTitle}</span>
+                </h4>
+                <p className="text-xs text-slate-400 mt-0.5">
+                  Модуль: <strong className="text-slate-200">{selectedItem.skillTitle}</strong> ({selectedItem.skillSlug})
+                </p>
               </div>
               <button
                 onClick={() => setSelectedItem(null)}
-                className="p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 cursor-pointer"
+                className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-all cursor-pointer"
               >
-                <X className="w-4 h-4" />
+                ✕
               </button>
             </div>
 
-            {/* Task Question & Description */}
-            <div className="flex flex-col gap-2">
-              <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
-                <HelpCircle className="w-3.5 h-3.5 text-indigo-400" />
-                <span>Запитання, що викликало аномалію:</span>
-              </span>
-              <div className="p-4 bg-slate-950 rounded-xl border border-slate-800 flex flex-col gap-2">
-                <h5 className="font-bold text-white text-sm">
-                  {selectedItem.taskTitle || 'Тестове Запитання'}
-                </h5>
-                <p className="text-xs text-slate-300 leading-relaxed font-mono whitespace-pre-wrap">
-                  {selectedItem.taskDescription || 'Опис завдання відсутній.'}
-                </p>
-              </div>
+            <div className="flex flex-col gap-1 text-xs">
+              <span className="text-[10px] uppercase font-mono tracking-wider text-slate-500 font-semibold">Умова завдання:</span>
+              <p className="p-3 bg-slate-950 border border-slate-800 rounded-xl text-slate-300 leading-relaxed font-sans">
+                {selectedItem.taskDescription}
+              </p>
             </div>
 
-            {/* Options display if choice task */}
-            {selectedItem.taskOptions && Array.isArray(selectedItem.taskOptions) && (
-              <div className="flex flex-col gap-2">
-                <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-400">
-                  Варіанти відповідей завдання:
-                </span>
-                <div className="grid grid-cols-1 gap-1.5 max-h-36 overflow-y-auto">
-                  {selectedItem.taskOptions.map((opt: any, oIdx: number) => (
-                    <div
-                      key={oIdx}
-                      className="p-2.5 bg-slate-950 border border-slate-800 rounded-lg text-xs flex items-center justify-between"
-                    >
-                      <span className="text-slate-300">{opt.text || opt}</span>
-                      <span className="text-[10px] font-mono text-slate-500">{opt.id || `Варіант ${oIdx + 1}`}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Telemetry Verdict & Adjusted BKT Values */}
-            <div className="flex flex-col gap-2">
-              <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-400">
-                Діагноз Телеметрії та Реакція Рушія BKT:
+            {/* Role specific explanation */}
+            <div className="flex flex-col gap-1 text-xs">
+              <span className="text-[10px] uppercase font-mono tracking-wider text-slate-500 font-semibold">
+                {role === 'student' ? 'Вплив на прогрес та порада:' : 'Діагноз Телеметрії та Реакція Рушія BKT:'}
               </span>
-              <div className="p-3.5 bg-amber-950/20 border border-amber-500/30 rounded-xl flex flex-col gap-2">
-                <div className="flex items-center justify-between text-xs font-mono">
-                  <span className="text-amber-300 font-bold">
-                    {selectedItem.pGuessUsed && selectedItem.pGuessUsed > 0.3
-                      ? '⚡ Латентність < 3.5с: Ймовірність вгадування підвищено до 0.85'
-                      : '🛡️ Високий prior P(L): Студент знає матеріал, зрізання балів пом\'якшено'}
-                  </span>
-                  <div className="flex items-center gap-2">
-                    <span className="px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30 font-bold">
-                      P(Guess) = {selectedItem.pGuessUsed ?? 0.2}
+              <div className="p-3.5 bg-purple-950/20 border border-purple-500/30 rounded-xl flex flex-col gap-2">
+                {role === 'teacher' ? (
+                  <div className="flex items-center justify-between text-xs font-mono">
+                    <span className="text-amber-300 font-bold">
+                      {selectedItem.pGuessUsed && selectedItem.pGuessUsed > 0.3
+                        ? '⚡ Підвищення P(Guess): Ймовірність вгадування збільшено'
+                        : '🛡️ Підвищення P(Slip): Захист від втрати знання'}
                     </span>
-                    <span className="px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 font-bold">
-                      P(Slip) = {selectedItem.pSlipUsed ?? 0.1}
-                    </span>
+                    <div className="flex items-center gap-2">
+                      <span className="px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30 font-bold">
+                        P(Guess) = {selectedItem.pGuessUsed ?? 0.2}
+                      </span>
+                      <span className="px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 font-bold">
+                        P(Slip) = {selectedItem.pSlipUsed ?? 0.1}
+                      </span>
+                    </div>
                   </div>
-                </div>
+                ) : (
+                  <p className="text-xs text-purple-200 font-sans leading-relaxed">
+                    💡 Рушій BKT помітив особливість введення (наприклад, вставку тексту або швидке надсилання). Щоб тема впевнено перейшла у стан засвоєння, наберіть наступне практичне завдання вручну.
+                  </p>
+                )}
 
                 {selectedItem.adjustReasons && selectedItem.adjustReasons.length > 0 && (
-                  <div className="pt-2 border-t border-amber-500/20 flex flex-col gap-1">
-                    {selectedItem.adjustReasons.map((reason, rIdx) => (
-                      <div key={rIdx} className="text-xs text-amber-200 flex items-center gap-2 font-mono">
-                        <span>💡</span>
-                        <span>{reason}</span>
+                  <div className="pt-2 border-t border-purple-500/20 flex flex-col gap-1 font-mono text-[11px] text-purple-200">
+                    {selectedItem.adjustReasons.map((r, rIdx) => (
+                      <div key={rIdx} className="flex items-center gap-2">
+                        <span>⚡</span>
+                        <span>{r}</span>
                       </div>
                     ))}
                   </div>
@@ -1061,7 +566,7 @@ export function AnomalyTreeWidget({
                   className="px-4 py-2 rounded-xl text-xs font-bold bg-purple-600 hover:bg-purple-500 text-white flex items-center gap-1.5 shadow-lg shadow-purple-600/30 cursor-pointer transition-all"
                 >
                   <ExternalLink className="w-3.5 h-3.5" />
-                  <span>Перейти до редактора цього завдання</span>
+                  <span>Перейти до завдання</span>
                 </button>
               )}
             </div>
