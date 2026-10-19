@@ -430,11 +430,66 @@
               "type": "text",
               "raw_text": "Перемикач режимів `[ 📜 Список Модулів | 🌳 RPG Дерево ]` у бічній панелі.",
               "subitems": []
+            }
+          ]
+        },
+        {
+          "title": "0.8 Вкладка Історії Спроб у Бічній Панелі Студента та Синхронізація Відгуку Викладача (`SBC-216`)",
+          "level": 3,
+          "paragraphs": [],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "**Концепція та Проблематика:**",
+              "subitems": []
             },
             {
               "type": "text",
-              "raw_text": "Повноекранне модальне вікно огляду та взаємодії з деревом знань.",
+              "raw_text": "При проходженні завдань з відкритим текстом (`TEXT_ESSAY` / `OPEN_TEXT`) студент надсилав відповідь і чекав верифікації викладачем (`PENDING_REVIEW`).",
               "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Після перевірки викладачем у своєму кабінеті (`apps/teacher`) статус рішення та коментар не відображалися у студента автоматично, а кнопка «Наступне завдання» залишалася заблокованою.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Архітектурні компоненти та реалізація:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**REST API (`GET /api/v1/tasks/:id/submissions?userId=...`):**",
+              "subitems": [
+                "Ендпоінт у [`apps/api/src/adapters/inbound/http/task.controller.ts`](file:///apps/api/src/adapters/inbound/http/task.controller.ts).",
+                "Повертає масив усіх спроб студента для конкретної задачі (`attemptNumber`, `code`, `status`, `teacherReviewStatus`, `teacherComment`, `createdAt`), відсортований за спаданням дати (`desc`)."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**WebSocket-подія `teacher_review_decision`:**",
+              "subitems": [
+                "Розширено метод `notifyTeacherReviewDecision` у [`telemetry.gateway.ts`](file:///apps/api/src/adapters/inbound/websocket/telemetry.gateway.ts) та виклик у [`bkt.controller.ts`](file:///apps/api/src/adapters/inbound/http/bkt.controller.ts).",
+                "Передаються поля: `{ submissionId, decision, userId, taskId, comment, scoreOverride }`."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Інтерфейс Студента (`apps/student/src/app/page.tsx`):**",
+              "subitems": [
+                "**Вкладки у бічній панелі (Side Drawer):**",
+                "Перемикач `[ 📖 Умова | 🕒 Історія спроб (N) ]` над карткою задачі.",
+                "У вкладці історії виводиться повна хронологія спроб студента:",
+                "Порядковий номер (`Спроба #1`, `Спроба #2 • Остання`), бейджі статусу (`✓ Затверджено`, `⏳ В черзі`, `Архівована (Superseded)`, `✕ Відхилено`).",
+                "Спеціальний цитатний блок **«💬 Коментар викладача: \"...\"»** із бузково-фіолетовим підсвічуванням.",
+                "Можливість розкрити вихідний текст розв'язку (`<details>`).",
+                "**Реактивне оновлення без перезавантаження:**",
+                "При отриманні події `teacher_review_decision` студентський портал автоматично підвантажує історію через `fetchTaskSubmissions(task.id)`.",
+                "Якщо рішення стосується поточного завдання: `evalResult.isPassed` перемикається у `true` (при `APPROVE`), розблоковуючи кнопку переходу **«Наступне завдання ➔»**.",
+                "У нижній картці результату (`Toast Panel`) виводиться окремий блок відгуку викладача."
+              ]
             },
             {
               "type": "text",

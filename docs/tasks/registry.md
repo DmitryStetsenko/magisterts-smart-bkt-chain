@@ -12,11 +12,11 @@
 | **`SBC-EP-BKT`** | Bayesian Knowledge Tracing & Behavioral Telemetry | 24 |
 | **`SBC-EP-LLM`** | Automated Code Assessment & Open-Text Evaluation | 10 |
 | **`SBC-EP-W3`** | Web3 Infrastructure & Smart Contracts | 0 |
-| **`SBC-EP-ST`** | Student Portal & Skill Tree Map | 26 |
+| **`SBC-EP-ST`** | Student Portal & Skill Tree Map | 27 |
 | **`SBC-EP-TC`** | Teacher Portal & Analytics CRM | 18 |
 | **`SBC-EP-AD`** | Admin Portal & Knowledge DAG Builder | 8 |
 | **`SBC-EP-LD`** | Landing Web Page | 9 |
-| **ВСЬОГО** | - | **213** |
+| **ВСЬОГО** | - | **215** |
 
 ---
 
@@ -244,6 +244,8 @@
 | **SBC-182** | `Story` | `ST` | add anomaly tree view toggle to student skill tree widget | 2026-10-13 | `dfde3e5` |
 | **SBC-193** | `Story` | `ST` | display semantic rubric breakdown and teacher review status | 2026-10-14 | `9ac1768` |
 | **SBC-194** | `Task` | `ST` | log micro-step 5 student semantic rubric UI | 2026-10-14 | `8c19e4a` |
+| **SBC-216** | `Story` | `ST` | implement attempt history tab in student task drawer with teacher feedback and live review decision synchronization | 2026-10-19 | `1e201d7` |
+| **SBC-217** | `Task` | `INF` | update daily progress, detailed technical log and compile docs json for student attempt history and teacher feedback | 2026-10-19 | `pending` |
 
 ---
 
