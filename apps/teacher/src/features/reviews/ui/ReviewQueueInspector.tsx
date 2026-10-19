@@ -95,8 +95,18 @@ export const ReviewQueueInspector: React.FC<ReviewQueueInspectorProps> = ({
       <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-800 pb-4">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <span className="text-[10px] font-mono uppercase bg-amber-500/10 text-amber-300 px-2 py-0.5 rounded border border-amber-500/20 font-bold">
-              ⏳ Очікує верифікації
+            <span className={`text-[10px] font-mono uppercase px-2 py-0.5 rounded border font-bold ${
+              currentReview.teacherReviewStatus === 'APPROVED'
+                ? 'bg-emerald-500/10 text-emerald-300 border-emerald-500/30'
+                : currentReview.teacherReviewStatus === 'REJECTED'
+                ? 'bg-rose-500/10 text-rose-300 border-rose-500/30'
+                : 'bg-amber-500/10 text-amber-300 border-amber-500/20'
+            }`}>
+              {currentReview.teacherReviewStatus === 'APPROVED'
+                ? '✓ Затверджено'
+                : currentReview.teacherReviewStatus === 'REJECTED'
+                ? '✕ Відхилено'
+                : '⏳ Очікує верифікації'}
             </span>
             <span className="text-[10px] font-mono text-slate-400">
               Здано: {new Date(currentReview.submittedAt).toLocaleString()}

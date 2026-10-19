@@ -119,16 +119,19 @@ export default function TeacherDashboardPage() {
   const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(true);
   const [activeStudentView, setActiveStudentView] = useState<'metrics' | 'tree'>('metrics');
 
-  // Teacher Review Queue State
+  // Teacher Review Queue State & Filter Tab ('pending' | 'reviewed')
+  const [reviewFilterTab, setReviewFilterTab] = useState<'pending' | 'reviewed'>('pending');
   const [reviewQueue, setReviewQueue] = useState<any[]>([]);
   const [selectedReviewId, setSelectedReviewId] = useState<string | null>(null);
   const [isReviewSubmitting, setIsReviewSubmitting] = useState<boolean>(false);
   const [reviewComment, setReviewComment] = useState<string>('');
   const [reviewScoreOverride, setReviewScoreOverride] = useState<number | ''>('');
 
-  const fetchReviewQueue = async () => {
+  const fetchReviewQueue = async (tabOverride?: 'pending' | 'reviewed') => {
     try {
-      const res = await fetch(`${API_URL}/api/v1/bkt/reviews/queue?courseSlug=${activeCourseSlug}`);
+      const activeTabMode = tabOverride || reviewFilterTab;
+      const statusParam = activeTabMode === 'reviewed' ? 'REVIEWED' : 'PENDING';
+      const res = await fetch(`${API_URL}/api/v1/bkt/reviews/queue?courseSlug=${activeCourseSlug}&status=${statusParam}`);
       if (res.ok) {
         const data = await res.json();
         setReviewQueue(data);
@@ -145,7 +148,7 @@ export default function TeacherDashboardPage() {
 
   useEffect(() => {
     fetchReviewQueue();
-  }, [activeCourseSlug]);
+  }, [activeCourseSlug, reviewFilterTab]);
 
   // Real-time WebSocket listener for student submissions, telemetry updates, and state resets
   useEffect(() => {
@@ -654,25 +657,60 @@ export default function TeacherDashboardPage() {
               {/* Drawer: Review Queue List */}
               {activeTab === 'reviews' && (
                 <div className="flex flex-col gap-3">
+                  {/* Review Queue Filter Tabs: Pending vs Reviewed Archive */}
+                  <div className="bg-slate-950 p-1 rounded-xl border border-slate-800 flex items-center gap-1 shadow-inner">
+                    <button
+                      onClick={() => setReviewFilterTab('pending')}
+                      className={`flex-1 py-1.5 px-3 rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
+                        reviewFilterTab === 'pending'
+                          ? 'bg-amber-600 text-white shadow-md shadow-amber-600/30'
+                          : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                      }`}
+                    >
+                      <span>⏳ В черзі</span>
+                    </button>
+                    <button
+                      onClick={() => setReviewFilterTab('reviewed')}
+                      className={`flex-1 py-1.5 px-3 rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
+                        reviewFilterTab === 'reviewed'
+                          ? 'bg-purple-600 text-white shadow-md shadow-purple-600/30'
+                          : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                      }`}
+                    >
+                      <span>✓ Перевірені</span>
+                    </button>
+                  </div>
+
                   <div className="text-[11px] text-slate-400">
-                    Відповіді, що потрапили у «сіру зону» або вимагають верифікації викладачем:
+                    {reviewFilterTab === 'pending'
+                      ? 'Відповіді, що потрапили у «сіру зону» або вимагають верифікації викладачем:'
+                      : 'Архів уже перевірених та оцінених викладачем відкритих робіт:'}
                   </div>
 
                   {reviewQueue.length === 0 ? (
                     <div className="p-6 text-center text-xs text-slate-500 bg-slate-950/60 rounded-xl border border-slate-800">
-                      Черга перевірки порожня. Усі відкриті відповіді оцінені.
+                      {reviewFilterTab === 'pending'
+                        ? 'Черга перевірки порожня. Усі відкриті відповіді оцінені.'
+                        : 'Немає перевірених робіт в архіві.'}
                     </div>
                   ) : (
                     <div className="flex flex-col gap-2 mt-1">
                       {reviewQueue.map((item) => {
                         const isSelected = selectedReviewId === item.submissionId;
+                        const isApproved = item.teacherReviewStatus === 'APPROVED';
+                        const isRejected = item.teacherReviewStatus === 'REJECTED';
+
                         return (
                           <div
                             key={item.submissionId}
                             onClick={() => setSelectedReviewId(item.submissionId)}
                             className={`p-3 rounded-xl border transition-all cursor-pointer flex flex-col gap-1.5 ${
                               isSelected
-                                ? 'bg-amber-950/40 border-amber-500 shadow-md shadow-amber-950/50 ring-1 ring-amber-500/50'
+                                ? isApproved
+                                  ? 'bg-emerald-950/40 border-emerald-500 shadow-md shadow-emerald-950/50 ring-1 ring-emerald-500/50'
+                                  : isRejected
+                                  ? 'bg-rose-950/40 border-rose-500 shadow-md shadow-rose-950/50 ring-1 ring-rose-500/50'
+                                  : 'bg-amber-950/40 border-amber-500 shadow-md shadow-amber-950/50 ring-1 ring-amber-500/50'
                                 : 'bg-slate-950/80 border-slate-800/80 hover:bg-slate-800/50 hover:border-slate-700'
                             }`}
                           >
@@ -684,8 +722,18 @@ export default function TeacherDashboardPage() {
                                     Спроба {item.attemptNumber || item.attemptsHistory?.length}
                                   </span>
                                 )}
-                                <span className="px-1.5 py-0.5 rounded text-[9px] font-mono font-bold bg-amber-500/10 text-amber-300 border border-amber-500/30">
-                                  В черзі
+                                <span className={`px-1.5 py-0.5 rounded text-[9px] font-mono font-bold ${
+                                  isApproved
+                                    ? 'bg-emerald-500/10 text-emerald-300 border border-emerald-500/30'
+                                    : isRejected
+                                    ? 'bg-rose-500/10 text-rose-300 border border-rose-500/30'
+                                    : 'bg-amber-500/10 text-amber-300 border border-amber-500/30'
+                                }`}>
+                                  {isApproved
+                                    ? '✓ Затверджено'
+                                    : isRejected
+                                    ? '✕ Відхилено'
+                                    : 'В черзі'}
                                 </span>
                               </div>
                             </div>

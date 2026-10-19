@@ -690,11 +690,23 @@ export class BktController {
   }
 
   @Get('reviews/queue')
-  @ApiOperation({ summary: 'Get queue of student open-ended submissions awaiting teacher review' })
-  async getTeacherReviewQueue(@Query('courseSlug') courseSlug?: string) {
+  @ApiOperation({ summary: 'Get queue of student open-ended submissions awaiting teacher review or reviewed archive' })
+  @ApiQuery({ name: 'courseSlug', required: false, description: 'Course slug filter' })
+  @ApiQuery({ name: 'status', required: false, description: 'Status filter: PENDING | REVIEWED | ALL' })
+  async getTeacherReviewQueue(
+    @Query('courseSlug') courseSlug?: string,
+    @Query('status') statusFilter?: string,
+  ) {
+    let reviewStatusCondition: any = TeacherReviewStatus.PENDING_REVIEW;
+    if (statusFilter === 'REVIEWED') {
+      reviewStatusCondition = { in: [TeacherReviewStatus.APPROVED, TeacherReviewStatus.REJECTED] };
+    } else if (statusFilter === 'ALL') {
+      reviewStatusCondition = { not: TeacherReviewStatus.NONE };
+    }
+
     const submissions = await this.prisma.submission.findMany({
       where: {
-        teacherReviewStatus: TeacherReviewStatus.PENDING_REVIEW,
+        teacherReviewStatus: reviewStatusCondition,
         ...(courseSlug
           ? {
               task: {
