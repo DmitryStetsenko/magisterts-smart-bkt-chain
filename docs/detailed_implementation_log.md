@@ -171,6 +171,12 @@
      - Реалізовано компактні фільтри-чіпси `[ Всі (N) | Копіпаст | Швидкість | Спам | Тертя ]`.
      - Додано рольове розмежування подачі інформації через пропс `role: student | teacher`.
 
+### 0.11 Наукове Обґрунтування Когнітивного Порогу Часу у BKT (`SBC-225`)
+- **Академічна база та література:** Дослідження Response Time Effort (Wise & Kong, 2005), моделі детекції «Gaming the System» (Baker et al., 2004) та когнітивні фіксації читання тексту/коду (Rayner, 1998).
+- **Формула динамічного порогу:** $T_{\text{threshold}} = T_{\text{motor}} + \frac{W_{\text{prompt}}}{V_{\text{read}}} + T_{\text{task\_type}}$, де $T_{\text{motor}} \approx 0.8\text{ с}$, $V_{\text{read}} \approx 4\text{ сл/с}$.
+- **Динамічна модуляція BKT:** При $\Delta t < T_{\text{threshold}}$ фіксується Rapid Guessing, $P(G) \uparrow 0.85$, що нейтралізує випадковий приріст знань $P(L_t)$ за формулою Баєса.
+- Документ наукового базису: [`docs/justifications/01_cognitive_latency_threshold_and_rapid_guessing.md`](file:///docs/justifications/01_cognitive_latency_threshold_and_rapid_guessing.md).
+
 ---
 
 ## 🧱 Крок 1: Проєктування бази даних (Prisma Schema) та локальне оточення

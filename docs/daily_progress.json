@@ -182,6 +182,31 @@
             },
             {
               "type": "text",
+              "raw_text": "**Створення Каталогу Наукових Обґрунтувань та Фіксація Когнітивного Порогу Часу (`SBC-225`):**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Створено новий розділ документації `docs/justifications/` для академічного базису дисертації.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Додано фундаментальний документ: [`docs/justifications/01_cognitive_latency_threshold_and_rapid_guessing.md`](file:///docs/justifications/01_cognitive_latency_threshold_and_rapid_guessing.md).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Деталізовано теорію Response Time Effort (Wise & Kong, 2005), боротьбу з Gaming the System (Baker, 2004), фізіологічні константи читання тексту та коду (Rayner, 1998).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Наведено математичний розрахунок та графік порівняння класичного BKT і динамічної адаптації Smart-BKT-Chain з формулами наукової новизни.",
+              "subitems": []
+            },
+            {
+              "type": "text",
               "raw_text": "---",
               "subitems": []
             }
