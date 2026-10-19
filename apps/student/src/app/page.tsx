@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { io } from 'socket.io-client';
-import { Brain, Sparkles, CheckCircle, AlertCircle, RefreshCw, User, Code2, BookOpen, Scale, ChevronDown, ArrowRight, AlertTriangle, X, Settings, Network, Compass, Flame } from 'lucide-react';
+import { Brain, Sparkles, CheckCircle, AlertCircle, RefreshCw, User, Code2, BookOpen, Scale, ChevronDown, ArrowRight, AlertTriangle, X, Settings, Network, Compass, Flame, History, MessageSquareQuote, CheckCircle2 } from 'lucide-react';
 import { MonacoCodeEditor } from '../features/code-editor/ui/MonacoCodeEditor';
 import { QuizTaskEditor } from '../features/quiz-editor/ui/QuizTaskEditor';
 import { EssayTaskEditor } from '../features/essay-editor/ui/EssayTaskEditor';
@@ -76,6 +76,22 @@ export default function StudentPortalPage() {
   const [evalResult, setEvalResult] = useState<any>(null);
   const [graphNodes, setGraphNodes] = useState<SkillGraphNode[]>([]);
   const [studentAdjustments, setStudentAdjustments] = useState<any[]>([]);
+
+  // Task Submissions History & Drawer Sub-tab ('condition' | 'history')
+  const [taskSubmissions, setTaskSubmissions] = useState<any[]>([]);
+  const [taskDrawerSubTab, setTaskDrawerSubTab] = useState<'condition' | 'history'>('condition');
+
+  const fetchTaskSubmissions = async (taskId: string) => {
+    try {
+      const res = await fetch(`${API_URL}/api/v1/tasks/${taskId}/submissions?userId=demo-student`);
+      if (res.ok) {
+        const data = await res.json();
+        setTaskSubmissions(data);
+      }
+    } catch (err) {
+      console.error('Error fetching task submissions:', err);
+    }
+  };
 
   const fetchCourseStructureAndState = async (courseSlug: string) => {
     try {
@@ -161,12 +177,17 @@ export default function StudentPortalPage() {
             skillTitle: data.recommendation.recommendedSkill.title,
           });
         }
+        if (data.task?.id) {
+          fetchTaskSubmissions(data.task.id);
+        }
       } else {
         setTask(null);
+        setTaskSubmissions([]);
       }
     } catch (err) {
       console.error('Error fetching task:', err);
       setTask(null);
+      setTaskSubmissions([]);
     } finally {
       setIsLoading(false);
     }
@@ -214,6 +235,26 @@ export default function StudentPortalPage() {
       socket.on('teacher_review_decision', (data: any) => {
         console.log('⚡ Received teacher_review_decision via WebSocket:', data);
         fetchCourseStructureAndState(activeCourseSlug);
+        if (task?.id) {
+          fetchTaskSubmissions(task.id);
+        }
+        // If decision matches current active task or submission, update live evalResult
+        if (task && (!data.taskId || data.taskId === task.id)) {
+          const isApproved = data.decision === 'APPROVE';
+          setEvalResult((prev: any) => {
+            if (!prev) return null;
+            return {
+              ...prev,
+              isPassed: isApproved,
+              teacherReviewStatus: isApproved ? 'APPROVED' : 'REJECTED',
+              feedback: isApproved
+                ? (data.comment ? `Затверджено викладачем: "${data.comment}"` : 'Відповідь перевірено та затверджено викладачем!')
+                : (data.comment ? `Відхилено викладачем: "${data.comment}"` : 'Відповідь відхилено викладачем. Потрібно внести виправлення.'),
+              teacherComment: data.comment || prev.teacherComment,
+              semanticScore: data.scoreOverride !== undefined && data.scoreOverride !== null ? data.scoreOverride : prev.semanticScore,
+            };
+          });
+        }
       });
     }
 
@@ -244,7 +285,10 @@ export default function StudentPortalPage() {
       if (res.ok) {
         const data = await res.json();
         setEvalResult(data);
-        await fetchCourseStructureAndState(activeCourseSlug);
+        await Promise.all([
+          fetchCourseStructureAndState(activeCourseSlug),
+          fetchTaskSubmissions(task.id),
+        ]);
       }
     } catch (err) {
       console.error('Error evaluating task submission:', err);
@@ -504,61 +548,206 @@ export default function StudentPortalPage() {
 
             {/* 📜 Scrollable Drawer Body Content */}
             <div className="flex-1 p-5 overflow-y-auto flex flex-col gap-5">
-              {/* Content Drawer 1: Task Condition */}
+              {/* Content Drawer 1: Task Condition & Attempt History */}
               {activeTab === 'task' && task && (
-                <div className="flex flex-col gap-5 flex-1">
-                  <div className="flex items-center justify-between">
-                    <span className="px-2.5 py-1 rounded-full text-xs font-mono font-bold uppercase tracking-wider bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
-                      {task.skill.title}
-                    </span>
-                    <span className="px-2.5 py-1 rounded-full text-xs font-mono font-bold uppercase bg-slate-800 text-slate-300 border border-slate-700">
-                      {task.difficulty}
-                    </span>
+                <div className="flex flex-col gap-4 flex-1">
+                  {/* Sub-tab navigation: Condition vs History */}
+                  <div className="bg-slate-950 p-1 rounded-xl border border-slate-800 flex items-center gap-1 shadow-inner">
+                    <button
+                      onClick={() => setTaskDrawerSubTab('condition')}
+                      className={`flex-1 py-1.5 px-3 rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
+                        taskDrawerSubTab === 'condition'
+                          ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30'
+                          : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                      }`}
+                    >
+                      <BookOpen className="w-3.5 h-3.5" />
+                      <span>Умова</span>
+                    </button>
+                    <button
+                      onClick={() => setTaskDrawerSubTab('history')}
+                      className={`flex-1 py-1.5 px-3 rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer relative ${
+                        taskDrawerSubTab === 'history'
+                          ? 'bg-purple-600 text-white shadow-md shadow-purple-600/30'
+                          : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                      }`}
+                    >
+                      <History className="w-3.5 h-3.5" />
+                      <span>Історія спроб</span>
+                      {taskSubmissions.length > 0 && (
+                        <span className={`px-1.5 py-0.2 rounded-full text-[9px] font-mono font-bold ${
+                          taskSubmissions.some((s) => s.teacherComment)
+                            ? 'bg-amber-400 text-slate-950 animate-pulse'
+                            : 'bg-slate-800 text-slate-300'
+                        }`}>
+                          {taskSubmissions.length}
+                        </span>
+                      )}
+                    </button>
                   </div>
 
-                  <div>
-                    <h3 className="text-base font-bold text-white mb-2">{task.title}</h3>
-                    <p className="text-xs text-slate-300 leading-relaxed">{task.description}</p>
-                  </div>
-
-                  {recommendation && (
-                    <div className="p-3.5 bg-indigo-950/40 border border-indigo-500/30 rounded-xl flex items-start gap-2.5">
-                      <Sparkles className="w-4 h-4 text-indigo-400 shrink-0 mt-0.5" />
-                      <div className="text-[11px] text-indigo-200">
-                        <span className="font-bold text-indigo-300 block mb-0.5">Рекомендація BKT Engine:</span>
-                        {recommendation.reason || 'Завдання обрано відповідно до вашого рівня засвоєння.'}
+                  {taskDrawerSubTab === 'condition' ? (
+                    <div className="flex flex-col gap-5 flex-1">
+                      <div className="flex items-center justify-between">
+                        <span className="px-2.5 py-1 rounded-full text-xs font-mono font-bold uppercase tracking-wider bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
+                          {task.skill.title}
+                        </span>
+                        <span className="px-2.5 py-1 rounded-full text-xs font-mono font-bold uppercase bg-slate-800 text-slate-300 border border-slate-700">
+                          {task.difficulty}
+                        </span>
                       </div>
-                    </div>
-                  )}
 
-                  {task.taskType === 'CODE' && task.testCases.length > 0 && (
-                    <div className="flex flex-col gap-2 pt-2 border-t border-slate-800">
-                      <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
-                        Відкриті Тест-Кейси
-                      </span>
-                      {task.testCases.map((tc, idx) => (
-                        <div
-                          key={idx}
-                          className="p-2.5 bg-slate-950/70 border border-slate-800 rounded-lg text-xs font-mono flex flex-col gap-0.5"
-                        >
-                          <span className="text-slate-400 text-[11px]">
-                            Вхідні дані: <code className="text-indigo-300">{tc.input}</code>
-                          </span>
-                          <span className="text-slate-400 text-[11px]">
-                            Очікуваний вивід: <code className="text-emerald-300">{tc.expectedOutput}</code>
-                          </span>
+                      <div>
+                        <h3 className="text-base font-bold text-white mb-2">{task.title}</h3>
+                        <p className="text-xs text-slate-300 leading-relaxed">{task.description}</p>
+                      </div>
+
+                      {recommendation && (
+                        <div className="p-3.5 bg-indigo-950/40 border border-indigo-500/30 rounded-xl flex items-start gap-2.5">
+                          <Sparkles className="w-4 h-4 text-indigo-400 shrink-0 mt-0.5" />
+                          <div className="text-[11px] text-indigo-200">
+                            <span className="font-bold text-indigo-300 block mb-0.5">Рекомендація BKT Engine:</span>
+                            {recommendation.reason || 'Завдання обрано відповідно до вашого рівня засвоєння.'}
+                          </div>
                         </div>
-                      ))}
+                      )}
+
+                      {task.taskType === 'CODE' && task.testCases.length > 0 && (
+                        <div className="flex flex-col gap-2 pt-2 border-t border-slate-800">
+                          <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
+                            Відкриті Тест-Кейси
+                          </span>
+                          {task.testCases.map((tc, idx) => (
+                            <div
+                              key={idx}
+                              className="p-2.5 bg-slate-950/70 border border-slate-800 rounded-lg text-xs font-mono flex flex-col gap-0.5"
+                            >
+                              <span className="text-slate-400 text-[11px]">
+                                Вхідні дані: <code className="text-indigo-300">{tc.input}</code>
+                              </span>
+                              <span className="text-slate-400 text-[11px]">
+                                Очікуваний вивід: <code className="text-emerald-300">{tc.expectedOutput}</code>
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+
+                      <button
+                        onClick={() => fetchRecommendedTask(activeCourseSlug)}
+                        className="inline-flex items-center justify-center gap-2 px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold border border-slate-700 transition-all cursor-pointer mt-auto"
+                      >
+                        <RefreshCw className="w-3.5 h-3.5" />
+                        <span>Оновити рекомендоване завдання</span>
+                      </button>
+                    </div>
+                  ) : (
+                    /* History Sub-tab */
+                    <div className="flex flex-col gap-3 flex-1">
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="text-slate-400 font-semibold uppercase tracking-wider text-[11px]">
+                          Хронологія спроб та перевірок:
+                        </span>
+                        <button
+                          onClick={() => task && fetchTaskSubmissions(task.id)}
+                          className="text-[11px] text-purple-400 hover:text-purple-300 flex items-center gap-1 cursor-pointer font-mono"
+                        >
+                          <RefreshCw className="w-3 h-3" />
+                          <span>Оновити</span>
+                        </button>
+                      </div>
+
+                      {taskSubmissions.length === 0 ? (
+                        <div className="p-6 bg-slate-950/70 border border-slate-800 rounded-xl text-center text-xs text-slate-400 flex flex-col items-center gap-2">
+                          <History className="w-6 h-6 text-slate-600" />
+                          <span>Ви ще не надсилали спроб для цього завдання.</span>
+                        </div>
+                      ) : (
+                        <div className="flex flex-col gap-3">
+                          {taskSubmissions.map((sub, idx) => {
+                            const isLatest = idx === 0;
+                            const isApproved = sub.teacherReviewStatus === 'APPROVED' || sub.status === 'ACCEPTED';
+                            const isPending = sub.teacherReviewStatus === 'PENDING_REVIEW';
+                            const isSuperseded = sub.teacherReviewStatus === 'SUPERSEDED';
+
+                            return (
+                              <div
+                                key={sub.id}
+                                className={`p-3.5 rounded-xl border flex flex-col gap-2.5 transition-all ${
+                                  isLatest
+                                    ? isApproved
+                                      ? 'bg-emerald-950/30 border-emerald-500/40 shadow-lg shadow-emerald-950/30'
+                                      : isPending
+                                      ? 'bg-amber-950/30 border-amber-500/40 shadow-lg shadow-amber-950/30'
+                                      : 'bg-purple-950/30 border-purple-500/40'
+                                    : 'bg-slate-950/60 border-slate-800 opacity-80'
+                                }`}
+                              >
+                                <div className="flex items-center justify-between">
+                                  <div className="flex items-center gap-1.5">
+                                    <span className="text-xs font-bold text-white">
+                                      Спроба #{sub.attemptNumber || taskSubmissions.length - idx}
+                                    </span>
+                                    {isLatest && (
+                                      <span className="text-[9px] font-mono px-1.5 py-0.2 rounded font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+                                        Остання
+                                      </span>
+                                    )}
+                                  </div>
+                                  <span className={`text-[10px] font-bold font-mono px-2 py-0.5 rounded-full border ${
+                                    isApproved
+                                      ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30'
+                                      : isPending
+                                      ? 'bg-amber-500/10 text-amber-300 border border-amber-500/30'
+                                      : isSuperseded
+                                      ? 'bg-slate-800 text-slate-400 border-slate-700'
+                                      : 'bg-rose-500/10 text-rose-400 border-rose-500/30'
+                                  }`}>
+                                    {isApproved
+                                      ? '✓ Затверджено'
+                                      : isPending
+                                      ? '⏳ В черзі'
+                                      : isSuperseded
+                                      ? 'Архівована'
+                                      : '✕ Відхилено'}
+                                  </span>
+                                </div>
+
+                                <div className="text-[10px] text-slate-500 font-mono">
+                                  Здано: {new Date(sub.createdAt).toLocaleString()}
+                                </div>
+
+                                {/* Teacher Comment Banner if present */}
+                                {sub.teacherComment && (
+                                  <div className="p-2.5 rounded-lg bg-purple-950/40 border border-purple-500/40 flex flex-col gap-1">
+                                    <div className="flex items-center gap-1.5 text-purple-300 font-bold text-[11px]">
+                                      <MessageSquareQuote className="w-3.5 h-3.5 shrink-0" />
+                                      <span>Коментар викладача:</span>
+                                    </div>
+                                    <p className="text-xs text-purple-100 font-sans italic leading-relaxed pl-5">
+                                      "{sub.teacherComment}"
+                                    </p>
+                                  </div>
+                                )}
+
+                                {/* Submitted Answer Preview */}
+                                {sub.code && (
+                                  <details className="text-[11px] text-slate-400">
+                                    <summary className="cursor-pointer hover:text-slate-200 select-none">
+                                      Переглянути текст відповіді
+                                    </summary>
+                                    <pre className="mt-1 p-2 bg-slate-900 border border-slate-800 rounded text-slate-300 font-mono text-[10px] whitespace-pre-wrap max-h-32 overflow-y-auto">
+                                      {sub.code}
+                                    </pre>
+                                  </details>
+                                )}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      )}
                     </div>
                   )}
-
-                  <button
-                    onClick={() => fetchRecommendedTask(activeCourseSlug)}
-                    className="inline-flex items-center justify-center gap-2 px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold border border-slate-700 transition-all cursor-pointer mt-auto"
-                  >
-                    <RefreshCw className="w-3.5 h-3.5" />
-                    <span>Оновити рекомендоване завдання</span>
-                  </button>
                 </div>
               )}
 
@@ -868,6 +1057,19 @@ export default function StudentPortalPage() {
                               ⚠️ Виявлено когнітивну помилку: зверніть увагу на точність формулювання щодо теми.
                             </div>
                           )}
+                        </div>
+                      )}
+
+                      {/* Teacher Comment Banner in Toast if reviewed */}
+                      {evalResult.teacherComment && (
+                        <div className="p-3 rounded-xl bg-purple-950/40 border border-purple-500/40 flex flex-col gap-1.5 mt-1">
+                          <div className="flex items-center gap-1.5 text-purple-300 font-bold text-xs">
+                            <MessageSquareQuote className="w-4 h-4 text-purple-400 shrink-0" />
+                            <span>Відгук та зауваження викладача:</span>
+                          </div>
+                          <p className="text-xs text-purple-100 italic leading-relaxed pl-5">
+                            "{evalResult.teacherComment}"
+                          </p>
                         </div>
                       )}
                     </div>

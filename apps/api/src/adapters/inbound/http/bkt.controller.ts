@@ -890,6 +890,9 @@ export class BktController {
       submissionId: updatedSub.id,
       decision: dto.decision,
       userId: submission.userId,
+      taskId: submission.taskId,
+      comment: dto.comment || null,
+      scoreOverride: dto.scoreOverride !== undefined ? dto.scoreOverride : null,
     });
 
     return {

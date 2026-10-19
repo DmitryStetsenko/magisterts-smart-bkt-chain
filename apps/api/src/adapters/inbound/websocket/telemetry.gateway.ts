@@ -179,9 +179,12 @@ export class TelemetryGateway implements OnGatewayConnection, OnGatewayDisconnec
     submissionId: string;
     decision: 'APPROVE' | 'REJECT';
     userId: string;
+    taskId?: string;
+    comment?: string | null;
+    scoreOverride?: number | null;
   }) {
     this.logger.log(
-      `Emitting teacher_review_decision event for submission ${payload.submissionId} (${payload.decision})`,
+      `Emitting teacher_review_decision event for submission ${payload.submissionId} (${payload.decision}), task ${payload.taskId || 'unknown'}`,
     );
     this.server.emit('teacher_review_decision', payload);
   }

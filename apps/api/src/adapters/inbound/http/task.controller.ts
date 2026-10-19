@@ -156,4 +156,39 @@ export class TaskController {
 
     return task;
   }
+
+  @Get(':id/submissions')
+  @ApiOperation({ summary: 'Get student attempt history and teacher feedback for a specific task' })
+  @ApiQuery({ name: 'userId', required: false, description: 'Student User ID' })
+  async getTaskSubmissions(
+    @Param('id') taskId: string,
+    @Query('userId') userId?: string,
+  ) {
+    let targetUserId = userId;
+    let user = targetUserId ? await this.prisma.user.findUnique({ where: { id: targetUserId } }) : null;
+    if (!user) {
+      user = await this.prisma.user.findFirst({ where: { role: 'STUDENT' } });
+      if (!user) throw new NotFoundException('Student user not found');
+      targetUserId = user.id;
+    }
+
+    const submissions = await this.prisma.submission.findMany({
+      where: {
+        taskId,
+        userId: targetUserId,
+      },
+      orderBy: { createdAt: 'desc' },
+      select: {
+        id: true,
+        attemptNumber: true,
+        code: true,
+        status: true,
+        teacherReviewStatus: true,
+        teacherComment: true,
+        createdAt: true,
+      },
+    });
+
+    return submissions;
+  }
 }
