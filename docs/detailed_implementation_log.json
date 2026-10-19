@@ -583,6 +583,15 @@
             },
             {
               "type": "text",
+              "raw_text": "**Імплементація компонентів (`SBC-221`):**",
+              "subitems": [
+                "У файлах `packages/ui/src/analytics/AnomalyTreeWidget.tsx`, `apps/teacher/.../AnomalyTreeWidget.tsx` та `apps/student/.../AnomalyTreeWidget.tsx` повністю прибрано застарілі таби (Дерево Модулів, DAG Граф, RPG Матриця Рун).",
+                "Реалізовано компактні фільтри-чіпси `[ Всі (N) | Копіпаст | Швидкість | Спам | Тертя ]`.",
+                "Додано рольове розмежування подачі інформації через пропс `role: student | teacher`."
+              ]
+            },
+            {
+              "type": "text",
               "raw_text": "---",
               "subitems": []
             }
