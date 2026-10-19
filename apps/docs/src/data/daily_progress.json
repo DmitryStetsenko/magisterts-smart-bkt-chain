@@ -167,6 +167,21 @@
             },
             {
               "type": "text",
+              "raw_text": "**Усунення Задвоєння Іконок та Повна Відмова від Емодзі (`SBC-223`):**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Прибрано хаотичні текстові емодзі (🌿, ⚡, 📋, 💡, 🔍, 🛡️, 🤔, 🔄), які стояли поруч з векторними Lucide-іконками у кнопках перемикання режимів та заголовках.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Встановлено єдиний візуальний стандарт: виключно чіткі SVG-іконки Lucide (`Layers`, `Zap`, `ClipboardCopy`, `Gauge`, `Repeat`, `BrainCircuit`, `Lightbulb`).",
+              "subitems": []
+            },
+            {
+              "type": "text",
               "raw_text": "---",
               "subitems": []
             }

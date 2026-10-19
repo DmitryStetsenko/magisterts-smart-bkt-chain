@@ -16,7 +16,7 @@
 | **`SBC-EP-TC`** | Teacher Portal & Analytics CRM | 19 |
 | **`SBC-EP-AD`** | Admin Portal & Knowledge DAG Builder | 8 |
 | **`SBC-EP-LD`** | Landing Web Page | 9 |
-| **ВСЬОГО** | - | **219** |
+| **ВСЬОГО** | - | **220** |
 
 ---
 
@@ -277,6 +277,7 @@
 | **SBC-219** | `Task` | `INF` | update daily progress, detailed technical log, scope baseline and compile docs json for teacher review archive | 2026-10-19 | `a1d2109` |
 | **SBC-220** | Task | TC | document brainstorm session 06 on anomaly tree refactoring into role-configurable category widget | 2026-10-19 | 82694f |
 | **SBC-221** | Story | TC | refactor anomaly tree into clean role-configurable categories accordion and remove redundant sub-tabs | 2026-10-19 | 5267cb4 |
+| **SBC-223** | `Style` | `TC` | remove duplicate emojis and enforce clean SVG icons in skill and anomaly tree navigation | 2026-10-19 | `05de2b7` |
 
 ---
 

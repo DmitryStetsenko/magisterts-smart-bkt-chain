@@ -220,3 +220,4 @@ SBC-218,SBC-EP-TC,Story,"implement teacher reviewed submissions archive filter i
 SBC-219,SBC-EP-INF,Task,"update daily progress, detailed technical log, scope baseline and compile docs json for teacher review archive",Done,2026-10-19,a1d2109
 SBC-220,SBC-EP-TC,Task,"document brainstorm session 06 on anomaly tree refactoring into role-configurable category widget",Done,2026-10-19,f92ba46
 SBC-221,SBC-EP-TC,Story,"refactor anomaly tree into clean role-configurable categories accordion and remove redundant sub-tabs",Done,2026-10-19,5267cb4
+SBC-223,SBC-EP-TC,Style,"remove duplicate emojis and enforce clean SVG icons in skill and anomaly tree navigation",Done,2026-10-19,05de2b7
