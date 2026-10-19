@@ -20,7 +20,9 @@ import {
   BrainCircuit,
   MessageSquareQuote,
   Flame,
-  Info
+  Info,
+  ShieldCheck,
+  Lightbulb
 } from 'lucide-react';
 import { SkillGraphNode } from '../skill-graph/skill-graph.types';
 
@@ -75,8 +77,8 @@ const CATEGORIES: CategoryConfig[] = [
     titleTeacher: 'Буфер обміну / Сторонній код (Paste Anomaly)',
     descStudent: 'Спроби, де значну частину коду або тексту було вставлено без ручного набору.',
     descTeacher: 'Разова вставка великого фрагмента тексту або pasteRatio > 0.70 (підозра на ШІ або списування).',
-    badgeStudent: '💡 Рекомендація набору',
-    badgeTeacher: '📋 Копіпаст коду',
+    badgeStudent: 'Рекомендація набору',
+    badgeTeacher: 'Копіпаст коду',
     accentColor: 'amber',
     borderColor: 'border-amber-500/30',
     bgColor: 'bg-amber-950/20',
@@ -89,8 +91,8 @@ const CATEGORIES: CategoryConfig[] = [
     titleTeacher: 'Швидкісна здача / Спідран (Speedrun Anomaly)',
     descStudent: 'Завдання було вирішено за лічені секунди, швидше за звичайний час прочитання умови.',
     descTeacher: 'Час рішення нижче когнітивного порогу (< 3.5с або < 5с). Підвищення P(Guess).',
-    badgeStudent: '⚡ Швидка відповідь',
-    badgeTeacher: '⚡ Спідран / Вгадування',
+    badgeStudent: 'Швидка відповідь',
+    badgeTeacher: 'Спідран / Вгадування',
     accentColor: 'orange',
     borderColor: 'border-orange-500/30',
     bgColor: 'bg-orange-950/20',
@@ -103,8 +105,8 @@ const CATEGORIES: CategoryConfig[] = [
     titleTeacher: 'Семантичний спам / Лупінг фраз (Semantic Anomaly)',
     descStudent: 'У відповіді виявлено повторювані фрази або недостатню аргументацію.',
     descTeacher: 'Спрацював спам-фільтр циклічного повторення фраз або низький семантичний скор.',
-    badgeStudent: '🔄 Потрібна увага',
-    badgeTeacher: '🔄 Семантичний спам',
+    badgeStudent: 'Потрібна увага',
+    badgeTeacher: 'Семантичний спам',
     accentColor: 'rose',
     borderColor: 'border-rose-500/30',
     bgColor: 'bg-rose-950/20',
@@ -117,8 +119,8 @@ const CATEGORIES: CategoryConfig[] = [
     titleTeacher: 'Когнітивне тертя / Невпевненість (Cognitive Friction)',
     descStudent: 'Спроби з великою кількістю виправлень та тривалими паузами. Це природна частина навчання!',
     descTeacher: 'Висока частка видалень (Backspace/Delete) та високий prior P(L). Пом\'якшення через P(Slip).',
-    badgeStudent: '🤔 Активний пошук',
-    badgeTeacher: '🛡️ Захист P(Slip)',
+    badgeStudent: 'Активний пошук',
+    badgeTeacher: 'Захист P(Slip)',
     accentColor: 'indigo',
     borderColor: 'border-indigo-500/30',
     bgColor: 'bg-indigo-950/20',
@@ -248,7 +250,7 @@ export function AnomalyTreeWidget({
 
   return (
     <div className="w-full bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-2xl flex flex-col gap-5 text-slate-100 font-sans">
-      {/* 🌲 Clean Header: Title + Incidents Badge + Search */}
+      {/* Clean Header: Title + Incidents Badge + Search */}
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-slate-800 pb-4">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-purple-500/10 border border-purple-500/30 flex items-center justify-center text-purple-400">
@@ -319,7 +321,7 @@ export function AnomalyTreeWidget({
       </div>
 
       {/* ───────────────────────────────────────────────────────────── */}
-      {/* 🗂️ CLEAN CATEGORIES ACCORDION (One Level, Zero Confusion)        */}
+      {/* CLEAN CATEGORIES ACCORDION (One Level, Zero Confusion)        */}
       {/* ───────────────────────────────────────────────────────────── */}
       <div className="flex flex-col gap-4 font-mono text-xs">
         {totalAnomalies === 0 ? (
@@ -450,7 +452,7 @@ export function AnomalyTreeWidget({
                           {/* Reason or Guidance Banner */}
                           {item.adjustReasons && item.adjustReasons.length > 0 && (
                             <div className={`flex items-center gap-2 pt-2 border-t border-slate-800 text-[11px] ${cat.textColor} font-sans`}>
-                              <span className="font-mono">⚡</span>
+                              <cat.icon className="w-3.5 h-3.5 shrink-0" />
                               <span className="truncate">
                                 {role === 'student' && cat.key === 'paste'
                                   ? 'Порада: Спробуйте набрати цей алгоритм власноруч для повноцінного опанування навички'
@@ -470,7 +472,7 @@ export function AnomalyTreeWidget({
       </div>
 
       {/* ───────────────────────────────────────────────────────────── */}
-      {/* 🔍 MODAL INSPECTOR: Detailed Incident View                     */}
+      {/* MODAL INSPECTOR: Detailed Incident View                       */}
       {/* ───────────────────────────────────────────────────────────── */}
       {selectedItem && (
         <div 
@@ -484,7 +486,7 @@ export function AnomalyTreeWidget({
             <div className="flex items-start justify-between border-b border-slate-800 pb-3">
               <div>
                 <h4 className="text-sm font-bold text-white flex items-center gap-2">
-                  <span className="text-purple-400">🔍 Деталі інциденту:</span>
+                  <span className="text-purple-400">Деталі інциденту:</span>
                   <span>{selectedItem.taskTitle}</span>
                 </h4>
                 <p className="text-xs text-slate-400 mt-0.5">
@@ -516,8 +518,8 @@ export function AnomalyTreeWidget({
                   <div className="flex items-center justify-between text-xs font-mono">
                     <span className="text-amber-300 font-bold">
                       {selectedItem.pGuessUsed && selectedItem.pGuessUsed > 0.3
-                        ? '⚡ Підвищення P(Guess): Ймовірність вгадування збільшено'
-                        : '🛡️ Підвищення P(Slip): Захист від втрати знання'}
+                        ? 'Підвищення P(Guess): Ймовірність вгадування збільшено'
+                        : 'Підвищення P(Slip): Захист від втрати знання'}
                     </span>
                     <div className="flex items-center gap-2">
                       <span className="px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30 font-bold">
@@ -529,16 +531,19 @@ export function AnomalyTreeWidget({
                     </div>
                   </div>
                 ) : (
-                  <p className="text-xs text-purple-200 font-sans leading-relaxed">
-                    💡 Рушій BKT помітив особливість введення (наприклад, вставку тексту або швидке надсилання). Щоб тема впевнено перейшла у стан засвоєння, наберіть наступне практичне завдання вручну.
-                  </p>
+                  <div className="flex items-start gap-2 text-xs text-purple-200 font-sans leading-relaxed">
+                    <Lightbulb className="w-4 h-4 text-purple-400 shrink-0 mt-0.5" />
+                    <p>
+                      Рушій BKT помітив особливість введення (наприклад, вставку тексту або швидке надсилання). Щоб тема впевнено перейшла у стан засвоєння, наберіть наступне практичне завдання вручну.
+                    </p>
+                  </div>
                 )}
 
                 {selectedItem.adjustReasons && selectedItem.adjustReasons.length > 0 && (
                   <div className="pt-2 border-t border-purple-500/20 flex flex-col gap-1 font-mono text-[11px] text-purple-200">
                     {selectedItem.adjustReasons.map((r, rIdx) => (
                       <div key={rIdx} className="flex items-center gap-2">
-                        <span>⚡</span>
+                        <AlertTriangle className="w-3.5 h-3.5 text-amber-400 shrink-0" />
                         <span>{r}</span>
                       </div>
                     ))}

@@ -128,7 +128,7 @@ export function GameSkillTreeWidget({
             }`}
           >
             <Layers className="w-3.5 h-3.5" />
-            <span>🌿 Дерево Знань</span>
+            <span>Дерево Знань</span>
           </button>
 
           <button
@@ -139,8 +139,8 @@ export function GameSkillTreeWidget({
                 : 'text-slate-400 hover:text-white hover:bg-slate-900'
             }`}
           >
-            <Zap className="w-3.5 h-3.5 text-amber-400" />
-            <span>⚡ Дерево Аномалій</span>
+            <Zap className="w-3.5 h-3.5" />
+            <span>Дерево Аномалій</span>
             {adjustments.length > 0 && (
               <span className={`px-1.5 py-0.2 text-[9px] rounded-full font-black ${
                 treeDisplayMode === 'anomalies'
