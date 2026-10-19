@@ -16,7 +16,7 @@
 | **`SBC-EP-TC`** | Teacher Portal & Analytics CRM | 19 |
 | **`SBC-EP-AD`** | Admin Portal & Knowledge DAG Builder | 8 |
 | **`SBC-EP-LD`** | Landing Web Page | 9 |
-| **ВСЬОГО** | - | **217** |
+| **ВСЬОГО** | - | **218** |
 
 ---
 
@@ -275,6 +275,7 @@
 | **SBC-215** | `Task` | `INF` | update daily progress, detailed technical log and compile docs json for real-time sync | 2026-10-17 | `3b34dad` |
 | **SBC-218** | `Story` | `TC` | implement teacher reviewed submissions archive filter in review queue with decision history inspection | 2026-10-19 | `f3073b0` |
 | **SBC-219** | `Task` | `INF` | update daily progress, detailed technical log, scope baseline and compile docs json for teacher review archive | 2026-10-19 | `a1d2109` |
+| **SBC-220** | Task | TC | document brainstorm session 06 on anomaly tree refactoring into role-configurable category widget | 2026-10-19 | f92ba46 |
 
 ---
 

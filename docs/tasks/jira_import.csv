@@ -218,3 +218,4 @@ SBC-216,SBC-EP-ST,Story,"implement attempt history tab in student task drawer wi
 SBC-217,SBC-EP-INF,Task,"update daily progress, detailed technical log and compile docs json for student attempt history and teacher feedback",Done,2026-10-19,3b34dad
 SBC-218,SBC-EP-TC,Story,"implement teacher reviewed submissions archive filter in review queue with decision history inspection",Done,2026-10-19,f3073b0
 SBC-219,SBC-EP-INF,Task,"update daily progress, detailed technical log, scope baseline and compile docs json for teacher review archive",Done,2026-10-19,a1d2109
+SBC-220,SBC-EP-TC,Task,"document brainstorm session 06 on anomaly tree refactoring into role-configurable category widget",Done,2026-10-19,f92ba46
