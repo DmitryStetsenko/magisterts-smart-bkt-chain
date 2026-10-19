@@ -13,10 +13,10 @@
 | **`SBC-EP-LLM`** | Automated Code Assessment & Open-Text Evaluation | 10 |
 | **`SBC-EP-W3`** | Web3 Infrastructure & Smart Contracts | 0 |
 | **`SBC-EP-ST`** | Student Portal & Skill Tree Map | 27 |
-| **`SBC-EP-TC`** | Teacher Portal & Analytics CRM | 18 |
+| **`SBC-EP-TC`** | Teacher Portal & Analytics CRM | 19 |
 | **`SBC-EP-AD`** | Admin Portal & Knowledge DAG Builder | 8 |
 | **`SBC-EP-LD`** | Landing Web Page | 9 |
-| **ВСЬОГО** | - | **215** |
+| **ВСЬОГО** | - | **217** |
 
 ---
 
@@ -245,7 +245,7 @@
 | **SBC-193** | `Story` | `ST` | display semantic rubric breakdown and teacher review status | 2026-10-14 | `9ac1768` |
 | **SBC-194** | `Task` | `ST` | log micro-step 5 student semantic rubric UI | 2026-10-14 | `8c19e4a` |
 | **SBC-216** | `Story` | `ST` | implement attempt history tab in student task drawer with teacher feedback and live review decision synchronization | 2026-10-19 | `1e201d7` |
-| **SBC-217** | `Task` | `INF` | update daily progress, detailed technical log and compile docs json for student attempt history and teacher feedback | 2026-10-19 | `pending` |
+| **SBC-217** | `Task` | `INF` | update daily progress, detailed technical log and compile docs json for student attempt history and teacher feedback | 2026-10-19 | `3b34dad` |
 
 ---
 
@@ -272,7 +272,9 @@
 | **SBC-212** | `Story` | `TC` | implement teacher review queue deduplication with submission versioning and attempts history | 2026-10-16 | `8e73ef1` |
 | **SBC-213** | `Bug` | `TC` | auto-refresh teacher review queue on student state reset via WebSocket and handler | 2026-10-16 | `b78f44a` |
 | **SBC-214** | `Story` | `TC` | real-time bidirectional WebSocket synchronization of student submissions and teacher review decisions | 2026-10-17 | `2ed2cea` |
-| **SBC-215** | `Task` | `INF` | update daily progress, detailed technical log and compile docs json for real-time sync | 2026-10-17 | `pending` |
+| **SBC-215** | `Task` | `INF` | update daily progress, detailed technical log and compile docs json for real-time sync | 2026-10-17 | `3b34dad` |
+| **SBC-218** | `Story` | `TC` | implement teacher reviewed submissions archive filter in review queue with decision history inspection | 2026-10-19 | `f3073b0` |
+| **SBC-219** | `Task` | `INF` | update daily progress, detailed technical log, scope baseline and compile docs json for teacher review archive | 2026-10-19 | `a1d2109` |
 
 ---
 

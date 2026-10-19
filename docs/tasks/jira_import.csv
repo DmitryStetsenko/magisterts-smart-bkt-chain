@@ -213,6 +213,8 @@ SBC-211,SBC-EP-TC,Task,"document brainstorm session 05 on review queue deduplica
 SBC-212,SBC-EP-TC,Story,"implement teacher review queue deduplication with submission versioning and attempts history",Done,2026-10-16,8e73ef1
 SBC-213,SBC-EP-TC,Bug,"auto-refresh teacher review queue on student state reset via WebSocket and handler",Done,2026-10-16,b78f44a
 SBC-214,SBC-EP-TC,Story,"real-time bidirectional WebSocket synchronization of student submissions and teacher review decisions",Done,2026-10-17,2ed2cea
-SBC-215,SBC-EP-INF,Task,"update daily progress, detailed technical log and compile docs json for real-time sync",Done,2026-10-17,pending
+SBC-215,SBC-EP-INF,Task,"update daily progress, detailed technical log and compile docs json for real-time sync",Done,2026-10-17,3b34dad
 SBC-216,SBC-EP-ST,Story,"implement attempt history tab in student task drawer with teacher feedback and live review decision synchronization",Done,2026-10-19,1e201d7
-SBC-217,SBC-EP-INF,Task,"update daily progress, detailed technical log and compile docs json for student attempt history and teacher feedback",In Progress,2026-10-19,pending
+SBC-217,SBC-EP-INF,Task,"update daily progress, detailed technical log and compile docs json for student attempt history and teacher feedback",Done,2026-10-19,3b34dad
+SBC-218,SBC-EP-TC,Story,"implement teacher reviewed submissions archive filter in review queue with decision history inspection",Done,2026-10-19,f3073b0
+SBC-219,SBC-EP-INF,Task,"update daily progress, detailed technical log, scope baseline and compile docs json for teacher review archive",Done,2026-10-19,a1d2109
