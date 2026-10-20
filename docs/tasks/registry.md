@@ -293,6 +293,7 @@
 | **SBC-237** | `Story` | `TC` | transform redundant coursemap side drawer into Pedagogical Audit, Triad Balance, and Task Inspector panel | 2026-10-20 | `6079470` |
 | **SBC-238** | `Story` | `TC` | convert task inspector into sliding right-hand drawer to keep skill tree canvas unobstructed | 2026-10-20 | `5d3469c` |
 | **SBC-239** | `Style` | `TC` | remove screen blur, place sliding drawer below top header with smooth slideInRight animation | 2026-10-20 | `7437a3b` |
+| **SBC-240** | `Refactor` | `TC` | eliminate duplicate task inspector from left sidebar, keep dedicated right drawer for inspection | 2026-10-20 | `pending` |
 
 ---
 

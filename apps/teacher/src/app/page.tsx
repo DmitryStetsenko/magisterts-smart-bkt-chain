@@ -620,7 +620,7 @@ export default function TeacherDashboardPage() {
                 {activeTab === 'coursemap' && (
                   <>
                     <Network className="w-4 h-4 text-indigo-400" />
-                    <span>Педагогічний Пульт & Інспектор</span>
+                    <span>Педагогічний Пульт Модуля</span>
                   </>
                 )}
                 {activeTab === 'reviews' && (
@@ -904,82 +904,10 @@ export default function TeacherDashboardPage() {
                 </div>
               )}
 
-              {/* Drawer 2: Pedagogical Control Panel & Task Inspector */}
+              {/* Drawer 2: Pedagogical Control Panel */}
               {activeTab === 'coursemap' && courseDetails && (
                 <div className="flex flex-col gap-4">
-                  {/* Selected Task Fast Inspector (if task is clicked on tree) */}
-                  {selectedTaskId && (() => {
-                    const task = allTasks.find((t) => t.id === selectedTaskId);
-                    if (!task) return null;
 
-                    return (
-                      <div className="bg-slate-950 border border-indigo-500/40 rounded-2xl p-4 shadow-xl flex flex-col gap-3 animate-fadeIn">
-                        <div className="flex items-center justify-between border-b border-slate-800 pb-2.5">
-                          <div className="flex items-center gap-1.5">
-                            <span className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold ${
-                              task.difficulty === 'HARD'
-                                ? 'bg-rose-500/20 text-rose-300 border border-rose-500/30'
-                                : task.difficulty === 'MEDIUM'
-                                ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
-                                : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
-                            }`}>
-                              {task.difficulty === 'HARD' ? '🔴 HARD (100%)' : task.difficulty === 'MEDIUM' ? '🟡 MEDIUM (100%)' : '🟢 EASY (70%)'}
-                            </span>
-                            {getTaskTypeBadge(task.taskType)}
-                          </div>
-                          <button
-                            onClick={() => setSelectedTaskId(null)}
-                            className="p-1 rounded text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
-                            title="Скинути інспектор завдання"
-                          >
-                            <X className="w-3.5 h-3.5" />
-                          </button>
-                        </div>
-
-                        <div>
-                          <span className="text-[10px] font-mono text-purple-400 block mb-0.5">
-                            {task.topic || 'general'} ➔ {task.subConcept || 'core'}
-                          </span>
-                          <h3 className="text-xs font-bold text-white leading-snug">{task.title}</h3>
-                        </div>
-
-                        <div className="flex flex-col gap-1">
-                          <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-400">Умова:</span>
-                          <p className="text-[11px] text-slate-300 bg-slate-900/80 p-2.5 rounded-xl border border-slate-800 font-mono leading-relaxed whitespace-pre-wrap max-h-40 overflow-y-auto">
-                            {task.description}
-                          </p>
-                        </div>
-
-                        {task.starterCode && (
-                          <div className="flex flex-col gap-1">
-                            <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-400">Шаблон коду:</span>
-                            <pre className="text-[10px] text-emerald-400 bg-slate-900/90 p-2 rounded-xl border border-slate-800 font-mono overflow-x-auto max-h-32">
-                              {task.starterCode}
-                            </pre>
-                          </div>
-                        )}
-
-                        {task.testCases && task.testCases.length > 0 && (
-                          <div className="flex flex-col gap-1.5 pt-1">
-                            <div className="flex items-center justify-between text-[10px] font-semibold text-slate-400">
-                              <span>Тест-кейси ({task.testCases.length})</span>
-                              {task.testCases.some((tc: any) => tc.isSecret) && (
-                                <span className="text-[9px] text-rose-300 font-mono">🔒 Є Secret-тести</span>
-                              )}
-                            </div>
-                            <div className="flex flex-col gap-1 max-h-36 overflow-y-auto pr-0.5">
-                              {task.testCases.map((tc: any, i: number) => (
-                                <div key={i} className="p-1.5 rounded-lg bg-slate-900 border border-slate-800 text-[10px] font-mono flex items-center justify-between">
-                                  <span className="text-slate-400 truncate max-w-[120px]">In: <code className="text-white">{tc.input}</code></span>
-                                  <span className="text-emerald-400">Exp: {tc.expectedOutput}</span>
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })()}
 
                   {/* 1. 🏆 Bloom Triad Coverage & Anti-Gaming Audit Widget */}
                   {(() => {
