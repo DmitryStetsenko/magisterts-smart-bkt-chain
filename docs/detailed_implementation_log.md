@@ -936,4 +936,25 @@ eferenceAnswer, критерії options.keywords (microtask|мікротаск|
   - Повні збірки `npm run build:api`, `npm run build:teacher` та `npm run build:student` завершено без помилок ✅.
   - Наскрізні E2E тести Playwright `npx playwright test` пройдено успішно ✅.
 
+### 11.13 Наукове Обґрунтування Багаторівневої Майстерності, Динамічного Масштабування Складності та Когнітивного Відпочинку (`SBC-226`)
+- **Документи реалізації:**
+  - [`docs/justifications/02_multilevel_mastery_difficulty_scaling_and_cooldown.md`](file:///docs/justifications/02_multilevel_mastery_difficulty_scaling_and_cooldown.md)
+  - [`docs/justifications/README.md`](file:///docs/justifications/README.md)
+- **Архітектурні та Математичні Рішення:**
+  1. **Відмова від бінарного порогу BKT:** Запроваджено 4-рівневу шкалу засвоєння відповідно до Таксономії Блума:
+     - *Below Basic (Novice)*: $P(L) < 0.50$ (заблоковано);
+     - *Basic (Developing)*: $0.50 \le P(L) < 0.75$ (умовний допуск, мікро-завдання);
+     - *Proficient (Competent)*: $0.75 \le P(L) < 0.90$ (відкриття наступного модуля за Mastery Learning Theory);
+     - *Mastery (Advanced)*: $P(L) \ge 0.90$ (Gold NFT Badge).
+  2. **Спадна адаптація складності (Top-Down Challenge & Graceful Degradation):**
+     - Початкове завдання видається підвищеної/середньої складності (`HARD`/`MEDIUM`).
+     - При помилках або затримках складність динамічно знижується до `EASY`/допоміжного питання з автоматичним обмеженням модульного балу (Grade Capping: $90-100\%$, $75-89\%$, $60-74\%$).
+  3. **Генерація мікро-завдань за вектором сумніву (Uncertainty-Driven Remediation):**
+     - Детекція слабких зон за вектором $\vec{U} = \langle \text{ErrorType}, \Delta \tau_{\text{latency}}, N_{\text{deletes}}, \text{PassedTestRatio} \rangle$.
+     - Замість скидання прогресу викликається LLM-генератор короткого завдання (Find the Bug, Fill-in-the-blank) на ліквідацію конкретного гепу знань.
+  4. **Запобігання "Буксуванню" (Wheel-Spinning Mitigation & Cognitive Cool-Down):**
+     - При багаторазових невдалих спробах прогрес безпечно фіксується (наприклад, $P(L) = 0.62$).
+     - Активується режим паузи «Cognitive Cool-Down» (15-30 хв у демо / 2-4 год у проді) з наданням персоналізованої навчальної картки (Study Card) для інтервального повторення.
+
+
 

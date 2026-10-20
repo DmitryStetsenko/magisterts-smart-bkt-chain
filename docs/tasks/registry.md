@@ -9,14 +9,14 @@
 | **`SBC-EP-INF`** | Monorepo & CI/CD Setup | 88 |
 | **`SBC-EP-SH`** | Database Modeling & Shared Packages | 17 |
 | **`SBC-EP-BK`** | Authentication & Core API | 14 |
-| **`SBC-EP-BKT`** | Bayesian Knowledge Tracing & Behavioral Telemetry | 25 |
+| **`SBC-EP-BKT`** | Bayesian Knowledge Tracing & Behavioral Telemetry | 26 |
 | **`SBC-EP-LLM`** | Automated Code Assessment & Open-Text Evaluation | 10 |
 | **`SBC-EP-W3`** | Web3 Infrastructure & Smart Contracts | 0 |
 | **`SBC-EP-ST`** | Student Portal & Skill Tree Map | 27 |
 | **`SBC-EP-TC`** | Teacher Portal & Analytics CRM | 19 |
 | **`SBC-EP-AD`** | Admin Portal & Knowledge DAG Builder | 8 |
 | **`SBC-EP-LD`** | Landing Web Page | 9 |
-| **ВСЬОГО** | - | **222** |
+| **ВСЬОГО** | - | **223** |
 
 ---
 
@@ -189,6 +189,7 @@
 | **SBC-198** | `Task` | `BKT` | log micro-step 7 keyword stuffing protection and telemetry integration | 2026-10-14 | `64a2e7f` |
 | **SBC-202** | `Task` | `BKT` | add full open-text assessment pipeline and anomaly specification to telemetry_analytics.md | 2026-10-14 | `d8b755d` |
 | **SBC-225** | `Task` | `BKT` | document scientific justification for cognitive latency threshold and rapid guessing in BKT | 2026-10-19 | `2f718c8` |
+| **SBC-226** | `Task` | `BKT` | document scientific justification for multi-level mastery, adaptive difficulty scaling and cognitive cool-down | 2026-10-20 | `pending` |
 
 ---
 

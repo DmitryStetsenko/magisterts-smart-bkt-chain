@@ -10,4 +10,8 @@
    - **Дата:** 19 жовтня 2026
    - **Тематика:** Теорія Response-Time Effort (Wise & Kong, 2005), критерії «Gaming the System» (Baker, 2004), психофізіологія швидкості читання та розбору коду (Rayner, 1998), динамічна модуляція $P(G) \uparrow 0.85$ у BKT, математичне порівняння класичного алгоритму та Smart-BKT-Chain.
 
+2. [02. Наукове Обґрунтування Багаторівневої Адаптивності, Динамічного Масштабування Складності та Когнітивного Відпочинку](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/docs/justifications/02_multilevel_mastery_difficulty_scaling_and_cooldown.md)
+   - **Дата:** 20 жовтня 2026
+   - **Тематика:** Таксономія Блума (Revised Bloom's Taxonomy) та 4-рівнева модель майстерності замість бінарного порогу BKT; Теорія відповіді на пункт (IRT) та спадна адаптація складності (Top-Down Challenge $\to$ Graceful Degradation); генерація мікро-завдань за вектором сумніву $\vec{U}$; запобігання феномену «Wheel-Spinning» (Beck & Gong, 2013) через механізм «Cognitive Cool-Down» (інтервальний відпочинок із фіксацією прогресу).
+
 ---
