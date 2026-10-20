@@ -33,8 +33,9 @@ export default function TeacherDashboardPage() {
   const [selectedSkillSlug, setSelectedSkillSlug] = useState<string | null>(null);
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
 
-  // Search & Filter state inside side drawers
+  // Search & Filter state inside side drawers and top bar
   const [studentSearch, setStudentSearch] = useState<string>('');
+  const [isStudentDropdownOpen, setIsStudentDropdownOpen] = useState<boolean>(false);
   const [dagSearch, setDagSearch] = useState<string>('');
 
   // Modal explanation state for BKT/WPM/CopyPaste/Fatigue metrics
@@ -116,7 +117,8 @@ export default function TeacherDashboardPage() {
   // isDrawerOpen controls whether its companion sidebar drawer is visible.
   type TeacherTab = 'analytics' | 'reviews' | 'coursemap' | 'settings';
   const [activeTab, setActiveTab] = useState<TeacherTab>('analytics');
-  const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(true);
+  // By default, student selection is in the top bar, so canvas has 100% space
+  const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
   const [activeStudentView, setActiveStudentView] = useState<'metrics' | 'tree'>('metrics');
 
   // Teacher Review Queue State & Filter Tab ('pending' | 'reviewed')
@@ -332,9 +334,10 @@ export default function TeacherDashboardPage() {
           </div>
         </div>
 
-        {/* Top Controls: Course Selector & Profile */}
+        {/* Top Controls: Course Selector, Searchable Student Selector & Profile */}
         <div className="flex items-center gap-3">
-          <div className="relative min-w-[200px] sm:min-w-[280px]">
+          {/* Course Selector */}
+          <div className="relative min-w-[180px] sm:min-w-[240px]">
             <select
               id="teacher-course-select"
               value={activeCourseSlug}
@@ -350,6 +353,90 @@ export default function TeacherDashboardPage() {
             <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-purple-400">
               <ChevronDown className="w-3.5 h-3.5" />
             </div>
+          </div>
+
+          {/* 🔍 Searchable Student Dropdown Selector */}
+          <div className="relative min-w-[200px] sm:min-w-[260px]">
+            <button
+              id="teacher-student-dropdown-btn"
+              onClick={() => setIsStudentDropdownOpen((prev) => !prev)}
+              className="w-full flex items-center justify-between px-3 py-1.5 rounded-xl bg-slate-950 border border-purple-500/40 hover:border-purple-400 text-xs font-semibold text-white transition-all shadow-inner cursor-pointer"
+            >
+              <div className="flex items-center gap-2 truncate">
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shrink-0"></span>
+                <span className="truncate">
+                  {selectedStudent ? selectedStudent.name : 'Обрати студента...'}
+                </span>
+                {selectedStudent && (
+                  <span className="px-1.5 py-0.2 rounded text-[10px] font-mono text-emerald-300 bg-emerald-500/10 border border-emerald-500/20 shrink-0">
+                    {(selectedStudent.averageMastery !== undefined ? (selectedStudent.averageMastery * 100).toFixed(0) : '0')}% P(L)
+                  </span>
+                )}
+              </div>
+              <ChevronDown className={`w-3.5 h-3.5 text-purple-400 shrink-0 transition-transform ${isStudentDropdownOpen ? 'rotate-180' : ''}`} />
+            </button>
+
+            {/* Dropdown Menu with Search */}
+            {isStudentDropdownOpen && (
+              <div className="absolute right-0 top-full mt-1.5 w-72 sm:w-80 bg-slate-900 border border-purple-500/40 rounded-2xl shadow-2xl z-50 overflow-hidden flex flex-col backdrop-blur-xl animate-fadeIn">
+                <div className="p-2.5 border-b border-slate-800 bg-slate-950/80">
+                  <div className="relative">
+                    <Search className="w-3.5 h-3.5 absolute left-3 top-2.5 text-slate-500" />
+                    <input
+                      type="text"
+                      placeholder="Пошук студента за ім'ям чи email..."
+                      value={studentSearch}
+                      onChange={(e) => setStudentSearch(e.target.value)}
+                      autoFocus
+                      className="w-full bg-slate-900 border border-slate-700 rounded-xl pl-9 pr-3 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-purple-500"
+                    />
+                  </div>
+                </div>
+
+                <div className="max-h-60 overflow-y-auto p-1.5 flex flex-col gap-1">
+                  {filteredStudents.length === 0 ? (
+                    <div className="p-4 text-center text-xs text-slate-500">Студентів не знайдено</div>
+                  ) : (
+                    filteredStudents.map((st) => {
+                      const stId = st.id || st.studentId || st.email;
+                      const isSelected = selectedStudentId === stId;
+                      const avgMastery = st.averageMastery !== undefined ? (st.averageMastery * 100).toFixed(0) : '0';
+
+                      return (
+                        <div
+                          key={stId}
+                          onClick={() => {
+                            setSelectedStudentId(stId);
+                            setIsStudentDropdownOpen(false);
+                          }}
+                          className={`p-2.5 rounded-xl transition-all cursor-pointer flex items-center justify-between gap-2 ${
+                            isSelected
+                              ? 'bg-purple-950/60 border border-purple-500/80 text-white shadow-sm'
+                              : 'hover:bg-slate-800 text-slate-300'
+                          }`}
+                        >
+                          <div className="overflow-hidden">
+                            <div className="text-xs font-bold truncate flex items-center gap-1.5">
+                              <span>{st.name}</span>
+                              {isSelected && <span className="text-[10px] text-purple-400">●</span>}
+                            </div>
+                            <div className="text-[11px] text-slate-400 truncate font-mono">{st.email}</div>
+                          </div>
+                          <div className="flex flex-col items-end shrink-0">
+                            <span className="text-xs font-mono font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
+                              {avgMastery}% P(L)
+                            </span>
+                            <span className="text-[10px] text-slate-400 font-mono mt-0.5">
+                              WPM: {st.wpm ?? st.avgWpm ?? 0}
+                            </span>
+                          </div>
+                        </div>
+                      );
+                    })
+                  )}
+                </div>
+              </div>
+            )}
           </div>
 
           <div className="flex items-center gap-2 bg-slate-950 px-3 py-1.5 rounded-xl border border-slate-800 text-xs">
