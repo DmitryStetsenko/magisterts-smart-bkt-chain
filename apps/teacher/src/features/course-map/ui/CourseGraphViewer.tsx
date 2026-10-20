@@ -770,17 +770,10 @@ export function CourseGraphViewer({
         </div>
       )}
 
-      {/* 📌 Task Inspector: Sliding Right-Hand Drawer (Slide-Over Panel) */}
+      {/* 📌 Task Inspector: Sliding Right-Hand Drawer (Slide-Over Panel below Sticky Header) */}
       {activeTask && (
-        <>
-          {/* Subtle backdrop overlay */}
-          <div
-            onClick={() => onSelectTask('')}
-            className="fixed inset-0 bg-black/40 backdrop-blur-[2px] z-40 transition-opacity animate-fadeIn"
-          />
-
-          <aside className="fixed right-0 top-0 bottom-0 w-full sm:w-[480px] lg:w-[540px] bg-slate-900 border-l border-indigo-500/30 shadow-2xl z-50 flex flex-col overflow-hidden animate-slideInRight">
-            {/* Drawer Top Header */}
+        <aside className="fixed right-0 top-14 bottom-0 w-full sm:w-[480px] lg:w-[540px] bg-slate-900 border-l border-indigo-500/30 shadow-2xl z-20 flex flex-col overflow-hidden animate-slideInRight">
+          {/* Drawer Top Header */}
             <div className="p-5 border-b border-slate-800 bg-slate-950/80 flex items-start justify-between gap-3 shrink-0">
               <div className="flex flex-col gap-2">
                 <div className="flex items-center gap-2 flex-wrap">
@@ -910,7 +903,6 @@ export function CourseGraphViewer({
               </button>
             </div>
           </aside>
-        </>
       )}
     </div>
   );

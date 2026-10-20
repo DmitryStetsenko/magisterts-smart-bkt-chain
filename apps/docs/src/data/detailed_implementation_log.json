@@ -4450,6 +4450,73 @@
               "subitems": []
             }
           ]
+        },
+        {
+          "title": "11.26 Усунення Блюру та Плавна Анімація Правої Панелі під Хедером (`SBC-239`)",
+          "level": 3,
+          "paragraphs": [],
+          "code_blocks": [
+            {
+              "lang": "css",
+              "content": "@keyframes slideInFromRight {\n         from {\n           transform: translateX(100%);\n           opacity: 0.5;\n         }\n         to {\n           transform: translateX(0);\n           opacity: 1;\n         }\n       }\n       .animate-slideInRight {\n         animation: slideInFromRight 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;\n       }"
+            }
+          ],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "**Змінені файли:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "[`apps/teacher/src/app/globals.css`](file:///apps/teacher/src/app/globals.css)",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "[`apps/teacher/src/features/course-map/ui/CourseGraphViewer.tsx`](file:///apps/teacher/src/features/course-map/ui/CourseGraphViewer.tsx)",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Архітектурні особливості:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Відмова від фонового оверлею (`backdrop-blur`):**",
+              "subitems": [
+                "Видалено шар `fixed inset-0 bg-black/40 backdrop-blur-[2px]`.",
+                "Дерево Навичок, графічні зв'язки тріад та аналітичний сайдбар аудиту залишаються кришталево чіткими та доступними для візуального зіставлення з кодом завдання."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Позиціонування під системним хедером:**",
+              "subitems": [
+                "Панель інспектора зафіксована через `fixed right-0 top-14 bottom-0 z-20`.",
+                "Оскільки верхній хедер порталу має висоту `h-14` (56px) та шар `z-30`, панель інспектора акуратно стикується безпосередньо під ним, не перекриваючи селектор курсів, профіль активного студента та глобальні органи управління."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Сплайнова анімація виїзду:**",
+              "subitems": [
+                "Реалізовано CSS-кейфрейми:",
+                "Плавний виїзд з-за правого краю з кривою прискорення/гальмування без ривків."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Тестування:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Production збірку `npm run build:teacher` завершено успішно (0 помилок типізації) ✅.",
+              "subitems": []
+            }
+          ]
         }
       ]
     }

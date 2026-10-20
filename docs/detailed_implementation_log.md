@@ -1205,5 +1205,37 @@ eferenceAnswer, критерії options.keywords (microtask|мікротаск|
 - **Тестування:**
   - Production збірку `npm run build:teacher` завершено успішно (0 помилок типізації) ✅.
 
+### 11.26 Усунення Блюру та Плавна Анімація Правої Панелі під Хедером (`SBC-239`)
+- **Змінені файли:**
+  - [`apps/teacher/src/app/globals.css`](file:///apps/teacher/src/app/globals.css)
+  - [`apps/teacher/src/features/course-map/ui/CourseGraphViewer.tsx`](file:///apps/teacher/src/features/course-map/ui/CourseGraphViewer.tsx)
+- **Архітектурні особливості:**
+  1. **Відмова від фонового оверлею (`backdrop-blur`):**
+     - Видалено шар `fixed inset-0 bg-black/40 backdrop-blur-[2px]`.
+     - Дерево Навичок, графічні зв'язки тріад та аналітичний сайдбар аудиту залишаються кришталево чіткими та доступними для візуального зіставлення з кодом завдання.
+  2. **Позиціонування під системним хедером:**
+     - Панель інспектора зафіксована через `fixed right-0 top-14 bottom-0 z-20`.
+     - Оскільки верхній хедер порталу має висоту `h-14` (56px) та шар `z-30`, панель інспектора акуратно стикується безпосередньо під ним, не перекриваючи селектор курсів, профіль активного студента та глобальні органи управління.
+  3. **Сплайнова анімація виїзду:**
+     - Реалізовано CSS-кейфрейми:
+       ```css
+       @keyframes slideInFromRight {
+         from {
+           transform: translateX(100%);
+           opacity: 0.5;
+         }
+         to {
+           transform: translateX(0);
+           opacity: 1;
+         }
+       }
+       .animate-slideInRight {
+         animation: slideInFromRight 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+       }
+       ```
+     - Плавний виїзд з-за правого краю з кривою прискорення/гальмування без ривків.
+- **Тестування:**
+  - Production збірку `npm run build:teacher` завершено успішно (0 помилок типізації) ✅.
+
 
 
