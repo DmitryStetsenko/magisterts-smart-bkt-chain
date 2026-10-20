@@ -289,7 +289,8 @@
 | **SBC-229** | `Story` | `TC` | implement cohort mastery distribution and live risk feed widgets in teacher analytics side drawer | 2026-10-20 | `e612f0a` |
 | **SBC-234** | `Story` | `TC` | implement interactive CourseGraphViewer with topic hierarchy, subconcepts, and cognitive triad matrix in teacher portal | 2026-10-20 | `b607a94` |
 | **SBC-235** | `Story` | `TC` | redesign CourseGraphViewer into visual branching skill tree with SVG curves, topic triads, and RPG aesthetic | 2026-10-20 | `7101f6c` |
-| **SBC-236** | `Bug` | `TC` | fix difficulty selection filter and search reactivity in CourseGraphViewer tree and matrix views | 2026-10-20 | `pending` |
+| **SBC-236** | `Bug` | `TC` | fix difficulty selection filter and search reactivity in CourseGraphViewer tree and matrix views | 2026-10-20 | `0bdb30b` |
+| **SBC-237** | `Story` | `TC` | transform redundant coursemap side drawer into Pedagogical Audit, Triad Balance, and Task Inspector panel | 2026-10-20 | `pending` |
 
 ---
 

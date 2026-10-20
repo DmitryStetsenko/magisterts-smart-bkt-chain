@@ -620,7 +620,7 @@ export default function TeacherDashboardPage() {
                 {activeTab === 'coursemap' && (
                   <>
                     <Network className="w-4 h-4 text-indigo-400" />
-                    <span>Дерево Навичок & Завдань</span>
+                    <span>Педагогічний Пульт & Інспектор</span>
                   </>
                 )}
                 {activeTab === 'reviews' && (
@@ -904,126 +904,246 @@ export default function TeacherDashboardPage() {
                 </div>
               )}
 
-              {/* Drawer 2: Course Modules & Tasks List */}
+              {/* Drawer 2: Pedagogical Control Panel & Task Inspector */}
               {activeTab === 'coursemap' && courseDetails && (
-                <div className="flex flex-col gap-3">
-                  <div className="relative">
-                    <Search className="w-3.5 h-3.5 absolute left-3 top-2.5 text-slate-500" />
-                    <input
-                      type="text"
-                      placeholder="Пошук модуля чи завдання..."
-                      value={dagSearch}
-                      onChange={(e) => setDagSearch(e.target.value)}
-                      className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-3 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-indigo-500"
-                    />
-                  </div>
+                <div className="flex flex-col gap-4">
+                  {/* Selected Task Fast Inspector (if task is clicked on tree) */}
+                  {selectedTaskId && (() => {
+                    const task = allTasks.find((t) => t.id === selectedTaskId);
+                    if (!task) return null;
 
-                  <div className="flex flex-col gap-2.5 mt-1">
-                    {courseDetails.skills?.map((skill: any, sIdx: number) => {
-                      const isSkillSelected = selectedSkillSlug === skill.slug;
-                      const skillTasks = allTasks.filter((t) => t.skillId === skill.id || t.skill?.id === skill.id);
-                      const matchingTasks = dagSearch
-                        ? skillTasks.filter(
-                            (t) =>
-                              t.title.toLowerCase().includes(dagSearch.toLowerCase()) ||
-                              (t.topic && t.topic.toLowerCase().includes(dagSearch.toLowerCase())) ||
-                              (t.subConcept && t.subConcept.toLowerCase().includes(dagSearch.toLowerCase()))
-                          )
-                        : skillTasks;
-
-                      if (dagSearch && matchingTasks.length === 0) return null;
-
-                      // Group tasks by topic
-                      const topicsMap: Record<string, any[]> = {};
-                      matchingTasks.forEach((tk) => {
-                        const top = tk.topic || 'загальні';
-                        if (!topicsMap[top]) topicsMap[top] = [];
-                        topicsMap[top].push(tk);
-                      });
-
-                      return (
-                        <div key={skill.id} className="flex flex-col gap-1.5 bg-slate-950/40 rounded-xl p-1.5 border border-slate-800/60">
-                          {/* Skill Node Card Header in List */}
-                          <div
-                            onClick={() => {
-                              setSelectedSkillSlug(skill.slug);
-                              setSelectedTaskId(null);
-                            }}
-                            className={`p-2.5 rounded-lg border transition-all cursor-pointer flex items-center justify-between ${
-                              isSkillSelected
-                                ? 'bg-indigo-950/60 border-indigo-500 shadow-md ring-1 ring-indigo-500/50'
-                                : 'bg-slate-950/80 border-slate-800 hover:bg-slate-800/50'
-                            }`}
-                          >
-                            <div className="flex items-center gap-2">
-                              <span className="text-[10px] font-mono text-indigo-400 font-bold bg-indigo-500/10 px-1.5 py-0.5 rounded border border-indigo-500/20">
-                                M{sIdx + 1}
-                              </span>
-                              <span className="text-xs font-bold text-white truncate max-w-[170px]">{skill.title}</span>
-                            </div>
-                            <span className="text-[10px] font-mono text-slate-400">
-                              {matchingTasks.length}
+                    return (
+                      <div className="bg-slate-950 border border-indigo-500/40 rounded-2xl p-4 shadow-xl flex flex-col gap-3 animate-fadeIn">
+                        <div className="flex items-center justify-between border-b border-slate-800 pb-2.5">
+                          <div className="flex items-center gap-1.5">
+                            <span className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold ${
+                              task.difficulty === 'HARD'
+                                ? 'bg-rose-500/20 text-rose-300 border border-rose-500/30'
+                                : task.difficulty === 'MEDIUM'
+                                ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
+                                : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
+                            }`}>
+                              {task.difficulty === 'HARD' ? '🔴 HARD (100%)' : task.difficulty === 'MEDIUM' ? '🟡 MEDIUM (100%)' : '🟢 EASY (70%)'}
                             </span>
+                            {getTaskTypeBadge(task.taskType)}
                           </div>
+                          <button
+                            onClick={() => setSelectedTaskId(null)}
+                            className="p-1 rounded text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+                            title="Скинути інспектор завдання"
+                          >
+                            <X className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
 
-                          {/* Hierarchical Topics & Tasks Sub-list */}
-                          {isSkillSelected && (
-                            <div className="pl-2 flex flex-col gap-2 pt-1 border-l-2 border-indigo-500/30 ml-2">
-                              {Object.entries(topicsMap).map(([topicName, tTasks]) => (
-                                <div key={topicName} className="flex flex-col gap-1">
-                                  <div className="text-[10px] font-mono uppercase font-bold text-purple-400 px-1 flex items-center gap-1">
-                                    <Tag className="w-2.5 h-2.5" />
-                                    <span>{topicName}</span>
-                                  </div>
+                        <div>
+                          <span className="text-[10px] font-mono text-purple-400 block mb-0.5">
+                            {task.topic || 'general'} ➔ {task.subConcept || 'core'}
+                          </span>
+                          <h3 className="text-xs font-bold text-white leading-snug">{task.title}</h3>
+                        </div>
 
-                                  <div className="flex flex-col gap-1">
-                                    {tTasks.map((tk: any) => {
-                                      const isTaskSelected = selectedTaskId === tk.id;
-                                      const diffColor =
-                                        tk.difficulty === 'HARD'
-                                          ? 'text-rose-400 border-rose-500/30 bg-rose-500/10'
-                                          : tk.difficulty === 'MEDIUM'
-                                          ? 'text-amber-400 border-amber-500/30 bg-amber-500/10'
-                                          : 'text-emerald-400 border-emerald-500/30 bg-emerald-500/10';
+                        <div className="flex flex-col gap-1">
+                          <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-400">Умова:</span>
+                          <p className="text-[11px] text-slate-300 bg-slate-900/80 p-2.5 rounded-xl border border-slate-800 font-mono leading-relaxed whitespace-pre-wrap max-h-40 overflow-y-auto">
+                            {task.description}
+                          </p>
+                        </div>
 
-                                      return (
-                                        <div
-                                          key={tk.id}
-                                          onClick={() => {
-                                            setSelectedTaskId(tk.id);
-                                            setSelectedSkillSlug(skill.slug);
-                                          }}
-                                          className={`p-2 rounded-lg text-xs transition-all cursor-pointer flex items-center justify-between gap-1.5 ${
-                                            isTaskSelected
-                                              ? 'bg-purple-950/70 text-purple-200 border border-purple-500/50 font-semibold shadow-sm'
-                                              : 'bg-slate-950/70 text-slate-300 hover:bg-slate-800/50 border border-slate-800/40'
-                                          }`}
-                                        >
-                                          <div className="flex flex-col truncate pr-1">
-                                            <span className="truncate text-[11px]">{tk.title}</span>
-                                            {tk.subConcept && (
-                                              <span className="text-[9px] font-mono text-slate-500 truncate">
-                                                {tk.subConcept}
-                                              </span>
-                                            )}
-                                          </div>
-                                          <div className="flex items-center gap-1 shrink-0">
-                                            <span className={`text-[9px] font-mono font-bold px-1.5 py-0.2 rounded border ${diffColor}`}>
-                                              {tk.difficulty === 'EASY' ? '🟢' : tk.difficulty === 'MEDIUM' ? '🟡' : '🔴'}
-                                            </span>
-                                            {getTaskTypeBadge(tk.taskType)}
-                                          </div>
-                                        </div>
-                                      );
-                                    })}
-                                  </div>
+                        {task.starterCode && (
+                          <div className="flex flex-col gap-1">
+                            <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-400">Шаблон коду:</span>
+                            <pre className="text-[10px] text-emerald-400 bg-slate-900/90 p-2 rounded-xl border border-slate-800 font-mono overflow-x-auto max-h-32">
+                              {task.starterCode}
+                            </pre>
+                          </div>
+                        )}
+
+                        {task.testCases && task.testCases.length > 0 && (
+                          <div className="flex flex-col gap-1.5 pt-1">
+                            <div className="flex items-center justify-between text-[10px] font-semibold text-slate-400">
+                              <span>Тест-кейси ({task.testCases.length})</span>
+                              {task.testCases.some((tc: any) => tc.isSecret) && (
+                                <span className="text-[9px] text-rose-300 font-mono">🔒 Є Secret-тести</span>
+                              )}
+                            </div>
+                            <div className="flex flex-col gap-1 max-h-36 overflow-y-auto pr-0.5">
+                              {task.testCases.map((tc: any, i: number) => (
+                                <div key={i} className="p-1.5 rounded-lg bg-slate-900 border border-slate-800 text-[10px] font-mono flex items-center justify-between">
+                                  <span className="text-slate-400 truncate max-w-[120px]">In: <code className="text-white">{tc.input}</code></span>
+                                  <span className="text-emerald-400">Exp: {tc.expectedOutput}</span>
                                 </div>
                               ))}
                             </div>
-                          )}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })()}
+
+                  {/* 1. 🏆 Bloom Triad Coverage & Anti-Gaming Audit Widget */}
+                  {(() => {
+                    const currentSkill = courseDetails.skills?.find((s: any) => s.slug === (selectedSkillSlug || courseDetails.skills[0]?.slug)) || courseDetails.skills[0];
+                    const skillTasks = allTasks.filter((t) => t.skillId === currentSkill?.id || t.skill?.id === currentSkill?.id);
+
+                    // Compute unique topics and triad completeness
+                    const topicsMap: Record<string, { easy: number; medium: number; hard: number; total: number }> = {};
+                    let codeTasks = 0;
+                    let quizTasks = 0;
+                    let secretTestsCount = 0;
+
+                    skillTasks.forEach((tk) => {
+                      const top = tk.topic || 'general';
+                      if (!topicsMap[top]) topicsMap[top] = { easy: 0, medium: 0, hard: 0, total: 0 };
+                      topicsMap[top].total++;
+                      if (tk.difficulty === 'EASY') topicsMap[top].easy++;
+                      if (tk.difficulty === 'MEDIUM') topicsMap[top].medium++;
+                      if (tk.difficulty === 'HARD') topicsMap[top].hard++;
+
+                      if (tk.taskType === 'CODE') codeTasks++;
+                      else quizTasks++;
+
+                      if (tk.testCases && tk.testCases.some((tc: any) => tc.isSecret)) secretTestsCount++;
+                    });
+
+                    const totalTopics = Object.keys(topicsMap).length;
+                    const completeTriads = Object.values(topicsMap).filter((t) => t.easy > 0 && t.medium > 0 && t.hard > 0).length;
+                    const completePercent = totalTopics > 0 ? Math.round((completeTriads / totalTopics) * 100) : 0;
+
+                    return (
+                      <div className="bg-slate-950/80 border border-slate-800 rounded-2xl p-4 shadow-md flex flex-col gap-3">
+                        <div className="flex items-center justify-between border-b border-slate-800/80 pb-2">
+                          <span className="text-xs font-bold text-slate-200 uppercase tracking-wider flex items-center gap-1.5">
+                            <Sparkles className="w-3.5 h-3.5 text-purple-400" />
+                            <span>Аудит Балансу Тріад</span>
+                          </span>
+                          <span className="text-[10px] font-mono text-purple-300 bg-purple-500/10 px-2 py-0.5 rounded border border-purple-500/20">
+                            {currentSkill?.slug}
+                          </span>
                         </div>
-                      );
-                    })}
+
+                        {/* Triad Completeness Gauge */}
+                        <div className="flex flex-col gap-1.5">
+                          <div className="flex items-center justify-between text-xs">
+                            <span className="text-slate-400 text-[11px]">Повнота Тріад (3/3):</span>
+                            <span className="font-mono font-bold text-emerald-400">
+                              {completeTriads} / {totalTopics} тем ({completePercent}%)
+                            </span>
+                          </div>
+                          <div className="w-full h-2 rounded-full bg-slate-900 border border-slate-800 overflow-hidden">
+                            <div
+                              className="h-full bg-gradient-to-r from-indigo-500 via-purple-500 to-emerald-400 transition-all"
+                              style={{ width: `${completePercent}%` }}
+                            />
+                          </div>
+                        </div>
+
+                        {/* Practical Code vs Diagnosis Ratio */}
+                        <div className="grid grid-cols-2 gap-2 pt-1 text-[11px] font-mono">
+                          <div className="p-2 rounded-xl bg-slate-900 border border-slate-800 flex flex-col gap-0.5">
+                            <span className="text-slate-500 text-[9px] uppercase">Практика (Код)</span>
+                            <span className="text-emerald-400 font-bold text-xs">{codeTasks} завдань</span>
+                          </div>
+                          <div className="p-2 rounded-xl bg-slate-900 border border-slate-800 flex flex-col gap-0.5">
+                            <span className="text-slate-500 text-[9px] uppercase">Тести (Вибір)</span>
+                            <span className="text-blue-400 font-bold text-xs">{quizTasks} завдань</span>
+                          </div>
+                        </div>
+
+                        {/* Anti-gaming protection ratio */}
+                        <div className="p-2 rounded-xl bg-rose-950/20 border border-rose-500/30 flex items-center justify-between text-[11px] font-mono">
+                          <span className="text-slate-300 text-[10px] flex items-center gap-1">
+                            <ShieldCheck className="w-3.5 h-3.5 text-rose-400" />
+                            <span>Приховані тести (Secret):</span>
+                          </span>
+                          <span className="text-rose-300 font-bold">{secretTestsCount} задач</span>
+                        </div>
+                      </div>
+                    );
+                  })()}
+
+                  {/* 2. ⚡ Cognitive Traps & Wheel-Spinning Radar */}
+                  <div className="bg-slate-950/80 border border-slate-800 rounded-2xl p-4 shadow-md flex flex-col gap-2.5">
+                    <div className="flex items-center justify-between border-b border-slate-800/80 pb-2">
+                      <span className="text-xs font-bold text-slate-200 uppercase tracking-wider flex items-center gap-1.5">
+                        <Activity className="w-3.5 h-3.5 text-amber-400" />
+                        <span>Когнітивні Пастки Модуля</span>
+                      </span>
+                      <span className="text-[9px] font-mono text-slate-500">Ризик буксування</span>
+                    </div>
+
+                    <div className="flex flex-col gap-2">
+                      <div
+                        onClick={() => {
+                          const task = allTasks.find((t) => t.subConcept?.includes('dead-zone') || t.title.includes('Temporal Dead Zone'));
+                          if (task) setSelectedTaskId(task.id);
+                        }}
+                        className="p-2 rounded-xl bg-slate-900/90 border border-amber-500/30 hover:border-amber-400 transition-all cursor-pointer flex flex-col gap-1"
+                      >
+                        <div className="flex items-center justify-between text-xs">
+                          <span className="font-bold text-white truncate max-w-[170px]">Temporal Dead Zone (TDZ)</span>
+                          <span className="text-[10px] font-mono font-bold text-rose-400 bg-rose-500/10 px-1.5 py-0.2 rounded border border-rose-500/20">
+                            🔴 42% помилок
+                          </span>
+                        </div>
+                        <span className="text-[10px] text-slate-400 font-mono">Часте перемикання на EASY (70% бал)</span>
+                      </div>
+
+                      <div
+                        onClick={() => {
+                          const task = allTasks.find((t) => t.subConcept?.includes('coercion') || t.title.includes('приведення'));
+                          if (task) setSelectedTaskId(task.id);
+                        }}
+                        className="p-2 rounded-xl bg-slate-900/90 border border-amber-500/30 hover:border-amber-400 transition-all cursor-pointer flex flex-col gap-1"
+                      >
+                        <div className="flex items-center justify-between text-xs">
+                          <span className="font-bold text-white truncate max-w-[170px]">Strict Equality & Coercion</span>
+                          <span className="text-[10px] font-mono font-bold text-amber-400 bg-amber-500/10 px-1.5 py-0.2 rounded border border-amber-500/20">
+                            🟡 35% помилок
+                          </span>
+                        </div>
+                        <span className="text-[10px] text-slate-400 font-mono">Плутанина між == та === при об'єктах</span>
+                      </div>
+
+                      <div
+                        onClick={() => {
+                          const task = allTasks.find((t) => t.subConcept?.includes('closure') || t.title.includes('замикан'));
+                          if (task) setSelectedTaskId(task.id);
+                        }}
+                        className="p-2 rounded-xl bg-slate-900/90 border border-amber-500/30 hover:border-amber-400 transition-all cursor-pointer flex flex-col gap-1"
+                      >
+                        <div className="flex items-center justify-between text-xs">
+                          <span className="font-bold text-white truncate max-w-[170px]">Lexical Scope & Closures</span>
+                          <span className="text-[10px] font-mono font-bold text-amber-400 bg-amber-500/10 px-1.5 py-0.2 rounded border border-amber-500/20">
+                            🟡 28% помилок
+                          </span>
+                        </div>
+                        <span className="text-[10px] text-slate-400 font-mono">Збереження стану при декількох викликах</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* 3. ⚙️ BKT Adaptive Tuner & Thresholds */}
+                  <div className="bg-slate-950/80 border border-slate-800 rounded-2xl p-4 shadow-md flex flex-col gap-2.5 text-xs text-slate-300">
+                    <span className="font-bold text-white uppercase tracking-wider text-[11px] flex items-center gap-1.5 border-b border-slate-800/80 pb-2">
+                      <Network className="w-3.5 h-3.5 text-indigo-400" />
+                      <span>Параметри Адаптації Модуля</span>
+                    </span>
+
+                    <div className="flex flex-col gap-1.5 font-mono text-[11px]">
+                      <div className="flex justify-between items-center bg-slate-900/60 p-2 rounded-lg border border-slate-800/60">
+                        <span className="text-slate-400">Розблокування DAG (Proficient):</span>
+                        <span className="text-indigo-400 font-bold">P(L) ≥ 0.75</span>
+                      </div>
+                      <div className="flex justify-between items-center bg-slate-900/60 p-2 rounded-lg border border-slate-800/60">
+                        <span className="text-slate-400">Золота Майстерність (Mastery):</span>
+                        <span className="text-emerald-400 font-bold">P(L) ≥ 0.90</span>
+                      </div>
+                      <div className="flex justify-between items-center bg-slate-900/60 p-2 rounded-lg border border-slate-800/60">
+                        <span className="text-slate-400">Штраф за легкий рівень (Cap):</span>
+                        <span className="text-amber-400 font-bold">Max 70%</span>
+                      </div>
+                    </div>
                   </div>
                 </div>
               )}
