@@ -287,7 +287,7 @@
 | **SBC-223** | `Style` | `TC` | remove duplicate emojis and enforce clean SVG icons in skill and anomaly tree navigation | 2026-10-19 | `05de2b7` |
 | **SBC-228** | `Story` | `TC` | move student selector to searchable top-bar dropdown in teacher portal and collapse redundant side drawer | 2026-10-20 | `39bbe31` |
 | **SBC-229** | `Story` | `TC` | implement cohort mastery distribution and live risk feed widgets in teacher analytics side drawer | 2026-10-20 | `e612f0a` |
-| **SBC-234** | `Story` | `TC` | implement interactive CourseGraphViewer with topic hierarchy, subconcepts, and cognitive triad matrix in teacher portal | 2026-10-20 | pending |
+| **SBC-234** | `Story` | `TC` | implement interactive CourseGraphViewer with topic hierarchy, subconcepts, and cognitive triad matrix in teacher portal | 2026-10-20 | `b607a94` |
 
 ---
 
