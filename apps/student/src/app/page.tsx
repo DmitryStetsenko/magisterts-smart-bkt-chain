@@ -125,10 +125,10 @@ export default function StudentPortalPage() {
         const courseData = await courseRes.json();
         const mappedNodes: SkillGraphNode[] = courseData.skills.map((skill: any) => {
           const p = bktMap[skill.id] ?? 0.0;
-          const isMastered = p >= 0.95;
+          const isMastered = p >= 0.90; // Gold Mastery threshold
           const parentIds = skill.parentDependencies?.map((d: any) => d.parentSkillId) || [];
           const parentMastered =
-            parentIds.length === 0 || parentIds.every((pid: string) => (bktMap[pid] ?? 0) >= 0.95);
+            parentIds.length === 0 || parentIds.every((pid: string) => (bktMap[pid] ?? 0) >= 0.75); // Bloom Proficient threshold unlocks next
 
           const skillAdjustments = adjustments.filter(
             (a) => a.skillSlug === skill.slug || a.skillTitle === skill.title
@@ -165,7 +165,7 @@ export default function StudentPortalPage() {
     setEvalResult(null);
     try {
       await fetchCourseStructureAndState(courseSlug);
-      const res = await fetch(`${API_URL}/api/v1/tasks/recommended?courseSlug=${courseSlug}`);
+      const res = await fetch(`${API_URL}/api/v1/tasks/recommended?courseSlug=${courseSlug}&userId=demo-student`);
       if (res.ok) {
         const data = await res.json();
         setTask(data.task);
@@ -815,7 +815,7 @@ export default function StudentPortalPage() {
                           <AlertTriangle className="w-4 h-4 text-rose-400 shrink-0 mt-0.5" />
                           <div className="text-[11px] text-rose-200">
                             <strong className="text-rose-300 block mb-0.5">Вузол Наразі Заблоковано!</strong>
-                            Для розблокування цього модуля необхідно спершу засвоїти попередні залежні модулі до рівня майстерності P(L) ≥ 0.95.
+                            Для розблокування цього модуля необхідно спершу засвоїти попередні залежні модулі до рівня майстерності P(L) ≥ 0.75 (Bloom Proficient).
                           </div>
                         </div>
                       )}
@@ -825,7 +825,7 @@ export default function StudentPortalPage() {
                         <div className="flex justify-between items-center text-xs">
                           <span className="text-slate-400 font-semibold">Рівень Майстерності P(L):</span>
                           <span className={`font-mono font-bold text-sm ${
-                            inspectedSkill.pMastery >= 0.95 ? 'text-emerald-400' : 'text-indigo-400'
+                            inspectedSkill.pMastery >= 0.90 ? 'text-emerald-400' : 'text-indigo-400'
                           }`}>
                             {(inspectedSkill.pMastery * 100).toFixed(1)}%
                           </span>
@@ -833,7 +833,7 @@ export default function StudentPortalPage() {
                         <div className="w-full h-2 bg-slate-900 rounded-full overflow-hidden border border-slate-800">
                           <div
                             className={`h-full transition-all duration-500 ${
-                              inspectedSkill.pMastery >= 0.95
+                              inspectedSkill.pMastery >= 0.90
                                 ? 'bg-emerald-400'
                                 : inspectedSkill.status === 'LOCKED'
                                 ? 'bg-slate-700'
@@ -844,7 +844,7 @@ export default function StudentPortalPage() {
                         </div>
                         <div className="flex justify-between text-[10px] text-slate-500 font-mono">
                           <span>0%</span>
-                          <span className="text-emerald-400">Поріг: ≥ 95.0%</span>
+                          <span className="text-emerald-400">Поріг: ≥ 90.0% (Gold) / 75.0% (Відкрито)</span>
                         </div>
                       </div>
 
@@ -857,7 +857,7 @@ export default function StudentPortalPage() {
                           {inspectedSkill.parentSkillIds.length === 0
                             ? '🟢 Базовий стартовий вузол курсу.'
                             : inspectedSkill.status === 'LOCKED'
-                            ? '🔒 Потребує опанування попередніх навичок.'
+                            ? '🔒 Потребує опанування попередніх навичок (P(L) ≥ 0.75).'
                             : '✨ Усі пререквізити виконано! Модуль відкрито.'}
                         </div>
                       </div>
@@ -874,12 +874,12 @@ export default function StudentPortalPage() {
                         className={`w-full py-2.5 px-4 rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer shadow-lg mt-2 ${
                           inspectedSkill.status === 'LOCKED'
                             ? 'bg-slate-800 text-slate-500 cursor-not-allowed shadow-none'
-                            : inspectedSkill.pMastery >= 0.95
+                            : inspectedSkill.pMastery >= 0.90
                             ? 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-emerald-600/30'
                             : 'bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white shadow-indigo-600/40'
                         }`}
                       >
-                        <span>{inspectedSkill.status === 'LOCKED' ? '🔒 Заблоковано' : inspectedSkill.pMastery >= 0.95 ? 'Тренувати знову' : 'Розпочати квест модуля ➔'}</span>
+                        <span>{inspectedSkill.status === 'LOCKED' ? '🔒 Заблоковано' : inspectedSkill.pMastery >= 0.90 ? 'Тренувати знову' : 'Розпочати квест модуля ➔'}</span>
                       </button>
                     </div>
                   ) : (

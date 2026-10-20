@@ -249,8 +249,8 @@
 | **SBC-193** | `Story` | `ST` | display semantic rubric breakdown and teacher review status | 2026-10-14 | `9ac1768` |
 | **SBC-194** | `Task` | `ST` | log micro-step 5 student semantic rubric UI | 2026-10-14 | `8c19e4a` |
 | **SBC-216** | `Story` | `ST` | implement attempt history tab in student task drawer with teacher feedback and live review decision synchronization | 2026-10-19 | `1e201d7` |
-| **SBC-217** | `Task` | `INF` | update daily progress, detailed technical log and compile docs json for student attempt history and teacher feedback | 2026-10-19 | `3b34dad` |
-| **SBC-230** | `Story` | `ST` | implement top adaptive degradation notice banner with score cap and remove confusing per-task difficulty badges | 2026-10-20 | pending |
+| **SBC-230** | `Story` | `ST` | implement top adaptive degradation notice banner with score cap and remove confusing per-task difficulty badges | 2026-10-20 | `e612f0a` |
+| **SBC-231** | `Bug` | `ST` | harmonize DAG unlock thresholds and prevent premature module advance while practice tasks remain | 2026-10-20 | pending |
 
 ---
 

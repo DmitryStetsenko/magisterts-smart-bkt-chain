@@ -1035,3 +1035,27 @@ eferenceAnswer, критерії options.keywords (microtask|мікротаск|
 - **Тестування:**
   - 35/35 unit-тестів API пройдено успішно ✅.
   - Production збірки `npm run build:api` та `npm run build:student` завершено успішно без помилок ✅.
+
+### 11.18 Синхронізація Порогів Розблокування DAG та Запобігання Передчасному Переходу Між Модулями (`SBC-231`)
+- **Змінені файли:**
+  - [`apps/api/src/adapters/inbound/http/task.controller.ts`](file:///apps/api/src/adapters/inbound/http/task.controller.ts)
+  - [`apps/api/src/domain/sequencing/task-sequencer.ts`](file:///apps/api/src/domain/sequencing/task-sequencer.ts)
+  - [`apps/student/src/app/page.tsx`](file:///apps/student/src/app/page.tsx)
+  - [`packages/ui/src/skill-graph/GameSkillTreeWidget.tsx`](file:///packages/ui/src/skill-graph/GameSkillTreeWidget.tsx)
+- **Архітектурні особливості:**
+  1. **Уніфікація ідентифікатора студента (`demo-student` resolution):**
+     - В `TaskController.getRecommendedTask` додано коректну обробку аліаса `demo-student`. Раніше запит без `userId` або з псевдонімом міг шукати історію за іншим ID, через що `lastAttempt` не знаходився і деградація після помилки не вмикалася.
+     - У `apps/student/src/app/page.tsx` виклик `fetchRecommendedTask` тепер явно передає `userId=demo-student`.
+  2. **Політика збереження фокусу на поточному модулі (`TaskSequencer`):**
+     - Раніше `currentActiveSkill` перемикався на наступний модуль щойно $P(L) \ge 0.75$, навіть якщо в поточному модулі залишалися невиконані практичні задачі.
+     - Тепер модуль залишається активним, якщо він або ще не досяг рівня компетентності ($P(L) < 0.75$), або в ньому ще є невиконані завдання до досягнення повної майстерності ($P(L) < 0.90$). Студент проходить практичні завдання поточного модуля до кінця.
+  3. **Гармонізація порогів розблокування DAG з моделлю Блума:**
+     - Усунуто розбіжність між бекендом (0.75) та фронтендом (0.95).
+     - У `apps/student/src/app/page.tsx` та `@sbc/ui` (`GameSkillTreeWidget.tsx`) встановлено:
+       - $P(L) \ge 0.75$ — поріг компетентності (Bloom Proficient), що розблоковує залежні дочірні модулі в DAG.
+       - $P(L) \ge 0.90$ — поріг повної майстерності (Gold Mastery).
+     - Оновлено всі підписи інспектора вузлів, індикатори променів зв'язку та умови відображення блокування `🔒 Заблоковано`.
+- **Тестування:**
+  - 35/35 unit-тестів API пройдено успішно (`npm run test:api`) ✅.
+  - Production збірки `npm run build:api` та `npm run build:student` пройшли без помилок ✅.
+

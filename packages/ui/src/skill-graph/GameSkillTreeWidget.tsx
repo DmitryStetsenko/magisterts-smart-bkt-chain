@@ -242,8 +242,8 @@ export function GameSkillTreeWidget({
                 const startPos = nodePositions[idx - 1];
                 const endPos = nodePositions[idx];
                 const prevNode = nodes[idx - 1];
-                const isMasteredConnection = prevNode.pMastery >= 0.95;
-                const isActiveConnection = prevNode.pMastery >= 0.95 && node.status !== 'LOCKED';
+                const isMasteredConnection = prevNode.pMastery >= 0.90;
+                const isActiveConnection = prevNode.pMastery >= 0.75 && node.status !== 'LOCKED';
 
                 // Curving Bezier Path for Natural RPG Tree Branching
                 const deltaY = endPos.y - startPos.y;
@@ -288,7 +288,7 @@ export function GameSkillTreeWidget({
               const pos = nodePositions[idx];
               const isSelected = selectedNode?.id === node.id || selectedNode?.slug === node.slug;
               const isCurrentActive = node.slug === activeSkillSlug;
-              const isMastered = node.pMastery >= 0.95;
+              const isMastered = node.pMastery >= 0.90;
               const isLocked = node.status === 'LOCKED';
 
 
@@ -456,7 +456,7 @@ export function GameSkillTreeWidget({
                 <div className="w-full h-2 bg-slate-900 rounded-full overflow-hidden border border-slate-800">
                   <div
                     className={`h-full transition-all duration-500 ${
-                      selectedNode.pMastery >= 0.95
+                      selectedNode.pMastery >= 0.90
                         ? 'bg-emerald-400 shadow-sm shadow-emerald-400'
                         : 'bg-gradient-to-r from-amber-500 to-indigo-500'
                     }`}
@@ -465,7 +465,7 @@ export function GameSkillTreeWidget({
                 </div>
                 <div className="flex justify-between text-[10px] text-slate-500 font-mono">
                   <span>Старт: 0%</span>
-                  <span className="text-emerald-400">Поріг: ≥ 95.0%</span>
+                  <span className="text-emerald-400">Поріг: ≥ 90.0% (Gold) / 75.0% (Відкрито)</span>
                 </div>
               </div>
 
@@ -613,7 +613,7 @@ export function GameSkillTreeWidget({
                   {selectedNode.parentSkillIds.length === 0
                     ? '🟢 Базовий вузол курсу. Доступний одразу.'
                     : selectedNode.status === 'LOCKED'
-                    ? '🔒 Необхідно закрити попередні залежні модулі на рівень P(L) ≥ 0.95.'
+                    ? '🔒 Необхідно закрити попередні залежні модулі на рівень P(L) ≥ 0.75.'
                     : '✨ Усі пререквізити виконано! Вузол відкрито.'}
                 </p>
               </div>
@@ -639,12 +639,12 @@ export function GameSkillTreeWidget({
                     className={`w-full py-2.5 px-4 rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer shadow-lg ${
                       selectedNode.status === 'LOCKED'
                         ? 'bg-slate-800 text-slate-500 cursor-not-allowed shadow-none'
-                        : selectedNode.pMastery >= 0.95
+                        : selectedNode.pMastery >= 0.90
                         ? 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-emerald-600/30'
                         : 'bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white shadow-indigo-600/40'
                     }`}
                   >
-                    <span>{actionButtonLabel || (selectedNode.pMastery >= 0.95 ? 'Тренувати знову' : 'Розпочати квест')}</span>
+                    <span>{actionButtonLabel || (selectedNode.pMastery >= 0.90 ? 'Тренувати знову' : 'Розпочати квест')}</span>
                     <ArrowRight className="w-4 h-4 ml-auto" />
                   </button>
                 )}

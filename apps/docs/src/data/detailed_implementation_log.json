@@ -3911,6 +3911,86 @@
               "subitems": []
             }
           ]
+        },
+        {
+          "title": "11.18 Синхронізація Порогів Розблокування DAG та Запобігання Передчасному Переходу Між Модулями (`SBC-231`)",
+          "level": 3,
+          "paragraphs": [],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "**Змінені файли:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "[`apps/api/src/adapters/inbound/http/task.controller.ts`](file:///apps/api/src/adapters/inbound/http/task.controller.ts)",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "[`apps/api/src/domain/sequencing/task-sequencer.ts`](file:///apps/api/src/domain/sequencing/task-sequencer.ts)",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "[`apps/student/src/app/page.tsx`](file:///apps/student/src/app/page.tsx)",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "[`packages/ui/src/skill-graph/GameSkillTreeWidget.tsx`](file:///packages/ui/src/skill-graph/GameSkillTreeWidget.tsx)",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Архітектурні особливості:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Уніфікація ідентифікатора студента (`demo-student` resolution):**",
+              "subitems": [
+                "В `TaskController.getRecommendedTask` додано коректну обробку аліаса `demo-student`. Раніше запит без `userId` або з псевдонімом міг шукати історію за іншим ID, через що `lastAttempt` не знаходився і деградація після помилки не вмикалася.",
+                "У `apps/student/src/app/page.tsx` виклик `fetchRecommendedTask` тепер явно передає `userId=demo-student`."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Політика збереження фокусу на поточному модулі (`TaskSequencer`):**",
+              "subitems": [
+                "Раніше `currentActiveSkill` перемикався на наступний модуль щойно $P(L) \\ge 0.75$, навіть якщо в поточному модулі залишалися невиконані практичні задачі.",
+                "Тепер модуль залишається активним, якщо він або ще не досяг рівня компетентності ($P(L) < 0.75$), або в ньому ще є невиконані завдання до досягнення повної майстерності ($P(L) < 0.90$). Студент проходить практичні завдання поточного модуля до кінця."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Гармонізація порогів розблокування DAG з моделлю Блума:**",
+              "subitems": [
+                "Усунуто розбіжність між бекендом (0.75) та фронтендом (0.95).",
+                "У `apps/student/src/app/page.tsx` та `@sbc/ui` (`GameSkillTreeWidget.tsx`) встановлено:",
+                "$P(L) \\ge 0.75$ — поріг компетентності (Bloom Proficient), що розблоковує залежні дочірні модулі в DAG.",
+                "$P(L) \\ge 0.90$ — поріг повної майстерності (Gold Mastery).",
+                "Оновлено всі підписи інспектора вузлів, індикатори променів зв'язку та умови відображення блокування `🔒 Заблоковано`."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Тестування:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "35/35 unit-тестів API пройдено успішно (`npm run test:api`) ✅.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Production збірки `npm run build:api` та `npm run build:student` пройшли без помилок ✅.",
+              "subitems": []
+            }
+          ]
         }
       ]
     }

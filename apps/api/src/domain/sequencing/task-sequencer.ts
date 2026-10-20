@@ -66,11 +66,20 @@ export class TaskSequencer {
 
     const unlockedSkills = skills.filter(isSkillUnlocked);
 
-    // 2. Look for the first unlocked skill that is NOT yet proficient (mastery < 0.75)
+    // 2. Determine current active skill:
+    // A module remains active while it is either:
+    // a) not yet proficient (< 0.75), OR
+    // b) has uncompleted tasks and has not yet achieved mastery (>= 0.90)
+    // This prevents premature leaps to next module while student is still learning the current module!
     const currentActiveSkill = unlockedSkills.find((skill) => {
       const mastery = studentStates[skill.id] ?? 0;
-      return !BktEngine.isProficient(mastery);
-    });
+      if (!BktEngine.isProficient(mastery)) return true;
+      if (BktEngine.isMastered(mastery)) return false; // >= 0.90 Mastery: allow advancing to next module
+      // If proficient (0.75 - 0.89), check if this skill still has uncompleted tasks
+      const skillTasks = tasks.filter((t) => t.skillId === skill.id);
+      const hasUncompleted = skillTasks.some((t) => !completedSet.has(t.id));
+      return hasUncompleted;
+    }) || unlockedSkills[0];
 
     // Helper: sort/pick task by difficulty priority and topic relevance
     const pickBestTask = (skillTasks: TaskDomain[]): TaskDomain | undefined => {
@@ -89,7 +98,7 @@ export class TaskSequencer {
         }
       }
 
-      // 2. If preferredDifficulty is specified, try to find task with that difficulty
+      // 2. If preferredDifficulty is specified, try to find task with that difficulty across this skill
       if (preferredDifficulty) {
         const matchDiff = uncompleted.find((t) => t.difficulty === preferredDifficulty);
         if (matchDiff) return matchDiff;
@@ -106,31 +115,34 @@ export class TaskSequencer {
         const recommendedTask = pickBestTask(activeSkillTasks);
 
         if (!recommendedTask) {
-          // All tasks in active module completed, but mastery is still < 0.75
+          const mastery = studentStates[currentActiveSkill.id] ?? 0;
+          if (!BktEngine.isProficient(mastery)) {
+            // All tasks in active module completed, but mastery is still < 0.75
+            return {
+              recommendedSkill: currentActiveSkill,
+              recommendedTask: activeSkillTasks[0],
+              reason: 'MODULE_TASKS_EXHAUSTED',
+              currentMastery: mastery,
+              isExhausted: true,
+            };
+          }
+        } else {
+          const isDegraded = preferredDifficulty === 'EASY' && recommendedTask.difficulty === 'EASY';
+
           return {
             recommendedSkill: currentActiveSkill,
-            recommendedTask: activeSkillTasks[0],
-            reason: 'MODULE_TASKS_EXHAUSTED',
+            recommendedTask,
+            reason: 'PRACTICE_CURRENT_SKILL',
             currentMastery: studentStates[currentActiveSkill.id] ?? 0,
-            isExhausted: true,
+            isExhausted: false,
+            isDifficultyDegraded: isDegraded,
+            maxScoreCap: isDegraded ? 70 : 100,
           };
         }
-
-        const isDegraded = preferredDifficulty === 'EASY' && recommendedTask.difficulty === 'EASY';
-
-        return {
-          recommendedSkill: currentActiveSkill,
-          recommendedTask,
-          reason: 'PRACTICE_CURRENT_SKILL',
-          currentMastery: studentStates[currentActiveSkill.id] ?? 0,
-          isExhausted: false,
-          isDifficultyDegraded: isDegraded,
-          maxScoreCap: isDegraded ? 70 : 100,
-        };
       }
     }
 
-    // 3. Fallback: If all unlocked skills are proficient, check if any remaining unlocked skills have uncompleted tasks
+    // 3. Fallback: If current active module has all tasks done, check remaining unlocked skills that have uncompleted tasks
     for (const unlockedSkill of unlockedSkills) {
       const sTasks = tasks.filter((t) => t.skillId === unlockedSkill.id);
       const recommendedTask = pickBestTask(sTasks);
@@ -139,7 +151,7 @@ export class TaskSequencer {
         return {
           recommendedSkill: unlockedSkill,
           recommendedTask,
-          reason: 'PRACTICE_CURRENT_SKILL',
+          reason: 'ADVANCE_NEXT_SKILL',
           currentMastery: studentStates[unlockedSkill.id] ?? 0,
           isDifficultyDegraded: isDegraded,
           maxScoreCap: isDegraded ? 70 : 100,

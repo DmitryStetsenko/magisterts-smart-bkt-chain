@@ -42,7 +42,9 @@ export class TaskController {
     @Query('courseSlug') courseSlug?: string,
   ) {
     let targetUserId = userId;
-    let user = targetUserId ? await this.prisma.user.findUnique({ where: { id: targetUserId } }) : null;
+    let user = targetUserId && targetUserId !== 'demo-student'
+      ? await this.prisma.user.findUnique({ where: { id: targetUserId } })
+      : null;
     if (!user) {
       user = await this.prisma.user.findFirst({ where: { role: 'STUDENT' } });
       if (!user) throw new NotFoundException('No student found');
