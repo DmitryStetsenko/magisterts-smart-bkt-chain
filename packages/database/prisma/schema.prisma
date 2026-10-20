@@ -141,6 +141,8 @@ model Task {
   rubrics           Json?
   misconceptions    Json?
   difficulty        TaskDifficulty     @default(EASY)
+  topic             String?
+  subConcept        String?
   timeLimitMs       Int                @default(5000)
   memoryLimitMb     Int                @default(128)
   createdAt         DateTime           @default(now())

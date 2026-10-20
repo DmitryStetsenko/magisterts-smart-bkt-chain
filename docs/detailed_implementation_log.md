@@ -955,6 +955,8 @@ eferenceAnswer, критерії options.keywords (microtask|мікротаск|
   4. **Запобігання "Буксуванню" (Wheel-Spinning Mitigation & Cognitive Cool-Down):**
      - При багаторазових невдалих спробах прогрес безпечно фіксується (наприклад, $P(L) = 0.62$).
      - Активується режим паузи «Cognitive Cool-Down» (15-30 хв у демо / 2-4 год у проді) з наданням персоналізованої навчальної картки (Study Card) для інтервального повторення.
+  5. **Семантична декомпозиція знань (Topic / SubConcept Data Schema):**
+     - Розширено модель завдання `Task` полями `topic: String?` та `subConcept: String?` у `packages/database/prisma/schema.prisma` для гранулярної діагностики прогалин (Knowledge Components) замість розмитого аналізу на рівні цілого модуля.
 
 
 
