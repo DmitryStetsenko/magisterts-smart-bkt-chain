@@ -27,6 +27,8 @@ export interface SequencingRecommendation {
   reason: 'PRACTICE_CURRENT_SKILL' | 'ADVANCE_NEXT_SKILL' | 'REVIEW_COMPLETED' | 'MODULE_TASKS_EXHAUSTED';
   currentMastery: number;
   isExhausted?: boolean;
+  isDifficultyDegraded?: boolean;
+  maxScoreCap?: number; // e.g. 70 for degraded level, 100 for standard
 }
 
 export class TaskSequencer {
@@ -93,9 +95,9 @@ export class TaskSequencer {
         if (matchDiff) return matchDiff;
       }
 
-      // 3. Natural order: EASY -> MEDIUM -> HARD progression
-      const diffWeight: Record<string, number> = { EASY: 1, MEDIUM: 2, HARD: 3 };
-      return uncompleted.sort((a, b) => (diffWeight[a.difficulty] || 2) - (diffWeight[b.difficulty] || 2))[0];
+      // 3. Default standard challenge priority: Start with standard tasks allowing 100% score (MEDIUM), then HARD, then EASY
+      const standardOrder: Record<string, number> = { MEDIUM: 1, HARD: 2, EASY: 3 };
+      return uncompleted.sort((a, b) => (standardOrder[a.difficulty] || 2) - (standardOrder[b.difficulty] || 2))[0];
     };
 
     if (currentActiveSkill) {
@@ -114,12 +116,16 @@ export class TaskSequencer {
           };
         }
 
+        const isDegraded = preferredDifficulty === 'EASY' && recommendedTask.difficulty === 'EASY';
+
         return {
           recommendedSkill: currentActiveSkill,
           recommendedTask,
           reason: 'PRACTICE_CURRENT_SKILL',
           currentMastery: studentStates[currentActiveSkill.id] ?? 0,
           isExhausted: false,
+          isDifficultyDegraded: isDegraded,
+          maxScoreCap: isDegraded ? 70 : 100,
         };
       }
     }
@@ -129,11 +135,14 @@ export class TaskSequencer {
       const sTasks = tasks.filter((t) => t.skillId === unlockedSkill.id);
       const recommendedTask = pickBestTask(sTasks);
       if (recommendedTask) {
+        const isDegraded = preferredDifficulty === 'EASY' && recommendedTask.difficulty === 'EASY';
         return {
           recommendedSkill: unlockedSkill,
           recommendedTask,
           reason: 'PRACTICE_CURRENT_SKILL',
           currentMastery: studentStates[unlockedSkill.id] ?? 0,
+          isDifficultyDegraded: isDegraded,
+          maxScoreCap: isDegraded ? 70 : 100,
         };
       }
     }

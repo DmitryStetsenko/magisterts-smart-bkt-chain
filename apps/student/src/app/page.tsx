@@ -17,6 +17,8 @@ interface TaskDetail {
   starterCode?: string;
   options?: any;
   difficulty: string;
+  topic?: string | null;
+  subConcept?: string | null;
   skill: {
     id: string;
     slug: string;
@@ -592,15 +594,12 @@ export default function StudentPortalPage() {
                         <span className="px-2.5 py-1 rounded-full text-xs font-mono font-bold uppercase tracking-wider bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
                           {task.skill.title}
                         </span>
-                        <span className={`px-2.5 py-1 rounded-full text-xs font-mono font-bold uppercase border ${
-                          task.difficulty === 'HARD'
-                            ? 'bg-rose-500/15 text-rose-300 border-rose-500/30'
-                            : task.difficulty === 'MEDIUM'
-                            ? 'bg-amber-500/15 text-amber-300 border-amber-500/30'
-                            : 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30'
-                        }`}>
-                          {task.difficulty === 'HARD' ? '🔴 HARD' : task.difficulty === 'MEDIUM' ? '🟡 MEDIUM' : '🟢 EASY'}
-                        </span>
+                        {recommendation?.isDifficultyDegraded && (
+                          <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-amber-500/15 text-amber-300 border border-amber-500/30 flex items-center gap-1">
+                            <AlertCircle className="w-3 h-3" />
+                            <span>Допоміжний рівень (Макс: {recommendation?.maxScoreCap ?? 70}%)</span>
+                          </span>
+                        )}
                       </div>
 
                       <div>
@@ -940,6 +939,33 @@ export default function StudentPortalPage() {
             </div>
           ) : task ? (
             <div className="flex-1 p-4 lg:p-6 overflow-y-auto flex flex-col gap-4">
+              {/* ⚠️ Top Adaptive Degradation Notice Banner */}
+              {recommendation?.isDifficultyDegraded && (
+                <div className="w-full bg-gradient-to-r from-amber-950/70 via-amber-900/40 to-slate-900 border border-amber-500/40 rounded-2xl p-4 shadow-xl flex items-start sm:items-center justify-between gap-4 animate-fadeIn">
+                  <div className="flex items-start sm:items-center gap-3">
+                    <div className="p-2 rounded-xl bg-amber-500/20 border border-amber-500/30 text-amber-400 shrink-0 mt-0.5 sm:mt-0">
+                      <AlertTriangle className="w-5 h-5 animate-pulse" />
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="text-sm font-bold text-white">Рівень складності адаптовано</span>
+                        <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                          Максимальний бал: {recommendation?.maxScoreCap ?? 70}%
+                        </span>
+                      </div>
+                      <p className="text-xs text-amber-200/90 mt-0.5 leading-relaxed">
+                        Система помітила труднощі в попередніх завданнях і тимчасово надала допоміжні питання для закріплення базових концепцій. Ви зможете повернутися до 100% балу після успішного освоєння теми.
+                      </p>
+                    </div>
+                  </div>
+                  <div className="hidden md:flex items-center gap-2 shrink-0">
+                    <span className="text-[11px] font-mono text-amber-400/80 bg-slate-950/60 px-3 py-1.5 rounded-xl border border-amber-500/20">
+                      Тема: {task.topic || task.skill.title}
+                    </span>
+                  </div>
+                </div>
+              )}
+
               {task.taskType === 'SINGLE_CHOICE' || task.taskType === 'MULTIPLE_CHOICE' ? (
                 <QuizTaskEditor
                   taskId={task.id}

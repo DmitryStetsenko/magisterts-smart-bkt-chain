@@ -3832,6 +3832,85 @@
               "subitems": []
             }
           ]
+        },
+        {
+          "title": "11.17 Очищення Інтерфейсу Студента та Впровадження Верхнього Банера Адаптивного Зниження Рівня (`SBC-230`)",
+          "level": 3,
+          "paragraphs": [],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "**Змінені файли:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "[`apps/api/src/domain/sequencing/task-sequencer.ts`](file:///apps/api/src/domain/sequencing/task-sequencer.ts)",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "[`apps/api/src/adapters/inbound/http/task.controller.ts`](file:///apps/api/src/adapters/inbound/http/task.controller.ts)",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "[`apps/student/src/app/page.tsx`](file:///apps/student/src/app/page.tsx)",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Архітектурні особливості:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Природний потік тестування без стигматизації:**",
+              "subitems": [
+                "Видалено статичні бейджі складності (`EASY / MEDIUM / HARD`) з карток завдань у бічній панелі студента. Завдання подаються у природному навчальному континуумі без штучного маркування."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Стартовий пріоритет повноцінного виклику (Top-Down Challenge):**",
+              "subitems": [
+                "В `TaskSequencer` змінено пріоритет за замовчуванням: `MEDIUM -> HARD -> EASY`. Усі студенти на старті модуля отримують завдання нормального рівня з можливістю здобути 100% максимального балу."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Динамічна детекція невдач та спадна адаптація (Graceful Degradation):**",
+              "subitems": [
+                "В `TaskController` додано перевірку останньої спроби студента (`bktHistory`).",
+                "Якщо остання спроба була невдалою (`isCorrect === false`), секвенсер автоматично запитує споріднену тему (`preferredTopic`) зі зниженою складністю `EASY`.",
+                "Результат рекомендації маркується прапорцем `isDifficultyDegraded: true` та обмеженням оцінки `maxScoreCap: 70`."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Верхній Інформаційний Банер Адаптації в Студентському Кабінеті:**",
+              "subitems": [
+                "Відображається вгорі центральної робочої області **виключно** при активації режиму допоміжних питань.",
+                "Містить бейдж *«Максимальний бал: 70%»*, ідентифікатор мікро-теми та підбадьорливе академічне пояснення тимчасовості обмеження."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Тестування:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "35/35 unit-тестів API пройдено успішно ✅.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Production збірки `npm run build:api` та `npm run build:student` завершено успішно без помилок ✅.",
+              "subitems": []
+            }
+          ]
         }
       ]
     }

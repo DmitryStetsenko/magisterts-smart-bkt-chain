@@ -102,11 +102,24 @@ export class TaskController {
       subConcept: t.subConcept,
     }));
 
+    // Check if student's most recent attempt was incorrect to trigger graceful degradation to EASY on the same topic
+    const lastAttempt = await this.prisma.bktHistory.findFirst({
+      where: { userId: targetUserId },
+      orderBy: { createdAt: 'desc' },
+      include: { task: true },
+    });
+
+    const isLastFailed = lastAttempt && !lastAttempt.isCorrect;
+    const preferredTopic = isLastFailed ? lastAttempt.task?.topic : null;
+    const preferredDifficulty = isLastFailed ? ('EASY' as const) : null;
+
     const recommendation = TaskSequencer.recommendNextTask({
       skills: skillDomains,
       studentStates: masteryMap,
       tasks: taskDomains,
       completedTaskIds: submissions.map((s) => s.taskId),
+      preferredTopic,
+      preferredDifficulty,
     });
 
     let fullTask = null;
