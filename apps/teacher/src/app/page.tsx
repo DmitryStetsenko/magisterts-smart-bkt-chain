@@ -620,7 +620,7 @@ export default function TeacherDashboardPage() {
                 {activeTab === 'coursemap' && (
                   <>
                     <Network className="w-4 h-4 text-indigo-400" />
-                    <span>Дерево Модулів & Завдань</span>
+                    <span>Дерево Навичок & Завдань</span>
                   </>
                 )}
                 {activeTab === 'reviews' && (
