@@ -1141,5 +1141,28 @@ eferenceAnswer, критерії options.keywords (microtask|мікротаск|
 - **Тестування:**
   - Production збірку `npm run build:teacher` завершено успішно (0 помилок типізації) ✅.
 
+### 11.23 Виправлення Реактивності Фільтрів Складності та Пошуку в Дереві Навичок (`SBC-236`)
+- **Змінений файл:**
+  - [`apps/teacher/src/features/course-map/ui/CourseGraphViewer.tsx`](file:///apps/teacher/src/features/course-map/ui/CourseGraphViewer.tsx)
+- **Архітектурні особливості:**
+  1. **Причина неспрацьовування:**
+     - Раніше у `CourseGraphViewer.tsx` фільтрація проводилася лише для розрахунку змінної `visibleTasks`. Проте в JSX самі картки рендерилися напряму через фіксовані поля тріади `tg.easy`, `tg.medium`, `tg.hard` без урахування обраного значення `difficultyFilter`.
+  2. **Реалізовані зміни:**
+     - Введено динамічні предикати видимості для кожного рівня тріади:
+       ```typescript
+       const isEasyVisible = tg.easy && (difficultyFilter === 'ALL' || difficultyFilter === 'EASY') && matchesSearch(tg.easy);
+       const isMediumVisible = tg.medium && (difficultyFilter === 'ALL' || difficultyFilter === 'MEDIUM') && matchesSearch(tg.medium);
+       const isHardVisible = tg.hard && (difficultyFilter === 'ALL' || difficultyFilter === 'HARD') && matchesSearch(tg.hard);
+       ```
+     - У разі вибору конкретної складності:
+       - Необрані рівні виключаються з DOM;
+       - Розкладка `grid` адаптивно перемикається з `grid-cols-3` на компактний фокус `grid-cols-1`;
+       - SVG-промені зв'язку активують відповідні енергетичні кольори (`#10b981`, `#f59e0b`, `#f43f5e`);
+       - Якщо в гілці немає завдань із даною складністю або пошуковим словом, уся тематична гілка коректно ховається.
+  3. **Синхронізація з матрицею:**
+     - Табличний режим матриці Блума також враховує комбінацію фільтрів складності та пошуку.
+- **Тестування:**
+  - Production збірку `npm run build:teacher` завершено успішно (0 помилок типізації) ✅.
+
 
 

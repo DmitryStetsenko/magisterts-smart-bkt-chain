@@ -410,22 +410,37 @@ export function CourseGraphViewer({
             {Object.values(topicTriads)
               .filter((tg) => selectedTopic === null || tg.topic === selectedTopic)
               .map((tg) => {
-                const visibleTasks = [tg.easy, tg.medium, tg.hard, ...tg.all]
-                  .filter((t, idx, self) => t && self.findIndex((x) => x?.id === t.id) === idx)
-                  .filter((t: any) => {
-                    if (difficultyFilter !== 'ALL' && t.difficulty !== difficultyFilter) return false;
-                    if (
-                      searchQuery &&
-                      !t.title.toLowerCase().includes(searchQuery.toLowerCase()) &&
-                      !t.description.toLowerCase().includes(searchQuery.toLowerCase()) &&
-                      !(t.subConcept || '').toLowerCase().includes(searchQuery.toLowerCase())
-                    ) {
-                      return false;
-                    }
-                    return true;
-                  }) as TaskItem[];
+                // Determine whether each leaf matches the active difficulty and search filters
+                const matchesSearch = (task?: TaskItem) => {
+                  if (!task) return false;
+                  if (!searchQuery) return true;
+                  const q = searchQuery.toLowerCase();
+                  return (
+                    task.title.toLowerCase().includes(q) ||
+                    task.description.toLowerCase().includes(q) ||
+                    (task.subConcept || '').toLowerCase().includes(q) ||
+                    (task.topic || '').toLowerCase().includes(q)
+                  );
+                };
 
-                if (visibleTasks.length === 0) return null;
+                const isEasyVisible =
+                  tg.easy &&
+                  (difficultyFilter === 'ALL' || difficultyFilter === 'EASY') &&
+                  matchesSearch(tg.easy);
+
+                const isMediumVisible =
+                  tg.medium &&
+                  (difficultyFilter === 'ALL' || difficultyFilter === 'MEDIUM') &&
+                  matchesSearch(tg.medium);
+
+                const isHardVisible =
+                  tg.hard &&
+                  (difficultyFilter === 'ALL' || difficultyFilter === 'HARD') &&
+                  matchesSearch(tg.hard);
+
+                // If filter is active and none of the triad tasks match, hide this whole branch
+                const totalMatching = (isEasyVisible ? 1 : 0) + (isMediumVisible ? 1 : 0) + (isHardVisible ? 1 : 0);
+                if (totalMatching === 0) return null;
 
                 return (
                   <div
@@ -441,7 +456,7 @@ export function CourseGraphViewer({
                             <span>Гілка Навичок</span>
                           </span>
                           <span className="text-[10px] font-mono text-slate-400 bg-slate-950 px-2 py-0.5 rounded border border-slate-800">
-                            {visibleTasks.length} завдань
+                            {totalMatching} з {tg.all.length} завдань
                           </span>
                         </div>
                         <h4 className="text-sm font-bold text-white font-mono mt-2 break-all">
@@ -479,123 +494,143 @@ export function CourseGraphViewer({
                           </linearGradient>
                         </defs>
                         {/* 3 Radiating curves from center-left to 3 leaf tiers on the right */}
-                        <path d="M 0 80 C 20 80, 20 28, 40 28" stroke={`url(#grad-${tg.topic})`} strokeWidth="2" fill="none" />
-                        <path d="M 0 80 C 20 80, 20 80, 40 80" stroke={`url(#grad-${tg.topic})`} strokeWidth="2" fill="none" />
-                        <path d="M 0 80 C 20 80, 20 132, 40 132" stroke={`url(#grad-${tg.topic})`} strokeWidth="2" fill="none" />
+                        {isEasyVisible && (
+                          <path d="M 0 80 C 20 80, 20 28, 40 28" stroke="#10b981" strokeWidth="2.5" fill="none" opacity="0.9" />
+                        )}
+                        {isMediumVisible && (
+                          <path d="M 0 80 C 20 80, 20 80, 40 80" stroke="#f59e0b" strokeWidth="2.5" fill="none" opacity="0.9" />
+                        )}
+                        {isHardVisible && (
+                          <path d="M 0 80 C 20 80, 20 132, 40 132" stroke="#f43f5e" strokeWidth="2.5" fill="none" opacity="0.9" />
+                        )}
+                        {/* Dimmed lines if filtered out */}
+                        {!isEasyVisible && difficultyFilter === 'ALL' && (
+                          <path d="M 0 80 C 20 80, 20 28, 40 28" stroke="#334155" strokeWidth="1" strokeDasharray="3 3" fill="none" opacity="0.4" />
+                        )}
+                        {!isMediumVisible && difficultyFilter === 'ALL' && (
+                          <path d="M 0 80 C 20 80, 20 80, 40 80" stroke="#334155" strokeWidth="1" strokeDasharray="3 3" fill="none" opacity="0.4" />
+                        )}
+                        {!isHardVisible && difficultyFilter === 'ALL' && (
+                          <path d="M 0 80 C 20 80, 20 132, 40 132" stroke="#334155" strokeWidth="1" strokeDasharray="3 3" fill="none" opacity="0.4" />
+                        )}
                         {/* Topic Hub Anchor Point */}
                         <circle cx="0" cy="80" r="4" fill="#6366f1" />
                       </svg>
                     </div>
 
-                    {/* Right: 3 Triad Leaves (EASY, MEDIUM, HARD) */}
-                    <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-3.5">
+                    {/* Right: Triad Leaves (Filtered dynamically by difficulty) */}
+                    <div className={`flex-1 grid gap-3.5 ${
+                      difficultyFilter === 'ALL'
+                        ? 'grid-cols-1 md:grid-cols-3'
+                        : 'grid-cols-1'
+                    }`}>
                       {/* 🟢 LEAF 1: EASY */}
-                      <div
-                        onClick={() => tg.easy && onSelectTask(tg.easy.id)}
-                        className={`group relative p-3.5 rounded-xl border flex flex-col justify-between gap-2.5 transition-all cursor-pointer ${
-                          tg.easy
-                            ? selectedTaskId === tg.easy.id
+                      {isEasyVisible && (
+                        <div
+                          onClick={() => tg.easy && onSelectTask(tg.easy.id)}
+                          className={`group relative p-3.5 rounded-xl border flex flex-col justify-between gap-2.5 transition-all cursor-pointer ${
+                            selectedTaskId === tg.easy?.id
                               ? 'bg-emerald-950/70 border-emerald-400 shadow-lg shadow-emerald-950/80 ring-2 ring-emerald-500/50 -translate-y-0.5'
                               : 'bg-slate-900/90 border-slate-800 hover:border-emerald-500/50 hover:bg-slate-900 hover:-translate-y-0.5 shadow-md'
-                            : 'bg-slate-950 border-dashed border-slate-800/60 opacity-40 cursor-not-allowed'
-                        }`}
-                      >
-                        <div className="flex items-center justify-between">
-                          <span className="text-[9px] font-bold uppercase tracking-wider text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-md border border-emerald-500/20 flex items-center gap-1">
-                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                            <span>Рівень 1: EASY</span>
-                          </span>
-                          {tg.easy && renderTypeBadge(tg.easy.taskType)}
-                        </div>
-
-                        <div>
-                          <h5 className="text-xs font-semibold text-slate-100 group-hover:text-white line-clamp-2">
-                            {tg.easy ? tg.easy.title : 'Немає полегшеного варіанту'}
-                          </h5>
-                          {tg.easy?.subConcept && (
-                            <span className="text-[10px] text-purple-300 font-mono block mt-1">
-                              ✦ {tg.easy.subConcept}
+                          }`}
+                        >
+                          <div className="flex items-center justify-between">
+                            <span className="text-[9px] font-bold uppercase tracking-wider text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-md border border-emerald-500/20 flex items-center gap-1">
+                              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                              <span>Рівень 1: EASY</span>
                             </span>
-                          )}
-                        </div>
+                            {tg.easy && renderTypeBadge(tg.easy.taskType)}
+                          </div>
 
-                        <div className="pt-2 border-t border-slate-800/80 flex items-center justify-between text-[10px] font-mono">
-                          <span className="text-emerald-400 font-bold">Max 70%</span>
-                          <span className="text-slate-400">P(G)=0.25</span>
+                          <div>
+                            <h5 className="text-xs font-semibold text-slate-100 group-hover:text-white line-clamp-2">
+                              {tg.easy?.title}
+                            </h5>
+                            {tg.easy?.subConcept && (
+                              <span className="text-[10px] text-purple-300 font-mono block mt-1">
+                                ✦ {tg.easy.subConcept}
+                              </span>
+                            )}
+                          </div>
+
+                          <div className="pt-2 border-t border-slate-800/80 flex items-center justify-between text-[10px] font-mono">
+                            <span className="text-emerald-400 font-bold">Max 70%</span>
+                            <span className="text-slate-400">P(G)=0.25</span>
+                          </div>
                         </div>
-                      </div>
+                      )}
 
                       {/* 🟡 LEAF 2: MEDIUM */}
-                      <div
-                        onClick={() => tg.medium && onSelectTask(tg.medium.id)}
-                        className={`group relative p-3.5 rounded-xl border flex flex-col justify-between gap-2.5 transition-all cursor-pointer ${
-                          tg.medium
-                            ? selectedTaskId === tg.medium.id
+                      {isMediumVisible && (
+                        <div
+                          onClick={() => tg.medium && onSelectTask(tg.medium.id)}
+                          className={`group relative p-3.5 rounded-xl border flex flex-col justify-between gap-2.5 transition-all cursor-pointer ${
+                            selectedTaskId === tg.medium?.id
                               ? 'bg-amber-950/70 border-amber-400 shadow-lg shadow-amber-950/80 ring-2 ring-amber-500/50 -translate-y-0.5'
                               : 'bg-slate-900/90 border-slate-800 hover:border-amber-500/50 hover:bg-slate-900 hover:-translate-y-0.5 shadow-md'
-                            : 'bg-slate-950 border-dashed border-slate-800/60 opacity-40 cursor-not-allowed'
-                        }`}
-                      >
-                        <div className="flex items-center justify-between">
-                          <span className="text-[9px] font-bold uppercase tracking-wider text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded-md border border-amber-500/20 flex items-center gap-1">
-                            <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span>
-                            <span>Рівень 2: MEDIUM</span>
-                          </span>
-                          {tg.medium && renderTypeBadge(tg.medium.taskType)}
-                        </div>
-
-                        <div>
-                          <h5 className="text-xs font-semibold text-slate-100 group-hover:text-white line-clamp-2">
-                            {tg.medium ? tg.medium.title : 'Немає практичного завдання'}
-                          </h5>
-                          {tg.medium?.subConcept && (
-                            <span className="text-[10px] text-purple-300 font-mono block mt-1">
-                              ✦ {tg.medium.subConcept}
+                          }`}
+                        >
+                          <div className="flex items-center justify-between">
+                            <span className="text-[9px] font-bold uppercase tracking-wider text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded-md border border-amber-500/20 flex items-center gap-1">
+                              <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span>
+                              <span>Рівень 2: MEDIUM</span>
                             </span>
-                          )}
-                        </div>
+                            {tg.medium && renderTypeBadge(tg.medium.taskType)}
+                          </div>
 
-                        <div className="pt-2 border-t border-slate-800/80 flex items-center justify-between text-[10px] font-mono">
-                          <span className="text-amber-400 font-bold">Max 100%</span>
-                          <span className="text-slate-400">P(G)=0.05</span>
+                          <div>
+                            <h5 className="text-xs font-semibold text-slate-100 group-hover:text-white line-clamp-2">
+                              {tg.medium?.title}
+                            </h5>
+                            {tg.medium?.subConcept && (
+                              <span className="text-[10px] text-purple-300 font-mono block mt-1">
+                                ✦ {tg.medium.subConcept}
+                              </span>
+                            )}
+                          </div>
+
+                          <div className="pt-2 border-t border-slate-800/80 flex items-center justify-between text-[10px] font-mono">
+                            <span className="text-amber-400 font-bold">Max 100%</span>
+                            <span className="text-slate-400">P(G)=0.05</span>
+                          </div>
                         </div>
-                      </div>
+                      )}
 
                       {/* 🔴 LEAF 3: HARD */}
-                      <div
-                        onClick={() => tg.hard && onSelectTask(tg.hard.id)}
-                        className={`group relative p-3.5 rounded-xl border flex flex-col justify-between gap-2.5 transition-all cursor-pointer ${
-                          tg.hard
-                            ? selectedTaskId === tg.hard.id
+                      {isHardVisible && (
+                        <div
+                          onClick={() => tg.hard && onSelectTask(tg.hard.id)}
+                          className={`group relative p-3.5 rounded-xl border flex flex-col justify-between gap-2.5 transition-all cursor-pointer ${
+                            selectedTaskId === tg.hard?.id
                               ? 'bg-rose-950/70 border-rose-400 shadow-lg shadow-rose-950/80 ring-2 ring-rose-500/50 -translate-y-0.5'
                               : 'bg-slate-900/90 border-slate-800 hover:border-rose-500/50 hover:bg-slate-900 hover:-translate-y-0.5 shadow-md'
-                            : 'bg-slate-950 border-dashed border-slate-800/60 opacity-40 cursor-not-allowed'
-                        }`}
-                      >
-                        <div className="flex items-center justify-between">
-                          <span className="text-[9px] font-bold uppercase tracking-wider text-rose-400 bg-rose-500/10 px-2 py-0.5 rounded-md border border-rose-500/20 flex items-center gap-1">
-                            <span className="w-1.5 h-1.5 rounded-full bg-rose-400 animate-pulse"></span>
-                            <span>Рівень 3: HARD</span>
-                          </span>
-                          {tg.hard && renderTypeBadge(tg.hard.taskType)}
-                        </div>
-
-                        <div>
-                          <h5 className="text-xs font-semibold text-slate-100 group-hover:text-white line-clamp-2">
-                            {tg.hard ? tg.hard.title : 'Немає складного випробування'}
-                          </h5>
-                          {tg.hard?.subConcept && (
-                            <span className="text-[10px] text-purple-300 font-mono block mt-1">
-                              ✦ {tg.hard.subConcept}
+                          }`}
+                        >
+                          <div className="flex items-center justify-between">
+                            <span className="text-[9px] font-bold uppercase tracking-wider text-rose-400 bg-rose-500/10 px-2 py-0.5 rounded-md border border-rose-500/20 flex items-center gap-1">
+                              <span className="w-1.5 h-1.5 rounded-full bg-rose-400 animate-pulse"></span>
+                              <span>Рівень 3: HARD</span>
                             </span>
-                          )}
-                        </div>
+                            {tg.hard && renderTypeBadge(tg.hard.taskType)}
+                          </div>
 
-                        <div className="pt-2 border-t border-slate-800/80 flex items-center justify-between text-[10px] font-mono">
-                          <span className="text-rose-400 font-bold">Max 100%</span>
-                          <span className="text-slate-400">P(G)=0.01 • Edge</span>
+                          <div>
+                            <h5 className="text-xs font-semibold text-slate-100 group-hover:text-white line-clamp-2">
+                              {tg.hard?.title}
+                            </h5>
+                            {tg.hard?.subConcept && (
+                              <span className="text-[10px] text-purple-300 font-mono block mt-1">
+                                ✦ {tg.hard.subConcept}
+                              </span>
+                            )}
+                          </div>
+
+                          <div className="pt-2 border-t border-slate-800/80 flex items-center justify-between text-[10px] font-mono">
+                            <span className="text-rose-400 font-bold">Max 100%</span>
+                            <span className="text-slate-400">P(G)=0.01 • Edge</span>
+                          </div>
                         </div>
-                      </div>
+                      )}
                     </div>
                   </div>
                 );
@@ -631,6 +666,25 @@ export function CourseGraphViewer({
             <tbody className="divide-y divide-slate-800/60 text-xs">
               {Object.values(topicTriads)
                 .filter((tg) => selectedTopic === null || tg.topic === selectedTopic)
+                .filter((tg) => {
+                  const matchesSearch = (task?: TaskItem) => {
+                    if (!task) return false;
+                    if (!searchQuery) return true;
+                    const q = searchQuery.toLowerCase();
+                    return (
+                      task.title.toLowerCase().includes(q) ||
+                      task.description.toLowerCase().includes(q) ||
+                      (task.subConcept || '').toLowerCase().includes(q) ||
+                      (task.topic || '').toLowerCase().includes(q)
+                    );
+                  };
+
+                  const isEasyVisible = tg.easy && (difficultyFilter === 'ALL' || difficultyFilter === 'EASY') && matchesSearch(tg.easy);
+                  const isMediumVisible = tg.medium && (difficultyFilter === 'ALL' || difficultyFilter === 'MEDIUM') && matchesSearch(tg.medium);
+                  const isHardVisible = tg.hard && (difficultyFilter === 'ALL' || difficultyFilter === 'HARD') && matchesSearch(tg.hard);
+
+                  return isEasyVisible || isMediumVisible || isHardVisible;
+                })
                 .map((tg) => (
                   <tr key={tg.topic} className="hover:bg-slate-950/40 transition-colors">
                     <td className="py-3 px-3 align-top">
@@ -646,7 +700,7 @@ export function CourseGraphViewer({
 
                     {/* EASY TD */}
                     <td className="py-3 px-3 align-top">
-                      {tg.easy ? (
+                      {tg.easy && (difficultyFilter === 'ALL' || difficultyFilter === 'EASY') ? (
                         <div
                           onClick={() => tg.easy && onSelectTask(tg.easy.id)}
                           className={`p-2.5 rounded-lg border transition-all cursor-pointer ${
@@ -662,13 +716,13 @@ export function CourseGraphViewer({
                           </div>
                         </div>
                       ) : (
-                        <span className="text-slate-600 italic text-[11px]">— відсутній —</span>
+                        <span className="text-slate-600 italic text-[11px]">— відсутній / відфільтровано —</span>
                       )}
                     </td>
 
                     {/* MEDIUM TD */}
                     <td className="py-3 px-3 align-top">
-                      {tg.medium ? (
+                      {tg.medium && (difficultyFilter === 'ALL' || difficultyFilter === 'MEDIUM') ? (
                         <div
                           onClick={() => tg.medium && onSelectTask(tg.medium.id)}
                           className={`p-2.5 rounded-lg border transition-all cursor-pointer ${
@@ -684,13 +738,13 @@ export function CourseGraphViewer({
                           </div>
                         </div>
                       ) : (
-                        <span className="text-slate-600 italic text-[11px]">— відсутній —</span>
+                        <span className="text-slate-600 italic text-[11px]">— відсутній / відфільтровано —</span>
                       )}
                     </td>
 
                     {/* HARD TD */}
                     <td className="py-3 px-3 align-top">
-                      {tg.hard ? (
+                      {tg.hard && (difficultyFilter === 'ALL' || difficultyFilter === 'HARD') ? (
                         <div
                           onClick={() => tg.hard && onSelectTask(tg.hard.id)}
                           className={`p-2.5 rounded-lg border transition-all cursor-pointer ${
@@ -706,7 +760,7 @@ export function CourseGraphViewer({
                           </div>
                         </div>
                       ) : (
-                        <span className="text-slate-600 italic text-[11px]">— відсутній —</span>
+                        <span className="text-slate-600 italic text-[11px]">— відсутній / відфільтровано —</span>
                       )}
                     </td>
                   </tr>

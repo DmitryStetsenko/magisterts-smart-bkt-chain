@@ -4256,6 +4256,70 @@
               "subitems": []
             }
           ]
+        },
+        {
+          "title": "11.23 Виправлення Реактивності Фільтрів Складності та Пошуку в Дереві Навичок (`SBC-236`)",
+          "level": 3,
+          "paragraphs": [],
+          "code_blocks": [
+            {
+              "lang": "typescript",
+              "content": "const isEasyVisible = tg.easy && (difficultyFilter === 'ALL' || difficultyFilter === 'EASY') && matchesSearch(tg.easy);\n       const isMediumVisible = tg.medium && (difficultyFilter === 'ALL' || difficultyFilter === 'MEDIUM') && matchesSearch(tg.medium);\n       const isHardVisible = tg.hard && (difficultyFilter === 'ALL' || difficultyFilter === 'HARD') && matchesSearch(tg.hard);"
+            }
+          ],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "**Змінений файл:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "[`apps/teacher/src/features/course-map/ui/CourseGraphViewer.tsx`](file:///apps/teacher/src/features/course-map/ui/CourseGraphViewer.tsx)",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Архітектурні особливості:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Причина неспрацьовування:**",
+              "subitems": [
+                "Раніше у `CourseGraphViewer.tsx` фільтрація проводилася лише для розрахунку змінної `visibleTasks`. Проте в JSX самі картки рендерилися напряму через фіксовані поля тріади `tg.easy`, `tg.medium`, `tg.hard` без урахування обраного значення `difficultyFilter`."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Реалізовані зміни:**",
+              "subitems": [
+                "Введено динамічні предикати видимості для кожного рівня тріади:",
+                "У разі вибору конкретної складності:",
+                "Необрані рівні виключаються з DOM;",
+                "Розкладка `grid` адаптивно перемикається з `grid-cols-3` на компактний фокус `grid-cols-1`;",
+                "SVG-промені зв'язку активують відповідні енергетичні кольори (`#10b981`, `#f59e0b`, `#f43f5e`);",
+                "Якщо в гілці немає завдань із даною складністю або пошуковим словом, уся тематична гілка коректно ховається."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Синхронізація з матрицею:**",
+              "subitems": [
+                "Табличний режим матриці Блума також враховує комбінацію фільтрів складності та пошуку."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Тестування:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Production збірку `npm run build:teacher` завершено успішно (0 помилок типізації) ✅.",
+              "subitems": []
+            }
+          ]
         }
       ]
     }
