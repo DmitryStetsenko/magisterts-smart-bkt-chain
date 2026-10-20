@@ -770,103 +770,147 @@ export function CourseGraphViewer({
         </div>
       )}
 
-      {/* 📌 Task Inspector Modal / Slide-down Preview */}
+      {/* 📌 Task Inspector: Sliding Right-Hand Drawer (Slide-Over Panel) */}
       {activeTask && (
-        <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-2xl flex flex-col gap-5 mt-2 animate-fadeIn">
-          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800 pb-4">
-            <div>
-              <div className="flex items-center gap-2">
-                {renderDifficultyBadge(activeTask.difficulty)}
-                {renderTypeBadge(activeTask.taskType)}
-                <span className="text-[11px] font-mono text-purple-400 bg-purple-500/10 px-2 py-0.5 rounded border border-purple-500/20">
-                  {activeTask.topic || 'general'} ➔ {activeTask.subConcept || 'core'}
-                </span>
+        <>
+          {/* Subtle backdrop overlay */}
+          <div
+            onClick={() => onSelectTask('')}
+            className="fixed inset-0 bg-black/40 backdrop-blur-[2px] z-40 transition-opacity animate-fadeIn"
+          />
+
+          <aside className="fixed right-0 top-0 bottom-0 w-full sm:w-[480px] lg:w-[540px] bg-slate-900 border-l border-indigo-500/30 shadow-2xl z-50 flex flex-col overflow-hidden animate-slideInRight">
+            {/* Drawer Top Header */}
+            <div className="p-5 border-b border-slate-800 bg-slate-950/80 flex items-start justify-between gap-3 shrink-0">
+              <div className="flex flex-col gap-2">
+                <div className="flex items-center gap-2 flex-wrap">
+                  {renderDifficultyBadge(activeTask.difficulty)}
+                  {renderTypeBadge(activeTask.taskType)}
+                  <span className="text-[10px] font-mono text-purple-300 bg-purple-500/10 px-2 py-0.5 rounded border border-purple-500/20">
+                    {activeTask.topic || 'general'} ➔ {activeTask.subConcept || 'core'}
+                  </span>
+                </div>
+                <h2 className="text-base font-bold text-white leading-snug">{activeTask.title}</h2>
               </div>
-              <h2 className="text-lg font-bold text-white mt-1.5">{activeTask.title}</h2>
+              <button
+                onClick={() => onSelectTask('')}
+                className="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition-colors shrink-0 cursor-pointer"
+                title="Закрити бічну панель інспектора"
+              >
+                <X className="w-5 h-5" />
+              </button>
             </div>
-            <button
-              onClick={() => onSelectTask('')}
-              className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
-              title="Закрити інспектор"
-            >
-              <X className="w-5 h-5" />
-            </button>
-          </div>
 
-          <div className="flex flex-col gap-2">
-            <h4 className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Умова Завдання:</h4>
-            <div className="p-4 bg-slate-950 border border-slate-800 rounded-xl text-xs text-slate-200 font-mono leading-relaxed whitespace-pre-wrap">
-              {activeTask.description}
-            </div>
-          </div>
-
-          {/* Starter Code Preview */}
-          {activeTask.starterCode && (
-            <div className="flex flex-col gap-2">
-              <h4 className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Стартовий Шаблон Коду:</h4>
-              <div className="p-3 bg-slate-950 border border-slate-800 rounded-xl text-xs text-emerald-400 font-mono leading-relaxed whitespace-pre-wrap">
-                {activeTask.starterCode}
+            {/* Drawer Scrollable Content */}
+            <div className="flex-1 p-5 overflow-y-auto flex flex-col gap-5">
+              {/* Task Description */}
+              <div className="flex flex-col gap-2">
+                <h4 className="text-xs font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+                  <FileText className="w-3.5 h-3.5 text-indigo-400" />
+                  <span>Умова Завдання:</span>
+                </h4>
+                <div className="p-4 bg-slate-950 border border-slate-800 rounded-xl text-xs text-slate-200 font-mono leading-relaxed whitespace-pre-wrap">
+                  {activeTask.description}
+                </div>
               </div>
-            </div>
-          )}
 
-          {/* Quiz Options Preview */}
-          {activeTask.options && Array.isArray(activeTask.options) && (
-            <div className="flex flex-col gap-2">
-              <h4 className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Варіанти Відповідей:</h4>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                {activeTask.options.map((opt: any, i: number) => (
-                  <div
-                    key={opt.id || i}
-                    className={`p-3 rounded-xl border text-xs flex items-center justify-between ${
-                      opt.isCorrect
-                        ? 'bg-emerald-950/40 border-emerald-500/50 text-emerald-300 font-semibold'
-                        : 'bg-slate-950 border-slate-800 text-slate-400'
-                    }`}
-                  >
-                    <span>{opt.text}</span>
-                    {opt.isCorrect && <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />}
+              {/* Starter Code Preview */}
+              {activeTask.starterCode && (
+                <div className="flex flex-col gap-2">
+                  <h4 className="text-xs font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+                    <Code className="w-3.5 h-3.5 text-emerald-400" />
+                    <span>Стартовий Шаблон Коду:</span>
+                  </h4>
+                  <pre className="p-3.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-emerald-400 font-mono leading-relaxed whitespace-pre-wrap overflow-x-auto">
+                    {activeTask.starterCode}
+                  </pre>
+                </div>
+              )}
+
+              {/* Quiz Options Preview */}
+              {activeTask.options && Array.isArray(activeTask.options) && (
+                <div className="flex flex-col gap-2">
+                  <h4 className="text-xs font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+                    <CheckSquare className="w-3.5 h-3.5 text-purple-400" />
+                    <span>Варіанти Відповідей:</span>
+                  </h4>
+                  <div className="flex flex-col gap-2">
+                    {activeTask.options.map((opt: any, i: number) => (
+                      <div
+                        key={opt.id || i}
+                        className={`p-3 rounded-xl border text-xs flex items-center justify-between gap-2 ${
+                          opt.isCorrect
+                            ? 'bg-emerald-950/40 border-emerald-500/50 text-emerald-300 font-semibold'
+                            : 'bg-slate-950 border-slate-800 text-slate-400'
+                        }`}
+                      >
+                        <span>{opt.text}</span>
+                        {opt.isCorrect && <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />}
+                      </div>
+                    ))}
                   </div>
-                ))}
-              </div>
-            </div>
-          )}
+                </div>
+              )}
 
-          {/* Test cases Preview */}
-          {activeTask.testCases && activeTask.testCases.length > 0 && (
-            <div className="flex flex-col gap-2">
-              <h4 className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
-                Тест-кейси ({activeTask.testCases.length}):
-              </h4>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                {activeTask.testCases.map((tc, idx) => (
-                  <div
-                    key={idx}
-                    className={`p-3 rounded-xl font-mono text-xs flex items-center justify-between border ${
-                      tc.isSecret
-                        ? 'bg-rose-950/20 border-rose-500/30 text-rose-300'
-                        : 'bg-slate-950 border-slate-800 text-slate-300'
-                    }`}
-                  >
-                    <div>
-                      <span className="text-slate-500">Input:</span>{' '}
-                      <code className="text-white">{tc.input}</code>
-                    </div>
-                    <div>
-                      <span className="text-slate-500">Expect:</span>{' '}
-                      <code className="text-emerald-400">{tc.expectedOutput}</code>
-                      {tc.isSecret && (
-                        <span className="ml-2 text-[9px] bg-rose-500/20 text-rose-300 px-1.5 py-0.5 rounded border border-rose-500/30">
-                          SECRET
-                        </span>
-                      )}
-                    </div>
+              {/* Test cases Preview */}
+              {activeTask.testCases && activeTask.testCases.length > 0 && (
+                <div className="flex flex-col gap-2">
+                  <div className="flex items-center justify-between">
+                    <h4 className="text-xs font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+                      <Zap className="w-3.5 h-3.5 text-amber-400" />
+                      <span>Тест-кейси ({activeTask.testCases.length}):</span>
+                    </h4>
+                    {activeTask.testCases.some((tc) => tc.isSecret) && (
+                      <span className="text-[10px] text-rose-300 font-mono bg-rose-500/10 px-2 py-0.5 rounded border border-rose-500/20">
+                        🔒 Захист Secret-тестами
+                      </span>
+                    )}
                   </div>
-                ))}
-              </div>
+                  <div className="flex flex-col gap-2">
+                    {activeTask.testCases.map((tc, idx) => (
+                      <div
+                        key={idx}
+                        className={`p-3 rounded-xl font-mono text-xs flex flex-col gap-1 border ${
+                          tc.isSecret
+                            ? 'bg-rose-950/20 border-rose-500/30 text-rose-300'
+                            : 'bg-slate-950 border-slate-800 text-slate-300'
+                        }`}
+                      >
+                        <div className="flex items-center justify-between">
+                          <span className="text-slate-500 text-[11px]">Тест #{idx + 1}</span>
+                          {tc.isSecret && (
+                            <span className="text-[9px] bg-rose-500/20 text-rose-300 px-1.5 py-0.5 rounded border border-rose-500/30">
+                              SECRET
+                            </span>
+                          )}
+                        </div>
+                        <div className="text-[11px] truncate">
+                          <span className="text-slate-500">Вхід:</span>{' '}
+                          <code className="text-white">{tc.input}</code>
+                        </div>
+                        <div className="text-[11px] truncate">
+                          <span className="text-slate-500">Очікується:</span>{' '}
+                          <code className="text-emerald-400">{tc.expectedOutput}</code>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
-          )}
-        </div>
+
+            {/* Drawer Bottom Bar */}
+            <div className="p-4 border-t border-slate-800 bg-slate-950/90 flex items-center justify-between text-xs font-mono text-slate-400 shrink-0">
+              <span>BKT ID: {activeTask.id.slice(0, 8)}...</span>
+              <button
+                onClick={() => onSelectTask('')}
+                className="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-white font-sans text-xs transition-colors cursor-pointer"
+              >
+                Закрити
+              </button>
+            </div>
+          </aside>
+        </>
       )}
     </div>
   );

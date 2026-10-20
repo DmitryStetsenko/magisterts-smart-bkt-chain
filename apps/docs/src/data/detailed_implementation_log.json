@@ -4395,6 +4395,61 @@
               "subitems": []
             }
           ]
+        },
+        {
+          "title": "11.25 Правобічна Висувна Панель Інспектора Завдань (`SBC-238`)",
+          "level": 3,
+          "paragraphs": [],
+          "code_blocks": [
+            {
+              "lang": "tsx",
+              "content": "<aside className=\"fixed right-0 top-0 bottom-0 w-full sm:w-[480px] lg:w-[540px] bg-slate-900 border-l border-indigo-500/30 shadow-2xl z-50 flex flex-col overflow-hidden animate-slideInRight\">"
+            }
+          ],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "**Змінені файли:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "[`apps/teacher/src/features/course-map/ui/CourseGraphViewer.tsx`](file:///apps/teacher/src/features/course-map/ui/CourseGraphViewer.tsx)",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Архітектурні особливості:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Slide-Over Drawer Design:**",
+              "subitems": [
+                "Замість громіздкого блоку під полотном використано патерн правобічної висувної шторки:",
+                "Включає плавний фоновий бекдроп `fixed inset-0 bg-black/40 backdrop-blur-[2px] z-40`, який закриває панель при кліку поза нею."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Організація вмісту інспектора:**",
+              "subitems": [
+                "Хедер з бейджами складності, типу (`Code VM` / `Single Choice`) та підконцепту;",
+                "Скрольована зона з умовою задачі, стартовим шаблоном коду (`starterCode`), варіантами тестових відповідей із чекмарком правильної та тест-кейсами із захисними мітками `SECRET`;",
+                "Швидке закриття хрестиком або кнопкою в нижньому футері без зміщення полотна Дерева Навичок."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Тестування:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Production збірку `npm run build:teacher` завершено успішно (0 помилок типізації) ✅.",
+              "subitems": []
+            }
+          ]
         }
       ]
     }

@@ -1188,5 +1188,22 @@ eferenceAnswer, критерії options.keywords (microtask|мікротаск|
 - **Тестування:**
   - Production збірку `npm run build:teacher` завершено успішно (0 помилок типізації) ✅.
 
+### 11.25 Правобічна Висувна Панель Інспектора Завдань (`SBC-238`)
+- **Змінені файли:**
+  - [`apps/teacher/src/features/course-map/ui/CourseGraphViewer.tsx`](file:///apps/teacher/src/features/course-map/ui/CourseGraphViewer.tsx)
+- **Архітектурні особливості:**
+  1. **Slide-Over Drawer Design:**
+     - Замість громіздкого блоку під полотном використано патерн правобічної висувної шторки:
+       ```tsx
+       <aside className="fixed right-0 top-0 bottom-0 w-full sm:w-[480px] lg:w-[540px] bg-slate-900 border-l border-indigo-500/30 shadow-2xl z-50 flex flex-col overflow-hidden animate-slideInRight">
+       ```
+     - Включає плавний фоновий бекдроп `fixed inset-0 bg-black/40 backdrop-blur-[2px] z-40`, який закриває панель при кліку поза нею.
+  2. **Організація вмісту інспектора:**
+     - Хедер з бейджами складності, типу (`Code VM` / `Single Choice`) та підконцепту;
+     - Скрольована зона з умовою задачі, стартовим шаблоном коду (`starterCode`), варіантами тестових відповідей із чекмарком правильної та тест-кейсами із захисними мітками `SECRET`;
+     - Швидке закриття хрестиком або кнопкою в нижньому футері без зміщення полотна Дерева Навичок.
+- **Тестування:**
+  - Production збірку `npm run build:teacher` завершено успішно (0 помилок типізації) ✅.
+
 
 
