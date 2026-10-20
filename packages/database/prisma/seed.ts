@@ -4,6 +4,14 @@ dotenv.config({ path: path.resolve(__dirname, '../../../.env') });
 dotenv.config();
 
 import { PrismaClient, UserRole, TaskDifficulty, TaskType } from '@prisma/client';
+import {
+  jsBasicsTasks,
+  jsFunctionsTasks,
+  jsCollectionsTasks,
+  jsAsyncTasks,
+  jsOopTasks,
+  SeedTask,
+} from './data/js-tasks.data';
 
 const prisma = new PrismaClient();
 
@@ -144,346 +152,55 @@ async function main() {
   ];
   for (const dep of jsDeps) {
     await prisma.skillDependency.create({
-      data: { parentSkillId: dep.parent.id, childSkillId: dep.child.id, requiredMastery: 0.95 },
+      data: { parentSkillId: dep.parent.id, childSkillId: dep.child.id, requiredMastery: 0.75 },
     });
   }
 
-  // ==================== JS TASKS (Multi-Tier Adaptive Bank) ====================
-  // --- MODULE 1: jsBasics (js-basics) ---
-  // Topic: variables-declaration
-  await prisma.task.create({
-    data: {
-      skillId: jsBasics.id,
-      topic: 'variables-declaration',
-      subConcept: 'const-immutability',
-      taskType: TaskType.SINGLE_CHOICE,
-      title: 'Теорія JS: Оголошення змінних `const`',
-      description: 'Що відбудеться при спробі повторного присвоєння значення змінній, оголошеній через `const x = 10`?',
-      difficulty: TaskDifficulty.EASY,
-      options: [
-        { id: 'opt1', text: 'Значення успішно зміниться', isCorrect: false },
-        { id: 'opt2', text: 'Виникне помилка TypeError: Assignment to constant variable', isCorrect: true },
-        { id: 'opt3', text: 'Змінна стане undefined', isCorrect: false },
-      ],
-    },
-  });
+  // ==================== JS TASKS (Multi-Tier Adaptive Bank: 100+ Tasks) ====================
+  // Helper to insert structured task bank with options and test cases
+  const insertModuleTasks = async (skillId: string, tasks: SeedTask[]) => {
+    for (const t of tasks) {
+      await prisma.task.create({
+        data: {
+          skillId,
+          topic: t.topic,
+          subConcept: t.subConcept,
+          taskType: t.taskType as any,
+          title: t.title,
+          description: t.description,
+          difficulty: t.difficulty as any,
+          starterCode: t.starterCode,
+          options: t.options ? (t.options as any) : undefined,
+          referenceAnswer: t.referenceAnswer,
+          rubrics: t.rubrics ? (t.rubrics as any) : undefined,
+          testCases: t.testCases && t.testCases.length > 0
+            ? {
+                create: t.testCases.map((tc) => ({
+                  input: tc.input,
+                  expectedOutput: tc.expectedOutput,
+                  isSecret: tc.isSecret ?? false,
+                })),
+              }
+            : undefined,
+        },
+      });
+    }
+  };
 
-  await prisma.task.create({
-    data: {
-      skillId: jsBasics.id,
-      topic: 'variables-declaration',
-      subConcept: 'let-vs-var-scope',
-      taskType: TaskType.SINGLE_CHOICE,
-      title: 'Область видимості: `let` проти `var`',
-      description: 'Яка ключова відмінність між областю видимості змінних `let` та `var` всередині блоку `{ ... }`?',
-      difficulty: TaskDifficulty.MEDIUM,
-      options: [
-        { id: 'opt1', text: '`let` має блочну область видимості, а `var` — функціональну', isCorrect: true },
-        { id: 'opt2', text: '`var` має блочну область, а `let` — глобальну', isCorrect: false },
-        { id: 'opt3', text: 'Між ними немає жодної різниці', isCorrect: false },
-      ],
-    },
-  });
+  console.log('  -> Seeding JS Module 1: Basics (' + jsBasicsTasks.length + ' tasks)...');
+  await insertModuleTasks(jsBasics.id, jsBasicsTasks);
 
-  // Topic: primitive-types
-  await prisma.task.create({
-    data: {
-      skillId: jsBasics.id,
-      topic: 'primitive-types',
-      subConcept: 'type-identification',
-      taskType: TaskType.MULTIPLE_CHOICE,
-      title: 'Теорія JS: Примітивні типи даних',
-      description: 'Оберіть УСІ примітивні типи даних у мові JavaScript:',
-      difficulty: TaskDifficulty.EASY,
-      options: [
-        { id: 'opt1', text: 'number', isCorrect: true },
-        { id: 'opt2', text: 'string', isCorrect: true },
-        { id: 'opt3', text: 'boolean', isCorrect: true },
-        { id: 'opt4', text: 'Array', isCorrect: false },
-        { id: 'opt5', text: 'symbol', isCorrect: true },
-      ],
-    },
-  });
+  console.log('  -> Seeding JS Module 2: Functions (' + jsFunctionsTasks.length + ' tasks)...');
+  await insertModuleTasks(jsFunctions.id, jsFunctionsTasks);
 
-  await prisma.task.create({
-    data: {
-      skillId: jsBasics.id,
-      topic: 'primitive-types',
-      subConcept: 'type-coercion',
-      taskType: TaskType.SINGLE_CHOICE,
-      title: 'Неявне приведення типів (Type Coercion)',
-      description: 'Який результат виразу `"5" - 2` та `"5" + 2` у JavaScript?',
-      difficulty: TaskDifficulty.MEDIUM,
-      options: [
-        { id: 'opt1', text: '3 та "52"', isCorrect: true },
-        { id: 'opt2', text: '"3" та 7', isCorrect: false },
-        { id: 'opt3', text: 'NaN та "52"', isCorrect: false },
-        { id: 'opt4', text: '3 та 7', isCorrect: false },
-      ],
-    },
-  });
+  console.log('  -> Seeding JS Module 3: Collections (' + jsCollectionsTasks.length + ' tasks)...');
+  await insertModuleTasks(jsCollections.id, jsCollectionsTasks);
 
-  // Topic: arithmetic-functions
-  await prisma.task.create({
-    data: {
-      skillId: jsBasics.id,
-      topic: 'arithmetic-functions',
-      subConcept: 'basic-addition',
-      taskType: TaskType.CODE,
-      title: 'Сума двох чисел',
-      description: 'Напишіть функцію `sum(a, b)`, яка повертає суму двох чисел.',
-      starterCode: 'function sum(a, b) {\n  // Ваш код тут\n}',
-      difficulty: TaskDifficulty.EASY,
-      testCases: {
-        create: [
-          { input: '[2, 3]', expectedOutput: '5', isSecret: false },
-          { input: '[-1, 1]', expectedOutput: '0', isSecret: false },
-        ],
-      },
-    },
-  });
+  console.log('  -> Seeding JS Module 4: Async (' + jsAsyncTasks.length + ' tasks)...');
+  await insertModuleTasks(jsAsync.id, jsAsyncTasks);
 
-  await prisma.task.create({
-    data: {
-      skillId: jsBasics.id,
-      topic: 'arithmetic-functions',
-      subConcept: 'parity-check',
-      taskType: TaskType.CODE,
-      title: 'Перевірка парності числа',
-      description: 'Напишіть функцію `isEven(n)`, яка повертає `true`, якщо число парне, та `false` якщо ні.',
-      starterCode: 'function isEven(n) {\n  // Ваш код тут\n}',
-      difficulty: TaskDifficulty.EASY,
-      testCases: {
-        create: [
-          { input: '[4]', expectedOutput: 'true', isSecret: false },
-          { input: '[7]', expectedOutput: 'false', isSecret: false },
-        ],
-      },
-    },
-  });
-
-  await prisma.task.create({
-    data: {
-      skillId: jsBasics.id,
-      topic: 'arithmetic-functions',
-      subConcept: 'clamping-algorithm',
-      taskType: TaskType.CODE,
-      title: 'Обмеження діапазону (Clamp Number)',
-      description: 'Напишіть функцію `clamp(num, min, max)`, яка повертає `num`, якщо воно між `min` і `max`. Якщо менше `min` — повертає `min`, якщо більше `max` — повертає `max`.',
-      starterCode: 'function clamp(num, min, max) {\n  // Ваш код тут\n}',
-      difficulty: TaskDifficulty.MEDIUM,
-      testCases: {
-        create: [
-          { input: '[5, 0, 10]', expectedOutput: '5', isSecret: false },
-          { input: '[-5, 0, 10]', expectedOutput: '0', isSecret: false },
-          { input: '[15, 0, 10]', expectedOutput: '10', isSecret: false },
-        ],
-      },
-    },
-  });
-
-  await prisma.task.create({
-    data: {
-      skillId: jsBasics.id,
-      topic: 'arithmetic-functions',
-      subConcept: 'prime-number-check',
-      taskType: TaskType.CODE,
-      title: 'Визначення простого числа (Prime Check)',
-      description: 'Напишіть функцію `isPrime(n)`, яка повертає `true`, якщо число є простим (більше 1 і ділиться тільки на 1 і себе), та `false` в іншому випадку.',
-      starterCode: 'function isPrime(n) {\n  // Ваш код тут\n}',
-      difficulty: TaskDifficulty.HARD,
-      testCases: {
-        create: [
-          { input: '[7]', expectedOutput: 'true', isSecret: false },
-          { input: '[4]', expectedOutput: 'false', isSecret: false },
-          { input: '[1]', expectedOutput: 'false', isSecret: false },
-          { input: '[13]', expectedOutput: 'true', isSecret: true },
-        ],
-      },
-    },
-  });
-
-  // --- MODULE 2: jsFunctions (js-functions) ---
-  // Topic: arrow-functions
-  await prisma.task.create({
-    data: {
-      skillId: jsFunctions.id,
-      topic: 'arrow-functions',
-      subConcept: 'syntax-rules',
-      taskType: TaskType.SINGLE_CHOICE,
-      title: 'Синтаксис Arrow Functions',
-      description: 'Яка з наступних стрілочних функцій ПРАВИЛЬНО неявно повертає обʼєкт `{ val: 42 }`?',
-      difficulty: TaskDifficulty.EASY,
-      options: [
-        { id: 'opt1', text: '() => { val: 42 }', isCorrect: false },
-        { id: 'opt2', text: '() => ({ val: 42 })', isCorrect: true },
-        { id: 'opt3', text: '() => return { val: 42 }', isCorrect: false },
-      ],
-    },
-  });
-
-  await prisma.task.create({
-    data: {
-      skillId: jsFunctions.id,
-      topic: 'arrow-functions',
-      subConcept: 'math-power',
-      taskType: TaskType.CODE,
-      title: 'Піднесення до степеня (Arrow Function)',
-      description: 'Напишіть стрілочну функцію `power(base, exp)`, яка підносить число `base` до степеня `exp`.',
-      starterCode: 'const power = (base, exp) => {\n  // Ваш код тут\n};',
-      difficulty: TaskDifficulty.EASY,
-      testCases: {
-        create: [
-          { input: '[2, 3]', expectedOutput: '8', isSecret: false },
-          { input: '[3, 4]', expectedOutput: '81', isSecret: true },
-        ],
-      },
-    },
-  });
-
-  // Topic: closures
-  await prisma.task.create({
-    data: {
-      skillId: jsFunctions.id,
-      topic: 'closures',
-      subConcept: 'counter-closure',
-      taskType: TaskType.CODE,
-      title: 'Лічильник на Замиканнях (Counter Closure)',
-      description: 'Напишіть функцію `createCounter()`, яка повертає іншу функцію, що при кожному виклику повертає число на 1 більше за попереднє (починаючи з 1).',
-      starterCode: 'function createCounter() {\n  // Ваш код тут\n}',
-      difficulty: TaskDifficulty.MEDIUM,
-      testCases: {
-        create: [
-          { input: '[]', expectedOutput: '1', isSecret: false },
-        ],
-      },
-    },
-  });
-
-  await prisma.task.create({
-    data: {
-      skillId: jsFunctions.id,
-      topic: 'closures',
-      subConcept: 'currying-and-memoization',
-      taskType: TaskType.CODE,
-      title: 'Каррування функцій (Currying multiply)',
-      description: 'Напишіть карровану функцію `multiply(a)(b)`, яка викликається як `multiply(2)(3)` і повертає 6.',
-      starterCode: 'function multiply(a) {\n  // Ваш код тут\n}',
-      difficulty: TaskDifficulty.HARD,
-      testCases: {
-        create: [
-          { input: '[2]', expectedOutput: '6', isSecret: false },
-        ],
-      },
-    },
-  });
-
-  // --- MODULE 3: jsCollections (js-collections) ---
-  // Topic: array-methods
-  await prisma.task.create({
-    data: {
-      skillId: jsCollections.id,
-      topic: 'array-methods',
-      subConcept: 'map-vs-foreach',
-      taskType: TaskType.SINGLE_CHOICE,
-      title: 'Методи масивів: `map` проти `forEach`',
-      description: 'У чому принципова різниця між методом `map` та `forEach` над масивом?',
-      difficulty: TaskDifficulty.EASY,
-      options: [
-        { id: 'opt1', text: '`map` повертає новий масив трансформованих значень, а `forEach` повертає undefined', isCorrect: true },
-        { id: 'opt2', text: '`forEach` мутує оригінальний масив, а `map` — ніколи', isCorrect: false },
-        { id: 'opt3', text: '`map` працює тільки з числами', isCorrect: false },
-      ],
-    },
-  });
-
-  await prisma.task.create({
-    data: {
-      skillId: jsCollections.id,
-      topic: 'array-methods',
-      subConcept: 'filter-even-numbers',
-      taskType: TaskType.CODE,
-      title: 'Фільтрація парних елементів',
-      description: 'Напишіть функцію `filterEvens(numbers)`, яка приймає масив чисел і повертає новий масив тільки з парними числами.',
-      starterCode: 'function filterEvens(numbers) {\n  // Ваш код тут\n}',
-      difficulty: TaskDifficulty.MEDIUM,
-      testCases: {
-        create: [
-          { input: '[[1, 2, 3, 4, 5, 6]]', expectedOutput: '[2,4,6]', isSecret: false },
-        ],
-      },
-    },
-  });
-
-  await prisma.task.create({
-    data: {
-      skillId: jsCollections.id,
-      topic: 'array-methods',
-      subConcept: 'reduce-aggregation',
-      taskType: TaskType.CODE,
-      title: 'Підрахунок входжень (Array Reduce)',
-      description: 'Напишіть функцію `countOccurrences(arr)`, яка приймає масив рядків і повертає обʼєкт з кількістю входжень кожного елемента (наприклад: `["a","b","a"]` ➔ `{"a":2,"b":1}`).',
-      starterCode: 'function countOccurrences(arr) {\n  // Ваш код тут\n}',
-      difficulty: TaskDifficulty.HARD,
-      testCases: {
-        create: [
-          { input: '[["apple", "banana", "apple"]]', expectedOutput: '{"apple":2,"banana":1}', isSecret: false },
-        ],
-      },
-    },
-  });
-
-  // --- MODULE 4: jsAsync (js-async) ---
-  // Topic: event-loop
-  await prisma.task.create({
-    data: {
-      skillId: jsAsync.id,
-      topic: 'event-loop',
-      subConcept: 'micro-vs-macro-tasks',
-      taskType: TaskType.TEXT_ESSAY,
-      title: 'Аналіз концепції: Event Loop та асинхронність',
-      description: 'Поясніть своїми словами принцип роботи Event Loop та різницю між Microtasks (Promises) і Macrotasks (setTimeout) у JavaScript.',
-      difficulty: TaskDifficulty.MEDIUM,
-      referenceAnswer:
-        'Event Loop контролює Call Stack та черги Microtasks/Macrotasks. Microtasks (Promises, queueMicrotask) виконуються першочергово після поточного стеку перед оновленням рендеру, а Macrotasks (setTimeout, setInterval) виконуються на наступних ітераціях подій.',
-      options: {
-        keywords: [
-          'microtask|мікротаск|promise|проміс',
-          'macrotask|макротаск|settimeout|таймер',
-          'call stack|стек',
-          'черга|queue',
-        ],
-        minWords: 15,
-      },
-      rubrics: {
-        keywords: [
-          'microtask|мікротаск|promise|проміс',
-          'macrotask|макротаск|settimeout|таймер',
-          'call stack|стек',
-          'черга|queue',
-        ],
-        minWords: 15,
-      },
-    },
-  });
-
-  await prisma.task.create({
-    data: {
-      skillId: jsAsync.id,
-      topic: 'async-await',
-      subConcept: 'fetch-user-promise',
-      taskType: TaskType.CODE,
-      title: 'Асинхронне отримання профілю користувача',
-      description: 'Напишіть асинхронну функцію `fetchUser(id)`, яка за допомогою `await` повертає обʼєкт `{ id, name: "User_" + id }`.',
-      starterCode: 'async function fetchUser(id) {\n  await new Promise(r => setTimeout(r, 10));\n  return { id, name: "User_" + id };\n}',
-      difficulty: TaskDifficulty.HARD,
-      testCases: {
-        create: [
-          { input: '[1]', expectedOutput: '{"id":1,"name":"User_1"}', isSecret: false },
-        ],
-      },
-    },
-  });
+  console.log('  -> Seeding JS Module 5: OOP (' + jsOopTasks.length + ' tasks)...');
+  await insertModuleTasks(jsOop.id, jsOopTasks);
 
 
   // ==================== COURSE 2: ENGLISH LANGUAGE B2 ====================

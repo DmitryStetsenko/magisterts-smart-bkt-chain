@@ -71,6 +71,28 @@
      - 35/35 unit-тестів API пройдено (`npm run test:api`).
      - Production збірку `apps/student` завершено успішно (0 помилок).
 
+7. **Розробка Методологічної Специфікації Створення Завдань (`SBC-232`, `EP-SH`):**
+   - **Документ:** Створено окрему науково-педагогічну специфікацію [`docs/justifications/03_task_authoring_and_pedagogical_specification.md`](file:///docs/justifications/03_task_authoring_and_pedagogical_specification.md).
+   - **Ключові положення:**
+     - **Канон Когнітивної Тріади:** кожен підконцепт повинен мати синхронізовану трійку завдань (`EASY` — діагностика фактів/вибір варіантів, `MEDIUM` — стандартне кодування/Bug Hunt з відкритими тестами, `HARD` — крайові випадки/алгоритмічні задачі з прихованими тестами).
+     - **Стандартизація метаданих:** закріплено вимоги до полів `topic` та `subConcept` у форматі `kebab-case`.
+     - **Валідація тест-кейсів:** суворий JSON-формат для `input` та `expectedOutput`, наявність принаймні одного прихованого тесту (`isSecret: true`) для запобігання підгонці під тести.
+
+8. **Генерація Масштабного Банку Завдань на 107 Тасок для Курсу JavaScript (`SBC-233`, `EP-SH`):**
+   - **Датасет (`packages/database/prisma/data/js-tasks.data.ts`):**
+     - Згенеровано 107 повноцінних завдань для 5 модулів курсу JS:
+       - **Модуль 1 (Синтаксис та База):** 22 завдання (`variables-declaration`, `primitive-types`, `type-coercion`, `operators-and-logic`, `arithmetic-functions`, `branching-and-loops`, `string-manipulation`).
+       - **Модуль 2 (Функції & Closures):** 22 завдання (`arrow-functions`, `default-parameters`, `rest-and-spread`, `closures`, `hoisting-functions`, `parameters-and-scope`, `recursion-fundamentals`).
+       - **Модуль 3 (Колекції & Обʼєкти):** 22 завдання (`array-iteration`, `array-reduction`, `object-manipulation`, `map-and-set`, `array-mutations-and-searches`, `object-destructuring`, `sorting-and-comparators`).
+       - **Модуль 4 (Асинхронність & Event Loop):** 22 завдання (`event-loop`, `promises`, `async-await`, `error-handling-async`, `promise-combinators`, `timers-and-intervals`, `async-generators-and-iterators`).
+       - **Модуль 5 (ООП & Класи):** 19 завдань (`classes-es6`, `inheritance`, `prototypes`, `static-methods`, `getters-and-setters`, `object-composition-and-mixins`).
+   - **Скрипт посіву (`seed.ts`):**
+     - Інтегровано модульний імпорт та автоматизовану функцію `insertModuleTasks` з підтримкою збереження тест-кейсів та варіантів відповідей.
+     - Гармонізовано поріг міжмодульної залежності `requiredMastery: 0.75` (замість старого 0.95).
+     - Успішно засіяно базу даних (загальна кількість завдань у БД зросла до 114 з урахуванням інших курсів).
+   - **Валідація:**
+     - 35/35 unit-тестів API пройдено (`npm run test:api`).
+
 ## 📅 19 жовтня 2026 року
 
 ### ✅ Що зроблено за день:

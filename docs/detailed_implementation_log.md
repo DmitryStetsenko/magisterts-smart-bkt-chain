@@ -1059,3 +1059,42 @@ eferenceAnswer, критерії options.keywords (microtask|мікротаск|
   - 35/35 unit-тестів API пройдено успішно (`npm run test:api`) ✅.
   - Production збірки `npm run build:api` та `npm run build:student` пройшли без помилок ✅.
 
+### 11.19 Методологічна Специфікація Створення Завдань (`SBC-232`)
+- **Створений файл:**
+  - [`docs/justifications/03_task_authoring_and_pedagogical_specification.md`](file:///docs/justifications/03_task_authoring_and_pedagogical_specification.md)
+- **Архітектурні особливості:**
+  1. **Канон Когнітивної Тріади (Cognitive Triad):**
+     - Кожен підконцепт (`subConcept`) обов'язково забезпечується трьома рівнями складності:
+       - `EASY`: вибір відповіді (Single/Multiple Choice), швидка діагностика розуміння синтаксису;
+       - `MEDIUM`: написання коду або Bug Hunt з відкритими тестами для тренування стандартного патерну;
+       - `HARD`: поглиблений алгоритм або крайовий випадок з обов'язковими прихованими тестами (`isSecret: true`).
+  2. **Математична відповідність параметрів BKT:**
+     - Встановлено рекомендовані кореляції:
+       - `EASY`: $P(G) \approx 0.20-0.25$, $P(S) \approx 0.05$;
+       - `MEDIUM`: $P(G) \approx 0.05$, $P(S) \approx 0.15$;
+       - `HARD`: $P(G) \approx 0.01$, $P(S) \approx 0.20$.
+  3. **Стандартизація схем даних тест-кейсів:**
+     - Обов'язкова валідація JSON-серіалізованих аргументів масиву вхідних параметрів `input` та суворий рядок очікуваного виводу `expectedOutput`.
+
+### 11.20 Масштабний Банк Адаптивних Завдань Курсу JavaScript на 107 Тасок (`SBC-233`)
+- **Створені та змінені файли:**
+  - [`packages/database/prisma/data/js-tasks.data.ts`](file:///packages/database/prisma/data/js-tasks.data.ts)
+  - [`packages/database/prisma/seed.ts`](file:///packages/database/prisma/seed.ts)
+- **Архітектурні особливості:**
+  1. **Модульна архітектура банків даних:**
+     - Завдання винесено з монолітного `seed.ts` в ізольований датасет `js-tasks.data.ts`, структурований за модулями курсу:
+       - `jsBasicsTasks`: 22 завдання (7 тем по 3 рівні + 1 кастомний Bug Hunt);
+       - `jsFunctionsTasks`: 22 завдання (7 тем по 3 рівні + 1 кастомний Bug Hunt);
+       - `jsCollectionsTasks`: 22 завдання (7 тем по 3 рівні + 1 кастомний Bug Hunt);
+       - `jsAsyncTasks`: 22 завдання (7 тем по 3 рівні + 1 кастомний Bug Hunt);
+       - `jsOopTasks`: 19 завдань (6 тем по 3 рівні + 1 кастомний Bug Hunt).
+  2. **Повна валідність та чистота коду:**
+     - Усі завдання мають робочі starter-шаблони, зрозумілі умови українською мовою та валідні JSON тест-кейси з прихованими тестами проти читерства.
+  3. **Синхронізація порогу залежностей у сидингу:**
+     - У `seed.ts` оновлено `requiredMastery: 0.75` для всіх залежностей JS (`jsBasics -> jsFunctions -> jsCollections -> jsAsync -> jsOop`), що відповідає алгоритму `TaskSequencer` та `BktEngine.PROFICIENT_THRESHOLD`.
+  4. **Результати посіву бази даних:**
+     - Загальна кількість завдань у БД: **114** (107 завдань JS + завдання супутніх курсів англійської та юриспруденції).
+- **Тестування:**
+  - 35/35 unit-тестів API пройдено успішно (`npm run test:api`) ✅.
+
+
