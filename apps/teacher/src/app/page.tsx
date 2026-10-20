@@ -2,10 +2,11 @@
 
 import React, { useState, useEffect } from 'react';
 import { io } from 'socket.io-client';
-import { ShieldCheck, Network, Users, BarChart3, Code2, BookOpen, Scale, ChevronDown, X, Search, RotateCcw, AlertTriangle, CheckCircle2, Lock, HelpCircle, Code, FileText, CheckSquare, Sparkles, Keyboard, Copy, Activity, Info, GitBranch, Layers, ClipboardCheck } from 'lucide-react';
+import { ShieldCheck, Network, Users, BarChart3, Code2, BookOpen, Scale, ChevronDown, X, Search, RotateCcw, AlertTriangle, CheckCircle2, Lock, HelpCircle, Code, FileText, CheckSquare, Sparkles, Keyboard, Copy, Activity, Info, GitBranch, Layers, ClipboardCheck, Tag } from 'lucide-react';
 import { StudentAnalyticsItem } from '../features/analytics/model/analytics.types';
 import { AnomalyTreeWidget, GameSkillTreeWidget, SkillGraphNode } from '@sbc/ui';
 import { ReviewQueueInspector } from '../features/reviews/ui/ReviewQueueInspector';
+import { CourseGraphViewer } from '../features/course-map/ui/CourseGraphViewer';
 
 interface CourseItem {
   slug: string;
@@ -917,59 +918,109 @@ export default function TeacherDashboardPage() {
                     />
                   </div>
 
-                  <div className="flex flex-col gap-2 mt-1">
+                  <div className="flex flex-col gap-2.5 mt-1">
                     {courseDetails.skills?.map((skill: any, sIdx: number) => {
                       const isSkillSelected = selectedSkillSlug === skill.slug;
                       const skillTasks = allTasks.filter((t) => t.skillId === skill.id || t.skill?.id === skill.id);
+                      const matchingTasks = dagSearch
+                        ? skillTasks.filter(
+                            (t) =>
+                              t.title.toLowerCase().includes(dagSearch.toLowerCase()) ||
+                              (t.topic && t.topic.toLowerCase().includes(dagSearch.toLowerCase())) ||
+                              (t.subConcept && t.subConcept.toLowerCase().includes(dagSearch.toLowerCase()))
+                          )
+                        : skillTasks;
+
+                      if (dagSearch && matchingTasks.length === 0) return null;
+
+                      // Group tasks by topic
+                      const topicsMap: Record<string, any[]> = {};
+                      matchingTasks.forEach((tk) => {
+                        const top = tk.topic || 'загальні';
+                        if (!topicsMap[top]) topicsMap[top] = [];
+                        topicsMap[top].push(tk);
+                      });
 
                       return (
-                        <div key={skill.id} className="flex flex-col gap-1.5">
+                        <div key={skill.id} className="flex flex-col gap-1.5 bg-slate-950/40 rounded-xl p-1.5 border border-slate-800/60">
                           {/* Skill Node Card Header in List */}
                           <div
                             onClick={() => {
                               setSelectedSkillSlug(skill.slug);
                               setSelectedTaskId(null);
                             }}
-                            className={`p-3 rounded-xl border transition-all cursor-pointer flex items-center justify-between ${
+                            className={`p-2.5 rounded-lg border transition-all cursor-pointer flex items-center justify-between ${
                               isSkillSelected
-                                ? 'bg-indigo-950/40 border-indigo-500 shadow-md ring-1 ring-indigo-500/50'
+                                ? 'bg-indigo-950/60 border-indigo-500 shadow-md ring-1 ring-indigo-500/50'
                                 : 'bg-slate-950/80 border-slate-800 hover:bg-slate-800/50'
                             }`}
                           >
                             <div className="flex items-center gap-2">
-                              <span className="text-[10px] font-mono text-indigo-400 font-bold bg-indigo-500/10 px-2 py-0.5 rounded border border-indigo-500/20">
+                              <span className="text-[10px] font-mono text-indigo-400 font-bold bg-indigo-500/10 px-1.5 py-0.5 rounded border border-indigo-500/20">
                                 M{sIdx + 1}
                               </span>
-                              <span className="text-xs font-bold text-white">{skill.title}</span>
+                              <span className="text-xs font-bold text-white truncate max-w-[170px]">{skill.title}</span>
                             </div>
                             <span className="text-[10px] font-mono text-slate-400">
-                              {skillTasks.length} задач
+                              {matchingTasks.length}
                             </span>
                           </div>
 
-                          {/* Tasks Sub-list under Skill */}
-                          <div className="pl-3 flex flex-col gap-1 border-l-2 border-slate-800 ml-3">
-                            {skillTasks.map((tk: any) => {
-                              const isTaskSelected = selectedTaskId === tk.id;
-                              return (
-                                <div
-                                  key={tk.id}
-                                  onClick={() => {
-                                    setSelectedTaskId(tk.id);
-                                    setSelectedSkillSlug(skill.slug);
-                                  }}
-                                  className={`p-2 rounded-lg text-xs transition-all cursor-pointer flex items-center justify-between ${
-                                    isTaskSelected
-                                      ? 'bg-purple-950/60 text-purple-200 border border-purple-500/40 font-semibold'
-                                      : 'bg-slate-950/50 text-slate-300 hover:bg-slate-800/40 border border-slate-800/40'
-                                  }`}
-                                >
-                                  <span className="truncate pr-2">{tk.title}</span>
-                                  {getTaskTypeBadge(tk.taskType)}
+                          {/* Hierarchical Topics & Tasks Sub-list */}
+                          {isSkillSelected && (
+                            <div className="pl-2 flex flex-col gap-2 pt-1 border-l-2 border-indigo-500/30 ml-2">
+                              {Object.entries(topicsMap).map(([topicName, tTasks]) => (
+                                <div key={topicName} className="flex flex-col gap-1">
+                                  <div className="text-[10px] font-mono uppercase font-bold text-purple-400 px-1 flex items-center gap-1">
+                                    <Tag className="w-2.5 h-2.5" />
+                                    <span>{topicName}</span>
+                                  </div>
+
+                                  <div className="flex flex-col gap-1">
+                                    {tTasks.map((tk: any) => {
+                                      const isTaskSelected = selectedTaskId === tk.id;
+                                      const diffColor =
+                                        tk.difficulty === 'HARD'
+                                          ? 'text-rose-400 border-rose-500/30 bg-rose-500/10'
+                                          : tk.difficulty === 'MEDIUM'
+                                          ? 'text-amber-400 border-amber-500/30 bg-amber-500/10'
+                                          : 'text-emerald-400 border-emerald-500/30 bg-emerald-500/10';
+
+                                      return (
+                                        <div
+                                          key={tk.id}
+                                          onClick={() => {
+                                            setSelectedTaskId(tk.id);
+                                            setSelectedSkillSlug(skill.slug);
+                                          }}
+                                          className={`p-2 rounded-lg text-xs transition-all cursor-pointer flex items-center justify-between gap-1.5 ${
+                                            isTaskSelected
+                                              ? 'bg-purple-950/70 text-purple-200 border border-purple-500/50 font-semibold shadow-sm'
+                                              : 'bg-slate-950/70 text-slate-300 hover:bg-slate-800/50 border border-slate-800/40'
+                                          }`}
+                                        >
+                                          <div className="flex flex-col truncate pr-1">
+                                            <span className="truncate text-[11px]">{tk.title}</span>
+                                            {tk.subConcept && (
+                                              <span className="text-[9px] font-mono text-slate-500 truncate">
+                                                {tk.subConcept}
+                                              </span>
+                                            )}
+                                          </div>
+                                          <div className="flex items-center gap-1 shrink-0">
+                                            <span className={`text-[9px] font-mono font-bold px-1.5 py-0.2 rounded border ${diffColor}`}>
+                                              {tk.difficulty === 'EASY' ? '🟢' : tk.difficulty === 'MEDIUM' ? '🟡' : '🔴'}
+                                            </span>
+                                            {getTaskTypeBadge(tk.taskType)}
+                                          </div>
+                                        </div>
+                                      );
+                                    })}
+                                  </div>
                                 </div>
-                              );
-                            })}
-                          </div>
+                              ))}
+                            </div>
+                          )}
                         </div>
                       );
                     })}
@@ -1352,127 +1403,24 @@ export default function TeacherDashboardPage() {
         </div>
       )}
 
-          {/* Main View 2: Course & Tasks Detail Inspector */}
+          {/* Main View 2: Course & Tasks Detail Inspector via Interactive CourseGraphViewer */}
           {activeTab === 'coursemap' && (
-            <div className="flex flex-col gap-6">
-              {selectedTaskId ? (
-                // Task Details Canvas View
-                (() => {
-                  const task = allTasks.find((t) => t.id === selectedTaskId);
-                  if (!task) return null;
-                  return (
-                    <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl flex flex-col gap-5">
-                      <div className="flex items-center justify-between border-b border-slate-800 pb-4">
-                        <div>
-                          <span className="text-[10px] font-mono uppercase bg-purple-500/10 text-purple-400 px-2 py-0.5 rounded border border-purple-500/20">
-                            Деталізація Завдання ({task.difficulty})
-                          </span>
-                          <h2 className="text-xl font-bold text-white mt-1">{task.title}</h2>
-                        </div>
-                        {getTaskTypeBadge(task.taskType)}
-                      </div>
-
-                      <div className="flex flex-col gap-2">
-                        <h4 className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Умова завдання:</h4>
-                        <div className="p-4 bg-slate-950 border border-slate-800 rounded-xl text-xs text-slate-200 font-mono leading-relaxed whitespace-pre-wrap">
-                          {task.description}
-                        </div>
-                      </div>
-
-                      {/* Options / Answers if Quiz */}
-                      {task.options && (
-                        <div className="flex flex-col gap-2">
-                          <h4 className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Варіанти відповідей та Ключі:</h4>
-                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                            {Array.isArray(task.options.choices) &&
-                              task.options.choices.map((c: any, i: number) => {
-                                const isCorrect =
-                                  task.options.correctAnswer === c.id ||
-                                  (Array.isArray(task.options.correctAnswers) && task.options.correctAnswers.includes(c.id));
-                                return (
-                                  <div
-                                    key={i}
-                                    className={`p-3 rounded-xl border text-xs flex items-center justify-between ${
-                                      isCorrect
-                                        ? 'bg-emerald-950/40 border-emerald-500/50 text-emerald-300 font-semibold'
-                                        : 'bg-slate-950 border-slate-800 text-slate-400'
-                                    }`}
-                                  >
-                                    <span>{c.text || c.label}</span>
-                                    {isCorrect && <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />}
-                                  </div>
-                                );
-                              })}
-                          </div>
-                        </div>
-                      )}
-
-                      {/* Test cases if Code task */}
-                      {task.testCases && (
-                        <div className="flex flex-col gap-2">
-                          <h4 className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Автоматичні Тест-кейси (VM Runner):</h4>
-                          <div className="flex flex-col gap-2">
-                            {task.testCases.map((tc: any, idx: number) => (
-                              <div key={idx} className="p-3 bg-slate-950 border border-slate-800 rounded-xl font-mono text-xs flex items-center justify-between">
-                                <span className="text-slate-400">Input: <code className="text-white">{tc.input}</code></span>
-                                <span className="text-slate-400">Expected: <code className="text-emerald-400">{tc.expectedOutput}</code></span>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  );
-                })()
-              ) : (
-                // Skill Node Details Canvas View
-                (() => {
-                  const skill = courseDetails?.skills?.find((s: any) => s.slug === selectedSkillSlug) || courseDetails?.skills?.[0];
-                  if (!skill) return <div className="text-slate-400 text-sm">Оберіть модуль зі списку для перегляду.</div>;
-                  const skillTasks = allTasks.filter((t) => t.skillId === skill.id || t.skill?.id === skill.id);
-
-                  return (
-                    <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl flex flex-col gap-6">
-                      <div className="flex items-center justify-between border-b border-slate-800 pb-4">
-                        <div>
-                          <span className="text-[10px] font-mono uppercase bg-indigo-500/10 text-indigo-400 px-2 py-0.5 rounded border border-indigo-500/20">
-                            Вузол Графа Навичок (DAG Node)
-                          </span>
-                          <h2 className="text-xl font-bold text-white mt-1">{skill.title}</h2>
-                          <p className="text-xs text-slate-400 mt-1">{skill.description || 'Модуль роз розширеного курсу.'}</p>
-                        </div>
-                        <div className="text-right">
-                          <span className="text-xs font-mono text-slate-400 block">Завдань у модулі</span>
-                          <span className="text-lg font-bold text-indigo-400 font-mono">{skillTasks.length}</span>
-                        </div>
-                      </div>
-
-                      <div className="flex flex-col gap-3">
-                        <h4 className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Список Завдань Модуля:</h4>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                          {skillTasks.map((tk: any) => (
-                            <div
-                              key={tk.id}
-                              onClick={() => setSelectedTaskId(tk.id)}
-                              className="p-4 rounded-xl bg-slate-950 border border-slate-800 hover:border-indigo-500/50 cursor-pointer transition-all flex flex-col justify-between gap-3 shadow-md"
-                            >
-                              <div className="flex items-center justify-between">
-                                <span className="text-xs font-bold text-white">{tk.title}</span>
-                                {getTaskTypeBadge(tk.taskType)}
-                              </div>
-                              <p className="text-[11px] text-slate-400 line-clamp-2">{tk.description}</p>
-                              <span className="text-[10px] text-indigo-400 font-semibold self-end">
-                                Детальніше ➔
-                              </span>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })()
-              )}
-            </div>
+            <CourseGraphViewer
+              courseTitle={courseDetails?.title || activeCourse?.title || 'Навчальний курс'}
+              courseSlug={activeCourseSlug}
+              skills={courseDetails?.skills || []}
+              allTasks={allTasks}
+              selectedSkillSlug={selectedSkillSlug}
+              selectedTaskId={selectedTaskId}
+              onSelectSkill={(slug) => {
+                setSelectedSkillSlug(slug);
+                setSelectedTaskId(null);
+              }}
+              onSelectTask={(taskId) => {
+                setSelectedTaskId(taskId);
+              }}
+              onCloseDrawer={() => setIsDrawerOpen(false)}
+            />
           )}
 
           {/* Main View: Teacher Review Queue Inspector */}
