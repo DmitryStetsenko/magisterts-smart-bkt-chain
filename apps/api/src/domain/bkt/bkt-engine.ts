@@ -12,9 +12,15 @@ export class BktEngine {
   };
 
   /**
-   * Mastery threshold for considering a skill node mastered
+   * Mastery threshold for considering a skill node fully mastered (Advanced / Gold)
    */
-  public static readonly MASTERY_THRESHOLD = 0.95;
+  public static readonly MASTERY_THRESHOLD = 0.90;
+
+  /**
+   * Mastery threshold for considering a skill node passed/competent (Proficient / Bloom Apply)
+   * Unlocks dependent child nodes in DAG according to Bloom's Mastery Learning theory.
+   */
+  public static readonly PROFICIENT_THRESHOLD = 0.75;
 
   /**
    * Calculates the posterior probability of mastery P(L_t) after an observation
@@ -60,9 +66,16 @@ export class BktEngine {
   }
 
   /**
-   * Helper to check if a mastery probability meets or exceeds threshold (0.95)
+   * Helper to check if a mastery probability meets or exceeds threshold (0.90)
    */
   public static isMastered(pMastery: number): boolean {
     return pMastery >= this.MASTERY_THRESHOLD;
+  }
+
+  /**
+   * Helper to check if a mastery probability meets or exceeds proficient threshold (0.75)
+   */
+  public static isProficient(pMastery: number): boolean {
+    return pMastery >= this.PROFICIENT_THRESHOLD;
   }
 }

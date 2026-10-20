@@ -12,8 +12,20 @@
      - **Спадна адаптація складності (Top-Down Challenge $\to$ Graceful Degradation):** Початок тестування з підвищеної/середньої складності (`HARD` / `MEDIUM`), а при труднощах — плавне зниження до `EASY` / допоміжних питань з пропорційним шкалюванням підсумкового балу (Grade Capping: $90-100\%$, $75-89\%$, $60-74\%$).
      - **Генерація мікро-завдань за вектором сумніву (Uncertainty Remediation):** Виявлення зон непевності за латентністю та виправленнями у телеметрії з таргетованою мікро-генерацією завдань через LLM.
      - **Механізм когнітивного відпочинку (Cognitive Cool-Down):** При виявленні буксування прогрес заморожується, блокується надсилання спроб на фіксований час (15-30 хв у демо / 2-4 год у проді), а студенту надається дружня довідка та навчальні картки для перегляду.
-     - **Семантична прив'язка мікро-тем (`topic` / `subConcept`):** Розширено модель завдання `Task` у `packages/database/prisma/schema.prisma` полями `topic` та `subConcept` для точкової діагностики помилок та формування релевантних простіших запитань саме за проблемним Knowledge Component.
-   - **Документація:** Створено науковий документ [`docs/justifications/02_multilevel_mastery_difficulty_scaling_and_cooldown.md`](file:///docs/justifications/02_multilevel_mastery_difficulty_scaling_and_cooldown.md) та оновлено реєстр обґрунтувань [`docs/justifications/README.md`](file:///docs/justifications/README.md).
+2. **Імплементація Багаторівневого Банку Завдань JS та Оновлення TaskSequencer (`SBC-227`, `EP-BKT`):**
+   - **База Даних (`packages/database`):**
+     - Згенеровано оновлений Prisma Client та виконано `npx prisma db push` для нових полів `topic` і `subConcept`.
+     - Перероблено `seed.ts`: створено розгалужену матрицю завдань для курсу JavaScript за рівнями складності `EASY`, `MEDIUM`, `HARD` та мікро-темами (`variables-declaration`, `primitive-types`, `arithmetic-functions`, `arrow-functions`, `closures`, `array-methods`, `event-loop`, `async-await`).
+     - Тематику `Event Loop` логічно перенесено з 1-го модуля до Модуля 4 (Асинхронність).
+   - **Ядро Адаптивності (`apps/api`):**
+     - В `BktEngine` впроваджено поріг `PROFICIENT_THRESHOLD = 0.75` (за теорією Mastery Learning Блума) та метод `isProficient()`. Поріг повного освоєння (`MASTERY_THRESHOLD`) встановлено на `0.90`.
+     - В `TaskSequencer` реалізовано адаптивний алгоритм селекції завдань із сортуванням за складністю `EASY -> MEDIUM -> HARD` та пріоритетним підбором завдань на ту саму тему (`preferredTopic`) при виявленні помилок.
+     - Оновлено `TaskController`: задіяно передачу `topic` та `subConcept` до доменного секвенсера.
+   - **Інтерфейс Студента (`apps/student`):**
+     - Оновлено стилізацію бейджа складності: динамічні градієнтні бейджі (🔴 HARD, 🟡 MEDIUM, 🟢 EASY) для наочної візуалізації поточного адаптивного рівня.
+   - **Тестування та Валідація:**
+     - 35/35 unit-тестів API пройдено успішно (`npm run test:api`).
+     - Production збірки `build:api` та `build:student` завершено без помилок.
 
 ## 📅 19 жовтня 2026 року
 

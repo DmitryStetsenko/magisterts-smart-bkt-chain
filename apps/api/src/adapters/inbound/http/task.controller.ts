@@ -98,6 +98,8 @@ export class TaskController {
       skillId: t.skillId,
       title: t.title,
       difficulty: t.difficulty,
+      topic: t.topic,
+      subConcept: t.subConcept,
     }));
 
     const recommendation = TaskSequencer.recommendNextTask({

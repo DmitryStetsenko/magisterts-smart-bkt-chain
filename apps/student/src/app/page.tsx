@@ -592,8 +592,14 @@ export default function StudentPortalPage() {
                         <span className="px-2.5 py-1 rounded-full text-xs font-mono font-bold uppercase tracking-wider bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
                           {task.skill.title}
                         </span>
-                        <span className="px-2.5 py-1 rounded-full text-xs font-mono font-bold uppercase bg-slate-800 text-slate-300 border border-slate-700">
-                          {task.difficulty}
+                        <span className={`px-2.5 py-1 rounded-full text-xs font-mono font-bold uppercase border ${
+                          task.difficulty === 'HARD'
+                            ? 'bg-rose-500/15 text-rose-300 border-rose-500/30'
+                            : task.difficulty === 'MEDIUM'
+                            ? 'bg-amber-500/15 text-amber-300 border-amber-500/30'
+                            : 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30'
+                        }`}>
+                          {task.difficulty === 'HARD' ? '🔴 HARD' : task.difficulty === 'MEDIUM' ? '🟡 MEDIUM' : '🟢 EASY'}
                         </span>
                       </div>
 

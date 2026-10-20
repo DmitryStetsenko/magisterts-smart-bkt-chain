@@ -955,8 +955,31 @@ eferenceAnswer, критерії options.keywords (microtask|мікротаск|
   4. **Запобігання "Буксуванню" (Wheel-Spinning Mitigation & Cognitive Cool-Down):**
      - При багаторазових невдалих спробах прогрес безпечно фіксується (наприклад, $P(L) = 0.62$).
      - Активується режим паузи «Cognitive Cool-Down» (15-30 хв у демо / 2-4 год у проді) з наданням персоналізованої навчальної картки (Study Card) для інтервального повторення.
-  5. **Семантична декомпозиція знань (Topic / SubConcept Data Schema):**
-     - Розширено модель завдання `Task` полями `topic: String?` та `subConcept: String?` у `packages/database/prisma/schema.prisma` для гранулярної діагностики прогалин (Knowledge Components) замість розмитого аналізу на рівні цілого модуля.
+### 11.14 Багаторівневий Банк Завдань JS та Адаптивний TaskSequencer за Тематиками (`SBC-227`)
+- **Змінені файли:**
+  - [`packages/database/prisma/schema.prisma`](file:///packages/database/prisma/schema.prisma)
+  - [`packages/database/prisma/seed.ts`](file:///packages/database/prisma/seed.ts)
+  - [`apps/api/src/domain/bkt/bkt-engine.ts`](file:///apps/api/src/domain/bkt/bkt-engine.ts)
+  - [`apps/api/src/domain/sequencing/task-sequencer.ts`](file:///apps/api/src/domain/sequencing/task-sequencer.ts)
+  - [`apps/api/src/adapters/inbound/http/task.controller.ts`](file:///apps/api/src/adapters/inbound/http/task.controller.ts)
+  - [`apps/student/src/app/page.tsx`](file:///apps/student/src/app/page.tsx)
+- **Архітектурні особливості:**
+  1. **Семантична декомпозиція мікро-тем:**
+     - Модуль 1 (Синтаксис та База): `variables-declaration` (EASY, MEDIUM), `primitive-types` (EASY, MEDIUM), `arithmetic-functions` (EASY sum/parity, MEDIUM clamp, HARD isPrime).
+     - Модуль 2 (Функції & Closures): `arrow-functions` (EASY quiz, EASY power code), `closures` (MEDIUM counter, HARD currying multiply).
+     - Модуль 3 (Колекції): `array-methods` (EASY map vs forEach quiz, MEDIUM filterEvens code, HARD countOccurrences reduce).
+     - Модуль 4 (Асинхронність): `event-loop` (MEDIUM text essay), `async-await` (HARD fetchUser promise).
+  2. **Оновлений поріг Блума в `BktEngine`:**
+     - Поріг для відкриття наступного модуля за теорією Mastery Learning знижено до `PROFICIENT_THRESHOLD = 0.75`.
+     - Поріг для отримання сертифікаційного звання Mastery встановлено на `MASTERY_THRESHOLD = 0.90`.
+  3. **Логіка `TaskSequencer`:**
+     - Враховує `preferredTopic` при виявленні помилки для цільового підбору спорідненої задачі.
+     - Забезпечує природну прогресію складності `EASY -> MEDIUM -> HARD`.
+  4. **UI студента:**
+     - Візуальна диференціація складності: 🔴 HARD, 🟡 MEDIUM, 🟢 EASY.
+- **Тестування:**
+  - 35/35 unit-тестів API пройдено успішно ✅.
+  - Production збірки `build:api` та `build:student` завершено успішно ✅.
 
 
 

@@ -3634,13 +3634,102 @@
                 "При багаторазових невдалих спробах прогрес безпечно фіксується (наприклад, $P(L) = 0.62$).",
                 "Активується режим паузи «Cognitive Cool-Down» (15-30 хв у демо / 2-4 год у проді) з наданням персоналізованої навчальної картки (Study Card) для інтервального повторення."
               ]
+            }
+          ]
+        },
+        {
+          "title": "11.14 Багаторівневий Банк Завдань JS та Адаптивний TaskSequencer за Тематиками (`SBC-227`)",
+          "level": 3,
+          "paragraphs": [],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "**Змінені файли:**",
+              "subitems": []
             },
             {
               "type": "text",
-              "raw_text": "**Семантична декомпозиція знань (Topic / SubConcept Data Schema):**",
+              "raw_text": "[`packages/database/prisma/schema.prisma`](file:///packages/database/prisma/schema.prisma)",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "[`packages/database/prisma/seed.ts`](file:///packages/database/prisma/seed.ts)",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "[`apps/api/src/domain/bkt/bkt-engine.ts`](file:///apps/api/src/domain/bkt/bkt-engine.ts)",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "[`apps/api/src/domain/sequencing/task-sequencer.ts`](file:///apps/api/src/domain/sequencing/task-sequencer.ts)",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "[`apps/api/src/adapters/inbound/http/task.controller.ts`](file:///apps/api/src/adapters/inbound/http/task.controller.ts)",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "[`apps/student/src/app/page.tsx`](file:///apps/student/src/app/page.tsx)",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Архітектурні особливості:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Семантична декомпозиція мікро-тем:**",
               "subitems": [
-                "Розширено модель завдання `Task` полями `topic: String?` та `subConcept: String?` у `packages/database/prisma/schema.prisma` для гранулярної діагностики прогалин (Knowledge Components) замість розмитого аналізу на рівні цілого модуля."
+                "Модуль 1 (Синтаксис та База): `variables-declaration` (EASY, MEDIUM), `primitive-types` (EASY, MEDIUM), `arithmetic-functions` (EASY sum/parity, MEDIUM clamp, HARD isPrime).",
+                "Модуль 2 (Функції & Closures): `arrow-functions` (EASY quiz, EASY power code), `closures` (MEDIUM counter, HARD currying multiply).",
+                "Модуль 3 (Колекції): `array-methods` (EASY map vs forEach quiz, MEDIUM filterEvens code, HARD countOccurrences reduce).",
+                "Модуль 4 (Асинхронність): `event-loop` (MEDIUM text essay), `async-await` (HARD fetchUser promise)."
               ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Оновлений поріг Блума в `BktEngine`:**",
+              "subitems": [
+                "Поріг для відкриття наступного модуля за теорією Mastery Learning знижено до `PROFICIENT_THRESHOLD = 0.75`.",
+                "Поріг для отримання сертифікаційного звання Mastery встановлено на `MASTERY_THRESHOLD = 0.90`."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Логіка `TaskSequencer`:**",
+              "subitems": [
+                "Враховує `preferredTopic` при виявленні помилки для цільового підбору спорідненої задачі.",
+                "Забезпечує природну прогресію складності `EASY -> MEDIUM -> HARD`."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**UI студента:**",
+              "subitems": [
+                "Візуальна диференціація складності: 🔴 HARD, 🟡 MEDIUM, 🟢 EASY."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Тестування:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "35/35 unit-тестів API пройдено успішно ✅.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Production збірки `build:api` та `build:student` завершено успішно ✅.",
+              "subitems": []
             }
           ]
         }

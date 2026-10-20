@@ -223,3 +223,4 @@ SBC-221,SBC-EP-TC,Story,"refactor anomaly tree into clean role-configurable cate
 SBC-223,SBC-EP-TC,Style,"remove duplicate emojis and enforce clean SVG icons in skill and anomaly tree navigation",Done,2026-10-19,05de2b7
 SBC-224,SBC-EP-INF,Task,"log emoji removal and sync task registry and daily progress",Done,2026-10-19,52d9d9b
 SBC-225,SBC-EP-BKT,Task,"document scientific justification for cognitive latency threshold and rapid guessing in BKT",Done,2026-10-19,2f718c8
+SBC-226,SBC-EP-BKT,Task,"document scientific justification for multi-level mastery, adaptive difficulty scaling and cognitive cool-down",Done,2026-10-20,0f06a78
