@@ -627,9 +627,15 @@ export default function StudentPortalPage() {
                               key={idx}
                               className="p-2.5 bg-slate-950/70 border border-slate-800 rounded-lg text-xs font-mono flex flex-col gap-0.5"
                             >
-                              <span className="text-slate-400 text-[11px]">
-                                Вхідні дані: <code className="text-indigo-300">{tc.input}</code>
-                              </span>
+                              {tc.input && (
+                                <span className="text-slate-400 text-[11px]">
+                                  {tc.input.startsWith('"') && !tc.input.startsWith('"eval:') && !tc.input.startsWith('[')
+                                    ? <>Перевірка змінної: <code className="text-indigo-300">{tc.input.replace(/"/g, '')}</code></>
+                                    : tc.input.includes('eval:')
+                                    ? <>Обчислення виразу: <code className="text-indigo-300">{tc.input.replace('eval:', '').replace(/"/g, '')}</code></>
+                                    : <>Вхідні дані: <code className="text-indigo-300">{tc.input}</code></>}
+                                </span>
+                              )}
                               <span className="text-slate-400 text-[11px]">
                                 Очікуваний вивід: <code className="text-emerald-300">{tc.expectedOutput}</code>
                               </span>

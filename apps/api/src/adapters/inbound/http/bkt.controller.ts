@@ -154,11 +154,17 @@ export class BktController {
                 }
                 result = fn.apply(null, args);
               } else {
-                if (typeof rawInput === 'string' && this[rawInput] !== undefined) {
-                  result = this[rawInput];
-                } else if (typeof rawInput === 'string' && rawInput.startsWith('eval:')) {
-                  const expr = rawInput.replace('eval:', '');
+                if (typeof rawInput === 'string' && rawInput.startsWith('eval:')) {
+                  const expr = rawInput.slice(5);
                   result = eval(expr);
+                } else if (typeof rawInput === 'string' && this[rawInput] !== undefined) {
+                  result = this[rawInput];
+                } else if (typeof rawInput === 'string' && typeof eval !== 'undefined') {
+                  try {
+                    result = eval(rawInput);
+                  } catch (e) {
+                    result = typeof sandbox.result !== 'undefined' ? sandbox.result : undefined;
+                  }
                 } else {
                   result = typeof sandbox.result !== 'undefined' ? sandbox.result : undefined;
                 }

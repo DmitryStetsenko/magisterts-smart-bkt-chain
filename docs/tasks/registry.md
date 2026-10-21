@@ -193,7 +193,8 @@
 | **SBC-225** | `Task` | `BKT` | document scientific justification for cognitive latency threshold and rapid guessing in BKT | 2026-10-19 | `2f718c8` |
 | **SBC-226** | `Task` | `BKT` | document scientific justification for multi-level mastery, adaptive difficulty scaling and cognitive cool-down | 2026-10-20 | `0f06a78` |
 | **SBC-227** | `Story` | `BKT` | implement multi-tier JS task bank with topic/subConcept metadata, Bloom 0.75 threshold and adaptive TaskSequencer | 2026-10-20 | `0f06a78` |
-| **SBC-241** | `Story` | `BKT` | restructure JS curriculum progression, topic-first sequencing order and universal VM script evaluation | 2026-10-21 | `pending` |
+| **SBC-241** | `Story` | `BKT` | restructure JS curriculum progression, topic-first sequencing order and universal VM script evaluation | 2026-10-21 | `54e0935` |
+| **SBC-243** | `Story` | `BKT` | eliminate function wrappers from Module 1 tasks, introduce direct variable and expression exercises | 2026-10-21 | `pending` |
 
 ---
 
@@ -295,7 +296,7 @@
 | **SBC-238** | `Story` | `TC` | convert task inspector into sliding right-hand drawer to keep skill tree canvas unobstructed | 2026-10-20 | `5d3469c` |
 | **SBC-239** | `Style` | `TC` | remove screen blur, place sliding drawer below top header with smooth slideInRight animation | 2026-10-20 | `7437a3b` |
 | **SBC-240** | `Refactor` | `TC` | eliminate duplicate task inspector from left sidebar, keep dedicated right drawer for inspection | 2026-10-20 | `c67f550` |
-| **SBC-242** | `Story` | `TC` | implement Full Course Knowledge Tree viewer with multi-tier modules, topic branches, and question cards | 2026-10-21 | `pending` |
+| **SBC-242** | `Story` | `TC` | implement Full Course Knowledge Tree viewer with multi-tier modules, topic branches, and question cards | 2026-10-21 | `eb4f893` |
 
 ---
 
