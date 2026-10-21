@@ -255,6 +255,7 @@
 | **SBC-216** | `Story` | `ST` | implement attempt history tab in student task drawer with teacher feedback and live review decision synchronization | 2026-10-19 | `1e201d7` |
 | **SBC-230** | `Story` | `ST` | implement top adaptive degradation notice banner with score cap and remove confusing per-task difficulty badges | 2026-10-20 | `e612f0a` |
 | **SBC-231** | `Bug` | `ST` | harmonize DAG unlock thresholds and prevent premature module advance while practice tasks remain | 2026-10-20 | pending |
+| **SBC-244** | `Story` | `ST` | add deterministic options shuffling with letter markers in QuizTaskEditor | 2026-10-21 | pending |
 
 ---
 

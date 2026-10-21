@@ -21,6 +21,7 @@ interface QuizTaskEditorProps {
 }
 
 export function QuizTaskEditor({
+  taskId,
   taskType,
   options = [],
   onSubmit,
@@ -32,11 +33,31 @@ export function QuizTaskEditor({
   const [selectedMultipleIds, setSelectedMultipleIds] = useState<string[]>([]);
   const [startTime, setStartTime] = useState<number>(Date.now());
 
+  // Deterministically shuffle options per task to prevent correct answer always appearing first (Fisher-Yates)
+  const shuffledOptions = React.useMemo(() => {
+    if (!options || options.length <= 1) return options;
+    const arr = [...options];
+    // Simple deterministic hash seed from taskId
+    let seed = 0;
+    for (let i = 0; i < (taskId || '').length; i++) {
+      seed = (seed * 31 + taskId.charCodeAt(i)) & 0xffffffff;
+    }
+    const pseudoRandom = () => {
+      seed = (seed * 1664525 + 1013904223) & 0xffffffff;
+      return (seed >>> 0) / 4294967296;
+    };
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(pseudoRandom() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+  }, [taskId, options]);
+
   useEffect(() => {
     setStartTime(Date.now());
     setSelectedSingleId('');
     setSelectedMultipleIds([]);
-  }, [options]);
+  }, [taskId, options]);
 
   const handleToggleMultiple = (id: string) => {
     setSelectedMultipleIds((prev) =>
@@ -78,8 +99,9 @@ export function QuizTaskEditor({
       </div>
 
       <div className="flex flex-col gap-3">
-        {options.map((opt) => {
+        {shuffledOptions.map((opt, idx) => {
           const active = isSelected(opt.id);
+          const letter = String.fromCharCode(65 + idx); // A, B, C, D
           return (
             <div
               key={opt.id}
@@ -96,19 +118,19 @@ export function QuizTaskEditor({
             >
               <div className="flex items-center gap-3">
                 <div
-                  className={`w-5 h-5 rounded-${
+                  className={`w-6 h-6 rounded-${
                     taskType === 'SINGLE_CHOICE' ? 'full' : 'md'
-                  } border flex items-center justify-center transition-all ${
+                  } border flex items-center justify-center font-mono font-bold text-xs transition-all ${
                     active
                       ? 'bg-indigo-600 border-indigo-400 text-white'
-                      : 'border-slate-700 bg-slate-900'
+                      : 'border-slate-700 bg-slate-900 text-slate-400'
                   }`}
                 >
-                  {active && <CheckCircle2 className="w-3.5 h-3.5" />}
+                  {active ? <CheckCircle2 className="w-4 h-4" /> : letter}
                 </div>
                 <span className="text-sm font-medium">{opt.text}</span>
               </div>
-              <span className="text-xs font-mono text-slate-500 uppercase">{opt.id}</span>
+              <span className="text-xs font-mono text-slate-600 font-semibold">{letter}</span>
             </div>
           );
         })}
