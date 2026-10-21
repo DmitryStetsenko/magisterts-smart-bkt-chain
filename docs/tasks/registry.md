@@ -16,7 +16,7 @@
 | **`SBC-EP-TC`** | Teacher Portal & Analytics CRM | 22 |
 | **`SBC-EP-AD`** | Admin Portal & Knowledge DAG Builder | 8 |
 | **`SBC-EP-LD`** | Landing Web Page | 9 |
-| **ВСЬОГО** | - | **230** |
+| **ВСЬОГО** | - | **231** |
 
 ---
 
@@ -192,7 +192,8 @@
 | **SBC-202** | `Task` | `BKT` | add full open-text assessment pipeline and anomaly specification to telemetry_analytics.md | 2026-10-14 | `d8b755d` |
 | **SBC-225** | `Task` | `BKT` | document scientific justification for cognitive latency threshold and rapid guessing in BKT | 2026-10-19 | `2f718c8` |
 | **SBC-226** | `Task` | `BKT` | document scientific justification for multi-level mastery, adaptive difficulty scaling and cognitive cool-down | 2026-10-20 | `0f06a78` |
-| **SBC-227** | `Story` | `BKT` | implement multi-tier JS task bank with topic/subConcept metadata, Bloom 0.75 threshold and adaptive TaskSequencer | 2026-10-20 | `pending` |
+| **SBC-227** | `Story` | `BKT` | implement multi-tier JS task bank with topic/subConcept metadata, Bloom 0.75 threshold and adaptive TaskSequencer | 2026-10-20 | `0f06a78` |
+| **SBC-241** | `Story` | `BKT` | restructure JS curriculum progression, topic-first sequencing order and universal VM script evaluation | 2026-10-21 | `pending` |
 
 ---
 

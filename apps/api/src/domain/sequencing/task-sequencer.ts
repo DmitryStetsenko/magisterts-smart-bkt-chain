@@ -104,9 +104,17 @@ export class TaskSequencer {
         if (matchDiff) return matchDiff;
       }
 
-      // 3. Default standard challenge priority: Start with standard tasks allowing 100% score (MEDIUM), then HARD, then EASY
-      const standardOrder: Record<string, number> = { MEDIUM: 1, HARD: 2, EASY: 3 };
-      return uncompleted.sort((a, b) => (standardOrder[a.difficulty] || 2) - (standardOrder[b.difficulty] || 2))[0];
+      // 3. Sequential Topic-First & Cognitive Triad Progression:
+      // Tasks are ordered naturally by topic sequence in the syllabus, progressing EASY -> MEDIUM -> HARD
+      // This guarantees that a student begins with knowledge verification (EASY), then applies skills (MEDIUM), then masters them (HARD).
+      const diffOrder: Record<string, number> = { EASY: 1, MEDIUM: 2, HARD: 3 };
+      return uncompleted.sort((a, b) => {
+        // If topics differ, maintain original syllabus order of tasks
+        if (a.topic && b.topic && a.topic !== b.topic) {
+          return 0;
+        }
+        return (diffOrder[a.difficulty] || 2) - (diffOrder[b.difficulty] || 2);
+      })[0];
     };
 
     if (currentActiveSkill) {

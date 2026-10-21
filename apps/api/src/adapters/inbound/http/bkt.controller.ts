@@ -138,23 +138,31 @@ export class BktController {
               ${normalizedCode}
               const rawInput = ${testCase.input};
               const fnName = Object.keys(this).find(k => typeof this[k] === 'function' && !['eval', 'setTimeout', 'clearTimeout', 'Promise', 'console'].includes(k));
-              if (!fnName) {
-                throw new Error("Функція не знайдена. Визначте функцію у рішення.");
-              }
-              const fn = this[fnName];
-              let args;
-              if (Array.isArray(rawInput)) {
-                if (fn.length === 1 && rawInput.length > 0 && Array.isArray(rawInput[0])) {
-                  args = rawInput;
-                } else if (fn.length === 1 && rawInput.length > 1) {
-                  args = [rawInput];
+              if (fnName) {
+                const fn = this[fnName];
+                let args;
+                if (Array.isArray(rawInput)) {
+                  if (fn.length === 1 && rawInput.length > 0 && Array.isArray(rawInput[0])) {
+                    args = rawInput;
+                  } else if (fn.length === 1 && rawInput.length > 1) {
+                    args = [rawInput];
+                  } else {
+                    args = rawInput;
+                  }
                 } else {
-                  args = rawInput;
+                  args = [rawInput];
                 }
+                result = fn.apply(null, args);
               } else {
-                args = [rawInput];
+                if (typeof rawInput === 'string' && this[rawInput] !== undefined) {
+                  result = this[rawInput];
+                } else if (typeof rawInput === 'string' && rawInput.startsWith('eval:')) {
+                  const expr = rawInput.replace('eval:', '');
+                  result = eval(expr);
+                } else {
+                  result = typeof sandbox.result !== 'undefined' ? sandbox.result : undefined;
+                }
               }
-              result = fn.apply(null, args);
             `;
 
             const context = vm.createContext(sandbox);

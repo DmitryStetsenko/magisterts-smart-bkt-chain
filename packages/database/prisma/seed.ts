@@ -92,8 +92,8 @@ async function main() {
     data: {
       courseId: courseJs.id,
       slug: 'js-basics',
-      title: 'Модуль 1: Синтаксис та База',
-      description: 'Типи даних, змінні let/const, логічні оператори та цикли',
+      title: 'Модуль 1: Змінні, Типи та Оператори',
+      description: 'Оголошення let/const, примітивні типи, приведення типів та базові оператори',
       category: 'Core Programming',
       difficulty: TaskDifficulty.EASY,
     },
@@ -103,8 +103,8 @@ async function main() {
     data: {
       courseId: courseJs.id,
       slug: 'js-functions',
-      title: 'Модуль 2: Функції & Closures',
-      description: 'Arrow functions, замикання, rest/spread та хойстинг',
+      title: 'Модуль 2: Умовні конструкції та Функції',
+      description: 'Порівняння, if/else, тернарний оператор, функції, параметри та замикання',
       category: 'Core Programming',
       difficulty: TaskDifficulty.EASY,
     },

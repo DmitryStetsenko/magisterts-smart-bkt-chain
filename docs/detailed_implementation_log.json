@@ -4565,6 +4565,78 @@
               "subitems": []
             }
           ]
+        },
+        {
+          "title": "11.28 Реструктуризація Навчальної Програми JS та Тематичного Секвенсора (`SBC-241`)",
+          "level": 3,
+          "paragraphs": [],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "**Змінені файли:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "[`apps/api/src/adapters/inbound/http/bkt.controller.ts`](file:///apps/api/src/adapters/inbound/http/bkt.controller.ts)",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "[`apps/api/src/domain/sequencing/task-sequencer.ts`](file:///apps/api/src/domain/sequencing/task-sequencer.ts)",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "[`packages/database/prisma/seed.ts`](file:///packages/database/prisma/seed.ts)",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Архітектурні особливості:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Універсалізація виконання коду у Node.js VM:**",
+              "subitems": [
+                "Раніше секція `case TaskType.CODE` вимагала обов'язкової наявності функції в коді студента (`if (!fnName) throw new Error(...)`). Це унеможливлювало створення завдань на оголошення змінних або прості вирази у першому модулі.",
+                "Додано підтримку обчислення значень глобальних змінних та виразів через `this[rawInput]` та `eval:` префікс у тест-кейсах."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Послідовна онтологічна селекція в `TaskSequencer`:**",
+              "subitems": [
+                "Замість агресивного вибору `MEDIUM` завдань на будь-яку тему всередині модуля, секвенсор відтепер дотримується природного порядку навчального плану (`syllabus order`) та тріади `EASY -> MEDIUM -> HARD`.",
+                "Першим завданням студента стає концептуальний квіз на розуміння ключових слів та примітивів, що знімає психологічний бар'єр входу."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Синхронізація Модулів у Схемі та Сидах:**",
+              "subitems": [
+                "Модуль 1: *«Змінні, Типи та Оператори»* (`js-basics`).",
+                "Модуль 2: *«Умовні конструкції та Функції»* (`js-functions`)."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Тестування та валідація:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "35/35 unit-тестів API пройдено успішно (`npm run test:api`) ✅.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Production збірки `build:api` та `build:student` завершено успішно (0 помилок) ✅.",
+              "subitems": []
+            }
+          ]
         }
       ]
     }
