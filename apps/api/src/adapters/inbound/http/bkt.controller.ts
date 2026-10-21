@@ -180,7 +180,11 @@ export class BktController {
               rawResult = await rawResult;
             }
 
-            actualOutput = typeof rawResult === 'object' ? JSON.stringify(rawResult) : String(rawResult);
+            actualOutput = typeof rawResult === 'string'
+              ? JSON.stringify(rawResult)
+              : typeof rawResult === 'object'
+              ? JSON.stringify(rawResult)
+              : String(rawResult);
             testPassed = actualOutput.replace(/\s+/g, '') === testCase.expectedOutput.replace(/\s+/g, '');
           } catch (err) {
             actualOutput = `Error: ${(err as Error).message}`;

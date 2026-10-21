@@ -1044,6 +1044,45 @@ export default function StudentPortalPage() {
                     </div>
                   )}
 
+                  {/* 🧪 Code Test Details Breakdown */}
+                  {evalResult.testDetails && evalResult.testDetails.length > 0 && (
+                    <div className="flex flex-col gap-2 p-3 bg-slate-950/60 rounded-xl border border-slate-800/80 text-xs font-mono">
+                      <span className="font-semibold text-slate-400 uppercase tracking-wider text-[10px]">
+                        Результати перевірки тестів:
+                      </span>
+                      <div className="flex flex-col gap-1.5">
+                        {evalResult.testDetails.map((td: any, i: number) => (
+                          <div
+                            key={i}
+                            className={`p-2 rounded-lg border flex items-center justify-between gap-2 text-[11px] ${
+                              td.passed
+                                ? 'bg-emerald-950/30 border-emerald-500/30 text-emerald-200'
+                                : 'bg-rose-950/30 border-rose-500/40 text-rose-200'
+                            }`}
+                          >
+                            <div className="flex items-center gap-2">
+                              <span>{td.passed ? '✓' : '✕'}</span>
+                              <span className="text-slate-300">
+                                {td.input && td.input.startsWith('"') && !td.input.includes('eval:')
+                                  ? `Змінна ${td.input.replace(/"/g, '')}`
+                                  : `Тест #${i + 1}`}:
+                              </span>
+                              <span className="text-slate-400">Очікувалось:</span>
+                              <code className="text-emerald-300">{td.expected}</code>
+                              <span className="text-slate-400">| Отримано:</span>
+                              <code className={td.passed ? 'text-emerald-300' : 'text-rose-300'}>{td.actual}</code>
+                            </div>
+                            <span className={`px-1.5 py-0.2 rounded font-bold text-[9px] ${
+                              td.passed ? 'bg-emerald-500/20 text-emerald-300' : 'bg-rose-500/20 text-rose-300'
+                            }`}>
+                              {td.passed ? 'PASSED' : 'FAILED'}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
                   {/* 🔬 Semantic Evaluation & Teacher Review Details */}
                   {(evalResult.semanticScore !== undefined || evalResult.semanticDetails) && (
                     <div className="p-3 bg-slate-950/70 rounded-xl border border-slate-800/90 flex flex-col gap-2.5 text-xs">
