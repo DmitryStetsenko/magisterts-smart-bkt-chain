@@ -254,8 +254,8 @@
 | **SBC-194** | `Task` | `ST` | log micro-step 5 student semantic rubric UI | 2026-10-14 | `8c19e4a` |
 | **SBC-216** | `Story` | `ST` | implement attempt history tab in student task drawer with teacher feedback and live review decision synchronization | 2026-10-19 | `1e201d7` |
 | **SBC-230** | `Story` | `ST` | implement top adaptive degradation notice banner with score cap and remove confusing per-task difficulty badges | 2026-10-20 | `e612f0a` |
-| **SBC-231** | `Bug` | `ST` | harmonize DAG unlock thresholds and prevent premature module advance while practice tasks remain | 2026-10-20 | pending |
-| **SBC-244** | `Story` | `ST` | add deterministic options shuffling with letter markers in QuizTaskEditor | 2026-10-21 | pending |
+| **SBC-244** | `Story` | `ST` | add deterministic options shuffling with letter markers in QuizTaskEditor | 2026-10-21 | `35ad827` |
+| **SBC-245** | `Story` | `ST` | add adaptive difficulty degradation prompt button to evaluation toast | 2026-10-21 | pending |
 
 ---
 

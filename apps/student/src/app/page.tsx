@@ -82,6 +82,7 @@ export default function StudentPortalPage() {
   // Task Submissions History & Drawer Sub-tab ('condition' | 'history')
   const [taskSubmissions, setTaskSubmissions] = useState<any[]>([]);
   const [taskDrawerSubTab, setTaskDrawerSubTab] = useState<'condition' | 'history'>('condition');
+  const [consecutiveFailures, setConsecutiveFailures] = useState<number>(0);
 
   const fetchTaskSubmissions = async (taskId: string) => {
     try {
@@ -287,6 +288,11 @@ export default function StudentPortalPage() {
       if (res.ok) {
         const data = await res.json();
         setEvalResult(data);
+        if (data.isPassed) {
+          setConsecutiveFailures(0);
+        } else {
+          setConsecutiveFailures((prev) => prev + 1);
+        }
         await Promise.all([
           fetchCourseStructureAndState(activeCourseSlug),
           fetchTaskSubmissions(task.id),
@@ -1149,6 +1155,34 @@ export default function StudentPortalPage() {
                           </p>
                         </div>
                       )}
+                    </div>
+                  )}
+
+                  {/* ⚡ Adaptive Graceful Degradation Action Prompt */}
+                  {!evalResult.isPassed && (
+                    <div className="pt-2 border-t border-rose-500/20 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-rose-950/20 p-3 rounded-xl">
+                      <div className="flex items-center gap-2">
+                        <span className="p-1 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                          <AlertTriangle className="w-4 h-4" />
+                        </span>
+                        <div className="flex flex-col">
+                          <span className="text-xs font-bold text-slate-200">
+                            {consecutiveFailures >= 2 ? 'Помічено системні труднощі' : 'Складно з цим завданням?'}
+                          </span>
+                          <span className="text-[11px] text-slate-400">
+                            Ви можете переключитися на допоміжне адаптивне завдання легшого рівня (Max: 70%).
+                          </span>
+                        </div>
+                      </div>
+
+                      <button
+                        onClick={() => fetchRecommendedTask(activeCourseSlug)}
+                        className="px-3.5 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs flex items-center justify-center gap-2 shadow-lg shadow-amber-500/20 transition-all cursor-pointer shrink-0 border border-amber-300"
+                      >
+                        <Sparkles className="w-3.5 h-3.5" />
+                        <span>Взяти допоміжне завдання</span>
+                        <ArrowRight className="w-3.5 h-3.5" />
+                      </button>
                     </div>
                   )}
                 </div>
