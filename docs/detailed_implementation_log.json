@@ -4637,6 +4637,63 @@
               "subitems": []
             }
           ]
+        },
+        {
+          "title": "11.29 Інтерактивний Віджет Повного Дерева Курсу та Силабусу Запитань (`SBC-242`)",
+          "level": 3,
+          "paragraphs": [],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "**Змінені файли:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "[`apps/teacher/src/features/course-map/ui/CourseGraphViewer.tsx`](file:///apps/teacher/src/features/course-map/ui/CourseGraphViewer.tsx)",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Архітектурні особливості:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Трьохрежимний перемикач огляду:**",
+              "subitems": [
+                "`full`: Повне Дерево Курсу (Full Course Knowledge Tree) — наскрізний макро-огляд усіх модулів програми одночасно.",
+                "`tree`: Фокус Модуля (Module Focus Tree) — глибоке RPG-дерево окремо вибраного вузла.",
+                "`triads`: Матриця Тріад Блума (Bloom Cognitive Triads) — порівняльна аналітична таблиця."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Реактивне групування `fullCourseTree`:**",
+              "subitems": [
+                "Мемоізована обробка всього пулу завдань із розподілом: `skills` $\\to$ `topics` $\\to$ `triads (easy, medium, hard)`.",
+                "Підтримка живої фільтрації за складністю та повнотекстового пошуку за назвами завдань чи підконцептами."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Плавне висування інспектора завдань:**",
+              "subitems": [
+                "Інтегровано з висувною правою панеллю `aside` під системним хедером (`top-14`) без затемнення робочого дерева знань."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Тестування:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Production збірку `npm run build:teacher` завершено успішно (0 помилок типізації) ✅.",
+              "subitems": []
+            }
+          ]
         }
       ]
     }
