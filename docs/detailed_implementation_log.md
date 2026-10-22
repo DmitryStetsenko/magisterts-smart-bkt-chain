@@ -259,6 +259,19 @@
 - **Динамічна модуляція BKT:** При $\Delta t < T_{\text{threshold}}$ фіксується Rapid Guessing, $P(G) \uparrow 0.85$, що нейтралізує випадковий приріст знань $P(L_t)$ за формулою Баєса.
 - Документ наукового базису: [`docs/justifications/01_cognitive_latency_threshold_and_rapid_guessing.md`](file:///docs/justifications/01_cognitive_latency_threshold_and_rapid_guessing.md).
 
+### 0.12 Умовне Надання Scaffolding та Захист від Передчасних Підказок (SBC-252)
+- **Концепція та Педагогічна Модель:**
+  - На основі Сесії Брейншторму 07 зафіксовано, що підказки та навчальні посилання ніколи не повинні виступати пасивним фоном або «спокусою» на чистій першій спробі студента.
+  - Показ скорочувальних підказок на новому завданні створює небезпеку передчасного використання «милиць», що автоматично зрізає підсумковий бал на 15–30% навіть тоді, коли студент міг відповісти самостійно.
+- **Технічна Реалізація (pps/student/src/app/page.tsx):**
+  - Створено логічний предикат hasFailedAttemptOnCurrentTask:
+    \\text{ShowScaffolding} = (\\text{evalResult} \\land \\neg \\text{evalResult.isPassed}) \\lor \\text{isDifficultyDegraded} \\lor \\text{hasRejectedSubmissions} \\lor (\\text{consecutiveFailures} > 0)
+  - Сократівські підказки та картка навчального переходу вмонтовані в DOM з плавною появою nimate-fadeIn виключно після того, як студент зафіксував помилку або отримав ремедіаційне завдання внаслідок деградації.
+- **Тестування:**
+  - Production збірку pps/student перевірено через 
+pm run build:student — 0 помилок типізації, повна сумісність із Next.js Turbopack.
+
+
 ---
 
 ## 🧱 Крок 1: Проєктування бази даних (Prisma Schema) та локальне оточення

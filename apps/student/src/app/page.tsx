@@ -354,6 +354,18 @@ export default function StudentPortalPage() {
   const activeSkillNode = graphNodes.find((n) => n.slug === task?.skill?.slug);
   const activeSkillMasteryPct = activeSkillNode ? Math.round(activeSkillNode.pMastery * 100) : 0;
 
+  // 💡 Scaffolding Visibility: Show hints & study unit deep-link ONLY when student struggles:
+  // 1. Current attempt failed (evalResult && !evalResult.isPassed)
+  // 2. Task is an adaptive degradation fallback (recommendation?.isDifficultyDegraded)
+  // 3. Task has previous failed submissions in history
+  // 4. Consecutive failures on current skill >= 1
+  const hasFailedAttemptOnCurrentTask = Boolean(
+    (evalResult && !evalResult.isPassed) ||
+    taskSubmissions.some((s) => s.status === 'REJECTED' || s.isCorrect === false) ||
+    consecutiveFailures > 0 ||
+    recommendation?.isDifficultyDegraded
+  );
+
   return (
     <div className="h-screen w-screen bg-slate-950 text-slate-100 flex flex-col font-sans overflow-hidden">
       {/* 📌 Sticky Top Navigation Bar with Prominent Progress Indicator */}
@@ -775,9 +787,9 @@ export default function StudentPortalPage() {
                         </div>
                       )}
 
-                      {/* 💡 Socratic Hints Interactive Widget */}
-                      {task.socraticHints && task.socraticHints.length > 0 && (
-                        <div className="flex flex-col gap-2 pt-3 border-t border-slate-800">
+                      {/* 💡 Socratic Hints Interactive Widget (Visible only after struggle/failed attempt/degradation) */}
+                      {hasFailedAttemptOnCurrentTask && task.socraticHints && task.socraticHints.length > 0 && (
+                        <div className="flex flex-col gap-2 pt-3 border-t border-slate-800 animate-fadeIn">
                           <div className="flex items-center justify-between">
                             <span className="text-[11px] font-semibold text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
                               <HelpCircle className="w-3.5 h-3.5 text-amber-400" />
@@ -834,9 +846,9 @@ export default function StudentPortalPage() {
                         </div>
                       )}
 
-                      {/* 📖 Deep-link to Study App */}
-                      {task.studyUnitUrl && (
-                        <div className="p-3 bg-gradient-to-r from-blue-950/40 to-indigo-950/40 border border-blue-500/30 rounded-xl flex items-center justify-between gap-3">
+                      {/* 📖 Deep-link to Study App (Visible only after struggle/failed attempt/degradation) */}
+                      {hasFailedAttemptOnCurrentTask && task.studyUnitUrl && (
+                        <div className="p-3 bg-gradient-to-r from-blue-950/40 to-indigo-950/40 border border-blue-500/30 rounded-xl flex items-center justify-between gap-3 animate-fadeIn">
                           <div className="flex items-center gap-2">
                             <BookOpen className="w-4 h-4 text-blue-400 shrink-0" />
                             <div className="flex flex-col">

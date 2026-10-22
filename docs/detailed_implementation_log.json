@@ -931,6 +931,58 @@
               "type": "text",
               "raw_text": "Документ наукового базису: [`docs/justifications/01_cognitive_latency_threshold_and_rapid_guessing.md`](file:///docs/justifications/01_cognitive_latency_threshold_and_rapid_guessing.md).",
               "subitems": []
+            }
+          ]
+        },
+        {
+          "title": "0.12 Умовне Надання Scaffolding та Захист від Передчасних Підказок (SBC-252)",
+          "level": 3,
+          "paragraphs": [
+            "pm run build:student — 0 помилок типізації, повна сумісність із Next.js Turbopack."
+          ],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "**Концепція та Педагогічна Модель:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "На основі Сесії Брейншторму 07 зафіксовано, що підказки та навчальні посилання ніколи не повинні виступати пасивним фоном або «спокусою» на чистій першій спробі студента.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Показ скорочувальних підказок на новому завданні створює небезпеку передчасного використання «милиць», що автоматично зрізає підсумковий бал на 15–30% навіть тоді, коли студент міг відповісти самостійно.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Технічна Реалізація (\u0007pps/student/src/app/page.tsx):**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Створено логічний предикат hasFailedAttemptOnCurrentTask:",
+              "subitems": [
+                "\\\\text{ShowScaffolding} = (\\\\text{evalResult} \\\\land \\\\neg \\\\text{evalResult.isPassed}) \\\\lor \\\\text{isDifficultyDegraded} \\\\lor \\\\text{hasRejectedSubmissions} \\\\lor (\\\\text{consecutiveFailures} > 0)"
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "Сократівські підказки та картка навчального переходу вмонтовані в DOM з плавною появою \u0007nimate-fadeIn виключно після того, як студент зафіксував помилку або отримав ремедіаційне завдання внаслідок деградації.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Тестування:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Production збірку \u0007pps/student перевірено через",
+              "subitems": []
             },
             {
               "type": "text",
