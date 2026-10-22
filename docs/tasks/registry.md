@@ -139,7 +139,7 @@
 | **SBC-232** | `Story` | `SH` | document authoring and pedagogical specification for multi-tier adaptive task bank | 2026-10-20 | `f4af440` |
 | **SBC-233** | `Story` | `SH` | generate comprehensive 107-task adaptive bank across 5 JS modules adhering to authoring specification | 2026-10-20 | `f4af440` |
 | **SBC-250** | `Story` | `SH` | integrate authoring Socratic hints and study unit deep linking into Task schema, seed data, and student UI | 2026-10-22 | `8185996` |
-| **SBC-253** | `Story` | `SH` | expand multi-tier task bank with isomorphic blitzes, metaphors, Socratic hints and study deep-links | 2026-10-22 | `pending` |
+| **SBC-253** | `Story` | `SH` | expand multi-tier task bank with isomorphic blitzes, metaphors, Socratic hints and study deep-links | 2026-10-22 | `44d68a9` |
 
 ---
 
