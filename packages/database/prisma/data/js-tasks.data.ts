@@ -50,6 +50,7 @@ export interface SeedTask {
 // ============================================================================
 export const jsBasicsTasks: SeedTask[] = [
   // --- Topic 1: variables-declaration ---
+  // EASY Blitz 1: Academic / Conceptual
   {
     topic: 'variables-declaration',
     subConcept: 'const-immutability',
@@ -64,8 +65,48 @@ export const jsBasicsTasks: SeedTask[] = [
       { id: 'opt4', text: 'Код виконається без помилки, але значення залишиться 3.14', isCorrect: false },
     ],
     socraticHints: [
-      { level: 1, hint: 'Зверніть увагу на саму назву "const" (константа). Чи дозволяє середовище змінювати звʼязку ідентифікатора з іншим значенням після ініціалізації?', penaltyPct: 15 },
-      { level: 2, hint: 'У сучасному JavaScript операція присвоєння "=" до ідентифікатора const є неприпустимою і викидає критичну помилку часу виконання.', penaltyPct: 30 },
+      { level: 1, hint: 'Зверніть увагу на саму назву "const" (константа). Чи дозволяє мова змінювати звʼязку ідентифікатора з новим значенням після ініціалізації?', penaltyPct: 15 },
+      { level: 2, hint: 'Операція присвоєння "=" до ідентифікатора const є неприпустимою і негайно викидає виняток TypeError.', penaltyPct: 30 },
+    ],
+    studyUnitUrl: '/learn/js-dev/module-1/variables-declaration#const-immutability',
+  },
+  // EASY Blitz 2: Metaphor / Real-World Analogy
+  {
+    topic: 'variables-declaration',
+    subConcept: 'const-immutability-metaphor',
+    taskType: 'SINGLE_CHOICE',
+    title: 'Метафора: Коробка з пломбою (const vs let)',
+    description: 'Уявіть змінні як коробки на складі. Яка життєва метафора найкраще пояснює поведінку ключового слова `const` для примітивних значень?',
+    difficulty: 'EASY',
+    options: [
+      { id: 'opt1', text: 'Це опломбований контейнер: поклавши туди число одного разу, його не можна замінити на інше без зриву пломби (TypeError)', isCorrect: true },
+      { id: 'opt2', text: 'Це звичайна поштова скринька, куди листоноша може класти нові листи щодня', isCorrect: false },
+      { id: 'opt3', text: 'Це дошка оголошень, на якій написане крейдою автоматично зникає щосекунди', isCorrect: false },
+      { id: 'opt4', text: 'Це дзеркало, яке завжди показує лише значення сусідньої змінної', isCorrect: false },
+    ],
+    socraticHints: [
+      { level: 1, hint: 'Що зазвичай робить пломба або гравіювання? Вона фіксує вміст назавжди, не дозволяючи заміну.', penaltyPct: 15 },
+      { level: 2, hint: 'Ключове слово const жорстко захищає змінну від повторного переприсвоєння.', penaltyPct: 30 },
+    ],
+    studyUnitUrl: '/learn/js-dev/module-1/variables-declaration#const-immutability',
+  },
+  // EASY Blitz 3: Syntax Pattern & "What If?"
+  {
+    topic: 'variables-declaration',
+    subConcept: 'const-initialization-requirement',
+    taskType: 'SINGLE_CHOICE',
+    title: 'Синтаксичний бліц: Оголошення const без значення',
+    description: 'Що станеться, якщо написати рядок `const maxRetries;` без надання початкового значення?',
+    difficulty: 'EASY',
+    options: [
+      { id: 'opt1', text: 'Виникне помилка синтаксису: Missing initializer in const declaration', isCorrect: true },
+      { id: 'opt2', text: 'Змінна автоматично отримає значення undefined і чекатиме ініціалізації', isCorrect: false },
+      { id: 'opt3', text: 'Змінна автоматично ініціалізується нулем 0', isCorrect: false },
+      { id: 'opt4', text: 'Код успішно скомпілюється і створить глобальну змінну', isCorrect: false },
+    ],
+    socraticHints: [
+      { level: 1, hint: 'Якщо значення const ніколи не можна змінити пізніше, чи має сенс створювати її порожньою?', penaltyPct: 15 },
+      { level: 2, hint: 'Специфікація JavaScript вимагає обовʼязкового надання значення одразу під час оголошення const.', penaltyPct: 30 },
     ],
     studyUnitUrl: '/learn/js-dev/module-1/variables-declaration#const-immutability',
   },
@@ -108,6 +149,7 @@ export const jsBasicsTasks: SeedTask[] = [
   },
 
   // --- Topic 2: primitive-types ---
+  // EASY Blitz 1: Academic
   {
     topic: 'primitive-types',
     subConcept: 'type-identification',
@@ -123,6 +165,51 @@ export const jsBasicsTasks: SeedTask[] = [
       { id: 'opt5', text: 'Array', isCorrect: false },
       { id: 'opt6', text: 'Object', isCorrect: false },
     ],
+    socraticHints: [
+      { level: 1, hint: 'Примітиви — це неподільні базові значення, що передаються за значенням, а не за посиланням. Чи є Array та Object примітивами?', penaltyPct: 15 },
+      { level: 2, hint: 'У JS 7 примітивних типів: string, number, bigint, boolean, symbol, undefined, null. Масиви та обʼєкти належать до посилальних типів.', penaltyPct: 30 },
+    ],
+    studyUnitUrl: '/learn/js-dev/module-1/primitive-types#type-identification',
+  },
+  // EASY Blitz 2: Metaphor / Real-World Analogy
+  {
+    topic: 'primitive-types',
+    subConcept: 'primitive-vs-reference-metaphor',
+    taskType: 'SINGLE_CHOICE',
+    title: 'Метафора: Значення проти Посилання (Примітив vs Обʼєкт)',
+    description: 'Уявіть копіювання інформації в реальному світі. Яка аналогія точно відображає роботу з примітивними типами (число, рядок)?',
+    difficulty: 'EASY',
+    options: [
+      { id: 'opt1', text: 'Ксерокопія документа: змінюючи позначки на своїй копії, ви жодним чином не змінюєте оригінал у колеги', isCorrect: true },
+      { id: 'opt2', text: 'Спільний Google Doc за посиланням: якщо один редагує текст, усі бачать зміну', isCorrect: false },
+      { id: 'opt3', text: 'Ключ від квартири: кілька людей відкривають ті самі двері', isCorrect: false },
+      { id: 'opt4', text: 'Ярлик на робочому столі компʼютера, що веде до файлу на диску', isCorrect: false },
+    ],
+    socraticHints: [
+      { level: 1, hint: 'При копіюванні примітивів кожна змінна отримує незалежне значення в стеку памʼяті.', penaltyPct: 15 },
+      { level: 2, hint: 'Ксерокопія повністю автономна: олівець на другій копії ніколи не торкнеться оригіналу.', penaltyPct: 30 },
+    ],
+    studyUnitUrl: '/learn/js-dev/module-1/primitive-types#primitive-vs-reference',
+  },
+  // EASY Blitz 3: Syntax Pattern & "What If?"
+  {
+    topic: 'primitive-types',
+    subConcept: 'typeof-undefined-vs-null',
+    taskType: 'SINGLE_CHOICE',
+    title: 'Синтаксичний бліц: Значення за замовчуванням неоголошеної змінної',
+    description: 'Яке значення та тип має щойно оголошена змінна `let userAge;` до того, як їй щось присвоїли?',
+    difficulty: 'EASY',
+    options: [
+      { id: 'opt1', text: 'Значення undefined та тип "undefined"', isCorrect: true },
+      { id: 'opt2', text: 'Значення null та тип "object"', isCorrect: false },
+      { id: 'opt3', text: 'Значення 0 та тип "number"', isCorrect: false },
+      { id: 'opt4', text: 'Порожній рядок "" та тип "string"', isCorrect: false },
+    ],
+    socraticHints: [
+      { level: 1, hint: 'Якщо ви запитали у людини вік, а вона ще не відповіла — значення не визначено чи навмисно очищено?', penaltyPct: 15 },
+      { level: 2, hint: 'У JS рушій автоматично призначає неініціалізованим змінним let значення undefined.', penaltyPct: 30 },
+    ],
+    studyUnitUrl: '/learn/js-dev/module-1/primitive-types#undefined-semantics',
   },
   {
     topic: 'primitive-types',
@@ -137,6 +224,11 @@ export const jsBasicsTasks: SeedTask[] = [
       { id: 'opt3', text: '"undefined"', isCorrect: false },
       { id: 'opt4', text: '"primitive"', isCorrect: false },
     ],
+    socraticHints: [
+      { level: 1, hint: 'Це знаменитий історичний артефакт першої версії JS 1995 року, повʼязаний із двійковими тегами типів.', penaltyPct: 15 },
+      { level: 2, hint: 'Рушій V8 через перші нульові біти помилково вважає null обʼєктом і повертає рядок "object".', penaltyPct: 30 },
+    ],
+    studyUnitUrl: '/learn/js-dev/module-1/primitive-types#typeof-operator-quirks',
   },
   {
     topic: 'primitive-types',
@@ -150,9 +242,15 @@ export const jsBasicsTasks: SeedTask[] = [
       { input: 'eval:typeof userId', expectedOutput: '"symbol"', isSecret: false },
       { input: 'eval:Number.isNaN(notANumber)', expectedOutput: 'true', isSecret: false },
     ],
+    socraticHints: [
+      { level: 1, hint: 'Функція Symbol() викликається БЕЗ оператора new, оскільки Symbol є примітивом.', penaltyPct: 15 },
+      { level: 2, hint: 'Для другого завдання просто присвойте глобальну константу NaN змінній notANumber.', penaltyPct: 30 },
+    ],
+    studyUnitUrl: '/learn/js-dev/module-1/primitive-types#symbol-and-nan-semantics',
   },
 
   // --- Topic 3: type-coercion ---
+  // EASY Blitz 1: Academic
   {
     topic: 'type-coercion',
     subConcept: 'implicit-coercion-rules',
@@ -166,6 +264,53 @@ export const jsBasicsTasks: SeedTask[] = [
       { id: 'opt3', text: '3 та 7', isCorrect: false },
       { id: 'opt4', text: 'NaN та "52"', isCorrect: false },
     ],
+    socraticHints: [
+      { level: 1, hint: 'Оператор "-" існує ТІЛЬКИ в математиці (приводить рядок до числа), а оператор "+" вміє конкатенувати рядки.', penaltyPct: 15 },
+      { level: 2, hint: 'Якщо один із операндів плюс рядок, JS склеює обидва як текст: "5" + 2 = "52".', penaltyPct: 30 },
+    ],
+    studyUnitUrl: '/learn/js-dev/module-1/type-coercion#implicit-coercion-rules',
+  },
+  // EASY Blitz 2: Metaphor / Real-World Analogy
+  {
+    topic: 'type-coercion',
+    subConcept: 'loose-vs-strict-equality-metaphor',
+    taskType: 'SINGLE_CHOICE',
+    title: 'Метафора: Контроль на кордоні (=== проти ==)',
+    description: 'Яка життєва метафора найточніше описує різницю між суворою рівністю `===` та несуворою `==`?',
+    difficulty: 'EASY',
+    options: [
+      { id: 'opt1', text: '=== вимагає і однаковий біометричний паспорт (тип), і особистість (значення); а == намагається перевдягнути гостя під будь-який дрес-код (приводить типи)', isCorrect: true },
+      { id: 'opt2', text: '=== порівнює довжину слів, а == порівнює колір шрифту', isCorrect: false },
+      { id: 'opt3', text: '=== працює лише з числами від 0 до 100', isCorrect: false },
+      { id: 'opt4', text: 'Вони абсолютно однакові, але === виконується вдвічі швидше', isCorrect: false },
+    ],
+    socraticHints: [
+      { level: 1, hint: 'Суворе порівняння === ніколи не змінює типи порівнюваних операндів.', penaltyPct: 15 },
+      { level: 2, hint: 'Несуворе порівняння == перед звіркою виконує неявне приведення (наприклад, рядок "5" перетворює на число 5).', penaltyPct: 30 },
+    ],
+    studyUnitUrl: '/learn/js-dev/module-1/type-coercion#equality-operators',
+  },
+  // EASY Blitz 3: Syntax Pattern & "What If?"
+  {
+    topic: 'type-coercion',
+    subConcept: 'boolean-coercion-falsy',
+    taskType: 'MULTIPLE_CHOICE',
+    title: 'Синтаксичний бліц: Значення, що приводяться до false (Falsy)',
+    description: 'Оберіть УСІ значення, які при приведенні `Boolean(value)` дають `false` (Falsy-значення):',
+    difficulty: 'EASY',
+    options: [
+      { id: 'opt1', text: '0 та -0', isCorrect: true },
+      { id: 'opt2', text: 'Порожній рядок ""', isCorrect: true },
+      { id: 'opt3', text: 'null та undefined', isCorrect: true },
+      { id: 'opt4', text: 'NaN', isCorrect: true },
+      { id: 'opt5', text: 'Порожній масив []', isCorrect: false },
+      { id: 'opt6', text: 'Рядок "0" (непорожній)', isCorrect: false },
+    ],
+    socraticHints: [
+      { level: 1, hint: 'Чи є будь-який обʼєкт або масив у JS (навіть порожній []) правдивим (truthy)? Так, посилання завжди truthy.', penaltyPct: 15 },
+      { level: 2, hint: 'У JS рівно 8 falsy значень: false, 0, -0, 0n, "", null, undefined, NaN.', penaltyPct: 30 },
+    ],
+    studyUnitUrl: '/learn/js-dev/module-1/type-coercion#falsy-values',
   },
   {
     topic: 'type-coercion',
@@ -180,6 +325,11 @@ export const jsBasicsTasks: SeedTask[] = [
       { input: '"hasPassed"', expectedOutput: 'true', isSecret: false },
       { input: 'eval:typeof numericScore', expectedOutput: '"number"', isSecret: true },
     ],
+    socraticHints: [
+      { level: 1, hint: 'Функція Number("42") явно конвертує текст на числове значення 42.', penaltyPct: 15 },
+      { level: 2, hint: 'Вираз numericScore >= 40 обчислюється як true, а Boolean(true) залишається true.', penaltyPct: 30 },
+    ],
+    studyUnitUrl: '/learn/js-dev/module-1/type-coercion#explicit-coercion',
   },
   {
     topic: 'type-coercion',
@@ -194,9 +344,15 @@ export const jsBasicsTasks: SeedTask[] = [
       { id: 'opt3', text: 'NaN', isCorrect: false },
       { id: 'opt4', text: 'TypeError: Cannot convert object to primitive', isCorrect: false },
     ],
+    socraticHints: [
+      { level: 1, hint: 'Порожній масив [] при перетворенні на примітив повертає порожній рядок "".', penaltyPct: 15 },
+      { level: 2, hint: 'Обʼєкт {} конвертується у рядок "[object Object]". Їх склеювання через "+" дає "[object Object]".', penaltyPct: 30 },
+    ],
+    studyUnitUrl: '/learn/js-dev/module-1/type-coercion#corner-case-coercion',
   },
 
   // --- Topic 4: operators-and-logic ---
+  // EASY Blitz 1: Academic
   {
     topic: 'operators-and-logic',
     subConcept: 'nullish-coalescing',
@@ -210,6 +366,51 @@ export const jsBasicsTasks: SeedTask[] = [
       { id: 'opt3', text: '|| не працює з булевими значеннями', isCorrect: false },
       { id: 'opt4', text: 'Вони абсолютно ідентичні у сучасних версіях JS', isCorrect: false },
     ],
+    socraticHints: [
+      { level: 1, hint: 'Згадайте значення 0 або порожнього рядка "". Для оператора || це брехня (falsy), але для гри рахунок 0 є валідним значенням!', penaltyPct: 15 },
+      { level: 2, hint: 'Оператор ?? (Nullish Coalescing) перевіряє виключно відсутність значення: null або undefined.', penaltyPct: 30 },
+    ],
+    studyUnitUrl: '/learn/js-dev/module-1/operators-and-logic#nullish-coalescing',
+  },
+  // EASY Blitz 2: Metaphor / Real-World Analogy
+  {
+    topic: 'operators-and-logic',
+    subConcept: 'short-circuit-metaphor',
+    taskType: 'SINGLE_CHOICE',
+    title: 'Метафора: Запобіжник у проводці (Short-Circuit Evaluation)',
+    description: 'Яка життєва метафора найкраще описує поведінку оператора `false && doHeavyWork()`?',
+    difficulty: 'EASY',
+    options: [
+      { id: 'opt1', text: 'Перегорілий запобіжник на старті: струм не йде далі, тому другий прилад (doHeavyWork) навіть не вмикається', isCorrect: true },
+      { id: 'opt2', text: 'Два паралельні генератори, що працюють одночасно в будь-якому випадку', isCorrect: false },
+      { id: 'opt3', text: 'Турнікет у метро, який завжди пропускає обох пасажирів', isCorrect: false },
+      { id: 'opt4', text: 'Терези, що обовʼязково зважують обидва мішки перед відповіддю', isCorrect: false },
+    ],
+    socraticHints: [
+      { level: 1, hint: 'Якщо перша умова в ланцюжку && уже брехлива, чи може весь вираз стати істинним?', penaltyPct: 15 },
+      { level: 2, hint: 'Рушій V8 заощаджує ресурси й негайно повертає перше хибне значення, не обчислюючи праву частину.', penaltyPct: 30 },
+    ],
+    studyUnitUrl: '/learn/js-dev/module-1/operators-and-logic#short-circuit',
+  },
+  // EASY Blitz 3: Syntax Pattern & "What If?"
+  {
+    topic: 'operators-and-logic',
+    subConcept: 'logical-not-double-negation',
+    taskType: 'SINGLE_CHOICE',
+    title: 'Синтаксичний бліц: Подвійне заперечення (!!val)',
+    description: 'Яка мета використання патерну з двома знаками оклику `!!value` у реальних проектах?',
+    difficulty: 'EASY',
+    options: [
+      { id: 'opt1', text: 'Швидке приведення будь-якого значення до суворого булевого типу (true або false)', isCorrect: true },
+      { id: 'opt2', text: 'Збільшення швидкості виконання коду вдвічі', isCorrect: false },
+      { id: 'opt3', text: 'Очищення рядка від пробілів', isCorrect: false },
+      { id: 'opt4', text: 'Порівняння двох значень на тотожність', isCorrect: false },
+    ],
+    socraticHints: [
+      { level: 1, hint: 'Перший ! інвертує значення в булеве навпаки, а другий ! повертає його у правильний полярний стан.', penaltyPct: 15 },
+      { level: 2, hint: '!!"hello" повертає true, а !!null повертає false — це ідіоматичний кастинг до boolean.', penaltyPct: 30 },
+    ],
+    studyUnitUrl: '/learn/js-dev/module-1/operators-and-logic#double-negation',
   },
   {
     topic: 'operators-and-logic',
@@ -223,6 +424,11 @@ export const jsBasicsTasks: SeedTask[] = [
       { input: '"activePort"', expectedOutput: '3000', isSecret: false },
       { input: '"theme"', expectedOutput: '"dark"', isSecret: false },
     ],
+    socraticHints: [
+      { level: 1, hint: 'userPort має значення null, тому activePort отримає значення з правого боку — 3000.', penaltyPct: 15 },
+      { level: 2, hint: 'Порожній рядок "" для оператора || є falsy, тому theme обере наступне значення "dark".', penaltyPct: 30 },
+    ],
+    studyUnitUrl: '/learn/js-dev/module-1/operators-and-logic#default-assignments',
   },
   {
     topic: 'operators-and-logic',
@@ -237,9 +443,15 @@ export const jsBasicsTasks: SeedTask[] = [
       { id: 'opt3', text: '5', isCorrect: false },
       { id: 'opt4', text: '4', isCorrect: false },
     ],
+    socraticHints: [
+      { level: 1, hint: 'Порівняйте біти порозрядно: 1 & 1 дає 1 у молодшому розряді, решта бітів дають 0.', penaltyPct: 15 },
+      { level: 2, hint: '0b101 & 0b001 = 0b001, що в десятковій системі дорівнює 1.', penaltyPct: 30 },
+    ],
+    studyUnitUrl: '/learn/js-dev/module-1/operators-and-logic#bitwise-flags',
   },
 
   // --- Topic 5: arithmetic-functions ---
+  // EASY Blitz 1: Academic
   {
     topic: 'arithmetic-functions',
     subConcept: 'basic-addition',
@@ -252,6 +464,51 @@ export const jsBasicsTasks: SeedTask[] = [
       { input: '"area"', expectedOutput: '120', isSecret: false },
       { input: '"perimeter"', expectedOutput: '46', isSecret: false },
     ],
+    socraticHints: [
+      { level: 1, hint: 'Площа прямокутника обчислюється множенням width * height.', penaltyPct: 15 },
+      { level: 2, hint: 'Периметр — це сума всіх чотирьох сторін: 2 * (width + height).', penaltyPct: 30 },
+    ],
+    studyUnitUrl: '/learn/js-dev/module-1/arithmetic-functions#basic-calculations',
+  },
+  // EASY Blitz 2: Metaphor / Real-World Analogy
+  {
+    topic: 'arithmetic-functions',
+    subConcept: 'modulo-operator-metaphor',
+    taskType: 'SINGLE_CHOICE',
+    title: 'Метафора: Механічний годинник (Оператор залишку %)',
+    description: 'Уявіть звичайний 12-годинний циферблат. Якщо зараз 10 година ранку, і мине 5 годин, стрілка покаже 3 годину дня. Який математичний оператор реалізує цю логіку циклічності?',
+    difficulty: 'EASY',
+    options: [
+      { id: 'opt1', text: 'Оператор залишку від ділення (15 % 12 === 3)', isCorrect: true },
+      { id: 'opt2', text: 'Оператор піднесення до степеня (10 ** 5)', isCorrect: false },
+      { id: 'opt3', text: 'Побітовий зсув вправо (15 >> 12)', isCorrect: false },
+      { id: 'opt4', text: 'Округлення Math.floor(15 / 12)', isCorrect: false },
+    ],
+    socraticHints: [
+      { level: 1, hint: 'Скільки повних обертів по 12 годин вміщується в 15 годин? 1 повний оберт, а залишок — це положення стрілки.', penaltyPct: 15 },
+      { level: 2, hint: 'Оператор % (modulo) ідеально підходить для циклічних черг, днів тижня та стрілок годинника.', penaltyPct: 30 },
+    ],
+    studyUnitUrl: '/learn/js-dev/module-1/arithmetic-functions#modulo-clock',
+  },
+  // EASY Blitz 3: Syntax Pattern & "What If?"
+  {
+    topic: 'arithmetic-functions',
+    subConcept: 'increment-prefix-vs-postfix',
+    taskType: 'SINGLE_CHOICE',
+    title: 'Синтаксичний бліц: Префіксний проти Постфіксного інкременту (++x vs x++)',
+    description: 'Які значення матимуть змінні `b` та `c` після виконання: `let a = 5; let b = a++; let c = ++a;`?',
+    difficulty: 'EASY',
+    options: [
+      { id: 'opt1', text: 'b дорівнює 5, а c дорівнює 7', isCorrect: true },
+      { id: 'opt2', text: 'b дорівнює 6, а c дорівнює 6', isCorrect: false },
+      { id: 'opt3', text: 'b дорівнює 5, а c дорівнює 6', isCorrect: false },
+      { id: 'opt4', text: 'b дорівнює 6, а c дорівнює 7', isCorrect: false },
+    ],
+    socraticHints: [
+      { level: 1, hint: 'Постфіксний a++ спочатку віддає старе значення (5) у b, а потім збільшує a до 6.', penaltyPct: 15 },
+      { level: 2, hint: 'Префіксний ++a спочатку збільшує a з 6 до 7, і одразу записує 7 у c.', penaltyPct: 30 },
+    ],
+    studyUnitUrl: '/learn/js-dev/module-1/arithmetic-functions#increment-decrement',
   },
   {
     topic: 'arithmetic-functions',
@@ -265,6 +522,11 @@ export const jsBasicsTasks: SeedTask[] = [
       { input: '"power"', expectedOutput: '125', isSecret: false },
       { input: '"remainder"', expectedOutput: '2', isSecret: false },
     ],
+    socraticHints: [
+      { level: 1, hint: 'Оператор ** підносить основу до степеня: 5 * 5 * 5 = 125.', penaltyPct: 15 },
+      { level: 2, hint: '17 ділиться на 5 як 3 цілих і 2 в залишку (5 * 3 + 2 = 17).', penaltyPct: 30 },
+    ],
+    studyUnitUrl: '/learn/js-dev/module-1/arithmetic-functions#math-operators',
   },
   {
     topic: 'arithmetic-functions',
@@ -279,9 +541,15 @@ export const jsBasicsTasks: SeedTask[] = [
       { id: 'opt3', text: 'Оператор === заборонено застосовувати до дробових чисел', isCorrect: false },
       { id: 'opt4', text: 'Число 0.3 автоматично округлюється до 0 у булевих виразах', isCorrect: false },
     ],
+    socraticHints: [
+      { level: 1, hint: 'Десяткові дроби 0.1 та 0.2 не можуть бути точно представлені скінченним двійковим дробом у двійковій системі компʼютера.', penaltyPct: 15 },
+      { level: 2, hint: 'Виникає мікроскопічна похибка округлення стандарту подвійної точності IEEE 754.', penaltyPct: 30 },
+    ],
+    studyUnitUrl: '/learn/js-dev/module-1/arithmetic-functions#floating-point-ieee754',
   },
 
   // --- Topic 6: branching-and-loops ---
+  // EASY Blitz 1: Academic
   {
     topic: 'branching-and-loops',
     subConcept: 'switch-case-fallthrough',
@@ -295,6 +563,51 @@ export const jsBasicsTasks: SeedTask[] = [
       { id: 'opt3', text: 'Цикл switch негайно завершиться', isCorrect: false },
       { id: 'opt4', text: 'Виконається блок default', isCorrect: false },
     ],
+    socraticHints: [
+      { level: 1, hint: 'Слово break буквально означає "розірвати/вийти". Якщо виходу немає, потік коду просто падає нижче.', penaltyPct: 15 },
+      { level: 2, hint: 'Цей ефект називається fall-through: наступні кейси будуть виконуватися без повторної перевірки умови.', penaltyPct: 30 },
+    ],
+    studyUnitUrl: '/learn/js-dev/module-1/branching-and-loops#switch-fallthrough',
+  },
+  // EASY Blitz 2: Metaphor / Real-World Analogy
+  {
+    topic: 'branching-and-loops',
+    subConcept: 'ternary-operator-metaphor',
+    taskType: 'SINGLE_CHOICE',
+    title: 'Метафора: Дорожня розвилка (Тернарний оператор condition ? A : B)',
+    description: 'Яка життєва метафора найкраще відображає роботу тернарного виразу `isVip ? "Зона 1" : "Зона 2"`?',
+    difficulty: 'EASY',
+    options: [
+      { id: 'opt1', text: 'Стрілка на залізничній колії: один важіль направляє потяг або на ліву колію, або на праву, але завжди лише в один кінцевий пункт', isCorrect: true },
+      { id: 'opt2', text: 'Карусель, яка крутить пасажирів 10 разів по колу', isCorrect: false },
+      { id: 'opt3', text: 'Сміттєпровід, який скидає всі посилки одночасно', isCorrect: false },
+      { id: 'opt4', text: 'Телевізор, який показує одночасно три канали', isCorrect: false },
+    ],
+    socraticHints: [
+      { level: 1, hint: 'Тернарний оператор приймає одну умову і повертає одне з двох можливих значень.', penaltyPct: 15 },
+      { level: 2, hint: 'Це компактна заміна блоку if-else у формі одного обчислюваного виразу.', penaltyPct: 30 },
+    ],
+    studyUnitUrl: '/learn/js-dev/module-1/branching-and-loops#ternary-operator',
+  },
+  // EASY Blitz 3: Syntax Pattern & "What If?"
+  {
+    topic: 'branching-and-loops',
+    subConcept: 'infinite-loop-break-condition',
+    taskType: 'SINGLE_CHOICE',
+    title: 'Синтаксичний бліц: Умова виходу з циклу while',
+    description: 'Що відбудеться з браузером або середовищем Node.js при запуску циклу `while (true) {}` без команди `break` всередині?',
+    difficulty: 'EASY',
+    options: [
+      { id: 'opt1', text: 'Потік виконання зависне у нескінченному циклі (Infinite Loop), на 100% завантаживши ядро процесора', isCorrect: true },
+      { id: 'opt2', text: 'JS автоматично зупинить цикл через 5 секунд і поверне null', isCorrect: false },
+      { id: 'opt3', text: 'Виникне помилка переповнення стеку викликів (Maximum call stack size exceeded)', isCorrect: false },
+      { id: 'opt4', text: 'Цикл виконається 1 раз і сам закриється', isCorrect: false },
+    ],
+    socraticHints: [
+      { level: 1, hint: 'Умова "true" ніколи не стане false сама по собі.', penaltyPct: 15 },
+      { level: 2, hint: 'Без оператора break або зміни умови цикл блокує головний потік виконання (Event Loop).', penaltyPct: 30 },
+    ],
+    studyUnitUrl: '/learn/js-dev/module-1/branching-and-loops#infinite-loops',
   },
   {
     topic: 'branching-and-loops',
@@ -307,6 +620,11 @@ export const jsBasicsTasks: SeedTask[] = [
     testCases: [
       { input: '"grade"', expectedOutput: '"PASS"', isSecret: false },
     ],
+    socraticHints: [
+      { level: 1, hint: 'Синтаксис тернарного оператора: умова ? значенняЯкщоПравда : значенняЯкщоХибно.', penaltyPct: 15 },
+      { level: 2, hint: 'Оскільки 85 >= 60 є true, змінна grade отримає значення "PASS".', penaltyPct: 30 },
+    ],
+    studyUnitUrl: '/learn/js-dev/module-1/branching-and-loops#ternary-expressions',
   },
   {
     topic: 'branching-and-loops',
@@ -321,9 +639,15 @@ export const jsBasicsTasks: SeedTask[] = [
       { id: 'opt3', text: 'У циклі do...while не можна використовувати ключове слово break', isCorrect: false },
       { id: 'opt4', text: 'while підтримує тільки числові лічильники, а do...while будь-які вирази', isCorrect: false },
     ],
+    socraticHints: [
+      { level: 1, hint: 'Зверніть увагу на порядок ключових слів: спочатку "do" (зроби), а лише потім "while" (поки умова дійсна).', penaltyPct: 15 },
+      { level: 2, hint: 'Навіть якщо умова завідомо хибна на старті (наприклад while (false)), do...while все одно зробить одну ітерацію.', penaltyPct: 30 },
+    ],
+    studyUnitUrl: '/learn/js-dev/module-1/branching-and-loops#do-while-semantics',
   },
 
   // --- Topic 7: string-manipulation ---
+  // EASY Blitz 1: Academic
   {
     topic: 'string-manipulation',
     subConcept: 'template-literals',
@@ -337,6 +661,51 @@ export const jsBasicsTasks: SeedTask[] = [
       { id: 'opt3', text: 'Одинарні лапки (\'\')', isCorrect: false },
       { id: 'opt4', text: 'Кутові дужки (<>)', isCorrect: false },
     ],
+    socraticHints: [
+      { level: 1, hint: 'Цей символ зазвичай розташований під клавішею Esc на клавіатурі (буква "Ё" або тильда ~).', penaltyPct: 15 },
+      { level: 2, hint: 'Тільки зворотні лапки `` підтримують конструкцію інтерполяції ${вираз} та багаторядковий текст.', penaltyPct: 30 },
+    ],
+    studyUnitUrl: '/learn/js-dev/module-1/string-manipulation#template-literals',
+  },
+  // EASY Blitz 2: Metaphor / Real-World Analogy
+  {
+    topic: 'string-manipulation',
+    subConcept: 'string-immutability-metaphor',
+    taskType: 'SINGLE_CHOICE',
+    title: 'Метафора: Надрукована книга (Незмінність рядків)',
+    description: 'Чому вираз `let s = "hello"; s[0] = "H";` не змінює першу літеру слова на велику?',
+    difficulty: 'EASY',
+    options: [
+      { id: 'opt1', text: 'Рядки в JS — як типографські відбитки: їх можна прочитати по літерах, але не можна затерти одну літеру; можна лише надрукувати новий рядок', isCorrect: true },
+      { id: 'opt2', text: 'Тому що великі літери заборонені в рядках', isCorrect: false },
+      { id: 'opt3', text: 'Тому що індексація рядків починається з одиниці 1, а не з нуля', isCorrect: false },
+      { id: 'opt4', text: 'Це можливо тільки всередині функцій', isCorrect: false },
+    ],
+    socraticHints: [
+      { level: 1, hint: 'Усі примітивні типи в JavaScript є абсолютно імутабельними (незмінними).', penaltyPct: 15 },
+      { level: 2, hint: 'Будь-яка операція зі зміною рядка насправді створює новий рядок у памʼяті, а не модифікує старий.', penaltyPct: 30 },
+    ],
+    studyUnitUrl: '/learn/js-dev/module-1/string-manipulation#string-immutability',
+  },
+  // EASY Blitz 3: Syntax Pattern & "What If?"
+  {
+    topic: 'string-manipulation',
+    subConcept: 'string-length-property',
+    taskType: 'SINGLE_CHOICE',
+    title: 'Синтаксичний бліц: Довжина рядка (length)',
+    description: 'Чому дорівнює вираз `"Code".length` та який індекс має останній символ цього слова?',
+    difficulty: 'EASY',
+    options: [
+      { id: 'opt1', text: 'length дорівнює 4, а останній індекс дорівнює 3', isCorrect: true },
+      { id: 'opt2', text: 'length дорівнює 4, а останній індекс дорівнює 4', isCorrect: false },
+      { id: 'opt3', text: 'length дорівнює 5 через невидимий нульовий байт', isCorrect: false },
+      { id: 'opt4', text: 'length дорівнює 3, оскільки відлік починається з 0', isCorrect: false },
+    ],
+    socraticHints: [
+      { level: 1, hint: 'Кількість літер у слові "Code" дорівнює 4.', penaltyPct: 15 },
+      { level: 2, hint: 'Оскільки індексація починається з 0 (0, 1, 2, 3), останній символ завжди має індекс str.length - 1.', penaltyPct: 30 },
+    ],
+    studyUnitUrl: '/learn/js-dev/module-1/string-manipulation#string-length',
   },
   {
     topic: 'string-manipulation',
@@ -349,6 +718,11 @@ export const jsBasicsTasks: SeedTask[] = [
     testCases: [
       { input: '"profileCard"', expectedOutput: '"Користувач: Іван, Посада: Розробник"', isSecret: false },
     ],
+    socraticHints: [
+      { level: 1, hint: 'Використовуйте зворотні лапки `` та знак долара з фігурними дужками ${firstName}.', penaltyPct: 15 },
+      { level: 2, hint: 'Шаблонний рядок автоматично підставить значення змінних всередину тексту.', penaltyPct: 30 },
+    ],
+    studyUnitUrl: '/learn/js-dev/module-1/string-manipulation#interpolation',
   },
   {
     topic: 'string-manipulation',
@@ -363,6 +737,11 @@ export const jsBasicsTasks: SeedTask[] = [
       { id: 'opt3', text: 'Виникне помилка SyntaxError', isCorrect: false },
       { id: 'opt4', text: 'Символ стане undefined', isCorrect: false },
     ],
+    socraticHints: [
+      { level: 1, hint: 'У нестрогому режимі операція просто мовчки ігнорується, а у strict mode викидає помилку.', penaltyPct: 15 },
+      { level: 2, hint: 'Сам рядок у памʼяті не змінюється і залишається "cat".', penaltyPct: 30 },
+    ],
+    studyUnitUrl: '/learn/js-dev/module-1/string-manipulation#immutability-pitfalls',
   },
   // Capstone Bug Hunt for js-basics
   {
@@ -378,6 +757,11 @@ export const jsBasicsTasks: SeedTask[] = [
       { id: 'opt3', text: 'undefined', isCorrect: false },
       { id: 'opt4', text: 'ReferenceError: a is not defined', isCorrect: false },
     ],
+    socraticHints: [
+      { level: 1, hint: 'Змінні, оголошені через let, мають блокову область видимості (Block Scope), обмежену фігурними дужками {}.', penaltyPct: 15 },
+      { level: 2, hint: 'Внутрішня змінна a = 2 затінює зовнішню лише всередині блоку if, а за його межами зовнішнє значення a = 1 залишається незмінним.', penaltyPct: 30 },
+    ],
+    studyUnitUrl: '/learn/js-dev/module-1/variables-declaration#block-scope-shadowing',
   },
 ];
 
@@ -400,6 +784,11 @@ export const jsFunctionsTasks: SeedTask[] = [
       { id: 'opt3', text: 'Завжди посилається на глобальний обʼєкт window/global', isCorrect: false },
       { id: 'opt4', text: 'Стрілочні функції не підтримують використання this і генерують помилку', isCorrect: false },
     ],
+    socraticHints: [
+      { level: 1, hint: 'Згадайте: стрілочні функції не мають власного arguments та власного звʼязування this.', penaltyPct: 15 },
+      { level: 2, hint: 'Стрілочна функція захоплює this із того місця, де вона була буквально написана в коді (лексично).', penaltyPct: 30 },
+    ],
+    studyUnitUrl: '/learn/js-dev/module-2/functions#arrow-functions',
   },
   {
     topic: 'arrow-functions',
@@ -415,6 +804,11 @@ export const jsFunctionsTasks: SeedTask[] = [
       { input: '[3, 4]', expectedOutput: '81', isSecret: true },
       { input: '[10, 0]', expectedOutput: '1', isSecret: true },
     ],
+    socraticHints: [
+      { level: 1, hint: 'Згадайте: стрілочні функції не мають власного arguments та власного звʼязування this.', penaltyPct: 15 },
+      { level: 2, hint: 'Стрілочна функція захоплює this із того місця, де вона була буквально написана в коді (лексично).', penaltyPct: 30 },
+    ],
+    studyUnitUrl: '/learn/js-dev/module-2/functions#arrow-functions',
   },
   {
     topic: 'arrow-functions',
@@ -429,6 +823,11 @@ export const jsFunctionsTasks: SeedTask[] = [
       { input: '[2, "Bob", "admin"]', expectedOutput: '{"id":2,"name":"Bob","role":"admin"}', isSecret: false },
       { input: '[99, "Charlie", "mentor"]', expectedOutput: '{"id":99,"name":"Charlie","role":"mentor"}', isSecret: true },
     ],
+    socraticHints: [
+      { level: 1, hint: 'Згадайте: стрілочні функції не мають власного arguments та власного звʼязування this.', penaltyPct: 15 },
+      { level: 2, hint: 'Стрілочна функція захоплює this із того місця, де вона була буквально написана в коді (лексично).', penaltyPct: 30 },
+    ],
+    studyUnitUrl: '/learn/js-dev/module-2/functions#arrow-functions',
   },
 
   // --- Topic 2: default-parameters ---
@@ -445,6 +844,11 @@ export const jsFunctionsTasks: SeedTask[] = [
       { id: 'opt3', text: 'Коли передано null або false', isCorrect: false },
       { id: 'opt4', text: 'При будь-якому falsy значенні (0, false, null, NaN)', isCorrect: false },
     ],
+    socraticHints: [
+      { level: 1, hint: 'Чи є null навмисно переданим значенням обʼєкта? Так! Лише відсутність значення або undefined активує дефолтне значення.', penaltyPct: 15 },
+      { level: 2, hint: 'У JS дефолтний параметр спрацьовує виключно якщо аргумент === undefined.', penaltyPct: 30 },
+    ],
+    studyUnitUrl: '/learn/js-dev/module-2/functions#default-parameters',
   },
   {
     topic: 'default-parameters',
@@ -460,6 +864,11 @@ export const jsFunctionsTasks: SeedTask[] = [
       { input: '[50, 0]', expectedOutput: '50', isSecret: true },
       { input: '[1000, 50]', expectedOutput: '500', isSecret: true },
     ],
+    socraticHints: [
+      { level: 1, hint: 'Чи є null навмисно переданим значенням обʼєкта? Так! Лише відсутність значення або undefined активує дефолтне значення.', penaltyPct: 15 },
+      { level: 2, hint: 'У JS дефолтний параметр спрацьовує виключно якщо аргумент === undefined.', penaltyPct: 30 },
+    ],
+    studyUnitUrl: '/learn/js-dev/module-2/functions#default-parameters',
   },
   {
     topic: 'default-parameters',
@@ -474,6 +883,11 @@ export const jsFunctionsTasks: SeedTask[] = [
       { input: '["Web Dev", "custom-id"]', expectedOutput: '{"name":"Web Dev","id":"custom-id"}', isSecret: false },
       { input: '["Deep Learning BKT"]', expectedOutput: '{"name":"Deep Learning BKT","id":"deep-learning-bkt"}', isSecret: true },
     ],
+    socraticHints: [
+      { level: 1, hint: 'Чи є null навмисно переданим значенням обʼєкта? Так! Лише відсутність значення або undefined активує дефолтне значення.', penaltyPct: 15 },
+      { level: 2, hint: 'У JS дефолтний параметр спрацьовує виключно якщо аргумент === undefined.', penaltyPct: 30 },
+    ],
+    studyUnitUrl: '/learn/js-dev/module-2/functions#default-parameters',
   },
 
   // --- Topic 3: rest-and-spread ---
@@ -490,6 +904,11 @@ export const jsFunctionsTasks: SeedTask[] = [
       { id: 'opt3', text: 'Функція може містити декілька незалежних Rest-параметрів', isCorrect: false },
       { id: 'opt4', text: 'Rest-параметр можна використовувати тільки зі стрілочними функціями', isCorrect: false },
     ],
+    socraticHints: [
+      { level: 1, hint: 'Rest (...args) збирає окремі значення в масив, а Spread (...arr) розгортає масив на окремі елементи.', penaltyPct: 15 },
+      { level: 2, hint: 'У списку параметрів функції три крапки завжди позначають rest-параметр.', penaltyPct: 30 },
+    ],
+    studyUnitUrl: '/learn/js-dev/module-2/functions#rest-and-spread',
   },
   {
     topic: 'rest-and-spread',
@@ -505,6 +924,11 @@ export const jsFunctionsTasks: SeedTask[] = [
       { input: '[10, -5, 20]', expectedOutput: '25', isSecret: false },
       { input: '[5, 5, 5, 5, 5]', expectedOutput: '25', isSecret: true },
     ],
+    socraticHints: [
+      { level: 1, hint: 'Rest (...args) збирає окремі значення в масив, а Spread (...arr) розгортає масив на окремі елементи.', penaltyPct: 15 },
+      { level: 2, hint: 'У списку параметрів функції три крапки завжди позначають rest-параметр.', penaltyPct: 30 },
+    ],
+    studyUnitUrl: '/learn/js-dev/module-2/functions#rest-and-spread',
   },
   {
     topic: 'rest-and-spread',
@@ -520,6 +944,11 @@ export const jsFunctionsTasks: SeedTask[] = [
       { input: '[[10, 20], 0, 5]', expectedOutput: '[5,10,20]', isSecret: true },
       { input: '[[1], 1, 2]', expectedOutput: '[1,2]', isSecret: true },
     ],
+    socraticHints: [
+      { level: 1, hint: 'Rest (...args) збирає окремі значення в масив, а Spread (...arr) розгортає масив на окремі елементи.', penaltyPct: 15 },
+      { level: 2, hint: 'У списку параметрів функції три крапки завжди позначають rest-параметр.', penaltyPct: 30 },
+    ],
+    studyUnitUrl: '/learn/js-dev/module-2/functions#rest-and-spread',
   },
 
   // --- Topic 4: closures ---
@@ -536,6 +965,11 @@ export const jsFunctionsTasks: SeedTask[] = [
       { id: 'opt3', text: 'Метод видалення невикористовуваної памʼяті збивачем сміття (GC)', isCorrect: false },
       { id: 'opt4', text: 'Спосіб оголошення приватних методів виключно у класах ES6', isCorrect: false },
     ],
+    socraticHints: [
+      { level: 1, hint: 'Замикання — це здатність внутрішньої функції памʼятати змінні зі свого лексичного оточення навіть після завершення зовнішньої функції.', penaltyPct: 15 },
+      { level: 2, hint: 'Функція зберігає приховане посилання [[Environment]] на скоуп, де вона народилася.', penaltyPct: 30 },
+    ],
+    studyUnitUrl: '/learn/js-dev/module-2/functions#closures',
   },
   {
     topic: 'closures',
@@ -550,6 +984,11 @@ export const jsFunctionsTasks: SeedTask[] = [
       { input: '[0]', expectedOutput: '{"count":0}', isSecret: false },
       { input: '[100]', expectedOutput: '{"count":100}', isSecret: true },
     ],
+    socraticHints: [
+      { level: 1, hint: 'Замикання — це здатність внутрішньої функції памʼятати змінні зі свого лексичного оточення навіть після завершення зовнішньої функції.', penaltyPct: 15 },
+      { level: 2, hint: 'Функція зберігає приховане посилання [[Environment]] на скоуп, де вона народилася.', penaltyPct: 30 },
+    ],
+    studyUnitUrl: '/learn/js-dev/module-2/functions#closures',
   },
   {
     topic: 'closures',
@@ -564,6 +1003,11 @@ export const jsFunctionsTasks: SeedTask[] = [
       { input: '[1]', expectedOutput: '30', isSecret: false }, // 1 * 5 * 6
       { input: '[10]', expectedOutput: '1000', isSecret: true },
     ],
+    socraticHints: [
+      { level: 1, hint: 'Замикання — це здатність внутрішньої функції памʼятати змінні зі свого лексичного оточення навіть після завершення зовнішньої функції.', penaltyPct: 15 },
+      { level: 2, hint: 'Функція зберігає приховане посилання [[Environment]] на скоуп, де вона народилася.', penaltyPct: 30 },
+    ],
+    studyUnitUrl: '/learn/js-dev/module-2/functions#closures',
   },
 
   // --- Topic 5: hoisting-functions ---
@@ -580,6 +1024,11 @@ export const jsFunctionsTasks: SeedTask[] = [
       { id: 'opt3', text: 'Function Expression піднімається в глобальну область, а Declaration ні', isCorrect: false },
       { id: 'opt4', text: 'Вони поводяться абсолютно ідентично', isCorrect: false },
     ],
+    socraticHints: [
+      { level: 1, hint: 'Чим відрізняється Function Declaration від Function Expression? Оголошення function foo() піднімається повністю разом із тілом.', penaltyPct: 15 },
+      { level: 2, hint: 'Function Expression (const f = function(){}) створює змінну, яка до ініціалізації перебуває в TDZ.', penaltyPct: 30 },
+    ],
+    studyUnitUrl: '/learn/js-dev/module-2/functions#hoisting',
   },
   {
     topic: 'hoisting-functions',
@@ -594,6 +1043,11 @@ export const jsFunctionsTasks: SeedTask[] = [
       { input: '[null, 5]', expectedOutput: 'null', isSecret: false },
       { input: '[undefined]', expectedOutput: 'null', isSecret: true },
     ],
+    socraticHints: [
+      { level: 1, hint: 'Чим відрізняється Function Declaration від Function Expression? Оголошення function foo() піднімається повністю разом із тілом.', penaltyPct: 15 },
+      { level: 2, hint: 'Function Expression (const f = function(){}) створює змінну, яка до ініціалізації перебуває в TDZ.', penaltyPct: 30 },
+    ],
+    studyUnitUrl: '/learn/js-dev/module-2/functions#hoisting',
   },
   {
     topic: 'hoisting-functions',
@@ -608,6 +1062,11 @@ export const jsFunctionsTasks: SeedTask[] = [
       { input: '["wrong"]', expectedOutput: 'false', isSecret: false },
       { input: '[""]', expectedOutput: 'false', isSecret: true },
     ],
+    socraticHints: [
+      { level: 1, hint: 'Чим відрізняється Function Declaration від Function Expression? Оголошення function foo() піднімається повністю разом із тілом.', penaltyPct: 15 },
+      { level: 2, hint: 'Function Expression (const f = function(){}) створює змінну, яка до ініціалізації перебуває в TDZ.', penaltyPct: 30 },
+    ],
+    studyUnitUrl: '/learn/js-dev/module-2/functions#hoisting',
   },
 
   // --- Topic 6: parameters-and-scope ---
@@ -624,6 +1083,11 @@ export const jsFunctionsTasks: SeedTask[] = [
       { id: 'opt3', text: 'Виникне помилка зміни зовнішнього стану в Strict Mode', isCorrect: false },
       { id: 'opt4', text: 'Зміниться лише якщо функція поверне цей обʼєкт через return', isCorrect: false },
     ],
+    socraticHints: [
+      { level: 1, hint: 'Область видимості визначає, де саме змінні доступні для читання та запису.', penaltyPct: 15 },
+      { level: 2, hint: 'Локальні змінні всередині функції ізольовані від зовнішнього глобального простору.', penaltyPct: 30 },
+    ],
+    studyUnitUrl: '/learn/js-dev/module-2/functions#scope',
   },
   {
     topic: 'parameters-and-scope',
@@ -638,6 +1102,11 @@ export const jsFunctionsTasks: SeedTask[] = [
       { input: '[{"name":"Mark","age":30}, 35]', expectedOutput: '{"name":"Mark","age":35}', isSecret: false },
       { input: '[{"name":"Solo","age":18}, 19]', expectedOutput: '{"name":"Solo","age":19}', isSecret: true },
     ],
+    socraticHints: [
+      { level: 1, hint: 'Область видимості визначає, де саме змінні доступні для читання та запису.', penaltyPct: 15 },
+      { level: 2, hint: 'Локальні змінні всередині функції ізольовані від зовнішнього глобального простору.', penaltyPct: 30 },
+    ],
+    studyUnitUrl: '/learn/js-dev/module-2/functions#scope',
   },
   {
     topic: 'parameters-and-scope',
@@ -651,6 +1120,11 @@ export const jsFunctionsTasks: SeedTask[] = [
       { input: '[{"a":{"b":1}}]', expectedOutput: '{"a":{"b":1}}', isSecret: false },
       { input: '[{"x":10}]', expectedOutput: '{"x":10}', isSecret: true },
     ],
+    socraticHints: [
+      { level: 1, hint: 'Область видимості визначає, де саме змінні доступні для читання та запису.', penaltyPct: 15 },
+      { level: 2, hint: 'Локальні змінні всередині функції ізольовані від зовнішнього глобального простору.', penaltyPct: 30 },
+    ],
+    studyUnitUrl: '/learn/js-dev/module-2/functions#scope',
   },
 
   // --- Topic 7: recursion-fundamentals ---
@@ -667,6 +1141,11 @@ export const jsFunctionsTasks: SeedTask[] = [
       { id: 'opt3', text: 'Операційна система негайно завершить процес Node.js без помилки', isCorrect: false },
       { id: 'opt4', text: 'Браузер автоматично перетворить функцію на цикл while', isCorrect: false },
     ],
+    socraticHints: [
+      { level: 1, hint: 'Яка обовʼязкова частина рекурсивної функції запобігає переповненню стеку (Stack Overflow)?', penaltyPct: 15 },
+      { level: 2, hint: 'Базовий випадок (Base Case) зупиняє подальші самовиклики при досягненні умови виходу.', penaltyPct: 30 },
+    ],
+    studyUnitUrl: '/learn/js-dev/module-2/functions#recursion',
   },
   {
     topic: 'recursion-fundamentals',
@@ -683,6 +1162,11 @@ export const jsFunctionsTasks: SeedTask[] = [
       { input: '[5]', expectedOutput: '120', isSecret: false },
       { input: '[6]', expectedOutput: '720', isSecret: true },
     ],
+    socraticHints: [
+      { level: 1, hint: 'Яка обовʼязкова частина рекурсивної функції запобігає переповненню стеку (Stack Overflow)?', penaltyPct: 15 },
+      { level: 2, hint: 'Базовий випадок (Base Case) зупиняє подальші самовиклики при досягненні умови виходу.', penaltyPct: 30 },
+    ],
+    studyUnitUrl: '/learn/js-dev/module-2/functions#recursion',
   },
   {
     topic: 'recursion-fundamentals',
@@ -698,6 +1182,11 @@ export const jsFunctionsTasks: SeedTask[] = [
       { input: '[[[], [1, 2], []]]', expectedOutput: '[1,2]', isSecret: true },
       { input: '[[10, 20, 30]]', expectedOutput: '[10,20,30]', isSecret: true },
     ],
+    socraticHints: [
+      { level: 1, hint: 'Яка обовʼязкова частина рекурсивної функції запобігає переповненню стеку (Stack Overflow)?', penaltyPct: 15 },
+      { level: 2, hint: 'Базовий випадок (Base Case) зупиняє подальші самовиклики при досягненні умови виходу.', penaltyPct: 30 },
+    ],
+    studyUnitUrl: '/learn/js-dev/module-2/functions#recursion',
   },
   // Capstone Bug Hunt for js-functions
   {
@@ -711,6 +1200,11 @@ export const jsFunctionsTasks: SeedTask[] = [
     testCases: [
       { input: '[5]', expectedOutput: '50', isSecret: false }, // tester checks with num=10
     ],
+    socraticHints: [
+      { level: 1, hint: 'Замикання — це здатність внутрішньої функції памʼятати змінні зі свого лексичного оточення навіть після завершення зовнішньої функції.', penaltyPct: 15 },
+      { level: 2, hint: 'Функція зберігає приховане посилання [[Environment]] на скоуп, де вона народилася.', penaltyPct: 30 },
+    ],
+    studyUnitUrl: '/learn/js-dev/module-2/functions#closures',
   },
 ];
 
@@ -733,6 +1227,11 @@ export const jsCollectionsTasks: SeedTask[] = [
       { id: 'opt3', text: '`map` працює тільки з числами, а `forEach` з будь-якими типами', isCorrect: false },
       { id: 'opt4', text: '`map` асинхронний, а `forEach` синхронний', isCorrect: false },
     ],
+    socraticHints: [
+      { level: 1, hint: 'map() завжди повертає новий масив однакової довжини, а forEach() лише виконує побічні дії і повертає undefined.', penaltyPct: 15 },
+      { level: 2, hint: 'Для чистої трансформації списків завжди обирайте map(), зберігаючи незмінність вхідного масиву.', penaltyPct: 30 },
+    ],
+    studyUnitUrl: '/learn/js-dev/module-3/collections#array-iteration',
   },
   {
     topic: 'array-iteration',
@@ -748,6 +1247,11 @@ export const jsCollectionsTasks: SeedTask[] = [
       { input: '[[0, -2, -3, 8]]', expectedOutput: '[0,-2,8]', isSecret: true },
       { input: '[[100, 101, 102]]', expectedOutput: '[100,102]', isSecret: true },
     ],
+    socraticHints: [
+      { level: 1, hint: 'map() завжди повертає новий масив однакової довжини, а forEach() лише виконує побічні дії і повертає undefined.', penaltyPct: 15 },
+      { level: 2, hint: 'Для чистої трансформації списків завжди обирайте map(), зберігаючи незмінність вхідного масиву.', penaltyPct: 30 },
+    ],
+    studyUnitUrl: '/learn/js-dev/module-3/collections#array-iteration',
   },
   {
     topic: 'array-iteration',
@@ -763,6 +1267,11 @@ export const jsCollectionsTasks: SeedTask[] = [
       { input: '[[1, 2, 3], 5]', expectedOutput: '[[1,2,3]]', isSecret: true },
       { input: '[[], 3]', expectedOutput: '[]', isSecret: true },
     ],
+    socraticHints: [
+      { level: 1, hint: 'map() завжди повертає новий масив однакової довжини, а forEach() лише виконує побічні дії і повертає undefined.', penaltyPct: 15 },
+      { level: 2, hint: 'Для чистої трансформації списків завжди обирайте map(), зберігаючи незмінність вхідного масиву.', penaltyPct: 30 },
+    ],
+    studyUnitUrl: '/learn/js-dev/module-3/collections#array-iteration',
   },
 
   // --- Topic 2: array-reduction ---
@@ -779,6 +1288,11 @@ export const jsCollectionsTasks: SeedTask[] = [
       { id: 'opt3', text: 'Метод поверне undefined', isCorrect: false },
       { id: 'opt4', text: 'Метод поверне null', isCorrect: false },
     ],
+    socraticHints: [
+      { level: 1, hint: 'reduce() згортає масив у єдине акумульоване значення будь-якого типу (число, обʼєкт, список).', penaltyPct: 15 },
+      { level: 2, hint: 'Перший аргумент колбеку — акумулятор (acc), другий — поточний елемент (cur). Не забувайте передавати початкове значення!', penaltyPct: 30 },
+    ],
+    studyUnitUrl: '/learn/js-dev/module-3/collections#array-reduction',
   },
   {
     topic: 'array-reduction',
@@ -794,6 +1308,11 @@ export const jsCollectionsTasks: SeedTask[] = [
       { input: '[[]]', expectedOutput: '{}', isSecret: true },
       { input: '[["js", "ts", "js", "js"]]', expectedOutput: '{"js":3,"ts":1}', isSecret: true },
     ],
+    socraticHints: [
+      { level: 1, hint: 'reduce() згортає масив у єдине акумульоване значення будь-якого типу (число, обʼєкт, список).', penaltyPct: 15 },
+      { level: 2, hint: 'Перший аргумент колбеку — акумулятор (acc), другий — поточний елемент (cur). Не забувайте передавати початкове значення!', penaltyPct: 30 },
+    ],
+    studyUnitUrl: '/learn/js-dev/module-3/collections#array-reduction',
   },
   {
     topic: 'array-reduction',
@@ -807,6 +1326,11 @@ export const jsCollectionsTasks: SeedTask[] = [
       { input: '[[{"role":"admin","name":"A"},{"role":"user","name":"B"},{"role":"admin","name":"C"}], "role"]', expectedOutput: '{"admin":[{"role":"admin","name":"A"},{"role":"admin","name":"C"}],"user":[{"role":"user","name":"B"}]}', isSecret: false },
       { input: '[[], "type"]', expectedOutput: '{}', isSecret: true },
     ],
+    socraticHints: [
+      { level: 1, hint: 'reduce() згортає масив у єдине акумульоване значення будь-якого типу (число, обʼєкт, список).', penaltyPct: 15 },
+      { level: 2, hint: 'Перший аргумент колбеку — акумулятор (acc), другий — поточний елемент (cur). Не забувайте передавати початкове значення!', penaltyPct: 30 },
+    ],
+    studyUnitUrl: '/learn/js-dev/module-3/collections#array-reduction',
   },
 
   // --- Topic 3: object-manipulation ---
@@ -823,6 +1347,11 @@ export const jsCollectionsTasks: SeedTask[] = [
       { id: 'opt3', text: 'Масив значень: [1, 2]', isCorrect: false },
       { id: 'opt4', text: 'Ітератор посилань Map', isCorrect: false },
     ],
+    socraticHints: [
+      { level: 1, hint: 'Object.keys() повертає масив власних перелічуваних ключів, а Object.entries() повертає пари [ключ, значення].', penaltyPct: 15 },
+      { level: 2, hint: 'Для безпечного клонування обʼєктів першого рівня використовуйте Object.assign({}, obj) або spread {...obj}.', penaltyPct: 30 },
+    ],
+    studyUnitUrl: '/learn/js-dev/module-3/collections#objects',
   },
   {
     topic: 'object-manipulation',
@@ -837,6 +1366,11 @@ export const jsCollectionsTasks: SeedTask[] = [
       { input: '[{"a":10,"b":20}, ["c"]]', expectedOutput: '{}', isSecret: false },
       { input: '[{"x":1,"y":2,"z":3}, ["x","z"]]', expectedOutput: '{"x":1,"z":3}', isSecret: true },
     ],
+    socraticHints: [
+      { level: 1, hint: 'Object.keys() повертає масив власних перелічуваних ключів, а Object.entries() повертає пари [ключ, значення].', penaltyPct: 15 },
+      { level: 2, hint: 'Для безпечного клонування обʼєктів першого рівня використовуйте Object.assign({}, obj) або spread {...obj}.', penaltyPct: 30 },
+    ],
+    studyUnitUrl: '/learn/js-dev/module-3/collections#objects',
   },
   {
     topic: 'object-manipulation',
@@ -850,6 +1384,11 @@ export const jsCollectionsTasks: SeedTask[] = [
       { input: '[{"a":{"x":1},"b":2}, {"a":{"y":2},"b":3,"c":4}]', expectedOutput: '{"a":{"x":1,"y":2},"b":3,"c":4}', isSecret: false },
       { input: '[{}, {"key":"val"}]', expectedOutput: '{"key":"val"}', isSecret: true },
     ],
+    socraticHints: [
+      { level: 1, hint: 'Object.keys() повертає масив власних перелічуваних ключів, а Object.entries() повертає пари [ключ, значення].', penaltyPct: 15 },
+      { level: 2, hint: 'Для безпечного клонування обʼєктів першого рівня використовуйте Object.assign({}, obj) або spread {...obj}.', penaltyPct: 30 },
+    ],
+    studyUnitUrl: '/learn/js-dev/module-3/collections#objects',
   },
 
   // --- Topic 4: map-and-set ---
@@ -866,6 +1405,11 @@ export const jsCollectionsTasks: SeedTask[] = [
       { id: 'opt3', text: 'Тільки значення, які повторювалися: 1, 2', isCorrect: false },
       { id: 'opt4', text: 'Колекція видасть помилку дубліката', isCorrect: false },
     ],
+    socraticHints: [
+      { level: 1, hint: 'Головна властивість Set — унікальність значень (без дублікатів).', penaltyPct: 15 },
+      { level: 2, hint: 'На відміну від звичайного обʼєкта, ключами Map можуть бути будь-які типи, включаючи функції та інші обʼєкти.', penaltyPct: 30 },
+    ],
+    studyUnitUrl: '/learn/js-dev/module-3/collections#map-set',
   },
   {
     topic: 'map-and-set',
@@ -881,6 +1425,11 @@ export const jsCollectionsTasks: SeedTask[] = [
       { input: '[[]]', expectedOutput: '[]', isSecret: true },
       { input: '[[5, 5, 5, 5]]', expectedOutput: '[5]', isSecret: true },
     ],
+    socraticHints: [
+      { level: 1, hint: 'Головна властивість Set — унікальність значень (без дублікатів).', penaltyPct: 15 },
+      { level: 2, hint: 'На відміну від звичайного обʼєкта, ключами Map можуть бути будь-які типи, включаючи функції та інші обʼєкти.', penaltyPct: 30 },
+    ],
+    studyUnitUrl: '/learn/js-dev/module-3/collections#map-set',
   },
   {
     topic: 'map-and-set',
@@ -895,6 +1444,11 @@ export const jsCollectionsTasks: SeedTask[] = [
       { input: '[[1, 2], [3, 4]]', expectedOutput: '[]', isSecret: false },
       { input: '[["x", "y"], ["y", "z"]]', expectedOutput: '["y"]', isSecret: true },
     ],
+    socraticHints: [
+      { level: 1, hint: 'Головна властивість Set — унікальність значень (без дублікатів).', penaltyPct: 15 },
+      { level: 2, hint: 'На відміну від звичайного обʼєкта, ключами Map можуть бути будь-які типи, включаючи функції та інші обʼєкти.', penaltyPct: 30 },
+    ],
+    studyUnitUrl: '/learn/js-dev/module-3/collections#map-set',
   },
 
   // --- Topic 5: array-mutations-and-searches ---
@@ -911,6 +1465,11 @@ export const jsCollectionsTasks: SeedTask[] = [
       { id: 'opt3', text: 'concat()', isCorrect: false },
       { id: 'opt4', text: 'filter()', isCorrect: false },
     ],
+    socraticHints: [
+      { level: 1, hint: 'Методи push, pop, splice мутують оригінальний масив на місці; concat, slice, toSorted створюють нові копії.', penaltyPct: 15 },
+      { level: 2, hint: 'indexOf шукає за суворою рівністю ===, а find() приймає функцію-предикат.', penaltyPct: 30 },
+    ],
+    studyUnitUrl: '/learn/js-dev/module-3/collections#array-mutations',
   },
   {
     topic: 'array-mutations-and-searches',
@@ -926,6 +1485,11 @@ export const jsCollectionsTasks: SeedTask[] = [
       { input: '[[2, 4, 6, 8, 10, 12], 2]', expectedOutput: '0', isSecret: true },
       { input: '[[2, 4, 6, 8, 10, 12], 12]', expectedOutput: '5', isSecret: true },
     ],
+    socraticHints: [
+      { level: 1, hint: 'Методи push, pop, splice мутують оригінальний масив на місці; concat, slice, toSorted створюють нові копії.', penaltyPct: 15 },
+      { level: 2, hint: 'indexOf шукає за суворою рівністю ===, а find() приймає функцію-предикат.', penaltyPct: 30 },
+    ],
+    studyUnitUrl: '/learn/js-dev/module-3/collections#array-mutations',
   },
   {
     topic: 'array-mutations-and-searches',
@@ -940,6 +1504,11 @@ export const jsCollectionsTasks: SeedTask[] = [
       { input: '[[0, 0, 1, 1, 1, 2, 2, 3, 3, 4]]', expectedOutput: '5', isSecret: false },
       { input: '[[1, 2, 3]]', expectedOutput: '3', isSecret: true },
     ],
+    socraticHints: [
+      { level: 1, hint: 'Методи push, pop, splice мутують оригінальний масив на місці; concat, slice, toSorted створюють нові копії.', penaltyPct: 15 },
+      { level: 2, hint: 'indexOf шукає за суворою рівністю ===, а find() приймає функцію-предикат.', penaltyPct: 30 },
+    ],
+    studyUnitUrl: '/learn/js-dev/module-3/collections#array-mutations',
   },
 
   // --- Topic 6: object-destructuring ---
@@ -956,6 +1525,11 @@ export const jsCollectionsTasks: SeedTask[] = [
       { id: 'opt3', text: 'const { name = user_name } = obj;', isCorrect: false },
       { id: 'opt4', text: 'const { user_name -> name } = obj;', isCorrect: false },
     ],
+    socraticHints: [
+      { level: 1, hint: 'Деструктуризація дозволяє витягати властивості обʼєкта в окремі змінні за їхніми назвами: const { name, age } = user.', penaltyPct: 15 },
+      { level: 2, hint: 'Можна задавати значення за замовчуванням: const { role = "guest" } = user, або перейменовувати: const { name: userName } = user.', penaltyPct: 30 },
+    ],
+    studyUnitUrl: '/learn/js-dev/module-3/collections#destructuring',
   },
   {
     topic: 'object-destructuring',
@@ -970,6 +1544,11 @@ export const jsCollectionsTasks: SeedTask[] = [
       { input: '[{"name":"Тарас"}]', expectedOutput: '"Тарас (Київ)"', isSecret: false },
       { input: '[{"name":"Іван","city":"Одеса"}]', expectedOutput: '"Іван (Одеса)"', isSecret: true },
     ],
+    socraticHints: [
+      { level: 1, hint: 'Деструктуризація дозволяє витягати властивості обʼєкта в окремі змінні за їхніми назвами: const { name, age } = user.', penaltyPct: 15 },
+      { level: 2, hint: 'Можна задавати значення за замовчуванням: const { role = "guest" } = user, або перейменовувати: const { name: userName } = user.', penaltyPct: 30 },
+    ],
+    studyUnitUrl: '/learn/js-dev/module-3/collections#destructuring',
   },
   {
     topic: 'object-destructuring',
@@ -983,6 +1562,11 @@ export const jsCollectionsTasks: SeedTask[] = [
       { input: '[{"data":{"user":{"address":{"street":"Khreshchatyk","zip":"01001"}}}}]', expectedOutput: '{"street":"Khreshchatyk","zip":"01001"}', isSecret: false },
       { input: '[{"data":{"user":{"address":{"street":"Central"}}}}]', expectedOutput: '{"street":"Central","zip":"00000"}', isSecret: false },
     ],
+    socraticHints: [
+      { level: 1, hint: 'Деструктуризація дозволяє витягати властивості обʼєкта в окремі змінні за їхніми назвами: const { name, age } = user.', penaltyPct: 15 },
+      { level: 2, hint: 'Можна задавати значення за замовчуванням: const { role = "guest" } = user, або перейменовувати: const { name: userName } = user.', penaltyPct: 30 },
+    ],
+    studyUnitUrl: '/learn/js-dev/module-3/collections#destructuring',
   },
 
   // --- Topic 7: sorting-and-comparators ---
@@ -999,6 +1583,11 @@ export const jsCollectionsTasks: SeedTask[] = [
       { id: 'opt3', text: '[10, 5, 2, 1] (за спаданням)', isCorrect: false },
       { id: 'opt4', text: 'Виникне помилка, оскільки компаратор є обовʼязковим', isCorrect: false },
     ],
+    socraticHints: [
+      { level: 1, hint: 'За замовчуванням метод sort() перетворює всі елементи на рядки! Саме тому [10, 2].sort() дає [10, 2].', penaltyPct: 15 },
+      { level: 2, hint: 'Для правильного числового сортування передавайте компаратор: (a, b) => a - b (за зростанням).', penaltyPct: 30 },
+    ],
+    studyUnitUrl: '/learn/js-dev/module-3/collections#sorting',
   },
   {
     topic: 'sorting-and-comparators',
@@ -1014,6 +1603,11 @@ export const jsCollectionsTasks: SeedTask[] = [
       { input: '[[1]]', expectedOutput: '[1]', isSecret: true },
       { input: '[[]]', expectedOutput: '[]', isSecret: true },
     ],
+    socraticHints: [
+      { level: 1, hint: 'За замовчуванням метод sort() перетворює всі елементи на рядки! Саме тому [10, 2].sort() дає [10, 2].', penaltyPct: 15 },
+      { level: 2, hint: 'Для правильного числового сортування передавайте компаратор: (a, b) => a - b (за зростанням).', penaltyPct: 30 },
+    ],
+    studyUnitUrl: '/learn/js-dev/module-3/collections#sorting',
   },
   {
     topic: 'sorting-and-comparators',
@@ -1027,6 +1621,11 @@ export const jsCollectionsTasks: SeedTask[] = [
       { input: '[[{"name":"B","score":80},{"name":"A","score":90},{"name":"C","score":80}]]', expectedOutput: '[{"name":"A","score":90},{"name":"B","score":80},{"name":"C","score":80}]', isSecret: false },
       { input: '[[{"name":"Z","score":100},{"name":"A","score":100}]]', expectedOutput: '[{"name":"A","score":100},{"name":"Z","score":100}]', isSecret: true },
     ],
+    socraticHints: [
+      { level: 1, hint: 'За замовчуванням метод sort() перетворює всі елементи на рядки! Саме тому [10, 2].sort() дає [10, 2].', penaltyPct: 15 },
+      { level: 2, hint: 'Для правильного числового сортування передавайте компаратор: (a, b) => a - b (за зростанням).', penaltyPct: 30 },
+    ],
+    studyUnitUrl: '/learn/js-dev/module-3/collections#sorting',
   },
   // Capstone Bug Hunt for js-collections
   {
@@ -1040,6 +1639,11 @@ export const jsCollectionsTasks: SeedTask[] = [
     testCases: [
       { input: '[[-2, 5, -1, 10, 0]]', expectedOutput: '15', isSecret: false },
     ],
+    socraticHints: [
+      { level: 1, hint: 'map() завжди повертає новий масив однакової довжини, а forEach() лише виконує побічні дії і повертає undefined.', penaltyPct: 15 },
+      { level: 2, hint: 'Для чистої трансформації списків завжди обирайте map(), зберігаючи незмінність вхідного масиву.', penaltyPct: 30 },
+    ],
+    studyUnitUrl: '/learn/js-dev/module-3/collections#array-iteration',
   },
 ];
 
@@ -1062,6 +1666,11 @@ export const jsAsyncTasks: SeedTask[] = [
       { id: 'opt3', text: 'Черга подій I/O рендерингу браузера', isCorrect: false },
       { id: 'opt4', text: 'Порядок виконання є випадковим і залежить від завантаження CPU', isCorrect: false },
     ],
+    socraticHints: [
+      { level: 1, hint: 'Call Stack виконує синхронний код першим. Що виконується раніше після нього: черга Microtasks (Promises) чи Macrotasks (setTimeout)?', penaltyPct: 15 },
+      { level: 2, hint: 'Мікротаски (Promise.then, queueMicrotask) мають абсолютний пріоритет і очищуються повністю перед кожним макротаском.', penaltyPct: 30 },
+    ],
+    studyUnitUrl: '/learn/js-dev/module-4/async#event-loop',
   },
   {
     topic: 'event-loop',
@@ -1079,6 +1688,11 @@ export const jsAsyncTasks: SeedTask[] = [
       keywords: ['microtask|мікротаск|promise|проміс', 'macrotask|макротаск|settimeout|таймер', 'call stack|стек', 'черга|queue'],
       minWords: 15,
     },
+    socraticHints: [
+      { level: 1, hint: 'Call Stack виконує синхронний код першим. Що виконується раніше після нього: черга Microtasks (Promises) чи Macrotasks (setTimeout)?', penaltyPct: 15 },
+      { level: 2, hint: 'Мікротаски (Promise.then, queueMicrotask) мають абсолютний пріоритет і очищуються повністю перед кожним макротаском.', penaltyPct: 30 },
+    ],
+    studyUnitUrl: '/learn/js-dev/module-4/async#event-loop',
   },
   {
     topic: 'event-loop',
@@ -1091,6 +1705,11 @@ export const jsAsyncTasks: SeedTask[] = [
     testCases: [
       { input: '[]', expectedOutput: '[1,4,3,2]', isSecret: false },
     ],
+    socraticHints: [
+      { level: 1, hint: 'Call Stack виконує синхронний код першим. Що виконується раніше після нього: черга Microtasks (Promises) чи Macrotasks (setTimeout)?', penaltyPct: 15 },
+      { level: 2, hint: 'Мікротаски (Promise.then, queueMicrotask) мають абсолютний пріоритет і очищуються повністю перед кожним макротаском.', penaltyPct: 30 },
+    ],
+    studyUnitUrl: '/learn/js-dev/module-4/async#event-loop',
   },
 
   // --- Topic 2: promises ---
@@ -1107,6 +1726,11 @@ export const jsAsyncTasks: SeedTask[] = [
       { id: 'opt3', text: 'loading, completed, error', isCorrect: false },
       { id: 'opt4', text: 'initial, resolved, broken', isCorrect: false },
     ],
+    socraticHints: [
+      { level: 1, hint: 'Проміс має три стани: pending (очікування), fulfilled (успіх), rejected (помилка).', penaltyPct: 15 },
+      { level: 2, hint: 'Стан промісу є незворотним: перейшовши у fulfilled чи rejected, він ніколи не зміниться знову.', penaltyPct: 30 },
+    ],
+    studyUnitUrl: '/learn/js-dev/module-4/async#promises',
   },
   {
     topic: 'promises',
@@ -1120,6 +1744,11 @@ export const jsAsyncTasks: SeedTask[] = [
       { input: '[10]', expectedOutput: '"done"', isSecret: false },
       { input: '[5]', expectedOutput: '"done"', isSecret: true },
     ],
+    socraticHints: [
+      { level: 1, hint: 'Проміс має три стани: pending (очікування), fulfilled (успіх), rejected (помилка).', penaltyPct: 15 },
+      { level: 2, hint: 'Стан промісу є незворотним: перейшовши у fulfilled чи rejected, він ніколи не зміниться знову.', penaltyPct: 30 },
+    ],
+    studyUnitUrl: '/learn/js-dev/module-4/async#promises',
   },
   {
     topic: 'promises',
@@ -1133,6 +1762,11 @@ export const jsAsyncTasks: SeedTask[] = [
       { input: '[Promise.resolve(42)]', expectedOutput: '{"status":"fulfilled","value":42}', isSecret: false },
       { input: '[Promise.reject(new Error("Network Error"))]', expectedOutput: '{"status":"rejected","reason":"Network Error"}', isSecret: false },
     ],
+    socraticHints: [
+      { level: 1, hint: 'Проміс має три стани: pending (очікування), fulfilled (успіх), rejected (помилка).', penaltyPct: 15 },
+      { level: 2, hint: 'Стан промісу є незворотним: перейшовши у fulfilled чи rejected, він ніколи не зміниться знову.', penaltyPct: 30 },
+    ],
+    studyUnitUrl: '/learn/js-dev/module-4/async#promises',
   },
 
   // --- Topic 3: async-await ---
@@ -1149,6 +1783,11 @@ export const jsAsyncTasks: SeedTask[] = [
       { id: 'opt3', text: 'Колбек-обгортку', isCorrect: false },
       { id: 'opt4', text: 'undefined до моменту завершення таски', isCorrect: false },
     ],
+    socraticHints: [
+      { level: 1, hint: 'Будь-яка функція з ключовим словом async автоматично повертає Promise.', penaltyPct: 15 },
+      { level: 2, hint: 'Оператор await призупиняє виконання функції до вирішення промісу, розгортаючи його результат або викидаючи помилку.', penaltyPct: 30 },
+    ],
+    studyUnitUrl: '/learn/js-dev/module-4/async#async-await',
   },
   {
     topic: 'async-await',
@@ -1163,6 +1802,11 @@ export const jsAsyncTasks: SeedTask[] = [
       { input: '[42]', expectedOutput: '{"id":42,"name":"User_42"}', isSecret: false },
       { input: '[99]', expectedOutput: '{"id":99,"name":"User_99"}', isSecret: true },
     ],
+    socraticHints: [
+      { level: 1, hint: 'Будь-яка функція з ключовим словом async автоматично повертає Promise.', penaltyPct: 15 },
+      { level: 2, hint: 'Оператор await призупиняє виконання функції до вирішення промісу, розгортаючи його результат або викидаючи помилку.', penaltyPct: 30 },
+    ],
+    studyUnitUrl: '/learn/js-dev/module-4/async#async-await',
   },
   {
     topic: 'async-await',
@@ -1177,6 +1821,11 @@ export const jsAsyncTasks: SeedTask[] = [
       { input: '[[]]', expectedOutput: '[]', isSecret: false },
       { input: '[[10, 20]]', expectedOutput: '[{"id":10,"name":"User_10"},{"id":20,"name":"User_20"}]', isSecret: true },
     ],
+    socraticHints: [
+      { level: 1, hint: 'Будь-яка функція з ключовим словом async автоматично повертає Promise.', penaltyPct: 15 },
+      { level: 2, hint: 'Оператор await призупиняє виконання функції до вирішення промісу, розгортаючи його результат або викидаючи помилку.', penaltyPct: 30 },
+    ],
+    studyUnitUrl: '/learn/js-dev/module-4/async#async-await',
   },
 
   // --- Topic 4: error-handling-async ---
@@ -1193,6 +1842,11 @@ export const jsAsyncTasks: SeedTask[] = [
       { id: 'opt3', text: 'Ключове слово throw catch', isCorrect: false },
       { id: 'opt4', text: 'Блок onError() після виклику await', isCorrect: false },
     ],
+    socraticHints: [
+      { level: 1, hint: 'Для перехоплення помилок у функціях async/await використовуйте стандартний блок try { ... } catch (err) { ... }.', penaltyPct: 15 },
+      { level: 2, hint: 'У класичних промісах помилки перехоплюються через метод .catch(err => ...).', penaltyPct: 30 },
+    ],
+    studyUnitUrl: '/learn/js-dev/module-4/async#error-handling',
   },
   {
     topic: 'error-handling-async',
@@ -1207,6 +1861,11 @@ export const jsAsyncTasks: SeedTask[] = [
       { input: '["invalid json", {"status": "default"}]', expectedOutput: '{"status":"default"}', isSecret: false },
       { input: '["", []]', expectedOutput: '[]', isSecret: true },
     ],
+    socraticHints: [
+      { level: 1, hint: 'Для перехоплення помилок у функціях async/await використовуйте стандартний блок try { ... } catch (err) { ... }.', penaltyPct: 15 },
+      { level: 2, hint: 'У класичних промісах помилки перехоплюються через метод .catch(err => ...).', penaltyPct: 30 },
+    ],
+    studyUnitUrl: '/learn/js-dev/module-4/async#error-handling',
   },
   {
     topic: 'error-handling-async',
@@ -1219,6 +1878,11 @@ export const jsAsyncTasks: SeedTask[] = [
     testCases: [
       { input: '[async () => "success", 2]', expectedOutput: '"success"', isSecret: false },
     ],
+    socraticHints: [
+      { level: 1, hint: 'Для перехоплення помилок у функціях async/await використовуйте стандартний блок try { ... } catch (err) { ... }.', penaltyPct: 15 },
+      { level: 2, hint: 'У класичних промісах помилки перехоплюються через метод .catch(err => ...).', penaltyPct: 30 },
+    ],
+    studyUnitUrl: '/learn/js-dev/module-4/async#error-handling',
   },
 
   // --- Topic 5: promise-combinators ---
@@ -1235,6 +1899,11 @@ export const jsAsyncTasks: SeedTask[] = [
       { id: 'opt3', text: 'Тільки перший успішно виконаний проміс, ігноруючи помилки', isCorrect: false },
       { id: 'opt4', text: 'Викидає помилку, якщо хоча б один проміс був повільнішим за 100 мс', isCorrect: false },
     ],
+    socraticHints: [
+      { level: 1, hint: 'Promise.all() падає одразу при першій же помилці; Promise.allSettled() завжди чекає завершення всіх промісів.', penaltyPct: 15 },
+      { level: 2, hint: 'Promise.race() повертає результат першого завершеного промісу (байдуже, успішного чи помилкового).', penaltyPct: 30 },
+    ],
+    studyUnitUrl: '/learn/js-dev/module-4/async#promise-combinators',
   },
   {
     topic: 'promise-combinators',
@@ -1247,6 +1916,11 @@ export const jsAsyncTasks: SeedTask[] = [
     testCases: [
       { input: '[[Promise.reject("err"), Promise.resolve("winner")]]', expectedOutput: '"winner"', isSecret: false },
     ],
+    socraticHints: [
+      { level: 1, hint: 'Promise.all() падає одразу при першій же помилці; Promise.allSettled() завжди чекає завершення всіх промісів.', penaltyPct: 15 },
+      { level: 2, hint: 'Promise.race() повертає результат першого завершеного промісу (байдуже, успішного чи помилкового).', penaltyPct: 30 },
+    ],
+    studyUnitUrl: '/learn/js-dev/module-4/async#promise-combinators',
   },
   {
     topic: 'promise-combinators',
@@ -1259,6 +1933,11 @@ export const jsAsyncTasks: SeedTask[] = [
     testCases: [
       { input: '[Promise.resolve("fast"), 1000]', expectedOutput: '"fast"', isSecret: false },
     ],
+    socraticHints: [
+      { level: 1, hint: 'Promise.all() падає одразу при першій же помилці; Promise.allSettled() завжди чекає завершення всіх промісів.', penaltyPct: 15 },
+      { level: 2, hint: 'Promise.race() повертає результат першого завершеного промісу (байдуже, успішного чи помилкового).', penaltyPct: 30 },
+    ],
+    studyUnitUrl: '/learn/js-dev/module-4/async#promise-combinators',
   },
 
   // --- Topic 6: timers-and-intervals ---
@@ -1275,6 +1954,11 @@ export const jsAsyncTasks: SeedTask[] = [
       { id: 'opt3', text: 'Це синтаксична помилка, мінімальне значення має бути 1', isCorrect: false },
       { id: 'opt4', text: 'Код переноситься у Web Worker', isCorrect: false },
     ],
+    socraticHints: [
+      { level: 1, hint: 'setTimeout викликає функцію один раз із затримкою, а setInterval повторює виклики через фіксований проміжок часу.', penaltyPct: 15 },
+      { level: 2, hint: 'Для зупинки таймерів передавайте отриманий ID у clearTimeout() або clearInterval().', penaltyPct: 30 },
+    ],
+    studyUnitUrl: '/learn/js-dev/module-4/async#timers',
   },
   {
     topic: 'timers-and-intervals',
@@ -1289,6 +1973,11 @@ export const jsAsyncTasks: SeedTask[] = [
       { input: '[5]', expectedOutput: '[1,2,3,4,5]', isSecret: false },
       { input: '[0]', expectedOutput: '[]', isSecret: true },
     ],
+    socraticHints: [
+      { level: 1, hint: 'setTimeout викликає функцію один раз із затримкою, а setInterval повторює виклики через фіксований проміжок часу.', penaltyPct: 15 },
+      { level: 2, hint: 'Для зупинки таймерів передавайте отриманий ID у clearTimeout() або clearInterval().', penaltyPct: 30 },
+    ],
+    studyUnitUrl: '/learn/js-dev/module-4/async#timers',
   },
   {
     topic: 'timers-and-intervals',
@@ -1301,6 +1990,11 @@ export const jsAsyncTasks: SeedTask[] = [
     testCases: [
       { input: '[() => "ok", 50]', expectedOutput: '"function"', isSecret: false }, // tester checks typeof returned function
     ],
+    socraticHints: [
+      { level: 1, hint: 'setTimeout викликає функцію один раз із затримкою, а setInterval повторює виклики через фіксований проміжок часу.', penaltyPct: 15 },
+      { level: 2, hint: 'Для зупинки таймерів передавайте отриманий ID у clearTimeout() або clearInterval().', penaltyPct: 30 },
+    ],
+    studyUnitUrl: '/learn/js-dev/module-4/async#timers',
   },
 
   // --- Topic 7: async-generators-and-iterators ---
@@ -1317,6 +2011,11 @@ export const jsAsyncTasks: SeedTask[] = [
       { id: 'opt3', text: 'Для заміни стандартного циклу while у промісах', isCorrect: false },
       { id: 'opt4', text: 'Це застарілий синтаксис, вилучений у ES2020', isCorrect: false },
     ],
+    socraticHints: [
+      { level: 1, hint: 'Асинхронний генератор оголошується як async function* і повертає потік даних через yield.', penaltyPct: 15 },
+      { level: 2, hint: 'Для споживання асинхронних генераторів використовується цикл for await (const item of generator).', penaltyPct: 30 },
+    ],
+    studyUnitUrl: '/learn/js-dev/module-4/async#async-generators',
   },
   {
     topic: 'async-generators-and-iterators',
@@ -1330,6 +2029,11 @@ export const jsAsyncTasks: SeedTask[] = [
       { input: '[[Promise.resolve(10), Promise.resolve(20), Promise.resolve(30)]]', expectedOutput: '[10,20,30]', isSecret: false },
       { input: '[[]]', expectedOutput: '[]', isSecret: true },
     ],
+    socraticHints: [
+      { level: 1, hint: 'Асинхронний генератор оголошується як async function* і повертає потік даних через yield.', penaltyPct: 15 },
+      { level: 2, hint: 'Для споживання асинхронних генераторів використовується цикл for await (const item of generator).', penaltyPct: 30 },
+    ],
+    studyUnitUrl: '/learn/js-dev/module-4/async#async-generators',
   },
   {
     topic: 'async-generators-and-iterators',
@@ -1343,6 +2047,11 @@ export const jsAsyncTasks: SeedTask[] = [
       { input: '[5, async x => x * 2, async x => x + 10]', expectedOutput: '20', isSecret: false },
       { input: '[10, async x => x - 3]', expectedOutput: '7', isSecret: true },
     ],
+    socraticHints: [
+      { level: 1, hint: 'Асинхронний генератор оголошується як async function* і повертає потік даних через yield.', penaltyPct: 15 },
+      { level: 2, hint: 'Для споживання асинхронних генераторів використовується цикл for await (const item of generator).', penaltyPct: 30 },
+    ],
+    studyUnitUrl: '/learn/js-dev/module-4/async#async-generators',
   },
   // Capstone Bug Hunt for js-async
   {
@@ -1356,6 +2065,11 @@ export const jsAsyncTasks: SeedTask[] = [
     testCases: [
       { input: '[[Promise.resolve(1), Promise.resolve(2), Promise.resolve(3)]]', expectedOutput: '6', isSecret: false },
     ],
+    socraticHints: [
+      { level: 1, hint: 'Будь-яка функція з ключовим словом async автоматично повертає Promise.', penaltyPct: 15 },
+      { level: 2, hint: 'Оператор await призупиняє виконання функції до вирішення промісу, розгортаючи його результат або викидаючи помилку.', penaltyPct: 30 },
+    ],
+    studyUnitUrl: '/learn/js-dev/module-4/async#async-await',
   },
 ];
 
@@ -1378,6 +2092,11 @@ export const jsOopTasks: SeedTask[] = [
       { id: 'opt3', text: 'Автоматичне видалення обʼєкта після використання', isCorrect: false },
       { id: 'opt4', text: 'Запобігання клонуванню обʼєкта', isCorrect: false },
     ],
+    socraticHints: [
+      { level: 1, hint: 'Класи в ES6 — це синтаксичний цукор над прототипним успадкуванням.', penaltyPct: 15 },
+      { level: 2, hint: 'Методи, оголошені всередині класу, автоматично потрапляють у prototype функції-конструктора.', penaltyPct: 30 },
+    ],
+    studyUnitUrl: '/learn/js-dev/module-5/oop#classes-es6',
   },
   {
     topic: 'classes-es6',
@@ -1392,6 +2111,11 @@ export const jsOopTasks: SeedTask[] = [
       { input: '["Bob", "Admin"]', expectedOutput: '"Bob is a Admin"', isSecret: false },
       { input: '["SBC", "Bot"]', expectedOutput: '"SBC is a Bot"', isSecret: true },
     ],
+    socraticHints: [
+      { level: 1, hint: 'Класи в ES6 — це синтаксичний цукор над прототипним успадкуванням.', penaltyPct: 15 },
+      { level: 2, hint: 'Методи, оголошені всередині класу, автоматично потрапляють у prototype функції-конструктора.', penaltyPct: 30 },
+    ],
+    studyUnitUrl: '/learn/js-dev/module-5/oop#classes-es6',
   },
   {
     topic: 'classes-es6',
@@ -1405,6 +2129,11 @@ export const jsOopTasks: SeedTask[] = [
       { input: '[100, 40]', expectedOutput: '60', isSecret: false }, // deposit 100, withdraw 40 -> 60
       { input: '[50, 100]', expectedOutput: '50', isSecret: false }, // withdraw exceeds balance
     ],
+    socraticHints: [
+      { level: 1, hint: 'Класи в ES6 — це синтаксичний цукор над прототипним успадкуванням.', penaltyPct: 15 },
+      { level: 2, hint: 'Методи, оголошені всередині класу, автоматично потрапляють у prototype функції-конструктора.', penaltyPct: 30 },
+    ],
+    studyUnitUrl: '/learn/js-dev/module-5/oop#classes-es6',
   },
 
   // --- Topic 2: inheritance ---
@@ -1421,6 +2150,11 @@ export const jsOopTasks: SeedTask[] = [
       { id: 'opt3', text: 'Тому що super() очищає прототип', isCorrect: false },
       { id: 'opt4', text: 'super() дозволено взагалі не викликати', isCorrect: false },
     ],
+    socraticHints: [
+      { level: 1, hint: 'Ключове слово extends створює звʼязок прототипів між дочірнім та батьківським класом.', penaltyPct: 15 },
+      { level: 2, hint: 'У конструкторі дочірнього класу виклик super() є обовʼязковим до першого звернення до this!', penaltyPct: 30 },
+    ],
+    studyUnitUrl: '/learn/js-dev/module-5/oop#inheritance',
   },
   {
     topic: 'inheritance',
@@ -1435,6 +2169,11 @@ export const jsOopTasks: SeedTask[] = [
       { input: '[3, 7]', expectedOutput: '21', isSecret: false },
       { input: '[12, 12]', expectedOutput: '144', isSecret: true },
     ],
+    socraticHints: [
+      { level: 1, hint: 'Ключове слово extends створює звʼязок прототипів між дочірнім та батьківським класом.', penaltyPct: 15 },
+      { level: 2, hint: 'У конструкторі дочірнього класу виклик super() є обовʼязковим до першого звернення до this!', penaltyPct: 30 },
+    ],
+    studyUnitUrl: '/learn/js-dev/module-5/oop#inheritance',
   },
   {
     topic: 'inheritance',
@@ -1449,6 +2188,11 @@ export const jsOopTasks: SeedTask[] = [
       { input: '[5000]', expectedOutput: '1000', isSecret: false }, // 500 + 500
       { input: '[10000]', expectedOutput: '1500', isSecret: true },
     ],
+    socraticHints: [
+      { level: 1, hint: 'Ключове слово extends створює звʼязок прототипів між дочірнім та батьківським класом.', penaltyPct: 15 },
+      { level: 2, hint: 'У конструкторі дочірнього класу виклик super() є обовʼязковим до першого звернення до this!', penaltyPct: 30 },
+    ],
+    studyUnitUrl: '/learn/js-dev/module-5/oop#inheritance',
   },
 
   // --- Topic 3: prototypes ---
@@ -1465,6 +2209,11 @@ export const jsOopTasks: SeedTask[] = [
       { id: 'opt3', text: 'Створюється нова порожня властивість у глобальному обʼєкті', isCorrect: false },
       { id: 'opt4', text: 'Рушій перевіряє тільки батьківський клас у strict mode', isCorrect: false },
     ],
+    socraticHints: [
+      { level: 1, hint: 'Кожен обʼєкт у JS має внутрішнє посилання [[Prototype]] на інший обʼєкт, з якого він успадковує властивості.', penaltyPct: 15 },
+      { level: 2, hint: 'Ланцюжок прототипів (Prototype Chain) закінчується на Object.prototype, чий прототип дорівнює null.', penaltyPct: 30 },
+    ],
+    studyUnitUrl: '/learn/js-dev/module-5/oop#prototypes',
   },
   {
     topic: 'prototypes',
@@ -1479,6 +2228,11 @@ export const jsOopTasks: SeedTask[] = [
       { input: '["Tesla", "Model 3"]', expectedOutput: '"Tesla Model 3 is driving"', isSecret: false },
       { input: '["BMW", "M5"]', expectedOutput: '"BMW M5 is driving"', isSecret: true },
     ],
+    socraticHints: [
+      { level: 1, hint: 'Кожен обʼєкт у JS має внутрішнє посилання [[Prototype]] на інший обʼєкт, з якого він успадковує властивості.', penaltyPct: 15 },
+      { level: 2, hint: 'Ланцюжок прототипів (Prototype Chain) закінчується на Object.prototype, чий прототип дорівнює null.', penaltyPct: 30 },
+    ],
+    studyUnitUrl: '/learn/js-dev/module-5/oop#prototypes',
   },
   {
     topic: 'prototypes',
@@ -1491,6 +2245,11 @@ export const jsOopTasks: SeedTask[] = [
     testCases: [
       { input: '[{"greet": "hello"}]', expectedOutput: '"hello"', isSecret: false },
     ],
+    socraticHints: [
+      { level: 1, hint: 'Кожен обʼєкт у JS має внутрішнє посилання [[Prototype]] на інший обʼєкт, з якого він успадковує властивості.', penaltyPct: 15 },
+      { level: 2, hint: 'Ланцюжок прототипів (Prototype Chain) закінчується на Object.prototype, чий прототип дорівнює null.', penaltyPct: 30 },
+    ],
+    studyUnitUrl: '/learn/js-dev/module-5/oop#prototypes',
   },
 
   // --- Topic 4: static-methods ---
@@ -1507,6 +2266,11 @@ export const jsOopTasks: SeedTask[] = [
       { id: 'opt3', text: 'this.create() у глобальному контексті', isCorrect: false },
       { id: 'opt4', text: 'Статичні методи викликаються тільки автоматично рушієм V8', isCorrect: false },
     ],
+    socraticHints: [
+      { level: 1, hint: 'Статичні методи оголошуються зі словом static і викликаються безпосередньо на класі, а не на його екземплярах: Math.max().', penaltyPct: 15 },
+      { level: 2, hint: 'У статичних методах ключове слово this посилається на сам клас, а не на створений обʼєкт.', penaltyPct: 30 },
+    ],
+    studyUnitUrl: '/learn/js-dev/module-5/oop#static-methods',
   },
   {
     topic: 'static-methods',
@@ -1521,6 +2285,11 @@ export const jsOopTasks: SeedTask[] = [
       { input: '[3]', expectedOutput: '27', isSecret: false }, // MathUtils.cube(3)
       { input: '[10]', expectedOutput: '100', isSecret: true },
     ],
+    socraticHints: [
+      { level: 1, hint: 'Статичні методи оголошуються зі словом static і викликаються безпосередньо на класі, а не на його екземплярах: Math.max().', penaltyPct: 15 },
+      { level: 2, hint: 'У статичних методах ключове слово this посилається на сам клас, а не на створений обʼєкт.', penaltyPct: 30 },
+    ],
+    studyUnitUrl: '/learn/js-dev/module-5/oop#static-methods',
   },
   {
     topic: 'static-methods',
@@ -1533,6 +2302,11 @@ export const jsOopTasks: SeedTask[] = [
     testCases: [
       { input: '[]', expectedOutput: 'true', isSecret: false }, // new DB() === new DB()
     ],
+    socraticHints: [
+      { level: 1, hint: 'Статичні методи оголошуються зі словом static і викликаються безпосередньо на класі, а не на його екземплярах: Math.max().', penaltyPct: 15 },
+      { level: 2, hint: 'У статичних методах ключове слово this посилається на сам клас, а не на створений обʼєкт.', penaltyPct: 30 },
+    ],
+    studyUnitUrl: '/learn/js-dev/module-5/oop#static-methods',
   },
 
   // --- Topic 5: getters-and-setters ---
@@ -1549,6 +2323,11 @@ export const jsOopTasks: SeedTask[] = [
       { id: 'opt3', text: 'user.get("fullName")', isCorrect: false },
       { id: 'opt4', text: 'user->fullName', isCorrect: false },
     ],
+    socraticHints: [
+      { level: 1, hint: 'Геттер get prop() дозволяє звертатися до методу як до звичайної властивості: obj.prop замість obj.prop().', penaltyPct: 15 },
+      { level: 2, hint: 'Сеттер set prop(val) перехоплює спробу присвоєння obj.prop = 10 для валідації або інкапсуляції.', penaltyPct: 30 },
+    ],
+    studyUnitUrl: '/learn/js-dev/module-5/oop#getters-and-setters',
   },
   {
     topic: 'getters-and-setters',
@@ -1563,6 +2342,11 @@ export const jsOopTasks: SeedTask[] = [
       { input: '[100]', expectedOutput: '212', isSecret: false },
       { input: '[-40]', expectedOutput: '-40', isSecret: true },
     ],
+    socraticHints: [
+      { level: 1, hint: 'Геттер get prop() дозволяє звертатися до методу як до звичайної властивості: obj.prop замість obj.prop().', penaltyPct: 15 },
+      { level: 2, hint: 'Сеттер set prop(val) перехоплює спробу присвоєння obj.prop = 10 для валідації або інкапсуляції.', penaltyPct: 30 },
+    ],
+    studyUnitUrl: '/learn/js-dev/module-5/oop#getters-and-setters',
   },
   {
     topic: 'getters-and-setters',
@@ -1575,6 +2359,11 @@ export const jsOopTasks: SeedTask[] = [
     testCases: [
       { input: '[25]', expectedOutput: '25', isSecret: false },
     ],
+    socraticHints: [
+      { level: 1, hint: 'Геттер get prop() дозволяє звертатися до методу як до звичайної властивості: obj.prop замість obj.prop().', penaltyPct: 15 },
+      { level: 2, hint: 'Сеттер set prop(val) перехоплює спробу присвоєння obj.prop = 10 для валідації або інкапсуляції.', penaltyPct: 30 },
+    ],
+    studyUnitUrl: '/learn/js-dev/module-5/oop#getters-and-setters',
   },
 
   // --- Topic 6: object-composition-and-mixins ---
@@ -1591,6 +2380,11 @@ export const jsOopTasks: SeedTask[] = [
       { id: 'opt3', text: 'Успадкування взагалі заборонено в стандарті ES6', isCorrect: false },
       { id: 'opt4', text: 'Композиція працює тільки з базами даних', isCorrect: false },
     ],
+    socraticHints: [
+      { level: 1, hint: 'Принцип "Композиція замість успадкування" полягає у збиранні поведінки з маленьких незалежних функцій чи міксінів.', penaltyPct: 15 },
+      { level: 2, hint: 'Object.assign(target.prototype, mixin) додає методи міксіна до класу без жорсткої ієрархії успадкування.', penaltyPct: 30 },
+    ],
+    studyUnitUrl: '/learn/js-dev/module-5/oop#composition-and-mixins',
   },
   {
     topic: 'object-composition-and-mixins',
@@ -1603,6 +2397,11 @@ export const jsOopTasks: SeedTask[] = [
     testCases: [
       { input: '[class Bot {}, {"ping": () => "pong"}]', expectedOutput: '"pong"', isSecret: false },
     ],
+    socraticHints: [
+      { level: 1, hint: 'Принцип "Композиція замість успадкування" полягає у збиранні поведінки з маленьких незалежних функцій чи міксінів.', penaltyPct: 15 },
+      { level: 2, hint: 'Object.assign(target.prototype, mixin) додає методи міксіна до класу без жорсткої ієрархії успадкування.', penaltyPct: 30 },
+    ],
+    studyUnitUrl: '/learn/js-dev/module-5/oop#composition-and-mixins',
   },
   {
     topic: 'object-composition-and-mixins',
@@ -1615,6 +2414,11 @@ export const jsOopTasks: SeedTask[] = [
     testCases: [
       { input: '["test"]', expectedOutput: 'true', isSecret: false },
     ],
+    socraticHints: [
+      { level: 1, hint: 'Принцип "Композиція замість успадкування" полягає у збиранні поведінки з маленьких незалежних функцій чи міксінів.', penaltyPct: 15 },
+      { level: 2, hint: 'Object.assign(target.prototype, mixin) додає методи міксіна до класу без жорсткої ієрархії успадкування.', penaltyPct: 30 },
+    ],
+    studyUnitUrl: '/learn/js-dev/module-5/oop#composition-and-mixins',
   },
   // Capstone Bug Hunt for js-oop
   {
@@ -1628,5 +2432,10 @@ export const jsOopTasks: SeedTask[] = [
     testCases: [
       { input: '[]', expectedOutput: '1', isSecret: false },
     ],
+    socraticHints: [
+      { level: 1, hint: 'Класи в ES6 — це синтаксичний цукор над прототипним успадкуванням.', penaltyPct: 15 },
+      { level: 2, hint: 'Методи, оголошені всередині класу, автоматично потрапляють у prototype функції-конструктора.', penaltyPct: 30 },
+    ],
+    studyUnitUrl: '/learn/js-dev/module-5/oop#classes-es6',
   },
 ];
