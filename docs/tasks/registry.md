@@ -138,7 +138,7 @@
 | **SBC-189** | `Story` | `SH` | extend Prisma schema with OPEN_TEXT, TeacherReviewStatus and semantic evaluation fields | 2026-10-14 | `2d0efad` |
 | **SBC-232** | `Story` | `SH` | document authoring and pedagogical specification for multi-tier adaptive task bank | 2026-10-20 | `f4af440` |
 | **SBC-233** | `Story` | `SH` | generate comprehensive 107-task adaptive bank across 5 JS modules adhering to authoring specification | 2026-10-20 | `f4af440` |
-| **SBC-250** | `Story` | `SH` | integrate authoring Socratic hints and study unit deep linking into Task schema, seed data, and student UI | 2026-10-22 | `pending` |
+| **SBC-250** | `Story` | `SH` | integrate authoring Socratic hints and study unit deep linking into Task schema, seed data, and student UI | 2026-10-22 | `8185996` |
 
 ---
 
@@ -260,7 +260,7 @@
 | **SBC-244** | `Story` | `ST` | add deterministic options shuffling with letter markers in QuizTaskEditor | 2026-10-21 | `35ad827` |
 | **SBC-245** | `Story` | `ST` | add adaptive difficulty degradation prompt button to evaluation toast | 2026-10-21 | `22479aa` |
 | **SBC-246** | `Story` | `ST` | add prominent course and module progress indicators to student header and workspace HUD | 2026-10-22 | `9fab206` |
-| **SBC-248** | `Style` | `ST` | replace bulky degradation text badge with compact message icon and interactive explanation tooltip | 2026-10-22 | `pending` |
+| **SBC-248** | `Style` | `ST` | replace bulky degradation text badge with compact message icon and interactive explanation tooltip | 2026-10-22 | `560e622` |
 
 ---
 
