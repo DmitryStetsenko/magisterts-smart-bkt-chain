@@ -43,8 +43,17 @@ export class TaskSequencer {
     completedTaskIds: string[];
     preferredTopic?: string | null;
     preferredDifficulty?: 'EASY' | 'MEDIUM' | 'HARD' | null;
+    excludeTaskId?: string | null;
   }): SequencingRecommendation | null {
-    const { skills, studentStates, tasks, completedTaskIds, preferredTopic, preferredDifficulty } = params;
+    const {
+      skills,
+      studentStates,
+      tasks,
+      completedTaskIds,
+      preferredTopic,
+      preferredDifficulty,
+      excludeTaskId,
+    } = params;
 
     if (!skills.length || !tasks.length) {
       return null;
@@ -83,7 +92,41 @@ export class TaskSequencer {
 
     // Helper: sort/pick task by difficulty priority and topic relevance
     const pickBestTask = (skillTasks: TaskDomain[]): TaskDomain | undefined => {
-      const uncompleted = skillTasks.filter((t) => !completedSet.has(t.id));
+      // Filter uncompleted tasks, also excluding the currently failed/excluded task
+      const uncompleted = skillTasks.filter(
+        (t) => !completedSet.has(t.id) && (!excludeTaskId || t.id !== excludeTaskId)
+      );
+
+      // If graceful degradation to EASY was requested:
+      if (preferredDifficulty === 'EASY') {
+        // 1. First priority: uncompleted EASY task on preferredTopic
+        if (preferredTopic) {
+          const sameTopicEasy = uncompleted.find(
+            (t) => t.topic === preferredTopic && t.difficulty === 'EASY'
+          );
+          if (sameTopicEasy) return sameTopicEasy;
+        }
+
+        // 2. Second priority: any uncompleted EASY task in this active skill module
+        const skillEasy = uncompleted.find((t) => t.difficulty === 'EASY');
+        if (skillEasy) return skillEasy;
+
+        // 3. Third priority (Remediation / Review): if student previously completed the topic's EASY task,
+        // re-offer it as an auxiliary remediation review drill (excluding current failed task)
+        if (preferredTopic) {
+          const topicEasyReview = skillTasks.find(
+            (t) => t.topic === preferredTopic && t.difficulty === 'EASY' && (!excludeTaskId || t.id !== excludeTaskId)
+          );
+          if (topicEasyReview) return topicEasyReview;
+        }
+
+        // 4. Fourth priority: any EASY task in this module for remediation review
+        const moduleEasyReview = skillTasks.find(
+          (t) => t.difficulty === 'EASY' && (!excludeTaskId || t.id !== excludeTaskId)
+        );
+        if (moduleEasyReview) return moduleEasyReview;
+      }
+
       if (uncompleted.length === 0) return undefined;
 
       // 1. If preferredTopic is provided, prioritize tasks on the same topic

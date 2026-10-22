@@ -9,14 +9,14 @@
 | **`SBC-EP-INF`** | Monorepo & CI/CD Setup | 88 |
 | **`SBC-EP-SH`** | Database Modeling & Shared Packages | 19 |
 | **`SBC-EP-BK`** | Authentication & Core API | 14 |
-| **`SBC-EP-BKT`** | Bayesian Knowledge Tracing & Behavioral Telemetry | 27 |
+| **`SBC-EP-BKT`** | Bayesian Knowledge Tracing & Behavioral Telemetry | 28 |
 | **`SBC-EP-LLM`** | Automated Code Assessment & Open-Text Evaluation | 10 |
 | **`SBC-EP-W3`** | Web3 Infrastructure & Smart Contracts | 0 |
 | **`SBC-EP-ST`** | Student Portal & Skill Tree Map | 28 |
 | **`SBC-EP-TC`** | Teacher Portal & Analytics CRM | 22 |
 | **`SBC-EP-AD`** | Admin Portal & Knowledge DAG Builder | 8 |
 | **`SBC-EP-LD`** | Landing Web Page | 9 |
-| **ВСЬОГО** | - | **232** |
+| **ВСЬОГО** | - | **233** |
 
 ---
 
@@ -195,6 +195,7 @@
 | **SBC-227** | `Story` | `BKT` | implement multi-tier JS task bank with topic/subConcept metadata, Bloom 0.75 threshold and adaptive TaskSequencer | 2026-10-20 | `0f06a78` |
 | **SBC-241** | `Story` | `BKT` | restructure JS curriculum progression, topic-first sequencing order and universal VM script evaluation | 2026-10-21 | `54e0935` |
 | **SBC-243** | `Story` | `BKT` | eliminate function wrappers from Module 1 tasks, introduce direct variable and expression exercises | 2026-10-21 | `pending` |
+| **SBC-247** | `Bug` | `BKT` | prevent re-offering identical failed task on graceful degradation and supply auxiliary remediation task | 2026-10-22 | `pending` |
 
 ---
 

@@ -57,4 +57,31 @@ describe('TaskSequencer (Adaptive Task Sequencing Engine)', () => {
     expect(recommendation?.recommendedSkill.slug).toBe('js-async');
     expect(recommendation?.recommendedTask.id).toBe('t3_1');
   });
+
+  it('should not recommend the same failed task when degrading difficulty with excludeTaskId', () => {
+    const topicTasks: TaskDomain[] = [
+      { id: 't_easy', skillId: 's1', title: 'Оголошення const', difficulty: 'EASY', topic: 'variables' },
+      { id: 't_med', skillId: 's1', title: 'Область видимості let', difficulty: 'MEDIUM', topic: 'variables' },
+      { id: 't_hard', skillId: 's1', title: 'Temporal Dead Zone', difficulty: 'HARD', topic: 'variables' },
+    ];
+
+    // Student has completed EASY task, but failed MEDIUM task and clicked auxiliary task
+    const recommendation = TaskSequencer.recommendNextTask({
+      skills,
+      studentStates: { s1: 0.4 },
+      tasks: topicTasks,
+      completedTaskIds: ['t_easy'],
+      preferredTopic: 'variables',
+      preferredDifficulty: 'EASY',
+      excludeTaskId: 't_med',
+    });
+
+    expect(recommendation).not.toBeNull();
+    // Must NOT be the failed medium task!
+    expect(recommendation?.recommendedTask.id).not.toBe('t_med');
+    // Must provide auxiliary EASY remediation review task
+    expect(recommendation?.recommendedTask.id).toBe('t_easy');
+    expect(recommendation?.isDifficultyDegraded).toBe(true);
+    expect(recommendation?.maxScoreCap).toBe(70);
+  });
 });

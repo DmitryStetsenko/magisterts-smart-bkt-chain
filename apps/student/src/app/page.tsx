@@ -161,12 +161,15 @@ export default function StudentPortalPage() {
     }
   };
 
-  const fetchRecommendedTask = async (courseSlug: string) => {
+  const fetchRecommendedTask = async (courseSlug: string, excludeTaskId?: string) => {
     setIsLoading(true);
     setEvalResult(null);
     try {
       await fetchCourseStructureAndState(courseSlug);
-      const res = await fetch(`${API_URL}/api/v1/tasks/recommended?courseSlug=${courseSlug}&userId=demo-student`);
+      const url = `${API_URL}/api/v1/tasks/recommended?courseSlug=${courseSlug}&userId=demo-student${
+        excludeTaskId ? `&excludeTaskId=${excludeTaskId}` : ''
+      }`;
+      const res = await fetch(url);
       if (res.ok) {
         const data = await res.json();
         setTask(data.task);
@@ -1324,7 +1327,7 @@ export default function StudentPortalPage() {
                       </div>
 
                       <button
-                        onClick={() => fetchRecommendedTask(activeCourseSlug)}
+                        onClick={() => fetchRecommendedTask(activeCourseSlug, task?.id)}
                         className="px-3.5 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs flex items-center justify-center gap-2 shadow-lg shadow-amber-500/20 transition-all cursor-pointer shrink-0 border border-amber-300"
                       >
                         <Sparkles className="w-3.5 h-3.5" />

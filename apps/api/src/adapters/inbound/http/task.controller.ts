@@ -37,9 +37,11 @@ export class TaskController {
   @ApiOperation({ summary: 'Get adaptive next recommended task for a student based on BKT mastery' })
   @ApiQuery({ name: 'userId', required: false, description: 'Student User ID' })
   @ApiQuery({ name: 'courseSlug', required: false, description: 'Course slug filter (js-dev, english-b2, ukraine-law)' })
+  @ApiQuery({ name: 'excludeTaskId', required: false, description: 'Task ID to exclude from recommendation (e.g. current task during degradation)' })
   async getRecommendedTask(
     @Query('userId') userId?: string,
     @Query('courseSlug') courseSlug?: string,
+    @Query('excludeTaskId') excludeTaskId?: string,
   ) {
     let targetUserId = userId;
     let user = targetUserId && targetUserId !== 'demo-student'
@@ -114,6 +116,7 @@ export class TaskController {
     const isLastFailed = lastAttempt && !lastAttempt.isCorrect;
     const preferredTopic = isLastFailed ? lastAttempt.task?.topic : null;
     const preferredDifficulty = isLastFailed ? ('EASY' as const) : null;
+    const effectiveExcludeTaskId = excludeTaskId || (isLastFailed ? lastAttempt.taskId : undefined);
 
     const recommendation = TaskSequencer.recommendNextTask({
       skills: skillDomains,
@@ -122,6 +125,7 @@ export class TaskController {
       completedTaskIds: submissions.map((s) => s.taskId),
       preferredTopic,
       preferredDifficulty,
+      excludeTaskId: effectiveExcludeTaskId,
     });
 
     let fullTask = null;
