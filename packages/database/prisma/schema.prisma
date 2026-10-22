@@ -140,6 +140,8 @@ model Task {
   referenceAnswer   String?
   rubrics           Json?
   misconceptions    Json?
+  socraticHints     Json?              // Array of authoring Socratic hints: [{ level: 1, hint: "...", penaltyPct: 15 }]
+  studyUnitUrl      String?            // Deep-link anchor to Study App: "/learn/js-dev/module-1#const-mutability"
   difficulty        TaskDifficulty     @default(EASY)
   topic             String?
   subConcept        String?

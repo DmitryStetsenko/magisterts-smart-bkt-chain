@@ -173,6 +173,8 @@ async function main() {
           options: t.options ? (t.options as any) : undefined,
           referenceAnswer: t.referenceAnswer,
           rubrics: t.rubrics ? (t.rubrics as any) : undefined,
+          socraticHints: t.socraticHints ? (t.socraticHints as any) : undefined,
+          studyUnitUrl: t.studyUnitUrl,
           testCases: t.testCases && t.testCases.length > 0
             ? {
                 create: t.testCases.map((tc) => ({

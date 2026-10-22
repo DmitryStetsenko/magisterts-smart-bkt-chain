@@ -7,7 +7,7 @@
 | Епік | Назва | Кількість завдань |
 | :--- | :--- | :---: |
 | **`SBC-EP-INF`** | Monorepo & CI/CD Setup | 88 |
-| **`SBC-EP-SH`** | Database Modeling & Shared Packages | 19 |
+| **`SBC-EP-SH`** | Database Modeling & Shared Packages | 20 |
 | **`SBC-EP-BK`** | Authentication & Core API | 14 |
 | **`SBC-EP-BKT`** | Bayesian Knowledge Tracing & Behavioral Telemetry | 29 |
 | **`SBC-EP-LLM`** | Automated Code Assessment & Open-Text Evaluation | 10 |
@@ -16,7 +16,7 @@
 | **`SBC-EP-TC`** | Teacher Portal & Analytics CRM | 22 |
 | **`SBC-EP-AD`** | Admin Portal & Knowledge DAG Builder | 8 |
 | **`SBC-EP-LD`** | Landing Web Page | 9 |
-| **ВСЬОГО** | - | **235** |
+| **ВСЬОГО** | - | **236** |
 
 ---
 
@@ -138,6 +138,7 @@
 | **SBC-189** | `Story` | `SH` | extend Prisma schema with OPEN_TEXT, TeacherReviewStatus and semantic evaluation fields | 2026-10-14 | `2d0efad` |
 | **SBC-232** | `Story` | `SH` | document authoring and pedagogical specification for multi-tier adaptive task bank | 2026-10-20 | `f4af440` |
 | **SBC-233** | `Story` | `SH` | generate comprehensive 107-task adaptive bank across 5 JS modules adhering to authoring specification | 2026-10-20 | `f4af440` |
+| **SBC-250** | `Story` | `SH` | integrate authoring Socratic hints and study unit deep linking into Task schema, seed data, and student UI | 2026-10-22 | `pending` |
 
 ---
 

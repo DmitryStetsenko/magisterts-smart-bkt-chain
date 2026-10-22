@@ -22,6 +22,12 @@ export interface SeedTestCase {
   isSecret?: boolean;
 }
 
+export interface SocraticHint {
+  level: number;
+  hint: string;
+  penaltyPct: number;
+}
+
 export interface SeedTask {
   topic: string;
   subConcept: string;
@@ -34,6 +40,8 @@ export interface SeedTask {
   testCases?: SeedTestCase[];
   referenceAnswer?: string;
   rubrics?: any;
+  socraticHints?: SocraticHint[];
+  studyUnitUrl?: string;
 }
 
 // ============================================================================
@@ -55,6 +63,11 @@ export const jsBasicsTasks: SeedTask[] = [
       { id: 'opt3', text: 'Значення стане undefined', isCorrect: false },
       { id: 'opt4', text: 'Код виконається без помилки, але значення залишиться 3.14', isCorrect: false },
     ],
+    socraticHints: [
+      { level: 1, hint: 'Зверніть увагу на саму назву "const" (константа). Чи дозволяє середовище змінювати звʼязку ідентифікатора з іншим значенням після ініціалізації?', penaltyPct: 15 },
+      { level: 2, hint: 'У сучасному JavaScript операція присвоєння "=" до ідентифікатора const є неприпустимою і викидає критичну помилку часу виконання.', penaltyPct: 30 },
+    ],
+    studyUnitUrl: '/learn/js-dev/module-1/variables-declaration#const-immutability',
   },
   {
     topic: 'variables-declaration',
@@ -68,6 +81,11 @@ export const jsBasicsTasks: SeedTask[] = [
       { input: '"city"', expectedOutput: '"Kyiv"', isSecret: false },
       { input: '"temperature"', expectedOutput: '25', isSecret: false },
     ],
+    socraticHints: [
+      { level: 1, hint: 'Як збільшити числове значення змінної на 3? Можна використати скорочений оператор += 3 або пряме додавання temperature = temperature + 3.', penaltyPct: 15 },
+      { level: 2, hint: 'Переконайтеся, що ви використовуєте ключове слово let, а не const, оскільки значення temperature потрібно перезаписати.', penaltyPct: 30 },
+    ],
+    studyUnitUrl: '/learn/js-dev/module-1/variables-declaration#let-block-scope',
   },
   {
     topic: 'variables-declaration',
@@ -82,6 +100,11 @@ export const jsBasicsTasks: SeedTask[] = [
       { id: 'opt3', text: 'Це обмеження безпеки браузера, викликане Strict Mode', isCorrect: false },
       { id: 'opt4', text: 'Рушій автоматично встановлює їм значення null до ініціалізації', isCorrect: false },
     ],
+    socraticHints: [
+      { level: 1, hint: 'Чи дійсно змінні let/const не піднімаються (hoisting)? Специфікація піднімає їх на рівні лексичного оточення, але залишає неініціалізованими до фактичного рядка коду.', penaltyPct: 15 },
+      { level: 2, hint: 'Цей часовий проміжок між початком блоку та ініціалізацією змінної має спеціальну назву в стандарті ECMAScript — TDZ.', penaltyPct: 30 },
+    ],
+    studyUnitUrl: '/learn/js-dev/module-1/variables-declaration#temporal-dead-zone',
   },
 
   // --- Topic 2: primitive-types ---

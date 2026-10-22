@@ -423,6 +423,50 @@
           ]
         },
         {
+          "title": "0.11 Авторські Сократівські Підказки та Deep-Link у Застосунок Навчання (`SBC-250`)",
+          "level": 3,
+          "paragraphs": [],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "**Методологічне правило:** Сократівські підказки є невід'ємною частиною авторського дизайну кожного завдання і закладаються на етапі створення контенту методистом, а не генеруються евристично під час виконання.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Архітектурні зміни:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Prisma ORM (`packages/database/prisma/schema.prisma`):**",
+              "subitems": [
+                "Модель `Task` розширена полями:",
+                "`socraticHints Json?`: масив об'єктів `{ level: number, hint: string, penaltyPct: number }`.",
+                "`studyUnitUrl String?`: точний URI-якір до відповідного уроку майбутнього навчального застосунку (`Study App`)."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Оновлення сид-банку та специфікації:**",
+              "subitems": [
+                "Оновлено [`docs/justifications/03_task_authoring_and_pedagogical_specification.md`](file:///docs/justifications/03_task_authoring_and_pedagogical_specification.md) — додано чек-листи валідності для підказок та deep-links.",
+                "Для завдань Модуля 1 прописано двоярусні сократівські навідні питання та посилання на навчальні юніти.",
+                "Базу даних синхронізовано (`npx prisma db push`) та пересиджено (`npm run db:seed`)."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Студентський клієнт (`apps/student/src/app/page.tsx`):**",
+              "subitems": [
+                "В інтерфейс перегляду умови завдання додано інтерактивний блок `Сократівські підказки`: студент може за потреби розкрити підказку 1-го рівня (штраф -15%) або підказку 2-го рівня (штраф -30%).",
+                "Додано блок `Потрібно повторити тему?` з кнопкою швидкого переходу до відповідного уроку за адресою `task.studyUnitUrl`."
+              ]
+            }
+          ]
+        },
+        {
           "title": "0.6 Глобальний Стандарт Уніфікованого Стану Навігації (`activeTab` + `isDrawerOpen`)",
           "level": 3,
           "paragraphs": [],
