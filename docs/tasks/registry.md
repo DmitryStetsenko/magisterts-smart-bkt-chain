@@ -305,6 +305,7 @@
 | **SBC-239** | `Style` | `TC` | remove screen blur, place sliding drawer below top header with smooth slideInRight animation | 2026-10-20 | `7437a3b` |
 | **SBC-240** | `Refactor` | `TC` | eliminate duplicate task inspector from left sidebar, keep dedicated right drawer for inspection | 2026-10-20 | `c67f550` |
 | **SBC-242** | `Story` | `TC` | implement Full Course Knowledge Tree viewer with multi-tier modules, topic branches, and question cards | 2026-10-21 | `eb4f893` |
+| **SBC-254** | `Story` | `TC` | implement BKT metric verification and calculation audit sandbox in teacher portal | 2026-10-22 | Pending |
 
 ---
 

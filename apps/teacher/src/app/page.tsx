@@ -2,11 +2,12 @@
 
 import React, { useState, useEffect } from 'react';
 import { io } from 'socket.io-client';
-import { ShieldCheck, Network, Users, BarChart3, Code2, BookOpen, Scale, ChevronDown, X, Search, RotateCcw, AlertTriangle, CheckCircle2, Lock, HelpCircle, Code, FileText, CheckSquare, Sparkles, Keyboard, Copy, Activity, Info, GitBranch, Layers, ClipboardCheck, Tag } from 'lucide-react';
+import { ShieldCheck, Network, Users, BarChart3, Code2, BookOpen, Scale, ChevronDown, X, Search, RotateCcw, AlertTriangle, CheckCircle2, Lock, HelpCircle, Code, FileText, CheckSquare, Sparkles, Keyboard, Copy, Activity, Info, GitBranch, Layers, ClipboardCheck, Tag, FlaskConical } from 'lucide-react';
 import { StudentAnalyticsItem } from '../features/analytics/model/analytics.types';
 import { AnomalyTreeWidget, GameSkillTreeWidget, SkillGraphNode } from '@sbc/ui';
 import { ReviewQueueInspector } from '../features/reviews/ui/ReviewQueueInspector';
 import { CourseGraphViewer } from '../features/course-map/ui/CourseGraphViewer';
+import { MetricsAuditInspector } from '../features/metrics-audit/ui/MetricsAuditInspector';
 
 interface CourseItem {
   slug: string;
@@ -117,7 +118,7 @@ export default function TeacherDashboardPage() {
   // Unified Navigation State:
   // activeTab defines which workspace / module is active.
   // isDrawerOpen controls whether its companion sidebar drawer is visible.
-  type TeacherTab = 'analytics' | 'reviews' | 'coursemap' | 'settings';
+  type TeacherTab = 'analytics' | 'reviews' | 'coursemap' | 'metrics-audit' | 'settings';
   const [activeTab, setActiveTab] = useState<TeacherTab>('analytics');
   // By default, student selection is in the top bar, so canvas has 100% space
   const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
@@ -557,6 +558,27 @@ export default function TeacherDashboardPage() {
             )}
           </button>
 
+          <button
+            id="teacher-tab-metrics-audit"
+            onClick={() => handleTabClick('metrics-audit')}
+            className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all cursor-pointer relative ${
+              activeTab === 'metrics-audit'
+                ? isDrawerOpen
+                  ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-600/40 ring-1 ring-emerald-400/50'
+                  : 'bg-emerald-950/80 text-emerald-300 border border-emerald-500/30 hover:bg-emerald-900/90 hover:text-white'
+                : 'bg-slate-800/60 text-slate-400 hover:bg-slate-800 hover:text-white'
+            }`}
+            title="Математичний Аудит & Симулятор BKT (What-If Sandbox)"
+          >
+            <FlaskConical className="w-5 h-5" />
+            {activeTab === 'metrics-audit' && isDrawerOpen && (
+              <span className="absolute -left-1 w-1 h-5 bg-emerald-400 rounded-r-full shadow-sm shadow-emerald-400"></span>
+            )}
+            {activeTab === 'metrics-audit' && !isDrawerOpen && (
+              <span className="absolute -left-1 w-1 h-2 bg-emerald-400/70 rounded-r-full"></span>
+            )}
+          </button>
+
           {/* Bottom Area (External Shortcuts & Settings) */}
           <div className="mt-auto flex flex-col items-center gap-2.5">
             <div className="w-8 h-[1px] bg-slate-800/80 my-1"></div>
@@ -627,6 +649,12 @@ export default function TeacherDashboardPage() {
                   <>
                     <ClipboardCheck className="w-4 h-4 text-amber-400" />
                     <span>Черга Перевірки ({reviewQueue.length})</span>
+                  </>
+                )}
+                {activeTab === 'metrics-audit' && (
+                  <>
+                    <FlaskConical className="w-4 h-4 text-emerald-400" />
+                    <span>Аудит Метрик & Студенти</span>
                   </>
                 )}
                 {activeTab === 'settings' && (
@@ -1172,6 +1200,51 @@ export default function TeacherDashboardPage() {
                 </div>
               )}
 
+              {/* Drawer: Metrics Audit Student List */}
+              {activeTab === 'metrics-audit' && (
+                <div className="flex flex-col gap-3">
+                  <div className="text-[11px] text-slate-400">
+                    Оберіть студента для детального математичного аудиту його спроб:
+                  </div>
+
+                  <div className="flex flex-col gap-1.5 max-h-[calc(100vh-220px)] overflow-y-auto pr-1">
+                    {students.map((st) => {
+                      const stId = st.id || st.studentId || st.email;
+                      const isSelected = selectedStudentId === stId;
+                      const avgMastery = st.averageMastery !== undefined ? (st.averageMastery * 100).toFixed(0) : '0';
+
+                      return (
+                        <div
+                          key={stId}
+                          onClick={() => setSelectedStudentId(stId)}
+                          className={`p-2.5 rounded-xl border transition-all cursor-pointer flex items-center justify-between gap-2 ${
+                            isSelected
+                              ? 'bg-emerald-950/40 border-emerald-500 shadow-md ring-1 ring-emerald-500/50 text-white'
+                              : 'bg-slate-950/80 border-slate-800/80 hover:bg-slate-800/50 hover:border-slate-700 text-slate-300'
+                          }`}
+                        >
+                          <div className="overflow-hidden">
+                            <div className="text-xs font-bold truncate flex items-center gap-1.5">
+                              <span>{st.name}</span>
+                              {isSelected && <span className="text-[10px] text-emerald-400">●</span>}
+                            </div>
+                            <div className="text-[11px] text-slate-400 truncate font-mono">{st.email}</div>
+                          </div>
+                          <div className="flex flex-col items-end shrink-0">
+                            <span className="text-xs font-mono font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
+                              {avgMastery}% P(L)
+                            </span>
+                            <span className="text-[10px] text-slate-400 font-mono mt-0.5">
+                              Спроб: {st.recentAdjustments?.length || 0}
+                            </span>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
               {/* Drawer 3: Settings */}
               {activeTab === 'settings' && (
                 <div className="flex flex-col gap-3 text-xs text-slate-300">
@@ -1486,6 +1559,16 @@ export default function TeacherDashboardPage() {
                   handleReviewDecision(current.submissionId, decision);
                 }
               }}
+            />
+          )}
+
+          {/* Main View: Metrics Audit & BKT Math Simulator */}
+          {activeTab === 'metrics-audit' && (
+            <MetricsAuditInspector
+              students={students}
+              selectedStudentId={selectedStudentId}
+              onSelectStudent={(id) => setSelectedStudentId(id)}
+              activeCourseSlug={activeCourseSlug}
             />
           )}
 
