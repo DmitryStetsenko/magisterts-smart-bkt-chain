@@ -12,11 +12,11 @@
 | **`SBC-EP-BKT`** | Bayesian Knowledge Tracing & Behavioral Telemetry | 28 |
 | **`SBC-EP-LLM`** | Automated Code Assessment & Open-Text Evaluation | 10 |
 | **`SBC-EP-W3`** | Web3 Infrastructure & Smart Contracts | 0 |
-| **`SBC-EP-ST`** | Student Portal & Skill Tree Map | 28 |
+| **`SBC-EP-ST`** | Student Portal & Skill Tree Map | 29 |
 | **`SBC-EP-TC`** | Teacher Portal & Analytics CRM | 22 |
 | **`SBC-EP-AD`** | Admin Portal & Knowledge DAG Builder | 8 |
 | **`SBC-EP-LD`** | Landing Web Page | 9 |
-| **ВСЬОГО** | - | **233** |
+| **ВСЬОГО** | - | **234** |
 
 ---
 
@@ -257,7 +257,8 @@
 | **SBC-230** | `Story` | `ST` | implement top adaptive degradation notice banner with score cap and remove confusing per-task difficulty badges | 2026-10-20 | `e612f0a` |
 | **SBC-244** | `Story` | `ST` | add deterministic options shuffling with letter markers in QuizTaskEditor | 2026-10-21 | `35ad827` |
 | **SBC-245** | `Story` | `ST` | add adaptive difficulty degradation prompt button to evaluation toast | 2026-10-21 | `22479aa` |
-| **SBC-246** | `Story` | `ST` | add prominent course and module progress indicators to student header and workspace HUD | 2026-10-22 | pending |
+| **SBC-246** | `Story` | `ST` | add prominent course and module progress indicators to student header and workspace HUD | 2026-10-22 | `9fab206` |
+| **SBC-248** | `Style` | `ST` | replace bulky degradation text badge with compact message icon and interactive explanation tooltip | 2026-10-22 | `pending` |
 
 ---
 
