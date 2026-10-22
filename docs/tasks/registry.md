@@ -255,7 +255,8 @@
 | **SBC-216** | `Story` | `ST` | implement attempt history tab in student task drawer with teacher feedback and live review decision synchronization | 2026-10-19 | `1e201d7` |
 | **SBC-230** | `Story` | `ST` | implement top adaptive degradation notice banner with score cap and remove confusing per-task difficulty badges | 2026-10-20 | `e612f0a` |
 | **SBC-244** | `Story` | `ST` | add deterministic options shuffling with letter markers in QuizTaskEditor | 2026-10-21 | `35ad827` |
-| **SBC-245** | `Story` | `ST` | add adaptive difficulty degradation prompt button to evaluation toast | 2026-10-21 | pending |
+| **SBC-245** | `Story` | `ST` | add adaptive difficulty degradation prompt button to evaluation toast | 2026-10-21 | `22479aa` |
+| **SBC-246** | `Story` | `ST` | add prominent course and module progress indicators to student header and workspace HUD | 2026-10-22 | pending |
 
 ---
 

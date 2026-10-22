@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { io } from 'socket.io-client';
-import { Brain, Sparkles, CheckCircle, AlertCircle, RefreshCw, User, Code2, BookOpen, Scale, ChevronDown, ArrowRight, AlertTriangle, X, Settings, Network, Compass, Flame, History, MessageSquareQuote, CheckCircle2 } from 'lucide-react';
+import { Brain, Sparkles, CheckCircle, AlertCircle, RefreshCw, User, Code2, BookOpen, Scale, ChevronDown, ArrowRight, AlertTriangle, X, Settings, Network, Compass, Flame, History, MessageSquareQuote, CheckCircle2, Trophy, Target } from 'lucide-react';
 import { MonacoCodeEditor } from '../features/code-editor/ui/MonacoCodeEditor';
 import { QuizTaskEditor } from '../features/quiz-editor/ui/QuizTaskEditor';
 import { EssayTaskEditor } from '../features/essay-editor/ui/EssayTaskEditor';
@@ -333,9 +333,18 @@ export default function StudentPortalPage() {
     }
   };
 
+  // 📊 Real-time Course & Module Progress Metrics
+  const totalSkillsCount = graphNodes.length;
+  const masteredSkillsCount = graphNodes.filter((n) => n.pMastery >= 0.90).length;
+  const courseCompletionPct = totalSkillsCount > 0 ? Math.round((masteredSkillsCount / totalSkillsCount) * 100) : 0;
+  
+  // Active skill node & mastery
+  const activeSkillNode = graphNodes.find((n) => n.slug === task?.skill?.slug);
+  const activeSkillMasteryPct = activeSkillNode ? Math.round(activeSkillNode.pMastery * 100) : 0;
+
   return (
     <div className="h-screen w-screen bg-slate-950 text-slate-100 flex flex-col font-sans overflow-hidden">
-      {/* 📌 Sticky Top Navigation Bar */}
+      {/* 📌 Sticky Top Navigation Bar with Prominent Progress Indicator */}
       <header className="h-14 w-full bg-slate-900 border-b border-slate-800/90 px-4 flex items-center justify-between shrink-0 z-30 shadow-md">
         <div className="flex items-center gap-3">
           <div className="p-1.5 bg-indigo-600/20 border border-indigo-500/30 rounded-lg text-indigo-400">
@@ -351,9 +360,62 @@ export default function StudentPortalPage() {
           </div>
         </div>
 
+        {/* 🏆 Prominent Central Overall Course Progress Display */}
+        <div className="hidden md:flex items-center gap-4 bg-slate-950/80 px-4 py-1.5 rounded-2xl border border-slate-800 shadow-inner">
+          <div className="flex items-center gap-2">
+            <div className="p-1 bg-amber-500/10 border border-amber-500/30 rounded-lg text-amber-400">
+              <Trophy className="w-3.5 h-3.5" />
+            </div>
+            <div className="flex flex-col">
+              <div className="flex items-center gap-1.5 text-[11px] leading-tight font-semibold text-slate-300">
+                <span>Прогрес курсу:</span>
+                <span className="font-mono font-bold text-amber-400">{courseCompletionPct}%</span>
+                <span className="text-[10px] text-slate-500 font-mono">({masteredSkillsCount}/{totalSkillsCount} модулів)</span>
+              </div>
+              <div className="w-32 h-1.5 bg-slate-900 rounded-full overflow-hidden border border-slate-800 mt-1">
+                <div
+                  className="h-full bg-gradient-to-r from-amber-500 via-emerald-500 to-teal-400 rounded-full transition-all duration-500"
+                  style={{ width: `${courseCompletionPct}%` }}
+                />
+              </div>
+            </div>
+          </div>
+
+          {activeSkillNode && (
+            <div className="h-6 w-[1px] bg-slate-800"></div>
+          )}
+
+          {activeSkillNode && (
+            <div className="flex items-center gap-2">
+              <div className="p-1 bg-indigo-500/10 border border-indigo-500/30 rounded-lg text-indigo-400">
+                <Target className="w-3.5 h-3.5" />
+              </div>
+              <div className="flex flex-col">
+                <div className="flex items-center gap-1.5 text-[11px] leading-tight font-semibold text-slate-300">
+                  <span className="truncate max-w-[130px]">{activeSkillNode.title.split(':')[0]}:</span>
+                  <span className={`font-mono font-bold ${activeSkillMasteryPct >= 90 ? 'text-emerald-400' : 'text-indigo-400'}`}>
+                    {activeSkillMasteryPct}%
+                  </span>
+                  <span className="text-[10px] text-slate-500 font-mono">(P(L))</span>
+                </div>
+                <div className="w-28 h-1.5 bg-slate-900 rounded-full overflow-hidden border border-slate-800 mt-1">
+                  <div
+                    className={`h-full rounded-full transition-all duration-500 ${
+                      activeSkillMasteryPct >= 90
+                        ? 'bg-emerald-400'
+                        : 'bg-gradient-to-r from-indigo-500 to-purple-500'
+                    }`}
+                    style={{ width: `${Math.min(100, activeSkillMasteryPct)}%` }}
+                  />
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+
         {/* Top Controls: Course Selector & User Profile */}
         <div className="flex items-center gap-3">
-          <div className="relative min-w-[200px] sm:min-w-[260px]">
+          <div className="relative min-w-[200px] sm:min-w-[240px]">
             <select
               id="student-course-select"
               value={activeCourseSlug}
@@ -596,16 +658,32 @@ export default function StudentPortalPage() {
 
                   {taskDrawerSubTab === 'condition' ? (
                     <div className="flex flex-col gap-5 flex-1">
-                      <div className="flex items-center justify-between">
-                        <span className="px-2.5 py-1 rounded-full text-xs font-mono font-bold uppercase tracking-wider bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
-                          {task.skill.title}
-                        </span>
-                        {recommendation?.isDifficultyDegraded && (
-                          <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-amber-500/15 text-amber-300 border border-amber-500/30 flex items-center gap-1">
-                            <AlertCircle className="w-3 h-3" />
-                            <span>Допоміжний рівень (Макс: {recommendation?.maxScoreCap ?? 70}%)</span>
+                      <div className="flex flex-col gap-2 p-3 bg-slate-950/80 rounded-xl border border-slate-800 shadow-inner">
+                        <div className="flex items-center justify-between">
+                          <span className="px-2.5 py-0.5 rounded-full text-[11px] font-mono font-bold uppercase tracking-wider bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
+                            {task.skill.title}
                           </span>
-                        )}
+                          {recommendation?.isDifficultyDegraded ? (
+                            <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-amber-500/15 text-amber-300 border border-amber-500/30 flex items-center gap-1">
+                              <AlertCircle className="w-3 h-3" />
+                              <span>Допоміжний рівень (Макс: {recommendation?.maxScoreCap ?? 70}%)</span>
+                            </span>
+                          ) : (
+                            <span className="text-[11px] font-mono font-bold text-slate-400">
+                              P(L): <span className={activeSkillMasteryPct >= 90 ? 'text-emerald-400' : 'text-indigo-400'}>{activeSkillMasteryPct}%</span>
+                            </span>
+                          )}
+                        </div>
+                        <div className="w-full h-1.5 bg-slate-900 rounded-full overflow-hidden border border-slate-800">
+                          <div
+                            className={`h-full rounded-full transition-all duration-500 ${
+                              activeSkillMasteryPct >= 90
+                                ? 'bg-emerald-400'
+                                : 'bg-gradient-to-r from-indigo-500 to-purple-500'
+                            }`}
+                            style={{ width: `${Math.min(100, activeSkillMasteryPct)}%` }}
+                          />
+                        </div>
                       </div>
 
                       <div>
@@ -977,6 +1055,76 @@ export default function StudentPortalPage() {
                   </div>
                 </div>
               )}
+
+              {/* 📊 Active Course & Module Progress HUD */}
+              <div className="w-full bg-slate-900/90 border border-slate-800 rounded-2xl p-4 shadow-xl backdrop-blur-xl flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div className="flex items-center gap-3">
+                  <div className="p-2.5 rounded-xl bg-gradient-to-br from-indigo-600/20 to-purple-600/20 border border-indigo-500/30 text-indigo-400 shrink-0">
+                    <Trophy className="w-5 h-5 text-amber-400" />
+                  </div>
+                  <div className="flex flex-col">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="text-xs font-mono font-bold uppercase tracking-wider text-indigo-400">
+                        {task.skill.title}
+                      </span>
+                      {task.topic && (
+                        <span className="px-2 py-0.5 rounded-md text-[10px] font-mono bg-slate-800 text-slate-300 border border-slate-700">
+                          {task.topic}
+                        </span>
+                      )}
+                    </div>
+                    <div className="text-sm font-bold text-white mt-0.5 flex items-center gap-2">
+                      <span>{task.title}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Progress Indicators & Quick Navigation to Skill Tree */}
+                <div className="flex items-center gap-6 shrink-0 border-t md:border-t-0 md:border-l border-slate-800 pt-3 md:pt-0 md:pl-6 justify-between md:justify-end">
+                  {/* Active Module Mastery */}
+                  <div className="flex flex-col min-w-[120px]">
+                    <div className="flex justify-between items-center text-xs mb-1">
+                      <span className="text-[11px] text-slate-400 font-semibold">Модуль P(L):</span>
+                      <span className={`font-mono font-bold text-xs ${activeSkillMasteryPct >= 90 ? 'text-emerald-400' : 'text-indigo-400'}`}>
+                        {activeSkillMasteryPct}%
+                      </span>
+                    </div>
+                    <div className="w-full h-1.5 bg-slate-950 rounded-full overflow-hidden border border-slate-800">
+                      <div
+                        className={`h-full rounded-full transition-all duration-500 ${
+                          activeSkillMasteryPct >= 90 ? 'bg-emerald-400' : 'bg-gradient-to-r from-indigo-500 to-purple-500'
+                        }`}
+                        style={{ width: `${Math.min(100, activeSkillMasteryPct)}%` }}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Overall Course Progress */}
+                  <div className="flex flex-col min-w-[120px]">
+                    <div className="flex justify-between items-center text-xs mb-1">
+                      <span className="text-[11px] text-slate-400 font-semibold">Курс:</span>
+                      <span className="font-mono font-bold text-xs text-amber-400">
+                        {courseCompletionPct}%
+                      </span>
+                    </div>
+                    <div className="w-full h-1.5 bg-slate-950 rounded-full overflow-hidden border border-slate-800">
+                      <div
+                        className="h-full bg-gradient-to-r from-amber-500 to-emerald-400 rounded-full transition-all duration-500"
+                        style={{ width: `${courseCompletionPct}%` }}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Button to open Tree */}
+                  <button
+                    onClick={() => handleTabClick('tree')}
+                    className="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700/80 transition-all cursor-pointer"
+                    title="Відкрити Дерево Знань"
+                  >
+                    <Network className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
 
               {task.taskType === 'SINGLE_CHOICE' || task.taskType === 'MULTIPLE_CHOICE' ? (
                 <QuizTaskEditor
