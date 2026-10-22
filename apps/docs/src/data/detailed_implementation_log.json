@@ -370,6 +370,54 @@
           ]
         },
         {
+          "title": "0.10 Сесія Брейншторму 07: Подолання «Адаптивного Тупика» та Scaffolding",
+          "level": 3,
+          "paragraphs": [],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "**Документ:** [`docs/brainstorm/07_breaking_adaptive_deadlock_and_scaffolding.md`](file:///docs/brainstorm/07_breaking_adaptive_deadlock_and_scaffolding.md).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Проблематика:** «Петля фрустрації» (The Frustration Loop), коли багаторазові помилки на полегшених завданнях призводять до циклічного перекидання студента між тими самими двома питаннями без прогресу.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Концептуальні вектори розв'язання:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "*Scaffolding & Micro-Theory Cards:* Перехід від простої екзаменації до навчання на місці — картка мікро-теорії з розбором помилкових дистракторів (Distractor Feedback) та Сократівськими підказками.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "*Human-in-the-Loop:* Ескалація складного випадку до викладача через існуючу чергу `Teacher Review Queue`.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "*DAG Backtracking:* Тактичний відступ за графом передумов до батьківської навички для відновлення впевненості («Quick Win»).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "*Cognitive Cool-Down & Task Parking:* Можливість відкласти («припаркувати») тему на потім та змінити формат активності.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "*Task Bank Depth:* Насичення банку 3–4 ізоморфними завданнями з різними життєвими метафорами.",
+              "subitems": []
+            }
+          ]
+        },
+        {
           "title": "0.6 Глобальний Стандарт Уніфікованого Стану Навігації (`activeTab` + `isDrawerOpen`)",
           "level": 3,
           "paragraphs": [],

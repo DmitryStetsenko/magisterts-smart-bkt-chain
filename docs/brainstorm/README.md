@@ -30,3 +30,7 @@
    - *Дата:* 19 жовтня 2026
    - *Ключові теми:* Ліквідація зайвих 4 підвкладок (DAG, Руни), відмова від 3-рівневих акордеонів, 4 чисті смислові категорії аномалій (Буфер обміну, Спідран, Семантичний спам, Когнітивне тертя), пропси та рольова конфігурація `AnomalyCategoriesWidget` для `student` та `teacher`.
 
+7. [07. Порушення «Адаптивного Тупика» (Breaking the Adaptive Deadlock & Remediation Scaffolding)](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/docs/brainstorm/07_breaking_adaptive_deadlock_and_scaffolding.md)
+   - *Дата:* 22 жовтня 2026
+   - *Ключові теми:* Подолання замкненого кола деградації завдань (The Frustration Loop), Scaffolding замість екзаменатора, мікро-теорія Just-in-Time, розбір типових помилок (Distractor Feedback), Human-in-the-Loop ескалація до викладача, тактичний відступ за графом передумов (DAG Backtracking), Cognitive Cool-Down та паркування завдань.
+
