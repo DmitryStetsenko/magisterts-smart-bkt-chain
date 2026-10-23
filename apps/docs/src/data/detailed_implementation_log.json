@@ -5620,6 +5620,61 @@
               "subitems": []
             }
           ]
+        },
+        {
+          "title": "11.39. Скрізна Уніфікація Секцій Сайдбарів Кабінету Викладача за Правилом 7 (SBC-263)",
+          "level": 3,
+          "paragraphs": [],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "**Контекст та Мета:** Реалізувати вимоги Правила 7 в усіх бічних панелях кабінету викладача (`apps/teacher/src/app/page.tsx`), замінивши старі важкі рамки карток та статичні блоки на чисті безрамкові акордеон-секції з іконками `Plus` та `Minus`.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Компоненти та Зміни:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Сайдбар `analytics` (Огляд Групи & Ризики):**",
+              "subitems": [
+                "Секція 1: *«Розподіл Групи (Блум)»* — стан `isCohortDistributionOpen`, прогрес-бар когорт, 4 фільтр-кнопки Bloom tiers, іконка `Plus`/`Minus`.",
+                "Секція 2: *«Радар Ризиків & Аномалій»* — стан `isRiskFeedOpen`, бейдж кількості виявлених ризиків, картки студентів з аномаліями, іконка `Plus`/`Minus`.",
+                "Секція 3: *«Список Учнів»* — стан `isFilteredRosterOpen`, пошукове поле `Search`, скрольований список студентів із бейджами $P(L)$ та WPM, іконка `Plus`/`Minus`."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Сайдбар `coursemap` (Педагогічний Пульт Модуля):**",
+              "subitems": [
+                "Секція 1: *«Аудит Балансу Тріад»* — стан `isTriadAuditOpen`, повнота тріад $3/3$, баланс коду/тестів та захист прихованими тестами, іконка `Plus`/`Minus`.",
+                "Секція 2: *«Когнітивні Пастки Модуля»* — стан `isCognitiveTrapsOpen`, частотний аналіз помилок (TDZ, Coercion, Closures), іконка `Plus`/`Minus`.",
+                "Секція 3: *«Параметри Адаптації»* — стан `isAdaptiveParamsOpen`, пороги розблокування DAG $P(L) \\ge 0.75$, Gold Mastery $P(L) \\ge 0.90$, Cap $70\\%$, іконка `Plus`/`Minus`."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Стилізація та Візуальна Цілісність:**",
+              "subitems": [
+                "Усунуто важкі контейнерні рамки карток (`border border-slate-800 rounded-2xl bg-slate-950/70 p-3.5`).",
+                "Розділювачі секцій уніфіковано через `border-t border-slate-800/80 pt-2`.",
+                "Кожен заголовок отримав доступну кнопку `w-full flex items-center justify-between text-left px-0.5 py-1 text-slate-400 hover:text-white transition-colors cursor-pointer group`."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Тестування:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "`npm run build:teacher` успішно пройшов усі фази (Next.js 16 Turbopack, 0 помилок) ✅.",
+              "subitems": []
+            }
+          ]
         }
       ]
     }
