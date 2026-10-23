@@ -1201,63 +1201,12 @@ export default function TeacherDashboardPage() {
                 </div>
               )}
 
-              {/* Drawer: Metrics Audit Student List */}
-              {/* Drawer: Metrics Audit - Distinct sections for Personal Student Audit vs General Tools */}
+              {/* Drawer: Metrics Audit - Distinct sections for General Tools first, Personal Student Audit second */}
               {activeTab === 'metrics-audit' && (
                 <div className="flex flex-col gap-4">
-                  {/* SECTION 1: Персональний аудит конкретного студента */}
+                  {/* SECTION 1: Загальні системні інструменти (Не прив'язані до студента) - FIRST */}
                   <div className="flex flex-col gap-2">
-                    <div className="flex items-center justify-between text-[11px] font-bold uppercase tracking-wider text-purple-400 px-0.5">
-                      <span className="flex items-center gap-1.5">
-                        <User className="w-3.5 h-3.5 text-purple-400" />
-                        <span>Студенти для аудиту</span>
-                      </span>
-                      <span className="font-mono text-[10px] text-slate-500 font-normal">Всього: {students.length}</span>
-                    </div>
-
-                    <div className="flex flex-col gap-1.5 max-h-[calc(100vh-380px)] overflow-y-auto pr-1">
-                      {students.map((st) => {
-                        const stId = st.id || st.studentId || st.email;
-                        const isSelected = selectedStudentId === stId;
-                        const avgMastery = st.averageMastery !== undefined ? (st.averageMastery * 100).toFixed(0) : '0';
-
-                        return (
-                          <div
-                            key={stId}
-                            onClick={() => {
-                              setSelectedStudentId(stId);
-                              setAuditSubTab('live-log');
-                            }}
-                            className={`p-2.5 rounded-xl border transition-all cursor-pointer flex items-center justify-between gap-2 ${
-                              isSelected && auditSubTab === 'live-log'
-                                ? 'bg-purple-950/40 border-purple-500 shadow-md ring-1 ring-purple-500/50 text-white'
-                                : 'bg-slate-950/80 border-slate-800/80 hover:bg-slate-800/50 hover:border-slate-700 text-slate-300'
-                            }`}
-                          >
-                            <div className="overflow-hidden">
-                              <div className="text-xs font-bold truncate flex items-center gap-1.5">
-                                <span>{st.name}</span>
-                                {isSelected && auditSubTab === 'live-log' && <span className="text-[10px] text-purple-400">●</span>}
-                              </div>
-                              <div className="text-[11px] text-slate-400 truncate font-mono">{st.email}</div>
-                            </div>
-                            <div className="flex flex-col items-end shrink-0">
-                              <span className="text-xs font-mono font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
-                                {avgMastery}% P(L)
-                              </span>
-                              <span className="text-[10px] text-slate-400 font-mono mt-0.5">
-                                Спроб: {st.recentAdjustments?.length || 0}
-                              </span>
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-
-                  {/* SECTION 2: Загальні системні інструменти (Не прив'язані до студента) */}
-                  <div className="flex flex-col gap-2 pt-2 border-t border-slate-800/80">
-                    <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 px-0.5 flex items-center gap-1.5">
+                    <span className="text-[11px] font-bold uppercase tracking-wider text-cyan-400 px-0.5 flex items-center gap-1.5">
                       <Globe className="w-3.5 h-3.5 text-cyan-400" />
                       <span>Загальні інструменти</span>
                     </span>
@@ -1348,6 +1297,56 @@ export default function TeacherDashboardPage() {
                       </div>
                       <span className="text-[11px] text-indigo-400 font-bold shrink-0">➔</span>
                     </button>
+                  </div>
+
+                  {/* SECTION 2: Персональний аудит конкретного студента - SECOND */}
+                  <div className="flex flex-col gap-2 pt-2 border-t border-slate-800/80">
+                    <div className="flex items-center justify-between text-[11px] font-bold uppercase tracking-wider text-purple-400 px-0.5">
+                      <span className="flex items-center gap-1.5">
+                        <User className="w-3.5 h-3.5 text-purple-400" />
+                        <span>Студенти для аудиту</span>
+                      </span>
+                      <span className="font-mono text-[10px] text-slate-500 font-normal">Всього: {students.length}</span>
+                    </div>
+
+                    <div className="flex flex-col gap-1.5 max-h-[calc(100vh-420px)] overflow-y-auto pr-1">
+                      {students.map((st) => {
+                        const stId = st.id || st.studentId || st.email;
+                        const isSelected = selectedStudentId === stId;
+                        const avgMastery = st.averageMastery !== undefined ? (st.averageMastery * 100).toFixed(0) : '0';
+
+                        return (
+                          <div
+                            key={stId}
+                            onClick={() => {
+                              setSelectedStudentId(stId);
+                              setAuditSubTab('live-log');
+                            }}
+                            className={`p-2.5 rounded-xl border transition-all cursor-pointer flex items-center justify-between gap-2 ${
+                              isSelected && auditSubTab === 'live-log'
+                                ? 'bg-purple-950/40 border-purple-500 shadow-md ring-1 ring-purple-500/50 text-white'
+                                : 'bg-slate-950/80 border-slate-800/80 hover:bg-slate-800/50 hover:border-slate-700 text-slate-300'
+                            }`}
+                          >
+                            <div className="overflow-hidden">
+                              <div className="text-xs font-bold truncate flex items-center gap-1.5">
+                                <span>{st.name}</span>
+                                {isSelected && auditSubTab === 'live-log' && <span className="text-[10px] text-purple-400">●</span>}
+                              </div>
+                              <div className="text-[11px] text-slate-400 truncate font-mono">{st.email}</div>
+                            </div>
+                            <div className="flex flex-col items-end shrink-0">
+                              <span className="text-xs font-mono font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
+                                {avgMastery}% P(L)
+                              </span>
+                              <span className="text-[10px] text-slate-400 font-mono mt-0.5">
+                                Спроб: {st.recentAdjustments?.length || 0}
+                              </span>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
                   </div>
                 </div>
               )}

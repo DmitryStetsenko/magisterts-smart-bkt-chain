@@ -307,7 +307,8 @@
 | **SBC-254** | `Story` | `TC` | implement BKT metric verification and calculation audit sandbox in teacher portal | 2026-10-22 | `90da67f` |
 | **SBC-255** | `Story` | `TC` | implement interactive click-to-explain deep dive inspection modals for BKT math components in teacher portal | 2026-10-23 | `78d3b7f` |
 | **SBC-256** | `Story` | `TC` | implement comprehensive adaptive mechanisms registry in teacher portal audit module | 2026-10-23 | `80bc521` |
-| **SBC-257** | `Story` | `TC` | separate student-specific and global system audit tabs and side drawer sections | 2026-10-23 | Pending |
+| **SBC-257** | `Story` | `TC` | separate student-specific and global system audit tabs and side drawer sections | 2026-10-23 | `c05e25f` |
+| **SBC-258** | `Style` | `TC` | position general tools section first in teacher metrics audit side drawer | 2026-10-23 | Pending |
 
 ---
 
