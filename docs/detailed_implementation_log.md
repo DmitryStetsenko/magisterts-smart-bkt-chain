@@ -1642,3 +1642,19 @@ eferenceAnswer, критерії options.keywords (microtask|мікротаск|
      - У картці `transitStep` зафіксовано статус $P(T)=0.20$ як нижньої асимптоти (BKT Lower Bound $\approx 22.86\%$) та розкрито логіку загасання падіння для викладача, який аналізує журнал дій студента.
 - **Верифікація:** Збірка `npm run build:teacher` успішно завершена без помилок (0 помилок).
 
+### 11.44. Захист від Спаму Повторних Відповідей та Накрутки BKT (SBC-268)
+- **Контекст проблеми:** При багаторазовому натисканні кнопки відправки на правильно виконаному тестовому питанні клієнт продовжував відправляти нові сабміти на ендпоінт `POST /api/v1/bkt/evaluate`. Сервер інтерпретував кожен такий сабміт як нове незалежне позитивне спостереження, що за 3-4 кліки штучно розганяло $P(L)$ з 28.9% до 99.7% і передчасно зараховувало повне опанування модуля (100% Mastery).
+- **Впроваджені архітектурні зміни:**
+  1. **Frontend Guard ([apps/student/src/features/quiz-editor/ui/QuizTaskEditor.tsx](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/student/src/features/quiz-editor/ui/QuizTaskEditor.tsx)):**
+     - Додано умову блокування вибору: якщо `isPassed === true`, кліки по варіантах відповідей ігноруються (`read-only`), а обраний правильний варіант підсвічується смарагдовою рамкою.
+     - Кнопка «Відправити Відповідь» блокується (`disabled={... || isPassed}`) зі зміною статусу на «✓ Відповідь зараховано».
+     - Кнопка «Наступне завдання →» отримує привабливу пульсуючу анімацію (`animate-pulse`).
+  2. **Code Editor Guard ([apps/student/src/features/code-editor/ui/MonacoCodeEditor.tsx](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/student/src/features/code-editor/ui/MonacoCodeEditor.tsx)):**
+     - Кнопка «Перевірити код» блокується після зарахування тесту (`isPassed`), текст змінюється на «✓ Код зараховано».
+  3. **Backend Idempotency Guard ([apps/api/src/adapters/inbound/http/bkt.controller.ts](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/api/src/adapters/inbound/http/bkt.controller.ts)):**
+     - Введено перевірку `if (isAlreadyPassedBefore && isPassed)`.
+     - Заборонено повторний виклик `BktEngine.calculateNextState` та інкремент $P(L)$ для завдань, які вже були раніше успішно складені цим студентом.
+     - Додано інформаційний маркер у `feedback`: `ℹ️ (Завдання вже було зараховано раніше: показник P(L) збережено без повторного нарахування)`.
+- **Верифікація:**
+  - Збірки `npm run build:api` та `npm run build:student` успішно пройшли без помилок.
+

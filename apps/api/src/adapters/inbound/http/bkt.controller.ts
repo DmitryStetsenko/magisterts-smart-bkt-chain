@@ -346,27 +346,42 @@ export class BktController {
       feedback += ' 🛡️ (Схоже на випадкову помилку: засвоєння знижено помірно)';
     }
 
-    const calcResult = BktEngine.calculateNextState(
-      {
-        pMastery: bktState.pMastery,
-        pTransit: bktState.pTransit,
-        pSlip: adjusted.pSlip,
-        pGuess: adjusted.pGuess,
-      },
-      isPassed,
-    );
+    // 🛡️ Anti-Spam / Idempotency Guard for Repeated Correct Answers:
+    // If the student already successfully passed this task previously (isAlreadyPassedBefore && isPassed),
+    // we do NOT re-apply BKT knowledge gain for the same task over and over again to prevent spamming mastery up to 100%.
+    let calcResult: any;
+    if (isAlreadyPassedBefore && isPassed) {
+      feedback += ' ℹ️ (Завдання вже було зараховано раніше: показник P(L) збережено без повторного нарахування)';
+      calcResult = {
+        pMasteryPrior: bktState.pMastery,
+        pMasteryPosterior: bktState.pMastery,
+        isCorrect: true,
+        timestamp: new Date(),
+      };
+      updatedState = bktState;
+    } else {
+      calcResult = BktEngine.calculateNextState(
+        {
+          pMastery: bktState.pMastery,
+          pTransit: bktState.pTransit,
+          pSlip: adjusted.pSlip,
+          pGuess: adjusted.pGuess,
+        },
+        isPassed,
+      );
 
-    const isMastered = BktEngine.isMastered(calcResult.pMasteryPosterior);
+      const isMastered = BktEngine.isMastered(calcResult.pMasteryPosterior);
 
-    updatedState = await this.prisma.bktState.update({
-      where: { id: bktState.id },
-      data: {
-        pMastery: calcResult.pMasteryPosterior,
-        attemptsCount: bktState.attemptsCount + 1,
-        isMastered,
-        masteredAt: isMastered ? new Date() : null,
-      },
-    });
+      updatedState = await this.prisma.bktState.update({
+        where: { id: bktState.id },
+        data: {
+          pMastery: calcResult.pMasteryPosterior,
+          attemptsCount: bktState.attemptsCount + 1,
+          isMastered,
+          masteredAt: isMastered ? (bktState.masteredAt || new Date()) : null,
+        },
+      });
+    }
 
     bktResult = calcResult;
 

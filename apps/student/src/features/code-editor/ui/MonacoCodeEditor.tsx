@@ -107,11 +107,15 @@ export function MonacoCodeEditor({
 
           <button
             onClick={onSubmit}
-            disabled={isSubmitting}
-            className="inline-flex items-center gap-2 px-4 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white text-xs font-semibold shadow-lg shadow-emerald-900/30 transition-all cursor-pointer"
+            disabled={isSubmitting || isPassed}
+            className={`inline-flex items-center gap-2 px-4 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+              isPassed
+                ? 'bg-slate-900 text-slate-500 cursor-not-allowed border border-slate-800 opacity-60'
+                : 'bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white shadow-lg shadow-emerald-900/30 cursor-pointer'
+            }`}
           >
             <Play className="w-3.5 h-3.5 fill-current" />
-            <span>{isSubmitting ? 'Оцінювання...' : 'Перевірити код'}</span>
+            <span>{isPassed ? '✓ Код зараховано' : isSubmitting ? 'Оцінювання...' : 'Перевірити код'}</span>
           </button>
         </div>
       </div>

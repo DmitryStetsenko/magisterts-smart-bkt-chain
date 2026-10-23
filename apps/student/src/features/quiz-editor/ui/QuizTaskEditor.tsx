@@ -105,15 +105,20 @@ export function QuizTaskEditor({
           return (
             <div
               key={opt.id}
-              onClick={() =>
+              onClick={() => {
+                if (isPassed) return;
                 taskType === 'SINGLE_CHOICE'
                   ? setSelectedSingleId(opt.id)
-                  : handleToggleMultiple(opt.id)
-              }
-              className={`p-4 rounded-xl border transition-all cursor-pointer flex items-center justify-between gap-4 ${
-                active
-                  ? 'bg-indigo-950/50 border-indigo-500 text-white shadow-lg shadow-indigo-500/10'
-                  : 'bg-slate-950/60 border-slate-800 hover:border-slate-700 text-slate-300'
+                  : handleToggleMultiple(opt.id);
+              }}
+              className={`p-4 rounded-xl border transition-all flex items-center justify-between gap-4 ${
+                isPassed
+                  ? active
+                    ? 'bg-emerald-950/40 border-emerald-500/60 text-emerald-200 cursor-default shadow-lg shadow-emerald-950/30'
+                    : 'bg-slate-950/40 border-slate-900 text-slate-500 cursor-not-allowed opacity-60'
+                  : active
+                  ? 'bg-indigo-950/50 border-indigo-500 text-white shadow-lg shadow-indigo-500/10 cursor-pointer'
+                  : 'bg-slate-950/60 border-slate-800 hover:border-slate-700 text-slate-300 cursor-pointer'
               }`}
             >
               <div className="flex items-center gap-3">
@@ -121,7 +126,11 @@ export function QuizTaskEditor({
                   className={`w-6 h-6 rounded-${
                     taskType === 'SINGLE_CHOICE' ? 'full' : 'md'
                   } border flex items-center justify-center font-mono font-bold text-xs transition-all ${
-                    active
+                    isPassed
+                      ? active
+                        ? 'bg-emerald-600 border-emerald-400 text-white'
+                        : 'border-slate-800 bg-slate-900 text-slate-600'
+                      : active
                       ? 'bg-indigo-600 border-indigo-400 text-white'
                       : 'border-slate-700 bg-slate-900 text-slate-400'
                   }`}
@@ -142,7 +151,7 @@ export function QuizTaskEditor({
           disabled={!isPassed}
           className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-xs transition-all ${
             isPassed
-              ? 'bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-500 hover:from-emerald-500 hover:to-teal-400 text-white shadow-lg shadow-emerald-900/40 cursor-pointer border border-emerald-400/40 ring-2 ring-emerald-500/30'
+              ? 'bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-500 hover:from-emerald-500 hover:to-teal-400 text-white shadow-lg shadow-emerald-900/40 cursor-pointer border border-emerald-400/40 ring-2 ring-emerald-500/30 animate-pulse'
               : 'bg-slate-950 text-slate-600 border border-slate-800/80 cursor-not-allowed opacity-50'
           }`}
         >
@@ -152,15 +161,23 @@ export function QuizTaskEditor({
 
         <button
           onClick={handleSubmit}
-          disabled={!canSubmit || isSubmitting}
+          disabled={!canSubmit || isSubmitting || isPassed}
           className={`inline-flex items-center gap-2 px-6 py-2.5 rounded-xl font-bold text-xs transition-all ${
-            canSubmit && !isSubmitting
+            isPassed
+              ? 'bg-slate-900 text-slate-500 cursor-not-allowed border border-slate-800 opacity-60'
+              : canSubmit && !isSubmitting
               ? 'bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-600/30 cursor-pointer'
               : 'bg-slate-800 text-slate-500 cursor-not-allowed border border-slate-700'
           }`}
         >
           <Send className="w-4 h-4" />
-          <span>{isSubmitting ? 'Відправка відповіді...' : 'Відправити Відповідь'}</span>
+          <span>
+            {isPassed
+              ? '✓ Відповідь зараховано'
+              : isSubmitting
+              ? 'Відправка відповіді...'
+              : 'Відправити Відповідь'}
+          </span>
         </button>
       </div>
     </div>
