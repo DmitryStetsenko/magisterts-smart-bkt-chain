@@ -1218,8 +1218,8 @@ export default function TeacherDashboardPage() {
                         <span>Загальні інструменти</span>
                         <span className="px-1.5 py-0.2 rounded text-[9px] font-mono bg-cyan-500/10 text-cyan-300 border border-cyan-500/20">3</span>
                       </span>
-                      <span className="w-4 h-4 rounded flex items-center justify-center text-slate-400 group-hover:text-white group-hover:bg-slate-800 text-xs font-mono font-bold transition-all">
-                        {isGeneralToolsOpen ? '−' : '+'}
+                      <span className="p-0.5 rounded text-slate-400 group-hover:text-white group-hover:bg-slate-800 transition-all flex items-center justify-center">
+                        {isGeneralToolsOpen ? <Minus className="w-4 h-4 stroke-[2.5]" /> : <Plus className="w-4 h-4 stroke-[2.5]" />}
                       </span>
                     </button>
 
@@ -1328,8 +1328,8 @@ export default function TeacherDashboardPage() {
                           {students.length}
                         </span>
                       </div>
-                      <span className="w-4 h-4 rounded flex items-center justify-center text-slate-400 group-hover:text-white group-hover:bg-slate-800 text-xs font-mono font-bold transition-all">
-                        {isStudentsListOpen ? '−' : '+'}
+                      <span className="p-0.5 rounded text-slate-400 group-hover:text-white group-hover:bg-slate-800 transition-all flex items-center justify-center">
+                        {isStudentsListOpen ? <Minus className="w-4 h-4 stroke-[2.5]" /> : <Plus className="w-4 h-4 stroke-[2.5]" />}
                       </span>
                     </button>
 
