@@ -53,11 +53,12 @@ export function QuizTaskEditor({
     return arr;
   }, [taskId, options]);
 
+  // Reset selection only when moving to a different task
   useEffect(() => {
     setStartTime(Date.now());
     setSelectedSingleId('');
     setSelectedMultipleIds([]);
-  }, [taskId, options]);
+  }, [taskId]);
 
   const handleToggleMultiple = (id: string) => {
     setSelectedMultipleIds((prev) =>
@@ -114,32 +115,42 @@ export function QuizTaskEditor({
               className={`p-4 rounded-xl border transition-all flex items-center justify-between gap-4 ${
                 isPassed
                   ? active
-                    ? 'bg-emerald-950/40 border-emerald-500/60 text-emerald-200 cursor-default shadow-lg shadow-emerald-950/30'
-                    : 'bg-slate-950/40 border-slate-900 text-slate-500 cursor-not-allowed opacity-60'
+                    ? 'bg-emerald-950/60 border-emerald-500 text-white shadow-xl shadow-emerald-950/50 ring-2 ring-emerald-500/40 cursor-default'
+                    : 'bg-slate-950/40 border-slate-900 text-slate-400 cursor-not-allowed'
                   : active
                   ? 'bg-indigo-950/50 border-indigo-500 text-white shadow-lg shadow-indigo-500/10 cursor-pointer'
                   : 'bg-slate-950/60 border-slate-800 hover:border-slate-700 text-slate-300 cursor-pointer'
               }`}
             >
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-3 flex-1">
                 <div
                   className={`w-6 h-6 rounded-${
                     taskType === 'SINGLE_CHOICE' ? 'full' : 'md'
-                  } border flex items-center justify-center font-mono font-bold text-xs transition-all ${
+                  } border flex items-center justify-center font-mono font-bold text-xs transition-all shrink-0 ${
                     isPassed
                       ? active
-                        ? 'bg-emerald-600 border-emerald-400 text-white'
+                        ? 'bg-emerald-500 border-emerald-300 text-slate-950 font-black shadow-md'
                         : 'border-slate-800 bg-slate-900 text-slate-600'
                       : active
                       ? 'bg-indigo-600 border-indigo-400 text-white'
                       : 'border-slate-700 bg-slate-900 text-slate-400'
                   }`}
                 >
-                  {active ? <CheckCircle2 className="w-4 h-4" /> : letter}
+                  {active ? <CheckCircle2 className="w-4 h-4 stroke-[3]" /> : letter}
                 </div>
-                <span className="text-sm font-medium">{opt.text}</span>
+                <span className={`text-sm ${active ? 'font-bold text-white' : 'font-medium text-slate-300'}`}>
+                  {opt.text}
+                </span>
               </div>
-              <span className="text-xs font-mono text-slate-600 font-semibold">{letter}</span>
+
+              <div className="flex items-center gap-2 shrink-0">
+                {isPassed && active && (
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase tracking-wider bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 animate-pulse">
+                    ✓ Обрано вами
+                  </span>
+                )}
+                <span className="text-xs font-mono text-slate-600 font-semibold">{letter}</span>
+              </div>
             </div>
           );
         })}
