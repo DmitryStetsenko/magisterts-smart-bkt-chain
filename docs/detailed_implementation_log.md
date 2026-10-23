@@ -1548,6 +1548,21 @@ eferenceAnswer, критерії options.keywords (microtask|мікротаск|
 - **Тестування:**
   - `npm run build:teacher` успішно завершено (код 0) ✅.
 
+### 11.38. Регламентація Правила 7: Стандарт Секцій Бокових Панелей у Workspace Rules (SBC-262)
+- **Контекст та Мета:** Закріпити створений та узгоджений патерн акордеон-секцій у бокових панелях (`apps/teacher`, `apps/student`, `apps/admin`) на рівні обов'язкових правил репозиторію ([`.agents/AGENTS.md`](file:///.agents/AGENTS.md)), щоб унеможливити відхилення та гарантувати консистентний дизайн нових модулів.
+- **Регламентовані Вимоги Правила 7:**
+  1. **Безрамковий чистий дизайн (Borderless Clean Layout):**
+     - Заборонено важкі рамкові картки `border border-slate-800 rounded-2xl bg-slate-900/60`.
+     - Тло сайдбара залишається цільним та глибоким; розділення секцій лише тонкими лініями `border-t border-slate-800/80 pt-2.5 mt-2`.
+  2. **Векторні індикатори `Plus` / `Minus`:**
+     - Заборонено використання шевронів `ChevronDown` / `ChevronUp` для секцій сайдбара.
+     - Обов'язкові Lucide іконки: `<Minus className="w-4 h-4 stroke-[2.5]" />` при відкритому стані, `<Plus className="w-4 h-4 stroke-[2.5]" />` при закритому.
+     - Ховер-контейнер `p-0.5 rounded text-slate-400 group-hover:text-white group-hover:bg-slate-800 transition-all`.
+  3. **Шапка-кнопка:** Повнорозмірна кнопка `w-full flex items-center justify-between text-left px-0.5 py-1 text-slate-400 hover:text-white transition-colors cursor-pointer group` із заголовком `text-[11px] font-bold uppercase tracking-wider` та числовим бейджем кількості елементів.
+  4. **Анімація та обрізання скролу:** Використання `animate-fadeIn` для тіла секції та `max-h-[calc(100vh-...)] overflow-y-auto pr-1` для скрольованих переліків.
+- **Тестування та Верифікація:**
+  - Оновлено [`.agents/AGENTS.md`](file:///.agents/AGENTS.md) та регламентні документи.
+
 
 
 

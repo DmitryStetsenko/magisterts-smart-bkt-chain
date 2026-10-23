@@ -5565,6 +5565,61 @@
               "subitems": []
             }
           ]
+        },
+        {
+          "title": "11.38. Регламентація Правила 7: Стандарт Секцій Бокових Панелей у Workspace Rules (SBC-262)",
+          "level": 3,
+          "paragraphs": [],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "**Контекст та Мета:** Закріпити створений та узгоджений патерн акордеон-секцій у бокових панелях (`apps/teacher`, `apps/student`, `apps/admin`) на рівні обов'язкових правил репозиторію ([`.agents/AGENTS.md`](file:///.agents/AGENTS.md)), щоб унеможливити відхилення та гарантувати консистентний дизайн нових модулів.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Регламентовані Вимоги Правила 7:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Безрамковий чистий дизайн (Borderless Clean Layout):**",
+              "subitems": [
+                "Заборонено важкі рамкові картки `border border-slate-800 rounded-2xl bg-slate-900/60`.",
+                "Тло сайдбара залишається цільним та глибоким; розділення секцій лише тонкими лініями `border-t border-slate-800/80 pt-2.5 mt-2`."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Векторні індикатори `Plus` / `Minus`:**",
+              "subitems": [
+                "Заборонено використання шевронів `ChevronDown` / `ChevronUp` для секцій сайдбара.",
+                "Обов'язкові Lucide іконки: `<Minus className=\"w-4 h-4 stroke-[2.5]\" />` при відкритому стані, `<Plus className=\"w-4 h-4 stroke-[2.5]\" />` при закритому.",
+                "Ховер-контейнер `p-0.5 rounded text-slate-400 group-hover:text-white group-hover:bg-slate-800 transition-all`."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Шапка-кнопка:** Повнорозмірна кнопка `w-full flex items-center justify-between text-left px-0.5 py-1 text-slate-400 hover:text-white transition-colors cursor-pointer group` із заголовком `text-[11px] font-bold uppercase tracking-wider` та числовим бейджем кількості елементів.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Анімація та обрізання скролу:** Використання `animate-fadeIn` для тіла секції та `max-h-[calc(100vh-...)] overflow-y-auto pr-1` для скрольованих переліків.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Тестування та Верифікація:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Оновлено [`.agents/AGENTS.md`](file:///.agents/AGENTS.md) та регламентні документи.",
+              "subitems": []
+            }
+          ]
         }
       ]
     }

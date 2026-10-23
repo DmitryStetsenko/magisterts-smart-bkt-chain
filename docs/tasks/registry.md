@@ -311,7 +311,8 @@
 | **SBC-258** | `Style` | `TC` | position general tools section first in teacher metrics audit side drawer | 2026-10-23 | `3d65b18` |
 | **SBC-259** | `Story` | `TC` | implement collapsible accordions for general tools and student list in metrics audit drawer | 2026-10-23 | `0e4c47f` |
 | **SBC-260** | `Style` | `TC` | remove outer section borders and use minimalist plus-minus collapse toggles in audit drawer | 2026-10-23 | `6434d90` |
-| **SBC-261** | `Style` | `TC` | replace text toggles with enlarged Lucide Plus and Minus icons in drawer sections | 2026-10-23 | Pending |
+| **SBC-261** | `Style` | `TC` | replace text toggles with enlarged Lucide Plus and Minus icons in drawer sections | 2026-10-23 | `64f80b2` |
+| **SBC-262** | `Task` | `INF` | establish Rule 7 for Side Drawer Sections Standard in workspace rules and docs | 2026-10-23 | Pending |
 
 ---
 
