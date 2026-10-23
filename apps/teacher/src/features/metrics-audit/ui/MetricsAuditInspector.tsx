@@ -19,7 +19,9 @@ import {
   Compass,
   Sliders,
   Shield,
-  BookMarked
+  BookMarked,
+  User,
+  Globe
 } from 'lucide-react';
 import { StudentAnalyticsItem } from '../../analytics/model/analytics.types';
 
@@ -300,7 +302,7 @@ export function MetricsAuditInspector({
         expected: 'Статус PROFICIENT (відкриває дочірні вершини в дереві навичок)',
         fn: () => {
           const sub = computeBktMath({
-            priorL: 0.70,
+            priorL: 0.60,
             pTransit: 0.2,
             pSlip: 0.1,
             pGuess: 0.2,
@@ -308,7 +310,7 @@ export function MetricsAuditInspector({
             taskType: 'SINGLE_CHOICE',
             reactionLatencyMs: 6000,
           });
-          const pass = sub.posteriorL >= 0.75 && sub.masteryStatus === 'PROFICIENT';
+          const pass = sub.posteriorL >= 0.75 && sub.posteriorL < 0.90 && sub.masteryStatus === 'PROFICIENT';
           return { pass, actual: `P(L)=${sub.posteriorL} => Статус: ${sub.masteryStatus}` };
         },
       },
@@ -506,55 +508,75 @@ export function MetricsAuditInspector({
             </div>
           </div>
 
-          {/* Sub-Navigation Buttons */}
-          <div className="flex items-center gap-1.5 bg-slate-900/90 p-1.5 rounded-2xl border border-slate-800 shadow-inner shrink-0">
-            <button
-              onClick={() => setActiveSubTab('live-log')}
-              className={`px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-2 transition-all cursor-pointer ${
-                activeSubTab === 'live-log'
-                  ? 'bg-purple-600 text-white shadow-md shadow-purple-600/30'
-                  : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
-              }`}
-            >
-              <Calculator className="w-3.5 h-3.5" />
-              <span>Формула Студента</span>
-            </button>
+          {/* Sub-Navigation Buttons with Explicit Separation: Student-Specific vs Global System */}
+          <div className="flex flex-wrap items-center gap-2.5">
+            {/* GROUP 1: Персональний аудит студента */}
+            <div className="flex items-center gap-1 bg-slate-900/90 p-1.5 rounded-2xl border border-purple-500/30 shadow-inner">
+              <span className="text-[10px] font-mono uppercase tracking-wider font-bold text-purple-400 px-2 py-0.5 flex items-center gap-1 border-r border-slate-800 mr-0.5">
+                <User className="w-3 h-3 text-purple-400" />
+                <span>Студент:</span>
+              </span>
+              <button
+                onClick={() => setActiveSubTab('live-log')}
+                className={`px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-2 transition-all cursor-pointer ${
+                  activeSubTab === 'live-log'
+                    ? 'bg-purple-600 text-white shadow-md shadow-purple-600/30'
+                    : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
+                }`}
+              >
+                <Calculator className="w-3.5 h-3.5 text-purple-300" />
+                <span>Формула Студента</span>
+                {student && (
+                  <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-purple-950/80 text-purple-200 border border-purple-500/30">
+                    {student.name.split(' ')[0]}
+                  </span>
+                )}
+              </button>
+            </div>
 
-            <button
-              onClick={() => setActiveSubTab('what-if')}
-              className={`px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-2 transition-all cursor-pointer ${
-                activeSubTab === 'what-if'
-                  ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-md shadow-indigo-600/30'
-                  : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
-              }`}
-            >
-              <Sparkles className="w-3.5 h-3.5" />
-              <span>Пісочниця "What-If"</span>
-            </button>
+            {/* GROUP 2: Загальносистемні алгоритми та верифікація */}
+            <div className="flex items-center gap-1 bg-slate-900/90 p-1.5 rounded-2xl border border-slate-800 shadow-inner">
+              <span className="text-[10px] font-mono uppercase tracking-wider font-bold text-slate-400 px-2 py-0.5 flex items-center gap-1 border-r border-slate-800 mr-0.5">
+                <Globe className="w-3 h-3 text-cyan-400" />
+                <span>Загальні:</span>
+              </span>
 
-            <button
-              onClick={() => setActiveSubTab('test-matrix')}
-              className={`px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-2 transition-all cursor-pointer ${
-                activeSubTab === 'test-matrix'
-                  ? 'bg-emerald-600 text-white shadow-md shadow-emerald-600/30'
-                  : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
-              }`}
-            >
-              <ShieldCheck className="w-3.5 h-3.5" />
-              <span>Еталонна Матриця ({totalPass}/{testMatrix.length})</span>
-            </button>
+              <button
+                onClick={() => setActiveSubTab('what-if')}
+                className={`px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
+                  activeSubTab === 'what-if'
+                    ? 'bg-gradient-to-r from-indigo-600 to-cyan-600 text-white shadow-md shadow-indigo-600/30'
+                    : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                }`}
+              >
+                <Sparkles className="w-3.5 h-3.5 text-cyan-300" />
+                <span>Пісочниця "What-If"</span>
+              </button>
 
-            <button
-              onClick={() => setActiveSubTab('mechanisms')}
-              className={`px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-2 transition-all cursor-pointer ${
-                activeSubTab === 'mechanisms'
-                  ? 'bg-amber-600 text-white shadow-md shadow-amber-600/30'
-                  : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
-              }`}
-            >
-              <Compass className="w-3.5 h-3.5 text-amber-300" />
-              <span>Реєстр Механізмів (4-in-1)</span>
-            </button>
+              <button
+                onClick={() => setActiveSubTab('test-matrix')}
+                className={`px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
+                  activeSubTab === 'test-matrix'
+                    ? 'bg-emerald-600 text-white shadow-md shadow-emerald-600/30'
+                    : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                }`}
+              >
+                <ShieldCheck className="w-3.5 h-3.5 text-emerald-300" />
+                <span>Еталонна Матриця ({totalPass}/{testMatrix.length})</span>
+              </button>
+
+              <button
+                onClick={() => setActiveSubTab('mechanisms')}
+                className={`px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
+                  activeSubTab === 'mechanisms'
+                    ? 'bg-amber-600 text-white shadow-md shadow-amber-600/30'
+                    : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                }`}
+              >
+                <Compass className="w-3.5 h-3.5 text-amber-300" />
+                <span>Реєстр Механізмів (4-in-1)</span>
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -565,6 +587,18 @@ export function MetricsAuditInspector({
         {/* ════════ SUB-TAB 1: LIVE STUDENT BAYES BREAKDOWN ════════ */}
         {activeSubTab === 'live-log' && (
           <div className="flex flex-col gap-6">
+            {/* Scope Breadcrumb */}
+            <div className="bg-purple-950/20 border border-purple-500/30 rounded-xl px-4 py-2.5 flex items-center justify-between">
+              <div className="flex items-center gap-2 text-xs">
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-purple-500/15 text-purple-300 border border-purple-500/30 flex items-center gap-1">
+                  <User className="w-3 h-3 text-purple-400" />
+                  <span>ПЕРСОНАЛЬНИЙ АУДИТ СТУДЕНТА</span>
+                </span>
+                <span className="text-slate-400">•</span>
+                <span className="text-slate-300 font-medium">Аналіз відповідей та декомпозиція Баєса для: <strong className="text-white">{student?.name || 'не обрано'}</strong></span>
+              </div>
+            </div>
+
             {/* Student Selector Card */}
             <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-xl">
               <div className="flex items-center gap-3">
@@ -851,11 +885,24 @@ export function MetricsAuditInspector({
 
         {/* ════════ SUB-TAB 2: WHAT-IF SIMULATION SANDBOX ════════ */}
         {activeSubTab === 'what-if' && (
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-            {/* Left Control Panel: Inputs and Sliders (7 Cols) */}
-            <div className="lg:col-span-7 bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl flex flex-col gap-5">
-              <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-                <h3 className="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
+          <div className="flex flex-col gap-4">
+            {/* Scope Breadcrumb */}
+            <div className="bg-slate-900/60 border border-slate-800 rounded-xl px-4 py-2.5 flex items-center justify-between">
+              <div className="flex items-center gap-2 text-xs">
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-cyan-500/10 text-cyan-300 border border-cyan-500/30 flex items-center gap-1">
+                  <Globe className="w-3 h-3 text-cyan-400" />
+                  <span>ЗАГАЛЬНОСИСТЕМНИЙ ІНСТРУМЕНТ</span>
+                </span>
+                <span className="text-slate-400">•</span>
+                <span className="text-slate-300 font-medium">Пісочниця "What-If" не змінює базу даних і працює ізольовано як математичний тренажер</span>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+              {/* Left Control Panel: Inputs and Sliders (7 Cols) */}
+              <div className="lg:col-span-7 bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl flex flex-col gap-5">
+                <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+                  <h3 className="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
                   <Sparkles className="w-4 h-4 text-indigo-400" />
                   <span>Параметри Симуляції (Вхідні Дані)</span>
                 </h3>
@@ -1157,11 +1204,24 @@ export function MetricsAuditInspector({
               </div>
             </div>
           </div>
+        </div>
         )}
 
         {/* ════════ SUB-TAB 3: GOLD STANDARD VERIFICATION TEST MATRIX ════════ */}
         {activeSubTab === 'test-matrix' && (
           <div className="flex flex-col gap-4">
+            {/* Scope Breadcrumb */}
+            <div className="bg-slate-900/60 border border-slate-800 rounded-xl px-4 py-2.5 flex items-center justify-between">
+              <div className="flex items-center gap-2 text-xs">
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-cyan-500/10 text-cyan-300 border border-cyan-500/30 flex items-center gap-1">
+                  <Globe className="w-3 h-3 text-cyan-400" />
+                  <span>ЗАГАЛЬНОСИСТЕМНИЙ ІНСТРУМЕНТ</span>
+                </span>
+                <span className="text-slate-400">•</span>
+                <span className="text-slate-300 font-medium">Автоматизована верифікація ядрових бізнес-правил моделі BKT (не прив'язана до одного учня)</span>
+              </div>
+            </div>
+
             <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-xl">
               <div>
                 <h3 className="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
@@ -1225,6 +1285,18 @@ export function MetricsAuditInspector({
         {/* ════════ SUB-TAB 4: COMPREHENSIVE MECHANISMS REGISTRY ════════ */}
         {activeSubTab === 'mechanisms' && (
           <div className="flex flex-col gap-6 animate-fadeIn">
+            {/* Scope Breadcrumb */}
+            <div className="bg-slate-900/60 border border-slate-800 rounded-xl px-4 py-2.5 flex items-center justify-between">
+              <div className="flex items-center gap-2 text-xs">
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-cyan-500/10 text-cyan-300 border border-cyan-500/30 flex items-center gap-1">
+                  <Globe className="w-3 h-3 text-cyan-400" />
+                  <span>ЗАГАЛЬНОСИСТЕМНИЙ ІНСТРУМЕНТ</span>
+                </span>
+                <span className="text-slate-400">•</span>
+                <span className="text-slate-300 font-medium">Централізований нормативний довідник усіх 14 правил, коефіцієнтів та алгоритмічних захистів платформи</span>
+              </div>
+            </div>
+
             {/* Banner Header */}
             <div className="bg-gradient-to-r from-amber-950/40 via-slate-900 to-purple-950/40 border border-amber-500/30 rounded-2xl p-6 shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-4">
               <div className="flex items-center gap-3.5">

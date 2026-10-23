@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { io } from 'socket.io-client';
-import { ShieldCheck, Network, Users, BarChart3, Code2, BookOpen, Scale, ChevronDown, X, Search, RotateCcw, AlertTriangle, CheckCircle2, Lock, HelpCircle, Code, FileText, CheckSquare, Sparkles, Keyboard, Copy, Activity, Info, GitBranch, Layers, ClipboardCheck, Tag, FlaskConical, Compass } from 'lucide-react';
+import { ShieldCheck, Network, Users, BarChart3, Code2, BookOpen, Scale, ChevronDown, X, Search, RotateCcw, AlertTriangle, CheckCircle2, Lock, HelpCircle, Code, FileText, CheckSquare, Sparkles, Keyboard, Copy, Activity, Info, GitBranch, Layers, ClipboardCheck, Tag, FlaskConical, Compass, User, Globe } from 'lucide-react';
 import { StudentAnalyticsItem } from '../features/analytics/model/analytics.types';
 import { AnomalyTreeWidget, GameSkillTreeWidget, SkillGraphNode } from '@sbc/ui';
 import { ReviewQueueInspector } from '../features/reviews/ui/ReviewQueueInspector';
@@ -1202,77 +1202,152 @@ export default function TeacherDashboardPage() {
               )}
 
               {/* Drawer: Metrics Audit Student List */}
+              {/* Drawer: Metrics Audit - Distinct sections for Personal Student Audit vs General Tools */}
               {activeTab === 'metrics-audit' && (
-                <div className="flex flex-col gap-3">
-                  {/* Quick-Access to Mechanisms Catalog */}
-                  <button
-                    onClick={() => {
-                      setAuditSubTab('mechanisms');
-                    }}
-                    className={`w-full p-2.5 rounded-xl border text-left flex items-center justify-between transition-all cursor-pointer shadow-sm ${
-                      auditSubTab === 'mechanisms'
-                        ? 'bg-amber-950/60 border-amber-500 text-white shadow-amber-950/40 ring-1 ring-amber-500/50'
-                        : 'bg-gradient-to-r from-amber-950/30 to-purple-950/30 border-amber-500/30 hover:border-amber-400/60 text-amber-200'
-                    }`}
-                  >
-                    <div className="flex items-center gap-2.5 overflow-hidden">
-                      <div className="p-1.5 rounded-lg bg-amber-500/20 text-amber-300 shrink-0">
-                        <Compass className="w-4 h-4" />
-                      </div>
-                      <div className="overflow-hidden">
-                        <div className="text-xs font-bold text-white truncate flex items-center gap-1.5">
-                          <span>Реєстр Механізмів</span>
-                          <span className="px-1.5 py-0.2 rounded text-[9px] font-mono bg-amber-500/20 text-amber-300 border border-amber-500/30">
-                            4-in-1
-                          </span>
-                        </div>
-                        <div className="text-[10px] text-slate-400 truncate">
-                          Спрощення, підказки, телеметрія
-                        </div>
-                      </div>
+                <div className="flex flex-col gap-4">
+                  {/* SECTION 1: Персональний аудит конкретного студента */}
+                  <div className="flex flex-col gap-2">
+                    <div className="flex items-center justify-between text-[11px] font-bold uppercase tracking-wider text-purple-400 px-0.5">
+                      <span className="flex items-center gap-1.5">
+                        <User className="w-3.5 h-3.5 text-purple-400" />
+                        <span>Студенти для аудиту</span>
+                      </span>
+                      <span className="font-mono text-[10px] text-slate-500 font-normal">Всього: {students.length}</span>
                     </div>
-                    <span className="text-[11px] text-amber-400 font-bold shrink-0">➔</span>
-                  </button>
 
-                  <div className="text-[11px] text-slate-400 flex items-center justify-between pt-1 border-t border-slate-800/80">
-                    <span>Студенти для аудиту:</span>
-                    <span className="font-mono text-[10px] text-slate-500">Всього: {students.length}</span>
+                    <div className="flex flex-col gap-1.5 max-h-[calc(100vh-380px)] overflow-y-auto pr-1">
+                      {students.map((st) => {
+                        const stId = st.id || st.studentId || st.email;
+                        const isSelected = selectedStudentId === stId;
+                        const avgMastery = st.averageMastery !== undefined ? (st.averageMastery * 100).toFixed(0) : '0';
+
+                        return (
+                          <div
+                            key={stId}
+                            onClick={() => {
+                              setSelectedStudentId(stId);
+                              setAuditSubTab('live-log');
+                            }}
+                            className={`p-2.5 rounded-xl border transition-all cursor-pointer flex items-center justify-between gap-2 ${
+                              isSelected && auditSubTab === 'live-log'
+                                ? 'bg-purple-950/40 border-purple-500 shadow-md ring-1 ring-purple-500/50 text-white'
+                                : 'bg-slate-950/80 border-slate-800/80 hover:bg-slate-800/50 hover:border-slate-700 text-slate-300'
+                            }`}
+                          >
+                            <div className="overflow-hidden">
+                              <div className="text-xs font-bold truncate flex items-center gap-1.5">
+                                <span>{st.name}</span>
+                                {isSelected && auditSubTab === 'live-log' && <span className="text-[10px] text-purple-400">●</span>}
+                              </div>
+                              <div className="text-[11px] text-slate-400 truncate font-mono">{st.email}</div>
+                            </div>
+                            <div className="flex flex-col items-end shrink-0">
+                              <span className="text-xs font-mono font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
+                                {avgMastery}% P(L)
+                              </span>
+                              <span className="text-[10px] text-slate-400 font-mono mt-0.5">
+                                Спроб: {st.recentAdjustments?.length || 0}
+                              </span>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
                   </div>
 
-                  <div className="flex flex-col gap-1.5 max-h-[calc(100vh-280px)] overflow-y-auto pr-1">
-                    {students.map((st) => {
-                      const stId = st.id || st.studentId || st.email;
-                      const isSelected = selectedStudentId === stId;
-                      const avgMastery = st.averageMastery !== undefined ? (st.averageMastery * 100).toFixed(0) : '0';
+                  {/* SECTION 2: Загальні системні інструменти (Не прив'язані до студента) */}
+                  <div className="flex flex-col gap-2 pt-2 border-t border-slate-800/80">
+                    <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 px-0.5 flex items-center gap-1.5">
+                      <Globe className="w-3.5 h-3.5 text-cyan-400" />
+                      <span>Загальні інструменти</span>
+                    </span>
 
-                      return (
-                        <div
-                          key={stId}
-                          onClick={() => setSelectedStudentId(stId)}
-                          className={`p-2.5 rounded-xl border transition-all cursor-pointer flex items-center justify-between gap-2 ${
-                            isSelected
-                              ? 'bg-emerald-950/40 border-emerald-500 shadow-md ring-1 ring-emerald-500/50 text-white'
-                              : 'bg-slate-950/80 border-slate-800/80 hover:bg-slate-800/50 hover:border-slate-700 text-slate-300'
-                          }`}
-                        >
-                          <div className="overflow-hidden">
-                            <div className="text-xs font-bold truncate flex items-center gap-1.5">
-                              <span>{st.name}</span>
-                              {isSelected && <span className="text-[10px] text-emerald-400">●</span>}
-                            </div>
-                            <div className="text-[11px] text-slate-400 truncate font-mono">{st.email}</div>
+                    {/* Quick-Access to Mechanisms Catalog */}
+                    <button
+                      onClick={() => {
+                        setAuditSubTab('mechanisms');
+                      }}
+                      className={`w-full p-2.5 rounded-xl border text-left flex items-center justify-between transition-all cursor-pointer shadow-sm ${
+                        auditSubTab === 'mechanisms'
+                          ? 'bg-amber-950/60 border-amber-500 text-white shadow-amber-950/40 ring-1 ring-amber-500/50'
+                          : 'bg-slate-950/80 border-slate-800/80 hover:border-amber-500/40 text-slate-300'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2.5 overflow-hidden">
+                        <div className="p-1.5 rounded-lg bg-amber-500/20 text-amber-300 shrink-0">
+                          <Compass className="w-4 h-4" />
+                        </div>
+                        <div className="overflow-hidden">
+                          <div className="text-xs font-bold text-white truncate flex items-center gap-1.5">
+                            <span>Реєстр Механізмів</span>
+                            <span className="px-1.5 py-0.2 rounded text-[9px] font-mono bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                              4-in-1
+                            </span>
                           </div>
-                          <div className="flex flex-col items-end shrink-0">
-                            <span className="text-xs font-mono font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
-                              {avgMastery}% P(L)
-                            </span>
-                            <span className="text-[10px] text-slate-400 font-mono mt-0.5">
-                              Спроб: {st.recentAdjustments?.length || 0}
-                            </span>
+                          <div className="text-[10px] text-slate-400 truncate">
+                            Спрощення, підказки, телеметрія
                           </div>
                         </div>
-                      );
-                    })}
+                      </div>
+                      <span className="text-[11px] text-amber-400 font-bold shrink-0">➔</span>
+                    </button>
+
+                    {/* Quick-Access to Gold Standard Matrix */}
+                    <button
+                      onClick={() => {
+                        setAuditSubTab('test-matrix');
+                      }}
+                      className={`w-full p-2.5 rounded-xl border text-left flex items-center justify-between transition-all cursor-pointer shadow-sm ${
+                        auditSubTab === 'test-matrix'
+                          ? 'bg-emerald-950/60 border-emerald-500 text-white shadow-emerald-950/40 ring-1 ring-emerald-500/50'
+                          : 'bg-slate-950/80 border-slate-800/80 hover:border-emerald-500/40 text-slate-300'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2.5 overflow-hidden">
+                        <div className="p-1.5 rounded-lg bg-emerald-500/20 text-emerald-300 shrink-0">
+                          <ShieldCheck className="w-4 h-4" />
+                        </div>
+                        <div className="overflow-hidden">
+                          <div className="text-xs font-bold text-white truncate flex items-center gap-1.5">
+                            <span>Еталонна Матриця</span>
+                            <span className="px-1.5 py-0.2 rounded text-[9px] font-mono bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                              6/6 PASS
+                            </span>
+                          </div>
+                          <div className="text-[10px] text-slate-400 truncate">
+                            Автоматична верифікація правил
+                          </div>
+                        </div>
+                      </div>
+                      <span className="text-[11px] text-emerald-400 font-bold shrink-0">➔</span>
+                    </button>
+
+                    {/* Quick-Access to What-If Sandbox */}
+                    <button
+                      onClick={() => {
+                        setAuditSubTab('what-if');
+                      }}
+                      className={`w-full p-2.5 rounded-xl border text-left flex items-center justify-between transition-all cursor-pointer shadow-sm ${
+                        auditSubTab === 'what-if'
+                          ? 'bg-indigo-950/60 border-indigo-500 text-white shadow-indigo-950/40 ring-1 ring-indigo-500/50'
+                          : 'bg-slate-950/80 border-slate-800/80 hover:border-indigo-500/40 text-slate-300'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2.5 overflow-hidden">
+                        <div className="p-1.5 rounded-lg bg-indigo-500/20 text-indigo-300 shrink-0">
+                          <Sparkles className="w-4 h-4" />
+                        </div>
+                        <div className="overflow-hidden">
+                          <div className="text-xs font-bold text-white truncate flex items-center gap-1.5">
+                            <span>Пісочниця "What-If"</span>
+                          </div>
+                          <div className="text-[10px] text-slate-400 truncate">
+                            Інтерактивний тренажер параметрів
+                          </div>
+                        </div>
+                      </div>
+                      <span className="text-[11px] text-indigo-400 font-bold shrink-0">➔</span>
+                    </button>
                   </div>
                 </div>
               )}
