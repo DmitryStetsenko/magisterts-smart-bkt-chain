@@ -1581,6 +1581,22 @@ eferenceAnswer, критерії options.keywords (microtask|мікротаск|
 - **Тестування:**
   - `npm run build:teacher` успішно пройшов усі фази (Next.js 16 Turbopack, 0 помилок) ✅.
 
+### 11.40. Спільний UI-компонент DrawerSection та Секційність Черги Перевірки (SBC-264)
+- **Контекст та Мета:** Реалізувати принцип DRY & Reusability (Правило 6), створивши модульний компонент `DrawerSection` у `@sbc/ui`, та рефакторити монолітний сайдбар черги рецензування (`reviews`) та налаштувань (`settings`) на структуровані акордеон-секції за Правилом 7.
+- **Компоненти та Зміни:**
+  1. **Спільний компонент [`DrawerSection.tsx`](file:///packages/ui/src/drawer/DrawerSection.tsx):**
+     - Інтерфейс `DrawerSectionProps` (`title`, `icon`, `badge`, `badgeColor`, `defaultOpen`, `isOpen`, `onToggle`, `action`, `children`).
+     - Повна інтеграція стилів Правила 7: доступний `button` на всю ширину, векторні піктограми `Plus`/`Minus` (`w-4 h-4 stroke-[2.5]`), плавна анімація `animate-fadeIn`.
+     - Експортовано в кореневому [`packages/ui/src/index.ts`](file:///packages/ui/src/index.ts).
+  2. **Сайдбар Черги Рецензування (`reviews`):**
+     - *Секція 1: «Режим Черги»* — стан `isReviewFilterOpen`, таби `⏳ В черзі` vs `✓ Перевірені`, бейдж режиму, `Plus`/`Minus`.
+     - *Секція 2: «Роботи Студентів»* — стан `isReviewItemsOpen`, тонкий розділювач `border-t border-slate-800/80 pt-2`, лічильник робіт `{reviewQueue.length}`, список відповідей, `Plus`/`Minus`.
+  3. **Сайдбар Налаштувань (`settings`):**
+     - *Секція 1: «Поріг Майстерності BKT»* — стан `isBktThresholdsOpen`, бейдж `P(L) ≥ 0.95`, `Plus`/`Minus`.
+     - *Секція 2: «Штраф за Згадування»* — стан `isGuessPenaltiesOpen`, бейдж `P(G)`, `Plus`/`Minus`.
+- **Тестування:**
+  - `npm run build:teacher` успішно пройшов збірку без жодних зауважень (0 помилок) ✅.
+
 
 
 

@@ -138,6 +138,11 @@ export default function TeacherDashboardPage() {
 
   // Teacher Review Queue State & Filter Tab ('pending' | 'reviewed')
   const [reviewFilterTab, setReviewFilterTab] = useState<'pending' | 'reviewed'>('pending');
+  const [isReviewFilterOpen, setIsReviewFilterOpen] = useState<boolean>(true);
+  const [isReviewItemsOpen, setIsReviewItemsOpen] = useState<boolean>(true);
+  // Settings Drawer State (Rule 7)
+  const [isBktThresholdsOpen, setIsBktThresholdsOpen] = useState<boolean>(true);
+  const [isGuessPenaltiesOpen, setIsGuessPenaltiesOpen] = useState<boolean>(true);
   const [reviewQueue, setReviewQueue] = useState<any[]>([]);
   const [selectedReviewId, setSelectedReviewId] = useState<string | null>(null);
   const [isReviewSubmitting, setIsReviewSubmitting] = useState<boolean>(false);
@@ -1171,99 +1176,145 @@ export default function TeacherDashboardPage() {
                 </div>
               )}
 
-              {/* Drawer: Review Queue List */}
+              {/* Drawer: Review Queue List (Rule 7 Standard) */}
               {activeTab === 'reviews' && (
                 <div className="flex flex-col gap-3">
-                  {/* Review Queue Filter Tabs: Pending vs Reviewed Archive */}
-                  <div className="bg-slate-950 p-1 rounded-xl border border-slate-800 flex items-center gap-1 shadow-inner">
+                  {/* Section 1: Режими Черги (Фільтрація) */}
+                  <div className="flex flex-col gap-2">
                     <button
-                      onClick={() => setReviewFilterTab('pending')}
-                      className={`flex-1 py-1.5 px-3 rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
-                        reviewFilterTab === 'pending'
-                          ? 'bg-amber-600 text-white shadow-md shadow-amber-600/30'
-                          : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
-                      }`}
+                      onClick={() => setIsReviewFilterOpen((prev) => !prev)}
+                      className="w-full flex items-center justify-between text-left px-0.5 py-1 text-slate-400 hover:text-white transition-colors cursor-pointer group"
                     >
-                      <span>⏳ В черзі</span>
+                      <span className="text-[11px] font-bold uppercase tracking-wider text-amber-400 flex items-center gap-1.5 group-hover:text-amber-300 transition-colors">
+                        <ClipboardCheck className="w-3.5 h-3.5 text-amber-400" />
+                        <span>Режим Черги</span>
+                        <span className="px-1.5 py-0.2 rounded text-[9px] font-mono bg-amber-500/10 text-amber-300 border border-amber-500/20">
+                          {reviewFilterTab === 'pending' ? 'В черзі' : 'Архів'}
+                        </span>
+                      </span>
+                      <span className="p-0.5 rounded text-slate-400 group-hover:text-white group-hover:bg-slate-800 transition-all flex items-center justify-center">
+                        {isReviewFilterOpen ? <Minus className="w-4 h-4 stroke-[2.5]" /> : <Plus className="w-4 h-4 stroke-[2.5]" />}
+                      </span>
                     </button>
-                    <button
-                      onClick={() => setReviewFilterTab('reviewed')}
-                      className={`flex-1 py-1.5 px-3 rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
-                        reviewFilterTab === 'reviewed'
-                          ? 'bg-purple-600 text-white shadow-md shadow-purple-600/30'
-                          : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
-                      }`}
-                    >
-                      <span>✓ Перевірені</span>
-                    </button>
-                  </div>
 
-                  <div className="text-[11px] text-slate-400">
-                    {reviewFilterTab === 'pending'
-                      ? 'Відповіді, що потрапили у «сіру зону» або вимагають верифікації викладачем:'
-                      : 'Архів уже перевірених та оцінених викладачем відкритих робіт:'}
-                  </div>
-
-                  {reviewQueue.length === 0 ? (
-                    <div className="p-6 text-center text-xs text-slate-500 bg-slate-950/60 rounded-xl border border-slate-800">
-                      {reviewFilterTab === 'pending'
-                        ? 'Черга перевірки порожня. Усі відкриті відповіді оцінені.'
-                        : 'Немає перевірених робіт в архіві.'}
-                    </div>
-                  ) : (
-                    <div className="flex flex-col gap-2 mt-1">
-                      {reviewQueue.map((item) => {
-                        const isSelected = selectedReviewId === item.submissionId;
-                        const isApproved = item.teacherReviewStatus === 'APPROVED';
-                        const isRejected = item.teacherReviewStatus === 'REJECTED';
-
-                        return (
-                          <div
-                            key={item.submissionId}
-                            onClick={() => setSelectedReviewId(item.submissionId)}
-                            className={`p-3 rounded-xl border transition-all cursor-pointer flex flex-col gap-1.5 ${
-                              isSelected
-                                ? isApproved
-                                  ? 'bg-emerald-950/40 border-emerald-500 shadow-md shadow-emerald-950/50 ring-1 ring-emerald-500/50'
-                                  : isRejected
-                                  ? 'bg-rose-950/40 border-rose-500 shadow-md shadow-rose-950/50 ring-1 ring-rose-500/50'
-                                  : 'bg-amber-950/40 border-amber-500 shadow-md shadow-amber-950/50 ring-1 ring-amber-500/50'
-                                : 'bg-slate-950/80 border-slate-800/80 hover:bg-slate-800/50 hover:border-slate-700'
+                    {isReviewFilterOpen && (
+                      <div className="flex flex-col gap-2 animate-fadeIn">
+                        {/* Review Queue Filter Tabs: Pending vs Reviewed Archive */}
+                        <div className="bg-slate-950 p-1 rounded-xl border border-slate-800 flex items-center gap-1 shadow-inner">
+                          <button
+                            onClick={() => setReviewFilterTab('pending')}
+                            className={`flex-1 py-1.5 px-3 rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
+                              reviewFilterTab === 'pending'
+                                ? 'bg-amber-600 text-white shadow-md shadow-amber-600/30'
+                                : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
                             }`}
                           >
-                            <div className="flex items-center justify-between">
-                              <span className="text-xs font-bold text-white truncate">{item.studentName}</span>
-                              <div className="flex items-center gap-1">
-                                {(item.attemptNumber || (item.attemptsHistory && item.attemptsHistory.length > 1)) && (
-                                  <span className="px-1.5 py-0.5 rounded text-[9px] font-mono font-bold bg-purple-500/10 text-purple-300 border border-purple-500/30">
-                                    Спроба {item.attemptNumber || item.attemptsHistory?.length}
-                                  </span>
-                                )}
-                                <span className={`px-1.5 py-0.5 rounded text-[9px] font-mono font-bold ${
-                                  isApproved
-                                    ? 'bg-emerald-500/10 text-emerald-300 border border-emerald-500/30'
-                                    : isRejected
-                                    ? 'bg-rose-500/10 text-rose-300 border border-rose-500/30'
-                                    : 'bg-amber-500/10 text-amber-300 border border-amber-500/30'
-                                }`}>
-                                  {isApproved
-                                    ? '✓ Затверджено'
-                                    : isRejected
-                                    ? '✕ Відхилено'
-                                    : 'В черзі'}
-                                </span>
-                              </div>
-                            </div>
-                            <div className="text-[11px] text-slate-300 font-semibold truncate">{item.taskTitle}</div>
-                            <div className="text-[10px] text-slate-500 font-mono flex items-center justify-between">
-                              <span>{item.skillTitle}</span>
-                              <span>{new Date(item.submittedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
-                            </div>
+                            <span>⏳ В черзі</span>
+                          </button>
+                          <button
+                            onClick={() => setReviewFilterTab('reviewed')}
+                            className={`flex-1 py-1.5 px-3 rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
+                              reviewFilterTab === 'reviewed'
+                                ? 'bg-purple-600 text-white shadow-md shadow-purple-600/30'
+                                : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                            }`}
+                          >
+                            <span>✓ Перевірені</span>
+                          </button>
+                        </div>
+
+                        <div className="text-[11px] text-slate-400 px-0.5">
+                          {reviewFilterTab === 'pending'
+                            ? 'Відповіді, що потрапили у «сіру зону» або вимагають верифікації викладачем:'
+                            : 'Архів уже перевірених та оцінених викладачем відкритих робіт:'}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Section 2: Роботи Студентів для Оцінювання */}
+                  <div className="flex flex-col gap-2 pt-2 border-t border-slate-800/80">
+                    <button
+                      onClick={() => setIsReviewItemsOpen((prev) => !prev)}
+                      className="w-full flex items-center justify-between text-left px-0.5 py-1 text-slate-400 hover:text-white transition-colors cursor-pointer group"
+                    >
+                      <span className="text-[11px] font-bold uppercase tracking-wider text-purple-400 flex items-center gap-1.5 group-hover:text-purple-300 transition-colors">
+                        <User className="w-3.5 h-3.5 text-purple-400" />
+                        <span>Роботи Студентів</span>
+                        <span className="px-1.5 py-0.2 rounded text-[9px] font-mono bg-purple-500/10 text-purple-300 border border-purple-500/20">
+                          {reviewQueue.length}
+                        </span>
+                      </span>
+                      <span className="p-0.5 rounded text-slate-400 group-hover:text-white group-hover:bg-slate-800 transition-all flex items-center justify-center">
+                        {isReviewItemsOpen ? <Minus className="w-4 h-4 stroke-[2.5]" /> : <Plus className="w-4 h-4 stroke-[2.5]" />}
+                      </span>
+                    </button>
+
+                    {isReviewItemsOpen && (
+                      <div className="flex flex-col gap-2 animate-fadeIn">
+                        {reviewQueue.length === 0 ? (
+                          <div className="p-6 text-center text-xs text-slate-500 bg-slate-950/60 rounded-xl border border-slate-800/80">
+                            {reviewFilterTab === 'pending'
+                              ? 'Черга перевірки порожня. Усі відкриті відповіді оцінені.'
+                              : 'Немає перевірених робіт в архіві.'}
                           </div>
-                        );
-                      })}
-                    </div>
-                  )}
+                        ) : (
+                          <div className="flex flex-col gap-2">
+                            {reviewQueue.map((item) => {
+                              const isSelected = selectedReviewId === item.submissionId;
+                              const isApproved = item.teacherReviewStatus === 'APPROVED';
+                              const isRejected = item.teacherReviewStatus === 'REJECTED';
+
+                              return (
+                                <div
+                                  key={item.submissionId}
+                                  onClick={() => setSelectedReviewId(item.submissionId)}
+                                  className={`p-3 rounded-xl border transition-all cursor-pointer flex flex-col gap-1.5 ${
+                                    isSelected
+                                      ? isApproved
+                                        ? 'bg-emerald-950/40 border-emerald-500 shadow-md shadow-emerald-950/50 ring-1 ring-emerald-500/50'
+                                        : isRejected
+                                        ? 'bg-rose-950/40 border-rose-500 shadow-md shadow-rose-950/50 ring-1 ring-rose-500/50'
+                                        : 'bg-amber-950/40 border-amber-500 shadow-md shadow-amber-950/50 ring-1 ring-amber-500/50'
+                                      : 'bg-slate-950/80 border-slate-800/80 hover:bg-slate-800/50 hover:border-slate-700'
+                                  }`}
+                                >
+                                  <div className="flex items-center justify-between">
+                                    <span className="text-xs font-bold text-white truncate">{item.studentName}</span>
+                                    <div className="flex items-center gap-1">
+                                      {(item.attemptNumber || (item.attemptsHistory && item.attemptsHistory.length > 1)) && (
+                                        <span className="px-1.5 py-0.5 rounded text-[9px] font-mono font-bold bg-purple-500/10 text-purple-300 border border-purple-500/30">
+                                          Спроба {item.attemptNumber || item.attemptsHistory?.length}
+                                        </span>
+                                      )}
+                                      <span className={`px-1.5 py-0.5 rounded text-[9px] font-mono font-bold ${
+                                        isApproved
+                                          ? 'bg-emerald-500/10 text-emerald-300 border border-emerald-500/30'
+                                          : isRejected
+                                          ? 'bg-rose-500/10 text-rose-300 border border-rose-500/30'
+                                          : 'bg-amber-500/10 text-amber-300 border border-amber-500/30'
+                                      }`}>
+                                        {isApproved
+                                          ? '✓ Затверджено'
+                                          : isRejected
+                                          ? '✕ Відхилено'
+                                          : 'В черзі'}
+                                      </span>
+                                    </div>
+                                  </div>
+                                  <div className="text-[11px] text-slate-300 font-semibold truncate">{item.taskTitle}</div>
+                                  <div className="text-[10px] text-slate-500 font-mono flex items-center justify-between">
+                                    <span>{item.skillTitle}</span>
+                                    <span>{new Date(item.submittedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
                 </div>
               )}
 
@@ -1440,16 +1491,59 @@ export default function TeacherDashboardPage() {
                 </div>
               )}
 
-              {/* Drawer 3: Settings */}
+              {/* Drawer 3: Settings (Rule 7 Standard) */}
               {activeTab === 'settings' && (
                 <div className="flex flex-col gap-3 text-xs text-slate-300">
-                  <div className="p-3 bg-slate-950 border border-slate-800 rounded-xl">
-                    <span className="font-bold text-white block mb-1">Поріг Майстерності BKT</span>
-                    <p className="text-[11px] text-slate-400">Поточний поріг переходу між модулями: P(L) ≥ 0.95</p>
+                  {/* Section 1: Пороги Майстерності */}
+                  <div className="flex flex-col gap-2">
+                    <button
+                      onClick={() => setIsBktThresholdsOpen((prev) => !prev)}
+                      className="w-full flex items-center justify-between text-left px-0.5 py-1 text-slate-400 hover:text-white transition-colors cursor-pointer group"
+                    >
+                      <span className="text-[11px] font-bold uppercase tracking-wider text-amber-400 flex items-center gap-1.5 group-hover:text-amber-300 transition-colors">
+                        <ShieldCheck className="w-3.5 h-3.5 text-amber-400" />
+                        <span>Поріг Майстерності BKT</span>
+                        <span className="px-1.5 py-0.2 rounded text-[9px] font-mono bg-amber-500/10 text-amber-300 border border-amber-500/20">
+                          P(L) ≥ 0.95
+                        </span>
+                      </span>
+                      <span className="p-0.5 rounded text-slate-400 group-hover:text-white group-hover:bg-slate-800 transition-all flex items-center justify-center">
+                        {isBktThresholdsOpen ? <Minus className="w-4 h-4 stroke-[2.5]" /> : <Plus className="w-4 h-4 stroke-[2.5]" />}
+                      </span>
+                    </button>
+
+                    {isBktThresholdsOpen && (
+                      <div className="p-3 bg-slate-950/80 border border-slate-800/80 rounded-xl animate-fadeIn">
+                        <span className="font-bold text-white block mb-1">Поточний поріг переходу між модулями</span>
+                        <p className="text-[11px] text-slate-400">P(L) ≥ 0.95 відкриває залежні вершини графа навичок</p>
+                      </div>
+                    )}
                   </div>
-                  <div className="p-3 bg-slate-950 border border-slate-800 rounded-xl">
-                    <span className="font-bold text-white block mb-1">Параметри Штрафу за Згадування</span>
-                    <p className="text-[11px] text-slate-400">Динамічне підвищення P(G) при відповіді &lt; 2.0 сек</p>
+
+                  {/* Section 2: Штрафи за Вгадування */}
+                  <div className="flex flex-col gap-2 pt-2 border-t border-slate-800/80">
+                    <button
+                      onClick={() => setIsGuessPenaltiesOpen((prev) => !prev)}
+                      className="w-full flex items-center justify-between text-left px-0.5 py-1 text-slate-400 hover:text-white transition-colors cursor-pointer group"
+                    >
+                      <span className="text-[11px] font-bold uppercase tracking-wider text-purple-400 flex items-center gap-1.5 group-hover:text-purple-300 transition-colors">
+                        <Activity className="w-3.5 h-3.5 text-purple-400" />
+                        <span>Штраф за Згадування</span>
+                        <span className="px-1.5 py-0.2 rounded text-[9px] font-mono bg-purple-500/10 text-purple-300 border border-purple-500/20">
+                          P(G)
+                        </span>
+                      </span>
+                      <span className="p-0.5 rounded text-slate-400 group-hover:text-white group-hover:bg-slate-800 transition-all flex items-center justify-center">
+                        {isGuessPenaltiesOpen ? <Minus className="w-4 h-4 stroke-[2.5]" /> : <Plus className="w-4 h-4 stroke-[2.5]" />}
+                      </span>
+                    </button>
+
+                    {isGuessPenaltiesOpen && (
+                      <div className="p-3 bg-slate-950/80 border border-slate-800/80 rounded-xl animate-fadeIn">
+                        <span className="font-bold text-white block mb-1">Динамічне підвищення P(G)</span>
+                        <p className="text-[11px] text-slate-400">При швидкості відповіді &lt; 2.0 сек активується захист від випадкового вгадування</p>
+                      </div>
+                    )}
                   </div>
                 </div>
               )}
