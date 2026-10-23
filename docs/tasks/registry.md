@@ -317,6 +317,7 @@
 | **SBC-264** | `Style` | `TC` | create reusable DrawerSection in @sbc/ui and refactor Reviews and Settings drawers to Rule 7 | 2026-10-23 | `8abc0fc` |
 | **SBC-265** | `Chore` | `INF` | formalize Drawer Container and Mandatory DrawerSection Architecture in Rule 7 | 2026-10-23 | `a3077db` |
 | **SBC-266** | `Style` | `ST` | refactor Student Portal drawer to Rule 7 DrawerSection architecture | 2026-10-23 | `2166713` |
+| **SBC-267** | `Docs` | `BKT` | document BKT error decay dynamics and Lower Bound Asymptote across docs and teacher inspector | 2026-10-23 | `168be44` |
 
 ---
 
