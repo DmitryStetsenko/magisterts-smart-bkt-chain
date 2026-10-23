@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { io } from 'socket.io-client';
-import { ShieldCheck, Network, Users, BarChart3, Code2, BookOpen, Scale, ChevronDown, ChevronUp, X, Search, RotateCcw, AlertTriangle, CheckCircle2, Lock, HelpCircle, Code, FileText, CheckSquare, Sparkles, Keyboard, Copy, Activity, Info, GitBranch, Layers, ClipboardCheck, Tag, FlaskConical, Compass, User, Globe } from 'lucide-react';
+import { ShieldCheck, Network, Users, BarChart3, Code2, BookOpen, Scale, ChevronDown, ChevronUp, X, Search, RotateCcw, AlertTriangle, CheckCircle2, Lock, HelpCircle, Code, FileText, CheckSquare, Sparkles, Keyboard, Copy, Activity, Info, GitBranch, Layers, ClipboardCheck, Tag, FlaskConical, Compass, User, Globe, Plus, Minus } from 'lucide-react';
 import { StudentAnalyticsItem } from '../features/analytics/model/analytics.types';
 import { AnomalyTreeWidget, GameSkillTreeWidget, SkillGraphNode } from '@sbc/ui';
 import { ReviewQueueInspector } from '../features/reviews/ui/ReviewQueueInspector';
@@ -1204,27 +1204,27 @@ export default function TeacherDashboardPage() {
                 </div>
               )}
 
-              {/* Drawer: Metrics Audit - Distinct collapsible sections for General Tools and Personal Student Audit */}
+              {/* Drawer: Metrics Audit - Clean minimalist sections with +/- collapse toggles */}
               {activeTab === 'metrics-audit' && (
-                <div className="flex flex-col gap-3">
-                  {/* SECTION 1: Загальні системні інструменти (Не прив'язані до студента) - COLLAPSIBLE */}
-                  <div className="flex flex-col rounded-2xl bg-slate-900/60 border border-slate-800/80 overflow-hidden shadow-sm">
+                <div className="flex flex-col gap-4">
+                  {/* SECTION 1: Загальні системні інструменти (Не прив'язані до студента) */}
+                  <div className="flex flex-col gap-2">
                     <button
                       onClick={() => setIsGeneralToolsOpen((prev) => !prev)}
-                      className="w-full px-3 py-2.5 flex items-center justify-between text-left hover:bg-slate-800/40 transition-colors cursor-pointer"
+                      className="w-full flex items-center justify-between text-left px-0.5 py-1 text-slate-400 hover:text-white transition-colors cursor-pointer group"
                     >
-                      <span className="text-[11px] font-bold uppercase tracking-wider text-cyan-400 flex items-center gap-1.5">
+                      <span className="text-[11px] font-bold uppercase tracking-wider text-cyan-400 flex items-center gap-1.5 group-hover:text-cyan-300 transition-colors">
                         <Globe className="w-3.5 h-3.5 text-cyan-400" />
                         <span>Загальні інструменти</span>
                         <span className="px-1.5 py-0.2 rounded text-[9px] font-mono bg-cyan-500/10 text-cyan-300 border border-cyan-500/20">3</span>
                       </span>
-                      <span className="text-slate-400 hover:text-white transition-transform">
-                        {isGeneralToolsOpen ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+                      <span className="w-4 h-4 rounded flex items-center justify-center text-slate-400 group-hover:text-white group-hover:bg-slate-800 text-xs font-mono font-bold transition-all">
+                        {isGeneralToolsOpen ? '−' : '+'}
                       </span>
                     </button>
 
                     {isGeneralToolsOpen && (
-                      <div className="p-2.5 pt-0 flex flex-col gap-2 border-t border-slate-800/60">
+                      <div className="flex flex-col gap-2 animate-fadeIn">
                         {/* Quick-Access to Mechanisms Catalog */}
                         <button
                           onClick={() => {
@@ -1315,26 +1315,26 @@ export default function TeacherDashboardPage() {
                     )}
                   </div>
 
-                  {/* SECTION 2: Персональний аудит конкретного студента - COLLAPSIBLE */}
-                  <div className="flex flex-col rounded-2xl bg-slate-900/60 border border-slate-800/80 overflow-hidden shadow-sm">
+                  {/* SECTION 2: Персональний аудит конкретного студента */}
+                  <div className="flex flex-col gap-2 pt-2 border-t border-slate-800/80">
                     <button
                       onClick={() => setIsStudentsListOpen((prev) => !prev)}
-                      className="w-full px-3 py-2.5 flex items-center justify-between text-left hover:bg-slate-800/40 transition-colors cursor-pointer"
+                      className="w-full flex items-center justify-between text-left px-0.5 py-1 text-slate-400 hover:text-white transition-colors cursor-pointer group"
                     >
-                      <div className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-purple-400">
+                      <div className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-purple-400 group-hover:text-purple-300 transition-colors">
                         <User className="w-3.5 h-3.5 text-purple-400" />
                         <span>Студенти для аудиту</span>
                         <span className="font-mono text-[9px] text-slate-400 font-normal px-1.5 py-0.2 rounded bg-purple-500/10 border border-purple-500/20">
                           {students.length}
                         </span>
                       </div>
-                      <span className="text-slate-400 hover:text-white transition-transform">
-                        {isStudentsListOpen ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+                      <span className="w-4 h-4 rounded flex items-center justify-center text-slate-400 group-hover:text-white group-hover:bg-slate-800 text-xs font-mono font-bold transition-all">
+                        {isStudentsListOpen ? '−' : '+'}
                       </span>
                     </button>
 
                     {isStudentsListOpen && (
-                      <div className="p-2.5 pt-0 flex flex-col gap-1.5 max-h-[calc(100vh-360px)] overflow-y-auto pr-1 border-t border-slate-800/60">
+                      <div className="flex flex-col gap-1.5 max-h-[calc(100vh-380px)] overflow-y-auto pr-1 animate-fadeIn">
                         {students.map((st) => {
                           const stId = st.id || st.studentId || st.email;
                           const isSelected = selectedStudentId === stId;

@@ -309,7 +309,8 @@
 | **SBC-256** | `Story` | `TC` | implement comprehensive adaptive mechanisms registry in teacher portal audit module | 2026-10-23 | `80bc521` |
 | **SBC-257** | `Story` | `TC` | separate student-specific and global system audit tabs and side drawer sections | 2026-10-23 | `c05e25f` |
 | **SBC-258** | `Style` | `TC` | position general tools section first in teacher metrics audit side drawer | 2026-10-23 | `3d65b18` |
-| **SBC-259** | `Story` | `TC` | implement collapsible accordions for general tools and student list in metrics audit drawer | 2026-10-23 | Pending |
+| **SBC-259** | `Story` | `TC` | implement collapsible accordions for general tools and student list in metrics audit drawer | 2026-10-23 | `0e4c47f` |
+| **SBC-260** | `Style` | `TC` | remove outer section borders and use minimalist plus-minus collapse toggles in audit drawer | 2026-10-23 | Pending |
 
 ---
 
