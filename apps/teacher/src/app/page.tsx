@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { io } from 'socket.io-client';
-import { ShieldCheck, Network, Users, BarChart3, Code2, BookOpen, Scale, ChevronDown, X, Search, RotateCcw, AlertTriangle, CheckCircle2, Lock, HelpCircle, Code, FileText, CheckSquare, Sparkles, Keyboard, Copy, Activity, Info, GitBranch, Layers, ClipboardCheck, Tag, FlaskConical } from 'lucide-react';
+import { ShieldCheck, Network, Users, BarChart3, Code2, BookOpen, Scale, ChevronDown, X, Search, RotateCcw, AlertTriangle, CheckCircle2, Lock, HelpCircle, Code, FileText, CheckSquare, Sparkles, Keyboard, Copy, Activity, Info, GitBranch, Layers, ClipboardCheck, Tag, FlaskConical, Compass } from 'lucide-react';
 import { StudentAnalyticsItem } from '../features/analytics/model/analytics.types';
 import { AnomalyTreeWidget, GameSkillTreeWidget, SkillGraphNode } from '@sbc/ui';
 import { ReviewQueueInspector } from '../features/reviews/ui/ReviewQueueInspector';
@@ -120,6 +120,7 @@ export default function TeacherDashboardPage() {
   // isDrawerOpen controls whether its companion sidebar drawer is visible.
   type TeacherTab = 'analytics' | 'reviews' | 'coursemap' | 'metrics-audit' | 'settings';
   const [activeTab, setActiveTab] = useState<TeacherTab>('analytics');
+  const [auditSubTab, setAuditSubTab] = useState<'live-log' | 'what-if' | 'test-matrix' | 'mechanisms'>('live-log');
   // By default, student selection is in the top bar, so canvas has 100% space
   const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
   const [activeStudentView, setActiveStudentView] = useState<'metrics' | 'tree'>('metrics');
@@ -1203,11 +1204,42 @@ export default function TeacherDashboardPage() {
               {/* Drawer: Metrics Audit Student List */}
               {activeTab === 'metrics-audit' && (
                 <div className="flex flex-col gap-3">
-                  <div className="text-[11px] text-slate-400">
-                    Оберіть студента для детального математичного аудиту його спроб:
+                  {/* Quick-Access to Mechanisms Catalog */}
+                  <button
+                    onClick={() => {
+                      setAuditSubTab('mechanisms');
+                    }}
+                    className={`w-full p-2.5 rounded-xl border text-left flex items-center justify-between transition-all cursor-pointer shadow-sm ${
+                      auditSubTab === 'mechanisms'
+                        ? 'bg-amber-950/60 border-amber-500 text-white shadow-amber-950/40 ring-1 ring-amber-500/50'
+                        : 'bg-gradient-to-r from-amber-950/30 to-purple-950/30 border-amber-500/30 hover:border-amber-400/60 text-amber-200'
+                    }`}
+                  >
+                    <div className="flex items-center gap-2.5 overflow-hidden">
+                      <div className="p-1.5 rounded-lg bg-amber-500/20 text-amber-300 shrink-0">
+                        <Compass className="w-4 h-4" />
+                      </div>
+                      <div className="overflow-hidden">
+                        <div className="text-xs font-bold text-white truncate flex items-center gap-1.5">
+                          <span>Реєстр Механізмів</span>
+                          <span className="px-1.5 py-0.2 rounded text-[9px] font-mono bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                            4-in-1
+                          </span>
+                        </div>
+                        <div className="text-[10px] text-slate-400 truncate">
+                          Спрощення, підказки, телеметрія
+                        </div>
+                      </div>
+                    </div>
+                    <span className="text-[11px] text-amber-400 font-bold shrink-0">➔</span>
+                  </button>
+
+                  <div className="text-[11px] text-slate-400 flex items-center justify-between pt-1 border-t border-slate-800/80">
+                    <span>Студенти для аудиту:</span>
+                    <span className="font-mono text-[10px] text-slate-500">Всього: {students.length}</span>
                   </div>
 
-                  <div className="flex flex-col gap-1.5 max-h-[calc(100vh-220px)] overflow-y-auto pr-1">
+                  <div className="flex flex-col gap-1.5 max-h-[calc(100vh-280px)] overflow-y-auto pr-1">
                     {students.map((st) => {
                       const stId = st.id || st.studentId || st.email;
                       const isSelected = selectedStudentId === stId;
@@ -1569,6 +1601,8 @@ export default function TeacherDashboardPage() {
               selectedStudentId={selectedStudentId}
               onSelectStudent={(id) => setSelectedStudentId(id)}
               activeCourseSlug={activeCourseSlug}
+              activeSubTab={auditSubTab}
+              onSubTabChange={(tab) => setAuditSubTab(tab)}
             />
           )}
 
