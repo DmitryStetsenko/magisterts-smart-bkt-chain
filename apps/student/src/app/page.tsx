@@ -7,7 +7,7 @@ import { MonacoCodeEditor } from '../features/code-editor/ui/MonacoCodeEditor';
 import { QuizTaskEditor } from '../features/quiz-editor/ui/QuizTaskEditor';
 import { EssayTaskEditor } from '../features/essay-editor/ui/EssayTaskEditor';
 import { SkillDagMap } from '../features/skill-graph/ui/SkillDagMap';
-import { GameSkillTreeWidget, SkillGraphNode } from '@sbc/ui';
+import { GameSkillTreeWidget, SkillGraphNode, DrawerSection } from '@sbc/ui';
 
 interface TaskDetail {
   id: string;
@@ -641,10 +641,10 @@ export default function StudentPortalPage() {
             </div>
 
             {/* 📜 Scrollable Drawer Body Content */}
-            <div className="flex-1 p-5 overflow-y-auto flex flex-col gap-5">
+            <div className="flex-1 p-5 overflow-y-auto flex flex-col gap-3">
               {/* Content Drawer 1: Task Condition & Attempt History */}
               {activeTab === 'task' && task && (
-                <div className="flex flex-col gap-4 flex-1">
+                <div className="flex flex-col gap-3 flex-1">
                   {/* Sub-tab navigation: Condition vs History */}
                   <div className="bg-slate-950 p-1 rounded-xl border border-slate-800 flex items-center gap-1 shadow-inner">
                     <button
@@ -681,127 +681,164 @@ export default function StudentPortalPage() {
                   </div>
 
                   {taskDrawerSubTab === 'condition' ? (
-                    <div className="flex flex-col gap-5 flex-1">
-                      <div className="flex flex-col gap-2 p-3 bg-slate-950/80 rounded-xl border border-slate-800 shadow-inner">
-                        <div className="flex items-center justify-between">
-                          <span className="px-2.5 py-0.5 rounded-full text-[11px] font-mono font-bold uppercase tracking-wider bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
-                            {task.skill.title}
-                          </span>
-                          <div className="flex items-center gap-2">
-                            {recommendation?.isDifficultyDegraded && (
-                              <div className="relative">
-                                <button
-                                  type="button"
-                                  onClick={() => setIsDegradationTooltipOpen((prev) => !prev)}
-                                  className="p-1 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 flex items-center justify-center transition-all cursor-pointer shadow-sm group hover:scale-105 active:scale-95"
-                                  title="Адаптивне допоміжне завдання (натисніть для деталей)"
-                                  aria-label="Пояснення допоміжного рівня"
-                                >
-                                  <MessageSquare className="w-3.5 h-3.5 text-amber-400 group-hover:text-amber-300" />
-                                </button>
-
-                                {isDegradationTooltipOpen && (
-                                  <>
-                                    <div
-                                      className="fixed inset-0 z-40"
-                                      onClick={() => setIsDegradationTooltipOpen(false)}
-                                    />
-                                    <div className="absolute right-0 top-full mt-2 w-72 p-3 bg-slate-900/95 border border-amber-500/40 rounded-xl shadow-2xl z-50 animate-fadeIn backdrop-blur-md">
-                                      <div className="flex items-center justify-between gap-2 pb-2 mb-2 border-b border-amber-500/20 text-amber-300 font-bold text-xs">
-                                        <div className="flex items-center gap-1.5">
-                                          <AlertCircle className="w-3.5 h-3.5 text-amber-400" />
-                                          <span>Допоміжне завдання</span>
-                                        </div>
-                                        <span className="text-[10px] px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-200 border border-amber-500/30 font-mono">
-                                          Макс: {recommendation?.maxScoreCap ?? 70}%
-                                        </span>
-                                      </div>
-                                      <p className="text-[11px] text-slate-300 leading-relaxed">
-                                        Враховуючи труднощі у попередніх спробах, система тимчасово надала полегшене допоміжне завдання для закріплення базових концепцій теми.
-                                      </p>
-                                      <p className="text-[10px] text-amber-400/90 mt-2 font-medium">
-                                        ✨ Після успішного складання ви повернетеся до повноцінних завдань зі 100% максимального балу.
-                                      </p>
-                                    </div>
-                                  </>
-                                )}
-                              </div>
-                            )}
-
-                            <span className="text-[11px] font-mono font-bold text-slate-400">
-                              P(L): <span className={activeSkillMasteryPct >= 90 ? 'text-emerald-400' : 'text-indigo-400'}>{activeSkillMasteryPct}%</span>
+                    <div className="flex flex-col gap-3 flex-1">
+                      {/* Section 1: Активна навичка та поточний BKT стан */}
+                      <DrawerSection
+                        title="Поточна навичка та BKT стан"
+                        icon={Brain}
+                        iconColor="text-indigo-400"
+                        titleColor="text-indigo-400 group-hover:text-indigo-300"
+                        badge={`${Math.round(activeSkillMasteryPct)}%`}
+                        badgeColor={activeSkillMasteryPct >= 90 ? 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30' : 'bg-indigo-500/15 text-indigo-300 border-indigo-500/30'}
+                        defaultOpen={true}
+                      >
+                        <div className="flex flex-col gap-2 p-3 bg-slate-950/80 rounded-xl border border-slate-800 shadow-inner">
+                          <div className="flex items-center justify-between">
+                            <span className="px-2.5 py-0.5 rounded-full text-[11px] font-mono font-bold uppercase tracking-wider bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
+                              {task.skill.title}
                             </span>
-                          </div>
-                        </div>
-                        <div className="w-full h-1.5 bg-slate-900 rounded-full overflow-hidden border border-slate-800">
-                          <div
-                            className={`h-full rounded-full transition-all duration-500 ${
-                              activeSkillMasteryPct >= 90
-                                ? 'bg-emerald-400'
-                                : 'bg-gradient-to-r from-indigo-500 to-purple-500'
-                            }`}
-                            style={{ width: `${Math.min(100, activeSkillMasteryPct)}%` }}
-                          />
-                        </div>
-                      </div>
+                            <div className="flex items-center gap-2">
+                              {recommendation?.isDifficultyDegraded && (
+                                <div className="relative">
+                                  <button
+                                    type="button"
+                                    onClick={() => setIsDegradationTooltipOpen((prev) => !prev)}
+                                    className="p-1 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 flex items-center justify-center transition-all cursor-pointer shadow-sm group hover:scale-105 active:scale-95"
+                                    title="Адаптивне допоміжне завдання (натисніть для деталей)"
+                                    aria-label="Пояснення допоміжного рівня"
+                                  >
+                                    <MessageSquare className="w-3.5 h-3.5 text-amber-400 group-hover:text-amber-300" />
+                                  </button>
 
-                      <div>
-                        <h3 className="text-base font-bold text-white mb-2">{task.title}</h3>
-                        <p className="text-xs text-slate-300 leading-relaxed">{task.description}</p>
-                      </div>
-
-                      {recommendation && (
-                        <div className="p-3.5 bg-indigo-950/40 border border-indigo-500/30 rounded-xl flex items-start gap-2.5">
-                          <Sparkles className="w-4 h-4 text-indigo-400 shrink-0 mt-0.5" />
-                          <div className="text-[11px] text-indigo-200">
-                            <span className="font-bold text-indigo-300 block mb-0.5">Рекомендація BKT Engine:</span>
-                            {recommendation.reason || 'Завдання обрано відповідно до вашого рівня засвоєння.'}
-                          </div>
-                        </div>
-                      )}
-
-                      {task.taskType === 'CODE' && task.testCases.length > 0 && (
-                        <div className="flex flex-col gap-2 pt-2 border-t border-slate-800">
-                          <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
-                            Відкриті Тест-Кейси
-                          </span>
-                          {task.testCases.map((tc, idx) => (
-                            <div
-                              key={idx}
-                              className="p-2.5 bg-slate-950/70 border border-slate-800 rounded-lg text-xs font-mono flex flex-col gap-0.5"
-                            >
-                              {tc.input && (
-                                <span className="text-slate-400 text-[11px]">
-                                  {tc.input.startsWith('"') && !tc.input.startsWith('"eval:') && !tc.input.startsWith('[')
-                                    ? <>Перевірка змінної: <code className="text-indigo-300">{tc.input.replace(/"/g, '')}</code></>
-                                    : tc.input.includes('eval:')
-                                    ? <>Обчислення виразу: <code className="text-indigo-300">{tc.input.replace('eval:', '').replace(/"/g, '')}</code></>
-                                    : <>Вхідні дані: <code className="text-indigo-300">{tc.input}</code></>}
-                                </span>
+                                  {isDegradationTooltipOpen && (
+                                    <>
+                                      <div
+                                        className="fixed inset-0 z-40"
+                                        onClick={() => setIsDegradationTooltipOpen(false)}
+                                      />
+                                      <div className="absolute right-0 top-full mt-2 w-72 p-3 bg-slate-900/95 border border-amber-500/40 rounded-xl shadow-2xl z-50 animate-fadeIn backdrop-blur-md">
+                                        <div className="flex items-center justify-between gap-2 pb-2 mb-2 border-b border-amber-500/20 text-amber-300 font-bold text-xs">
+                                          <div className="flex items-center gap-1.5">
+                                            <AlertCircle className="w-3.5 h-3.5 text-amber-400" />
+                                            <span>Допоміжне завдання</span>
+                                          </div>
+                                          <span className="text-[10px] px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-200 border border-amber-500/30 font-mono">
+                                            Ліміт: {recommendation?.maxScoreCap ?? 70}%
+                                          </span>
+                                        </div>
+                                        <p className="text-[11px] text-slate-300 leading-relaxed">
+                                          Складність знижена в адаптивному режимі, оскільки попередня спроба викликала труднощі.
+                                        </p>
+                                        <p className="text-[10px] text-amber-400/90 mt-2 font-medium">
+                                          💡 Після засвоєння поверніться до оригінального завдання для 100% майстерності.
+                                        </p>
+                                      </div>
+                                    </>
+                                  )}
+                                </div>
                               )}
-                              <span className="text-slate-400 text-[11px]">
-                                Очікуваний вивід: <code className="text-emerald-300">{tc.expectedOutput}</code>
+
+                              <span className="text-[11px] font-mono font-bold text-slate-400">
+                                P(L): <span className={activeSkillMasteryPct >= 90 ? 'text-emerald-400' : 'text-indigo-400'}>{activeSkillMasteryPct.toFixed(1)}%</span>
                               </span>
                             </div>
-                          ))}
+                          </div>
+                          <div className="w-full h-1.5 bg-slate-900 rounded-full overflow-hidden border border-slate-800">
+                            <div
+                              className={`h-full rounded-full transition-all duration-500 ${
+                                activeSkillMasteryPct >= 90
+                                  ? 'bg-emerald-400'
+                                  : 'bg-gradient-to-r from-indigo-500 to-purple-500'
+                              }`}
+                              style={{ width: `${Math.min(100, activeSkillMasteryPct)}%` }}
+                            />
+                          </div>
                         </div>
+                      </DrawerSection>
+
+                      {/* Section 2: Умова поточного завдання */}
+                      <DrawerSection
+                        title="Умова завдання"
+                        icon={BookOpen}
+                        iconColor="text-cyan-400"
+                        titleColor="text-cyan-400 group-hover:text-cyan-300"
+                        defaultOpen={true}
+                        className="border-t border-slate-800/80 pt-2.5"
+                      >
+                        <div className="p-3 bg-slate-950/70 border border-slate-800/80 rounded-xl flex flex-col gap-2">
+                          <h3 className="text-sm font-bold text-white">{task.title}</h3>
+                          <p className="text-xs text-slate-300 leading-relaxed">{task.description}</p>
+                        </div>
+                      </DrawerSection>
+
+                      {/* Section 3: Рекомендація BKT Engine */}
+                      {recommendation && (
+                        <DrawerSection
+                          title="Рекомендація BKT Engine"
+                          icon={Sparkles}
+                          iconColor="text-purple-400"
+                          titleColor="text-purple-400 group-hover:text-purple-300"
+                          defaultOpen={true}
+                          className="border-t border-slate-800/80 pt-2.5"
+                        >
+                          <div className="p-3 bg-indigo-950/30 border border-indigo-500/30 rounded-xl flex items-start gap-2.5">
+                            <Sparkles className="w-4 h-4 text-indigo-400 shrink-0 mt-0.5" />
+                            <div className="text-[11px] text-indigo-200">
+                              <span className="font-bold text-indigo-300 block mb-0.5">Логіка підбору:</span>
+                              {recommendation.reason || 'Завдання обрано відповідно до вашого рівня засвоєння.'}
+                            </div>
+                          </div>
+                        </DrawerSection>
                       )}
 
-                      {/* 💡 Socratic Hints Interactive Widget (Visible only after struggle/failed attempt/degradation) */}
-                      {hasFailedAttemptOnCurrentTask && task.socraticHints && task.socraticHints.length > 0 && (
-                        <div className="flex flex-col gap-2 pt-3 border-t border-slate-800 animate-fadeIn">
-                          <div className="flex items-center justify-between">
-                            <span className="text-[11px] font-semibold text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
-                              <HelpCircle className="w-3.5 h-3.5 text-amber-400" />
-                              <span>Сократівські підказки</span>
-                            </span>
-                            {revealedHintLevel > 0 && (
-                              <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/30">
-                                Штраф: -{task.socraticHints[revealedHintLevel - 1]?.penaltyPct ?? 0}%
-                              </span>
-                            )}
+                      {/* Section 4: Відкриті Тест-Кейси */}
+                      {task.taskType === 'CODE' && task.testCases.length > 0 && (
+                        <DrawerSection
+                          title="Відкриті Тест-Кейси"
+                          icon={Target}
+                          iconColor="text-emerald-400"
+                          titleColor="text-emerald-400 group-hover:text-emerald-300"
+                          badge={task.testCases.length}
+                          badgeColor="bg-emerald-500/10 text-emerald-300 border-emerald-500/20"
+                          defaultOpen={true}
+                          className="border-t border-slate-800/80 pt-2.5"
+                        >
+                          <div className="flex flex-col gap-2">
+                            {task.testCases.map((tc, idx) => (
+                              <div
+                                key={idx}
+                                className="p-2.5 bg-slate-950/70 border border-slate-800 rounded-lg text-xs font-mono flex flex-col gap-0.5"
+                              >
+                                {tc.input && (
+                                  <span className="text-slate-400 text-[11px]">
+                                    {tc.input.startsWith('"') && !tc.input.startsWith('"eval:') && !tc.input.startsWith('[')
+                                      ? <>Перевірка змінної: <code className="text-indigo-300">{tc.input.replace(/"/g, '')}</code></>
+                                      : tc.input.includes('eval:')
+                                      ? <>Обчислення виразу: <code className="text-indigo-300">{tc.input.replace('eval:', '').replace(/"/g, '')}</code></>
+                                      : <>Вхідні дані: <code className="text-indigo-300">{tc.input}</code></>}
+                                  </span>
+                                )}
+                                <span className="text-slate-400 text-[11px]">
+                                  Очікуваний вивід: <code className="text-emerald-300">{tc.expectedOutput}</code>
+                                </span>
+                              </div>
+                            ))}
                           </div>
+                        </DrawerSection>
+                      )}
 
+                      {/* Section 5: Сократівські підказки */}
+                      {hasFailedAttemptOnCurrentTask && task.socraticHints && task.socraticHints.length > 0 && (
+                        <DrawerSection
+                          title="Сократівські підказки"
+                          icon={HelpCircle}
+                          iconColor="text-amber-400"
+                          titleColor="text-amber-400 group-hover:text-amber-300"
+                          badge={revealedHintLevel > 0 ? `-${task.socraticHints[revealedHintLevel - 1]?.penaltyPct ?? 0}%` : `${task.socraticHints.length}`}
+                          badgeColor="bg-amber-500/15 text-amber-300 border-amber-500/30"
+                          defaultOpen={true}
+                          className="border-t border-slate-800/80 pt-2.5"
+                        >
                           <div className="flex flex-col gap-2">
                             {task.socraticHints.map((hintObj, idx) => {
                               const isRevealed = revealedHintLevel >= hintObj.level;
@@ -843,35 +880,45 @@ export default function StudentPortalPage() {
                               );
                             })}
                           </div>
-                        </div>
+                        </DrawerSection>
                       )}
 
-                      {/* 📖 Deep-link to Study App (Visible only after struggle/failed attempt/degradation) */}
+                      {/* Section 6: Навчальний модуль у разі труднощів */}
                       {hasFailedAttemptOnCurrentTask && task.studyUnitUrl && (
-                        <div className="p-3 bg-gradient-to-r from-blue-950/40 to-indigo-950/40 border border-blue-500/30 rounded-xl flex items-center justify-between gap-3 animate-fadeIn">
-                          <div className="flex items-center gap-2">
-                            <BookOpen className="w-4 h-4 text-blue-400 shrink-0" />
-                            <div className="flex flex-col">
-                              <span className="text-xs font-bold text-blue-200">Потрібно повторити тему?</span>
-                              <span className="text-[10px] text-slate-400">Урок у Навчальному Застосунку</span>
+                        <DrawerSection
+                          title="Матеріал для повторення"
+                          icon={BookOpen}
+                          iconColor="text-blue-400"
+                          titleColor="text-blue-400 group-hover:text-blue-300"
+                          defaultOpen={true}
+                          className="border-t border-slate-800/80 pt-2.5"
+                        >
+                          <div className="p-3 bg-gradient-to-r from-blue-950/40 to-indigo-950/40 border border-blue-500/30 rounded-xl flex items-center justify-between gap-3 animate-fadeIn">
+                            <div className="flex items-center gap-2">
+                              <BookOpen className="w-4 h-4 text-blue-400 shrink-0" />
+                              <div className="flex flex-col">
+                                <span className="text-xs font-bold text-blue-200">Повторити теоретичну тему</span>
+                                <span className="text-[10px] text-slate-400">Урок в інтерактивному підручнику</span>
+                              </div>
                             </div>
+                            <a
+                              href={task.studyUnitUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="px-2.5 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs flex items-center gap-1 shadow-md shadow-blue-600/30 transition-all cursor-pointer shrink-0"
+                              title="Відкрити урок в інтерактивній системі"
+                            >
+                              <span>До уроку</span>
+                              <ArrowRight className="w-3 h-3" />
+                            </a>
                           </div>
-                          <a
-                            href={task.studyUnitUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="px-2.5 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-bold text-[11px] flex items-center gap-1 transition-all shrink-0 cursor-pointer shadow-sm"
-                            title="Відкрити урок у навчальному додатку"
-                          >
-                            <span>До уроку</span>
-                            <ArrowRight className="w-3 h-3" />
-                          </a>
-                        </div>
+                        </DrawerSection>
                       )}
 
+                      {/* Action Button */}
                       <button
                         onClick={() => fetchRecommendedTask(activeCourseSlug)}
-                        className="inline-flex items-center justify-center gap-2 px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold border border-slate-700 transition-all cursor-pointer mt-auto"
+                        className="inline-flex items-center justify-center gap-2 px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold border border-slate-700 transition-all cursor-pointer mt-2"
                       >
                         <RefreshCw className="w-3.5 h-3.5" />
                         <span>Оновити рекомендоване завдання</span>
@@ -880,108 +927,115 @@ export default function StudentPortalPage() {
                   ) : (
                     /* History Sub-tab */
                     <div className="flex flex-col gap-3 flex-1">
-                      <div className="flex items-center justify-between text-xs">
-                        <span className="text-slate-400 font-semibold uppercase tracking-wider text-[11px]">
-                          Хронологія спроб та перевірок:
-                        </span>
-                        <button
-                          onClick={() => task && fetchTaskSubmissions(task.id)}
-                          className="text-[11px] text-purple-400 hover:text-purple-300 flex items-center gap-1 cursor-pointer font-mono"
-                        >
-                          <RefreshCw className="w-3 h-3" />
-                          <span>Оновити</span>
-                        </button>
-                      </div>
+                      <DrawerSection
+                        title="Хронологія спроб та перевірок"
+                        icon={History}
+                        iconColor="text-purple-400"
+                        titleColor="text-purple-400 group-hover:text-purple-300"
+                        badge={taskSubmissions.length}
+                        badgeColor="bg-purple-500/10 text-purple-300 border-purple-500/20"
+                        defaultOpen={true}
+                        action={
+                          <button
+                            onClick={() => task && fetchTaskSubmissions(task.id)}
+                            className="text-[11px] text-purple-400 hover:text-purple-300 flex items-center gap-1 cursor-pointer font-mono"
+                            title="Оновити список спроб"
+                          >
+                            <RefreshCw className="w-3 h-3" />
+                            <span>Оновити</span>
+                          </button>
+                        }
+                      >
+                        {taskSubmissions.length === 0 ? (
+                          <div className="p-6 bg-slate-950/70 border border-slate-800 rounded-xl text-center text-xs text-slate-400 flex flex-col items-center gap-2">
+                            <History className="w-6 h-6 text-slate-600" />
+                            <span>Ви ще не надсилали спроб для цього завдання.</span>
+                          </div>
+                        ) : (
+                          <div className="flex flex-col gap-3 max-h-[calc(100vh-320px)] overflow-y-auto pr-1">
+                            {taskSubmissions.map((sub, idx) => {
+                              const isLatest = idx === 0;
+                              const isApproved = sub.teacherReviewStatus === 'APPROVED' || sub.status === 'ACCEPTED';
+                              const isPending = sub.teacherReviewStatus === 'PENDING_REVIEW';
+                              const isSuperseded = sub.teacherReviewStatus === 'SUPERSEDED';
 
-                      {taskSubmissions.length === 0 ? (
-                        <div className="p-6 bg-slate-950/70 border border-slate-800 rounded-xl text-center text-xs text-slate-400 flex flex-col items-center gap-2">
-                          <History className="w-6 h-6 text-slate-600" />
-                          <span>Ви ще не надсилали спроб для цього завдання.</span>
-                        </div>
-                      ) : (
-                        <div className="flex flex-col gap-3">
-                          {taskSubmissions.map((sub, idx) => {
-                            const isLatest = idx === 0;
-                            const isApproved = sub.teacherReviewStatus === 'APPROVED' || sub.status === 'ACCEPTED';
-                            const isPending = sub.teacherReviewStatus === 'PENDING_REVIEW';
-                            const isSuperseded = sub.teacherReviewStatus === 'SUPERSEDED';
-
-                            return (
-                              <div
-                                key={sub.id}
-                                className={`p-3.5 rounded-xl border flex flex-col gap-2.5 transition-all ${
-                                  isLatest
-                                    ? isApproved
-                                      ? 'bg-emerald-950/30 border-emerald-500/40 shadow-lg shadow-emerald-950/30'
-                                      : isPending
-                                      ? 'bg-amber-950/30 border-amber-500/40 shadow-lg shadow-amber-950/30'
-                                      : 'bg-purple-950/30 border-purple-500/40'
-                                    : 'bg-slate-950/60 border-slate-800 opacity-80'
-                                }`}
-                              >
-                                <div className="flex items-center justify-between">
-                                  <div className="flex items-center gap-1.5">
-                                    <span className="text-xs font-bold text-white">
-                                      Спроба #{sub.attemptNumber || taskSubmissions.length - idx}
-                                    </span>
-                                    {isLatest && (
-                                      <span className="text-[9px] font-mono px-1.5 py-0.2 rounded font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
-                                        Остання
+                              return (
+                                <div
+                                  key={sub.id}
+                                  className={`p-3.5 rounded-xl border flex flex-col gap-2.5 transition-all ${
+                                    isLatest
+                                      ? isApproved
+                                        ? 'bg-emerald-950/30 border-emerald-500/40 shadow-lg shadow-emerald-950/30'
+                                        : isPending
+                                        ? 'bg-amber-950/30 border-amber-500/40 shadow-lg shadow-amber-950/30'
+                                        : 'bg-purple-950/30 border-purple-500/40'
+                                      : 'bg-slate-950/60 border-slate-800 opacity-80'
+                                  }`}
+                                >
+                                  <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-1.5">
+                                      <span className="text-xs font-bold text-white">
+                                        Спроба #{sub.attemptNumber || taskSubmissions.length - idx}
                                       </span>
-                                    )}
-                                  </div>
-                                  <span className={`text-[10px] font-bold font-mono px-2 py-0.5 rounded-full border ${
-                                    isApproved
-                                      ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30'
-                                      : isPending
-                                      ? 'bg-amber-500/10 text-amber-300 border border-amber-500/30'
-                                      : isSuperseded
-                                      ? 'bg-slate-800 text-slate-400 border-slate-700'
-                                      : 'bg-rose-500/10 text-rose-400 border-rose-500/30'
-                                  }`}>
-                                    {isApproved
-                                      ? '✓ Затверджено'
-                                      : isPending
-                                      ? '⏳ В черзі'
-                                      : isSuperseded
-                                      ? 'Архівована'
-                                      : '✕ Відхилено'}
-                                  </span>
-                                </div>
-
-                                <div className="text-[10px] text-slate-500 font-mono">
-                                  Здано: {new Date(sub.createdAt).toLocaleString()}
-                                </div>
-
-                                {/* Teacher Comment Banner if present */}
-                                {sub.teacherComment && (
-                                  <div className="p-2.5 rounded-lg bg-purple-950/40 border border-purple-500/40 flex flex-col gap-1">
-                                    <div className="flex items-center gap-1.5 text-purple-300 font-bold text-[11px]">
-                                      <MessageSquareQuote className="w-3.5 h-3.5 shrink-0" />
-                                      <span>Коментар викладача:</span>
+                                      {isLatest && (
+                                        <span className="text-[9px] font-mono px-1.5 py-0.2 rounded font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+                                          Остання
+                                        </span>
+                                      )}
                                     </div>
-                                    <p className="text-xs text-purple-100 font-sans italic leading-relaxed pl-5">
-                                      "{sub.teacherComment}"
-                                    </p>
+                                    <span className={`text-[10px] font-bold font-mono px-2 py-0.5 rounded-full border ${
+                                      isApproved
+                                        ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30'
+                                        : isPending
+                                        ? 'bg-amber-500/10 text-amber-300 border border-amber-500/30'
+                                        : isSuperseded
+                                        ? 'bg-slate-800 text-slate-400 border-slate-700'
+                                        : 'bg-rose-500/10 text-rose-400 border-rose-500/30'
+                                    }`}>
+                                      {isApproved
+                                        ? '✓ Зараховано'
+                                        : isPending
+                                        ? '⏳ В черзі'
+                                        : isSuperseded
+                                        ? 'Замінено'
+                                        : '✕ Відхилено'}
+                                    </span>
                                   </div>
-                                )}
 
-                                {/* Submitted Answer Preview */}
-                                {sub.code && (
-                                  <details className="text-[11px] text-slate-400">
-                                    <summary className="cursor-pointer hover:text-slate-200 select-none">
-                                      Переглянути текст відповіді
-                                    </summary>
-                                    <pre className="mt-1 p-2 bg-slate-900 border border-slate-800 rounded text-slate-300 font-mono text-[10px] whitespace-pre-wrap max-h-32 overflow-y-auto">
-                                      {sub.code}
-                                    </pre>
-                                  </details>
-                                )}
-                              </div>
-                            );
-                          })}
-                        </div>
-                      )}
+                                  <div className="text-[10px] text-slate-500 font-mono">
+                                    Час: {new Date(sub.createdAt).toLocaleString()}
+                                  </div>
+
+                                  {/* Teacher Comment Banner if present */}
+                                  {sub.teacherComment && (
+                                    <div className="p-2.5 rounded-lg bg-purple-950/40 border border-purple-500/40 flex flex-col gap-1">
+                                      <div className="flex items-center gap-1.5 text-purple-300 font-bold text-[11px]">
+                                        <MessageSquareQuote className="w-3.5 h-3.5 shrink-0" />
+                                        <span>Коментар викладача:</span>
+                                      </div>
+                                      <p className="text-xs text-purple-100 font-sans italic leading-relaxed pl-5">
+                                        "{sub.teacherComment}"
+                                      </p>
+                                    </div>
+                                  )}
+
+                                  {/* Submitted Answer Preview */}
+                                  {sub.code && (
+                                    <details className="text-[11px] text-slate-400">
+                                      <summary className="cursor-pointer hover:text-slate-200 select-none">
+                                        Переглянути код відповіді
+                                      </summary>
+                                      <pre className="mt-1 p-2 bg-slate-900 border border-slate-800 rounded text-slate-300 font-mono text-[10px] overflow-x-auto max-h-36">
+                                        {sub.code}
+                                      </pre>
+                                    </details>
+                                  )}
+                                </div>
+                              );
+                            })}
+                          </div>
+                        )}
+                      </DrawerSection>
                     </div>
                   )}
                 </div>
@@ -990,100 +1044,110 @@ export default function StudentPortalPage() {
               {/* Content Drawer 2: Skill DAG Map */}
               {activeTab === 'bkt' && (
                 <div className="flex flex-col gap-3">
-                  <SkillDagMap nodes={graphNodes} activeSkillSlug={task?.skill?.slug} />
-
-                  <button
-                    onClick={() => {
-                      handleTabClick('tree');
-                    }}
-                    className="w-full py-2.5 px-3 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-lg shadow-indigo-600/30 transition-all cursor-pointer"
+                  <DrawerSection
+                    title="Граф зв'язків компетенцій"
+                    icon={Sparkles}
+                    iconColor="text-emerald-400"
+                    titleColor="text-emerald-400 group-hover:text-emerald-300"
+                    badge={graphNodes.length}
+                    badgeColor="bg-emerald-500/10 text-emerald-300 border-emerald-500/20"
+                    defaultOpen={true}
                   >
-                    <Network className="w-4 h-4" />
-                    <span>Відкрити Дерево Знань на Екрані</span>
-                  </button>
+                    <SkillDagMap nodes={graphNodes} activeSkillSlug={task?.skill?.slug} />
+
+                    <button
+                      onClick={() => {
+                        handleTabClick('tree');
+                      }}
+                      className="w-full py-2.5 px-3 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-lg shadow-indigo-600/30 transition-all cursor-pointer mt-2"
+                    >
+                      <Network className="w-4 h-4" />
+                      <span>Відкрити Дерево Знань на Екрані</span>
+                    </button>
+                  </DrawerSection>
                 </div>
               )}
 
               {/* Content Drawer: Node Detail (Inspector for Tree) */}
               {activeTab === 'tree' && (
-                <div className="flex flex-col gap-4">
+                <div className="flex flex-col gap-3">
                   {inspectedSkill ? (
-                    <div className="flex flex-col gap-4">
-                      {/* Node Status Badge */}
-                      <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-                        <span className="px-2.5 py-1 rounded-full text-[10px] font-mono font-bold uppercase tracking-wider bg-purple-500/10 text-purple-400 border border-purple-500/30 flex items-center gap-1.5">
-                          <Network className="w-3.5 h-3.5" />
-                          Модуль Дерева Знань
-                        </span>
-                        <span
-                          className={`text-[10px] font-bold font-mono px-2 py-0.5 rounded-full border ${
-                            inspectedSkill.pMastery >= 0.95
-                              ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30'
-                              : inspectedSkill.status === 'LOCKED'
-                              ? 'bg-rose-500/10 text-rose-400 border-rose-500/30'
-                              : 'bg-indigo-500/10 text-indigo-300 border-indigo-500/30'
-                          }`}
-                        >
-                          {inspectedSkill.pMastery >= 0.95
-                            ? '✨ Опановано'
-                            : inspectedSkill.status === 'LOCKED'
-                            ? '🔒 Заблоковано'
-                            : '⚔️ У процесі'}
-                        </span>
-                      </div>
+                    <div className="flex flex-col gap-3">
+                      {/* Section 1: Загальний статус вузла */}
+                      <DrawerSection
+                        title="Статус модуля"
+                        icon={Network}
+                        iconColor="text-purple-400"
+                        titleColor="text-purple-400 group-hover:text-purple-300"
+                        badge={inspectedSkill.pMastery >= 0.95 ? 'Опановано' : inspectedSkill.status === 'LOCKED' ? 'Заблоковано' : 'У процесі'}
+                        badgeColor={inspectedSkill.pMastery >= 0.95 ? 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30' : inspectedSkill.status === 'LOCKED' ? 'bg-rose-500/15 text-rose-300 border-rose-500/30' : 'bg-indigo-500/15 text-indigo-300 border-indigo-500/30'}
+                        defaultOpen={true}
+                      >
+                        <div className="flex flex-col gap-2 p-3 bg-slate-950/70 border border-slate-800/80 rounded-xl">
+                          <h3 className="text-sm font-bold text-white">{inspectedSkill.title}</h3>
+                          <p className="text-xs text-slate-300 leading-relaxed">
+                            {inspectedSkill.description || 'Ключовий модуль курсу для набуття практичних навичок.'}
+                          </p>
+                          {inspectedSkill.status === 'LOCKED' && (
+                            <div className="p-2.5 bg-rose-950/30 border border-rose-500/40 rounded-lg flex items-start gap-2 mt-1">
+                              <AlertTriangle className="w-3.5 h-3.5 text-rose-400 shrink-0 mt-0.5" />
+                              <div className="text-[11px] text-rose-200">
+                                <strong className="text-rose-300 block mb-0.5">Вузол Наразі Заблоковано!</strong>
+                                Необхідно спершу засвоїти попередні залежні модулі до рівня P(L) ≥ 0.75.
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      </DrawerSection>
 
-                      {/* Title & Description */}
-                      <div>
-                        <h3 className="text-base font-bold text-white">{inspectedSkill.title}</h3>
-                        <p className="text-xs text-slate-300 mt-2 leading-relaxed">
-                          {inspectedSkill.description || 'Ключовий модуль курсу для набуття практичних навичок.'}
-                        </p>
-                      </div>
-
-                      {/* Locked Warning Notice if node is locked */}
-                      {inspectedSkill.status === 'LOCKED' && (
-                        <div className="p-3 bg-rose-950/30 border border-rose-500/40 rounded-xl flex items-start gap-2.5">
-                          <AlertTriangle className="w-4 h-4 text-rose-400 shrink-0 mt-0.5" />
-                          <div className="text-[11px] text-rose-200">
-                            <strong className="text-rose-300 block mb-0.5">Вузол Наразі Заблоковано!</strong>
-                            Для розблокування цього модуля необхідно спершу засвоїти попередні залежні модулі до рівня майстерності P(L) ≥ 0.75 (Bloom Proficient).
+                      {/* Section 2: Рівень засвоєння P(L) */}
+                      <DrawerSection
+                        title="Майстерність BKT"
+                        icon={Brain}
+                        iconColor="text-emerald-400"
+                        titleColor="text-emerald-400 group-hover:text-emerald-300"
+                        badge={`${(inspectedSkill.pMastery * 100).toFixed(1)}%`}
+                        badgeColor={inspectedSkill.pMastery >= 0.90 ? 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30' : 'bg-indigo-500/15 text-indigo-300 border-indigo-500/30'}
+                        defaultOpen={true}
+                        className="border-t border-slate-800/80 pt-2.5"
+                      >
+                        <div className="bg-slate-950/80 border border-slate-800 rounded-xl p-3.5 flex flex-col gap-2.5">
+                          <div className="flex justify-between items-center text-xs">
+                            <span className="text-slate-400 font-semibold">Рівень Майстерності P(L):</span>
+                            <span className={`font-mono font-bold text-sm ${
+                              inspectedSkill.pMastery >= 0.90 ? 'text-emerald-400' : 'text-indigo-400'
+                            }`}>
+                              {(inspectedSkill.pMastery * 100).toFixed(1)}%
+                            </span>
+                          </div>
+                          <div className="w-full h-2 bg-slate-900 rounded-full overflow-hidden border border-slate-800">
+                            <div
+                              className={`h-full transition-all duration-500 ${
+                                inspectedSkill.pMastery >= 0.90
+                                  ? 'bg-emerald-400'
+                                  : inspectedSkill.status === 'LOCKED'
+                                  ? 'bg-slate-700'
+                                  : 'bg-gradient-to-r from-amber-500 to-indigo-500'
+                              }`}
+                              style={{ width: `${Math.min(100, inspectedSkill.pMastery * 100)}%` }}
+                            />
+                          </div>
+                          <div className="flex justify-between text-[10px] text-slate-500 font-mono">
+                            <span>0%</span>
+                            <span className="text-emerald-400">Поріг: ≥ 90.0% (Gold) / 75.0% (Відкрито)</span>
                           </div>
                         </div>
-                      )}
+                      </DrawerSection>
 
-                      {/* BKT Mastery Breakdown */}
-                      <div className="bg-slate-950/80 border border-slate-800 rounded-xl p-3.5 flex flex-col gap-2.5">
-                        <div className="flex justify-between items-center text-xs">
-                          <span className="text-slate-400 font-semibold">Рівень Майстерності P(L):</span>
-                          <span className={`font-mono font-bold text-sm ${
-                            inspectedSkill.pMastery >= 0.90 ? 'text-emerald-400' : 'text-indigo-400'
-                          }`}>
-                            {(inspectedSkill.pMastery * 100).toFixed(1)}%
-                          </span>
-                        </div>
-                        <div className="w-full h-2 bg-slate-900 rounded-full overflow-hidden border border-slate-800">
-                          <div
-                            className={`h-full transition-all duration-500 ${
-                              inspectedSkill.pMastery >= 0.90
-                                ? 'bg-emerald-400'
-                                : inspectedSkill.status === 'LOCKED'
-                                ? 'bg-slate-700'
-                                : 'bg-gradient-to-r from-amber-500 to-indigo-500'
-                            }`}
-                            style={{ width: `${Math.min(100, inspectedSkill.pMastery * 100)}%` }}
-                          />
-                        </div>
-                        <div className="flex justify-between text-[10px] text-slate-500 font-mono">
-                          <span>0%</span>
-                          <span className="text-emerald-400">Поріг: ≥ 90.0% (Gold) / 75.0% (Відкрито)</span>
-                        </div>
-                      </div>
-
-                      {/* Prerequisites info */}
-                      <div className="flex flex-col gap-1.5 text-xs">
-                        <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
-                          Вимоги до Розблокування:
-                        </span>
+                      {/* Section 3: Пререквізити */}
+                      <DrawerSection
+                        title="Вимоги та залежності"
+                        icon={Compass}
+                        iconColor="text-indigo-400"
+                        titleColor="text-indigo-400 group-hover:text-indigo-300"
+                        defaultOpen={true}
+                        className="border-t border-slate-800/80 pt-2.5"
+                      >
                         <div className="text-[11px] text-slate-300 bg-slate-950/70 p-2.5 rounded-lg border border-slate-800">
                           {inspectedSkill.parentSkillIds.length === 0
                             ? '🟢 Базовий стартовий вузол курсу.'
@@ -1091,7 +1155,7 @@ export default function StudentPortalPage() {
                             ? '🔒 Потребує опанування попередніх навичок (P(L) ≥ 0.75).'
                             : '✨ Усі пререквізити виконано! Модуль відкрито.'}
                         </div>
-                      </div>
+                      </DrawerSection>
 
                       {/* Action Button */}
                       <button
@@ -1110,12 +1174,12 @@ export default function StudentPortalPage() {
                             : 'bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white shadow-indigo-600/40'
                         }`}
                       >
-                        <span>{inspectedSkill.status === 'LOCKED' ? '🔒 Заблоковано' : inspectedSkill.pMastery >= 0.90 ? 'Тренувати знову' : 'Розпочати квест модуля ➔'}</span>
+                        <span>{inspectedSkill.status === 'LOCKED' ? '🔒 Заблоковано' : inspectedSkill.pMastery >= 0.90 ? 'Повторити тему' : 'Розпочати вправу вузла →'}</span>
                       </button>
                     </div>
                   ) : (
                     <div className="text-slate-400 text-xs p-4 text-center">
-                      Оберіть вузол на дереві знань для перегляду деталей.
+                      Виберіть вузол на карті або дереві знань для перегляду деталей.
                     </div>
                   )}
                 </div>
@@ -1123,14 +1187,25 @@ export default function StudentPortalPage() {
 
               {/* Content Drawer 3: Settings */}
               {activeTab === 'settings' && (
-                <div className="flex flex-col gap-4 text-xs text-slate-300">
-                  <p>Налаштування робочого середовища та відображення Monaco Editor.</p>
-                  <button
-                    onClick={() => fetchRecommendedTask(activeCourseSlug)}
-                    className="w-full py-2.5 bg-indigo-600 text-white rounded-xl font-bold cursor-pointer hover:bg-indigo-500 transition-all"
+                <div className="flex flex-col gap-3">
+                  <DrawerSection
+                    title="Діагностика та середовище"
+                    icon={Settings}
+                    iconColor="text-amber-400"
+                    titleColor="text-amber-400 group-hover:text-amber-300"
+                    defaultOpen={true}
                   >
-                    Перезавантажити стан BKT
-                  </button>
+                    <div className="flex flex-col gap-3 text-xs text-slate-300 p-3 bg-slate-950/70 border border-slate-800/80 rounded-xl">
+                      <p>Параметри середовища розробки та актуалізації моделі знань.</p>
+                      <button
+                        onClick={() => fetchRecommendedTask(activeCourseSlug)}
+                        className="w-full py-2.5 bg-indigo-600 text-white rounded-xl font-bold cursor-pointer hover:bg-indigo-500 transition-all flex items-center justify-center gap-2"
+                      >
+                        <RefreshCw className="w-3.5 h-3.5" />
+                        <span>Перезавантажити стан BKT</span>
+                      </button>
+                    </div>
+                  </DrawerSection>
                 </div>
               )}
             </div>

@@ -316,6 +316,7 @@
 | **SBC-263** | `Style` | `TC` | unify Analytics and CourseMap drawer sections to Rule 7 borderless accordion standard | 2026-10-23 | `afad77f` |
 | **SBC-264** | `Style` | `TC` | create reusable DrawerSection in @sbc/ui and refactor Reviews and Settings drawers to Rule 7 | 2026-10-23 | `8abc0fc` |
 | **SBC-265** | `Chore` | `INF` | formalize Drawer Container and Mandatory DrawerSection Architecture in Rule 7 | 2026-10-23 | `a3077db` |
+| **SBC-266** | `Style` | `ST` | refactor Student Portal drawer to Rule 7 DrawerSection architecture | 2026-10-23 | `2166713` |
 
 ---
 
