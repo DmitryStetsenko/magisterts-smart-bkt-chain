@@ -70,6 +70,7 @@ export class TaskController {
 
     const tasks = await this.prisma.task.findMany({
       where: courseIdCondition ? { skill: { courseId: courseIdCondition } } : {},
+      orderBy: { createdAt: 'asc' },
     });
 
     if (tasks.length === 0) {
@@ -109,7 +110,10 @@ export class TaskController {
 
     // Check if student's most recent attempt was incorrect to trigger graceful degradation to EASY on the same topic
     const lastAttempt = await this.prisma.bktHistory.findFirst({
-      where: { userId: targetUserId },
+      where: {
+        userId: targetUserId,
+        ...(courseIdCondition ? { task: { skill: { courseId: courseIdCondition } } } : {}),
+      },
       orderBy: { createdAt: 'desc' },
       include: { task: true },
     });
