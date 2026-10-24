@@ -12,11 +12,11 @@
 | **`SBC-EP-BKT`** | Bayesian Knowledge Tracing & Behavioral Telemetry | 29 |
 | **`SBC-EP-LLM`** | Automated Code Assessment & Open-Text Evaluation | 10 |
 | **`SBC-EP-W3`** | Web3 Infrastructure & Smart Contracts | 0 |
-| **`SBC-EP-ST`** | Student Portal & Skill Tree Map | 29 |
+| **`SBC-EP-ST`** | Student Portal & Skill Tree Map | 30 |
 | **`SBC-EP-TC`** | Teacher Portal & Analytics CRM | 22 |
 | **`SBC-EP-AD`** | Admin Portal & Knowledge DAG Builder | 8 |
 | **`SBC-EP-LD`** | Landing Web Page | 9 |
-| **ВСЬОГО** | - | **237** |
+| **ВСЬОГО** | - | **238** |
 
 ---
 
@@ -265,6 +265,7 @@
 | **SBC-248** | `Style` | `ST` | replace bulky degradation text badge with compact message icon and interactive explanation tooltip | 2026-10-22 | `560e622` |
 | **SBC-252** | `Story` | `ST` | hide Socratic hints and study unit deep-link on clean initial attempts and show conditionally upon struggle | 2026-10-22 | `81c4829` |
 | **SBC-269** | `Fix` | `ST` | persistently display and highlight selected quiz answer upon submission | 2026-10-23 | `27eb4ae` |
+| **SBC-271** | `Story` | `ST` | implement honest persistent disabled states for Socratic hints, study theory, and remediation buttons | 2026-10-24 | pending |
 
 ---
 

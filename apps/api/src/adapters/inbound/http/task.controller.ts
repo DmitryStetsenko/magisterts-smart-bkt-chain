@@ -154,9 +154,20 @@ export class TaskController {
       throw new NotFoundException('No recommended tasks available');
     }
 
+    // Check if an isomorphic or lower-difficulty remediation task exists for fullTask
+    const hasRemediationTask = tasks.some(
+      (t) =>
+        t.id !== fullTask.id &&
+        t.skillId === fullTask.skillId &&
+        ((t.topic && fullTask.topic && t.topic === fullTask.topic && t.difficulty === 'EASY') ||
+         (t.subConcept && fullTask.subConcept && t.subConcept === fullTask.subConcept) ||
+         (fullTask.difficulty !== 'EASY' && t.difficulty === 'EASY'))
+    );
+
     return {
       recommendation: recommendation || { targetSkillSlug: fullTask.skill.slug, reason: 'First task in course' },
       task: fullTask,
+      hasRemediationTask,
     };
   }
 
