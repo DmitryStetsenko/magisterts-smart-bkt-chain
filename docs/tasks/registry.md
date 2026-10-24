@@ -114,7 +114,7 @@
 | **SBC-224** | `Task` | `INF` | log emoji removal and sync task registry and daily progress | 2026-10-19 | `52d9d9b` |
 | **SBC-272** | `Story` | `INF` | persist active course selection in localStorage across page reloads for student and teacher portals | 2026-10-24 | `9201772` |
 | **SBC-273** | `Story` | `INF` | add floating toast notifications on course switch and record course testing ergonomics in backlog | 2026-10-24 | `a6ac8b5` |
-| **SBC-274** | `Story` | `INF` | implement modal confirmation dialog with pre-switch validation before changing courses | 2026-10-24 | `pending` |
+| **SBC-274** | `Story` | `INF` | implement modal confirmation dialog with pre-switch validation before changing courses | 2026-10-24 | `b454563` |
 
 ---
 
