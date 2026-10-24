@@ -66,6 +66,31 @@
             },
             {
               "type": "text",
+              "raw_text": "**Персистентне Збереження Обраного Курсу в LocalStorage (`SBC-272`, `EP-INF`):**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Проблема:** При виборі курсу в порталі студента або викладача (наприклад, перемиканні на новий шкільний курс `web-algorithms-school` чи `ukraine-law`) після звичайного перезавантаження сторінки (`F5`) активний курс скидався до початкового (`js-dev`).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Реалізація (`apps/student` та `apps/teacher`):**",
+              "subitems": [
+                "*Ключі сховища:* Запроваджено роздільні ключі `sbc_student_active_course` та `sbc_teacher_active_course` у браузерному `localStorage`.",
+                "*Безпечна ініціалізація стану (SSR Safe):* Lazy initializer для `useState`: `() => typeof window !== 'undefined' ? localStorage.getItem(...) || 'js-dev' : 'js-dev'`.",
+                "*Оновлення при завантаженні курсів:* При отриманні переліку курсів з API перевіряється наявність збереженого слагу. Якщо збережений курс є у списку доступних, він залишається активним і не скидається на нульовий елемент.",
+                "*Синхронізація при виборі:* Функції `handleSelectCourse` зберігають новий вибір у `localStorage` одразу при кліку."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Верифікація:** Успішно виконано збірки `npm run build:student` та `npm run build:teacher` без помилок.",
+              "subitems": []
+            },
+            {
+              "type": "text",
               "raw_text": "---",
               "subitems": []
             }

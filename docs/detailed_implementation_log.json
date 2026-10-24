@@ -6066,6 +6066,57 @@
               "subitems": []
             }
           ]
+        },
+        {
+          "title": "11.48. Збереження Активного Курсу в LocalStorage (SBC-272)",
+          "level": 3,
+          "paragraphs": [],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "**Контекст проблеми:** При переході між сторінками або звичайному оновленні вкладки браузера (`F5`) активний курс у кабінетах Студента (`apps/student`) та Викладача (`apps/teacher`) скидався до значення за замовчуванням `js-dev`. Це суттєво ускладнювало тестування й демонстрацію інших курсів (зокрема, шкільного курсу `web-algorithms-school` чи `ukraine-law`).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Технічні рішення та реалізація:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Студентський портал ([apps/student/src/app/page.tsx](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/student/src/app/page.tsx)):**",
+              "subitems": [
+                "Ініціалізація `useState` через функціональний аргумент: перевірка `typeof window !== 'undefined'` та зчитування ключа `sbc_student_active_course`.",
+                "Функція `handleSelectCourse`: запис обраного слагу до `localStorage` при кожній зміні курсу в селекторі.",
+                "Хук завантаження курсів: перевірка чи збережений слаг присутній у масиві завантажених курсів; якщо так — збереження його активним без примусового перезапису."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Викладацький портал ([apps/teacher/src/app/page.tsx](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/teacher/src/app/page.tsx)):**",
+              "subitems": [
+                "Ініціалізація `useState` зчитуванням ключа `sbc_teacher_active_course`.",
+                "Функція `handleSelectCourse`: запис обраного курсу в `localStorage` та оновлення стейту.",
+                "Хук отримання списку курсів із бекенду: перевірка наявності збереженого слагу перед встановленням дефолтного курсу."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Верифікація:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "`npm run build:student` завершено успішно (код 0).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "`npm run build:teacher` завершено успішно (код 0).",
+              "subitems": []
+            }
+          ]
         }
       ]
     }

@@ -25,7 +25,12 @@ const DEFAULT_COURSES: CourseItem[] = [
 
 export default function TeacherDashboardPage() {
   const [courses, setCourses] = useState<CourseItem[]>(DEFAULT_COURSES);
-  const [activeCourseSlug, setActiveCourseSlug] = useState<string>('js-dev');
+  const [activeCourseSlug, setActiveCourseSlug] = useState<string>(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('sbc_teacher_active_course') || 'js-dev';
+    }
+    return 'js-dev';
+  });
   const [students, setStudents] = useState<StudentAnalyticsItem[]>([]);
   const [courseDetails, setCourseDetails] = useState<any>(null);
   const [allTasks, setAllTasks] = useState<any[]>([]);
@@ -61,8 +66,15 @@ export default function TeacherDashboardPage() {
               skillSlugs: Array.isArray(c.skills) ? c.skills.map((s: any) => s.slug) : [],
             }));
             setCourses(mapped);
-            if (!mapped.some((c) => c.slug === activeCourseSlug)) {
-              setActiveCourseSlug(mapped[0].slug);
+            const savedCourse = typeof window !== 'undefined' ? localStorage.getItem('sbc_teacher_active_course') : null;
+            if (savedCourse && mapped.some((c) => c.slug === savedCourse)) {
+              setActiveCourseSlug(savedCourse);
+            } else if (!mapped.some((c) => c.slug === activeCourseSlug)) {
+              const defaultSlug = mapped[0].slug;
+              setActiveCourseSlug(defaultSlug);
+              if (typeof window !== 'undefined') {
+                localStorage.setItem('sbc_teacher_active_course', defaultSlug);
+              }
             }
           }
         }
@@ -72,6 +84,13 @@ export default function TeacherDashboardPage() {
     };
     fetchCourses();
   }, []);
+
+  const handleSelectCourse = (slug: string) => {
+    setActiveCourseSlug(slug);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('sbc_teacher_active_course', slug);
+    }
+  };
 
   const fetchStudentAnalytics = async () => {
     try {
@@ -388,7 +407,7 @@ export default function TeacherDashboardPage() {
             <select
               id="teacher-course-select"
               value={activeCourseSlug}
-              onChange={(e) => setActiveCourseSlug(e.target.value)}
+              onChange={(e) => handleSelectCourse(e.target.value)}
               className="w-full appearance-none px-3 py-1.5 rounded-xl bg-slate-950 border border-slate-700 text-xs font-semibold text-white focus:outline-none focus:border-purple-500 cursor-pointer pr-8 shadow-inner"
             >
               {courses.map((course) => (

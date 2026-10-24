@@ -53,7 +53,12 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
 
 export default function StudentPortalPage() {
   const [courses, setCourses] = useState<CourseItem[]>(DEFAULT_COURSES);
-  const [activeCourseSlug, setActiveCourseSlug] = useState<string>('js-dev');
+  const [activeCourseSlug, setActiveCourseSlug] = useState<string>(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('sbc_student_active_course') || 'js-dev';
+    }
+    return 'js-dev';
+  });
   const [task, setTask] = useState<TaskDetail | null>(null);
   const [exhaustedModalData, setExhaustedModalData] = useState<{ skillId: string; skillTitle: string } | null>(null);
 
@@ -65,8 +70,15 @@ export default function StudentPortalPage() {
           const data = await res.json();
           if (Array.isArray(data) && data.length > 0) {
             setCourses(data);
-            if (!data.some((c: any) => c.slug === activeCourseSlug)) {
-              setActiveCourseSlug(data[0].slug);
+            const savedCourse = typeof window !== 'undefined' ? localStorage.getItem('sbc_student_active_course') : null;
+            if (savedCourse && data.some((c: any) => c.slug === savedCourse)) {
+              setActiveCourseSlug(savedCourse);
+            } else if (!data.some((c: any) => c.slug === activeCourseSlug)) {
+              const defaultSlug = data[0].slug;
+              setActiveCourseSlug(defaultSlug);
+              if (typeof window !== 'undefined') {
+                localStorage.setItem('sbc_student_active_course', defaultSlug);
+              }
             }
           }
         }
@@ -76,6 +88,13 @@ export default function StudentPortalPage() {
     };
     fetchCourses();
   }, []);
+
+  const handleSelectCourse = (slug: string) => {
+    setActiveCourseSlug(slug);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('sbc_student_active_course', slug);
+    }
+  };
   const [recommendation, setRecommendation] = useState<any>(null);
   const [hasRemediationTask, setHasRemediationTask] = useState<boolean>(true);
   const [code, setCode] = useState<string>('');
@@ -445,7 +464,7 @@ export default function StudentPortalPage() {
             <select
               id="student-course-select"
               value={activeCourseSlug}
-              onChange={(e) => setActiveCourseSlug(e.target.value)}
+              onChange={(e) => handleSelectCourse(e.target.value)}
               className="w-full appearance-none px-3 py-1.5 rounded-xl bg-slate-950 border border-slate-700 text-xs font-semibold text-white focus:outline-none focus:border-indigo-500 cursor-pointer pr-8 shadow-inner"
             >
               {courses.map((course) => (

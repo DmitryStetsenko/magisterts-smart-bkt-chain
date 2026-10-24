@@ -1701,3 +1701,19 @@ eferenceAnswer, критерії options.keywords (microtask|мікротаск|
   - Збірка `npm run build:api` завершилася успішно (exit code 0).
   - Збірка `npm run build:student` успішно завершила компіляцію сторінок без помилок типізації (exit code 0).
 
+### 11.48. Збереження Активного Курсу в LocalStorage (SBC-272)
+- **Контекст проблеми:** При переході між сторінками або звичайному оновленні вкладки браузера (`F5`) активний курс у кабінетах Студента (`apps/student`) та Викладача (`apps/teacher`) скидався до значення за замовчуванням `js-dev`. Це суттєво ускладнювало тестування й демонстрацію інших курсів (зокрема, шкільного курсу `web-algorithms-school` чи `ukraine-law`).
+- **Технічні рішення та реалізація:**
+  1. **Студентський портал ([apps/student/src/app/page.tsx](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/student/src/app/page.tsx)):**
+     - Ініціалізація `useState` через функціональний аргумент: перевірка `typeof window !== 'undefined'` та зчитування ключа `sbc_student_active_course`.
+     - Функція `handleSelectCourse`: запис обраного слагу до `localStorage` при кожній зміні курсу в селекторі.
+     - Хук завантаження курсів: перевірка чи збережений слаг присутній у масиві завантажених курсів; якщо так — збереження його активним без примусового перезапису.
+  2. **Викладацький портал ([apps/teacher/src/app/page.tsx](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/teacher/src/app/page.tsx)):**
+     - Ініціалізація `useState` зчитуванням ключа `sbc_teacher_active_course`.
+     - Функція `handleSelectCourse`: запис обраного курсу в `localStorage` та оновлення стейту.
+     - Хук отримання списку курсів із бекенду: перевірка наявності збереженого слагу перед встановленням дефолтного курсу.
+- **Верифікація:**
+  - `npm run build:student` завершено успішно (код 0).
+  - `npm run build:teacher` завершено успішно (код 0).
+
+
