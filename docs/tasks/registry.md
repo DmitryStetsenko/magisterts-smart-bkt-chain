@@ -113,7 +113,7 @@
 | **SBC-210** | `Task` | `INF` | sync task registry and jira import csv for sbc-209 | 2026-10-15 | `4994498` |
 | **SBC-224** | `Task` | `INF` | log emoji removal and sync task registry and daily progress | 2026-10-19 | `52d9d9b` |
 | **SBC-272** | `Story` | `INF` | persist active course selection in localStorage across page reloads for student and teacher portals | 2026-10-24 | `9201772` |
-| **SBC-273** | `Story` | `INF` | add floating toast notifications on course switch and record course testing ergonomics in backlog | 2026-10-24 | `pending` |
+| **SBC-273** | `Story` | `INF` | add floating toast notifications on course switch and record course testing ergonomics in backlog | 2026-10-24 | `a6ac8b5` |
 
 ---
 
