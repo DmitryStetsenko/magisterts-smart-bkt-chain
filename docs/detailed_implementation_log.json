@@ -6117,6 +6117,59 @@
               "subitems": []
             }
           ]
+        },
+        {
+          "title": "11.49. Інформаційне Сповіщення про Зміну Курсу та Концепція Тестувального Перемикача (SBC-273 / BACKLOG-4)",
+          "level": 3,
+          "paragraphs": [],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "**Контекст проблеми:** При перемиканні активного курсу в інтерфейсі користувачеві бракувало чіткого візуального підтвердження виконаної дії (Toast notification), а також виникла потреба зафіксувати в беклозі методологію безпечного та ергономічного перемикання курсів під час тестування системи.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Технічні рішення та реалізація:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Toast-сповіщення у Студентському кабінеті ([apps/student/src/app/page.tsx](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/student/src/app/page.tsx)):**",
+              "subitems": [
+                "Додано стан `courseNotification: string | null`.",
+                "При виборі курсу з'являється плаваючий віджет у правому верхньому куті (`bg-indigo-950/90 border border-indigo-500/50 shadow-2xl backdrop-blur-xl`) з назвою активованого курсу, що автоматично зникає за 3.5 секунди або закривається кнопкою `X`."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Toast-сповіщення у Викладацькому кабінеті ([apps/teacher/src/app/page.tsx](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/teacher/src/app/page.tsx)):**",
+              "subitems": [
+                "Запроваджено фіолетовий Toast моніторингу аналітики при зміні фільтра курсу: *«Курс для аналітики змінено на: [Назва]»*."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Фіксація в Продуктовому Беклозі ([docs/backlog/README.md](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/docs/backlog/README.md)):**",
+              "subitems": [
+                "Створено розділ 4 та задачу `[BACKLOG-4] Ергономіка та протокол перемикання навчальних курсів у режимі тестування й демонстрації`:",
+                "Захист чернетки коду / відповідей перед перемиканням курсу.",
+                "Quick Switcher віджет для тестувальників (очищення спроб, емуляція ролей).",
+                "Коректне скидання WebSocket telemetry сесії між курсами."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Верифікація:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Збірки `npm run build:student` та `npm run build:teacher` успішно завершено (exit code 0).",
+              "subitems": []
+            }
+          ]
         }
       ]
     }

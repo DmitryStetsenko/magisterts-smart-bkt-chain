@@ -89,11 +89,19 @@ export default function StudentPortalPage() {
     fetchCourses();
   }, []);
 
+  const [courseNotification, setCourseNotification] = useState<string | null>(null);
+
   const handleSelectCourse = (slug: string) => {
     setActiveCourseSlug(slug);
     if (typeof window !== 'undefined') {
       localStorage.setItem('sbc_student_active_course', slug);
     }
+    const targetCourse = courses.find((c) => c.slug === slug);
+    const title = targetCourse ? targetCourse.title : slug;
+    setCourseNotification(`Активний курс переключено на: ${title}`);
+    setTimeout(() => {
+      setCourseNotification(null);
+    }, 3500);
   };
   const [recommendation, setRecommendation] = useState<any>(null);
   const [hasRemediationTask, setHasRemediationTask] = useState<boolean>(true);
@@ -388,7 +396,24 @@ export default function StudentPortalPage() {
   );
 
   return (
-    <div className="h-screen w-screen bg-slate-950 text-slate-100 flex flex-col font-sans overflow-hidden">
+    <div className="h-screen w-screen bg-slate-950 text-slate-100 flex flex-col font-sans overflow-hidden relative">
+      {/* 🔔 Floating Course Switch Toast Notification */}
+      {courseNotification && (
+        <div className="fixed top-16 right-6 z-50 animate-fadeIn flex items-center gap-3 px-4 py-3 rounded-2xl bg-indigo-950/90 border border-indigo-500/50 text-white shadow-2xl backdrop-blur-xl">
+          <Sparkles className="w-4 h-4 text-indigo-400 animate-spin shrink-0" />
+          <div className="text-xs font-medium">
+            <span className="font-bold text-indigo-300 block text-[11px] uppercase tracking-wider">Навчальний контекст</span>
+            {courseNotification}
+          </div>
+          <button
+            onClick={() => setCourseNotification(null)}
+            className="text-slate-400 hover:text-white p-1 rounded-lg ml-1"
+          >
+            <X className="w-3.5 h-3.5" />
+          </button>
+        </div>
+      )}
+
       {/* 📌 Sticky Top Navigation Bar with Prominent Progress Indicator */}
       <header className="h-14 w-full bg-slate-900 border-b border-slate-800/90 px-4 flex items-center justify-between shrink-0 z-30 shadow-md">
         <div className="flex items-center gap-3">
