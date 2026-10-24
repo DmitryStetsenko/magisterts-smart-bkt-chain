@@ -102,6 +102,7 @@ export class TaskController {
       skillId: t.skillId,
       title: t.title,
       difficulty: t.difficulty,
+      taskType: t.taskType,
       topic: t.topic,
       subConcept: t.subConcept,
     }));
@@ -116,6 +117,7 @@ export class TaskController {
     const isLastFailed = lastAttempt && !lastAttempt.isCorrect;
     const preferredTopic = isLastFailed ? lastAttempt.task?.topic : null;
     const preferredDifficulty = isLastFailed ? ('EASY' as const) : null;
+    const preferredTaskType = isLastFailed ? lastAttempt.task?.taskType : null;
     const effectiveExcludeTaskId = excludeTaskId || (isLastFailed ? lastAttempt.taskId : undefined);
 
     const recommendation = TaskSequencer.recommendNextTask({
@@ -125,6 +127,7 @@ export class TaskController {
       completedTaskIds: submissions.map((s) => s.taskId),
       preferredTopic,
       preferredDifficulty,
+      preferredTaskType,
       excludeTaskId: effectiveExcludeTaskId,
     });
 
@@ -154,11 +157,18 @@ export class TaskController {
       throw new NotFoundException('No recommended tasks available');
     }
 
-    // Check if an isomorphic or lower-difficulty remediation task exists for fullTask
+    // Check if an isomorphic or lower-difficulty remediation task exists for fullTask with matching modality
+    const isQuiz = (type?: string | null) => type === 'SINGLE_CHOICE' || type === 'MULTIPLE_CHOICE';
+    const matchesModality = (tType?: string | null, fullType?: string | null) => {
+      if (isQuiz(fullType)) return isQuiz(tType);
+      return tType === fullType;
+    };
+
     const hasRemediationTask = tasks.some(
       (t) =>
         t.id !== fullTask.id &&
         t.skillId === fullTask.skillId &&
+        matchesModality(t.taskType, fullTask.taskType) &&
         ((t.topic && fullTask.topic && t.topic === fullTask.topic && t.difficulty === 'EASY') ||
          (t.subConcept && fullTask.subConcept && t.subConcept === fullTask.subConcept) ||
          (fullTask.difficulty !== 'EASY' && t.difficulty === 'EASY'))

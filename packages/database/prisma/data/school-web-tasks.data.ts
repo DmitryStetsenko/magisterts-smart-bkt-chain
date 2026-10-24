@@ -34,7 +34,7 @@ export const schoolLinearDomTasks: SeedTask[] = [
     ]
   },
   {
-    topic: 'dom-traversal',
+    topic: 'linear-algorithms',
     subConcept: 'linear-calc-output',
     taskType: 'CODE',
     title: 'Практика: Лінійний обчислювальний алгоритм для веб-сторінки',
@@ -55,7 +55,7 @@ export const schoolLinearDomTasks: SeedTask[] = [
     ]
   },
   {
-    topic: 'dom-traversal',
+    topic: 'linear-algorithms',
     subConcept: 'format-user-badge',
     taskType: 'CODE',
     title: 'Практика: Лінійне перетворення даних для бейджа користувача',

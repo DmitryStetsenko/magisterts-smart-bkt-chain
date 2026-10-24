@@ -12,6 +12,7 @@ export interface TaskDomain {
   skillId: string;
   title: string;
   difficulty: string;
+  taskType?: string | null;
   topic?: string | null;
   subConcept?: string | null;
 }
@@ -34,7 +35,7 @@ export interface SequencingRecommendation {
 export class TaskSequencer {
   /**
    * Recommends the next optimal task for a student based on skill graph DAG,
-   * BKT mastery state (0.75 Bloom Proficient threshold), topic matching and difficulty scaling.
+   * BKT mastery state (0.75 Bloom Proficient threshold), topic matching, modality consistency, and difficulty scaling.
    */
   public static recommendNextTask(params: {
     skills: SkillNodeDomain[];
@@ -43,6 +44,7 @@ export class TaskSequencer {
     completedTaskIds: string[];
     preferredTopic?: string | null;
     preferredDifficulty?: 'EASY' | 'MEDIUM' | 'HARD' | null;
+    preferredTaskType?: string | null;
     excludeTaskId?: string | null;
   }): SequencingRecommendation | null {
     const {
@@ -52,6 +54,7 @@ export class TaskSequencer {
       completedTaskIds,
       preferredTopic,
       preferredDifficulty,
+      preferredTaskType,
       excludeTaskId,
     } = params;
 
@@ -99,30 +102,40 @@ export class TaskSequencer {
 
       // If graceful degradation to EASY was requested:
       if (preferredDifficulty === 'EASY') {
-        // 1. First priority: uncompleted EASY task on preferredTopic
+        // Modality Guard: if student struggled on a quiz, do NOT fallback to a CODE task!
+        const matchesModality = (t: TaskDomain): boolean => {
+          if (!preferredTaskType) return true;
+          const isQuiz = (type?: string | null) => type === 'SINGLE_CHOICE' || type === 'MULTIPLE_CHOICE';
+          if (isQuiz(preferredTaskType)) {
+            return isQuiz(t.taskType);
+          }
+          return t.taskType === preferredTaskType;
+        };
+
+        // 1. First priority: uncompleted EASY task on preferredTopic matching modality
         if (preferredTopic) {
           const sameTopicEasy = uncompleted.find(
-            (t) => t.topic === preferredTopic && t.difficulty === 'EASY'
+            (t) => t.topic === preferredTopic && t.difficulty === 'EASY' && matchesModality(t)
           );
           if (sameTopicEasy) return sameTopicEasy;
         }
 
-        // 2. Second priority: any uncompleted EASY task in this active skill module
-        const skillEasy = uncompleted.find((t) => t.difficulty === 'EASY');
+        // 2. Second priority: any uncompleted EASY task in this active skill module matching modality
+        const skillEasy = uncompleted.find((t) => t.difficulty === 'EASY' && matchesModality(t));
         if (skillEasy) return skillEasy;
 
-        // 3. Third priority (Remediation / Review): if student previously completed the topic's EASY task,
+        // 3. Third priority (Remediation / Review): if student previously completed the topic's EASY task matching modality,
         // re-offer it as an auxiliary remediation review drill (excluding current failed task)
         if (preferredTopic) {
           const topicEasyReview = skillTasks.find(
-            (t) => t.topic === preferredTopic && t.difficulty === 'EASY' && (!excludeTaskId || t.id !== excludeTaskId)
+            (t) => t.topic === preferredTopic && t.difficulty === 'EASY' && matchesModality(t) && (!excludeTaskId || t.id !== excludeTaskId)
           );
           if (topicEasyReview) return topicEasyReview;
         }
 
-        // 4. Fourth priority: any EASY task in this module for remediation review
+        // 4. Fourth priority: any EASY task in this module matching modality for remediation review
         const moduleEasyReview = skillTasks.find(
-          (t) => t.difficulty === 'EASY' && (!excludeTaskId || t.id !== excludeTaskId)
+          (t) => t.difficulty === 'EASY' && matchesModality(t) && (!excludeTaskId || t.id !== excludeTaskId)
         );
         if (moduleEasyReview) return moduleEasyReview;
       }
