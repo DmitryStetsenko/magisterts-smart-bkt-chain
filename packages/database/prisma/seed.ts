@@ -12,6 +12,13 @@ import {
   jsOopTasks,
   SeedTask,
 } from './data/js-tasks.data';
+import {
+  schoolLinearDomTasks,
+  schoolBranchingTasks,
+  schoolLoopsRenderTasks,
+  schoolValidationTasks,
+  schoolFilterSearchTasks,
+} from './data/school-web-tasks.data';
 
 const prisma = new PrismaClient();
 
@@ -418,6 +425,104 @@ async function main() {
     },
   });
 
+  // ==================== COURSE 4: ШКІЛЬНА ІНФОРМАТИКА (ВЕБТЕХНОЛОГІЇ ТА АЛГОРИТМІЗАЦІЯ) ====================
+  const courseSchool = await prisma.course.create({
+    data: {
+      slug: 'web-algorithms-school',
+      title: 'Вебтехнології та алгоритмізація (10–11 класи)',
+      description: 'Практико-орієнтований курс алгоритмізації на базі сучасних вебтехнологій (DOM, форми, масиви, сортування)',
+      icon: 'graduation-cap',
+    },
+  });
+
+  const schoolDom = await prisma.skillNode.create({
+    data: {
+      courseId: courseSchool.id,
+      slug: 'web-alg-linear-dom',
+      title: 'Тема 1: Лінійні алгоритми та маніпуляція DOM',
+      description: 'Доступ до елементів веб-сторінки, лінійні обчислення та динамічне виведення результатів',
+      category: 'Web Algorithms',
+      difficulty: TaskDifficulty.EASY,
+    },
+  });
+
+  const schoolBranching = await prisma.skillNode.create({
+    data: {
+      courseId: courseSchool.id,
+      slug: 'web-alg-branching-events',
+      title: 'Тема 2: Розгалужені алгоритми та події інтерфейсу',
+      description: 'Обробники кліків, зміна класів та умовна логіка веб-інтерфейсу',
+      category: 'Web Algorithms',
+      difficulty: TaskDifficulty.EASY,
+    },
+  });
+
+  const schoolLoops = await prisma.skillNode.create({
+    data: {
+      courseId: courseSchool.id,
+      slug: 'web-alg-loops-render',
+      title: 'Тема 3: Циклічні алгоритми та рендеринг списків',
+      description: 'Генерація списків у HTML, агрегація даних та обхід колекцій у циклі',
+      category: 'Web Algorithms',
+      difficulty: TaskDifficulty.MEDIUM,
+    },
+  });
+
+  const schoolValidation = await prisma.skillNode.create({
+    data: {
+      courseId: courseSchool.id,
+      slug: 'web-alg-form-validation',
+      title: 'Тема 4: Алгоритми валідації та логічні умови',
+      description: 'Перевірка форм реєстрації, надійності паролів та поштових доменів',
+      category: 'Web Algorithms',
+      difficulty: TaskDifficulty.MEDIUM,
+    },
+  });
+
+  const schoolFilter = await prisma.skillNode.create({
+    data: {
+      courseId: courseSchool.id,
+      slug: 'web-alg-filter-search',
+      title: 'Тема 5: Алгоритми пошуку, фільтрації та сортування',
+      description: 'Динамічний пошук по каталогу, сортування рейтингів та фільтри для інтернет-магазину',
+      category: 'Web Algorithms',
+      difficulty: TaskDifficulty.HARD,
+    },
+  });
+
+  // Шкільні залежності графа навичок (Dependencies)
+  const schoolDeps = [
+    { parent: schoolDom, child: schoolBranching },
+    { parent: schoolBranching, child: schoolLoops },
+    { parent: schoolLoops, child: schoolValidation },
+    { parent: schoolValidation, child: schoolFilter },
+  ];
+  for (const dep of schoolDeps) {
+    await prisma.skillDependency.create({
+      data: { parentSkillId: dep.parent.id, childSkillId: dep.child.id, requiredMastery: 0.7 },
+    });
+  }
+
+  // Наповнення завданнями
+  console.log('  -> Seeding School Web Algorithms Modules...');
+  await insertModuleTasks(schoolDom.id, schoolLinearDomTasks);
+  await insertModuleTasks(schoolBranching.id, schoolBranchingTasks);
+  await insertModuleTasks(schoolLoops.id, schoolLoopsRenderTasks);
+  await insertModuleTasks(schoolValidation.id, schoolValidationTasks);
+  await insertModuleTasks(schoolFilter.id, schoolFilterSearchTasks);
+
+  // Initial BKT State for Student in School Course
+  await prisma.bktState.create({
+    data: {
+      userId: student.id,
+      skillId: schoolDom.id,
+      pMastery: 0.4,
+      pTransit: 0.25,
+      pSlip: 0.1,
+      pGuess: 0.2,
+    },
+  });
+
   // Initial BKT State for JS
   await prisma.bktState.create({
     data: {
@@ -430,7 +535,7 @@ async function main() {
     },
   });
 
-  console.log('✅ Multi-discipline seeding completed: 3 Courses (JS, English B2, Law), 11 Nodes, 12 Tasks!');
+  console.log('✅ Multi-discipline seeding completed: 4 Courses (JS, English B2, Law, School Web Algorithms)!');
 }
 
 main()
