@@ -265,7 +265,7 @@
 | **SBC-248** | `Style` | `ST` | replace bulky degradation text badge with compact message icon and interactive explanation tooltip | 2026-10-22 | `560e622` |
 | **SBC-252** | `Story` | `ST` | hide Socratic hints and study unit deep-link on clean initial attempts and show conditionally upon struggle | 2026-10-22 | `81c4829` |
 | **SBC-269** | `Fix` | `ST` | persistently display and highlight selected quiz answer upon submission | 2026-10-23 | `27eb4ae` |
-| **SBC-271** | `Story` | `ST` | implement honest persistent disabled states for Socratic hints, study theory, and remediation buttons | 2026-10-24 | pending |
+| **SBC-271** | `Story` | `ST` | implement honest persistent disabled states for Socratic hints, study theory, and remediation buttons | 2026-10-24 | `5c096c5` |
 
 ---
 
