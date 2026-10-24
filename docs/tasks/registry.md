@@ -112,7 +112,7 @@
 | **SBC-208** | `Bug` | `INF` | update package-lock and enhance github pages workflow for resilient ci | 2026-10-15 | `b11f87b` |
 | **SBC-210** | `Task` | `INF` | sync task registry and jira import csv for sbc-209 | 2026-10-15 | `4994498` |
 | **SBC-224** | `Task` | `INF` | log emoji removal and sync task registry and daily progress | 2026-10-19 | `52d9d9b` |
-| **SBC-272** | `Story` | `INF` | persist active course selection in localStorage across page reloads for student and teacher portals | 2026-10-24 | `pending` |
+| **SBC-272** | `Story` | `INF` | persist active course selection in localStorage across page reloads for student and teacher portals | 2026-10-24 | `9201772` |
 
 ---
 
