@@ -86,8 +86,16 @@ export default function TeacherDashboardPage() {
   }, []);
 
   const [courseNotification, setCourseNotification] = useState<string | null>(null);
+  const [pendingCourseSlug, setPendingCourseSlug] = useState<string | null>(null);
 
   const handleSelectCourse = (slug: string) => {
+    if (slug === activeCourseSlug) return;
+    setPendingCourseSlug(slug);
+  };
+
+  const confirmCourseSwitch = () => {
+    if (!pendingCourseSlug) return;
+    const slug = pendingCourseSlug;
     setActiveCourseSlug(slug);
     if (typeof window !== 'undefined') {
       localStorage.setItem('sbc_teacher_active_course', slug);
@@ -98,6 +106,11 @@ export default function TeacherDashboardPage() {
     setTimeout(() => {
       setCourseNotification(null);
     }, 3500);
+    setPendingCourseSlug(null);
+  };
+
+  const cancelCourseSwitch = () => {
+    setPendingCourseSlug(null);
   };
 
   const fetchStudentAnalytics = async () => {
@@ -2029,6 +2042,41 @@ export default function TeacherDashboardPage() {
                 className="px-4 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold transition-all cursor-pointer"
               >
                 Зрозуміло
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Course Switch Confirmation Modal Popup */}
+      {pendingCourseSlug && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-md animate-fadeIn">
+          <div className="max-w-md w-full p-6 bg-slate-900 border border-purple-500/40 rounded-2xl shadow-2xl flex flex-col gap-5 text-center transform transition-all scale-100">
+            <div className="mx-auto p-3.5 bg-purple-500/10 border border-purple-500/30 rounded-full text-purple-400">
+              <ShieldCheck className="w-8 h-8 animate-pulse" />
+            </div>
+            <div className="flex flex-col gap-2">
+              <h3 className="text-lg font-bold text-white">Перемикання Дисципліни Моніторингу</h3>
+              <p className="text-xs text-slate-300 leading-relaxed">
+                Перемкнути навчальну аналітику, журнал перевірки та граф навичок на курс <strong className="text-purple-300">"{courses.find(c => c.slug === pendingCourseSlug)?.title || pendingCourseSlug}"</strong>?
+              </p>
+              <div className="p-3 bg-slate-950/70 border border-slate-800 rounded-xl text-[11px] text-slate-400 text-left flex flex-col gap-1">
+                <span>📊 Буде перераховано метрики когорти для обраного курсу.</span>
+                <span>🎓 Список студентів та черга перевірки оновляться відповідно.</span>
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={cancelCourseSwitch}
+                className="flex-1 py-2.5 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs transition-all cursor-pointer border border-slate-700"
+              >
+                Скасувати
+              </button>
+              <button
+                onClick={confirmCourseSwitch}
+                className="flex-1 py-2.5 px-4 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs uppercase tracking-wider shadow-lg shadow-purple-600/30 transition-all cursor-pointer border border-purple-400/30"
+              >
+                Підтвердити перехід
               </button>
             </div>
           </div>
