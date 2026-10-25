@@ -166,9 +166,20 @@ export const StudentAnalyticsTable: React.FC<StudentAnalyticsTableProps> = ({
               <h3 className="text-lg font-bold text-white">Підтвердження анулювання</h3>
             </div>
 
-            <p className="text-sm text-slate-300 leading-relaxed">
-              Ви дійсно бажаєте повністю анулювати всі BKT-оцінки, телеметрію та історію спроб для цього студента? Цю дію неможливо скасувати.
-            </p>
+            <div className="flex flex-col gap-2">
+              <p className="text-sm text-slate-300 leading-relaxed">
+                Ви дійсно бажаєте повністю анулювати навчальний прогрес для цього студента?
+              </p>
+              <div className="p-3 bg-rose-950/40 border border-rose-500/40 rounded-xl text-[11px] text-rose-200 text-left flex flex-col gap-1.5">
+                <span className="font-bold text-rose-300 uppercase tracking-wider text-[10px]">⚠️ Увага: Глобальне анулювання</span>
+                <span className="text-slate-300 leading-relaxed">
+                  Буде скинуто <strong>всі розв'язки, BKT-оцінки та історію спроб по ВСІХ курсах платформи</strong> (а не лише для поточної дисципліни).
+                </span>
+                <span className="text-[10px] text-slate-400 font-mono pt-1 border-t border-rose-500/20">
+                  • Цю дію неможливо скасувати
+                </span>
+              </div>
+            </div>
 
             <div className="flex items-center justify-end gap-3 mt-2">
               <button

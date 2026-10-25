@@ -1745,6 +1745,22 @@ eferenceAnswer, критерії options.keywords (microtask|мікротаск|
 - **Верифікація:**
   - Збірки `npm run build:student` та `npm run build:teacher` завершилися успішно з кодом 0.
 
+### 11.51. Попередження про Глобальне Анулювання Прогресу Студента у Кабінеті Викладача (SBC-275 / BACKLOG-5)
+- **Контекст проблеми:** Кнопка «Скинути BKT Прогрес» у кабінеті викладача ініціювала виклик `POST /api/v1/bkt/reset/:studentId`, який безповоротно видаляв записи у таблицях `submissions`, `bkt_histories`, `bkt_states` та `telemetry_sessions` для всього акаунта студента по ВСІХ курсах. Викладач міг помилково припустити, що скидання діє лише в межах відкритого курсу.
+- **Технічні рішення та реалізація:**
+  1. **Кастомне модальне вікно з явним застереженням ([apps/teacher/src/app/page.tsx](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/teacher/src/app/page.tsx)):**
+     - Впроваджено стан `resetConfirmStudent: StudentAnalyticsItem | null` та індикатор виконання `isResettingStudent: boolean`.
+     - Кнопка скидання у картці обраного студента викликає діалогове вікно з червоним блоком попередження:
+       *«⚠️ Увага: Глобальне анулювання акаунта. Поточний механізм бекенду скидає всі розв'язки, BKT-метрики майстерності та історію спроб студента по ВСІХ курсах платформи (а не лише для поточного курсу "[Назва]"). Стан P(L) повернеться до базового P(L₀), а всі спроби у черзі будуть видалені»*.
+     - Кнопки дій: «Скасувати» та «Скинути весь прогрес» із захистом від повторного кліку та спінером завантаження.
+  2. **Оновлення модального вікна таблиці ([apps/teacher/src/features/analytics/ui/StudentAnalyticsTable.tsx](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/teacher/src/features/analytics/ui/StudentAnalyticsTable.tsx)):**
+     - Повідомлення синхронізовано з єдиним стандартом попередження про глобальність скидання.
+  3. **Реєстрація архітектурного завдання в беклозі ([docs/backlog/README.md](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/docs/backlog/README.md)):**
+     - Оформлено задачу `[BACKLOG-5] Курс-ізольоване скидання прогресу студента (Course-Scoped Student BKT Reset)` для майбутньої параметризації ендпоінту бекенду за `courseSlug` та видалення лише тих `bktState`/`submission`, що прив'язані до `course.skills`.
+- **Верифікація:**
+  - Збірка `npm run build:teacher` успішно завершилася без помилок (код 0).
+
+
 
 
 

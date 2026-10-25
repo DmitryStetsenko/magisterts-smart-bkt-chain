@@ -49,6 +49,10 @@ export default function TeacherDashboardPage() {
   // Modal explanation state for BKT/WPM/CopyPaste/Fatigue metrics
   const [metricModal, setMetricModal] = useState<'bkt' | 'wpm' | 'copypaste' | 'fatigue' | null>(null);
 
+  // Modal confirmation state for global student BKT reset
+  const [resetConfirmStudent, setResetConfirmStudent] = useState<StudentAnalyticsItem | null>(null);
+  const [isResettingStudent, setIsResettingStudent] = useState<boolean>(false);
+
   const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
 
   useEffect(() => {
@@ -343,6 +347,7 @@ export default function TeacherDashboardPage() {
   }, [courseDetails, selectedStudent, allTasks]);
 
   const handleResetStudent = async (studentId: string) => {
+    setIsResettingStudent(true);
     try {
       const res = await fetch(`${API_URL}/api/v1/bkt/reset/${studentId}`, { method: 'POST' });
       if (res.ok) {
@@ -351,9 +356,12 @@ export default function TeacherDashboardPage() {
           fetchReviewQueue(),
         ]);
         setSelectedReviewId(null);
+        setResetConfirmStudent(null);
       }
     } catch (err) {
       console.error('Error resetting student BKT:', err);
+    } finally {
+      setIsResettingStudent(false);
     }
   };
 
@@ -1660,8 +1668,9 @@ export default function TeacherDashboardPage() {
                   </div>
 
                   <button
-                    onClick={() => handleResetStudent(selectedStudent.id || selectedStudent.studentId || selectedStudent.email)}
+                    onClick={() => setResetConfirmStudent(selectedStudent)}
                     className="px-3 py-2 rounded-xl bg-rose-600/20 text-rose-300 border border-rose-500/30 hover:bg-rose-600/30 transition-all text-xs font-bold flex items-center gap-2 cursor-pointer shadow-md"
+                    title="Анулювати всі BKT-оцінки та історію спроб для цього студента"
                   >
                     <RotateCcw className="w-3.5 h-3.5" />
                     <span>Скинути BKT Прогрес</span>
@@ -2077,6 +2086,65 @@ export default function TeacherDashboardPage() {
                 className="flex-1 py-2.5 px-4 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs uppercase tracking-wider shadow-lg shadow-purple-600/30 transition-all cursor-pointer border border-purple-400/30"
               >
                 Підтвердити перехід
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ⚠️ Reset Student Global BKT Progress Confirmation Modal */}
+      {resetConfirmStudent && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-md animate-fadeIn">
+          <div className="max-w-md w-full p-6 bg-slate-900 border border-rose-500/40 rounded-2xl shadow-2xl flex flex-col gap-5 text-center transform transition-all scale-100">
+            <div className="mx-auto p-3.5 bg-rose-500/10 border border-rose-500/30 rounded-full text-rose-400">
+              <AlertTriangle className="w-8 h-8 animate-pulse" />
+            </div>
+            <div className="flex flex-col gap-2">
+              <h3 className="text-lg font-bold text-white">Анулювання Прогресу Студента</h3>
+              <p className="text-xs text-slate-300 leading-relaxed">
+                Ви дійсно бажаєте скинути навчальний прогрес студента <strong className="text-white">"{resetConfirmStudent.name}"</strong>?
+              </p>
+              
+              {/* ⚠️ Clear Warning about Global Reset vs Course-Scoped */}
+              <div className="p-3.5 bg-rose-950/40 border border-rose-500/40 rounded-xl text-[11px] text-rose-200 text-left flex flex-col gap-2">
+                <div className="font-bold text-rose-300 flex items-center gap-1.5 uppercase tracking-wider text-[10px]">
+                  <span>⚠️ Увага: Глобальне анулювання акаунта</span>
+                </div>
+                <p className="leading-relaxed text-slate-300">
+                  Поточний механізм бекенду скидає <strong className="text-rose-300">всі розв'язки, BKT-метрики майстерності та історію спроб студента по ВСІХ курсах платформи</strong> (а не лише для поточного курсу <code className="text-purple-300 font-mono">"{activeCourse.title}"</code>).
+                </p>
+                <div className="pt-1.5 border-t border-rose-500/30 flex flex-col gap-1 text-[10px] text-slate-400 font-mono">
+                  <span>• Стан P(L) повернеться до базового апріорного P(L₀)</span>
+                  <span>• Усі спроби у черзі на перевірку будуть видалені</span>
+                  <span>• Цю дію неможливо скасувати</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <button
+                disabled={isResettingStudent}
+                onClick={() => setResetConfirmStudent(null)}
+                className="flex-1 py-2.5 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs transition-all cursor-pointer border border-slate-700 disabled:opacity-50"
+              >
+                Скасувати
+              </button>
+              <button
+                disabled={isResettingStudent}
+                onClick={() => handleResetStudent(resetConfirmStudent.id || resetConfirmStudent.studentId || resetConfirmStudent.email)}
+                className="flex-1 py-2.5 px-4 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs uppercase tracking-wider shadow-lg shadow-rose-900/40 transition-all cursor-pointer border border-rose-400/30 flex items-center justify-center gap-2 disabled:opacity-50"
+              >
+                {isResettingStudent ? (
+                  <>
+                    <RotateCcw className="w-3.5 h-3.5 animate-spin" />
+                    <span>Анулювання...</span>
+                  </>
+                ) : (
+                  <>
+                    <RotateCcw className="w-3.5 h-3.5" />
+                    <span>Скинути весь прогрес</span>
+                  </>
+                )}
               </button>
             </div>
           </div>

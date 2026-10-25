@@ -78,3 +78,37 @@
   4. **Глобальний стан вибраного курсу між вкладками (BroadcastChannel / Cross-tab sync):**
      - Можливість опціональної синхронізації між вкладками: якщо вчитель обрав курс у кабінеті викладача, студентський кабінет може запитати: *«Вчитель відкрив курс "Вебтехнології та алгоритмізація". Бажаєте перейти до нього?»*.
 
+---
+
+## 🎯 5. Точкове керування прогресом та життєвим циклом студента (Student Lifecycle & State Scoping)
+
+### 🧩 [BACKLOG-5] Курс-ізольоване скидання прогресу студента (Course-Scoped Student BKT Reset)
+
+- **Проблема:**
+  На даний момент ендпоінт бекенду `POST /api/v1/bkt/reset/:studentId` виконує повне очищення:
+  ```ts
+  await this.prisma.submission.deleteMany({ where: { userId: targetUserId } });
+  await this.prisma.bktHistory.deleteMany({ where: { userId: targetUserId } });
+  await this.prisma.bktState.deleteMany({ where: { userId: targetUserId } });
+  await this.prisma.telemetrySession.deleteMany({ where: { userId: targetUserId } });
+  ```
+  Це видаляє прогрес студента одразу по **всіх дисциплінах** (наприклад, скидаючи одночасно і `js-dev`, і `web-algorithms-school`, і `english-b2`, і `ukraine-law`), хоча викладач зазвичай знаходиться в контексті однієї конкретної дисципліни.
+
+- **Запропоноване архітектурне рішення:**
+  1. **Параметризація ендпоінту бекенду:**
+     - Модифікувати або розширити ендпоінт: `POST /api/v1/bkt/reset/:studentId?courseSlug=...` або `POST /api/v1/bkt/reset-course`.
+     - Знаходити вузли `skill_nodes`, прив'язані до конкретного `courseId`:
+       ```ts
+       const courseSkills = await this.prisma.skillNode.findMany({
+         where: { course: { slug: courseSlug } },
+         select: { id: true }
+       });
+       const skillIds = courseSkills.map(s => s.id);
+       ```
+     - Видаляти лише ті записи `bktState`, `bktHistory`, `submission` та `telemetrySession`, що належать до `skillId: { in: skillIds }` або `task.skillId: { in: skillIds }`.
+  2. **Гранулярний вибір в UI Викладача:**
+     - У модальному вікні підтвердження надати два варіанти:
+       - **«Скинути лише для поточного курсу»** (Рекомендовано) — безпечне скидання оцінок з обраного предмету.
+       - **«Скинути повністю весь профіль»** (Для тестування з нуля) — глобальне очищення бази.
+
+
