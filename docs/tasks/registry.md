@@ -144,7 +144,7 @@
 | **SBC-250** | `Story` | `SH` | integrate authoring Socratic hints and study unit deep linking into Task schema, seed data, and student UI | 2026-10-22 | `8185996` |
 | **SBC-253** | `Story` | `SH` | expand multi-tier task bank with isomorphic blitzes, metaphors, Socratic hints and study deep-links | 2026-10-22 | `44d68a9` |
 | **SBC-270** | `Story` | `SH` | seed school web algorithms course and task bank for informatics master research | 2026-10-24 | `8ce3c47` |
-| **SBC-277** | `Story` | `SH` | restructure school web algorithms course into 7 pedagogical modules with full adaptive remediation bank | 2026-10-25 | pending |
+| **SBC-277** | `Story` | `SH` | restructure school web algorithms course into 7 pedagogical modules with full adaptive remediation bank | 2026-10-25 | `af23d14` |
 
 ---
 
