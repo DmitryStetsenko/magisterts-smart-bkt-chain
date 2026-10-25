@@ -13,11 +13,13 @@ import {
   SeedTask,
 } from './data/js-tasks.data';
 import {
-  schoolLinearDomTasks,
-  schoolBranchingTasks,
-  schoolLoopsRenderTasks,
-  schoolValidationTasks,
-  schoolFilterSearchTasks,
+  schoolAlgBasicsTasks,
+  schoolAlgBranchingTasks,
+  schoolAlgLoopsTasks,
+  schoolAlgFunctionsTasks,
+  schoolAlgArraysTasks,
+  schoolWebDomEventsTasks,
+  schoolWebAppliedProjectsTasks,
 } from './data/school-web-tasks.data';
 
 const prisma = new PrismaClient();
@@ -435,13 +437,13 @@ async function main() {
     },
   });
 
-  const schoolDom = await prisma.skillNode.create({
+  const schoolBasics = await prisma.skillNode.create({
     data: {
       courseId: courseSchool.id,
-      slug: 'web-alg-linear-dom',
-      title: 'Тема 1: Лінійні алгоритми та маніпуляція DOM',
-      description: 'Доступ до елементів веб-сторінки, лінійні обчислення та динамічне виведення результатів',
-      category: 'Web Algorithms',
+      slug: 'school-alg-basics',
+      title: 'Модуль 1: Змінні, типи даних та лінійні вирази',
+      description: 'Оголошення let/const, базові типи (числа, рядки), лінійні формули та конвертери величин',
+      category: 'Algorithms & Web',
       difficulty: TaskDifficulty.EASY,
     },
   });
@@ -449,10 +451,10 @@ async function main() {
   const schoolBranching = await prisma.skillNode.create({
     data: {
       courseId: courseSchool.id,
-      slug: 'web-alg-branching-events',
-      title: 'Тема 2: Розгалужені алгоритми та події інтерфейсу',
-      description: 'Обробники кліків, зміна класів та умовна логіка веб-інтерфейсу',
-      category: 'Web Algorithms',
+      slug: 'school-alg-branching',
+      title: 'Модуль 2: Умовні конструкції та логічні розгалуження',
+      description: 'Оператори порівняння, логічні зв’язки && та ||, ланцюжки розгалуження if / else if',
+      category: 'Algorithms & Web',
       difficulty: TaskDifficulty.EASY,
     },
   });
@@ -460,42 +462,66 @@ async function main() {
   const schoolLoops = await prisma.skillNode.create({
     data: {
       courseId: courseSchool.id,
-      slug: 'web-alg-loops-render',
-      title: 'Тема 3: Циклічні алгоритми та рендеринг списків',
-      description: 'Генерація списків у HTML, агрегація даних та обхід колекцій у циклі',
-      category: 'Web Algorithms',
+      slug: 'school-alg-loops',
+      title: 'Модуль 3: Циклічні алгоритми та ітератори',
+      description: 'Цикли for та while, накопичення суми, фільтрація залишку від ділення та підрахунок символів',
+      category: 'Algorithms & Web',
       difficulty: TaskDifficulty.MEDIUM,
     },
   });
 
-  const schoolValidation = await prisma.skillNode.create({
+  const schoolFunctions = await prisma.skillNode.create({
     data: {
       courseId: courseSchool.id,
-      slug: 'web-alg-form-validation',
-      title: 'Тема 4: Алгоритми валідації та логічні умови',
-      description: 'Перевірка форм реєстрації, надійності паролів та поштових доменів',
-      category: 'Web Algorithms',
+      slug: 'school-alg-functions',
+      title: 'Модуль 4: Функції та модульність алгоритмів',
+      description: 'Параметри, повернення значень return, локальні змінні та декомпозиція задач на підпрограми',
+      category: 'Algorithms & Web',
       difficulty: TaskDifficulty.MEDIUM,
     },
   });
 
-  const schoolFilter = await prisma.skillNode.create({
+  const schoolArrays = await prisma.skillNode.create({
     data: {
       courseId: courseSchool.id,
-      slug: 'web-alg-filter-search',
-      title: 'Тема 5: Алгоритми пошуку, фільтрації та сортування',
-      description: 'Динамічний пошук по каталогу, сортування рейтингів та фільтри для інтернет-магазину',
-      category: 'Web Algorithms',
+      slug: 'school-alg-arrays',
+      title: 'Модуль 5: Масиви та обробка колекцій даних',
+      description: 'Індексація елементів, обхід масиву, пошук максимуму/мінімуму та агрегація середнього балу',
+      category: 'Algorithms & Web',
+      difficulty: TaskDifficulty.MEDIUM,
+    },
+  });
+
+  const schoolDom = await prisma.skillNode.create({
+    data: {
+      courseId: courseSchool.id,
+      slug: 'school-web-dom-events',
+      title: 'Модуль 6: Вебтехнології — Інтерактивний DOM та події',
+      description: 'Доступ до елементів за id, безпечне виведення тексту, генерація списків та стан лічильника',
+      category: 'Algorithms & Web',
+      difficulty: TaskDifficulty.MEDIUM,
+    },
+  });
+
+  const schoolProjects = await prisma.skillNode.create({
+    data: {
+      courseId: courseSchool.id,
+      slug: 'school-web-applied-projects',
+      title: 'Модуль 7: Прикладна веб-алгоритмізація (Проєктний модуль)',
+      description: 'Валідація паролів і форм, живий пошук у бібліотеці та сортування турнірних таблиць',
+      category: 'Algorithms & Web',
       difficulty: TaskDifficulty.HARD,
     },
   });
 
-  // Шкільні залежності графа навичок (Dependencies)
+  // Шкільні залежності графа навичок (Педагогічна послідовність)
   const schoolDeps = [
-    { parent: schoolDom, child: schoolBranching },
+    { parent: schoolBasics, child: schoolBranching },
     { parent: schoolBranching, child: schoolLoops },
-    { parent: schoolLoops, child: schoolValidation },
-    { parent: schoolValidation, child: schoolFilter },
+    { parent: schoolLoops, child: schoolFunctions },
+    { parent: schoolFunctions, child: schoolArrays },
+    { parent: schoolArrays, child: schoolDom },
+    { parent: schoolDom, child: schoolProjects },
   ];
   for (const dep of schoolDeps) {
     await prisma.skillDependency.create({
@@ -504,24 +530,27 @@ async function main() {
   }
 
   // Наповнення завданнями
-  console.log('  -> Seeding School Web Algorithms Modules...');
-  await insertModuleTasks(schoolDom.id, schoolLinearDomTasks);
-  await insertModuleTasks(schoolBranching.id, schoolBranchingTasks);
-  await insertModuleTasks(schoolLoops.id, schoolLoopsRenderTasks);
-  await insertModuleTasks(schoolValidation.id, schoolValidationTasks);
-  await insertModuleTasks(schoolFilter.id, schoolFilterSearchTasks);
+  console.log('  -> Seeding School Web Algorithms 7 Modules...');
+  await insertModuleTasks(schoolBasics.id, schoolAlgBasicsTasks);
+  await insertModuleTasks(schoolBranching.id, schoolAlgBranchingTasks);
+  await insertModuleTasks(schoolLoops.id, schoolAlgLoopsTasks);
+  await insertModuleTasks(schoolFunctions.id, schoolAlgFunctionsTasks);
+  await insertModuleTasks(schoolArrays.id, schoolAlgArraysTasks);
+  await insertModuleTasks(schoolDom.id, schoolWebDomEventsTasks);
+  await insertModuleTasks(schoolProjects.id, schoolWebAppliedProjectsTasks);
 
-  // Initial BKT State for Student in School Course
+  // Initial BKT State for Student in School Course (Starts at Module 1: Basics)
   await prisma.bktState.create({
     data: {
       userId: student.id,
-      skillId: schoolDom.id,
+      skillId: schoolBasics.id,
       pMastery: 0.4,
       pTransit: 0.25,
       pSlip: 0.1,
       pGuess: 0.2,
     },
   });
+
 
   // Initial BKT State for JS
   await prisma.bktState.create({
