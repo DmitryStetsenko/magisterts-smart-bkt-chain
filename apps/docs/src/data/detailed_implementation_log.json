@@ -6267,6 +6267,58 @@
               "subitems": []
             }
           ]
+        },
+        {
+          "title": "11.52. Курс-ізольоване Скидання та Запобіжний Тоглер для Глобального Анулювання (SBC-276)",
+          "level": 3,
+          "paragraphs": [],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "**Контекст проблеми:** Необхідно було реалізувати реальне точкове скидання прогресу в межах одного курсу, а глобальне скидання всієї бази прогресу студента додатково захистити інтерактивним запобіжником (checkbox toggle), щоб уникнути випадкових деструктивних дій.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Технічні рішення та реалізація:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Параметризація ендпоінту бекенду ([apps/api/src/adapters/inbound/http/bkt.controller.ts](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/api/src/adapters/inbound/http/bkt.controller.ts)):**",
+              "subitems": [
+                "Ендпоінт `POST /api/v1/bkt/reset/:studentId?courseSlug=...` тепер приймає необов'язковий Query-параметр `courseSlug`.",
+                "Якщо `courseSlug` передано, за допомогою Prisma робиться вибірка всіх вузлів навичок `skillNode`, асоційованих із цим курсом, та пов'язаних завдань `task.id`.",
+                "Запити `deleteMany` для `submission`, `bktHistory`, `bktState` та `telemetrySession` обмежуються `skillId: { in: skillIds }` та `taskId: { in: taskIds }`.",
+                "За відсутності `courseSlug` зберігається зворотна сумісність повного глобального очищення акаунта."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Дворівневе діалогове вікно у кабінеті викладача ([apps/teacher/src/app/page.tsx](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/teacher/src/app/page.tsx)):**",
+              "subitems": [
+                "Впроваджено стан запобіжника `resetGlobalSafetyToggle: boolean` (за замовчуванням `false`).",
+                "**Секція 1 (Рекомендована):** Пряма кнопка «🎯 Скинути тільки курс \"[Назва]\"» викликає `handleResetStudent(studentId, 'course')`.",
+                "**Секція 2 (Критична зона):** Чекбокс «Я розумію ризики і підтверджую глобальне скидання». Кнопка «Скинути весь прогрес студента» заблокована і стає активною лише після увімкнення чекбокса."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Верифікація:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "`npm run build:api` завершено успішно (код 0).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "`npm run build:teacher` завершено успішно (код 0).",
+              "subitems": []
+            }
+          ]
         }
       ]
     }

@@ -49,8 +49,9 @@ export default function TeacherDashboardPage() {
   // Modal explanation state for BKT/WPM/CopyPaste/Fatigue metrics
   const [metricModal, setMetricModal] = useState<'bkt' | 'wpm' | 'copypaste' | 'fatigue' | null>(null);
 
-  // Modal confirmation state for global student BKT reset
+  // Modal confirmation state for student BKT reset
   const [resetConfirmStudent, setResetConfirmStudent] = useState<StudentAnalyticsItem | null>(null);
+  const [resetGlobalSafetyToggle, setResetGlobalSafetyToggle] = useState<boolean>(false);
   const [isResettingStudent, setIsResettingStudent] = useState<boolean>(false);
 
   const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
@@ -346,17 +347,22 @@ export default function TeacherDashboardPage() {
     });
   }, [courseDetails, selectedStudent, allTasks]);
 
-  const handleResetStudent = async (studentId: string) => {
+  const handleResetStudent = async (studentId: string, scope: 'course' | 'all' = 'course') => {
     setIsResettingStudent(true);
     try {
-      const res = await fetch(`${API_URL}/api/v1/bkt/reset/${studentId}`, { method: 'POST' });
+      const url = scope === 'course'
+        ? `${API_URL}/api/v1/bkt/reset/${studentId}?courseSlug=${activeCourseSlug}`
+        : `${API_URL}/api/v1/bkt/reset/${studentId}`;
+      const res = await fetch(url, { method: 'POST' });
       if (res.ok) {
         await Promise.all([
           fetchStudentAnalytics(),
           fetchReviewQueue(),
+          fetchCourseStructure(),
         ]);
         setSelectedReviewId(null);
         setResetConfirmStudent(null);
+        setResetGlobalSafetyToggle(false);
       }
     } catch (err) {
       console.error('Error resetting student BKT:', err);
@@ -2092,59 +2098,111 @@ export default function TeacherDashboardPage() {
         </div>
       )}
 
-      {/* ⚠️ Reset Student Global BKT Progress Confirmation Modal */}
+      {/* ⚠️ Reset Student BKT Progress Confirmation Modal (Course-Scoped vs Global with Safety Toggle) */}
       {resetConfirmStudent && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-md animate-fadeIn">
-          <div className="max-w-md w-full p-6 bg-slate-900 border border-rose-500/40 rounded-2xl shadow-2xl flex flex-col gap-5 text-center transform transition-all scale-100">
-            <div className="mx-auto p-3.5 bg-rose-500/10 border border-rose-500/30 rounded-full text-rose-400">
-              <AlertTriangle className="w-8 h-8 animate-pulse" />
-            </div>
-            <div className="flex flex-col gap-2">
-              <h3 className="text-lg font-bold text-white">Анулювання Прогресу Студента</h3>
-              <p className="text-xs text-slate-300 leading-relaxed">
-                Ви дійсно бажаєте скинути навчальний прогрес студента <strong className="text-white">"{resetConfirmStudent.name}"</strong>?
-              </p>
-              
-              {/* ⚠️ Clear Warning about Global Reset vs Course-Scoped */}
-              <div className="p-3.5 bg-rose-950/40 border border-rose-500/40 rounded-xl text-[11px] text-rose-200 text-left flex flex-col gap-2">
-                <div className="font-bold text-rose-300 flex items-center gap-1.5 uppercase tracking-wider text-[10px]">
-                  <span>⚠️ Увага: Глобальне анулювання акаунта</span>
-                </div>
-                <p className="leading-relaxed text-slate-300">
-                  Поточний механізм бекенду скидає <strong className="text-rose-300">всі розв'язки, BKT-метрики майстерності та історію спроб студента по ВСІХ курсах платформи</strong> (а не лише для поточного курсу <code className="text-purple-300 font-mono">"{activeCourse.title}"</code>).
-                </p>
-                <div className="pt-1.5 border-t border-rose-500/30 flex flex-col gap-1 text-[10px] text-slate-400 font-mono">
-                  <span>• Стан P(L) повернеться до базового апріорного P(L₀)</span>
-                  <span>• Усі спроби у черзі на перевірку будуть видалені</span>
-                  <span>• Цю дію неможливо скасувати</span>
-                </div>
-              </div>
+          <div className="max-w-md w-full p-6 bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl flex flex-col gap-5 text-center transform transition-all scale-100">
+            <div className="mx-auto p-3.5 bg-amber-500/10 border border-amber-500/30 rounded-full text-amber-400">
+              <RotateCcw className="w-8 h-8" />
             </div>
 
-            <div className="flex items-center gap-3">
+            <div className="flex flex-col gap-1.5">
+              <h3 className="text-lg font-bold text-white">Анулювання Прогресу Студента</h3>
+              <p className="text-xs text-slate-300">
+                Оберіть рівень скидання даних для студента <strong className="text-white">"{resetConfirmStudent.name}"</strong>
+              </p>
+            </div>
+
+            {/* Option 1: Course-Scoped Reset (Primary & Safe) */}
+            <div className="p-3.5 bg-indigo-950/40 border border-indigo-500/40 rounded-xl text-left flex flex-col gap-2">
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] font-bold text-indigo-300 uppercase tracking-wider flex items-center gap-1.5">
+                  <span>🎯 Скинути прогрес поточного курсу</span>
+                </span>
+                <span className="text-[9px] font-mono font-bold px-1.5 py-0.5 rounded bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+                  Рекомендовано
+                </span>
+              </div>
+              <p className="text-xs text-slate-300 leading-relaxed">
+                Скидає відповіді, BKT-оцінки <code className="text-indigo-300 font-mono">P(L)</code> та чернетки <strong className="text-white">лише для дисципліни "{activeCourse.title}"</strong>. Прогрес студента в інших предметах залишиться недоторканим.
+              </p>
               <button
                 disabled={isResettingStudent}
-                onClick={() => setResetConfirmStudent(null)}
-                className="flex-1 py-2.5 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs transition-all cursor-pointer border border-slate-700 disabled:opacity-50"
-              >
-                Скасувати
-              </button>
-              <button
-                disabled={isResettingStudent}
-                onClick={() => handleResetStudent(resetConfirmStudent.id || resetConfirmStudent.studentId || resetConfirmStudent.email)}
-                className="flex-1 py-2.5 px-4 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs uppercase tracking-wider shadow-lg shadow-rose-900/40 transition-all cursor-pointer border border-rose-400/30 flex items-center justify-center gap-2 disabled:opacity-50"
+                onClick={() => handleResetStudent(resetConfirmStudent.id || resetConfirmStudent.studentId || resetConfirmStudent.email, 'course')}
+                className="w-full mt-1 py-2 px-3 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs shadow-md shadow-indigo-600/30 transition-all cursor-pointer flex items-center justify-center gap-2 disabled:opacity-50"
               >
                 {isResettingStudent ? (
                   <>
                     <RotateCcw className="w-3.5 h-3.5 animate-spin" />
-                    <span>Анулювання...</span>
+                    <span>Скидання курсу...</span>
                   </>
                 ) : (
                   <>
                     <RotateCcw className="w-3.5 h-3.5" />
-                    <span>Скинути весь прогрес</span>
+                    <span>Скинути тільки курс "{activeCourse.title}"</span>
                   </>
                 )}
+              </button>
+            </div>
+
+            {/* Option 2: Global Account Reset with Safety Toggle */}
+            <div className="p-3.5 bg-rose-950/30 border border-rose-500/30 rounded-xl text-left flex flex-col gap-2.5">
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] font-bold text-rose-300 uppercase tracking-wider flex items-center gap-1.5">
+                  <AlertTriangle className="w-3.5 h-3.5 text-rose-400" />
+                  <span>Повне анулювання акаунта (всі курси)</span>
+                </span>
+              </div>
+              <p className="text-[11px] text-slate-300 leading-relaxed">
+                Безповоротно видаляє всі спроби, історію та BKT-стан по <strong className="text-rose-300">всіх навчальних курсах платформи</strong>.
+              </p>
+
+              {/* Safety Switch Toggle */}
+              <label className="flex items-center gap-2.5 p-2 bg-slate-950/70 border border-slate-800 rounded-lg cursor-pointer hover:border-slate-700 transition-all select-none">
+                <input
+                  type="checkbox"
+                  checked={resetGlobalSafetyToggle}
+                  onChange={(e) => setResetGlobalSafetyToggle(e.target.checked)}
+                  className="w-4 h-4 rounded text-rose-600 focus:ring-rose-500 border-slate-700 bg-slate-900 cursor-pointer"
+                />
+                <span className="text-[11px] font-medium text-slate-300">
+                  Я розумію ризики і підтверджую глобальне скидання
+                </span>
+              </label>
+
+              <button
+                disabled={!resetGlobalSafetyToggle || isResettingStudent}
+                onClick={() => handleResetStudent(resetConfirmStudent.id || resetConfirmStudent.studentId || resetConfirmStudent.email, 'all')}
+                className={`w-full py-2 px-3 rounded-lg font-bold text-xs transition-all flex items-center justify-center gap-2 border ${
+                  resetGlobalSafetyToggle && !isResettingStudent
+                    ? 'bg-rose-600 hover:bg-rose-500 text-white shadow-lg shadow-rose-900/40 border-rose-400/40 cursor-pointer'
+                    : 'bg-slate-800 text-slate-500 border-slate-700/60 cursor-not-allowed opacity-60'
+                }`}
+              >
+                {isResettingStudent ? (
+                  <>
+                    <RotateCcw className="w-3.5 h-3.5 animate-spin" />
+                    <span>Повне скидання...</span>
+                  </>
+                ) : (
+                  <>
+                    <AlertTriangle className="w-3.5 h-3.5" />
+                    <span>Скинути весь прогрес студента</span>
+                  </>
+                )}
+              </button>
+            </div>
+
+            <div className="flex justify-end pt-1">
+              <button
+                disabled={isResettingStudent}
+                onClick={() => {
+                  setResetConfirmStudent(null);
+                  setResetGlobalSafetyToggle(false);
+                }}
+                className="w-full py-2 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold text-xs transition-all cursor-pointer border border-slate-700 disabled:opacity-50"
+              >
+                Закрити без змін
               </button>
             </div>
           </div>

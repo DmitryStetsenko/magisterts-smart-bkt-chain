@@ -82,33 +82,17 @@
 
 ## 🎯 5. Точкове керування прогресом та життєвим циклом студента (Student Lifecycle & State Scoping)
 
-### 🧩 [BACKLOG-5] Курс-ізольоване скидання прогресу студента (Course-Scoped Student BKT Reset)
+### 🧩 [BACKLOG-5] Курс-ізольоване скидання прогресу студента (Course-Scoped Student BKT Reset) — ВПРОВАДЖЕНО (SBC-276)
 
 - **Проблема:**
-  На даний момент ендпоінт бекенду `POST /api/v1/bkt/reset/:studentId` виконує повне очищення:
-  ```ts
-  await this.prisma.submission.deleteMany({ where: { userId: targetUserId } });
-  await this.prisma.bktHistory.deleteMany({ where: { userId: targetUserId } });
-  await this.prisma.bktState.deleteMany({ where: { userId: targetUserId } });
-  await this.prisma.telemetrySession.deleteMany({ where: { userId: targetUserId } });
-  ```
-  Це видаляє прогрес студента одразу по **всіх дисциплінах** (наприклад, скидаючи одночасно і `js-dev`, і `web-algorithms-school`, і `english-b2`, і `ukraine-law`), хоча викладач зазвичай знаходиться в контексті однієї конкретної дисципліни.
+  Раніше ендпоінт бекенду `POST /api/v1/bkt/reset/:studentId` виконував виключно глобальне очищення бази, скидаючи одночасно прогрес студента по всіх дисциплінах.
+- **Впроваджене рішення:**
+  1. **Параметризація бекенду (`apps/api`):**
+     - Додано параметр `?courseSlug=...` до ендпоінту `POST /api/v1/bkt/reset/:studentId?courseSlug=...`.
+     - При наявності параметра очищаються виключно вузли навичок, завдання та сесії телеметрії, які належать дисципліні `course.slug`.
+  2. **Дворівневе модальне вікно в UI Викладача (`apps/teacher`):**
+     - Основна безпечна кнопка: **«🎯 Скинути тільки курс "[Назва]"»** (виконується відразу).
+     - Небезпечна червона зона: **«⚠️ Повне анулювання акаунта (всі курси)»**, захищена обов'язковим чекбоксом-тоглером: *«Я розумію ризики і підтверджую глобальне скидання»*. Кнопка стає активною лише після увімкнення тоглера.
 
-- **Запропоноване архітектурне рішення:**
-  1. **Параметризація ендпоінту бекенду:**
-     - Модифікувати або розширити ендпоінт: `POST /api/v1/bkt/reset/:studentId?courseSlug=...` або `POST /api/v1/bkt/reset-course`.
-     - Знаходити вузли `skill_nodes`, прив'язані до конкретного `courseId`:
-       ```ts
-       const courseSkills = await this.prisma.skillNode.findMany({
-         where: { course: { slug: courseSlug } },
-         select: { id: true }
-       });
-       const skillIds = courseSkills.map(s => s.id);
-       ```
-     - Видаляти лише ті записи `bktState`, `bktHistory`, `submission` та `telemetrySession`, що належать до `skillId: { in: skillIds }` або `task.skillId: { in: skillIds }`.
-  2. **Гранулярний вибір в UI Викладача:**
-     - У модальному вікні підтвердження надати два варіанти:
-       - **«Скинути лише для поточного курсу»** (Рекомендовано) — безпечне скидання оцінок з обраного предмету.
-       - **«Скинути повністю весь профіль»** (Для тестування з нуля) — глобальне очищення бази.
 
 

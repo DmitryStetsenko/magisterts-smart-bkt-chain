@@ -692,8 +692,12 @@ export class BktController {
   }
 
   @Post('reset/:studentId?')
-  @ApiOperation({ summary: 'Reset student BKT state' })
-  async resetStudentState(@Param('studentId') studentId?: string) {
+  @ApiOperation({ summary: 'Reset student BKT state (optionally scoped to courseSlug)' })
+  @ApiQuery({ name: 'courseSlug', required: false, description: 'Optional course slug to scope the reset to a specific course' })
+  async resetStudentState(
+    @Param('studentId') studentId?: string,
+    @Query('courseSlug') courseSlug?: string,
+  ) {
     let targetUserId = studentId;
     let user = targetUserId
       ? await this.prisma.user.findFirst({
@@ -712,6 +716,58 @@ export class BktController {
     }
     targetUserId = user.id;
 
+    if (courseSlug) {
+      // Find all skills belonging to this course
+      const courseSkills = await this.prisma.skillNode.findMany({
+        where: {
+          course: { slug: courseSlug },
+        },
+        select: {
+          id: true,
+          tasks: { select: { id: true } },
+        },
+      });
+
+      const skillIds = courseSkills.map((s) => s.id);
+      const taskIds = courseSkills.flatMap((s) => s.tasks.map((t) => t.id));
+
+      await this.prisma.submission.deleteMany({
+        where: {
+          userId: targetUserId,
+          taskId: { in: taskIds },
+        },
+      });
+
+      await this.prisma.bktHistory.deleteMany({
+        where: {
+          userId: targetUserId,
+          skillId: { in: skillIds },
+        },
+      });
+
+      await this.prisma.bktState.deleteMany({
+        where: {
+          userId: targetUserId,
+          skillId: { in: skillIds },
+        },
+      });
+
+      await this.prisma.telemetrySession.deleteMany({
+        where: {
+          userId: targetUserId,
+          taskId: { in: taskIds },
+        },
+      });
+
+      this.telemetryGateway.notifyBktReset(targetUserId);
+
+      return {
+        message: `Student state for ${targetUserId} scoped to course ${courseSlug} has been reset`,
+        courseSlug,
+        skillsCount: skillIds.length,
+      };
+    }
+
     await this.prisma.submission.deleteMany({ where: { userId: targetUserId } });
     await this.prisma.bktHistory.deleteMany({ where: { userId: targetUserId } });
     await this.prisma.bktState.deleteMany({ where: { userId: targetUserId } });
@@ -719,7 +775,7 @@ export class BktController {
 
     this.telemetryGateway.notifyBktReset(targetUserId);
 
-    return { message: `Student state for ${targetUserId} has been reset` };
+    return { message: `Student state for ${targetUserId} has been reset globally` };
   }
 
   @Get('reviews/queue')

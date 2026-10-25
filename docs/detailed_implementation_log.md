@@ -1760,6 +1760,23 @@ eferenceAnswer, критерії options.keywords (microtask|мікротаск|
 - **Верифікація:**
   - Збірка `npm run build:teacher` успішно завершилася без помилок (код 0).
 
+### 11.52. Курс-ізольоване Скидання та Запобіжний Тоглер для Глобального Анулювання (SBC-276)
+- **Контекст проблеми:** Необхідно було реалізувати реальне точкове скидання прогресу в межах одного курсу, а глобальне скидання всієї бази прогресу студента додатково захистити інтерактивним запобіжником (checkbox toggle), щоб уникнути випадкових деструктивних дій.
+- **Технічні рішення та реалізація:**
+  1. **Параметризація ендпоінту бекенду ([apps/api/src/adapters/inbound/http/bkt.controller.ts](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/api/src/adapters/inbound/http/bkt.controller.ts)):**
+     - Ендпоінт `POST /api/v1/bkt/reset/:studentId?courseSlug=...` тепер приймає необов'язковий Query-параметр `courseSlug`.
+     - Якщо `courseSlug` передано, за допомогою Prisma робиться вибірка всіх вузлів навичок `skillNode`, асоційованих із цим курсом, та пов'язаних завдань `task.id`.
+     - Запити `deleteMany` для `submission`, `bktHistory`, `bktState` та `telemetrySession` обмежуються `skillId: { in: skillIds }` та `taskId: { in: taskIds }`.
+     - За відсутності `courseSlug` зберігається зворотна сумісність повного глобального очищення акаунта.
+  2. **Дворівневе діалогове вікно у кабінеті викладача ([apps/teacher/src/app/page.tsx](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/teacher/src/app/page.tsx)):**
+     - Впроваджено стан запобіжника `resetGlobalSafetyToggle: boolean` (за замовчуванням `false`).
+     - **Секція 1 (Рекомендована):** Пряма кнопка «🎯 Скинути тільки курс "[Назва]"» викликає `handleResetStudent(studentId, 'course')`.
+     - **Секція 2 (Критична зона):** Чекбокс «Я розумію ризики і підтверджую глобальне скидання». Кнопка «Скинути весь прогрес студента» заблокована і стає активною лише після увімкнення чекбокса.
+- **Верифікація:**
+  - `npm run build:api` завершено успішно (код 0).
+  - `npm run build:teacher` завершено успішно (код 0).
+
+
 
 
 

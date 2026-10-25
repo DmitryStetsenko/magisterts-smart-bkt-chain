@@ -13,10 +13,10 @@
 | **`SBC-EP-LLM`** | Automated Code Assessment & Open-Text Evaluation | 10 |
 | **`SBC-EP-W3`** | Web3 Infrastructure & Smart Contracts | 0 |
 | **`SBC-EP-ST`** | Student Portal & Skill Tree Map | 30 |
-| **`SBC-EP-TC`** | Teacher Portal & Analytics CRM | 23 |
+| **`SBC-EP-TC`** | Teacher Portal & Analytics CRM | 24 |
 | **`SBC-EP-AD`** | Admin Portal & Knowledge DAG Builder | 8 |
 | **`SBC-EP-LD`** | Landing Web Page | 9 |
-| **ВСЬОГО** | - | **242** |
+| **ВСЬОГО** | - | **243** |
 
 ---
 
@@ -326,6 +326,8 @@
 | **SBC-267** | `Docs` | `BKT` | document BKT error decay dynamics and Lower Bound Asymptote across docs and teacher inspector | 2026-10-23 | `168be44` |
 | **SBC-268** | `Fix` | `BKT` | prevent repeated submission spamming and duplicate BKT score inflation | 2026-10-23 | `738bad0` |
 | **SBC-275** | `Story` | `TC` | implement global student BKT reset confirmation modal with clear scope warnings | 2026-10-25 | `1128b73` |
+| **SBC-276** | `Story` | `TC` | implement course-scoped BKT reset and safety toggle for global student reset | 2026-10-25 | pending |
+
 
 ---
 
