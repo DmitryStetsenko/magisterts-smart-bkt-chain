@@ -326,7 +326,7 @@
 | **SBC-267** | `Docs` | `BKT` | document BKT error decay dynamics and Lower Bound Asymptote across docs and teacher inspector | 2026-10-23 | `168be44` |
 | **SBC-268** | `Fix` | `BKT` | prevent repeated submission spamming and duplicate BKT score inflation | 2026-10-23 | `738bad0` |
 | **SBC-275** | `Story` | `TC` | implement global student BKT reset confirmation modal with clear scope warnings | 2026-10-25 | `1128b73` |
-| **SBC-276** | `Story` | `TC` | implement course-scoped BKT reset and safety toggle for global student reset | 2026-10-25 | pending |
+| **SBC-276** | `Story` | `TC` | implement course-scoped BKT reset and safety toggle for global student reset | 2026-10-25 | `dafdb7b` |
 
 
 ---
