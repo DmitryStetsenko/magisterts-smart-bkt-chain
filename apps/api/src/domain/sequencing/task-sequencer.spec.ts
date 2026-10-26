@@ -84,4 +84,52 @@ describe('TaskSequencer (Adaptive Task Sequencing Engine)', () => {
     expect(recommendation?.isDifficultyDegraded).toBe(true);
     expect(recommendation?.maxScoreCap).toBe(70);
   });
+
+  it('should strictly avoid falling back to CODE tasks when degrading from a failed quiz (Fallback Modality Guard)', () => {
+    const mixedTasks: TaskDomain[] = [
+      { id: 't_quiz_failed', skillId: 's1', title: 'Quiz: const syntax', difficulty: 'MEDIUM', taskType: 'SINGLE_CHOICE', topic: 'variables' },
+      { id: 't_code_easy', skillId: 's1', title: 'Code: declare variable', difficulty: 'EASY', taskType: 'CODE', topic: 'variables' },
+      { id: 't_code_med', skillId: 's1', title: 'Code: calculate sum', difficulty: 'MEDIUM', taskType: 'CODE', topic: 'variables' },
+    ];
+
+    // Student failed a SINGLE_CHOICE quiz on variables. There are NO easy quizzes available, only CODE tasks.
+    const recommendation = TaskSequencer.recommendNextTask({
+      skills,
+      studentStates: { s1: 0.3 },
+      tasks: mixedTasks,
+      completedTaskIds: [],
+      preferredTopic: 'variables',
+      preferredDifficulty: 'EASY',
+      preferredTaskType: 'SINGLE_CHOICE',
+      excludeTaskId: 't_quiz_failed',
+    });
+
+    // Guardrail: must NOT recommend a CODE task (returns null to trigger theory recommendation)
+    expect(recommendation).toBeNull();
+  });
+
+  it('should recommend matching isomorphic quiz blitz when degrading from failed quiz', () => {
+    const mixedTasks: TaskDomain[] = [
+      { id: 't_quiz_failed', skillId: 's1', title: 'Quiz: const syntax', difficulty: 'MEDIUM', taskType: 'SINGLE_CHOICE', topic: 'variables' },
+      { id: 't_quiz_blitz', skillId: 's1', title: 'Quiz: let vs const basic', difficulty: 'EASY', taskType: 'SINGLE_CHOICE', topic: 'variables' },
+      { id: 't_code_easy', skillId: 's1', title: 'Code: declare variable', difficulty: 'EASY', taskType: 'CODE', topic: 'variables' },
+    ];
+
+    const recommendation = TaskSequencer.recommendNextTask({
+      skills,
+      studentStates: { s1: 0.3 },
+      tasks: mixedTasks,
+      completedTaskIds: [],
+      preferredTopic: 'variables',
+      preferredDifficulty: 'EASY',
+      preferredTaskType: 'SINGLE_CHOICE',
+      excludeTaskId: 't_quiz_failed',
+    });
+
+    expect(recommendation).not.toBeNull();
+    expect(recommendation?.recommendedTask.id).toBe('t_quiz_blitz');
+    expect(recommendation?.recommendedTask.taskType).toBe('SINGLE_CHOICE');
+    expect(recommendation?.isDifficultyDegraded).toBe(true);
+  });
 });
+

@@ -120,6 +120,60 @@
           ]
         },
         {
+          "title": "0.1.2 Запобіжники Модальності Секвенсора (Fallback Modality Guard, `SBC-278`, `BACKLOG-2`)",
+          "level": 3,
+          "paragraphs": [],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "**Проблематика та Контекст:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "При вивченні теоретичних розділів або проходженні концептуальних тестів (`SINGLE_CHOICE`, `MULTIPLE_CHOICE`) учень перевіряє розуміння понять та термінології.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Якщо у банку завдань для конкретного підконцепту (`subConcept`) не виявилося ізоморфного легшого квізу, попередній алгоритм фолбеку міг запропонувати завдання іншої модальності з цього ж модуля — наприклад, перемикав учня на написання коду (`taskType: CODE`). Це спричиняло дезорієнтацію та порушувало принцип дидактичної поступовості.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Архітектурні компоненти та реалізація:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Сувора категоризація модальностей (`TaskSequencer.ts`):**",
+              "subitems": [
+                "Впроваджено предикати `matchesModalityStrict`, які розрізняють три несумісні класи завдань:",
+                "*Тестові квізи:* `SINGLE_CHOICE`, `MULTIPLE_CHOICE`.",
+                "*Відкриті відповіді та есе:* `TEXT_ESSAY`, `OPEN_TEXT`.",
+                "*Програмування:* `CODE`.",
+                "При ремедіації (`preferredDifficulty === 'EASY'`) секвенсор фільтрує кандидатів виключно за активною модальністю.",
+                "**Fallback Modality Guardrail:** Якщо студент припустився помилки на квізі, секвенсор за жодних умов не здійснює фолбек на задачу з написанням коду (`return null`). Це сигналізує UI про необхідність теоретичної підтримки замість підвищення інженерного навантаження."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Уніфікація поведінки у REST API (`task.controller.ts`):**",
+              "subitems": [
+                "Метод `getRecommendedTask` при пошуку фолбек-завдання за курсом застосовує Prisma-фільтр за типом модальності для запобігання міжмодальним стрибкам під час деградації."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Unit-тестування (`task-sequencer.spec.ts`):**",
+              "subitems": [
+                "Додано тести `should strictly avoid falling back to CODE tasks when degrading from a failed quiz` та `should recommend matching isomorphic quiz blitz when degrading from failed quiz`."
+              ]
+            }
+          ]
+        },
+        {
           "title": "0.2 Модуль Візуальної Інспекції Графу Курсу (`CourseOverviewWidget`)",
           "level": 3,
           "paragraphs": [],

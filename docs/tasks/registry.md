@@ -204,6 +204,7 @@
 | **SBC-243** | `Story` | `BKT` | eliminate function wrappers from Module 1 tasks, introduce direct variable and expression exercises | 2026-10-21 | `pending` |
 | **SBC-247** | `Bug` | `BKT` | prevent re-offering identical failed task on graceful degradation and supply auxiliary remediation task | 2026-10-22 | `9529263` |
 | **SBC-249** | `Task` | `BKT` | document brainstorm session 07 on breaking adaptive deadlock, remediation looping and scaffolding | 2026-10-22 | `pending` |
+| **SBC-278** | `Story` | `BKT` | reinforce TaskSequencer Fallback Modality Guard preventing cross-modality jumps during remediation | 2026-10-26 | `pending` |
 
 ---
 

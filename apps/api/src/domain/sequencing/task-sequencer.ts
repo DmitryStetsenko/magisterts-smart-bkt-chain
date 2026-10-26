@@ -93,8 +93,25 @@ export class TaskSequencer {
       return hasUncompleted;
     }) || unlockedSkills[0];
 
-    // Helper: sort/pick task by difficulty priority and topic relevance
-    const pickBestTask = (skillTasks: TaskDomain[]): TaskDomain | undefined => {
+    const isQuizType = (type?: string | null) => type === 'SINGLE_CHOICE' || type === 'MULTIPLE_CHOICE';
+    const isTextEssayType = (type?: string | null) => type === 'TEXT_ESSAY' || type === 'OPEN_TEXT';
+
+    const matchesModalityStrict = (taskType?: string | null, targetModality?: string | null): boolean => {
+      if (!targetModality) return true;
+      if (isQuizType(targetModality)) {
+        return isQuizType(taskType);
+      }
+      if (isTextEssayType(targetModality)) {
+        return isTextEssayType(taskType);
+      }
+      if (targetModality === 'CODE') {
+        return taskType === 'CODE';
+      }
+      return taskType === targetModality;
+    };
+
+    // Helper: sort/pick task by difficulty priority and topic relevance with strict modality filtering
+    const pickBestTask = (skillTasks: TaskDomain[], targetModality?: string | null): TaskDomain | undefined => {
       // Filter uncompleted tasks, also excluding the currently failed/excluded task
       const uncompleted = skillTasks.filter(
         (t) => !completedSet.has(t.id) && (!excludeTaskId || t.id !== excludeTaskId)
@@ -102,49 +119,56 @@ export class TaskSequencer {
 
       // If graceful degradation to EASY was requested:
       if (preferredDifficulty === 'EASY') {
-        // Modality Guard: if student struggled on a quiz, do NOT fallback to a CODE task!
-        const matchesModality = (t: TaskDomain): boolean => {
-          if (!preferredTaskType) return true;
-          const isQuiz = (type?: string | null) => type === 'SINGLE_CHOICE' || type === 'MULTIPLE_CHOICE';
-          if (isQuiz(preferredTaskType)) {
-            return isQuiz(t.taskType);
-          }
-          return t.taskType === preferredTaskType;
-        };
+        const activeModality = targetModality || preferredTaskType;
 
         // 1. First priority: uncompleted EASY task on preferredTopic matching modality
         if (preferredTopic) {
           const sameTopicEasy = uncompleted.find(
-            (t) => t.topic === preferredTopic && t.difficulty === 'EASY' && matchesModality(t)
+            (t) => t.topic === preferredTopic && t.difficulty === 'EASY' && matchesModalityStrict(t.taskType, activeModality)
           );
           if (sameTopicEasy) return sameTopicEasy;
         }
 
         // 2. Second priority: any uncompleted EASY task in this active skill module matching modality
-        const skillEasy = uncompleted.find((t) => t.difficulty === 'EASY' && matchesModality(t));
+        const skillEasy = uncompleted.find(
+          (t) => t.difficulty === 'EASY' && matchesModalityStrict(t.taskType, activeModality)
+        );
         if (skillEasy) return skillEasy;
 
         // 3. Third priority (Remediation / Review): if student previously completed the topic's EASY task matching modality,
         // re-offer it as an auxiliary remediation review drill (excluding current failed task)
         if (preferredTopic) {
           const topicEasyReview = skillTasks.find(
-            (t) => t.topic === preferredTopic && t.difficulty === 'EASY' && matchesModality(t) && (!excludeTaskId || t.id !== excludeTaskId)
+            (t) => t.topic === preferredTopic && t.difficulty === 'EASY' && matchesModalityStrict(t.taskType, activeModality) && (!excludeTaskId || t.id !== excludeTaskId)
           );
           if (topicEasyReview) return topicEasyReview;
         }
 
         // 4. Fourth priority: any EASY task in this module matching modality for remediation review
         const moduleEasyReview = skillTasks.find(
-          (t) => t.difficulty === 'EASY' && matchesModality(t) && (!excludeTaskId || t.id !== excludeTaskId)
+          (t) => t.difficulty === 'EASY' && matchesModalityStrict(t.taskType, activeModality) && (!excludeTaskId || t.id !== excludeTaskId)
         );
         if (moduleEasyReview) return moduleEasyReview;
+
+        // Fallback Modality Guard (BACKLOG-2):
+        // If student failed a quiz (or essay), NEVER fall back to a CODE task during degradation!
+        if (activeModality && (isQuizType(activeModality) || isTextEssayType(activeModality))) {
+          return undefined;
+        }
       }
 
-      if (uncompleted.length === 0) return undefined;
+      // Modality-filtered pool for standard task progression
+      const candidatePool = targetModality
+        ? uncompleted.filter((t) => matchesModalityStrict(t.taskType, targetModality))
+        : uncompleted;
+
+      const workingPool = candidatePool.length > 0 ? candidatePool : uncompleted;
+
+      if (workingPool.length === 0) return undefined;
 
       // 1. If preferredTopic is provided, prioritize tasks on the same topic
       if (preferredTopic) {
-        const sameTopic = uncompleted.filter((t) => t.topic === preferredTopic);
+        const sameTopic = workingPool.filter((t) => t.topic === preferredTopic);
         if (sameTopic.length > 0) {
           if (preferredDifficulty) {
             const exactDiff = sameTopic.find((t) => t.difficulty === preferredDifficulty);
@@ -156,15 +180,14 @@ export class TaskSequencer {
 
       // 2. If preferredDifficulty is specified, try to find task with that difficulty across this skill
       if (preferredDifficulty) {
-        const matchDiff = uncompleted.find((t) => t.difficulty === preferredDifficulty);
+        const matchDiff = workingPool.find((t) => t.difficulty === preferredDifficulty);
         if (matchDiff) return matchDiff;
       }
 
       // 3. Sequential Topic-First & Cognitive Triad Progression:
       // Tasks are ordered naturally by topic sequence in the syllabus, progressing EASY -> MEDIUM -> HARD
-      // This guarantees that a student begins with knowledge verification (EASY), then applies skills (MEDIUM), then masters them (HARD).
       const diffOrder: Record<string, number> = { EASY: 1, MEDIUM: 2, HARD: 3 };
-      return uncompleted.sort((a, b) => {
+      return [...workingPool].sort((a, b) => {
         // If topics differ, maintain original syllabus order of tasks
         if (a.topic && b.topic && a.topic !== b.topic) {
           return 0;
@@ -176,15 +199,22 @@ export class TaskSequencer {
     if (currentActiveSkill) {
       const activeSkillTasks = tasks.filter((t) => t.skillId === currentActiveSkill.id);
       if (activeSkillTasks.length > 0) {
-        const recommendedTask = pickBestTask(activeSkillTasks);
+        const recommendedTask = pickBestTask(activeSkillTasks, preferredTaskType);
 
         if (!recommendedTask) {
           const mastery = studentStates[currentActiveSkill.id] ?? 0;
           if (!BktEngine.isProficient(mastery)) {
+            // Check if modality filter caused empty pick during degradation
+            if (preferredDifficulty === 'EASY' && preferredTaskType && (isQuizType(preferredTaskType) || isTextEssayType(preferredTaskType))) {
+              // Strictly avoid returning a non-modality task; return null so system offers theory card
+              return null;
+            }
+
             // All tasks in active module completed, but mastery is still < 0.75
+            const modalFallback = activeSkillTasks.find((t) => matchesModalityStrict(t.taskType, preferredTaskType)) || activeSkillTasks[0];
             return {
               recommendedSkill: currentActiveSkill,
-              recommendedTask: activeSkillTasks[0],
+              recommendedTask: modalFallback,
               reason: 'MODULE_TASKS_EXHAUSTED',
               currentMastery: mastery,
               isExhausted: true,
@@ -209,7 +239,7 @@ export class TaskSequencer {
     // 3. Fallback: If current active module has all tasks done, check remaining unlocked skills that have uncompleted tasks
     for (const unlockedSkill of unlockedSkills) {
       const sTasks = tasks.filter((t) => t.skillId === unlockedSkill.id);
-      const recommendedTask = pickBestTask(sTasks);
+      const recommendedTask = pickBestTask(sTasks, preferredTaskType);
       if (recommendedTask) {
         const isDegraded = preferredDifficulty === 'EASY' && recommendedTask.difficulty === 'EASY';
         return {
@@ -223,14 +253,19 @@ export class TaskSequencer {
       }
     }
 
+    // If degradation was requested with quiz/essay and no matching task found anywhere, do NOT fallback to a CODE task
+    if (preferredDifficulty === 'EASY' && preferredTaskType && (isQuizType(preferredTaskType) || isTextEssayType(preferredTaskType))) {
+      return null;
+    }
+
     // 4. Ultimate Fallback: All unlocked skills are proficient & completed. Review completed tasks from unlocked skills.
     const lastUnlocked = unlockedSkills[unlockedSkills.length - 1] || skills[0];
     const lastSkillTasks = tasks.filter((t) => t.skillId === lastUnlocked.id);
-    const fallbackTask = lastSkillTasks[0] || tasks[0];
+    const modalReviewTask = lastSkillTasks.find((t) => matchesModalityStrict(t.taskType, preferredTaskType)) || lastSkillTasks[0] || tasks[0];
 
     return {
       recommendedSkill: lastUnlocked,
-      recommendedTask: fallbackTask,
+      recommendedTask: modalReviewTask,
       reason: 'REVIEW_COMPLETED',
       currentMastery: studentStates[lastUnlocked.id] ?? 0,
     };

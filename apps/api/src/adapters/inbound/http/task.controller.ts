@@ -146,15 +146,43 @@ export class TaskController {
       });
     }
 
-    // Fallback if all recommended tasks completed or no sequencing match
+    // Fallback if all recommended tasks completed or no sequencing match (preserving modality)
     if (!fullTask && tasks.length > 0) {
-      fullTask = await this.prisma.task.findFirst({
-        where: courseIdCondition ? { skill: { courseId: courseIdCondition } } : {},
-        include: {
-          skill: true,
-          testCases: { where: { isSecret: false } },
-        },
-      });
+      const isQuizType = (type?: string | null) => type === 'SINGLE_CHOICE' || type === 'MULTIPLE_CHOICE';
+      const isTextEssayType = (type?: string | null) => type === 'TEXT_ESSAY' || type === 'OPEN_TEXT';
+      const matchesModality = (tType?: string | null, targetModality?: string | null) => {
+        if (!targetModality) return true;
+        if (isQuizType(targetModality)) return isQuizType(tType);
+        if (isTextEssayType(targetModality)) return isTextEssayType(tType);
+        if (targetModality === 'CODE') return tType === 'CODE';
+        return tType === targetModality;
+      };
+
+      // If student is in degradation mode (isLastFailed), strictly match modality and do NOT switch quiz to CODE
+      if (preferredDifficulty === 'EASY' && preferredTaskType && (isQuizType(preferredTaskType) || isTextEssayType(preferredTaskType))) {
+        fullTask = await this.prisma.task.findFirst({
+          where: {
+            ...(courseIdCondition ? { skill: { courseId: courseIdCondition } } : {}),
+            taskType: isQuizType(preferredTaskType)
+              ? { in: ['SINGLE_CHOICE', 'MULTIPLE_CHOICE'] }
+              : { in: ['TEXT_ESSAY', 'OPEN_TEXT'] },
+          },
+          include: {
+            skill: true,
+            testCases: { where: { isSecret: false } },
+          },
+        });
+      }
+
+      if (!fullTask) {
+        fullTask = await this.prisma.task.findFirst({
+          where: courseIdCondition ? { skill: { courseId: courseIdCondition } } : {},
+          include: {
+            skill: true,
+            testCases: { where: { isSecret: false } },
+          },
+        });
+      }
     }
 
     if (!fullTask) {

@@ -30,6 +30,23 @@
   5. *Build Next.js Documentation Site* (`npm run build:docs`) — збірка статичного експорту (`output: "export"`, `trailingSlash: true`, `basePath: "/magisterts-smart-bkt-chain"`).
   6. *Upload Artifact & Deploy Pages* (`actions/upload-pages-artifact@v3` + `actions/deploy-pages@v4`).
 
+### 0.1.2 Запобіжники Модальності Секвенсора (Fallback Modality Guard, `SBC-278`, `BACKLOG-2`)
+- **Проблематика та Контекст:**
+  - При вивченні теоретичних розділів або проходженні концептуальних тестів (`SINGLE_CHOICE`, `MULTIPLE_CHOICE`) учень перевіряє розуміння понять та термінології.
+  - Якщо у банку завдань для конкретного підконцепту (`subConcept`) не виявилося ізоморфного легшого квізу, попередній алгоритм фолбеку міг запропонувати завдання іншої модальності з цього ж модуля — наприклад, перемикав учня на написання коду (`taskType: CODE`). Це спричиняло дезорієнтацію та порушувало принцип дидактичної поступовості.
+- **Архітектурні компоненти та реалізація:**
+  1. **Сувора категоризація модальностей (`TaskSequencer.ts`):**
+     - Впроваджено предикати `matchesModalityStrict`, які розрізняють три несумісні класи завдань:
+       - *Тестові квізи:* `SINGLE_CHOICE`, `MULTIPLE_CHOICE`.
+       - *Відкриті відповіді та есе:* `TEXT_ESSAY`, `OPEN_TEXT`.
+       - *Програмування:* `CODE`.
+     - При ремедіації (`preferredDifficulty === 'EASY'`) секвенсор фільтрує кандидатів виключно за активною модальністю.
+     - **Fallback Modality Guardrail:** Якщо студент припустився помилки на квізі, секвенсор за жодних умов не здійснює фолбек на задачу з написанням коду (`return null`). Це сигналізує UI про необхідність теоретичної підтримки замість підвищення інженерного навантаження.
+  2. **Уніфікація поведінки у REST API (`task.controller.ts`):**
+     - Метод `getRecommendedTask` при пошуку фолбек-завдання за курсом застосовує Prisma-фільтр за типом модальності для запобігання міжмодальним стрибкам під час деградації.
+  3. **Unit-тестування (`task-sequencer.spec.ts`):**
+     - Додано тести `should strictly avoid falling back to CODE tasks when degrading from a failed quiz` та `should recommend matching isomorphic quiz blitz when degrading from failed quiz`.
+
 ### 0.2 Модуль Візуальної Інспекції Графу Курсу (`CourseOverviewWidget`)
 - **Концепція:** Перевикористовуваний автономний віджет `CourseOverviewWidget` (`apps/teacher/src/features/course-map/ui/CourseOverviewWidget.tsx`), призначений для повного огляду ієрархії курсів, модулів (DAG) та прив'язаних запитань/завдань.
 - **Особливості:**
