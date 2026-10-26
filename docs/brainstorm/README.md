@@ -34,3 +34,8 @@
    - *Дата:* 22 жовтня 2026
    - *Ключові теми:* Подолання замкненого кола деградації завдань (The Frustration Loop), Scaffolding замість екзаменатора, мікро-теорія Just-in-Time, розбір типових помилок (Distractor Feedback), Human-in-the-Loop ескалація до викладача, тактичний відступ за графом передумов (DAG Backtracking), Cognitive Cool-Down та паркування завдань.
 
+8. [08. Від Системи Оцінювання до Системи Адаптивного Навчання (Adaptive Learning Paradigm & Cross-App Contracts)](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/docs/brainstorm/08_adaptive_learning_paradigm_and_cross_app_contracts.md)
+   - *Дата:* 26 жовтня 2026
+   - *Ключові теми:* Подолання пастки «розумного термометра» (Computerized Adaptive Testing vs Intelligent Tutoring System), відповідність букві й духу магістерського паспорта, збереження стабільного ядра та розширення монорепозиторію, повноцінне оживлення пакета `@sbc/types` (Shared Domain Contracts), еволюція навчального шару (картки теорії, Misconception Feedback, Parsons Problems) та Web3 Proof-of-Competence.
+
+

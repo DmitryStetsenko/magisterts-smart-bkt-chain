@@ -47,6 +47,20 @@
   3. **Unit-тестування (`task-sequencer.spec.ts`):**
      - Додано тести `should strictly avoid falling back to CODE tasks when degrading from a failed quiz` та `should recommend matching isomorphic quiz blitz when degrading from failed quiz`.
 
+### 0.1.3 Парадигма Адаптивного Навчання та Наскрізні Контракти Монорепозиторію (`SBC-279`, `EP-INF`)
+- **Контекст та Аналіз Магістерської Роботи:**
+  - Проведено ґрунтовний аналіз структури наукової роботи «Формування алгоритмічної компетентності учнями старшої школи у процесі вивчення розділу "Вебтехнології"» та програмного комплексу «Децентралізована система адаптивного навчання».
+  - *Діагностика стану:* Платформа бездоганно виконує роль Computerized Adaptive Testing (CAT) та блокчейн-нотаріусу (Smart Contracts + BKT Engine). Проте «адаптивне навчання» вимагає наявності фази активного засвоєння знань — подання теорії (Just-in-Time Theory), аналізу оман (Misconceptions) та інтерактивного риштування (Scaffolding), а не лише оцінювання відповідей.
+- **Стратегія Розвитку (Evolutionary Expansion without Breaking Changes):**
+  1. **Наскрізні інтерфейси та типи (`packages/types`):**
+     - До цього часу пакет `packages/types` містив лише `package.json`, через що клієнтські застосунки (`apps/student`, `apps/teacher`, `apps/admin`) дублювали DTO та моделі даних.
+     - Заплановано наповнення `packages/types/src/` контрактами: `tasks.types.ts`, `bkt.types.ts`, `sequencing.types.ts`, `telemetry.types.ts`, `learning.types.ts`.
+  2. **Інтерактивний Дидактичний Шар (`apps/student`):**
+     - Підключення поля `studyUnitUrl` як повноцінного теоретичного конспекту/модалу в інтерфейсі студента, який автоматично активується при деградації знань ($P(L_n) < 0.35$).
+     - Впровадження рушія роз'яснення типових оман (`misconceptions`), який при виборі дистрактора дає дидактичне пояснення замість простого червоного індикатора.
+     - Розширення Сократівських підказок (`socraticHints`) до покрокового інтерактивного діалогу (Scaffolding).
+- **Документація:** Сформовано маніфест [`docs/brainstorm/08_adaptive_learning_paradigm_and_cross_app_contracts.md`](file:///docs/brainstorm/08_adaptive_learning_paradigm_and_cross_app_contracts.md) та зареєстровано `[BACKLOG-6]`, `[BACKLOG-7]`.
+
 ### 0.2 Модуль Візуальної Інспекції Графу Курсу (`CourseOverviewWidget`)
 - **Концепція:** Перевикористовуваний автономний віджет `CourseOverviewWidget` (`apps/teacher/src/features/course-map/ui/CourseOverviewWidget.tsx`), призначений для повного огляду ієрархії курсів, модулів (DAG) та прив'язаних запитань/завдань.
 - **Особливості:**
