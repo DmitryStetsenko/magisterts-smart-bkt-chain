@@ -98,3 +98,42 @@ export interface SubmissionDto {
   detectedMisconception?: MisconceptionDto | null;
   createdAt?: string | Date;
 }
+
+/**
+ * Спроба учня для історії перевірки викладачем
+ */
+export interface ReviewAttemptDto {
+  id: string;
+  attemptNumber: number;
+  answerText: string;
+  status: string;
+  teacherReviewStatus: string;
+  teacherComment?: string | null;
+  submittedAt: string;
+}
+
+/**
+ * Елемент черги ручної перевірки робіт викладачем
+ */
+export interface ReviewQueueItemDto {
+  submissionId: string;
+  studentId: string;
+  studentName: string;
+  studentEmail: string;
+  taskId: string;
+  taskTitle: string;
+  taskDescription: string;
+  skillId?: string;
+  skillSlug?: string;
+  skillTitle: string;
+  answerText: string;
+  attemptNumber?: number;
+  totalAttempts?: number;
+  submittedAt: string;
+  semanticScore?: number;
+  teacherReviewStatus: string;
+  referenceAnswer: string | null;
+  rubrics: any | null;
+  misconceptions: any | null;
+  attemptsHistory?: ReviewAttemptDto[];
+}

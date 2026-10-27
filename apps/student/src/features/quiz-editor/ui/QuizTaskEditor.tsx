@@ -2,18 +2,16 @@
 
 import React, { useState, useEffect } from 'react';
 import { HelpCircle, CheckCircle2, Clock, Send, ArrowRight } from 'lucide-react';
+import { QuizOptionDto } from '@sbc/types';
 
-export interface QuizOption {
-  id: string;
-  text: string;
-}
+export type QuizOption = QuizOptionDto;
 
 interface QuizTaskEditorProps {
   taskId: string;
   taskType: 'SINGLE_CHOICE' | 'MULTIPLE_CHOICE';
   title: string;
   description: string;
-  options: QuizOption[];
+  options: QuizOptionDto[];
   onSubmit: (payload: { selectedOptionId?: string; selectedOptionIds?: string[]; reactionLatencyMs: number }) => void;
   isSubmitting?: boolean;
   onNextTask?: () => void;

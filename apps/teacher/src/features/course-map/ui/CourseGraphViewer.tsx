@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useMemo } from 'react';
+import { TaskDto } from '@sbc/types';
 import {
   Network,
   HelpCircle,
@@ -30,21 +31,7 @@ import {
   Cpu
 } from 'lucide-react';
 
-export interface TaskItem {
-  id: string;
-  skillId: string;
-  topic?: string | null;
-  subConcept?: string | null;
-  taskType: 'CODE' | 'SINGLE_CHOICE' | 'MULTIPLE_CHOICE' | 'TEXT_ESSAY';
-  title: string;
-  description: string;
-  difficulty: 'EASY' | 'MEDIUM' | 'HARD';
-  starterCode?: string;
-  options?: any;
-  testCases?: Array<{ input: string; expectedOutput: string; isSecret?: boolean }>;
-  referenceAnswer?: string;
-  rubrics?: any;
-}
+export type TaskItem = TaskDto;
 
 export interface SkillNodeItem {
   id: string;

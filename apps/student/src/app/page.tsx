@@ -8,40 +8,11 @@ import { QuizTaskEditor } from '../features/quiz-editor/ui/QuizTaskEditor';
 import { EssayTaskEditor } from '../features/essay-editor/ui/EssayTaskEditor';
 import { SkillDagMap } from '../features/skill-graph/ui/SkillDagMap';
 import { GameSkillTreeWidget, SkillGraphNode, DrawerSection } from '@sbc/ui';
+import { TaskDto, CourseDto } from '@sbc/types';
 
-interface TaskDetail {
-  id: string;
-  taskType: 'CODE' | 'SINGLE_CHOICE' | 'MULTIPLE_CHOICE' | 'TEXT_ESSAY';
-  title: string;
-  description: string;
-  starterCode?: string;
-  options?: any;
-  difficulty: string;
-  topic?: string | null;
-  subConcept?: string | null;
-  skill: {
-    id: string;
-    slug: string;
-    title: string;
-  };
-  testCases: Array<{
-    input: string;
-    expectedOutput: string;
-  }>;
-  socraticHints?: Array<{
-    level: number;
-    hint: string;
-    penaltyPct: number;
-  }>;
-  studyUnitUrl?: string | null;
-}
-
-interface CourseItem {
-  slug: string;
-  title: string;
-  description?: string;
-  category?: string;
-}
+// Перевикористовуємо уніфіковані типи DTO платформи
+export type TaskDetail = TaskDto;
+export type CourseItem = Partial<CourseDto> & { slug: string; title: string; category?: string };
 
 const DEFAULT_COURSES: CourseItem[] = [
   { slug: 'js-dev', title: 'JavaScript & Web Dev', category: 'Programming' },
@@ -764,7 +735,7 @@ export default function StudentPortalPage() {
                         <div className="flex flex-col gap-2 p-3 bg-slate-950/80 rounded-xl border border-slate-800 shadow-inner">
                           <div className="flex items-center justify-between">
                             <span className="px-2.5 py-0.5 rounded-full text-[11px] font-mono font-bold uppercase tracking-wider bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
-                              {task.skill.title}
+                              {task.skill?.title || 'Навичка'}
                             </span>
                             <div className="flex items-center gap-2">
                               {recommendation?.isDifficultyDegraded && (
@@ -861,19 +832,19 @@ export default function StudentPortalPage() {
                       )}
 
                       {/* Section 4: Відкриті Тест-Кейси */}
-                      {task.taskType === 'CODE' && task.testCases.length > 0 && (
+                      {task.taskType === 'CODE' && (task.testCases?.length ?? 0) > 0 && (
                         <DrawerSection
                           title="Відкриті Тест-Кейси"
                           icon={Target}
                           iconColor="text-emerald-400"
                           titleColor="text-emerald-400 group-hover:text-emerald-300"
-                          badge={task.testCases.length}
+                          badge={task.testCases?.length || 0}
                           badgeColor="bg-emerald-500/10 text-emerald-300 border-emerald-500/20"
                           defaultOpen={true}
                           className="border-t border-slate-800/80 pt-2.5"
                         >
                           <div className="flex flex-col gap-2">
-                            {task.testCases.map((tc, idx) => (
+                            {(task.testCases || []).map((tc, idx) => (
                               <div
                                 key={idx}
                                 className="p-2.5 bg-slate-950/70 border border-slate-800 rounded-lg text-xs font-mono flex flex-col gap-0.5"
@@ -1353,7 +1324,7 @@ export default function StudentPortalPage() {
                   </div>
                   <div className="hidden md:flex items-center gap-2 shrink-0">
                     <span className="text-[11px] font-mono text-amber-400/80 bg-slate-950/60 px-3 py-1.5 rounded-xl border border-amber-500/20">
-                      Тема: {task.topic || task.skill.title}
+                      Тема: {task.topic || task.skill?.title || 'Навичка'}
                     </span>
                   </div>
                 </div>
@@ -1368,7 +1339,7 @@ export default function StudentPortalPage() {
                   <div className="flex flex-col">
                     <div className="flex items-center gap-2 flex-wrap">
                       <span className="text-xs font-mono font-bold uppercase tracking-wider text-indigo-400">
-                        {task.skill.title}
+                        {task.skill?.title || 'Навичка'}
                       </span>
                       {task.topic && (
                         <span className="px-2 py-0.5 rounded-md text-[10px] font-mono bg-slate-800 text-slate-300 border border-slate-700">

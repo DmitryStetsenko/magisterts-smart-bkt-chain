@@ -46,8 +46,16 @@
      - Забезпечено компіляцію через Webpack-режим (`npx next dev --webpack --port 3006`).
      - Верифіковано генерацію CSS бандла `/_next/static/css/app/layout.css` з класами Tailwind v4 (`bg-slate-950`, `flex`, `w-[380px]`, `DrawerSection`).
      - Проведено автоматичний скріншот-тест у браузері Playwright: підтверджено бездоганний преміальний темний вигляд, наявність Opera-rail, секцій змісту курсу та кодової пісочниці.
+5. **Повна наскрізна уніфікація типізації застосунків через `@sbc/types` (`SBC-284`, `EP-SH`):**
+   - **Проблематика:** Попри створення пакета `@sbc/types`, клієнтські застосунки (`apps/student`, `apps/teacher`, `apps/study`) продовжували частково використовувати застарілі локальні інтерфейси (`TaskDetail`, `CourseItem`, `ReviewQueueItem`, `LessonUnit`), що призводило до слабкої типізації (`options: any`, `allTasks: any[]`) та ризику розсинхронізації DTO контрактів.
+   - **Реалізація:**
+     - `packages/types/src/tasks.types.ts`: розширено контракти моделями перевірки викладачем `ReviewQueueItemDto`, `ReviewAttemptDto` та повною валідацією полів `TaskDto`.
+     - `packages/types/src/learning.types.ts`: уніфіковано моделі навчальних планів `LessonSectionDto`, `LessonUnitDto`, `CurriculumModuleDto`, `CourseCurriculumDto`.
+     - `apps/student`: усунуто локальні інтерфейси завдань, підключено прямий експорт `TaskDto`, типізовано тест-кейси та квізи через `QuizOptionDto`.
+     - `apps/teacher`: типізовано масиви завдань `TaskDto[]`, граф курсів `CourseGraphViewer`, чергу ручної перевірки `ReviewQueueItemDto`.
+     - `apps/study`: структуру навчальної програми шкільного курсу переведено на єдині контракти `CourseCurriculumDto` з `@sbc/types`.
    - **Верифікація:**
-     - Підтверджено успішну збірку всіх веб-застосунків монорепозиторію: `npm run build:study`, `npm run build:student`, `npm run build:teacher`, `npm run build:admin`.
+     - Успішна статична компіляція TypeScript у кожному сервісі: `npm run build:student`, `npm run build:teacher`, `npm run build:study`, `npm run build:api`.
 
 ---
 

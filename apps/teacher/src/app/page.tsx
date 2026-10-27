@@ -5,17 +5,18 @@ import { io } from 'socket.io-client';
 import { ShieldCheck, Network, Users, BarChart3, Code2, BookOpen, Scale, ChevronDown, ChevronUp, X, Search, RotateCcw, AlertTriangle, CheckCircle2, Lock, HelpCircle, Code, FileText, CheckSquare, Sparkles, Keyboard, Copy, Activity, Info, GitBranch, Layers, ClipboardCheck, Tag, FlaskConical, Compass, User, Globe, Plus, Minus, GraduationCap } from 'lucide-react';
 import { StudentAnalyticsItem } from '../features/analytics/model/analytics.types';
 import { AnomalyTreeWidget, GameSkillTreeWidget, SkillGraphNode } from '@sbc/ui';
+import { CourseDto, TaskDto } from '@sbc/types';
 import { ReviewQueueInspector } from '../features/reviews/ui/ReviewQueueInspector';
 import { CourseGraphViewer } from '../features/course-map/ui/CourseGraphViewer';
 import { MetricsAuditInspector } from '../features/metrics-audit/ui/MetricsAuditInspector';
 
-interface CourseItem {
+export type CourseItem = Omit<Partial<CourseDto>, 'icon'> & {
   slug: string;
   title: string;
   description?: string;
   icon?: any;
   skillSlugs: string[];
-}
+};
 
 const DEFAULT_COURSES: CourseItem[] = [
   { slug: 'js-dev', title: 'JavaScript & Web Dev', icon: Code2, skillSlugs: ['js-basics', 'js-functions', 'js-collections', 'js-async', 'js-oop'] },
@@ -33,7 +34,7 @@ export default function TeacherDashboardPage() {
   });
   const [students, setStudents] = useState<StudentAnalyticsItem[]>([]);
   const [courseDetails, setCourseDetails] = useState<any>(null);
-  const [allTasks, setAllTasks] = useState<any[]>([]);
+  const [allTasks, setAllTasks] = useState<TaskDto[]>([]);
 
   // Selected item states for Main Canvas Detail views
   const [selectedStudentId, setSelectedStudentId] = useState<string | null>(null);

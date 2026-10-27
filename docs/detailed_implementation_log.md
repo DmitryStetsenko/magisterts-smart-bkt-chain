@@ -48,6 +48,23 @@
   3. `apps/study/src/app/globals.css`:
      Директиви `@import "tailwindcss";` та сканування спільних компонентів `@source "../../../../packages/ui/src";`.
   4. Автоматизована перевірка рендерингу за допомогою headless браузера Playwright підтвердила повну відповідність стилів дизайн-системі платформи (темна тема, Opera-rail, кнопки, пісочниця коду, акордеони `DrawerSection`).
+### 0.1.4 Наскрізна Уніфікація Типів Монорепозиторію через `@sbc/types` (`SBC-284`, `EP-SH`)
+- **Проблематика:**
+  Наявність ізольованих інтерфейсів у фронтенд-застосунках (`interface TaskDetail`, `interface CourseItem`, `interface ReviewQueueItem`) створювала розбіжності з бекендом, вимагала використання `any` у складених структурах і не забезпечувала автоматичного відстеження змін у DTO.
+- **Технічна реалізація:**
+  1. **Розширення доменних DTO у `packages/types`:**
+     - [`packages/types/src/tasks.types.ts`](file:///packages/types/src/tasks.types.ts): додано повнофункціональні контракти `ReviewAttemptDto` та `ReviewQueueItemDto` для черги ручної перевірки робіт учнів викладачем. У `TaskDto` строго визначено типи `options: QuizOptionDto[]`, `testCases: TestCaseDto[]`, `difficulty: TaskDifficulty` (`EASY | MEDIUM | HARD | ADVANCED`), `taskType: TaskType` (`CODE | SINGLE_CHOICE | MULTIPLE_CHOICE | TEXT_ESSAY | OPEN_TEXT`).
+     - [`packages/types/src/learning.types.ts`](file:///packages/types/src/learning.types.ts): впроваджено типи для структури електронного інтерактивного підручника: `LessonSectionDto`, `LessonUnitDto`, `CurriculumModuleDto`, `CourseCurriculumDto`.
+  2. **Рефакторинг `apps/student`:**
+     - Замінено локальний `TaskDetail` на `export type TaskDetail = TaskDto;`.
+     - Замінено `CourseItem` на `export type CourseItem = Partial<CourseDto> & { slug: string; title: string; category?: string };`.
+     - У [`QuizTaskEditor.tsx`](file:///apps/student/src/features/quiz-editor/ui/QuizTaskEditor.tsx) використано `QuizOptionDto`.
+  3. **Рефакторинг `apps/teacher`:**
+     - Типізовано масив `allTasks: TaskDto[]`.
+     - У [`CourseGraphViewer.tsx`](file:///apps/teacher/src/features/course-map/ui/CourseGraphViewer.tsx) встановлено `export type TaskItem = TaskDto;`.
+     - У [`ReviewQueueInspector.tsx`](file:///apps/teacher/src/features/reviews/ui/ReviewQueueInspector.tsx) підключено `ReviewQueueItemDto` та `ReviewAttemptDto`.
+  4. **Рефакторинг `apps/study`:**
+     - У [`school-web-curriculum.ts`](file:///apps/study/src/data/school-web-curriculum.ts) навчальний план шкільного курсу переведено на експорт `CourseCurriculumDto`.
 
 ### 0.1.2 Запобіжники Модальності Секвенсора (Fallback Modality Guard, `SBC-278`, `BACKLOG-2`)
 - **Проблематика та Контекст:**

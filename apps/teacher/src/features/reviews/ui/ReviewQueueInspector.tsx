@@ -1,39 +1,10 @@
 'use client';
 
 import React from 'react';
+import { ReviewQueueItemDto, ReviewAttemptDto } from '@sbc/types';
 
-export interface ReviewAttempt {
-  id: string;
-  attemptNumber: number;
-  answerText: string;
-  status: string;
-  teacherReviewStatus: string;
-  teacherComment?: string | null;
-  submittedAt: string;
-}
-
-export interface ReviewQueueItem {
-  submissionId: string;
-  studentId: string;
-  studentName: string;
-  studentEmail: string;
-  taskId: string;
-  taskTitle: string;
-  taskDescription: string;
-  skillId?: string;
-  skillSlug?: string;
-  skillTitle: string;
-  answerText: string;
-  attemptNumber?: number;
-  totalAttempts?: number;
-  submittedAt: string;
-  semanticScore?: number;
-  teacherReviewStatus: string;
-  referenceAnswer: string | null;
-  rubrics: any | null;
-  misconceptions: any | null;
-  attemptsHistory?: ReviewAttempt[];
-}
+export type ReviewAttempt = ReviewAttemptDto;
+export type ReviewQueueItem = ReviewQueueItemDto;
 
 interface ReviewQueueInspectorProps {
   currentReview: ReviewQueueItem | null;

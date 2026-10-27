@@ -1,46 +1,14 @@
-export interface LessonSection {
-  id: string;
-  title: string;
-  badge?: string;
-  summary: string;
-  conceptExplanation: string;
-  codeSnippet?: {
-    language: string;
-    code: string;
-    explanation: string;
-  };
-  misconceptionAlert?: {
-    wrongBelief: string;
-    realityExplanation: string;
-    fixTip: string;
-  };
-  keyTakeaways: string[];
-}
+import { 
+  LessonSectionDto, 
+  LessonUnitDto, 
+  CurriculumModuleDto, 
+  CourseCurriculumDto 
+} from '@sbc/types';
 
-export interface LessonUnit {
-  slug: string;
-  moduleSlug: string;
-  moduleNumber: number;
-  title: string;
-  gradeLevel: string;
-  estimatedMinutes: number;
-  summary: string;
-  sections: LessonSection[];
-}
-
-export interface CourseCurriculum {
-  courseSlug: string;
-  courseTitle: string;
-  description: string;
-  gradeLevel: string;
-  modules: Array<{
-    moduleNumber: number;
-    moduleSlug: string;
-    title: string;
-    description: string;
-    units: LessonUnit[];
-  }>;
-}
+export type LessonSection = LessonSectionDto;
+export type LessonUnit = LessonUnitDto;
+export type CurriculumModule = CurriculumModuleDto;
+export type CourseCurriculum = CourseCurriculumDto;
 
 export const SCHOOL_WEB_CURRICULUM: CourseCurriculum = {
   courseSlug: 'web-algorithms-school',

@@ -169,6 +169,59 @@
           ]
         },
         {
+          "title": "0.1.4 Наскрізна Уніфікація Типів Монорепозиторію через `@sbc/types` (`SBC-284`, `EP-SH`)",
+          "level": 3,
+          "paragraphs": [
+            "Наявність ізольованих інтерфейсів у фронтенд-застосунках (`interface TaskDetail`, `interface CourseItem`, `interface ReviewQueueItem`) створювала розбіжності з бекендом, вимагала використання `any` у складених структурах і не забезпечувала автоматичного відстеження змін у DTO."
+          ],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "**Проблематика:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Технічна реалізація:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Розширення доменних DTO у `packages/types`:**",
+              "subitems": [
+                "[`packages/types/src/tasks.types.ts`](file:///packages/types/src/tasks.types.ts): додано повнофункціональні контракти `ReviewAttemptDto` та `ReviewQueueItemDto` для черги ручної перевірки робіт учнів викладачем. У `TaskDto` строго визначено типи `options: QuizOptionDto[]`, `testCases: TestCaseDto[]`, `difficulty: TaskDifficulty` (`EASY | MEDIUM | HARD | ADVANCED`), `taskType: TaskType` (`CODE | SINGLE_CHOICE | MULTIPLE_CHOICE | TEXT_ESSAY | OPEN_TEXT`).",
+                "[`packages/types/src/learning.types.ts`](file:///packages/types/src/learning.types.ts): впроваджено типи для структури електронного інтерактивного підручника: `LessonSectionDto`, `LessonUnitDto`, `CurriculumModuleDto`, `CourseCurriculumDto`."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Рефакторинг `apps/student`:**",
+              "subitems": [
+                "Замінено локальний `TaskDetail` на `export type TaskDetail = TaskDto;`.",
+                "Замінено `CourseItem` на `export type CourseItem = Partial<CourseDto> & { slug: string; title: string; category?: string };`.",
+                "У [`QuizTaskEditor.tsx`](file:///apps/student/src/features/quiz-editor/ui/QuizTaskEditor.tsx) використано `QuizOptionDto`."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Рефакторинг `apps/teacher`:**",
+              "subitems": [
+                "Типізовано масив `allTasks: TaskDto[]`.",
+                "У [`CourseGraphViewer.tsx`](file:///apps/teacher/src/features/course-map/ui/CourseGraphViewer.tsx) встановлено `export type TaskItem = TaskDto;`.",
+                "У [`ReviewQueueInspector.tsx`](file:///apps/teacher/src/features/reviews/ui/ReviewQueueInspector.tsx) підключено `ReviewQueueItemDto` та `ReviewAttemptDto`."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Рефакторинг `apps/study`:**",
+              "subitems": [
+                "У [`school-web-curriculum.ts`](file:///apps/study/src/data/school-web-curriculum.ts) навчальний план шкільного курсу переведено на експорт `CourseCurriculumDto`."
+              ]
+            }
+          ]
+        },
+        {
           "title": "0.1.2 Запобіжники Модальності Секвенсора (Fallback Modality Guard, `SBC-278`, `BACKLOG-2`)",
           "level": 3,
           "paragraphs": [],
