@@ -1,0 +1,216 @@
+{
+  "project_title": "💻 Документація Застосунка «Студентський Кабінет та Тренажер» (`apps/student`)",
+  "sections": [
+    {
+      "title": "🎯 1. Призначення та Педагогічна Роль",
+      "level": 2,
+      "paragraphs": [
+        "Застосунок `apps/student` є **головним практичним полігоном учня**, призначеним для:"
+      ],
+      "code_blocks": [],
+      "items": [
+        {
+          "type": "text",
+          "raw_text": "**Формативного та діагностичного оцінювання знань:** вирішення завдань з написання коду (`CODE`), концептуальних тестів (`SINGLE_CHOICE`, `MULTIPLE_CHOICE`) та аналітичних есе (`TEXT_ESSAY`).",
+          "subitems": []
+        },
+        {
+          "type": "text",
+          "raw_text": "**Адаптивного навчання на базі моделі BKT:** безперервний перерахунок апостеріорної ймовірності засвоєння навички $P(L_n)$ за формулами Bayesian Knowledge Tracing.",
+          "subitems": []
+        },
+        {
+          "type": "text",
+          "raw_text": "**Збору поведінкової телеметрії:** фіксація темпу набору (WPM), інтервалів пауз, подій видалення та вставок (copy-paste) для формування коефіцієнта академічної доброчесності.",
+          "subitems": []
+        },
+        {
+          "type": "text",
+          "raw_text": "**Інтерактивного Сократівського риштування (Scaffolding):** надання багаторівневих евристичних підказок при виникненні когнітивних труднощів.",
+          "subitems": []
+        },
+        {
+          "type": "text",
+          "raw_text": "---",
+          "subitems": []
+        }
+      ],
+      "subsections": []
+    },
+    {
+      "title": "🏛️ 2. Архітектура Інтерфейсу (UI Standard)",
+      "level": 2,
+      "paragraphs": [
+        "Інтерфейс побудовано за стандартом **Opera-style Shell**:"
+      ],
+      "code_blocks": [],
+      "items": [
+        {
+          "type": "text",
+          "raw_text": "**Шапка (`h-14`):** вибір активного курсу, профіль студента, індикатори BKT майстерності та глобального прогресу.",
+          "subitems": []
+        },
+        {
+          "type": "text",
+          "raw_text": "**Вертикальний рейл (`w-14`):** швидке перемикання режимів (`task` — активна задача, `bkt` — карта навичок DAG, `tree` — Дерево Знань, `study` — перехід до підручника).",
+          "subitems": []
+        },
+        {
+          "type": "text",
+          "raw_text": "**Бічна панель (`w-[380px]`):** структурована на базі уніфікованих секцій `<DrawerSection>` (Правило 7):",
+          "subitems": []
+        },
+        {
+          "type": "text",
+          "raw_text": "*Секція 1: Прогрес навички BKT ($P(L_n)$)*",
+          "subitems": []
+        },
+        {
+          "type": "text",
+          "raw_text": "*Секція 2: Умова та опис завдання*",
+          "subitems": []
+        },
+        {
+          "type": "text",
+          "raw_text": "*Секція 3: Рекомендація адаптивного секвенсора*",
+          "subitems": []
+        },
+        {
+          "type": "text",
+          "raw_text": "*Секція 4: Відкриті тест-кейси*",
+          "subitems": []
+        },
+        {
+          "type": "text",
+          "raw_text": "*Секція 5: Багаторівневі Сократівські підказки*",
+          "subitems": []
+        },
+        {
+          "type": "text",
+          "raw_text": "*Секція 6: Історія спроб та подань*",
+          "subitems": []
+        },
+        {
+          "type": "text",
+          "raw_text": "**Центральна робоча зона:**",
+          "subitems": []
+        },
+        {
+          "type": "text",
+          "raw_text": "`MonacoCodeEditor`: редактор коду з підсвіткою синтаксису, номерами рядків та гарячими клавішами.",
+          "subitems": []
+        },
+        {
+          "type": "text",
+          "raw_text": "`QuizTaskEditor`: рандомізовані варіанти відповідей з вимірюванням латентності реакції.",
+          "subitems": []
+        },
+        {
+          "type": "text",
+          "raw_text": "`EssayTaskEditor`: текстовий аналізатор розгорнутих відповідей.",
+          "subitems": []
+        },
+        {
+          "type": "text",
+          "raw_text": "---",
+          "subitems": []
+        }
+      ],
+      "subsections": []
+    },
+    {
+      "title": "📊 3. Математика BKT та Адаптивний Секвенсор",
+      "level": 2,
+      "paragraphs": [
+        "При кожному поданні рішення (`SubmissionDto`) ядро бекенду розраховує:",
+        "$$P(L_t) = P(L_t | O_t) + (1 - P(L_t | O_t)) \\cdot P(T)$$"
+      ],
+      "code_blocks": [],
+      "items": [
+        {
+          "type": "text",
+          "raw_text": "**Апостеріорне оновлення знання:**",
+          "subitems": []
+        },
+        {
+          "type": "text",
+          "raw_text": "Якщо спроба успішна ($O_t = 1$):",
+          "subitems": [
+            "$$P(L_t | O_t=1) = \\frac{P(L_{t-1}) \\cdot (1 - P(S))}{P(L_{t-1}) \\cdot (1 - P(S)) + (1 - P(L_{t-1})) \\cdot P(G)}$$"
+          ]
+        },
+        {
+          "type": "text",
+          "raw_text": "Якщо спроба хибна ($O_t = 0$):",
+          "subitems": [
+            "$$P(L_t | O_t=0) = \\frac{P(L_{t-1}) \\cdot P(S)}{P(L_{t-1}) \\cdot P(S) + (1 - P(L_{t-1})) \\cdot (1 - P(G))}$$"
+          ]
+        },
+        {
+          "type": "text",
+          "raw_text": "**Перехід між кроками:**",
+          "subitems": []
+        },
+        {
+          "type": "text",
+          "raw_text": "**Адаптивні рішення:**",
+          "subitems": []
+        },
+        {
+          "type": "text",
+          "raw_text": "При $P(L_n) \\ge 0.85$ навичка вважається засвоєною (`ADVANCE`).",
+          "subitems": []
+        },
+        {
+          "type": "text",
+          "raw_text": "При невдачах на базових задачах активується режим ремедіації (`REMEDIATE`) або рекомендація теоретичного опрацювання (`THEORY_REVIEW`) з переходом у `apps/study`.",
+          "subitems": []
+        },
+        {
+          "type": "text",
+          "raw_text": "---",
+          "subitems": []
+        }
+      ],
+      "subsections": []
+    },
+    {
+      "title": "🛠️ 4. Технічний Стек та Запуск",
+      "level": 2,
+      "paragraphs": [],
+      "code_blocks": [
+        {
+          "lang": "bash",
+          "content": "npm run dev:student"
+        },
+        {
+          "lang": "bash",
+          "content": "npm run build:student"
+        }
+      ],
+      "items": [
+        {
+          "type": "text",
+          "raw_text": "**Стек:** Next.js 16 (Webpack mode), React 19, Monaco Editor (`@monaco-editor/react`), Socket.io-client, Tailwind CSS v4, `@sbc/types`, `@sbc/ui`.",
+          "subitems": []
+        },
+        {
+          "type": "text",
+          "raw_text": "**Запуск у режимі розробки:**",
+          "subitems": []
+        },
+        {
+          "type": "text",
+          "raw_text": "*(Доступно за адресою: [http://localhost:3002](http://localhost:3002))*.",
+          "subitems": []
+        },
+        {
+          "type": "text",
+          "raw_text": "**Production-збірка:**",
+          "subitems": []
+        }
+      ],
+      "subsections": []
+    }
+  ]
+}

@@ -186,6 +186,10 @@ def main():
     compile_file("docs/detailed_implementation_log.md", "docs/detailed_implementation_log.json", "apps/docs/src/data/detailed_implementation_log.json")
     compile_file("docs/telemetry_analytics.md", "docs/telemetry_analytics.json", "apps/docs/src/data/telemetry_analytics.json")
     compile_file("docs/apps/study_portal.md", "docs/apps/study_portal.json", "apps/docs/src/data/apps_study_portal.json")
+    compile_file("docs/apps/student_portal.md", "docs/apps/student_portal.json", "apps/docs/src/data/apps_student_portal.json")
+    compile_file("docs/apps/teacher_dashboard.md", "docs/apps/teacher_dashboard.json", "apps/docs/src/data/apps_teacher_dashboard.json")
+    compile_file("docs/apps/admin_portal.md", "docs/apps/admin_portal.json", "apps/docs/src/data/apps_admin_portal.json")
+    compile_file("docs/apps/api_backend.md", "docs/apps/api_backend.json", "apps/docs/src/data/apps_api_backend.json")
 
 if __name__ == "__main__":
     main()

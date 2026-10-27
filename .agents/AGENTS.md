@@ -89,3 +89,25 @@
 5. **Анімація та оптимізація скролу контенту:**
    - Вміст розгорнутої секції має клас плавної появи `animate-fadeIn`.
    - Довгі списки елементів обов'язково обмежуються динамічною висотою (наприклад, `max-h-[calc(100vh-360px)] overflow-y-auto pr-1`) з тонким охайним скролбаром, щоб не ламати вертикальний лейаут сайдбара.
+
+---
+
+### 8. 📚 Дворівневий Стандарт Документації: Загальносистемний та Доменний по Застосунках (Dual-Level Architecture Documentation Standard)
+Оскільки платформа Smart-BKT-Chain є мультипортальною системою, де кожен веб-застосунок (`apps/*`) є самостійним потужним ресурсом зі своєю унікальною педагогічною, інженерною або управлінською роллю, документація **ЗОБОВ'ЯЗАНА** будуватися на двох чітко розмежованих рівнях:
+
+1. **Рівень 1: Загальносистемна Документація Платформи (Platform-Wide Core):**
+   - Розміщується у кореневому каталозі `docs/`:
+     - [`docs/architecture_overview.md`](file:///docs/architecture_overview.md) (або `docs/tech_stack.source.md`): загальна гексагональна архітектура, блокчейн-шар, шина повідомлень, спільні DTO контракти `@sbc/types`.
+     - [`docs/daily_progress.md`](file:///docs/daily_progress.md) та [`docs/detailed_implementation_log.md`](file:///docs/detailed_implementation_log.md): денний прогрес і наскрізний технічний журнал монорепозиторію.
+     - [`docs/roadmap.md`](file:///docs/roadmap.md) та [`docs/project_management.md`](file:///docs/project_management.md): епіки, стратегічні віхи та задачі.
+
+2. **Рівень 2: Доменна Документація Застосунків (App-Specific Documentation):**
+   - Усі застосунки платформи **ЗОБОВ'ЯЗАНІ** мати окремі вичерпні файли специфікацій у папці [`docs/apps/`](file:///docs/apps/):
+     - [`docs/apps/study_portal.md`](file:///docs/apps/study_portal.md) (`apps/study`, порт 3006): дидактична місія (10–11 класи), навчальна програма курсу, UI Shell, специфікація **Режиму Зручного Читання (Zen Focus Reading Engine)**, пісочниця `CodePlayground`, картки оман `Misconceptions`.
+     - [`docs/apps/student_portal.md`](file:///docs/apps/student_portal.md) (`apps/student`, порт 3002): інтерактивний тренажер, інтеграція Monaco Editor, поведінкова телеметрія (WPM, паузи, copy-paste), Сократівські підказки, калібрування BKT ($P(L_n)$).
+     - [`docs/apps/teacher_dashboard.md`](file:///docs/apps/teacher_dashboard.md) (`apps/teacher`, порт 3003): кабінет викладача, когортна аналітика, виявлення аномалій академічної доброчесності, черга ручної перевірки робіт `ReviewQueueInspector`, візуалізація графу навичок курсу.
+     - [`docs/apps/admin_portal.md`](file:///docs/apps/admin_portal.md) (`apps/admin`, порт 3004): методичний центр, налаштування та редагування графу навичок (Skill DAG), матриця складності BKT.
+     - [`docs/apps/api_backend.md`](file:///docs/apps/api_backend.md) (`apps/api`, порт 3000): ядро бекенду на NestJS, BKT-секвенсор, WebSockets телеметрії, LLM Judge та збереження станів у БД.
+
+3. **Обов'язкова автоматична компіляція у JSON:**
+   - Кожен новостворений або оновлений документ із `docs/apps/*.md` **обов'язково** додається до процедури компілятора [`scripts/compile_docs.py`](file:///scripts/compile_docs.py), транслюється у структурований JSON у `docs/apps/*.json` та `apps/docs/src/data/apps_*.json` для публікації на порталі документації `apps/docs`.

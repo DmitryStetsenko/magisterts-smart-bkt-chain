@@ -1,0 +1,143 @@
+{
+  "project_title": "👨‍🏫 Документація Застосунка «Кабінет Викладача та Аналітика» (`apps/teacher`)",
+  "sections": [
+    {
+      "title": "🎯 1. Призначення та Педагогічна Роль",
+      "level": 2,
+      "paragraphs": [
+        "Застосунок `apps/teacher` є **центром педагогічного нагляду, діагностики та верифікації знань**, який забезпечує:"
+      ],
+      "code_blocks": [],
+      "items": [
+        {
+          "type": "text",
+          "raw_text": "**Когортний моніторинг успішності:** візуалізація розподілу учнів за рівнями майстерності (Mastery $\\ge 0.85$, Proficient, Basic, At Risk).",
+          "subitems": []
+        },
+        {
+          "type": "text",
+          "raw_text": "**Детекцію аномалій академічної доброчесності:** аналіз збігів часової телеметрії (WPM > 120, надшвидкі розв'язки < 3 сек, масивні вставки тексту без редагування).",
+          "subitems": []
+        },
+        {
+          "type": "text",
+          "raw_text": "**Чергу ручної перевірки завдань (Review Queue):** розширений інспектор `ReviewQueueInspector` для перевірки есе, проєктних задач та спірних рішень з можливістю затвердження (`APPROVE`) або відхилення (`REJECT`) із коментарем.",
+          "subitems": []
+        },
+        {
+          "type": "text",
+          "raw_text": "**Інтерактивну навігацію графом курсу:** інспектор графу компетенцій `CourseGraphViewer` для перегляду зв'язків між навичками, пререквізитів та банку завдань кожного модуля.",
+          "subitems": []
+        },
+        {
+          "type": "text",
+          "raw_text": "---",
+          "subitems": []
+        }
+      ],
+      "subsections": []
+    },
+    {
+      "title": "🏛️ 2. Архітектура Інтерфейсу (UI Shell Standard)",
+      "level": 2,
+      "paragraphs": [],
+      "code_blocks": [],
+      "items": [
+        {
+          "type": "text",
+          "raw_text": "**Шапка (`h-14`):** вибір навчального курсу, пошуковий рядок учнів, лічильник черги перевірки, індикатор захищеності з'єднання.",
+          "subitems": []
+        },
+        {
+          "type": "text",
+          "raw_text": "**Вертикальний рейл (`w-14`):** швидкі вкладки (`analytics` — когортна аналітика, `reviews` — черга ручної перевірки, `graph` — граф курсу, `audit` — блокчейн-аудит, `study` — перехід до підручника).",
+          "subitems": []
+        },
+        {
+          "type": "text",
+          "raw_text": "**Бічна панель (`w-[380px]`):** структурована на базі безрамкових секцій `<DrawerSection>` (Правило 7):",
+          "subitems": []
+        },
+        {
+          "type": "text",
+          "raw_text": "*Секція 1: Фільтри когорти (All, Proficient, At-Risk, Anomalies)*",
+          "subitems": []
+        },
+        {
+          "type": "text",
+          "raw_text": "*Секція 2: Реєстр учнів класу із пошуком у реальному часі*",
+          "subitems": []
+        },
+        {
+          "type": "text",
+          "raw_text": "*Секція 3: Швидкі метрики когорти (середній BKT, середня швидкість, інциденти)*",
+          "subitems": []
+        },
+        {
+          "type": "text",
+          "raw_text": "**Центральне полотно:**",
+          "subitems": []
+        },
+        {
+          "type": "text",
+          "raw_text": "`ReviewQueueInspector`: детальний розбір відповідей учнів, історія спроб, критерії оцінювання (рубрики) та еталонна відповідь.",
+          "subitems": []
+        },
+        {
+          "type": "text",
+          "raw_text": "`CourseGraphViewer`: деревоподібна візуалізація вузлів навичок та завдань.",
+          "subitems": []
+        },
+        {
+          "type": "text",
+          "raw_text": "`AnomalyTreeWidget`: виявлення патернів нечесної поведінки або перевтоми.",
+          "subitems": []
+        },
+        {
+          "type": "text",
+          "raw_text": "---",
+          "subitems": []
+        }
+      ],
+      "subsections": []
+    },
+    {
+      "title": "🛠️ 3. Технічний Стек та Запуск",
+      "level": 2,
+      "paragraphs": [],
+      "code_blocks": [
+        {
+          "lang": "bash",
+          "content": "npm run dev:teacher"
+        },
+        {
+          "lang": "bash",
+          "content": "npm run build:teacher"
+        }
+      ],
+      "items": [
+        {
+          "type": "text",
+          "raw_text": "**Стек:** Next.js 16 (Webpack mode), React 19, Socket.io-client, Lucide React, Tailwind CSS v4, `@sbc/types`, `@sbc/ui`.",
+          "subitems": []
+        },
+        {
+          "type": "text",
+          "raw_text": "**Запуск у режимі розробки:**",
+          "subitems": []
+        },
+        {
+          "type": "text",
+          "raw_text": "*(Доступно за адресою: [http://localhost:3003](http://localhost:3003))*.",
+          "subitems": []
+        },
+        {
+          "type": "text",
+          "raw_text": "**Production-збірка:**",
+          "subitems": []
+        }
+      ],
+      "subsections": []
+    }
+  ]
+}
