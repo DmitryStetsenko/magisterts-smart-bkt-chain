@@ -146,7 +146,8 @@
 | **SBC-253** | `Story` | `SH` | expand multi-tier task bank with isomorphic blitzes, metaphors, Socratic hints and study deep-links | 2026-10-22 | `44d68a9` |
 | **SBC-270** | `Story` | `SH` | seed school web algorithms course and task bank for informatics master research | 2026-10-24 | `8ce3c47` |
 | **SBC-277** | `Story` | `SH` | restructure school web algorithms course into 7 pedagogical modules with full adaptive remediation bank | 2026-10-25 | `af23d14` |
-| **SBC-280** | `Story` | `SH` | scaffold modular cross-app DTO contracts in packages/types | 2026-10-27 | `pending` |
+| **SBC-280** | `Story` | `SH` | scaffold modular cross-app DTO contracts in packages/types | 2026-10-27 | `35c2d30` |
+| **SBC-281** | `Story` | `ST` | implement standalone interactive study application apps/study with live code playground | 2026-10-27 | `pending` |
 
 ---
 

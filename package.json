@@ -21,6 +21,8 @@
     "build:teacher": "npm run build --workspace=apps/teacher",
     "dev:admin": "npm run dev --workspace=apps/admin",
     "build:admin": "npm run build --workspace=apps/admin",
+    "dev:study": "npm run dev --workspace=apps/study",
+    "build:study": "npm run build --workspace=apps/study",
     "test:e2e": "playwright test",
     "compile:docs": "python scripts/compile_docs.py",
     "validate:commit": "node scripts/validate_commit_msg.js"
