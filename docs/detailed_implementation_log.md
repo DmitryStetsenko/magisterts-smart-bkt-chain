@@ -61,6 +61,37 @@
      - Розширення Сократівських підказок (`socraticHints`) до покрокового інтерактивного діалогу (Scaffolding).
 - **Документація:** Сформовано маніфест [`docs/brainstorm/08_adaptive_learning_paradigm_and_cross_app_contracts.md`](file:///docs/brainstorm/08_adaptive_learning_paradigm_and_cross_app_contracts.md) та зареєстровано `[BACKLOG-6]`, `[BACKLOG-7]`.
 
+### 0.1.4 Модульна Бібліотека Наскрізних DTO Контрактів (`@sbc/types`, `SBC-280`, `EP-SH`)
+- **Проблематика та Архітектурний Контекст:**
+  - До впровадження пакета `@sbc/types` сутності платформи дублювалися в інтерфейсах клієнтських застосунків (`apps/student`, `apps/teacher`, `apps/admin`). Поля зі складними структурами (наприклад, `options`, `misconceptions`, `rubrics`) оголошувалися з типом `any`, що створювало ризик десинхронізації контрактів при змінах бекенду та порушувало принцип єдиного джерела істини (Single Source of Truth).
+- **Структура Реалізації (`packages/types/src/`):**
+  1. **`tasks.types.ts`:**
+     - Модальності та типи завдань: `TaskType` (`CODE`, `SINGLE_CHOICE`, `MULTIPLE_CHOICE`, `TEXT_ESSAY`, `OPEN_TEXT`).
+     - Рівні складності: `TaskDifficulty` (`EASY`, `MEDIUM`, `HARD`, `ADVANCED`).
+     - Статуси подань: `SubmissionStatus` (`PENDING`, `ACCEPTED`, `REJECTED`, `ERROR`), `TeacherReviewStatus`.
+     - DTO моделей: `QuizOptionDto`, `TestCaseDto`, `SocraticHintDto`, `MisconceptionDto`, повна сутність `TaskDto` та результат спроби `SubmissionDto`.
+  2. **`bkt.types.ts`:**
+     - Параметри моделі Bayesian Knowledge Tracing: `BktParametersDto` ($P(L_0), P(T), P(S), P(G)$).
+     - Стан знань учня: `BktStateDto` ($P(L_n)$, `isMastered`, лічильники спроб).
+     - Результат перерахунку ймовірностей: `BktUpdateResultDto` з параметрами поведінкової корекції (`usedSlip`, `usedGuess`, `anomalyDetected`).
+     - Аудиторський зліпок для блокчейну: `BktAuditRecordDto`.
+  3. **`sequencing.types.ts`:**
+     - Категорії адаптивного переходу: `AdaptiveStepType` (`ADVANCE`, `REINFORCE`, `REMEDIATE`, `THEORY_REVIEW`, `BLOCKED`).
+     - Контракт рекомендації алгоритму: `SequencingRecommendationDto` з атрибутами `hasRemediationTask`, `activeModality`, `studyUnitUrl`, `suggestedAction`.
+     - Доменні сутності графу: `SkillNodeDto`, `CourseDto`.
+  4. **`learning.types.ts`:**
+     - Дидактичні сутності адаптивного навчання: `TheoryCapsuleDto` (теоретична капсула з прикладами коду та ключовими висновками).
+     - Інтерактивне риштування: `ScaffoldingStateDto` (розгортання підказок, фіксація активних штрафів, пропозиція теорії).
+     - Персоналізований зворотний зв'язок: `AdaptiveFeedbackDto` з попередженням про виявлену когнітивну оману `misconceptionAlert`.
+  5. **`telemetry.types.ts`:**
+     - Специфікація подій реального часу: `TelemetryEventType` (`KEYSTROKE`, `PASTE`, `FOCUS`, `BLUR`, `HINT_REQUESTED`, `THEORY_OPENED`, тощо).
+     - Розрахункові показники: `BehavioralMetricsDto` (WPM, лічильники вставок, затримка реакції, прапорець швидкого вгадування, індекс втоми).
+- **Інтеграція в робочі простори (npm workspaces):**
+  - Додано пряму залежність `"@sbc/types": "*"` у `apps/student/package.json`, `apps/teacher/package.json`, `apps/admin/package.json`, `apps/api/package.json`.
+- **Верифікація:**
+  - `npm run typecheck --workspace=@sbc/types` (0 помилок).
+  - Підтверджено збірку Next.js / NestJS додатків: `npm run build:student`, `npm run build:teacher`, `npm run build:admin`, `npm run build:api`.
+
 ### 0.2 Модуль Візуальної Інспекції Графу Курсу (`CourseOverviewWidget`)
 - **Концепція:** Перевикористовуваний автономний віджет `CourseOverviewWidget` (`apps/teacher/src/features/course-map/ui/CourseOverviewWidget.tsx`), призначений для повного огляду ієрархії курсів, модулів (DAG) та прив'язаних запитань/завдань.
 - **Особливості:**

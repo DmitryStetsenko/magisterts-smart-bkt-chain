@@ -2,6 +2,65 @@
   "project_title": "📅 Журнал розробки та прогресу проєкту (Daily Progress Log)",
   "sections": [
     {
+      "title": "📅 27 жовтня 2026 року",
+      "level": 2,
+      "paragraphs": [],
+      "code_blocks": [],
+      "items": [],
+      "subsections": [
+        {
+          "title": "✅ Що зроблено за день:",
+          "level": 3,
+          "paragraphs": [],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "**Створення модульної бібліотеки наскрізних DTO контрактів у пакеті `@sbc/types` (`SBC-280`, `EP-SH` / `BACKLOG-6`):**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Проблематика:** Раніше пакет `packages/types` був порожнім shell-пакетом, через що веб-застосунки (`apps/student`, `apps/teacher`, `apps/admin`) дублювали моделі даних локально, а поля завдань типізувалися слабко (`options?: any`).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Реалізація (`packages/types/src`):**",
+              "subitems": [
+                "`tasks.types.ts`: типізовано модальності завдань (`TaskType`, `TaskDifficulty`), моделі варіантів квізів `QuizOptionDto`, тест-кейсів `TestCaseDto`, Сократівських підказок `SocraticHintDto`, типових когнітивних оман `MisconceptionDto`, повної DTO моделі `TaskDto` та результатів спроби `SubmissionDto`.",
+                "`bkt.types.ts`: математичні параметри моделі BKT `BktParametersDto`, стан майстерності учня `BktStateDto`, дельта оновлення знань `BktUpdateResultDto` та аудиторський запис для блокчейну `BktAuditRecordDto`.",
+                "`sequencing.types.ts`: адаптивні типи кроків `AdaptiveStepType` (`ADVANCE`, `REINFORCE`, `REMEDIATE`, `THEORY_REVIEW`), контракт рекомендації секвенсора `SequencingRecommendationDto`, представлення вузла графу компетенцій `SkillNodeDto` та навчального курсу `CourseDto`.",
+                "`learning.types.ts`: теоретична навчальна капсула `TheoryCapsuleDto` для Just-in-Time навчання, стан інтерактивного риштування `ScaffoldingStateDto` та структура персоналізованого фідбеку `AdaptiveFeedbackDto`.",
+                "`telemetry.types.ts`: події поведінкової телеметрії у реальному часі `TelemetryEventDto` та метрики `BehavioralMetricsDto`.",
+                "`index.ts`: централізована точка входу для реекспорту всіх доменних DTO контрактів."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Інтеграція в монорепозиторій:**",
+              "subitems": [
+                "Підключено `@sbc/types: \"*\"` як пряму залежність у `apps/student`, `apps/teacher`, `apps/admin` та `apps/api`."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Верифікація:**",
+              "subitems": [
+                "Успішна типізація `tsc --noEmit` у `@sbc/types`.",
+                "Успішна збірка всіх 4 основних додатків платформи: `npm run build:student`, `npm run build:teacher`, `npm run build:admin` та `npm run build:api`."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "---",
+              "subitems": []
+            }
+          ]
+        }
+      ]
+    },
+    {
       "title": "📅 26 жовтня 2026 року",
       "level": 2,
       "paragraphs": [],

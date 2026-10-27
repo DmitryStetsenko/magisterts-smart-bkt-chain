@@ -20,6 +20,7 @@
     "@nestjs/swagger": "^7.4.2",
     "@nestjs/websockets": "^10.4.15",
     "@sbc/database": "*",
+    "@sbc/types": "*",
     "bullmq": "^6.3.11",
     "dotenv": "^16.4.7",
     "ioredis": "^6.0.0",

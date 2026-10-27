@@ -116,7 +116,6 @@
 | **SBC-273** | `Story` | `INF` | add floating toast notifications on course switch and record course testing ergonomics in backlog | 2026-10-24 | `a6ac8b5` |
 | **SBC-274** | `Story` | `INF` | implement modal confirmation dialog with pre-switch validation before changing courses | 2026-10-24 | `b454563` |
 | **SBC-279** | Task | INF | document brainstorm 08 and add adaptive learning roadmap to backlog | 2026-10-26 | pending |
-| **SBC-280** | Story | SH | scaffold modular cross-app DTO contracts in packages/types | 2026-10-26 | pending |
 
 ---
 
@@ -147,6 +146,7 @@
 | **SBC-253** | `Story` | `SH` | expand multi-tier task bank with isomorphic blitzes, metaphors, Socratic hints and study deep-links | 2026-10-22 | `44d68a9` |
 | **SBC-270** | `Story` | `SH` | seed school web algorithms course and task bank for informatics master research | 2026-10-24 | `8ce3c47` |
 | **SBC-277** | `Story` | `SH` | restructure school web algorithms course into 7 pedagogical modules with full adaptive remediation bank | 2026-10-25 | `af23d14` |
+| **SBC-280** | `Story` | `SH` | scaffold modular cross-app DTO contracts in packages/types | 2026-10-27 | `pending` |
 
 ---
 

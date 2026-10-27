@@ -2,6 +2,26 @@
 
 Цей документ фіксує щоденний прогрес розробки, архітектурні рішення та планування наступних кроків для системи «Smart-BKT-Chain».
 
+## 📅 27 жовтня 2026 року
+
+### ✅ Що зроблено за день:
+1. **Створення модульної бібліотеки наскрізних DTO контрактів у пакеті `@sbc/types` (`SBC-280`, `EP-SH` / `BACKLOG-6`):**
+   - **Проблематика:** Раніше пакет `packages/types` був порожнім shell-пакетом, через що веб-застосунки (`apps/student`, `apps/teacher`, `apps/admin`) дублювали моделі даних локально, а поля завдань типізувалися слабко (`options?: any`).
+   - **Реалізація (`packages/types/src`):**
+     - `tasks.types.ts`: типізовано модальності завдань (`TaskType`, `TaskDifficulty`), моделі варіантів квізів `QuizOptionDto`, тест-кейсів `TestCaseDto`, Сократівських підказок `SocraticHintDto`, типових когнітивних оман `MisconceptionDto`, повної DTO моделі `TaskDto` та результатів спроби `SubmissionDto`.
+     - `bkt.types.ts`: математичні параметри моделі BKT `BktParametersDto`, стан майстерності учня `BktStateDto`, дельта оновлення знань `BktUpdateResultDto` та аудиторський запис для блокчейну `BktAuditRecordDto`.
+     - `sequencing.types.ts`: адаптивні типи кроків `AdaptiveStepType` (`ADVANCE`, `REINFORCE`, `REMEDIATE`, `THEORY_REVIEW`), контракт рекомендації секвенсора `SequencingRecommendationDto`, представлення вузла графу компетенцій `SkillNodeDto` та навчального курсу `CourseDto`.
+     - `learning.types.ts`: теоретична навчальна капсула `TheoryCapsuleDto` для Just-in-Time навчання, стан інтерактивного риштування `ScaffoldingStateDto` та структура персоналізованого фідбеку `AdaptiveFeedbackDto`.
+     - `telemetry.types.ts`: події поведінкової телеметрії у реальному часі `TelemetryEventDto` та метрики `BehavioralMetricsDto`.
+     - `index.ts`: централізована точка входу для реекспорту всіх доменних DTO контрактів.
+   - **Інтеграція в монорепозиторій:**
+     - Підключено `@sbc/types: "*"` як пряму залежність у `apps/student`, `apps/teacher`, `apps/admin` та `apps/api`.
+   - **Верифікація:**
+     - Успішна типізація `tsc --noEmit` у `@sbc/types`.
+     - Успішна збірка всіх 4 основних додатків платформи: `npm run build:student`, `npm run build:teacher`, `npm run build:admin` та `npm run build:api`.
+
+---
+
 ## 📅 26 жовтня 2026 року
 
 ### ✅ Що зроблено за день:
