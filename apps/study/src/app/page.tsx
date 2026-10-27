@@ -27,6 +27,13 @@ import {
 import { DrawerSection } from '@sbc/ui';
 import { SCHOOL_WEB_CURRICULUM, LessonUnit, LessonSection } from '../data/school-web-curriculum';
 import { CodePlayground } from '../components/CodePlayground';
+import { 
+  ReaderFloatingToolbar, 
+  ReaderSettings, 
+  ReadingTheme, 
+  ReadingFont, 
+  ReadingFontSize 
+} from '../components/ReaderFloatingToolbar';
 
 export default function StudyPortalHomePage() {
   const [selectedModuleSlug, setSelectedModuleSlug] = useState<string>('school-alg-basics');
@@ -37,6 +44,45 @@ export default function StudyPortalHomePage() {
   type StudyTab = 'curriculum' | 'playground' | 'glossary' | 'settings';
   const [activeTab, setActiveTab] = useState<StudyTab>('curriculum');
   const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(true);
+
+  // 📖 Zen Reading Mode State
+  const [readerSettings, setReaderSettings] = useState<ReaderSettings>({
+    isFocusMode: false,
+    theme: 'night',
+    font: 'sans',
+    fontSize: 'normal',
+    maxWidth: 'standard',
+  });
+  const [scrollProgress, setScrollProgress] = useState<number>(0);
+
+  // Клавіатурна гаряча клавіша F для входу/виходу з режиму фокусного читання
+  React.useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Ігнорувати якщо користувач друкує в input, textarea або Monaco Editor
+      const target = e.target as HTMLElement;
+      if (['INPUT', 'TEXTAREA'].includes(target.tagName) || target.isContentEditable) {
+        return;
+      }
+      if (e.key === 'f' || e.key === 'F') {
+        e.preventDefault();
+        setReaderSettings((prev) => ({ ...prev, isFocusMode: !prev.isFocusMode }));
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
+  // Слухач скролу головного контенту для розрахунку прогресу
+  const handleScroll = (e: React.UIEvent<HTMLElement>) => {
+    const target = e.currentTarget;
+    const totalScroll = target.scrollHeight - target.clientHeight;
+    if (totalScroll > 0) {
+      const progress = (target.scrollTop / totalScroll) * 100;
+      setScrollProgress(progress);
+    } else {
+      setScrollProgress(0);
+    }
+  };
 
   const handleTabClick = (tab: StudyTab) => {
     if (activeTab === tab) {
@@ -50,10 +96,49 @@ export default function StudyPortalHomePage() {
   const currentModule = SCHOOL_WEB_CURRICULUM.modules.find(m => m.moduleSlug === selectedModuleSlug) || SCHOOL_WEB_CURRICULUM.modules[0];
   const currentUnit = currentModule.units.find(u => u.slug === selectedUnitSlug) || currentModule.units[0];
 
+  // Динамічні стилі для теми
+  const themeClasses = {
+    night: 'bg-slate-950 text-slate-100',
+    sepia: 'bg-[#181310] text-[#f5ebd7]',
+    oled: 'bg-black text-white',
+  }[readerSettings.theme];
+
+  const contentBgClasses = {
+    night: 'bg-slate-900/40 border-slate-800/80 text-slate-300',
+    sepia: 'bg-[#211a14] border-amber-900/40 text-[#eeddc3]',
+    oled: 'bg-neutral-950 border-neutral-900 text-neutral-300',
+  }[readerSettings.theme];
+
+  const headerBgClasses = {
+    night: 'bg-slate-900 border-slate-800/90',
+    sepia: 'bg-[#231d17] border-amber-950 text-[#f5ebd7]',
+    oled: 'bg-black border-neutral-900',
+  }[readerSettings.theme];
+
+  // Кегль тексту
+  const fontSizes = {
+    compact: 'text-[15px] leading-relaxed',
+    normal: 'text-[17px] leading-relaxed',
+    large: 'text-[19px] leading-relaxed',
+    xlarge: 'text-[21px] leading-loose',
+  }[readerSettings.fontSize];
+
+  // Гарнітура шрифту
+  const fontFamilyClass = readerSettings.font === 'serif' ? 'font-serif' : 'font-sans';
+
+  // Максимальна ширина полотна читання
+  const maxWidthClass = {
+    narrow: 'max-w-2xl',
+    standard: 'max-w-3xl',
+    wide: 'max-w-5xl',
+  }[readerSettings.maxWidth];
+
   return (
-    <div className="h-screen w-screen bg-slate-950 text-slate-100 flex flex-col font-sans overflow-hidden">
-      {/* 📌 1. ЄДИНА ФІКСОВАНА ШАПКА ПЛАТФОРМИ (Header) */}
-      <header className="h-14 w-full bg-slate-900 border-b border-slate-800/90 px-4 flex items-center justify-between shrink-0 z-30 shadow-md">
+    <div className={`h-screen w-screen ${themeClasses} flex flex-col font-sans overflow-hidden transition-colors duration-300`}>
+      {/* 📌 1. ЄДИНА ФІКСОВАНА ШАПКА ПЛАТФОРМИ (Header) - приховується або показується залежно від режиму */}
+      <header className={`h-14 w-full ${headerBgClasses} px-4 flex items-center justify-between shrink-0 z-30 shadow-md transition-all duration-300 ${
+        readerSettings.isFocusMode ? 'hidden' : 'flex'
+      }`}>
         {/* Ліва частина: Логотип платформи та бейдж режиму */}
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2.5">
@@ -88,8 +173,18 @@ export default function StudyPortalHomePage() {
           </div>
         </div>
 
-        {/* Права частина: Селектор курсу та Профіль користувача */}
+        {/* Права частина: Кнопка Режиму Читання, Селектор курсу та Профіль користувача */}
         <div className="flex items-center gap-3">
+          {/* Швидка кнопка входу в Режим Зручного Читання */}
+          <button
+            onClick={() => setReaderSettings(prev => ({ ...prev, isFocusMode: true }))}
+            className="px-3 py-1.5 rounded-xl bg-blue-600/20 border border-blue-500/40 text-blue-300 hover:bg-blue-600 hover:text-white transition-all text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-sm"
+            title="Увімкнути Режим Зручного Читання (F)"
+          >
+            <BookOpen className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">Фокус Читання [F]</span>
+          </button>
+
           <div className="relative min-w-[200px] sm:min-w-[260px]">
             <select
               id="study-course-select"
@@ -125,7 +220,8 @@ export default function StudyPortalHomePage() {
       {/* 🧭 2. ГОЛОВНА РОБОЧА ЗОНА З БІЧНИМ RAIL ТА ШТОРКОЮ */}
       <div className="flex-1 flex overflow-hidden">
         {/* 🎨 Opera-Style Slim Left Navigation Rail (Ярлики) */}
-        <nav className="w-14 bg-slate-900 border-r border-slate-800 flex flex-col items-center py-4 gap-3 shrink-0 z-20 shadow-xl">
+        {!readerSettings.isFocusMode && (
+          <nav className="w-14 bg-slate-900 border-r border-slate-800 flex flex-col items-center py-4 gap-3 shrink-0 z-20 shadow-xl transition-all duration-300">
           {/* Ярлик 1: Програма курсу та Уроки */}
           <button
             onClick={() => handleTabClick('curriculum')}
@@ -256,9 +352,10 @@ export default function StudyPortalHomePage() {
             </button>
           </div>
         </nav>
+        )}
 
         {/* 📂 3. ВИСУВНА БІЧНА ПАНЕЛЬ (Side Drawer з уніфікованими DrawerSection за Правилом 7) */}
-        {isDrawerOpen && (
+        {isDrawerOpen && !readerSettings.isFocusMode && (
           <aside className="w-full sm:w-[340px] lg:w-[380px] bg-slate-900/95 border-r border-slate-800 flex flex-col shrink-0 shadow-2xl backdrop-blur-xl animate-fadeIn z-10 overflow-hidden">
             {/* Шапка бічної панелі */}
             <div className="p-4 border-b border-slate-800 flex items-center justify-between shrink-0 bg-slate-900/90 backdrop-blur-md">
@@ -454,31 +551,46 @@ export default function StudyPortalHomePage() {
         )}
 
         {/* 💻 4. ГОЛОВНЕ ПОЛОТНО ПІДРУЧНИКА (Main Reading Canvas) */}
-        <main className="flex-1 flex flex-col overflow-y-auto bg-slate-950">
+        <main 
+          onScroll={handleScroll}
+          className={`flex-1 flex flex-col overflow-y-auto ${themeClasses} transition-colors duration-300 relative`}
+        >
           {/* Верхня смуга хлібних крихт (Breadcrumbs) */}
-          <div className="px-8 py-3.5 border-b border-slate-800/80 bg-slate-900/40 backdrop-blur-md sticky top-0 z-10 flex items-center justify-between">
-            <div className="flex items-center gap-2 text-xs font-mono text-slate-400">
+          <div className={`px-8 py-3.5 border-b sticky top-0 z-10 flex items-center justify-between backdrop-blur-md transition-colors duration-300 ${headerBgClasses}`}>
+            <div className="flex items-center gap-2 text-xs font-mono opacity-80">
               <span>{currentModule.title.split(':')[0]}</span>
-              <ChevronRight className="w-3.5 h-3.5 text-slate-600" />
+              <ChevronRight className="w-3.5 h-3.5 opacity-60" />
               <span className="text-blue-400 font-bold">{currentUnit.title}</span>
             </div>
 
-            <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-slate-900 border border-slate-800 text-xs font-mono text-slate-300">
-              <Clock className="w-3.5 h-3.5 text-blue-400" />
-              <span>Час на опрацювання: ~{currentUnit.estimatedMinutes} хв</span>
+            <div className="flex items-center gap-3">
+              {readerSettings.isFocusMode && (
+                <button
+                  onClick={() => setReaderSettings(prev => ({ ...prev, isFocusMode: false }))}
+                  className="px-2.5 py-1 rounded-lg bg-blue-600/20 text-blue-300 border border-blue-500/30 text-xs font-semibold hover:bg-blue-600 hover:text-white transition-all cursor-pointer"
+                  title="Вийти з фокус-режиму [F]"
+                >
+                  Вийти з фокусу [F]
+                </button>
+              )}
+
+              <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-slate-900/80 border border-slate-800 text-xs font-mono">
+                <Clock className="w-3.5 h-3.5 text-blue-400" />
+                <span>Час: ~{currentUnit.estimatedMinutes} хв</span>
+              </div>
             </div>
           </div>
 
           {/* Тіло матеріалу уроку */}
-          <div className="max-w-4xl mx-auto w-full px-8 py-8 flex flex-col gap-8">
+          <div className={`${maxWidthClass} ${fontFamilyClass} mx-auto w-full px-6 sm:px-8 py-8 flex flex-col gap-8 transition-all duration-300`}>
             {/* Шапка теми */}
             <div className="flex flex-col gap-3 border-b border-slate-800/80 pb-6">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold font-mono bg-blue-500/10 text-blue-400 border border-blue-500/20 w-fit">
                 <Sparkles className="w-3.5 h-3.5" />
                 <span>{currentUnit.gradeLevel} • Модуль {currentUnit.moduleNumber}</span>
               </div>
-              <h2 className="text-2xl font-black text-white tracking-tight">{currentUnit.title}</h2>
-              <p className="text-sm text-slate-300 leading-relaxed bg-slate-900/50 p-4 rounded-xl border border-slate-800/80">
+              <h2 className="text-2xl sm:text-3xl font-black tracking-tight">{currentUnit.title}</h2>
+              <p className={`${fontSizes} ${contentBgClasses} p-5 rounded-2xl border transition-colors duration-300`}>
                 {currentUnit.summary}
               </p>
             </div>
@@ -493,17 +605,17 @@ export default function StudyPortalHomePage() {
                       <span className="w-6 h-6 rounded-lg bg-blue-600/20 border border-blue-500/30 text-blue-400 font-mono font-bold text-xs flex items-center justify-center">
                         {idx + 1}
                       </span>
-                      <h3 className="text-lg font-bold text-white tracking-wide">{sec.title}</h3>
+                      <h3 className="text-lg font-bold tracking-wide">{sec.title}</h3>
                     </div>
                     {sec.badge && (
-                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-semibold bg-slate-800 text-slate-300 border border-slate-700">
+                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-semibold bg-slate-800/80 text-slate-300 border border-slate-700">
                         {sec.badge}
                       </span>
                     )}
                   </div>
 
                   {/* Теоретичне пояснення */}
-                  <div className="text-sm text-slate-300 leading-relaxed whitespace-pre-line bg-slate-900/40 p-5 rounded-2xl border border-slate-800/80">
+                  <div className={`${fontSizes} ${contentBgClasses} whitespace-pre-line p-6 rounded-2xl border transition-colors duration-300`}>
                     {sec.conceptExplanation}
                   </div>
 
@@ -525,7 +637,7 @@ export default function StudyPortalHomePage() {
                       <div className="text-xs text-amber-200/90 italic pl-6">
                         {sec.misconceptionAlert.wrongBelief}
                       </div>
-                      <div className="text-xs text-slate-300 pl-6 leading-relaxed">
+                      <div className="text-xs pl-6 leading-relaxed opacity-90">
                         <strong className="text-amber-300 font-semibold">Чому це хибно: </strong>
                         {sec.misconceptionAlert.realityExplanation}
                       </div>
@@ -537,12 +649,12 @@ export default function StudyPortalHomePage() {
                   )}
 
                   {/* Ключові висновки (Key Takeaways) */}
-                  <div className="p-4 rounded-xl bg-slate-900/40 border border-slate-800/60 flex flex-col gap-2">
+                  <div className={`p-4 rounded-xl ${contentBgClasses} border flex flex-col gap-2`}>
                     <div className="flex items-center gap-1.5 text-xs font-bold text-blue-300">
                       <Lightbulb className="w-3.5 h-3.5 text-blue-400" />
                       <span>Головні тези для запам'ятовування:</span>
                     </div>
-                    <ul className="flex flex-col gap-1 pl-4 list-disc text-xs text-slate-400 leading-relaxed">
+                    <ul className="flex flex-col gap-1 pl-4 list-disc text-xs opacity-80 leading-relaxed">
                       {sec.keyTakeaways.map((item, tIdx) => (
                         <li key={tIdx}>{item}</li>
                       ))}
@@ -574,6 +686,14 @@ export default function StudyPortalHomePage() {
               </a>
             </div>
           </div>
+
+          {/* 5. ПЛАВАЮЧА ПАНЕЛЬ ЗРУЧНОГО ЧИТАННЯ (Zen Reading Toolbar & Scroll Indicator) */}
+          <ReaderFloatingToolbar
+            settings={readerSettings}
+            onUpdateSettings={setReaderSettings}
+            scrollProgressPct={scrollProgress}
+            estimatedMinutesLeft={Math.max(1, Math.round(currentUnit.estimatedMinutes * (1 - scrollProgress / 100)))}
+          />
         </main>
       </div>
     </div>
