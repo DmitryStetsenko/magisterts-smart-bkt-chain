@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { ShieldCheck, Network, Settings, BookOpen, Database, ArrowRight } from 'lucide-react';
+import { ShieldCheck, Network, Settings, BookOpen, Database, ArrowRight, GraduationCap, User } from 'lucide-react';
 import { SkillDagEditor } from '../features/skill-editor/ui/SkillDagEditor';
 import { AdminSkillNode } from '../features/skill-editor/model/skill-editor.types';
 import { CourseManager } from '../features/course-manager/ui/CourseManager';
@@ -198,13 +198,33 @@ export default function AdminCMSDashboard() {
             <div className="w-8 h-[1px] bg-slate-800/80 my-1"></div>
 
             <a
+              href="http://localhost:3006"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-10 h-10 rounded-xl bg-blue-600/15 text-blue-400 border border-blue-500/20 flex items-center justify-center hover:bg-blue-600/30 hover:border-blue-500/40 transition-all"
+              title="Інтерактивний Підручник (Study Space - 3006)"
+            >
+              <GraduationCap className="w-4 h-4" />
+            </a>
+
+            <a
               href="http://localhost:3002"
               target="_blank"
               rel="noopener noreferrer"
               className="w-10 h-10 rounded-xl bg-indigo-600/15 text-indigo-400 border border-indigo-500/20 flex items-center justify-center hover:bg-indigo-600/30 hover:border-indigo-500/40 transition-all"
-              title="Кабінет Студента"
+              title="Кабінет Студента (Student Portal - 3002)"
             >
               <Database className="w-4 h-4" />
+            </a>
+
+            <a
+              href="http://localhost:3003"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-10 h-10 rounded-xl bg-purple-600/15 text-purple-400 border border-purple-500/20 flex items-center justify-center hover:bg-purple-600/30 hover:border-purple-500/40 transition-all"
+              title="Кабінет Викладача (Teacher Portal - 3003)"
+            >
+              <User className="w-4 h-4" />
             </a>
 
             <div className="w-8 h-[1px] bg-slate-800/80 my-1"></div>

@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { io } from 'socket.io-client';
-import { ShieldCheck, Network, Users, BarChart3, Code2, BookOpen, Scale, ChevronDown, ChevronUp, X, Search, RotateCcw, AlertTriangle, CheckCircle2, Lock, HelpCircle, Code, FileText, CheckSquare, Sparkles, Keyboard, Copy, Activity, Info, GitBranch, Layers, ClipboardCheck, Tag, FlaskConical, Compass, User, Globe, Plus, Minus } from 'lucide-react';
+import { ShieldCheck, Network, Users, BarChart3, Code2, BookOpen, Scale, ChevronDown, ChevronUp, X, Search, RotateCcw, AlertTriangle, CheckCircle2, Lock, HelpCircle, Code, FileText, CheckSquare, Sparkles, Keyboard, Copy, Activity, Info, GitBranch, Layers, ClipboardCheck, Tag, FlaskConical, Compass, User, Globe, Plus, Minus, GraduationCap } from 'lucide-react';
 import { StudentAnalyticsItem } from '../features/analytics/model/analytics.types';
 import { AnomalyTreeWidget, GameSkillTreeWidget, SkillGraphNode } from '@sbc/ui';
 import { ReviewQueueInspector } from '../features/reviews/ui/ReviewQueueInspector';
@@ -672,11 +672,21 @@ export default function TeacherDashboardPage() {
             <div className="w-8 h-[1px] bg-slate-800/80 my-1"></div>
 
             <a
+              href="http://localhost:3006"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-10 h-10 rounded-xl bg-blue-600/15 text-blue-400 border border-blue-500/20 flex items-center justify-center hover:bg-blue-600/30 hover:border-blue-500/40 transition-all"
+              title="Інтерактивний Підручник (Study Space - 3006)"
+            >
+              <GraduationCap className="w-4 h-4" />
+            </a>
+
+            <a
               href="http://localhost:3002"
               target="_blank"
               rel="noopener noreferrer"
               className="w-10 h-10 rounded-xl bg-indigo-600/15 text-indigo-400 border border-indigo-500/20 flex items-center justify-center hover:bg-indigo-600/30 hover:border-indigo-500/40 transition-all"
-              title="Кабінет Студента"
+              title="Кабінет Студента (Student Portal - 3002)"
             >
               <BookOpen className="w-4 h-4" />
             </a>
@@ -686,7 +696,7 @@ export default function TeacherDashboardPage() {
               target="_blank"
               rel="noopener noreferrer"
               className="w-10 h-10 rounded-xl bg-emerald-600/15 text-emerald-400 border border-emerald-500/20 flex items-center justify-center hover:bg-emerald-600/30 hover:border-emerald-500/40 transition-all"
-              title="Панель Адміністратора CMS"
+              title="Панель Адміністратора CMS (Admin Portal - 3004)"
             >
               <Code2 className="w-4 h-4" />
             </a>

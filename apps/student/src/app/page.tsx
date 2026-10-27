@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { io } from 'socket.io-client';
-import { Brain, Sparkles, CheckCircle, AlertCircle, RefreshCw, User, Code2, BookOpen, Scale, ChevronDown, ArrowRight, AlertTriangle, X, Settings, Network, Compass, Flame, History, MessageSquareQuote, CheckCircle2, Trophy, Target, MessageSquare, Info, HelpCircle } from 'lucide-react';
+import { Brain, Sparkles, CheckCircle, AlertCircle, RefreshCw, User, Code2, BookOpen, Scale, ChevronDown, ArrowRight, AlertTriangle, X, Settings, Network, Compass, Flame, History, MessageSquareQuote, CheckCircle2, Trophy, Target, MessageSquare, Info, HelpCircle, GraduationCap } from 'lucide-react';
 import { MonacoCodeEditor } from '../features/code-editor/ui/MonacoCodeEditor';
 import { QuizTaskEditor } from '../features/quiz-editor/ui/QuizTaskEditor';
 import { EssayTaskEditor } from '../features/essay-editor/ui/EssayTaskEditor';
@@ -614,11 +614,21 @@ export default function StudentPortalPage() {
 
             {/* External Apps Group */}
             <a
+              href="http://localhost:3006"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-10 h-10 rounded-xl bg-blue-600/15 text-blue-400 border border-blue-500/20 flex items-center justify-center hover:bg-blue-600/30 hover:border-blue-500/40 transition-all"
+              title="Інтерактивний Підручник (Study Space - 3006)"
+            >
+              <GraduationCap className="w-4 h-4" />
+            </a>
+
+            <a
               href="http://localhost:3003"
               target="_blank"
               rel="noopener noreferrer"
               className="w-10 h-10 rounded-xl bg-purple-600/15 text-purple-400 border border-purple-500/20 flex items-center justify-center hover:bg-purple-600/30 hover:border-purple-500/40 transition-all"
-              title="Кабінет Викладача (Teacher Portal)"
+              title="Кабінет Викладача (Teacher Portal - 3003)"
             >
               <User className="w-4 h-4" />
             </a>
@@ -628,7 +638,7 @@ export default function StudentPortalPage() {
               target="_blank"
               rel="noopener noreferrer"
               className="w-10 h-10 rounded-xl bg-emerald-600/15 text-emerald-400 border border-emerald-500/20 flex items-center justify-center hover:bg-emerald-600/30 hover:border-emerald-500/40 transition-all"
-              title="Панель Адміністратора (CMS DAG)"
+              title="Панель Адміністратора (CMS DAG - 3004)"
             >
               <Code2 className="w-4 h-4" />
             </a>
@@ -966,11 +976,11 @@ export default function StudentPortalPage() {
                               </div>
                             </div>
                             <a
-                              href={task.studyUnitUrl}
+                              href={task.studyUnitUrl.startsWith('http') ? task.studyUnitUrl : `http://localhost:3006${task.studyUnitUrl.startsWith('/') ? '' : '/'}${task.studyUnitUrl}`}
                               target="_blank"
                               rel="noopener noreferrer"
                               className="px-2.5 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs flex items-center gap-1 shadow-md shadow-blue-600/30 transition-all cursor-pointer shrink-0"
-                              title="Відкрити урок в інтерактивній системі"
+                              title="Відкрити урок в інтерактивному підручнику"
                             >
                               <span>До уроку</span>
                               <ArrowRight className="w-3 h-3" />
