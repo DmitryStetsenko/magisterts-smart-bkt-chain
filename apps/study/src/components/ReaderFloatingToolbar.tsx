@@ -28,6 +28,14 @@ export interface ReaderSettings {
   maxWidth: 'narrow' | 'standard' | 'wide';
 }
 
+export const DEFAULT_READER_SETTINGS: ReaderSettings = {
+  isFocusMode: false,
+  theme: 'night',
+  font: 'sans',
+  fontSize: 'normal',
+  maxWidth: 'wide',
+};
+
 interface ReaderFloatingToolbarProps {
   settings: ReaderSettings;
   onUpdateSettings: (updater: (prev: ReaderSettings) => ReaderSettings) => void;
@@ -43,8 +51,29 @@ export function ReaderFloatingToolbar({
 }: ReaderFloatingToolbarProps) {
   const [isOpen, setIsOpen] = React.useState<boolean>(false);
 
+  // Автоматично закривати панель налаштувань, якщо фокус-режим вимикається
+  React.useEffect(() => {
+    if (!settings.isFocusMode) {
+      setIsOpen(false);
+    }
+  }, [settings.isFocusMode]);
+
   const toggleFocusMode = () => {
-    onUpdateSettings((prev) => ({ ...prev, isFocusMode: !prev.isFocusMode }));
+    onUpdateSettings((prev) => {
+      if (prev.isFocusMode) {
+        // Вихід із режиму читання: скидання до стандартних стилів системи
+        return {
+          ...DEFAULT_READER_SETTINGS,
+          isFocusMode: false,
+        };
+      } else {
+        // Вхід у режим читання: активація фокусного режиму
+        return {
+          ...prev,
+          isFocusMode: true,
+        };
+      }
+    });
   };
 
   const setTheme = (theme: ReadingTheme) => {
@@ -96,8 +125,8 @@ export function ReaderFloatingToolbar({
         aria-label="Параметри зручного читання"
         className="fixed bottom-6 right-6 z-40 flex flex-col items-end gap-2 select-none"
       >
-        {/* Розгорнуте меню налаштувань */}
-        {isOpen && (
+        {/* Розгорнуте меню налаштувань - ДОСТУПНЕ ВИКЛЮЧНО В РЕЖИМІ ЧИТАННЯ */}
+        {settings.isFocusMode && isOpen && (
           <div className="p-4 rounded-2xl bg-slate-900/95 border border-slate-800 shadow-2xl backdrop-blur-xl flex flex-col gap-4 w-72 text-xs animate-in fade-in slide-in-from-bottom-3 duration-200">
             <div className="flex items-center justify-between border-b border-slate-800/80 pb-2">
               <span className="font-bold text-white flex items-center gap-1.5">
@@ -309,18 +338,20 @@ export function ReaderFloatingToolbar({
             )}
           </button>
 
-          {/* Кнопка розгортання панелі налаштувань */}
-          <button
-            onClick={() => setIsOpen((prev) => !prev)}
-            className={`p-2.5 rounded-2xl border shadow-xl flex items-center justify-center transition-all cursor-pointer backdrop-blur-md active:scale-95 ${
-              isOpen
-                ? 'bg-indigo-600 border-indigo-400 text-white'
-                : 'bg-slate-900/90 border-slate-700 text-slate-300 hover:text-white hover:bg-slate-800'
-            }`}
-            title="Налаштування шрифту та кольорів читання"
-          >
-            <Type className="w-4 h-4" />
-          </button>
+          {/* Кнопка налаштувань типографіки - ВІДОБРАЖАЄТЬСЯ ТІЛЬКИ В РЕЖИМІ ЧИТАННЯ */}
+          {settings.isFocusMode && (
+            <button
+              onClick={() => setIsOpen((prev) => !prev)}
+              className={`p-2.5 rounded-2xl border shadow-xl flex items-center justify-center transition-all cursor-pointer backdrop-blur-md active:scale-95 animate-in fade-in duration-150 ${
+                isOpen
+                  ? 'bg-indigo-600 border-indigo-400 text-white'
+                  : 'bg-slate-900/90 border-slate-700 text-slate-300 hover:text-white hover:bg-slate-800'
+              }`}
+              title="Налаштування шрифту та кольорів читання"
+            >
+              <Type className="w-4 h-4" />
+            </button>
+          )}
         </div>
       </aside>
     </>

@@ -30,6 +30,7 @@ import { CodePlayground } from '../components/CodePlayground';
 import { 
   ReaderFloatingToolbar, 
   ReaderSettings, 
+  DEFAULT_READER_SETTINGS,
   ReadingTheme, 
   ReadingFont, 
   ReadingFontSize 
@@ -45,14 +46,8 @@ export default function StudyPortalHomePage() {
   const [activeTab, setActiveTab] = useState<StudyTab>('curriculum');
   const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(true);
 
-  // 📖 Zen Reading Mode State
-  const [readerSettings, setReaderSettings] = useState<ReaderSettings>({
-    isFocusMode: false,
-    theme: 'night',
-    font: 'sans',
-    fontSize: 'normal',
-    maxWidth: 'standard',
-  });
+  // 📖 Zen Reading Mode State: початково стандартні налаштування
+  const [readerSettings, setReaderSettings] = useState<ReaderSettings>(DEFAULT_READER_SETTINGS);
   const [scrollProgress, setScrollProgress] = useState<number>(0);
 
   // Клавіатурна гаряча клавіша F для входу/виходу з режиму фокусного читання
@@ -65,7 +60,21 @@ export default function StudyPortalHomePage() {
       }
       if (e.key === 'f' || e.key === 'F') {
         e.preventDefault();
-        setReaderSettings((prev) => ({ ...prev, isFocusMode: !prev.isFocusMode }));
+        setReaderSettings((prev) => {
+          if (prev.isFocusMode) {
+            // При виході з режиму читання скидаємо до стандартних стилів
+            return {
+              ...DEFAULT_READER_SETTINGS,
+              isFocusMode: false,
+            };
+          } else {
+            // Вхід у режим фокусного читання
+            return {
+              ...prev,
+              isFocusMode: true,
+            };
+          }
+        });
       }
     };
     window.addEventListener('keydown', handleKeyDown);
@@ -96,42 +105,48 @@ export default function StudyPortalHomePage() {
   const currentModule = SCHOOL_WEB_CURRICULUM.modules.find(m => m.moduleSlug === selectedModuleSlug) || SCHOOL_WEB_CURRICULUM.modules[0];
   const currentUnit = currentModule.units.find(u => u.slug === selectedUnitSlug) || currentModule.units[0];
 
-  // Динамічні стилі для теми
+  // Динамічні стилі для теми: застосовуються ВИКЛЮЧНО в режимі читання (isFocusMode).
+  // У стандартному режимі залишається єдиний фірмовий dark-дизайн платформи.
+  const activeTheme = readerSettings.isFocusMode ? readerSettings.theme : 'night';
+  const activeFont = readerSettings.isFocusMode ? readerSettings.font : 'sans';
+  const activeFontSize = readerSettings.isFocusMode ? readerSettings.fontSize : 'normal';
+  const activeMaxWidth = readerSettings.isFocusMode ? readerSettings.maxWidth : 'wide';
+
   const themeClasses = {
     night: 'bg-slate-950 text-slate-100',
     sepia: 'bg-[#181310] text-[#f5ebd7]',
     oled: 'bg-black text-white',
-  }[readerSettings.theme];
+  }[activeTheme];
 
   const contentBgClasses = {
     night: 'bg-slate-900/40 border-slate-800/80 text-slate-300',
     sepia: 'bg-[#211a14] border-amber-900/40 text-[#eeddc3]',
     oled: 'bg-neutral-950 border-neutral-900 text-neutral-300',
-  }[readerSettings.theme];
+  }[activeTheme];
 
   const headerBgClasses = {
     night: 'bg-slate-900 border-slate-800/90',
     sepia: 'bg-[#231d17] border-amber-950 text-[#f5ebd7]',
     oled: 'bg-black border-neutral-900',
-  }[readerSettings.theme];
+  }[activeTheme];
 
   // Кегль тексту
   const fontSizes = {
     compact: 'text-[15px] leading-relaxed',
-    normal: 'text-[17px] leading-relaxed',
-    large: 'text-[19px] leading-relaxed',
-    xlarge: 'text-[21px] leading-loose',
-  }[readerSettings.fontSize];
+    normal: 'text-sm text-slate-300 leading-relaxed',
+    large: 'text-[18px] leading-relaxed',
+    xlarge: 'text-[20px] leading-loose',
+  }[activeFontSize];
 
   // Гарнітура шрифту
-  const fontFamilyClass = readerSettings.font === 'serif' ? 'font-serif' : 'font-sans';
+  const fontFamilyClass = activeFont === 'serif' ? 'font-serif' : 'font-sans';
 
   // Максимальна ширина полотна читання
   const maxWidthClass = {
     narrow: 'max-w-2xl',
     standard: 'max-w-3xl',
-    wide: 'max-w-5xl',
-  }[readerSettings.maxWidth];
+    wide: 'max-w-4xl',
+  }[activeMaxWidth];
 
   return (
     <div className={`h-screen w-screen ${themeClasses} flex flex-col font-sans overflow-hidden transition-colors duration-300`}>
@@ -566,7 +581,7 @@ export default function StudyPortalHomePage() {
             <div className="flex items-center gap-3">
               {readerSettings.isFocusMode && (
                 <button
-                  onClick={() => setReaderSettings(prev => ({ ...prev, isFocusMode: false }))}
+                  onClick={() => setReaderSettings({ ...DEFAULT_READER_SETTINGS, isFocusMode: false })}
                   className="px-2.5 py-1 rounded-lg bg-blue-600/20 text-blue-300 border border-blue-500/30 text-xs font-semibold hover:bg-blue-600 hover:text-white transition-all cursor-pointer"
                   title="Вийти з фокус-режиму [F]"
                 >
