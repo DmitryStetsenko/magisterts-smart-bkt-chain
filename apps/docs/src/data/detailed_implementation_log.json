@@ -120,6 +120,55 @@
           ]
         },
         {
+          "title": "0.1.3 Конфігурація Tailwind CSS v4 та PostCSS Пайплайну в `apps/study` (`SBC-283`, `EP-ST`)",
+          "level": 3,
+          "paragraphs": [
+            "Next.js 16 при збірці у режимі Turbopack за відсутності локального `postcss.config.mjs` у пакеті не підключав трансформатор `@tailwindcss/postcss`, що призводило до видачі сирого HTML без обробленого CSS бандла."
+          ],
+          "code_blocks": [
+            {
+              "lang": "javascript",
+              "content": "const config = {\n       plugins: {\n         '@tailwindcss/postcss': {},\n       },\n     };\n     export default config;"
+            }
+          ],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "**Проблематика:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Технічні налаштування:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "`apps/study/postcss.config.mjs`:",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "`apps/study/package.json`:",
+              "subitems": [
+                "Використано запуск dev-сервера з аргументом `--webpack`: `\"dev\": \"npx next dev --webpack --port 3006\"`."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "`apps/study/src/app/globals.css`:",
+              "subitems": [
+                "Директиви `@import \"tailwindcss\";` та сканування спільних компонентів `@source \"../../../../packages/ui/src\";`."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "Автоматизована перевірка рендерингу за допомогою headless браузера Playwright підтвердила повну відповідність стилів дизайн-системі платформи (темна тема, Opera-rail, кнопки, пісочниця коду, акордеони `DrawerSection`).",
+              "subitems": []
+            }
+          ]
+        },
+        {
           "title": "0.1.2 Запобіжники Модальності Секвенсора (Fallback Modality Guard, `SBC-278`, `BACKLOG-2`)",
           "level": 3,
           "paragraphs": [],

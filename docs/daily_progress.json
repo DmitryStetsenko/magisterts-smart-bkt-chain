@@ -101,6 +101,26 @@
             },
             {
               "type": "text",
+              "raw_text": "**Виправлення та валідація Tailwind CSS v4 збірки у `apps/study` (`SBC-283`, `EP-ST`):**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Проблема:** При переході за посиланням браузер відображав «голий» HTML без оформлення через відсутність обробника PostCSS та кеш дев-сервера Next.js.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Вирішення:**",
+              "subitems": [
+                "Створено та налаштовано `apps/study/postcss.config.mjs` з плагіном `@tailwindcss/postcss`.",
+                "Забезпечено компіляцію через Webpack-режим (`npx next dev --webpack --port 3006`).",
+                "Верифіковано генерацію CSS бандла `/_next/static/css/app/layout.css` з класами Tailwind v4 (`bg-slate-950`, `flex`, `w-[380px]`, `DrawerSection`).",
+                "Проведено автоматичний скріншот-тест у браузері Playwright: підтверджено бездоганний преміальний темний вигляд, наявність Opera-rail, секцій змісту курсу та кодової пісочниці."
+              ]
+            },
+            {
+              "type": "text",
               "raw_text": "**Верифікація:**",
               "subitems": [
                 "Підтверджено успішну збірку всіх веб-застосунків монорепозиторію: `npm run build:study`, `npm run build:student`, `npm run build:teacher`, `npm run build:admin`."

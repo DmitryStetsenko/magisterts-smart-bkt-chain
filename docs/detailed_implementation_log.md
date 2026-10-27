@@ -30,6 +30,25 @@
   5. *Build Next.js Documentation Site* (`npm run build:docs`) — збірка статичного експорту (`output: "export"`, `trailingSlash: true`, `basePath: "/magisterts-smart-bkt-chain"`).
   6. *Upload Artifact & Deploy Pages* (`actions/upload-pages-artifact@v3` + `actions/deploy-pages@v4`).
 
+### 0.1.3 Конфігурація Tailwind CSS v4 та PostCSS Пайплайну в `apps/study` (`SBC-283`, `EP-ST`)
+- **Проблематика:**
+  Next.js 16 при збірці у режимі Turbopack за відсутності локального `postcss.config.mjs` у пакеті не підключав трансформатор `@tailwindcss/postcss`, що призводило до видачі сирого HTML без обробленого CSS бандла.
+- **Технічні налаштування:**
+  1. `apps/study/postcss.config.mjs`:
+     ```javascript
+     const config = {
+       plugins: {
+         '@tailwindcss/postcss': {},
+       },
+     };
+     export default config;
+     ```
+  2. `apps/study/package.json`:
+     Використано запуск dev-сервера з аргументом `--webpack`: `"dev": "npx next dev --webpack --port 3006"`.
+  3. `apps/study/src/app/globals.css`:
+     Директиви `@import "tailwindcss";` та сканування спільних компонентів `@source "../../../../packages/ui/src";`.
+  4. Автоматизована перевірка рендерингу за допомогою headless браузера Playwright підтвердила повну відповідність стилів дизайн-системі платформи (темна тема, Opera-rail, кнопки, пісочниця коду, акордеони `DrawerSection`).
+
 ### 0.1.2 Запобіжники Модальності Секвенсора (Fallback Modality Guard, `SBC-278`, `BACKLOG-2`)
 - **Проблематика та Контекст:**
   - При вивченні теоретичних розділів або проходженні концептуальних тестів (`SINGLE_CHOICE`, `MULTIPLE_CHOICE`) учень перевіряє розуміння понять та термінології.
