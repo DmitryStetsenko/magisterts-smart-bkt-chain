@@ -275,7 +275,7 @@
 | **SBC-252** | `Story` | `ST` | hide Socratic hints and study unit deep-link on clean initial attempts and show conditionally upon struggle | 2026-10-22 | `81c4829` |
 | **SBC-269** | `Fix` | `ST` | persistently display and highlight selected quiz answer upon submission | 2026-10-23 | `27eb4ae` |
 | **SBC-271** | `Story` | `ST` | implement honest persistent disabled states for Socratic hints, study theory, and remediation buttons | 2026-10-24 | `5c096c5` |
-| **SBC-287** | `Story` | `ST` | implement Zen Focus reading mode engine with custom themes and typography controls in apps/study | 2026-10-27 | `pending` |
+| **SBC-287** | `Story` | `ST` | implement Zen Focus reading mode engine with custom themes and typography controls in apps/study | 2026-10-27 | `dd7227b` |
 
 ---
 
