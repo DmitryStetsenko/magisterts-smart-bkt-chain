@@ -38,4 +38,8 @@
    - *Дата:* 26 жовтня 2026
    - *Ключові теми:* Подолання пастки «розумного термометра» (Computerized Adaptive Testing vs Intelligent Tutoring System), відповідність букві й духу магістерського паспорта, збереження стабільного ядра та розширення монорепозиторію, повноцінне оживлення пакета `@sbc/types` (Shared Domain Contracts), еволюція навчального шару (картки теорії, Misconception Feedback, Parsons Problems) та Web3 Proof-of-Competence.
 
+9. [09. Концепція Повного Гайду Платформи та Каталогу Застосунків (Master Guide & Ecosystem Apps Handbook)](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/docs/brainstorm/09_complete_platform_handbook_and_guide_concept.md)
+   - *Дата:* 28 жовтня 2026
+   - *Ключові теми:* Єдиний наскрізний посібник платформи з 7 модулів, окремий вичерпний каталог усіх 5 застосунків екосистеми (`apps/study`, `apps/student`, `apps/teacher`, `apps/admin`, `apps/api`), рольові керівництва учня/вчителя/методиста, математичний апарат BKT та нижня асимптота, смартконтракти dNFT, FSD-архітектура та стандарти розробки.
+
 

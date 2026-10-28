@@ -185,6 +185,58 @@
           ]
         },
         {
+          "title": "0.1.8 Архітектура Наскрізного Гайду Платформи та Каталогу Застосунків (`SBC-290`, `EP-INF`)",
+          "level": 3,
+          "paragraphs": [
+            "Розрізнені технічні специфікації (`tech_stack`, `telemetry_analytics`, `apps/*.md`) ускладнювали швидкий онбординг нових розробників та сприйняття комплексу екзаменаційною комісією. Був потрібен єдиний структурований посібник, що зв'язує воєдино всі елементи екосистеми."
+          ],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "**Проблематика:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Технічні рішення та реалізація:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Мастер-документ `docs/guide/master_guide.md`:**",
+              "subitems": [
+                "Створено повнорозмірний посібник із 7 модулів (Онбординг, Детальний огляд 5 застосунків із портами 3000/3002/3003/3004/3006, Сценарії ролей з Mermaid-діаграмами послідовності дій, BKT-математика та нижня асимптота 22.86%, Блокчейн-докази dNFT / Soulbound, FSD-інженерія та Стандарти Rule 7/8, Науковий базис курсу 10–11 класів)."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Інтеграція в компілятор `scripts/compile_docs.py`:**",
+              "subitems": [
+                "Додано обробку `compile_file(\"docs/guide/master_guide.md\", \"docs/guide/master_guide.json\", \"apps/docs/src/data/master_guide.json\")`."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Новий маршрут та UI у веб-порталі `apps/docs`:**",
+              "subitems": [
+                "Створено сторінку `apps/docs/src/app/guide/page.tsx` на базі `<DocStandardView />`.",
+                "Розширено `Tab = 'guide' | ...` у `types.ts`.",
+                "Сайдбар `DocsLayout.tsx` отримав першу фірмову градієнтну кнопку `📖 Повний Гайд`.",
+                "На лендингу `LandingPage.tsx` додано головну кнопку-запрошення до Гайду."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Верифікація:**",
+              "subitems": [
+                "`python scripts/compile_docs.py` ➔ успішна компіляція `master_guide.json`.",
+                "`npm run build` у `apps/docs` ➔ успішна генерація 14 оптимізованих статичних маршрутів (код 0)."
+              ]
+            }
+          ]
+        },
+        {
           "title": "0.1.3 Конфігурація Tailwind CSS v4 та PostCSS Пайплайну в `apps/study` (`SBC-283`, `EP-ST`)",
           "level": 3,
           "paragraphs": [

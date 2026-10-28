@@ -34,6 +34,7 @@ export interface DocData {
 }
 
 export type Tab =
+  | 'guide'
   | 'roadmap'
   | 'tech'
   | 'telemetry'
