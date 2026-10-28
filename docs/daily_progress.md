@@ -45,8 +45,21 @@
        - Схему життєвого циклу спроб учня в дедуплікованій черзі викладача (`PENDING_REVIEW` $\rightarrow$ `SUPERSEDED` / `APPROVED`).
        - Блокчейн-докази dNFT / Soulbound та формулу криптографічного аудиторського хешу $\text{SHA256}$.
      - Автоматична синхронізація через `python scripts/compile_docs.py` з оновленням `apps/docs/src/data/master_guide.json`.
+4. **Створення Інтерактивного Довідкового Центру в стилі Google Support Documentation (`SBC-291`, `EP-INF`):**
+   - **Проблематика:** Необхідність створення простого, зрозумілого, покрокового керівництва користувача, аналогічного до офіційної довідки Google Таблиць (`support.google.com`), без перевантаження сухими лістингами коду, з акцентом на сценаріях використання (учень, вчитель, методист, розробник).
+   - **Реалізація:**
+     - Створено покрокову інструкцію [`docs/guide/google_support_guide.md`](file:///docs/guide/google_support_guide.md) зі структурою Google Support:
+       - Селектор ролей/платформ (`Усі платформи`, `👨‍🎓 Учень`, `👩‍🏫 Викладач`, `🛠️ Методист`, `💻 Розробник`).
+       - «Крок 1. Запуск та вхід до потрібного застосунку» з картою портів (`3006`, `3002`, `3003`, `3004`, `3000`).
+       - «Крок 2. Навчання та практичні сценарії» (Режим зручного читання Zen Focus, черга `ReviewQueueInspector`, налаштування DAG).
+       - «Крок 3. Підтвердження знань та блокчейн-сертифікація» (Soulbound dNFT, поріг майстерності $\ge 0.85$).
+       - Інформаційні плашки `💡 Порада від Google Support` та `⚠️ Важливо`.
+       - Блок інтерактивного зворотного зв'язку «Чи була ця інструкція корисною?».
+     - Оновлено компілятор [`scripts/compile_docs.py`](file:///scripts/compile_docs.py) для збирання `docs/guide/google_support_guide.json` та `apps/docs/src/data/google_support_guide.json`.
+     - Створено компонент [`apps/docs/src/widgets/google-help-view/ui/GoogleHelpView.tsx`](file:///apps/docs/src/widgets/google-help-view/ui/GoogleHelpView.tsx) з Material Chips та акордеонними секціями.
+     - Додано маршрут [`apps/docs/src/app/help/page.tsx`](file:///apps/docs/src/app/help/page.tsx) (`/help`) та кнопку переходу на головній сторінці й у сайдбарі.
    - **Верифікація:**
-     - Успішна оптимізована статична збірка всіх 14 маршрутів `npm run build` у `apps/docs` (код 0).
+     - Успішна статична збірка всіх 15 маршрутів `npm run build` у `apps/docs` (код 0).
 
 ---
 

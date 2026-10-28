@@ -118,6 +118,7 @@
 | **SBC-279** | Task | INF | document brainstorm 08 and add adaptive learning roadmap to backlog | 2026-10-26 | pending |
 | **SBC-289** | `Task` | `INF` | document brainstorm 09 on master guide and ecosystem apps handbook concept | 2026-10-28 | `8470a6a` |
 | **SBC-290** | `Story` | `INF` | implement master guide and ecosystem apps handbook on documentation portal | 2026-10-28 | `8470a6a` |
+| **SBC-291** | `Story` | `INF` | create interactive Google Support style help center and user guide | 2026-10-28 | pending |
 
 ---
 

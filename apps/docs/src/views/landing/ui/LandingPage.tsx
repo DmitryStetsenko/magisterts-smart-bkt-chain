@@ -141,6 +141,12 @@ export function LandingPage() {
             📖 Повний Гайд Проєкту
           </Link>
           <Link
+            href="/help/"
+            className="px-6 py-3 rounded-xl font-bold text-sm transition-all hover:scale-[1.02] active:scale-[0.98] bg-gradient-to-r from-blue-600 to-cyan-600 text-white shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40"
+          >
+            📘 Довідка Google
+          </Link>
+          <Link
             href="/roadmap/"
             className={`px-5 py-3 rounded-xl border font-semibold text-sm transition-all hover:scale-[1.02] active:scale-[0.98] ${
               isDarkMode ? 'bg-zinc-900 border-zinc-850 text-zinc-200 hover:bg-zinc-800 hover:text-white' : 'bg-white border-zinc-200 text-zinc-700 hover:bg-zinc-50 hover:text-black'
