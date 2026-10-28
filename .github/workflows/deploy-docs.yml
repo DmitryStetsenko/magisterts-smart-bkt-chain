@@ -5,14 +5,8 @@ on:
     branches:
       - main
       - master
+      - dev
       - dev-phase3-queues
-    paths:
-      - 'docs/**'
-      - 'apps/docs/**'
-      - 'scripts/**'
-      - 'package.json'
-      - 'package-lock.json'
-      - '.github/workflows/deploy-docs.yml'
 
   # Allows manual triggering from the Actions tab
   workflow_dispatch:
