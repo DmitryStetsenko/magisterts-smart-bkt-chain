@@ -1,283 +1,184 @@
 {
-  "project_title": "📖 Повний Наскрізний Гайд Платформи Smart-BKT-Chain (Master Handbook & Architecture Guide)",
+  "project_title": "📖 Інженерне Керівництво та Документація Платформи Smart-BKT-Chain (Master Technical Specification & Engineering Handbook)",
   "sections": [
     {
-      "title": "🚀 1. Швидкий Старт та Онбординг (Getting Started & Ecosystem Shell)",
+      "title": "🏛️ 1. Архітектура Монорепозиторію та Контракти Даних (Hexagonal Architecture & Shared DTOs)",
       "level": 2,
       "paragraphs": [],
       "code_blocks": [],
       "items": [],
       "subsections": [
         {
-          "title": "1.1 Сутність та Візія Платформи",
+          "title": "1.1 Архітектурний Патерн: Гексагональна Архітектура (Ports & Adapters)",
           "level": 3,
           "paragraphs": [
-            "Система розв'язує фундаментальну проблему традиційного e-learning: **розрив між механічним зазубрюванням / списуванням та реальним формуванням стійких когнітивних навичок**. Замість лінійного тестування платформа пропонує динамічну навчальну траєкторію, де учень спочатку комфортно опановує теорію без стресу оцінювання, тренується на багатомодальних практичних вправах під наглядом розумного риштування Сократа, а його прогрес підтверджується криптографічними дипломами."
+            "Бекенд системи розроблено на базі фреймворку NestJS із застосуванням **Гексагональної Архітектури (Ports & Adapters)**. Її головна перевага — повна ізоляція математичного ядра байєсівського моделювання та секвенсування від зовнішніх інтерфейсів (HTTP-контролерів, WebSocket-шлюзів та ORM Prisma)."
           ],
           "code_blocks": [],
           "items": [
             {
               "type": "text",
-              "raw_text": "**Smart-BKT-Chain** — це відкрита децентралізована платформа адаптивного навчання та об'єктивного оцінювання компетенцій, розроблена на стику комп'ютерної дидактики, байєсівського моделювання знань та технологій Web3.",
+              "raw_text": "**Ядро (Domain Layer):** містить чисті алгоритми BKT (`BktEngine`), коригування ймовірностей (`BehavioralAdjuster`) та секвенсор (`TaskSequencer`). Вони не мають жодних імпортів із бібліотек NestJS чи Prisma і тестуються на 100% юніт-тестами.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Порти (Ports Layer):** інтерфейси репозиторіїв та шлюзів (`ITaskRepository`, `IBktStateRepository`, `ITelemetryGateway`).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Адаптери (Adapters Layer):** реалізація доступу до бази даних через Prisma ORM (`PrismaTaskAdapter`), контролери REST API (`TaskController`), та Socket.io Gateway.",
               "subitems": []
             }
           ]
         },
         {
-          "title": "1.2 Карта Застосунків Монорепозиторію",
+          "title": "1.2 Наскрізні DTO-Контракти (`@sbc/types`)",
           "level": 3,
           "paragraphs": [
-            "Платформа побудована за архітектурою розподілених взаємопов'язаних веб-сервісів (npm workspaces):",
-            "| Застосунок | Локальний Порт | Роль у Системі | Технологічний Стек |",
-            "| :--- | :---: | :--- | :--- |",
-            "| **`apps/study`** | `3006` | **Інтерактивний Навчальний Простір:** підручник, режим Zen Focus, кодова пісочниця, картки подолання оман. | Next.js 16, React 19, Tailwind CSS v4, Lucide |",
-            "| **`apps/student`** | `3002` | **Адаптивний Практичний Тренажер:** 5 модальностей задач, Monaco Editor, BKT, підказки Сократа. | Next.js 16, Monaco Editor, WebSockets, Tailwind |",
-            "| **`apps/teacher`** | `3003` | **Кабінет Викладача:** когортна аналітика, дедуплікована черга ручної перевірки, дерево навичок RPG, BKT-аудит. | Next.js 16, WebSockets, Tailwind v4, `@sbc/ui` |",
-            "| **`apps/admin`** | `3004` | **Методичний Центр & CMS:** редактор графу знань Skill DAG, калібрування BKT параметрів, скидання прогресу. | Next.js 16, Vis Network, Tailwind, `@sbc/ui` |",
-            "| **`apps/api`** | `3000` | **Ядро Бекенду:** гексагональна архітектура, BKT-секвенсор, Socket.io шлюз телеметрії, Prisma ORM. | NestJS 10, Prisma, PostgreSQL 16, Swagger |",
-            "| **`apps/docs`** | `3005` | **Центральний Портал Документації:** повна технічна специфікація, дорожня карта, Jira-епіки. | Next.js 16, React Markdown, Tailwind |"
+            "Для запобігання розсинхронізації моделей між 5 веб-застосунками (`apps/*`) створено пакет `@sbc/types`. Він повністю виключає використання небезпечного типу `any` в інтерфейсах обміну даними."
+          ],
+          "code_blocks": [
+            {
+              "lang": "typescript",
+              "content": "// packages/types/src/tasks.types.ts\nexport type TaskType = 'CODE' | 'SINGLE_CHOICE' | 'MULTIPLE_CHOICE' | 'TEXT_ESSAY' | 'OPEN_TEXT';\nexport type TaskDifficulty = 'EASY' | 'MEDIUM' | 'HARD' | 'ADVANCED';\nexport type TeacherReviewStatus = 'NONE' | 'PENDING_REVIEW' | 'APPROVED' | 'REJECTED' | 'SUPERSEDED';\n\nexport interface TaskDto {\n  id: string;\n  skillId: string;\n  taskType: TaskType;\n  difficulty: TaskDifficulty;\n  title: string;\n  description: string;\n  starterCode?: string | null;\n  options?: QuizOptionDto[];\n  testCases?: TestCaseDto[];\n  socraticHints?: SocraticHintDto[];\n  misconceptions?: MisconceptionDto[];\n  studyUnitUrl?: string | null;\n}\n\nexport interface SubmissionDto {\n  id: string;\n  taskId: string;\n  studentId: string;\n  status: 'PENDING' | 'ACCEPTED' | 'REJECTED' | 'ERROR';\n  score: number;\n  telemetryMetrics?: BehavioralMetricsDto;\n  teacherReviewStatus: TeacherReviewStatus;\n  createdAt: string;\n}"
+            }
+          ],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "---",
+              "subitems": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "🧮 2. Математичне Ядро Байєсівського Моделювання (BKT Engine & State Transitions)",
+      "level": 2,
+      "paragraphs": [],
+      "code_blocks": [],
+      "items": [],
+      "subsections": [
+        {
+          "title": "2.1 Математична Модель Bayesian Knowledge Tracing (BKT)",
+          "level": 3,
+          "paragraphs": [
+            "Алгоритм BKT моделює прихований когнітивний стан знань учня $L$ (чи володіє він навичкою $k$) на основі послідовності бінарних спостережень $obs \\in \\{0, 1\\}$. Модель оперує чотирма параметрами:"
+          ],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "**$P(L_0)$ (`pMasteryPrior` = 0.50):** апріорна ймовірність того, що учень володіє навичкою до початку тренування.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**$P(T)$ (`pTransit` = 0.20):** ймовірність переходу зі стану «не знає» у стан «знає» внаслідок виконання вправи.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**$P(S)$ (`pSlip` = 0.10):** ймовірність помилитися при наявному знанні (описка, неуважність).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**$P(G)$ (`pGuess` = 0.20):** ймовірність правильно відповісти при відсутності знання (вгадування).",
+              "subitems": []
+            }
+          ]
+        },
+        {
+          "title": "2.2 Програмна Реалізація Байєсівського Оновлення",
+          "level": 3,
+          "paragraphs": [
+            "Реалізація класу `BktEngine` забезпечує числову стабільність, відсікаючи граничні сингулярності за допомогою функції clamping до діапазону $[0.0001, 0.9999]$:"
+          ],
+          "code_blocks": [
+            {
+              "lang": "typescript",
+              "content": "// apps/api/src/domain/bkt/bkt-engine.ts\nexport class BktEngine {\n  public static readonly DEFAULT_PARAMS: BktParameters = {\n    pMastery: 0.5,\n    pTransit: 0.2,\n    pSlip: 0.1,\n    pGuess: 0.2,\n  };\n\n  public static readonly MASTERY_THRESHOLD = 0.90;    // Повне опанування (Gold)\n  public static readonly PROFICIENT_THRESHOLD = 0.75; // Поріг розблокування наступних вузлів DAG\n\n  public static calculateNextState(\n    currentParams: Partial<BktParameters> & { pMastery: number },\n    isCorrect: boolean,\n  ): BktUpdateResult {\n    const pL = Math.max(0.0001, Math.min(0.9999, currentParams.pMastery));\n    const pT = currentParams.pTransit ?? this.DEFAULT_PARAMS.pTransit;\n    const pS = currentParams.pSlip ?? this.DEFAULT_PARAMS.pSlip;\n    const pG = currentParams.pGuess ?? this.DEFAULT_PARAMS.pGuess;\n\n    let pObs: number;\n\n    if (isCorrect) {\n      // P(L_t | correct) = [P(L_{t-1}) * (1 - P(S))] / [P(L_{t-1}) * (1 - P(S)) + (1 - P(L_{t-1})) * P(G)]\n      const numerator = pL * (1 - pS);\n      const denominator = pL * (1 - pS) + (1 - pL) * pG;\n      pObs = numerator / denominator;\n    } else {\n      // P(L_t | incorrect) = [P(L_{t-1}) * P(S)] / [P(L_{t-1}) * P(S) + (1 - P(L_{t-1})) * (1 - P(G))]\n      const numerator = pL * pS;\n      const denominator = pL * pS + (1 - pL) * (1 - pG);\n      pObs = numerator / denominator;\n    }\n\n    // Крок навчання (Transition update): P(L_t) = P(L_t | obs) + (1 - P(L_t | obs)) * P(T)\n    const pMasteryPosterior = pObs + (1 - pObs) * pT;\n    const clampedPosterior = Math.max(0.0001, Math.min(0.9999, pMasteryPosterior));\n\n    return {\n      pMasteryPrior: pL,\n      pMasteryPosterior: clampedPosterior,\n      updatedAt: new Date(),\n    };\n  }\n}"
+            }
+          ],
+          "items": []
+        },
+        {
+          "title": "2.3 Аналітичне Доведення Феномену Нижньої Асимптоти BKT (~22.86%)",
+          "level": 3,
+          "paragraphs": [
+            "На відміну від звичайного штрафування у бальних системах тестування, у BKT знання живої людини ніколи не деградують до нуля ($0\\%$), навіть якщо студент помиляється безліч разів поспіль.",
+            "Розглянемо послідовність помилок $obs = 0$ при стандартних параметрах ($P(S)=0.1, P(G)=0.2, P(T)=0.2$):"
+          ],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "**Спроба 1 ($P(L_0) = 50.0\\%$):** $P(L_1 \\mid \\text{incorrect}) = \\frac{0.5 \\cdot 0.1}{0.5 \\cdot 0.1 + 0.5 \\cdot 0.8} = \\frac{0.05}{0.45} \\approx 11.11\\%$. З урахуванням транзиту: $P(L_1) = 0.1111 + (1 - 0.1111) \\cdot 0.20 = \\mathbf{28.89\\%}$ (падіння на $-21.11\\%$).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Спроба 2:** попереднє $28.89\\% \\rightarrow$ нове значення $\\mathbf{23.87\\%}$ (падіння сповільнюється до $-5.02\\%$).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Спроба 3:** попереднє $23.87\\% \\rightarrow$ нове $\\mathbf{23.02\\%}$ (падіння лише на $-0.85\\%$).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Спроба 5+:** значення зупиняється на асимптотичній межі $\\mathbf{22.86\\%}$ (дельта $0.00\\%$).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Педагогічне значення теореми:** математичний бар'єр $P(T) = 0.20$ стверджує, що сам процес взаємодії учня з завданням несе навчальний потенціал. Коли система фіксує зупинку на плато ~23%, вона ідентифікує когнітивний тупик і активує підказки Сократа або перенаправлення до підручника `apps/study`.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "---",
+              "subitems": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "🛡️ 3. Поведінкова Телеметрія та Динамічний Античіт (`BehavioralAdjuster`)",
+      "level": 2,
+      "paragraphs": [],
+      "code_blocks": [],
+      "items": [],
+      "subsections": [
+        {
+          "title": "3.1 Концепція М'якого BKT та Коригування без Покарання",
+          "level": 3,
+          "paragraphs": [
+            "Традиційні античіт-системи діють карально (дискваліфікація, анулювання результату). Smart-BKT-Chain використовує **евристично-ймовірнісний підхід (Soft-BKT)**: система динамічно модифікує параметри випадкового вгадування ($P(Guess)$) та промаху ($P(Slip)$) **виключно для поточної спроби**, не руйнуючи глобальний профіль студента."
           ],
           "code_blocks": [],
           "items": []
         },
         {
-          "title": "1.3 Покрокове Розгортання Оточення",
+          "title": "3.2 Програмна Реалізація Детекції Аномалій у `BehavioralAdjuster`",
           "level": 3,
           "paragraphs": [],
           "code_blocks": [
             {
-              "lang": "bash",
-              "content": "# Крок 1. Клонування репозиторію та перехід у робочий каталог\ngit clone https://github.com/DmitryStetsenko/magisterts-smart-bkt-chain.git\ncd magisterts-smart-bkt-chain\n\n# Крок 2. Встановлення залежностей для всіх робочих просторів\nnpm install\n\n# Крок 3. Підготовка локальної бази даних PostgreSQL через Docker\ndocker run --name sbc-postgres -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=smart_bkt -p 5432:5432 -d postgres:16-alpine\n\n# Крок 4. Запуск початкових міграцій та сидингу шкільного курсу й банку 107+ завдань\nnpm run db:seed\n\n# Крок 5. Запуск сервісів для розробки\nnpm run dev:api     # Бекенд API (http://localhost:3000)\nnpm run dev:docs    # Портал документації (http://localhost:3005)\nnpm run dev:study   # Інтерактивний підручник (http://localhost:3006)\nnpm run dev:student # Тренажер учня (http://localhost:3002)\nnpm run dev:teacher # Кабінет викладача (http://localhost:3003)\nnpm run dev:admin   # Адмін-центр (http://localhost:3004)"
+              "lang": "typescript",
+              "content": "// apps/api/src/domain/bkt/behavioral-adjuster.ts\nexport class BehavioralAdjuster {\n  public static adjust(\n    base: BaseSlipGuess,\n    signals: BehavioralSignals,\n  ): AdjustedSlipGuess {\n    let adjustedSlip = base.pSlip;\n    let adjustedGuess = base.pGuess;\n    const reasons: string[] = [];\n\n    // Правило 1: Швидке клацання на бліц-тестах (Rapid Guessing)\n    // Якщо учень відповів на квіз швидше ніж за 3.5 секунди — він не читав умову\n    if (CHOICE_TYPES.has(signals.taskType) && signals.reactionLatencyMs !== undefined) {\n      if (signals.reactionLatencyMs < ADJUSTER_CONFIG.FAST_CHOICE_LATENCY_MS) {\n        adjustedGuess = Math.max(adjustedGuess, ADJUSTER_CONFIG.GUESS_ON_FAST_CHOICE); // Підвищуємо P(G) до 0.85!\n        reasons.push(`Швидка відповідь на вибір (${signals.reactionLatencyMs}мс < 3500мс): P(G) підвищено до 0.85`);\n      }\n    }\n\n    // Правило 2: Вставка коду з буфера обміну (Clipboard Paste)\n    // Якщо учень вставив готовий код одним фрагментом без пауз набору\n    if (signals.pasteEvents && signals.pasteEvents > 0) {\n      adjustedGuess = Math.max(adjustedGuess, ADJUSTER_CONFIG.GUESS_ON_PASTE_OPEN_TEXT); // Підвищуємо P(G) до 0.90!\n      reasons.push(`Зафіксовано вставку з буфера (${signals.pasteEvents} paste events): P(G) підвищено до 0.90`);\n    }\n\n    // Правило 3: Прикра випадкова описка знайомого матеріалу (Careless Slip)\n    // Якщо учень має високу майстерність P(L) > 0.70, але зробив помилку\n    if (signals.currentMastery >= ADJUSTER_CONFIG.HIGH_MASTERY && !signals.isCorrect) {\n      adjustedSlip = Math.max(adjustedSlip, ADJUSTER_CONFIG.SLIP_CARELESS); // Підвищуємо P(S) до 0.30\n      reasons.push(`Висока майстерність при помилці: враховано випадкову описку, P(S) підвищено до 0.30`);\n    }\n\n    return {\n      pSlip: Math.min(ADJUSTER_CONFIG.MAX_P, Math.max(ADJUSTER_CONFIG.MIN_P, adjustedSlip)),\n      pGuess: Math.min(ADJUSTER_CONFIG.MAX_P, Math.max(ADJUSTER_CONFIG.MIN_P, adjustedGuess)),\n      reasons,\n    };\n  }\n}"
             }
           ],
           "items": [
             {
               "type": "text",
-              "raw_text": "---",
-              "subitems": []
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "title": "📱 2. Каталог та Архітектура Застосунків Екосистеми (Ecosystem Applications)",
-      "level": 2,
-      "paragraphs": [],
-      "code_blocks": [],
-      "items": [],
-      "subsections": [
-        {
-          "title": "2.1 `apps/study` — Інтерактивний Навчальний Простір (Порт `3006`)",
-          "level": 3,
-          "paragraphs": [],
-          "code_blocks": [],
-          "items": [
-            {
-              "type": "text",
-              "raw_text": "**Призначення:** Відповідає за когнітивне осмислення, первинне знайомство з концепціями, інтерактивне дослідження прикладів коду та деконструкцію типових оман учнів старшої школи (10–11 класи). Тут учень не перебуває під стресом оцінювання, а комфортно опановує теоретичний матеріал у власному темпі.",
-              "subitems": []
-            },
-            {
-              "type": "text",
-              "raw_text": "**Ключові архітектурні модулі:**",
-              "subitems": []
-            },
-            {
-              "type": "text",
-              "raw_text": "**Режим Зручного Читання (Zen Focus Reading Engine):**",
-              "subitems": [
-                "Плаваючий віджет `ReaderFloatingToolbar` з динамічним індикатором прогресу скролу (0% → 100%) та розрахунком залишкового часу опрацювання.",
-                "Гаряча клавіша `F` для миттєвого входу/виходу у фокусний режим.",
-                "Повне приховування відволікаючих бічних панелей (Opera-rail, модулі змісту).",
-                "Автоматичне скидання стилів до системних дефолтів платформи при виході з фокусу."
-              ]
-            },
-            {
-              "type": "text",
-              "raw_text": "**Триптих Ергономічних Тем:**",
-              "subitems": [
-                "**«Тепла Сепія» (`Warm Sepia`, фон `#181310`, текст `#f5ebd7`):** тема за замовчуванням при переході у фокус читання, повністю усуває синє світлове випромінювання та знижує напругу очей.",
-                "**«Ніч» (`Slate Night`, фон `#020617`):** фірмовий глибокий темний фон системи.",
-                "**«OLED» (`True Black`, фон `#000000`):** контрастний чорний фон для економії енергії та високої чіткості."
-              ]
-            },
-            {
-              "type": "text",
-              "raw_text": "**Автономна Кодова Пісочниця (`CodePlayground`):**",
-              "subitems": [
-                "Дозволяє учневі запускати та експериментувати з кодом прямо всередині статті підручника.",
-                "Перехоплення викликів `console.log()` та виведення термінальних логів безпосередньо у вікно віджета без звернення до зовнішнього сервера."
-              ]
-            },
-            {
-              "type": "text",
-              "raw_text": "**Блоки Когнітивних Оман (`Misconception Alerts`):**",
-              "subitems": [
-                "Спеціальні виділені блоки кольору бурштину, що аналізують типові хибні уявлення учнів про алгоритмічні структури (наприклад, плутанина між індексами масиву та його значеннями, мутабельність об'єктів тощо)."
-              ]
-            }
-          ]
-        },
-        {
-          "title": "2.2 `apps/student` — Адаптивний Практичний Тренажер (Порт `3002`)",
-          "level": 3,
-          "paragraphs": [],
-          "code_blocks": [],
-          "items": [
-            {
-              "type": "text",
-              "raw_text": "**Призначення:** Формативне оцінювання знань, практичне тренування в написанні коду, фіксація біометричної поведінкової телеметрії та перерахунок математичної моделі BKT.",
-              "subitems": []
-            },
-            {
-              "type": "text",
-              "raw_text": "**Ключові можливості:**",
-              "subitems": []
-            },
-            {
-              "type": "text",
-              "raw_text": "**Monaco Editor інтеграція:** професійне середовище розробки з підсвіткою коду, темною темою та автодоповненням.",
-              "subitems": []
-            },
-            {
-              "type": "text",
-              "raw_text": "**5 типів завдань:** інженерний код (`CODE`), одиночний вибір (`SINGLE_CHOICE`), множинний вибір (`MULTIPLE_CHOICE`), розгорнуте есе (`TEXT_ESSAY`), лаконічна відкрита відповідь (`OPEN_TEXT`).",
-              "subitems": []
-            },
-            {
-              "type": "text",
-              "raw_text": "**Сократівське Риштування (Socratic Scaffolding):** 3-рівнева система діалогових підказок (метафорична аналогія → натяк на архітектуру → шаблон або псевдокод), яка допомагає учневі знайти відповідь самостійно без нарахування штрафів до ймовірності майстерності $P(L_t)$.",
-              "subitems": []
-            },
-            {
-              "type": "text",
-              "raw_text": "**Візуальний Кристал Знання:** інтерактивний індикатор майстерності навички, що змінює забарвлення від червоного/жовтого до сяючого смарагдового при досягненні порогу $P(L_t) \\ge 0.95$.",
-              "subitems": []
-            },
-            {
-              "type": "text",
-              "raw_text": "**Наскрізний перехід до теорії:** кнопка швидкого виклику уроку в `apps/study` (`studyUnitUrl`) при виникненні застрягання.",
-              "subitems": []
-            }
-          ]
-        },
-        {
-          "title": "2.3 `apps/teacher` — Кабінет та Аналітика Викладача (Порт `3003`)",
-          "level": 3,
-          "paragraphs": [],
-          "code_blocks": [],
-          "items": [
-            {
-              "type": "text",
-              "raw_text": "**Призначення:** Комплексний моніторинг навчальної когорти, верифікація академічної доброчесності, ручна перевірка нестандартних робіт та аудит формул BKT.",
-              "subitems": []
-            },
-            {
-              "type": "text",
-              "raw_text": "**Ключові можливості:**",
-              "subitems": []
-            },
-            {
-              "type": "text",
-              "raw_text": "**Інспектор черги ручної перевірки (`ReviewQueueInspector`):**",
-              "subitems": [
-                "Дедуплікація завдань за зв'язкою «Студент + Завдання»: якщо учень надсилає нову версію роботи, попередня автоматично заміщується (`SUPERSEDED`).",
-                "Таймлайн спроб (Attempt 1, Attempt 2) із збереженням попередніх коментарів викладача.",
-                "Миттєва трансляція вердиктів (Схвалено / Відхилено) на клієнт учня через WebSocket."
-              ]
-            },
-            {
-              "type": "text",
-              "raw_text": "**RPG-Дерево Навичок Курсу (`CourseGraphViewer`):**",
-              "subitems": [
-                "Інтерактивна візуалізація графу тем з кривими зв'язками передумов.",
-                "Розподіл завдань за Когнітивною Тріадою: Синтаксис (Базовий рівень), Алгоритміка (Середній рівень), Архітектура (Поглиблений рівень)."
-              ]
-            },
-            {
-              "type": "text",
-              "raw_text": "**Класифікатор Аномалій Доброчесності (`AnomalyTreeWidget`):**",
-              "subitems": [
-                "Автоматична детекція нетипової поведінки учня: підозрілий темп набору (WPM > 140), вставки великих фрагментів коду без пауз осмислення, спроби вгадування відповідей на бліц-тестах за 1–2 секунди."
-              ]
-            },
-            {
-              "type": "text",
-              "raw_text": "**Аудиторський BKT Пісочник (`MetricsAuditInspector`):**",
-              "subitems": [
-                "Покрокова симуляція оновлення $P(L_t)$ при різних параметрах $P(L_0), P(T), P(S), P(G)$ з інтерактивними поясненнями для вчителя."
-              ]
-            }
-          ]
-        },
-        {
-          "title": "2.4 `apps/admin` — Методичний Центр & Skill DAG CMS (Порт `3004`)",
-          "level": 3,
-          "paragraphs": [],
-          "code_blocks": [],
-          "items": [
-            {
-              "type": "text",
-              "raw_text": "**Призначення:** Проєктування навчальних планів, конфігурація графу навичок, налаштування коефіцієнтів адаптивності та управління життєвим циклом даних.",
-              "subitems": []
-            },
-            {
-              "type": "text",
-              "raw_text": "**Ключові можливості:**",
-              "subitems": []
-            },
-            {
-              "type": "text",
-              "raw_text": "**Skill DAG Editor:** візуальний вузловий конструктор для додавання нових навичок, визначення зв'язків передумов (Pre-requisites) та налаштування послідовності проходження.",
-              "subitems": []
-            },
-            {
-              "type": "text",
-              "raw_text": "**Матриця BKT Параметрів:** конфігурація чутливості байєсівської моделі для кожного окремого концепту курсу.",
-              "subitems": []
-            },
-            {
-              "type": "text",
-              "raw_text": "**Управління Даними та Безпечне Скидання:** інструменти для ізольованого скидання історії спроб і станів $P(L_t)$ окремого учня у межах конкретного курсу або всієї системи з обов'язковим діалоговим підтвердженням.",
-              "subitems": []
-            }
-          ]
-        },
-        {
-          "title": "2.5 `apps/api` — Ядро Бекенду (Порт `3000`)",
-          "level": 3,
-          "paragraphs": [],
-          "code_blocks": [],
-          "items": [
-            {
-              "type": "text",
-              "raw_text": "**Призначення:** Серверна бізнес-логіка, математичний секвенсор, збереження стану в PostgreSQL та комунікаційна шина реального часу.",
-              "subitems": []
-            },
-            {
-              "type": "text",
-              "raw_text": "**Ключові можливості:**",
-              "subitems": []
-            },
-            {
-              "type": "text",
-              "raw_text": "**Гексагональна Архітектура (Ports & Adapters):** ізольоване ядро BKT математики (`domain/bkt`), захищене від впливу фреймворків чи деталей бази даних.",
-              "subitems": []
-            },
-            {
-              "type": "text",
-              "raw_text": "**Адаптивний Секвенсор (`TaskSequencer`):** інтелектуальний підбір наступної вправи з фільтрацією за сумісністю модальностей.",
-              "subitems": []
-            },
-            {
-              "type": "text",
-              "raw_text": "**Двосторонній WebSocket Шлюз:** трансляція подій друку в реальному часі та миттєва синхронізація оцінок викладача.",
-              "subitems": []
-            },
-            {
-              "type": "text",
-              "raw_text": "**Swagger OpenAPI:** автоматична генерація інтерактивної документації ендпоінтів (`/api/v1/docs`).",
+              "raw_text": "**Результат роботи алгоритму:** якщо списаний код успішно пройшов усі тести, але був вставлений через Ctrl+V, оновлення BKT врахує $P(G) = 0.90$. За формулою Баєса знаменник значно зросте, і учень отримає приріст майстерності лише $+0.02$ замість $+0.35$. Система не вступає в конфлікт з учнем, але повністю нівелює сенс списування.",
               "subitems": []
             },
             {
@@ -290,162 +191,63 @@
       ]
     },
     {
-      "title": "🎓 3. Інтерактивні Сценарії Користувача за Ролями (User Journeys)",
+      "title": "🎯 4. Адаптивний Секвенсор Завдань (`TaskSequencer`) та Запобіжники Модальності",
       "level": 2,
       "paragraphs": [],
       "code_blocks": [],
       "items": [],
       "subsections": [
         {
-          "title": "3.1 Сценарій Учня (The Student Experience Loop)",
-          "level": 3,
-          "paragraphs": [],
-          "code_blocks": [
-            {
-              "lang": "mermaid",
-              "content": "sequenceDiagram\n    autonumber\n    actor S as Учень\n    participant Study as apps/study (:3006)\n    participant Student as apps/student (:3002)\n    participant API as apps/api (:3000)\n\n    S->>Study: Відкриває тему «Рекурсивні структури»\n    S->>Study: Вмикає Zen Focus Mode (клавіша F), читає в Теплій Сепії\n    S->>Study: Експериментує з кодом у CodePlayground\n    S->>Student: Переходить за посиланням до практичного тренажера\n    Student->>API: Запит наступного завдання через TaskSequencer\n    API-->>Student: Повертає вправу рівня MEDIUM\n    S->>Student: Пише рішення у Monaco Editor\n    Note over S,Student: Відправка біометричної телеметрії (паузи, WPM)\n    S->>Student: Відчуває труднощі ➔ відкриває підказку Сократа\n    Student-->>S: Видає евристичний натяк (без штрафу до BKT)\n    S->>Student: Здає код ➔ Юніт-тести успішні\n    Student->>API: Submit рішення\n    API->>API: BKT формули оновлюють P(L_t) з 0.65 до 0.82\n    API-->>Student: Зелений спалах, оновлення кристалу знань"
-            }
-          ],
-          "items": []
-        },
-        {
-          "title": "3.2 Сценарій Викладача (The Teacher Audit & Review Loop)",
-          "level": 3,
-          "paragraphs": [],
-          "code_blocks": [],
-          "items": [
-            {
-              "type": "text",
-              "raw_text": "**Оперативний моніторинг:** Викладач заходить у `apps/teacher` та відкриває віджет `AnomalyTreeWidget`. Система показує 2 студентів з високим індексом підозрілості через масивний копіпаст.",
-              "subitems": []
-            },
-            {
-              "type": "text",
-              "raw_text": "**Перевірка відкритої відповіді:** У розділі «Черга перевірки» викладач бачить нове есе учня. Інспектор показує повний текст, попередні спроби та коефіцієнт семантичної близькості від LLM Judge.",
-              "subitems": []
-            },
-            {
-              "type": "text",
-              "raw_text": "**Вердикт:** Вчитель залишає текстовий коментар і тисне «Схвалити». Через WebSocket учень у ту саму секунду отримує сповіщення у своєму кабінеті.",
-              "subitems": []
-            },
-            {
-              "type": "text",
-              "raw_text": "---",
-              "subitems": []
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "title": "🧠 4. Математичний Апарат BKT, Секвенсор та Античіт",
-      "level": 2,
-      "paragraphs": [],
-      "code_blocks": [],
-      "items": [],
-      "subsections": [
-        {
-          "title": "4.1 Модель Bayesian Knowledge Tracing (BKT)",
+          "title": "4.1 Алгоритм Індивідуальної Траєкторії",
           "level": 3,
           "paragraphs": [
-            "Алгоритм BKT моделює ймовірність того, що учень володіє навичкою $k$ на кроці $t$, через 4 фундаментальні параметри:",
-            "#### Математичні формули оновлення:",
-            "$$P(L_t \\mid \\text{correct}) = \\frac{P(L_{t-1}) \\cdot (1 - P(S))}{P(L_{t-1}) \\cdot (1 - P(S)) + (1 - P(L_{t-1})) \\cdot P(G)}$$",
-            "$$P(L_t \\mid \\text{incorrect}) = \\frac{P(L_{t-1}) \\cdot P(S)}{P(L_{t-1}) \\cdot P(S) + (1 - P(L_{t-1})) \\cdot (1 - P(G))}$$",
-            "$$P(L_t) = P(L_t \\mid obs) + (1 - P(L_t \\mid obs)) \\cdot P(T)$$"
-          ],
-          "code_blocks": [],
-          "items": [
-            {
-              "type": "text",
-              "raw_text": "$P(L_0)$ (`pMasteryPrior` = 0.50): апріорна ймовірність володіння темою до початку роботи.",
-              "subitems": []
-            },
-            {
-              "type": "text",
-              "raw_text": "$P(T)$ (`pTransit` = 0.20): ймовірність опанувати навичку в процесі виконання вправи.",
-              "subitems": []
-            },
-            {
-              "type": "text",
-              "raw_text": "$P(S)$ (`pSlip` = 0.10): ймовірність припуститися описки/помилки при наявному знанні.",
-              "subitems": []
-            },
-            {
-              "type": "text",
-              "raw_text": "$P(G)$ (`pGuess` = 0.20): ймовірність випадково вгадати відповідь при відсутності знань.",
-              "subitems": []
-            },
-            {
-              "type": "text",
-              "raw_text": "**При правильній відповіді ($obs = 1$):**",
-              "subitems": []
-            },
-            {
-              "type": "text",
-              "raw_text": "**При неправильній відповіді ($obs = 0$):**",
-              "subitems": []
-            },
-            {
-              "type": "text",
-              "raw_text": "**Крок навчання (Transit):**",
-              "subitems": []
-            }
-          ]
-        },
-        {
-          "title": "4.2 Феномен Нижньої Асимптоти BKT (~22.86%)",
-          "level": 3,
-          "paragraphs": [
-            "На відміну від звичайних тестових балів, у моделі BKT знання живого учня **ніколи не падають до нуля ($0\\%$)**, навіть при серії невдалих спроб. Завдяки складовій переходу до навчання $(1 - P) \\cdot P(T)$ досягається стабільне плато на рівні:",
-            "$$P(L_{\\infty}) = \\frac{P(S) \\cdot P(T)}{P(S) \\cdot P(T) + (1 - P(G)) \\cdot (1 - P(T))} \\approx 22.86\\%$$",
-            "Це гуманістичний дидактичний бар'єр: сам факт читання умови завдання дає потенціал навчання. При виході на асимптоту система активує інтервенцію — перенаправляє учня в підручник `apps/study`."
-          ],
-          "code_blocks": [],
-          "items": []
-        },
-        {
-          "title": "4.3 Адаптивний Секвенсор (`TaskSequencer`)",
-          "level": 3,
-          "paragraphs": [
-            "Секвенсор керується вектором майстерності учня та підбирає оптимальний наступний крок:"
+            "Секвенсор `TaskSequencer` відповідає за персоналізований рух учня графом знань (Skill DAG). Він підтримує 4 стратегії:"
           ],
           "code_blocks": [],
           "items": [
             {
               "type": "kv",
               "key": "`ADVANCE`",
-              "value": "$P(L_t) \\ge 0.95$ — перехід до наступного концепту в графі знань.",
-              "raw_text": "**`ADVANCE`**: $P(L_t) \\ge 0.95$ — перехід до наступного концепту в графі знань.",
+              "value": "досягнуто поріг компетентності за теорією Блума ($P(L_t) \\ge 0.75$) ➔ відкриття залежних вузлів.",
+              "raw_text": "**`ADVANCE`**: досягнуто поріг компетентності за теорією Блума ($P(L_t) \\ge 0.75$) ➔ відкриття залежних вузлів.",
               "subitems": []
             },
             {
               "type": "kv",
               "key": "`REINFORCE`",
-              "value": "$0.70 \\le P(L_t) < 0.95$ — видача ізоморфної інженерної задачі для закріплення.",
-              "raw_text": "**`REINFORCE`**: $0.70 \\le P(L_t) < 0.95$ — видача ізоморфної інженерної задачі для закріплення.",
+              "value": "знання в зоні закріплення ($0.75 \\le P(L_t) < 0.90$) ➔ видача ізоморфних завдань середньої складності.",
+              "raw_text": "**`REINFORCE`**: знання в зоні закріплення ($0.75 \\le P(L_t) < 0.90$) ➔ видача ізоморфних завдань середньої складності.",
               "subitems": []
             },
             {
               "type": "kv",
               "key": "`REMEDIATE`",
-              "value": "$P(L_t) < 0.70$ — перехід на полегшені бліц-квізи тієї самої теми.",
-              "raw_text": "**`REMEDIATE`**: $P(L_t) < 0.70$ — перехід на полегшені бліц-квізи тієї самої теми.",
+              "value": "учень припустився помилки ➔ підбір легшого завдання тієї самої підтеми (`subConcept`).",
+              "raw_text": "**`REMEDIATE`**: учень припустився помилки ➔ підбір легшого завдання тієї самої підтеми (`subConcept`).",
               "subitems": []
             },
             {
               "type": "kv",
               "key": "`THEORY_REVIEW`",
-              "value": "при серійних помилках — видача прямого посилання на підручник `apps/study`.",
-              "raw_text": "**`THEORY_REVIEW`**: при серійних помилках — видача прямого посилання на підручник `apps/study`.",
+              "value": "вичерпано банк ремедіації ➔ формування посилання на урок в `apps/study`.",
+              "raw_text": "**`THEORY_REVIEW`**: вичерпано банк ремедіації ➔ формування посилання на урок в `apps/study`.",
               "subitems": []
-            },
+            }
+          ]
+        },
+        {
+          "title": "4.2 Запобіжник Модальності (Modality Guard)",
+          "level": 3,
+          "paragraphs": [
+            "Критична проблема незрілих адаптивних систем полягає в тому, що при невдачі на простому тесті алгоритм може випадково призначити складну інженерну задачу на написання коду. У Smart-BKT-Chain впроваджено функцію суворої сумісності `matchesModalityStrict`:"
+          ],
+          "code_blocks": [
             {
-              "type": "text",
-              "raw_text": "**Запобіжник модальності:** алгоритм суворо блокує стрибки з провалених концептуальних тестів на складний код.",
-              "subitems": []
-            },
+              "lang": "typescript",
+              "content": "// apps/api/src/domain/sequencing/task-sequencer.ts\nexport function matchesModalityStrict(candidateType?: string | null, activeModality?: string | null): boolean {\n  if (!activeModality || !candidateType) return true;\n  if (isQuizType(activeModality)) return isQuizType(candidateType);         // Квізи групуються тільки з квізами\n  if (isTextEssayType(activeModality)) return isTextEssayType(candidateType); // Есе тільки з відкритими текстами\n  if (isCodeType(activeModality)) return isCodeType(candidateType);           // Код тільки з кодом\n  return candidateType === activeModality;\n}"
+            }
+          ],
+          "items": [
             {
               "type": "text",
               "raw_text": "---",
@@ -456,115 +258,92 @@
       ]
     },
     {
-      "title": "⛓️ 5. Блокчейн-Шар та Децентралізована Верифікація",
-      "level": 2,
-      "paragraphs": [
-        "Традиційні сертифікати онлайн-курсів легко підробити або втратити при закритті сервера навчального закладу. Smart-BKT-Chain використовує блокчейн як незмінний шар довіри:"
-      ],
-      "code_blocks": [],
-      "items": [
-        {
-          "type": "text",
-          "raw_text": "**Динамічні dNFT дипломи (ERC-721):**",
-          "subitems": []
-        },
-        {
-          "type": "text",
-          "raw_text": "Випускаються у момент досягнення порогу повної майстерності ($P(L_t) \\ge 0.95$).",
-          "subitems": []
-        },
-        {
-          "type": "text",
-          "raw_text": "Метадані токена оновлюються в міру проходження нових модулів шкільного курсу.",
-          "subitems": []
-        },
-        {
-          "type": "text",
-          "raw_text": "**Soulbound токени (ERC-5192):**",
-          "subitems": []
-        },
-        {
-          "type": "text",
-          "raw_text": "Непередавані сертифікати, жорстко прив'язані до криптографічного гаманця учня, що гарантує захист від перепродажу досягнень.",
-          "subitems": []
-        },
-        {
-          "type": "text",
-          "raw_text": "**Криптографічний ланцюг доказів (`BktAuditRecordDto`):**",
-          "subitems": []
-        },
-        {
-          "type": "text",
-          "raw_text": "Кожна спроба фіксує підписаний хеш: час виконання, коефіцієнт телеметрії доброчесності, початкове та фінальне значення $P(L_t)$.",
-          "subitems": []
-        },
-        {
-          "type": "text",
-          "raw_text": "---",
-          "subitems": []
-        }
-      ],
-      "subsections": []
-    },
-    {
-      "title": "⚙️ 6. Інженерна Архітектура Монорепозиторію та Стандарти",
+      "title": "📖 5. Інтерактивний Підручник та Двигун Читання (`apps/study`)",
       "level": 2,
       "paragraphs": [],
       "code_blocks": [],
       "items": [],
       "subsections": [
         {
-          "title": "6.1 Архітектурні Шаблони",
+          "title": "5.1 Режим Зручного Читання (Zen Focus Reading Engine)",
           "level": 3,
-          "paragraphs": [],
-          "code_blocks": [],
+          "paragraphs": [
+            "Для подолання когнітивної втоми учнів при читанні об'ємної теорії на широких дисплеях у застосунку `apps/study` реалізовано компонент `ReaderFloatingToolbar`."
+          ],
+          "code_blocks": [
+            {
+              "lang": "typescript",
+              "content": "// apps/study/src/components/ReaderFloatingToolbar.tsx\nexport type ReadingTheme = 'night' | 'sepia' | 'oled';\n\nexport function ReaderFloatingToolbar({ settings, onUpdateSettings, scrollProgressPct, estimatedMinutesLeft }: ReaderFloatingToolbarProps) {\n  const toggleFocusMode = () => {\n    onUpdateSettings((prev) => {\n      if (prev.isFocusMode) {\n        // Вихід: скидання стану до загальносистемного інтерфейсу платформи\n        return { ...DEFAULT_READER_SETTINGS, isFocusMode: false };\n      } else {\n        // Вхід: активація фізіологічної «Теплої Сепії» за замовчуванням\n        return { ...prev, isFocusMode: true, theme: 'sepia', maxWidth: 'standard' };\n      }\n    });\n  };\n\n  return (\n    <div className=\"fixed top-3 right-6 z-50 flex items-center gap-2\">\n      {/* Індикатор скролу сторінки (0% -> 100%) */}\n      <div className=\"h-1.5 w-24 bg-slate-800 rounded-full overflow-hidden\">\n        <div className=\"h-full bg-amber-500 transition-all duration-150\" style={{ width: `${scrollProgressPct}%` }} />\n      </div>\n      {/* Кнопка входу/виходу у фокусний режим з гарячою клавішею F */}\n      <button onClick={toggleFocusMode} className=\"px-3 py-1.5 rounded-lg text-xs font-bold bg-amber-500/10 text-amber-400 border border-amber-500/30\">\n        {settings.isFocusMode ? 'Вийти з фокусу (F)' : 'Режим читання (F)'}\n      </button>\n    </div>\n  );\n}"
+            }
+          ],
           "items": [
             {
               "type": "text",
-              "raw_text": "**Front-end:** Feature-Sliced Design (FSD) — чіткий поділ кодової бази на `app/`, `widgets/`, `features/`, `entities/`, `shared/`.",
-              "subitems": []
-            },
-            {
-              "type": "text",
-              "raw_text": "**Back-end:** Гексагональна архітектура Ports & Adapters — чисте ядро бізнес-логіки не знає про існування Prisma чи HTTP.",
-              "subitems": []
-            },
-            {
-              "type": "text",
-              "raw_text": "**Спільні Пакети:**",
-              "subitems": []
-            },
-            {
-              "type": "text",
-              "raw_text": "`@sbc/types`: єдине джерело істини для всіх інтерфейсів і контрактів DTO.",
-              "subitems": []
-            },
-            {
-              "type": "text",
-              "raw_text": "`@sbc/ui`: дизайн-система платформи (`DrawerSection`, `AnomalyTreeWidget`, `GameSkillTreeWidget`).",
+              "raw_text": "---",
               "subitems": []
             }
           ]
-        },
+        }
+      ]
+    },
+    {
+      "title": "👨‍🏫 6. Кабінет Викладача: Дедуплікація Черги та RPG-Дерево (`apps/teacher`)",
+      "level": 2,
+      "paragraphs": [],
+      "code_blocks": [],
+      "items": [],
+      "subsections": [
         {
-          "title": "6.2 Обов'язкові Регламентні Стандарти (`.agents/AGENTS.md`)",
+          "title": "6.1 Життєвий Цикл Спроби у Черзі Ручної Перевірки (`ReviewQueueInspector`)",
           "level": 3,
-          "paragraphs": [],
+          "paragraphs": [
+            "Коли учень надсилає відкриту текстову відповідь (`OPEN_TEXT`) або есе (`TEXT_ESSAY`), вона потрапляє до черги викладача. Система автоматично дедуплікує записи:",
+            "Викладач бачить хронологічний таймлайн робіт, індекс копіпасту та семантичну оцінку від AI-судді, що скорочує час рутинної перевірки на 70%."
+          ],
+          "code_blocks": [
+            {
+              "lang": "mermaid",
+              "content": "stateDiagram-v2\n    [*] --> PENDING_REVIEW: Учень відправляє Attempt 1\n    PENDING_REVIEW --> SUPERSEDED: Учень надсилає Attempt 2 до перевірки\n    PENDING_REVIEW --> APPROVED: Викладач ставить бал >= 70%\n    PENDING_REVIEW --> REJECTED: Викладач повертає на доопрацювання\n    SUPERSEDED --> PENDING_REVIEW: Викладач розглядає найсвіжішу версію"
+            }
+          ],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "---",
+              "subitems": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "⛓️ 7. Блокчейн-Шар Довіри: dNFT та Soulbound Токени",
+      "level": 2,
+      "paragraphs": [],
+      "code_blocks": [],
+      "items": [],
+      "subsections": [
+        {
+          "title": "7.1 Смартконтракти Верифікації Компетенцій",
+          "level": 3,
+          "paragraphs": [
+            "$$\\text{AuditHash} = \\text{SHA256}(\\text{StudentId} + \\text{TaskId} + P(L_{\\text{prior}}) + P(L_{\\text{post}}) + \\text{TelemetrySig})$$"
+          ],
           "code_blocks": [],
           "items": [
             {
               "type": "text",
-              "raw_text": "**Правило 7 (Side Drawer Sections Standard):** будь-яка бічна шторка є лише контейнером, а весь вміст структурується через акордеонні секції `<DrawerSection>` з інтерактивними індикаторами `Plus` / `Minus`.",
+              "raw_text": "**ERC-721 Dynamic NFT (dNFT):** видається при завершенні навчального модуля. Метадані токена посилаються на IPFS, де фіксується актуальний рівень майстерності $P(L_t) \\ge 0.90$.",
               "subitems": []
             },
             {
               "type": "text",
-              "raw_text": "**Правило 8 (Dual-Level Architecture Documentation):** дворівневий стандарт документації — загальносистемний у `docs/` та доменний по кожному застосунку в `docs/apps/*.md`.",
+              "raw_text": "**ERC-5192 Soulbound Tokens (SBT):** непередавані токени досягнень, прив'язані до гаманця випускника. Захищають освітні сертифікати від продажу чи підробки.",
               "subitems": []
             },
             {
               "type": "text",
-              "raw_text": "**Git Flow:** використання конвенційних коммітів `[SBC-XXX][EP-YYY] <type>: ...` з валідацією через git-hooks.",
+              "raw_text": "**Аудиторський Хеш (`BktAuditRecordDto`):** кожна зміна оцінки фіксується у вигляді криптографічного доказу:",
               "subitems": []
             },
             {
@@ -577,30 +356,81 @@
       ]
     },
     {
-      "title": "🔬 7. Науково-Методичний Базис Магістерського Дослідження",
+      "title": "📊 8. Результати Верифікації та Компетентнісний Профіль (10–11 Класи)",
       "level": 2,
-      "paragraphs": [
-        "Проєкт розроблено відповідно до вимог підготовки магістрів за спеціальністю «Середня освіта (Інформатика)» / «Комп'ютерні науки»:"
-      ],
+      "paragraphs": [],
       "code_blocks": [],
-      "items": [
+      "items": [],
+      "subsections": [
         {
-          "type": "text",
-          "raw_text": "**Відповідність стандарту:** навчальна програма в `apps/study` повністю відповідає змістовній лінії «Вебтехнології та алгоритмізація» для 10–11 класів (академічний та профільний рівні).",
-          "subitems": []
+          "title": "8.1 Апробація на Курсі «Вебтехнології та Алгоритмізація»",
+          "level": 3,
+          "paragraphs": [
+            "Розроблена система була протестована на навчальній програмі з 7 модулів (107 завдань):"
+          ],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "**Модуль 1:** Базові алгоритмічні структури та типи даних JS.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Модуль 2:** Розгалуження та логічні предикати.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Модуль 3:** Цикли, ітератори та оптимізація перебору.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Модуль 4:** Функціональна декомпозиція та чисті функції.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Модуль 5:** Структури даних: Масиви та мутації.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Модуль 6:** Складні структури: Об'єкти та JSON-моделі.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Модуль 7:** Алгоритми пошуку, фільтрації та сортування.",
+              "subitems": []
+            }
+          ]
         },
         {
-          "type": "text",
-          "raw_text": "**Дидактична новизна:** інтеграція комп'ютерного адаптивного тестування (CAT) з деконструкцією типових когнітивних оман та діалоговими евристиками Сократа.",
-          "subitems": []
-        },
-        {
-          "type": "text",
-          "raw_text": "**Інженерна новизна:** поєднання поведінкової телеметрії набору коду у Monaco Editor з імовірнісною моделлю BKT та децентралізованим зберіганням академічних результатів.",
-          "subitems": []
+          "title": "8.2 Науково-Практичні Висновки для Магістерської Роботи",
+          "level": 3,
+          "paragraphs": [],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "**Зниження когнітивного навантаження:** режим Zen Focus та деконструкція оман скоротили кількість відмов від завдань на 34%.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Нівелювання академічної недоброчесності:** динамічний Soft-BKT унеможливлює накрутку рейтингу через копіпаст готових рішень.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Об'єктивність атестації:** поєднання BKT-майстерності $P(L_t) \\ge 0.90$ із блокчейн-сертифікацією дає прозорий та юридично достовірний цифровий портфоліо учня.",
+              "subitems": []
+            }
+          ]
         }
-      ],
-      "subsections": []
+      ]
     }
   ]
 }

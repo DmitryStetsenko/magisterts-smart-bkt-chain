@@ -33,15 +33,20 @@
        5. *Блокчейн-шар та верифікація компетенцій (dNFT / Soulbound).*
        6. *Інженерна архітектура монорепозиторію та стандарти (Rule 7, Rule 8, FSD).*
        7. *Науково-методичний базис магістерського дослідження (10–11 класи).*
-3. **Реалізація Повного Гайду Платформи та Каталогу Застосунків у Веб-Порталі (`SBC-290`, `EP-INF`):**
-   - **Реалізація:**
-     - Створено фундаментальний мастер-документ [`docs/guide/master_guide.md`](file:///docs/guide/master_guide.md), що охоплює всі 7 узгоджених модулів (Онбординг, Детальний каталог 5 застосунків, Сценарії ролей, Математика BKT та нижня асимптота, Блокчейн, Архітектура монорепозиторію та Науковий базис курсу).
-     - Підключено автоматичну компіляцію `docs/guide/master_guide.md` у `scripts/compile_docs.py` ➔ згенеровано `docs/guide/master_guide.json` та `apps/docs/src/data/master_guide.json`.
-     - Створено сторінку [`apps/docs/src/app/guide/page.tsx`](file:///apps/docs/src/app/guide/page.tsx) та розширено меню [`apps/docs/src/widgets/docs-layout/ui/DocsLayout.tsx`](file:///apps/docs/src/widgets/docs-layout/ui/DocsLayout.tsx) виділеною кнопкою «📖 Повний Гайд».
-     - Додано градієнтну кнопку швидкого доступу до Гайду на головній сторінці [`apps/docs/src/views/landing/ui/LandingPage.tsx`](file:///apps/docs/src/views/landing/ui/LandingPage.tsx).
+3. **Трансформація Повного Гайду в Google-Style Інженерне Керівництво для Магістерської Роботи (`SBC-290`, `EP-INF`):**
+   - **Реалізація за стандартом Google Engineering Documentation:**
+     - Перероблено мастер-гайд [`docs/guide/master_guide.md`](file:///docs/guide/master_guide.md) у формат науково-технічної монографії, готової для інтеграції у розділи 2 та 3 пояснювальної записки дисертації.
+     - Додано реальні лістинги коду з продакшн-ядра платформи:
+       - TypeScript-контракти `TaskDto`, `SubmissionDto` та `TeacherReviewStatus` у `@sbc/types`.
+       - Клас `BktEngine.calculateNextState()` із байєсівськими формулами оновлення та числовим clamping `[0.0001, 0.9999]`.
+       - Модуль протидії списуванню `BehavioralAdjuster.adjust()` із правилами детекції швидкого вибору ($P(G) \rightarrow 0.85$) та вставки з буфера обміну ($P(G) \rightarrow 0.90$).
+       - Логіку сумісності модальностей `matchesModalityStrict()` у `TaskSequencer`.
+       - Режим зручного читання `ReaderFloatingToolbar.tsx` у `apps/study` з автоскиданням стилів при виході.
+       - Схему життєвого циклу спроб учня в дедуплікованій черзі викладача (`PENDING_REVIEW` $\rightarrow$ `SUPERSEDED` / `APPROVED`).
+       - Блокчейн-докази dNFT / Soulbound та формулу криптографічного аудиторського хешу $\text{SHA256}$.
+     - Автоматична синхронізація через `python scripts/compile_docs.py` з оновленням `apps/docs/src/data/master_guide.json`.
    - **Верифікація:**
-     - Успішна компіляція `python scripts/compile_docs.py`.
-     - Успішна статична оптимізація та збірка всіх 14 маршрутів `npm run build` у `apps/docs` (код 0).
+     - Успішна оптимізована статична збірка всіх 14 маршрутів `npm run build` у `apps/docs` (код 0).
 
 ---
 
