@@ -67,10 +67,14 @@ export function ReaderFloatingToolbar({
           isFocusMode: false,
         };
       } else {
-        // Вхід у режим читання: активація фокусного режиму
+        // Вхід у режим читання: активація фокусного режиму з «Теплою Сепією» за замовчуванням
         return {
           ...prev,
           isFocusMode: true,
+          theme: 'sepia', // Науково найзручніший режим для зору (теплий спектр без синього)
+          font: 'sans',
+          fontSize: 'normal',
+          maxWidth: 'standard',
         };
       }
     });
@@ -183,8 +187,8 @@ export function ReaderFloatingToolbar({
                 <span className="px-1 text-[11px] font-mono text-blue-400 min-w-[50px] text-center font-bold">
                   {settings.fontSize === 'compact' && '15px'}
                   {settings.fontSize === 'normal' && '17px'}
-                  {settings.fontSize === 'large' && '19px'}
-                  {settings.fontSize === 'xlarge' && '21px'}
+                  {settings.fontSize === 'large' && '18px'}
+                  {settings.fontSize === 'xlarge' && '20px'}
                 </span>
                 <button
                   onClick={increaseFontSize}
@@ -197,54 +201,7 @@ export function ReaderFloatingToolbar({
               </div>
             </div>
 
-            {/* Блок 3: Кольорова тема читання */}
-            <div className="flex flex-col gap-1.5">
-              <span className="text-slate-300 font-medium">Колір фону:</span>
-              <div className="grid grid-cols-3 gap-1.5">
-                <button
-                  onClick={() => setTheme('night')}
-                  className={`p-2 rounded-xl flex flex-col items-center gap-1 border text-[10px] font-semibold transition-all cursor-pointer ${
-                    settings.theme === 'night'
-                      ? 'bg-slate-950 border-blue-500 text-blue-300 shadow-sm'
-                      : 'bg-slate-950/60 border-slate-800 text-slate-400 hover:text-white'
-                  }`}
-                  title="Глибока темна ніч (Slate)"
-                >
-                  <Moon className="w-3.5 h-3.5 text-blue-400" />
-                  <span>Ніч</span>
-                </button>
-
-                <button
-                  onClick={() => setTheme('sepia')}
-                  className={`p-2 rounded-xl flex flex-col items-center gap-1 border text-[10px] font-semibold transition-all cursor-pointer ${
-                    settings.theme === 'sepia'
-                      ? 'bg-[#221c17] border-amber-500/80 text-amber-200 shadow-sm'
-                      : 'bg-[#1a1512] border-slate-800 text-stone-400 hover:text-amber-200'
-                  }`}
-                  title="Тепла сепія (без синього спектра, для вечора)"
-                >
-                  <Sun className="w-3.5 h-3.5 text-amber-400" />
-                  <span>Сепія</span>
-                </button>
-
-                <button
-                  onClick={() => setTheme('oled')}
-                  className={`p-2 rounded-xl flex flex-col items-center gap-1 border text-[10px] font-semibold transition-all cursor-pointer ${
-                    settings.theme === 'oled'
-                      ? 'bg-black border-purple-500 text-purple-300 shadow-sm'
-                      : 'bg-black/70 border-slate-800 text-slate-400 hover:text-white'
-                  }`}
-                  title="Абсолютний чорний для OLED дисплеїв"
-                >
-                  <span className="w-3.5 h-3.5 rounded-full bg-slate-900 border border-slate-700 flex items-center justify-center text-[8px] font-bold text-white">
-                    0
-                  </span>
-                  <span>OLED</span>
-                </button>
-              </div>
-            </div>
-
-            {/* Блок 4: Гарнітура шрифту */}
+            {/* Блок 3: Гарнітура шрифту */}
             <div className="flex items-center justify-between">
               <span className="text-slate-300 font-medium">Шрифт:</span>
               <div className="flex items-center gap-1 bg-slate-950 p-1 rounded-xl border border-slate-800">
@@ -271,7 +228,7 @@ export function ReaderFloatingToolbar({
               </div>
             </div>
 
-            {/* Блок 5: Ширина колонки */}
+            {/* Блок 4: Ширина колонки */}
             <div className="flex items-center justify-between">
               <span className="text-slate-300 font-medium">Ширина:</span>
               <div className="flex items-center gap-1 bg-slate-950 p-1 rounded-xl border border-slate-800">
@@ -313,9 +270,58 @@ export function ReaderFloatingToolbar({
           </div>
         )}
 
-        {/* Компактна плаваюча кнопка розгортання */}
+        {/* Компактна плаваюча панель управління читанням */}
         <div className="flex items-center gap-2">
-          {/* Швидка кнопка фокус-режиму */}
+          {/* ⚡ Швидкі кнопки перемикання колірних режимів читання (Сепія / Ніч / OLED) - активні у режимі фокусу */}
+          {settings.isFocusMode && (
+            <div className="flex items-center gap-1 bg-slate-900/90 border border-slate-700/80 p-1 rounded-2xl shadow-xl backdrop-blur-md animate-in fade-in slide-in-from-right-2 duration-150">
+              {/* Кнопка 1: Тепла Сепія (Default читання - без синього спектра) */}
+              <button
+                onClick={() => setTheme('sepia')}
+                className={`px-2.5 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
+                  settings.theme === 'sepia'
+                    ? 'bg-amber-600/90 text-amber-100 border border-amber-400/80 shadow-md shadow-amber-600/30'
+                    : 'text-stone-400 hover:text-amber-200 hover:bg-slate-800/80'
+                }`}
+                title="Тепла Сепія: м'який теплий тон без синього спектра (ідеально для зору)"
+              >
+                <Sun className="w-3.5 h-3.5 text-amber-400" />
+                <span className="text-[11px]">Сепія</span>
+              </button>
+
+              {/* Кнопка 2: Ніч (Slate) */}
+              <button
+                onClick={() => setTheme('night')}
+                className={`px-2.5 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
+                  settings.theme === 'night'
+                    ? 'bg-blue-600 text-white border border-blue-400/80 shadow-md shadow-blue-600/30'
+                    : 'text-slate-400 hover:text-blue-300 hover:bg-slate-800/80'
+                }`}
+                title="Ніч: глибока темно-синя палітра (Slate)"
+              >
+                <Moon className="w-3.5 h-3.5 text-blue-400" />
+                <span className="text-[11px]">Ніч</span>
+              </button>
+
+              {/* Кнопка 3: OLED (Чорний) */}
+              <button
+                onClick={() => setTheme('oled')}
+                className={`px-2.5 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
+                  settings.theme === 'oled'
+                    ? 'bg-neutral-800 text-purple-200 border border-purple-400/80 shadow-md shadow-purple-600/30'
+                    : 'text-slate-400 hover:text-white hover:bg-slate-800/80'
+                }`}
+                title="OLED: абсолютний чорний фон"
+              >
+                <span className="w-3 h-3 rounded-full bg-black border border-purple-400/80 flex items-center justify-center text-[7px] font-bold text-white">
+                  0
+                </span>
+                <span className="text-[11px]">OLED</span>
+              </button>
+            </div>
+          )}
+
+          {/* Головна кнопка Фокус-Режиму */}
           <button
             onClick={toggleFocusMode}
             className={`px-3 py-2.5 rounded-2xl border shadow-xl flex items-center gap-2 text-xs font-bold transition-all cursor-pointer backdrop-blur-md active:scale-95 ${
@@ -328,7 +334,7 @@ export function ReaderFloatingToolbar({
             {settings.isFocusMode ? (
               <>
                 <Minimize2 className="w-4 h-4 text-white" />
-                <span className="hidden sm:inline">Вийти з фокусу [F]</span>
+                <span className="hidden sm:inline">Вийти [F]</span>
               </>
             ) : (
               <>
@@ -338,7 +344,7 @@ export function ReaderFloatingToolbar({
             )}
           </button>
 
-          {/* Кнопка налаштувань типографіки - ВІДОБРАЖАЄТЬСЯ ТІЛЬКИ В РЕЖИМІ ЧИТАННЯ */}
+          {/* Додаткові параметри типографіки (кегль, гарнітура, ширина) */}
           {settings.isFocusMode && (
             <button
               onClick={() => setIsOpen((prev) => !prev)}
@@ -347,7 +353,7 @@ export function ReaderFloatingToolbar({
                   ? 'bg-indigo-600 border-indigo-400 text-white'
                   : 'bg-slate-900/90 border-slate-700 text-slate-300 hover:text-white hover:bg-slate-800'
               }`}
-              title="Налаштування шрифту та кольорів читання"
+              title="Налаштування кеглю, шрифту та ширини"
             >
               <Type className="w-4 h-4" />
             </button>

@@ -68,10 +68,14 @@ export default function StudyPortalHomePage() {
               isFocusMode: false,
             };
           } else {
-            // Вхід у режим фокусного читання
+            // Вхід у режим фокусного читання: за замовчуванням вмикаємо «Теплу Сепію»
             return {
               ...prev,
               isFocusMode: true,
+              theme: 'sepia',
+              font: 'sans',
+              fontSize: 'normal',
+              maxWidth: 'standard',
             };
           }
         });
@@ -192,7 +196,14 @@ export default function StudyPortalHomePage() {
         <div className="flex items-center gap-3">
           {/* Швидка кнопка входу в Режим Зручного Читання */}
           <button
-            onClick={() => setReaderSettings(prev => ({ ...prev, isFocusMode: true }))}
+            onClick={() => setReaderSettings(prev => ({ 
+              ...prev, 
+              isFocusMode: true,
+              theme: 'sepia',
+              font: 'sans',
+              fontSize: 'normal',
+              maxWidth: 'standard',
+            }))}
             className="px-3 py-1.5 rounded-xl bg-blue-600/20 border border-blue-500/40 text-blue-300 hover:bg-blue-600 hover:text-white transition-all text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-sm"
             title="Увімкнути Режим Зручного Читання (F)"
           >
