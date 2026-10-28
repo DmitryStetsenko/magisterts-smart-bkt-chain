@@ -133,30 +133,46 @@ export function LandingPage() {
         </div>
 
         {/* NAVIGATION BUTTONS */}
-        <div className="flex flex-wrap gap-4 justify-center pt-4">
+        <div className="flex flex-wrap gap-3 justify-center pt-4 max-w-4xl">
           <Link
             href="/roadmap/"
-            className={`px-6 py-3.5 rounded-xl border font-semibold transition-all hover:scale-[1.02] active:scale-[0.98] ${
+            className={`px-5 py-3 rounded-xl border font-semibold text-sm transition-all hover:scale-[1.02] active:scale-[0.98] ${
               isDarkMode ? 'bg-zinc-900 border-zinc-850 text-zinc-200 hover:bg-zinc-800 hover:text-white' : 'bg-white border-zinc-200 text-zinc-700 hover:bg-zinc-50 hover:text-black'
             }`}
           >
-            Дорожня карта
+            🗺️ Дорожня карта
           </Link>
           <Link
             href="/tech/"
-            className={`px-6 py-3.5 rounded-xl border font-semibold transition-all hover:scale-[1.02] active:scale-[0.98] ${
+            className={`px-5 py-3 rounded-xl border font-semibold text-sm transition-all hover:scale-[1.02] active:scale-[0.98] ${
               isDarkMode ? 'bg-zinc-900 border-zinc-850 text-zinc-200 hover:bg-zinc-800 hover:text-white' : 'bg-white border-zinc-200 text-zinc-700 hover:bg-zinc-50 hover:text-black'
             }`}
           >
-            Технічний стек
+            ⚙️ Технічний стек
+          </Link>
+          <Link
+            href="/telemetry/"
+            className={`px-5 py-3 rounded-xl border font-semibold text-sm transition-all hover:scale-[1.02] active:scale-[0.98] ${
+              isDarkMode ? 'bg-zinc-900 border-zinc-850 text-zinc-200 hover:bg-zinc-800 hover:text-white' : 'bg-white border-zinc-200 text-zinc-700 hover:bg-zinc-50 hover:text-black'
+            }`}
+          >
+            📊 Телеметрія & BKT
           </Link>
           <Link
             href="/pm/"
-            className={`px-6 py-3.5 rounded-xl border font-semibold transition-all hover:scale-[1.02] active:scale-[0.98] ${
+            className={`px-5 py-3 rounded-xl border font-semibold text-sm transition-all hover:scale-[1.02] active:scale-[0.98] ${
               isDarkMode ? 'bg-zinc-900 border-zinc-850 text-zinc-200 hover:bg-zinc-800 hover:text-white' : 'bg-white border-zinc-200 text-zinc-700 hover:bg-zinc-50 hover:text-black'
             }`}
           >
-            Управління & Jira
+            📋 Управління & Jira
+          </Link>
+          <Link
+            href="/apps/study/"
+            className={`px-5 py-3 rounded-xl border font-semibold text-sm transition-all hover:scale-[1.02] active:scale-[0.98] ${
+              isDarkMode ? 'bg-zinc-900 border-zinc-850 text-zinc-200 hover:bg-zinc-800 hover:text-white' : 'bg-white border-zinc-200 text-zinc-700 hover:bg-zinc-50 hover:text-black'
+            }`}
+          >
+            📖 Застосунки екосистеми
           </Link>
         </div>
 

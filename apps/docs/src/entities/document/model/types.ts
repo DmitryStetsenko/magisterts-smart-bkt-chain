@@ -33,4 +33,14 @@ export interface DocData {
   sections: Section[];
 }
 
-export type Tab = 'roadmap' | 'tech' | 'pm';
+export type Tab =
+  | 'roadmap'
+  | 'tech'
+  | 'telemetry'
+  | 'pm'
+  | 'study'
+  | 'student'
+  | 'teacher'
+  | 'admin'
+  | 'api';
+

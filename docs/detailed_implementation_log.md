@@ -30,6 +30,31 @@
   5. *Build Next.js Documentation Site* (`npm run build:docs`) — збірка статичного експорту (`output: "export"`, `trailingSlash: true`, `basePath: "/magisterts-smart-bkt-chain"`).
   6. *Upload Artifact & Deploy Pages* (`actions/upload-pages-artifact@v3` + `actions/deploy-pages@v4`).
 
+### 0.1.7 Інтеграція Документації Екосистеми Застосунків та Аналітики у Веб-Портал `apps/docs` (`SBC-288`, `EP-LD`)
+- **Проблематика:**
+  Портал документації `apps/docs` містив застарілу 3-вкладкову навігацію (`roadmap`, `tech`, `pm`). Нещодавно створені детальні специфікації застосунків (`docs/apps/*.md`) та звіт з телеметрії (`telemetry_analytics.md`) були недоступні користувачам сайту.
+- **Технічні рішення та реалізація:**
+  1. **Моделі даних та типізація (`apps/docs/src/entities/document/model/types.ts`):**
+     - Розширено `type Tab` значеннями: `'roadmap' | 'tech' | 'telemetry' | 'pm' | 'study' | 'student' | 'teacher' | 'admin' | 'api'`.
+  2. **Сайдбар та динамічний роутер (`apps/docs/src/widgets/docs-layout/ui/DocsLayout.tsx`):**
+     - Підключено імпорти згенерованих JSON: `apps_study_portal.json`, `apps_student_portal.json`, `apps_teacher_dashboard.json`, `apps_admin_portal.json`, `apps_api_backend.json`, `telemetry_analytics.json`.
+     - Меню перемикання розділено на блоки:
+       - *«Ядро системи»*: Дорожня карта, Технічний стек, Аналітика & BKT, Управління & Jira.
+       - *«Застосунки платформи»*: Навчальний Простір (3006), Тренажер Студента (3002), Дашборд Вчителя (3003), Адмін-Центр & DAG (3004), NestJS API & WS (3000).
+     - Динамічний бейдж у шапці контенту з автоматичною підстановкою назви поточної специфікації.
+  3. **Створення маршрутів у Next.js App Router:**
+     - `apps/docs/src/app/telemetry/page.tsx`
+     - `apps/docs/src/app/apps/study/page.tsx`
+     - `apps/docs/src/app/apps/student/page.tsx`
+     - `apps/docs/src/app/apps/teacher/page.tsx`
+     - `apps/docs/src/app/apps/admin/page.tsx`
+     - `apps/docs/src/app/apps/api/page.tsx`
+  4. **Оновлення навігаційних карток LandingPage (`apps/docs/src/views/landing/ui/LandingPage.tsx`):**
+     - Додано прямі кнопки швидкого переходу до «📊 Телеметрія & BKT» та «📖 Застосунки екосистеми».
+  5. **Валідація:**
+     - Запуск `python scripts/compile_docs.py` — успішно синхронізовано всі 11 джерел знань.
+     - Статичний експорт `npm run build` у `apps/docs` успішно згенерував 13 статичних HTML-сторінок.
+
 ### 0.1.3 Конфігурація Tailwind CSS v4 та PostCSS Пайплайну в `apps/study` (`SBC-283`, `EP-ST`)
 - **Проблематика:**
   Next.js 16 при збірці у режимі Turbopack за відсутності локального `postcss.config.mjs` у пакеті не підключав трансформатор `@tailwindcss/postcss`, що призводило до видачі сирого HTML без обробленого CSS бандла.

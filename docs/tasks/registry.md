@@ -366,6 +366,7 @@
 | **SBC-82** | `Bug` | `LD` | auto refresh recommended task on ACCEPTED submission status | 2026-10-04 | `104da6d` |
 | **SBC-87** | `Bug` | `LD` | disable automatic task transition on ACCEPTED submission status | 2026-10-04 | `abf03e3` |
 | **SBC-88** | `Bug` | `LD` | add content change fallback for robust monaco paste detection | 2026-10-04 | `7ff7dbd` |
+| **SBC-288** | `Story` | `LD` | integrate ecosystem applications and telemetry docs into documentation portal | 2026-10-28 | `pending` |
 
 ---
 

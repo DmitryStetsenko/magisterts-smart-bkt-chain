@@ -6,6 +6,12 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import roadmapData from '../../../data/roadmap.json';
 import techStackData from '../../../data/tech_stack.json';
 import projectManagementData from '../../../data/project_management.json';
+import telemetryData from '../../../data/telemetry_analytics.json';
+import studyPortalData from '../../../data/apps_study_portal.json';
+import studentPortalData from '../../../data/apps_student_portal.json';
+import teacherDashboardData from '../../../data/apps_teacher_dashboard.json';
+import adminPortalData from '../../../data/apps_admin_portal.json';
+import apiBackendData from '../../../data/apps_api_backend.json';
 import { DocData, Section, Tab } from '../../../entities/document/model/types';
 import { getSlug } from '../../../entities/document/lib/helpers';
 import { ThemeSwitcher } from '../../../features/theme-switcher/ui/ThemeSwitcher';
@@ -29,19 +35,60 @@ function DocsLayoutContent({ children }: DocsLayoutContentProps) {
   const roadmapDoc = roadmapData as DocData;
   const techDoc = techStackData as DocData;
   const pmDoc = projectManagementData as DocData;
+  const telemetryDoc = telemetryData as DocData;
+  const studyDoc = studyPortalData as DocData;
+  const studentDoc = studentPortalData as DocData;
+  const teacherDoc = teacherDashboardData as DocData;
+  const adminDoc = adminPortalData as DocData;
+  const apiDoc = apiBackendData as DocData;
 
   // Detect active tab from URL path
   const activeTab = useMemo<Tab>(() => {
     if (pathname.includes('/tech')) return 'tech';
+    if (pathname.includes('/telemetry')) return 'telemetry';
     if (pathname.includes('/pm')) return 'pm';
+    if (pathname.includes('/apps/study')) return 'study';
+    if (pathname.includes('/apps/student')) return 'student';
+    if (pathname.includes('/apps/teacher')) return 'teacher';
+    if (pathname.includes('/apps/admin')) return 'admin';
+    if (pathname.includes('/apps/api')) return 'api';
     return 'roadmap';
   }, [pathname]);
 
   const currentDoc = useMemo(() => {
-    if (activeTab === 'roadmap') return roadmapDoc;
-    if (activeTab === 'tech') return techDoc;
-    return pmDoc;
-  }, [activeTab, roadmapDoc, techDoc, pmDoc]);
+    switch (activeTab) {
+      case 'tech':
+        return techDoc;
+      case 'telemetry':
+        return telemetryDoc;
+      case 'pm':
+        return pmDoc;
+      case 'study':
+        return studyDoc;
+      case 'student':
+        return studentDoc;
+      case 'teacher':
+        return teacherDoc;
+      case 'admin':
+        return adminDoc;
+      case 'api':
+        return apiDoc;
+      case 'roadmap':
+      default:
+        return roadmapDoc;
+    }
+  }, [
+    activeTab,
+    roadmapDoc,
+    techDoc,
+    telemetryDoc,
+    pmDoc,
+    studyDoc,
+    studentDoc,
+    teacherDoc,
+    adminDoc,
+    apiDoc,
+  ]);
 
   // Toggle dark/light class on HTML element
   useEffect(() => {
@@ -232,40 +279,109 @@ function DocsLayoutContent({ children }: DocsLayoutContentProps) {
           
           {/* Tab Switcher */}
           <div className="p-4 border-b border-zinc-200 dark:border-zinc-900">
-            <div className={`flex flex-col gap-1 p-1 rounded-xl ${isDarkMode ? 'bg-zinc-900' : 'bg-zinc-200'}`}>
-              <Link
-                href="/roadmap/"
-                onClick={() => setIsSidebarOpen(false)}
-                className={`w-full text-left py-2.5 px-3 rounded-lg text-xs font-semibold tracking-wide transition-all flex items-center gap-2.5 ${activeTab === 'roadmap' ? (isDarkMode ? 'bg-zinc-800 text-white shadow-md' : 'bg-white text-zinc-955 shadow-sm') : (isDarkMode ? 'text-zinc-400 hover:text-zinc-200' : 'text-zinc-600 hover:text-zinc-900')}`}
-              >
-                <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
-                </svg>
-                <span>Дорожня карта</span>
-              </Link>
-              <Link
-                href="/tech/"
-                onClick={() => setIsSidebarOpen(false)}
-                className={`w-full text-left py-2.5 px-3 rounded-lg text-xs font-semibold tracking-wide transition-all flex items-center gap-2.5 ${activeTab === 'tech' ? (isDarkMode ? 'bg-zinc-800 text-white shadow-md' : 'bg-white text-zinc-955 shadow-sm') : (isDarkMode ? 'text-zinc-400 hover:text-zinc-200' : 'text-zinc-600 hover:text-zinc-900')}`}
-              >
-                <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
-                </svg>
-                <span>Технічний стек</span>
-              </Link>
-              <Link
-                href="/pm/"
-                onClick={() => setIsSidebarOpen(false)}
-                className={`w-full text-left py-2.5 px-3 rounded-lg text-xs font-semibold tracking-wide transition-all flex items-center gap-2.5 ${activeTab === 'pm' ? (isDarkMode ? 'bg-zinc-800 text-white shadow-md' : 'bg-white text-zinc-955 shadow-sm') : (isDarkMode ? 'text-zinc-400 hover:text-zinc-200' : 'text-zinc-600 hover:text-zinc-900')}`}
-              >
-                <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 002 2h2a2 2 0 002-2z" />
-                </svg>
-                <span>Управління & Jira</span>
-              </Link>
+            <div className="space-y-3">
+              {/* Core System Docs */}
+              <div>
+                <span className={`text-[10px] font-bold uppercase tracking-wider px-1 ${isDarkMode ? 'text-zinc-500' : 'text-zinc-400'}`}>
+                  Ядро системи
+                </span>
+                <div className={`mt-1 flex flex-col gap-1 p-1 rounded-xl ${isDarkMode ? 'bg-zinc-900' : 'bg-zinc-200'}`}>
+                  <Link
+                    href="/roadmap/"
+                    onClick={() => setIsSidebarOpen(false)}
+                    className={`w-full text-left py-2 px-2.5 rounded-lg text-xs font-semibold tracking-wide transition-all flex items-center gap-2.5 ${activeTab === 'roadmap' ? (isDarkMode ? 'bg-zinc-800 text-white shadow-md' : 'bg-white text-zinc-950 shadow-sm') : (isDarkMode ? 'text-zinc-400 hover:text-zinc-200' : 'text-zinc-600 hover:text-zinc-900')}`}
+                  >
+                    <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+                    </svg>
+                    <span>Дорожня карта</span>
+                  </Link>
+                  <Link
+                    href="/tech/"
+                    onClick={() => setIsSidebarOpen(false)}
+                    className={`w-full text-left py-2 px-2.5 rounded-lg text-xs font-semibold tracking-wide transition-all flex items-center gap-2.5 ${activeTab === 'tech' ? (isDarkMode ? 'bg-zinc-800 text-white shadow-md' : 'bg-white text-zinc-950 shadow-sm') : (isDarkMode ? 'text-zinc-400 hover:text-zinc-200' : 'text-zinc-600 hover:text-zinc-900')}`}
+                  >
+                    <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+                    </svg>
+                    <span>Технічний стек</span>
+                  </Link>
+                  <Link
+                    href="/telemetry/"
+                    onClick={() => setIsSidebarOpen(false)}
+                    className={`w-full text-left py-2 px-2.5 rounded-lg text-xs font-semibold tracking-wide transition-all flex items-center gap-2.5 ${activeTab === 'telemetry' ? (isDarkMode ? 'bg-zinc-800 text-white shadow-md' : 'bg-white text-zinc-950 shadow-sm') : (isDarkMode ? 'text-zinc-400 hover:text-zinc-200' : 'text-zinc-600 hover:text-zinc-900')}`}
+                  >
+                    <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                    </svg>
+                    <span>Аналітика & BKT</span>
+                  </Link>
+                  <Link
+                    href="/pm/"
+                    onClick={() => setIsSidebarOpen(false)}
+                    className={`w-full text-left py-2 px-2.5 rounded-lg text-xs font-semibold tracking-wide transition-all flex items-center gap-2.5 ${activeTab === 'pm' ? (isDarkMode ? 'bg-zinc-800 text-white shadow-md' : 'bg-white text-zinc-950 shadow-sm') : (isDarkMode ? 'text-zinc-400 hover:text-zinc-200' : 'text-zinc-600 hover:text-zinc-900')}`}
+                  >
+                    <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 002 2h2a2 2 0 002-2z" />
+                    </svg>
+                    <span>Управління & Jira</span>
+                  </Link>
+                </div>
+              </div>
+
+              {/* Applications Ecosystem Docs */}
+              <div>
+                <span className={`text-[10px] font-bold uppercase tracking-wider px-1 ${isDarkMode ? 'text-zinc-500' : 'text-zinc-400'}`}>
+                  Застосунки платформи
+                </span>
+                <div className={`mt-1 flex flex-col gap-1 p-1 rounded-xl ${isDarkMode ? 'bg-zinc-900' : 'bg-zinc-200'}`}>
+                  <Link
+                    href="/apps/study/"
+                    onClick={() => setIsSidebarOpen(false)}
+                    className={`w-full text-left py-2 px-2.5 rounded-lg text-xs font-semibold tracking-wide transition-all flex items-center gap-2.5 ${activeTab === 'study' ? (isDarkMode ? 'bg-zinc-800 text-white shadow-md' : 'bg-white text-zinc-950 shadow-sm') : (isDarkMode ? 'text-zinc-400 hover:text-zinc-200' : 'text-zinc-600 hover:text-zinc-900')}`}
+                  >
+                    <span className="w-2 h-2 rounded-full bg-emerald-400 flex-shrink-0" />
+                    <span className="truncate">Навчальний Простір (3006)</span>
+                  </Link>
+                  <Link
+                    href="/apps/student/"
+                    onClick={() => setIsSidebarOpen(false)}
+                    className={`w-full text-left py-2 px-2.5 rounded-lg text-xs font-semibold tracking-wide transition-all flex items-center gap-2.5 ${activeTab === 'student' ? (isDarkMode ? 'bg-zinc-800 text-white shadow-md' : 'bg-white text-zinc-950 shadow-sm') : (isDarkMode ? 'text-zinc-400 hover:text-zinc-200' : 'text-zinc-600 hover:text-zinc-900')}`}
+                  >
+                    <span className="w-2 h-2 rounded-full bg-indigo-400 flex-shrink-0" />
+                    <span className="truncate">Тренажер Студента (3002)</span>
+                  </Link>
+                  <Link
+                    href="/apps/teacher/"
+                    onClick={() => setIsSidebarOpen(false)}
+                    className={`w-full text-left py-2 px-2.5 rounded-lg text-xs font-semibold tracking-wide transition-all flex items-center gap-2.5 ${activeTab === 'teacher' ? (isDarkMode ? 'bg-zinc-800 text-white shadow-md' : 'bg-white text-zinc-950 shadow-sm') : (isDarkMode ? 'text-zinc-400 hover:text-zinc-200' : 'text-zinc-600 hover:text-zinc-900')}`}
+                  >
+                    <span className="w-2 h-2 rounded-full bg-purple-400 flex-shrink-0" />
+                    <span className="truncate">Дашборд Вчителя (3003)</span>
+                  </Link>
+                  <Link
+                    href="/apps/admin/"
+                    onClick={() => setIsSidebarOpen(false)}
+                    className={`w-full text-left py-2 px-2.5 rounded-lg text-xs font-semibold tracking-wide transition-all flex items-center gap-2.5 ${activeTab === 'admin' ? (isDarkMode ? 'bg-zinc-800 text-white shadow-md' : 'bg-white text-zinc-950 shadow-sm') : (isDarkMode ? 'text-zinc-400 hover:text-zinc-200' : 'text-zinc-600 hover:text-zinc-900')}`}
+                  >
+                    <span className="w-2 h-2 rounded-full bg-amber-400 flex-shrink-0" />
+                    <span className="truncate">Адмін-Центр & DAG (3004)</span>
+                  </Link>
+                  <Link
+                    href="/apps/api/"
+                    onClick={() => setIsSidebarOpen(false)}
+                    className={`w-full text-left py-2 px-2.5 rounded-lg text-xs font-semibold tracking-wide transition-all flex items-center gap-2.5 ${activeTab === 'api' ? (isDarkMode ? 'bg-zinc-800 text-white shadow-md' : 'bg-white text-zinc-950 shadow-sm') : (isDarkMode ? 'text-zinc-400 hover:text-zinc-200' : 'text-zinc-600 hover:text-zinc-900')}`}
+                  >
+                    <span className="w-2 h-2 rounded-full bg-sky-400 flex-shrink-0" />
+                    <span className="truncate">NestJS API & WS (3000)</span>
+                  </Link>
+                </div>
+              </div>
             </div>
 
-            <SearchDocs searchQuery={searchQuery} onSearchChange={handleSearchChange} isDarkMode={isDarkMode} />
+            <div className="mt-3">
+              <SearchDocs searchQuery={searchQuery} onSearchChange={handleSearchChange} isDarkMode={isDarkMode} />
+            </div>
           </div>
 
           {/* Navigation Links */}
@@ -322,7 +438,23 @@ function DocsLayoutContent({ children }: DocsLayoutContentProps) {
             <div className="space-y-4">
               <div className="flex items-center gap-2">
                 <span className={`px-2.5 py-1 text-xs font-semibold rounded-full uppercase tracking-wider ${isDarkMode ? 'bg-indigo-500/10 text-indigo-400' : 'bg-indigo-100 text-indigo-800'}`}>
-                  {activeTab === 'roadmap' ? 'Дорожня карта' : activeTab === 'tech' ? 'Технічна специфікація' : 'Управління розробкою'}
+                  {activeTab === 'roadmap'
+                    ? 'Дорожня карта'
+                    : activeTab === 'tech'
+                    ? 'Технічна специфікація'
+                    : activeTab === 'telemetry'
+                    ? 'Аналітика та BKT'
+                    : activeTab === 'pm'
+                    ? 'Управління розробкою'
+                    : activeTab === 'study'
+                    ? 'Специфікація apps/study'
+                    : activeTab === 'student'
+                    ? 'Специфікація apps/student'
+                    : activeTab === 'teacher'
+                    ? 'Специфікація apps/teacher'
+                    : activeTab === 'admin'
+                    ? 'Специфікація apps/admin'
+                    : 'Специфікація apps/api'}
                 </span>
                 <span className={`px-2.5 py-1 text-xs font-semibold rounded-full ${isDarkMode ? 'bg-zinc-900 text-zinc-400' : 'bg-zinc-200 text-zinc-600'}`}>
                   v1.0.0

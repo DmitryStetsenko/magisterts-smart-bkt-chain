@@ -2,6 +2,28 @@
 
 Цей документ фіксує щоденний прогрес розробки, архітектурні рішення та планування наступних кроків для системи «Smart-BKT-Chain».
 
+## 📅 28 жовтня 2026 року
+
+### ✅ Що зроблено за день:
+1. **Розширення порталу документації `apps/docs` сторінками екосистеми та аналітики (`SBC-288`, `EP-LD`):**
+   - **Проблематика:** Портал документації містив лише три початкові розділи («Дорожня карта», «Технічний стек», «Управління & Jira»). Специфікації новостворених застосунків (`apps/study`, `apps/student`, `apps/teacher`, `apps/admin`, `apps/api`) та аналітичного звіту `telemetry_analytics.md` були відсутні в навігації сайту документації.
+   - **Реалізація:**
+     - Розширено тип табів `Tab` у [`apps/docs/src/entities/document/model/types.ts`](file:///apps/docs/src/entities/document/model/types.ts).
+     - Створено повноцінні маршрути у додатку Next.js:
+       - [`apps/docs/src/app/telemetry/page.tsx`](file:///apps/docs/src/app/telemetry/page.tsx) — специфікація телеметрії, формул BKT, феномену нижньої асимптоти та античіту.
+       - [`apps/docs/src/app/apps/study/page.tsx`](file:///apps/docs/src/app/apps/study/page.tsx) — документація Інтерактивного простору навчання.
+       - [`apps/docs/src/app/apps/student/page.tsx`](file:///apps/docs/src/app/apps/student/page.tsx) — документація Тренажера студента.
+       - [`apps/docs/src/app/apps/teacher/page.tsx`](file:///apps/docs/src/app/apps/teacher/page.tsx) — документація Кабінету викладача.
+       - [`apps/docs/src/app/apps/admin/page.tsx`](file:///apps/docs/src/app/apps/admin/page.tsx) — документація Адмін-центру та DAG.
+       - [`apps/docs/src/app/apps/api/page.tsx`](file:///apps/docs/src/app/apps/api/page.tsx) — документація Backend API та WebSockets.
+     - Сайдбар [`apps/docs/src/widgets/docs-layout/ui/DocsLayout.tsx`](file:///apps/docs/src/widgets/docs-layout/ui/DocsLayout.tsx) розділено на дві логічні категорії («Ядро системи» та «Застосунки платформи») із кольоровими індикаторами застосунків.
+     - Оновлено навігаційні кнопки на головній сторінці [`apps/docs/src/views/landing/ui/LandingPage.tsx`](file:///apps/docs/src/views/landing/ui/LandingPage.tsx).
+   - **Верифікація:**
+     - Успішна компіляція `python scripts/compile_docs.py`.
+     - Успішна оптимізована статична збірка всіх 13 маршрутів `npm run build` у `apps/docs` (код 0).
+
+---
+
 ## 📅 27 жовтня 2026 року
 
 ### ✅ Що зроблено за день:

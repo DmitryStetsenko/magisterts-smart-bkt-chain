@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - master
+      - dev-phase3-queues
     paths:
       - 'docs/**'
       - 'apps/docs/**'
