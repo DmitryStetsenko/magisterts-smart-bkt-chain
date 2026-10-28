@@ -116,8 +116,8 @@
 | **SBC-273** | `Story` | `INF` | add floating toast notifications on course switch and record course testing ergonomics in backlog | 2026-10-24 | `a6ac8b5` |
 | **SBC-274** | `Story` | `INF` | implement modal confirmation dialog with pre-switch validation before changing courses | 2026-10-24 | `b454563` |
 | **SBC-279** | Task | INF | document brainstorm 08 and add adaptive learning roadmap to backlog | 2026-10-26 | pending |
-| **SBC-289** | `Task` | `INF` | document brainstorm 09 on master guide and ecosystem apps handbook concept | 2026-10-28 | `pending` |
-| **SBC-290** | `Story` | `INF` | implement master guide and ecosystem apps handbook on documentation portal | 2026-10-28 | `pending` |
+| **SBC-289** | `Task` | `INF` | document brainstorm 09 on master guide and ecosystem apps handbook concept | 2026-10-28 | `8470a6a` |
+| **SBC-290** | `Story` | `INF` | implement master guide and ecosystem apps handbook on documentation portal | 2026-10-28 | `8470a6a` |
 
 ---
 
