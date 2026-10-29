@@ -16,7 +16,8 @@
 | **`SBC-EP-TC`** | Teacher Portal & Analytics CRM | 24 |
 | **`SBC-EP-AD`** | Admin Portal & Knowledge DAG Builder | 8 |
 | **`SBC-EP-LD`** | Landing Web Page | 9 |
-| **ВСЬОГО** | - | **244** |
+| **`SBC-EP-MS`** | Master's Thesis Engineering & Academic Text Generation | 4 |
+| **ВСЬОГО** | - | **248** |
 
 ---
 
@@ -373,3 +374,13 @@
 
 ---
 
+## 🎯 SBC-EP-MS: Master's Thesis Engineering & Academic Text Generation
+
+| Task Key | Type | Scope | Summary | Date | Commit Hash |
+| :--- | :---: | :---: | :--- | :---: | :---: |
+| **SBC-292** | `Story` | `MS` | create structured specification and automated Word thesis generator for specialty 122 according to DSTU | 2026-10-28 | `429db01` |
+| **SBC-293** | `Fix` | `MS` | fix document outline headings, BKT formula typography and 5-column table alignment | 2026-10-29 | `73fb11a` |
+| **SBC-294** | `Docs` | `MS` | document thesis engineering guide, formula typography and editing workflow in scripts/docs | 2026-10-29 | `b68ac1e` |
+| **SBC-295** | `Task` | `MS` | establish SBC-EP-MS epic across project management methodology, workspace rules and registries | 2026-10-29 | `pending` |
+
+---

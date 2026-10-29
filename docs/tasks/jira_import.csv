@@ -224,3 +224,7 @@ SBC-223,SBC-EP-TC,Style,"remove duplicate emojis and enforce clean SVG icons in 
 SBC-224,SBC-EP-INF,Task,"log emoji removal and sync task registry and daily progress",Done,2026-10-19,52d9d9b
 SBC-225,SBC-EP-BKT,Task,"document scientific justification for cognitive latency threshold and rapid guessing in BKT",Done,2026-10-19,2f718c8
 SBC-226,SBC-EP-BKT,Task,"document scientific justification for multi-level mastery, adaptive difficulty scaling and cognitive cool-down",Done,2026-10-20,0f06a78
+SBC-292,SBC-EP-MS,Story,"create structured specification and automated Word thesis generator for specialty 122 according to DSTU",Done,2026-10-28,429db01
+SBC-293,SBC-EP-MS,Fix,"fix document outline headings, BKT formula typography and 5-column table alignment",Done,2026-10-29,73fb11a
+SBC-294,SBC-EP-MS,Docs,"document thesis engineering guide, formula typography and editing workflow in scripts/docs",Done,2026-10-29,b68ac1e
+SBC-295,SBC-EP-MS,Task,"establish SBC-EP-MS epic across project management methodology, workspace rules and registries",In Progress,2026-10-29,pending

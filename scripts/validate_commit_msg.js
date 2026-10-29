@@ -20,7 +20,7 @@ if (rawMsg.startsWith('Merge ') || rawMsg.startsWith('Revert ')) {
 }
 
 // Regex format: [SBC-XXX][EP-YYY] <type>: <description>
-const regex = /^\[SBC-\d+\]\[EP-(INF|SH|BK|BKT|LLM|W3|ST|TC|AD|LD)\] (feat|fix|docs|style|refactor|test|chore): .+/;
+const regex = /^\[SBC-\d+\]\[EP-(INF|SH|BK|BKT|LLM|W3|ST|TC|AD|LD|MS)\] (feat|fix|docs|style|refactor|test|chore): .+/;
 
 if (!regex.test(rawMsg)) {
   console.error('\n\x1b[31m%s\x1b[0m', '═══════════════════════════════════════════════════════════════════════');
@@ -30,7 +30,7 @@ if (!regex.test(rawMsg)) {
   console.error('\n\x1b[32m%s\x1b[0m', 'Очікуваний формат стандарту Jira Conventional Commits:');
   console.error('\x1b[36m%s\x1b[0m', '  [SBC-XXX][EP-YYY] <type>: <description>');
   console.error('\nДозволені коди епіків [EP-YYY]:');
-  console.error('  [EP-INF], [EP-SH], [EP-BK], [EP-BKT], [EP-LLM], [EP-W3], [EP-ST], [EP-TC], [EP-AD], [EP-LD]');
+  console.error('  [EP-INF], [EP-SH], [EP-BK], [EP-BKT], [EP-LLM], [EP-W3], [EP-ST], [EP-TC], [EP-AD], [EP-LD], [EP-MS]');
   console.error('\nДозволені типи <type>:');
   console.error('  feat, fix, docs, style, refactor, test, chore');
   console.error('\nПриклади:');

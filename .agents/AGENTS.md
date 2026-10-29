@@ -27,7 +27,7 @@
   `[SBC-XXX][EP-YYY] <type>: <опис англійською мовою>`
   де:
   - `SBC-XXX` — номер завдання з реєстру `docs/tasks/registry.md`;
-  - `[EP-YYY]` — короткий код епіку (`[EP-INF]`, `[EP-SH]`, `[EP-BK]`, `[EP-BKT]`, `[EP-LLM]`, `[EP-W3]`, `[EP-ST]`, `[EP-TC]`, `[EP-AD]`, `[EP-LD]`);
+  - `[EP-YYY]` — короткий код епіку (`[EP-INF]`, `[EP-SH]`, `[EP-BK]`, `[EP-BKT]`, `[EP-LLM]`, `[EP-W3]`, `[EP-ST]`, `[EP-TC]`, `[EP-AD]`, `[EP-LD]`, `[EP-MS]`);
   - `<type>` — `feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`.
 
 ---
