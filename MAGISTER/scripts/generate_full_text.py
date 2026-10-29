@@ -1,5 +1,5 @@
 """
-Головний збирач структури кваліфікаційної магістерської роботи на 4 розділи (50+ сторінок).
+Головний збирач структури кваліфікаційної магістерської роботи на 5 розділів (50+ сторінок).
 """
 
 from sections.intro_conclusions import get_intro_content, get_conclusions_content
@@ -7,6 +7,7 @@ from sections.section_1 import get_section_1
 from sections.section_2 import get_section_2
 from sections.section_3 import get_section_3
 from sections.section_4 import get_section_4
+from sections.section_5 import get_section_5
 
 def get_all_thesis_sections(apparatus):
     intro = {
@@ -21,6 +22,7 @@ def get_all_thesis_sections(apparatus):
     sec2 = get_section_2()
     sec3 = get_section_3()
     sec4 = get_section_4()
+    sec5 = get_section_5()
 
     conclusions = {
         "id": "conclusions",
@@ -30,4 +32,4 @@ def get_all_thesis_sections(apparatus):
         "content": get_conclusions_content()
     }
 
-    return [intro, sec1, sec2, sec3, sec4, conclusions]
+    return [intro, sec1, sec2, sec3, sec4, sec5, conclusions]
