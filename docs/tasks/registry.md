@@ -384,6 +384,7 @@
 | **SBC-295** | `Task` | `MS` | establish SBC-EP-MS epic across project management methodology, workspace rules and registries | 2026-10-29 | `58382f4` |
 | **SBC-296** | `Story` | `MS` | synchronize thesis_spec.json and generated docx with full platform architecture, telemetry and BKT formulas | 2026-10-29 | `398db12` |
 | **SBC-297** | `Story` | `MS` | restructure thesis into 4 chapters, expand text volume to 50+ pages and modularize sections pipeline | 2026-10-29 | `7d891b2` |
-| **SBC-298** | `Story` | `MS` | humanize academic narrative, eliminate AI boilerplate clichés and optimize perplexity and burstiness | 2026-10-29 | `pending` |
+| **SBC-298** | `Story` | `MS` | humanize academic narrative, eliminate AI boilerplate clichés and optimize perplexity and burstiness | 2026-10-29 | `557305f` |
+| **SBC-299** | `Story` | `MS` | scale thesis volume to 50+ pages with case studies, component breakdown and typography polish | 2026-10-29 | `pending` |
 
 ---

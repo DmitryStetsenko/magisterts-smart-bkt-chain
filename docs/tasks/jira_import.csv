@@ -229,4 +229,5 @@ SBC-293,SBC-EP-MS,Fix,"fix document outline headings, BKT formula typography and
 SBC-294,SBC-EP-MS,Docs,"document thesis engineering guide, formula typography and editing workflow in scripts/docs",Done,2026-10-29,b68ac1e
 SBC-296,SBC-EP-MS,Story,"synchronize thesis_spec.json and generated docx with full platform architecture, telemetry and BKT formulas",Done,2026-10-29,398db12
 SBC-297,SBC-EP-MS,Story,"restructure thesis into 4 chapters, expand text volume to 50+ pages and modularize sections pipeline",Done,2026-10-29,7d891b2
-SBC-298,SBC-EP-MS,Story,"humanize academic narrative, eliminate AI boilerplate clichés and optimize perplexity and burstiness",In Progress,2026-10-29,pending
+SBC-298,SBC-EP-MS,Story,"humanize academic narrative, eliminate AI boilerplate clichés and optimize perplexity and burstiness",Done,2026-10-29,557305f
+SBC-299,SBC-EP-MS,Story,"scale thesis volume to 50+ pages with case studies, component breakdown and typography polish",In Progress,2026-10-29,pending

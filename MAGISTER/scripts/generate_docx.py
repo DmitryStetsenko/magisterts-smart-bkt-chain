@@ -75,6 +75,7 @@ def clean_inline_math(text: str) -> str:
         (r'\right)', ')'),
         (r'\left[', '['),
         (r'\right]', ']'),
+        (r'\partial', '∂'),
         (r'\exp', 'exp'),
         (r'\text', ''),
         (r'\\_', '_'),
@@ -226,6 +227,9 @@ def render_real_table(doc, raw_table_text):
     if len(headers) == 5:
         # 30 + 35 + 35 + 35 + 35 = 170 мм
         col_widths = [Mm(30), Mm(35), Mm(35), Mm(35), Mm(35)]
+    elif len(headers) == 6:
+        # Для 6-колонкових таблиць (табл. 4.1): 20 + 55 + 24 + 23 + 24 + 24 = 170 мм
+        col_widths = [Mm(20), Mm(55), Mm(24), Mm(23), Mm(24), Mm(24)]
     elif len(headers) == 4:
         # 42 + 42 + 43 + 43 = 170 мм
         col_widths = [Mm(42), Mm(42), Mm(43), Mm(43)]
