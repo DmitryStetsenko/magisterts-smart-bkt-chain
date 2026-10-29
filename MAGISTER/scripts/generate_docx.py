@@ -192,7 +192,7 @@ def render_real_table(doc, raw_table_text):
     table.alignment = WD_TABLE_ALIGNMENT.CENTER
     set_table_borders(table)
 
-    # Пропорційні ширини стовпчиків (загальна ширина 170 мм)
+    # Пропорційні ширини стовпчиків (загальна робоча ширина аркуша 170 мм)
     col_widths = []
     if len(headers) == 5:
         # Для порівняльної таблиці 1.1: 30 мм, 35 мм, 35 мм, 35 мм, 35 мм
@@ -200,6 +200,13 @@ def render_real_table(doc, raw_table_text):
     elif len(headers) == 4:
         # Для таблиці 3.1: 50 мм, 40 мм, 40 мм, 40 мм
         col_widths = [Mm(50), Mm(40), Mm(40), Mm(40)]
+    elif len(headers) == 7:
+        # Для розширеної таблиці 1.2 бенчмарків (сума 170 мм): 28 + 22 + 24 + 24 + 26 + 22 + 24 = 170
+        col_widths = [Mm(28), Mm(22), Mm(24), Mm(24), Mm(26), Mm(22), Mm(24)]
+    else:
+        # Автоматичний рівномірний розподіл 170 мм
+        w = 170.0 / len(headers)
+        col_widths = [Mm(w) for _ in headers]
 
     # Заповнюємо шапку (Header row)
     hdr_cells = table.rows[0].cells
@@ -248,6 +255,32 @@ def render_real_table(doc, raw_table_text):
     p_after.paragraph_format.space_before = Pt(6)
     p_after.paragraph_format.space_after = Pt(0)
     p_after.paragraph_format.line_spacing = 1.5
+
+def render_code_block(doc, code_text):
+    """
+    Форматує лістинг вихідного коду за вимогами ДСТУ (моноширинний шрифт Consolas/Courier, рамка, одинарний інтервал)
+    """
+    p = doc.add_paragraph()
+    p.paragraph_format.first_line_indent = Mm(0)
+    p.paragraph_format.left_indent = Mm(12.5) # відступ блоку 1.25 см
+    p.paragraph_format.right_indent = Mm(10.0)
+    p.paragraph_format.space_before = Pt(6)
+    p.paragraph_format.space_after = Pt(6)
+    p.paragraph_format.line_spacing = 1.0 # одинарний інтервал для коду
+    
+    # Очищуємо теги [Код: ...]
+    clean_code = re.sub(r'^\[Код:\s*', '', code_text.strip())
+    clean_code = re.sub(r'\]$', '', clean_code).strip()
+    
+    run = p.add_run(clean_code)
+    run.font.name = 'Consolas'
+    run.font.size = Pt(9.5)
+    run.font.color.rgb = RGBColor(30, 41, 59) # темно-сірий колір коду
+
+    # Додаємо сіре тло (shading) до абзацу з кодом
+    pPr = p._p.get_or_add_pPr()
+    shd = parse_xml(f'<w:shd {nsdecls("w")} w:fill="F1F5F9"/>')
+    pPr.append(shd)
 
 def create_master_thesis_doc(spec_path: str, output_path: str):
     with open(spec_path, 'r', encoding='utf-8') as f:
@@ -546,6 +579,20 @@ def create_master_thesis_doc(spec_path: str, output_path: str):
                 i += 1
                 continue
             
+            # Якщо блок є лістингом програмного коду або містить підводку до коду
+            if '[Код:' in p_text or '```' in p_text:
+                if '\n[Код:' in p_text:
+                    pre_text, code_part = p_text.split('\n[Код:', 1)
+                    if pre_text.strip():
+                        add_body_paragraph(pre_text.strip())
+                    render_code_block(doc, '[Код:' + code_part)
+                elif p_text.startswith('[Код:'):
+                    render_code_block(doc, p_text)
+                else:
+                    render_code_block(doc, p_text)
+                i += 1
+                continue
+
             add_body_paragraph(p_text)
             i += 1
 

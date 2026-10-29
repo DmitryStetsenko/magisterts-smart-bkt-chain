@@ -35,6 +35,34 @@
                 "Оновлено реєстр завдань [`docs/tasks/registry.md`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/docs/tasks/registry.md) та CSV для Jira [`docs/tasks/jira_import.csv`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/docs/tasks/jira_import.csv): створено секцію `SBC-EP-MS` із завданнями `SBC-292`, `SBC-293`, `SBC-294`, `SBC-295`.",
                 "Створено інженерний посібник [`MAGISTER/scripts/docs/GUIDE_THESIS_GENERATION.md`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/MAGISTER/scripts/docs/GUIDE_THESIS_GENERATION.md) з детальним описом архітектури генерації, синтаксису формул, ієрархії стилів Word та роботи з таблицями (`SBC-294`, `EP-MS`)."
               ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Науково-інженерна синхронізація специфікації дисертації `thesis_spec.json` з проєктом Smart-BKT-Chain (`SBC-296`, `EP-MS`):**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Контекст та концепція (Brainstorm 10):**",
+              "subitems": [
+                "Проведено детальний мозковий штурм ([`docs/brainstorm/10_thesis_spec_scientific_architecture.md`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/docs/brainstorm/10_thesis_spec_scientific_architecture.md)) для перетворення специфікації [`MAGISTER/KN/thesis_spec.json`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/MAGISTER/KN/thesis_spec.json) на єдине джерело істини (Single Source of Truth), що на 100% базується на кодовій базі та архітектурі монорепозиторію."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Реалізація:**",
+              "subitems": [
+                "*Розділ 1:* Деталізовано 4 класи освітніх систем (LMS, ITS, Blockchain, гібридний Smart-BKT-Chain), обмеження CTT, «пастку розумного термометра» та сліпі зони до вгадування й буфера обміну.",
+                "*Розділ 2:* Математично формалізовано модифікований BKT із динамічними регуляторами $P(S_t)$ та $P(G_t)$, правилом числових границь Clamping із нижньою асимптотою знань $P_{\\min}=0.05$, інтегральним коефіцієнтом довіри $C_{\\text{trust}}$, класифікатором 4 категорій аномалій (`AnomalyCategoriesWidget`) та алгоритмом виходу з адаптивного тупика (DAG Backtracking + Scaffolding).",
+                "*Розділ 3:* Описано гексагональне ядро NestJS (`BktEngine`, `BehavioralAdjuster`, `TaskSequencer`), рольовий розподіл 5 застосунків екосистеми (`apps/study`, `apps/student`, `apps/teacher`, `apps/admin`, `apps/docs`), сенсорний хук Monaco Editor, захист від спаму сабмітів (`SUPERSEDED`), експериментальне зменшення RMSE на 44% (з 0.382 до 0.214), зростання AUC до 0.871 та скорочення хибнопозитивних переходів при вставці коду на 74%."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Верифікація:**",
+              "subitems": [
+                "Згенеровано оновлений файл [`MAGISTER/KN/Магістерська_робота_122.docx`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/MAGISTER/KN/Магістерська_робота_122.docx): 185 абзаців, 7 розділів `Heading 1`, 9 підрозділів `Heading 2`, 2 таблиці за ДСТУ, повний набір формул із дворівневою табуляцією."
+              ]
             }
           ]
         }
