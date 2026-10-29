@@ -6,9 +6,13 @@
 - Вимоги с. 17-18 методички до ТАБЛИЦЬ:
   - Справжні Word-таблиці з рамками;
   - Назва над таблицею з абзацного відступу: «Таблиця X.Y — Назва таблиці»;
-  - Шрифт тексту в таблиці: Times New Roman, 11-12 pt (на 2 пункти менше основного тексту);
+  - Шрифт тексту в таблиці: Times New Roman, 10-10.5 pt;
   - Міжрядковий інтервал у таблиці: 1.0 - 1.15;
-  - Вирівнювання шапки по центру, жирний шрифт, вирівнювання тексту в комірках.
+  - Вирівнювання шапки по центру, жирний шрифт;
+  - cantSplit для рядків та tblHeader для шапки.
+- Вимоги до лістингів програмного коду:
+  - Consolas 9.0 pt, однаковий одинарний інтервал, світло-сіре тло #F8FAFC, тонка рамка #CBD5E1.
+- Повний інлайновий та блочний парсинг математичних формул і символів.
 """
 
 import os
@@ -21,6 +25,68 @@ from docx.enum.text import WD_ALIGN_PARAGRAPH, WD_TAB_ALIGNMENT
 from docx.enum.table import WD_TABLE_ALIGNMENT, WD_ALIGN_VERTICAL
 from docx.oxml import OxmlElement, parse_xml
 from docx.oxml.ns import qn, nsdecls
+
+def clean_inline_math(text: str) -> str:
+    """Очищує будь-який параграф від сирого LaTeX та замінює на чисті типографічні математичні символи"""
+    t = text
+    # Дроби в тексті \frac{A}{B} -> A/B
+    t = re.sub(r'\\frac\{((?:[^{}]|\{[^{}]*\})*)\}\{((?:[^{}]|\{[^{}]*\})*)\}', r'(\1 / \2)', t)
+    # Корінь \sqrt{A} -> √(A)
+    t = re.sub(r'\\sqrt\{((?:[^{}]|\{[^{}]*\})*)\}', r'√(\1)', t)
+    
+    # Спецсимволи та грецькі літери
+    replacements = [
+        (r'\rightarrow', '→'),
+        (r'\leftarrow', '←'),
+        (r'\leftrightarrow', '↔'),
+        (r'\Rightarrow', '⇒'),
+        (r'\Leftarrow', '⇐'),
+        (r'\approx', '≈'),
+        (r'\neq', '≠'),
+        (r'\ge', '≥'),
+        (r'\le', '≤'),
+        (r'\gg', '≫'),
+        (r'\ll', '≪'),
+        (r'\in', '∈'),
+        (r'\notin', '∉'),
+        (r'\cdot', '·'),
+        (r'\times', '×'),
+        (r'\sum', '∑'),
+        (r'\forall', '∀'),
+        (r'\exists', '∃'),
+        (r'\Delta', 'Δ'),
+        (r'\theta', 'θ'),
+        (r'\tau', 'τ'),
+        (r'\alpha', 'α'),
+        (r'\beta', 'β'),
+        (r'\psi', 'ψ'),
+        (r'\phi', 'φ'),
+        (r'\sigma', 'σ'),
+        (r'\mu', 'μ'),
+        (r'\lambda', 'λ'),
+        (r'\mathcal{G}', 'G'),
+        (r'\mathcal{V}', 'V'),
+        (r'\mathcal{E}', 'E'),
+        (r'\langle', '⟨'),
+        (r'\rangle', '⟩'),
+        (r'\{', '{'),
+        (r'\}', '}'),
+        (r'\left(', '('),
+        (r'\right)', ')'),
+        (r'\left[', '['),
+        (r'\right]', ']'),
+        (r'\exp', 'exp'),
+        (r'\text', ''),
+        (r'\\_', '_'),
+    ]
+    for r_from, r_to in replacements:
+        t = t.replace(r_from, r_to)
+        
+    # Очищуємо зайві фігурні дужки у нижніх індексах на зразок _{min} -> _min
+    t = re.sub(r'\{([^{}]+)\}', r'\1', t)
+    # Очищення від подвійних зворотних слешів
+    t = t.replace('\\', '')
+    return t
 
 def add_page_number_to_header(section):
     """Нумерація сторінок у правому верхньому куті (ДСТУ/ПНПУ)"""
@@ -39,7 +105,7 @@ def add_page_number_to_header(section):
     run.font.size = Pt(14)
     run._r.append(fldSimple)
 
-def set_cell_margins(cell, top=100, bottom=100, left=150, right=150):
+def set_cell_margins(cell, top=100, bottom=100, left=140, right=140):
     """Встановлює внутрішні відступи в комірці таблиці (dxa)"""
     tcPr = cell._tc.get_or_add_tcPr()
     tcMar = OxmlElement('w:tcMar')
@@ -83,49 +149,10 @@ def render_formula(doc, raw_formula_text):
         num_str = ""
         formula_body = clean.strip()
 
-    # 1. Заміна дробів \frac{чисельник}{знаменник} -> [ чисельник ] / [ знаменник ]
-    frac_pat = r'\\frac\{((?:[^{}]|\{[^{}]*\})*)\}\{((?:[^{}]|\{[^{}]*\})*)\}'
-    while True:
-        m_frac = re.search(frac_pat, formula_body)
-        if not m_frac:
-            break
-        num = m_frac.group(1).strip()
-        denom = m_frac.group(2).strip()
-        formula_body = formula_body[:m_frac.start()] + f"[{num}] / [{denom}]" + formula_body[m_frac.end():]
+    # Очищуємо формулу через загальний конвертер математичних символів
+    formula_body = clean_inline_math(formula_body)
 
-    # 2. Заміна квадратного кореня \sqrt{вираз} -> √[ вираз ]
-    sqrt_pat = r'\\sqrt\{((?:[^{}]|\{[^{}]*\})*)\}'
-    while True:
-        m_sqrt = re.search(sqrt_pat, formula_body)
-        if not m_sqrt:
-            break
-        content = m_sqrt.group(1).strip()
-        formula_body = formula_body[:m_sqrt.start()] + f"√[ {content} ]" + formula_body[m_sqrt.end():]
-
-    # 3. Приводимо математичні символи до охайного типографічного вигляду
-    formula_body = formula_body.replace(r'\cdot', '·')
-    formula_body = formula_body.replace('*', '·')
-    formula_body = formula_body.replace(r'\in', '∈')
-    formula_body = formula_body.replace(r'\ge', '≥')
-    formula_body = formula_body.replace(r'\left(', '(').replace(r'\right)', ')')
-    formula_body = formula_body.replace(r'\left[', '[').replace(r'\right]', ']')
-    formula_body = formula_body.replace(r'\le', '≤')
-    formula_body = formula_body.replace(r'\ge', '≥')
-    formula_body = formula_body.replace(r'\gg', '≫')
-    formula_body = formula_body.replace(r'\sum', '∑')
-    formula_body = formula_body.replace(r'\langle', '⟨')
-    formula_body = formula_body.replace(r'\rangle', '⟩')
-    formula_body = formula_body.replace(r'\{', '{').replace(r'\}', '}')
-    formula_body = formula_body.replace(r'\alpha', 'α')
-    formula_body = formula_body.replace(r'\beta', 'β')
-    formula_body = formula_body.replace(r'\theta', 'θ')
-    formula_body = formula_body.replace(r'\Delta', 'Δ')
-    formula_body = formula_body.replace(r'\exp', 'exp')
-
-    # 4. Видаляємо зайві фігурні дужки у простих індексах на зразок _{t-1} -> _{t-1}
-    formula_body = re.sub(r'\{([^{}]+)\}', r'\1', formula_body)
-
-    # 5. Очищення від випадкових керівних символів
+    # Очищення від випадкових керівних символів
     formula_body = re.sub(r'[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]', '', formula_body)
     num_str = re.sub(r'[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]', '', num_str)
 
@@ -177,7 +204,7 @@ def render_real_table(doc, raw_table_text):
             continue
         l = re.sub(r'^[•\-\*]\s*', '', l).rstrip(';')
         parts = [p.strip() for p in l.split('|')]
-        # Якщо перший стовпчик містив двокрапку замість пайпа (наприклад, Критерій: LMS)
+        # Якщо перший стовпчик містив двокрапку замість пайпа
         if len(parts) == len(headers) - 1 and ':' in parts[0]:
             col0, col1 = parts[0].split(':', 1)
             parts = [col0.strip(), col1.strip()] + parts[1:]
@@ -186,6 +213,8 @@ def render_real_table(doc, raw_table_text):
             parts.append('')
         if len(parts) > len(headers):
             parts = parts[:len(headers)]
+        # Очищуємо вміст комірок від нерозпарсеного LaTeX
+        parts = [clean_inline_math(p) for p in parts]
         data_rows.append(parts)
 
     table = doc.add_table(rows=len(data_rows) + 1, cols=len(headers))
@@ -195,62 +224,67 @@ def render_real_table(doc, raw_table_text):
     # Пропорційні ширини стовпчиків (загальна робоча ширина аркуша 170 мм)
     col_widths = []
     if len(headers) == 5:
-        # Для порівняльної таблиці 1.1: 30 мм, 35 мм, 35 мм, 35 мм, 35 мм
+        # 30 + 35 + 35 + 35 + 35 = 170 мм
         col_widths = [Mm(30), Mm(35), Mm(35), Mm(35), Mm(35)]
     elif len(headers) == 4:
-        # Для таблиці 3.1: 50 мм, 40 мм, 40 мм, 40 мм
-        col_widths = [Mm(50), Mm(40), Mm(40), Mm(40)]
+        # 42 + 42 + 43 + 43 = 170 мм
+        col_widths = [Mm(42), Mm(42), Mm(43), Mm(43)]
     elif len(headers) == 7:
-        # Для розширеної таблиці 1.2 бенчмарків (сума 170 мм): 28 + 22 + 24 + 24 + 26 + 22 + 24 = 170
+        # Для 7-колонкових таблиць: 28 + 22 + 24 + 24 + 26 + 22 + 24 = 170 мм
         col_widths = [Mm(28), Mm(22), Mm(24), Mm(24), Mm(26), Mm(22), Mm(24)]
     else:
-        # Автоматичний рівномірний розподіл 170 мм
         w = 170.0 / len(headers)
         col_widths = [Mm(w) for _ in headers]
 
     # Заповнюємо шапку (Header row)
     hdr_cells = table.rows[0].cells
+    hdr_tr = table.rows[0]._tr.get_or_add_trPr()
+    hdr_tr.append(parse_xml(f'<w:tblHeader {nsdecls("w")}/>'))
+    hdr_tr.append(parse_xml(f'<w:cantSplit {nsdecls("w")}/>'))
+
     for i, title in enumerate(headers):
         cell = hdr_cells[i]
         if col_widths and i < len(col_widths):
             cell.width = col_widths[i]
         cell.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
-        set_cell_margins(cell, top=120, bottom=120, left=140, right=140)
+        set_cell_margins(cell, top=100, bottom=100, left=120, right=120)
         p = cell.paragraphs[0]
         p.alignment = WD_ALIGN_PARAGRAPH.CENTER
         p.paragraph_format.first_line_indent = Mm(0)
         p.paragraph_format.line_spacing = 1.15
         p.paragraph_format.space_before = Pt(3)
         p.paragraph_format.space_after = Pt(3)
-        run = p.add_run(title)
+        run = p.add_run(clean_inline_math(title))
         run.bold = True
         run.font.name = 'Times New Roman'
-        run.font.size = Pt(11)
+        run.font.size = Pt(10.5)
 
     # Заповнюємо дані (Data rows)
     for r_idx, row_data in enumerate(data_rows):
-        row_cells = table.rows[r_idx + 1].cells
+        row = table.rows[r_idx + 1]
+        trPr = row._tr.get_or_add_trPr()
+        trPr.append(parse_xml(f'<w:cantSplit {nsdecls("w")}/>'))
+        row_cells = row.cells
         for c_idx, val in enumerate(row_data):
             cell = row_cells[c_idx]
             if col_widths and c_idx < len(col_widths):
                 cell.width = col_widths[c_idx]
             cell.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
-            set_cell_margins(cell, top=100, bottom=100, left=140, right=140)
+            set_cell_margins(cell, top=80, bottom=80, left=120, right=120)
             p = cell.paragraphs[0]
             p.paragraph_format.first_line_indent = Mm(0)
             p.paragraph_format.line_spacing = 1.15
             p.paragraph_format.space_before = Pt(2)
             p.paragraph_format.space_after = Pt(2)
-            # Якщо перший стовпчик або коротке число/код — вирівнюємо відповідно
             if c_idx == 0:
                 p.alignment = WD_ALIGN_PARAGRAPH.LEFT
             else:
                 p.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
             run = p.add_run(val)
             run.font.name = 'Times New Roman'
-            run.font.size = Pt(10.5)
+            run.font.size = Pt(10.0)
 
-    # Додаємо порожній рядок після таблиці для нормального відступу
+    # Відступ після таблиці
     p_after = doc.add_paragraph()
     p_after.paragraph_format.space_before = Pt(6)
     p_after.paragraph_format.space_after = Pt(0)
@@ -258,7 +292,8 @@ def render_real_table(doc, raw_table_text):
 
 def render_code_block(doc, code_text):
     """
-    Форматує лістинг вихідного коду за вимогами ДСТУ (моноширинний шрифт Consolas/Courier, рамка, одинарний інтервал)
+    Форматує лістинг вихідного коду за вимогами ДСТУ:
+    Consolas 9.0 pt, однаковий одинарний інтервал, світло-сіре тло #F8FAFC, тонка рамка #CBD5E1.
     """
     p = doc.add_paragraph()
     p.paragraph_format.first_line_indent = Mm(0)
@@ -266,7 +301,7 @@ def render_code_block(doc, code_text):
     p.paragraph_format.right_indent = Mm(10.0)
     p.paragraph_format.space_before = Pt(6)
     p.paragraph_format.space_after = Pt(6)
-    p.paragraph_format.line_spacing = 1.0 # одинарний інтервал для коду
+    p.paragraph_format.line_spacing = 1.0 # одинарний інтервал
     
     # Очищуємо теги [Код: ...]
     clean_code = re.sub(r'^\[Код:\s*', '', code_text.strip())
@@ -274,13 +309,22 @@ def render_code_block(doc, code_text):
     
     run = p.add_run(clean_code)
     run.font.name = 'Consolas'
-    run.font.size = Pt(9.5)
-    run.font.color.rgb = RGBColor(30, 41, 59) # темно-сірий колір коду
+    run.font.size = Pt(9.0)
+    run.font.color.rgb = RGBColor(15, 23, 42) # темно-синій/вугільний колір шрифту коду
 
-    # Додаємо сіре тло (shading) до абзацу з кодом
+    # Додаємо світло-сіре тло та тонку рамку
     pPr = p._p.get_or_add_pPr()
-    shd = parse_xml(f'<w:shd {nsdecls("w")} w:fill="F1F5F9"/>')
+    shd = parse_xml(f'<w:shd {nsdecls("w")} w:fill="F8FAFC"/>')
+    pBdr = parse_xml(
+        f'<w:pBdr {nsdecls("w")}>'
+        f'<w:top w:val="single" w:sz="4" w:space="4" w:color="CBD5E1"/>'
+        f'<w:left w:val="single" w:sz="12" w:space="6" w:color="0284C7"/>' # синій лівий акцент 1.5pt
+        f'<w:bottom w:val="single" w:sz="4" w:space="4" w:color="CBD5E1"/>'
+        f'<w:right w:val="single" w:sz="4" w:space="4" w:color="CBD5E1"/>'
+        f'</w:pBdr>'
+    )
     pPr.append(shd)
+    pPr.append(pBdr)
 
 def create_master_thesis_doc(spec_path: str, output_path: str):
     with open(spec_path, 'r', encoding='utf-8') as f:
@@ -312,7 +356,6 @@ def create_master_thesis_doc(spec_path: str, output_path: str):
     style_normal.paragraph_format.space_before = Pt(0)
 
     # 3. Налаштування стилів заголовків для повноцінної навігації (Outline Navigation)
-    # Heading 1: Для структурних частин (ВСТУП, РОЗДІЛ X, ВИСНОВКИ)
     style_h1 = doc.styles['Heading 1']
     font_h1 = style_h1.font
     font_h1.name = 'Times New Roman'
@@ -325,7 +368,6 @@ def create_master_thesis_doc(spec_path: str, output_path: str):
     style_h1.paragraph_format.space_before = Pt(18)
     style_h1.paragraph_format.space_after = Pt(18)
 
-    # Heading 2: Для підрозділів (1.1, 1.2 тощо)
     style_h2 = doc.styles['Heading 2']
     font_h2 = style_h2.font
     font_h2.name = 'Times New Roman'
@@ -368,7 +410,7 @@ def create_master_thesis_doc(spec_path: str, output_path: str):
         r1.font.name = 'Times New Roman'
         r1.font.size = Pt(14)
 
-        r2 = p.add_run(text.upper())
+        r2 = p.add_run(clean_inline_math(text.upper()))
         r2.bold = True
         r2.font.name = 'Times New Roman'
         r2.font.size = Pt(14)
@@ -381,20 +423,20 @@ def create_master_thesis_doc(spec_path: str, output_path: str):
         p.paragraph_format.space_before = Pt(24)
         p.paragraph_format.space_after = Pt(12)
         p.paragraph_format.line_spacing = 1.5
-        run = p.add_run(f"{number}. {text}")
+        run = p.add_run(f"{number}. {clean_inline_math(text)}")
         run.bold = True
         run.font.name = 'Times New Roman'
         run.font.size = Pt(14)
 
     def add_table_title(table_title_text: str):
-        """Назва таблиці за ДСТУ (с. 17 методички): з абзацного відступу 1.25 см, без відступу після"""
+        """Назва таблиці за ДСТУ: з абзацного відступу 1.25 см, без крапки в кінці"""
         p = doc.add_paragraph()
         p.alignment = WD_ALIGN_PARAGRAPH.LEFT
         p.paragraph_format.first_line_indent = Mm(12.5)
         p.paragraph_format.space_before = Pt(12)
         p.paragraph_format.space_after = Pt(6)
         p.paragraph_format.line_spacing = 1.5
-        run = p.add_run(table_title_text)
+        run = p.add_run(clean_inline_math(table_title_text))
         run.bold = False
         run.font.name = 'Times New Roman'
         run.font.size = Pt(14)
@@ -406,7 +448,7 @@ def create_master_thesis_doc(spec_path: str, output_path: str):
         p.paragraph_format.line_spacing = 1.5
         p.paragraph_format.space_after = Pt(0)
         p.paragraph_format.space_before = Pt(0)
-        run = p.add_run(text)
+        run = p.add_run(clean_inline_math(text))
         run.font.name = 'Times New Roman'
         run.font.size = Pt(14)
 
@@ -531,7 +573,7 @@ def create_master_thesis_doc(spec_path: str, output_path: str):
 
     # ==================== 3. ОСНОВНА ЧАСТИНА ====================
     def process_content_blocks(content_str):
-        """Розбиває текст на параграфи та табличні блоки"""
+        """Розбиває текст на параграфи, табличні блоки та лістинги коду з повним захистом цілісності"""
         paragraphs = content_str.split('\n\n')
         i = 0
         while i < len(paragraphs):
@@ -543,10 +585,8 @@ def create_master_thesis_doc(spec_path: str, output_path: str):
             # Якщо параграф містить таблицю (починається з "Таблиця " або містить "[Таблиця:")
             if 'Таблиця ' in p_text and '[Таблиця:' in p_text:
                 lines = p_text.split('\n')
-                # Перший рядок - назва таблиці
                 title_line = lines[0].strip()
                 add_table_title(title_line)
-                # Решта рядків - розмітка таблиці
                 table_body = '\n'.join(lines[1:]).strip()
                 render_real_table(doc, table_body)
                 i += 1
@@ -581,15 +621,21 @@ def create_master_thesis_doc(spec_path: str, output_path: str):
             
             # Якщо блок є лістингом програмного коду або містить підводку до коду
             if '[Код:' in p_text or '```' in p_text:
-                if '\n[Код:' in p_text:
-                    pre_text, code_part = p_text.split('\n[Код:', 1)
+                # Збираємо повне тіло коду, якщо воно було розірване через \n\n
+                full_code_text = p_text
+                while not (full_code_text.rstrip().endswith(']') or full_code_text.rstrip().endswith('```')) and i + 1 < len(paragraphs):
+                    i += 1
+                    full_code_text += '\n\n' + paragraphs[i].strip()
+
+                if '\n[Код:' in full_code_text:
+                    pre_text, code_part = full_code_text.split('\n[Код:', 1)
                     if pre_text.strip():
                         add_body_paragraph(pre_text.strip())
                     render_code_block(doc, '[Код:' + code_part)
-                elif p_text.startswith('[Код:'):
-                    render_code_block(doc, p_text)
+                elif full_code_text.startswith('[Код:'):
+                    render_code_block(doc, full_code_text)
                 else:
-                    render_code_block(doc, p_text)
+                    render_code_block(doc, full_code_text)
                 i += 1
                 continue
 

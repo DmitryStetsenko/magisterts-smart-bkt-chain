@@ -382,6 +382,8 @@
 | **SBC-293** | `Fix` | `MS` | fix document outline headings, BKT formula typography and 5-column table alignment | 2026-10-29 | `73fb11a` |
 | **SBC-294** | `Docs` | `MS` | document thesis engineering guide, formula typography and editing workflow in scripts/docs | 2026-10-29 | `b68ac1e` |
 | **SBC-295** | `Task` | `MS` | establish SBC-EP-MS epic across project management methodology, workspace rules and registries | 2026-10-29 | `58382f4` |
-| **SBC-296** | `Story` | `MS` | synchronize thesis_spec.json and generated docx with full platform architecture, telemetry and BKT formulas | 2026-10-29 | `pending` |
+| **SBC-296** | `Story` | `MS` | synchronize thesis_spec.json and generated docx with full platform architecture, telemetry and BKT formulas | 2026-10-29 | `398db12` |
+| **SBC-297** | `Story` | `MS` | restructure thesis into 4 chapters, expand text volume to 50+ pages and modularize sections pipeline | 2026-10-29 | `7d891b2` |
+| **SBC-298** | `Story` | `MS` | humanize academic narrative, eliminate AI boilerplate clichés and optimize perplexity and burstiness | 2026-10-29 | `pending` |
 
 ---
