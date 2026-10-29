@@ -387,6 +387,7 @@
 | **SBC-298** | `Story` | `MS` | humanize academic narrative, eliminate AI boilerplate clichés and optimize perplexity and burstiness | 2026-10-29 | `557305f` |
 | **SBC-299** | `Story` | `MS` | scale thesis volume to 50+ pages with case studies, component breakdown and typography polish | 2026-10-29 | `236d979` |
 | **SBC-300** | `Story` | `MS` | introduce project organization chapter with jira flow and refine academic tone | 2026-10-29 | `28f0062` |
-| **SBC-301** | `Story` | `MS` | establish academic ethics standard and eliminate categorical phrasing across thesis sections | 2026-10-29 | `pending` |
+| **SBC-301** | `Story` | `MS` | establish academic ethics standard and eliminate categorical phrasing across thesis sections | 2026-10-29 | `1df01d1` |
+| **SBC-302** | `Story` | `MS` | eliminate exaggerated claims and enforce modest evidence-based academic tone in thesis and spec | 2026-10-29 | `pending` |
 
 ---

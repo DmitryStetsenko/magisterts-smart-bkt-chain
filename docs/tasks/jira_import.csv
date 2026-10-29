@@ -232,4 +232,6 @@ SBC-297,SBC-EP-MS,Story,"restructure thesis into 4 chapters, expand text volume 
 SBC-298,SBC-EP-MS,Story,"humanize academic narrative, eliminate AI boilerplate clichés and optimize perplexity and burstiness",Done,2026-10-29,557305f
 SBC-299,SBC-EP-MS,Story,"scale thesis volume to 50+ pages with case studies, component breakdown and typography polish",Done,2026-10-29,236d979
 SBC-300,SBC-EP-MS,Story,"introduce project organization chapter with jira flow and refine academic tone",Done,2026-10-29,28f0062
-SBC-301,SBC-EP-MS,Story,"establish academic ethics standard and eliminate categorical phrasing across thesis sections",In Progress,2026-10-29,pending
+SBC-301,SBC-EP-MS,Story,"establish academic ethics standard and eliminate categorical phrasing across thesis sections",Done,2026-10-29,1df01d1
+SBC-302,SBC-EP-MS,Story,"eliminate exaggerated claims and enforce modest evidence-based academic tone in thesis and spec",Done,2026-10-29,pending
+
