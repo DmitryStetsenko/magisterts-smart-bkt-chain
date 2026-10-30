@@ -9,6 +9,13 @@ import os
 
 BASE_MAGISTER_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 
+# Калібрувальні константи щільності тексту за ДСТУ 3008:2015 для Google Docs / MS Word
+WORDS_PER_PAGE = 175          # Емпірична середня кількість слів на 1 сторінку А4 (14pt, 1.5 інтервал)
+MIN_TARGET_PAGES = 60         # Мінімальний поріг сторінок магістерської роботи
+RECOMMENDED_TARGET_PAGES = 65 # Рекомендований оптимальний обсяг сторінок
+TARGET_WORDS_MIN = MIN_TARGET_PAGES * WORDS_PER_PAGE               # 10 500 слів
+TARGET_WORDS_RECOMMENDED = RECOMMENDED_TARGET_PAGES * WORDS_PER_PAGE # 11 375 слів
+
 PROFILES = {
     'kn': {
         'code': '122',
@@ -19,7 +26,9 @@ PROFILES = {
         'sections_dir': os.path.join(BASE_MAGISTER_DIR, 'KN', 'sections'),
         'spec_path': os.path.join(BASE_MAGISTER_DIR, 'KN', 'thesis_spec.json'),
         'docx_path': os.path.join(BASE_MAGISTER_DIR, 'KN', 'Магістерська_робота_122.docx'),
-        'target_pages': 58,
+        'target_pages': 65,
+        'min_words': TARGET_WORDS_MIN,
+        'optimal_words': TARGET_WORDS_RECOMMENDED,
     },
     'info': {
         'code': '014',
@@ -30,7 +39,9 @@ PROFILES = {
         'sections_dir': os.path.join(BASE_MAGISTER_DIR, 'INFORMATICA', 'sections'),
         'spec_path': os.path.join(BASE_MAGISTER_DIR, 'INFORMATICA', 'thesis_spec.json'),
         'docx_path': os.path.join(BASE_MAGISTER_DIR, 'INFORMATICA', 'Магістерська_робота_014.docx'),
-        'target_pages': 55,
+        'target_pages': 65,
+        'min_words': TARGET_WORDS_MIN,
+        'optimal_words': TARGET_WORDS_RECOMMENDED,
     }
 }
 

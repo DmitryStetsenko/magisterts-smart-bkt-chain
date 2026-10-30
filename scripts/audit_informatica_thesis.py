@@ -45,5 +45,13 @@ for fpath in files:
             print(f"  [WARNING] Found {len(matches)} occurrences of '{pat}' in {fpath}")
 
 print(f"\nTotal words in INFORMATICA sections: {total_words}")
+WORDS_PER_PAGE = 175
+est_pages = total_words / WORDS_PER_PAGE
+print(f"Estimated pages in Google Docs / Word (at {WORDS_PER_PAGE} words/page): {est_pages:.1f} pages")
+if est_pages < 60:
+    print(f"  [ATTENTION] Currently below 60 pages target! Need +{(60 - est_pages)*WORDS_PER_PAGE:.0f} words to reach 60 pages.")
+else:
+    print(f"  [SUCCESS] Target reached: >= 60 pages in Google Docs / Word!")
+
 if not found_any:
     print("ALL CLEAR: 0 banned clichés found across all sections!")
