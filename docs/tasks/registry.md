@@ -389,6 +389,7 @@
 | **SBC-300** | `Story` | `MS` | introduce project organization chapter with jira flow and refine academic tone | 2026-10-29 | `28f0062` |
 | **SBC-301** | `Story` | `MS` | establish academic ethics standard and eliminate categorical phrasing across thesis sections | 2026-10-29 | `1df01d1` |
 | **SBC-302** | `Story` | `MS` | eliminate exaggerated claims and enforce modest evidence-based academic tone in thesis and spec | 2026-10-29 | `cb2aedb` |
-| **SBC-303** | `Story` | `MS` | establish dual-thesis generator architecture with profile routing for KN 122 and INFO 014 | 2026-10-30 | `pending` |
+| **SBC-303** | `Story` | `MS` | establish dual-thesis generator architecture with profile routing for KN 122 and INFO 014 | 2026-10-30 | `24e3aad` |
+| **SBC-304** | `Story` | `MS` | generate full 4-chapter master thesis with DSTU tables and experiment for specialty 014 Informatica | 2026-10-30 | `pending` |
 
 ---

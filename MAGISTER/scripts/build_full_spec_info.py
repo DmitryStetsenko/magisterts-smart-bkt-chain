@@ -100,8 +100,12 @@ def build_info_thesis_spec():
         )
     }
 
-    # Підключення збирача розділів для спеціальності 014
-    from generate_full_text_info import get_all_info_thesis_sections
+    # Підключення збирача розділів для спеціальності 014 з папки MAGISTER/INFORMATICA
+    import sys
+    info_dir = prof['base_dir']
+    if info_dir not in sys.path:
+        sys.path.insert(0, info_dir)
+    from generate_full_text import get_all_info_thesis_sections
 
     sections = get_all_info_thesis_sections(researchApparatus)
 

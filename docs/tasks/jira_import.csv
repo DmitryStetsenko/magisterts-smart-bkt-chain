@@ -234,6 +234,8 @@ SBC-299,SBC-EP-MS,Story,"scale thesis volume to 50+ pages with case studies, com
 SBC-300,SBC-EP-MS,Story,"introduce project organization chapter with jira flow and refine academic tone",Done,2026-10-29,28f0062
 SBC-301,SBC-EP-MS,Story,"establish academic ethics standard and eliminate categorical phrasing across thesis sections",Done,2026-10-29,1df01d1
 SBC-302,SBC-EP-MS,Story,"eliminate exaggerated claims and enforce modest evidence-based academic tone in thesis and spec",Done,2026-10-29,cb2aedb
-SBC-303,SBC-EP-MS,Story,"establish dual-thesis generator architecture with profile routing for KN 122 and INFO 014",Done,2026-10-30,pending
+SBC-303,SBC-EP-MS,Story,"establish dual-thesis generator architecture with profile routing for KN 122 and INFO 014",Done,2026-10-30,24e3aad
+SBC-304,SBC-EP-MS,Story,"generate full 4-chapter master thesis with DSTU tables and experiment for specialty 014 Informatica",Done,2026-10-30,pending
+
 
 
