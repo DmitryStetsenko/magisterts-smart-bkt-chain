@@ -437,6 +437,11 @@
             },
             {
               "type": "text",
+              "raw_text": "`[EP-MS]` — Master's Thesis Engineering & Academic Text Generation (`MAGISTER/`)",
+              "subitems": []
+            },
+            {
+              "type": "text",
               "raw_text": "**Дозволені типи (`type`):**",
               "subitems": []
             },

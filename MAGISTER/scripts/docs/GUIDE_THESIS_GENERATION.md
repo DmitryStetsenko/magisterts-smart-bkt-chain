@@ -1,6 +1,6 @@
-# 📘 Інструкція з генерації та коригування магістерської дисертації (Спеціальність 122)
+# 📘 Інженерна інструкція з генерації та коригування магістерських дисертацій (122 та 014)
 
-Цей посібник описує архітектуру даних, правила оформлення за ДСТУ / методичними вимогами ПНПУ імені В. Г. Короленка, а також відлагоджений процес додавання та редагування розділів, формул, таблиць і списків.
+Цей посібник описує архітектуру даних, правила оформлення за ДСТУ 3008:2015 / ДСТУ 8302:2015, методичні вимоги ПНПУ імені В. Г. Короленка, а також відлагоджений процес генерації та редагування розділів, формул, таблиць і списків для обох спеціальностей (122 «Комп'ютерні науки» та 014 «Середня освіта (Інформатика)»).
 
 ---
 
@@ -8,34 +8,50 @@
 
 ```text
 MAGISTER/
-├── KN/
-│   ├── thesis_spec.json              # Повна структурована специфікація дисертації (JSON)
-│   └── Магістерська_робота_122.docx  # Згенерований фінальний документ Word
-├── SRC/
-│   └── вимоги.pdf                   # Офіційні методичні рекомендації кафедри/факультету
-└── scripts/
+├── THESIS_RULES.md                   <-- Нормативний звід правил: етика, ДСТУ, калібрування 175 слів/стор.
+├── DUAL_THESIS_WORKFLOW.md           <-- Регламент паралельної розробки та перемикання профілів
+├── KN/                               <-- Дисертація зі спеціальності 122 «Комп'ютерні науки»
+│   ├── sections/                     <-- Ізольовані розділи роботи 122 (intro, sec 1..5, conclusions)
+│   ├── thesis_spec.json              <-- Повна структурована специфікація дисертації (JSON)
+│   ├── Магістерська_робота_122.docx  <-- Згенерований фінальний документ Word (60+ сторінок)
+│   └── README.md
+├── INFORMATICA/                      <-- Дисертація зі спеціальності 014 «Середня освіта (Інформатика)»
+│   ├── sections/                     <-- Ізольовані методичні розділи 014 (intro, sec 1..5, bibliography)
+│   ├── thesis_spec.json              <-- Специфікація методичного дослідження (JSON)
+│   ├── Магістерська_робота_014.docx  <-- Згенерований фінальний документ Word (60+ сторінок)
+│   └── README.md
+└── scripts/                          <-- Спільний конвеєр генерації
     ├── docs/
-    │   └── GUIDE_THESIS_GENERATION.md # Ця детальна інструкція
-    ├── generate_docx.py              # Головний компілятор JSON -> DOCX з дотриманням ДСТУ
-    ├── update_section1.py            # Оновлювач Розділу 1 у thesis_spec.json
-    ├── update_section2.py            # Оновлювач Розділу 2 у thesis_spec.json
-    ├── update_section3.py            # Оновлювач Розділу 3 у thesis_spec.json
-    ├── update_sub1_1_balanced.py     # Збалансоване наповнення підрозділу 1.1 (порівняння платформ)
-    ├── expand_telemetry.py           # Поглиблення опису телеметрії у підрозділі 1.3
-    └── update_conclusions.py         # Оновлювач Загальних висновків
+    │   └── GUIDE_THESIS_GENERATION.md <-- Ця детальна інструкція
+    ├── thesis_profile.py             <-- Диспетчер конфігурації профілів kn та info (K=175 слів/стор.)
+    ├── build_full_spec.py            <-- Складальник специфікацій з підтримкою --profile kn|info
+    ├── build_full_spec_info.py       <-- Модуль наукового апарату для спеціальності 014
+    └── generate_docx.py              <-- Головний компілятор JSON -> DOCX з дотриманням ДСТУ
 ```
 
 ---
 
-## ⚙️ 2. Як відтворити збірку документа (Швидкий старт)
+## ⚙️ 2. Як відтворити збірку документів (Швидкий старт)
 
-Для повторної генерації повного документа Word після будь-яких правок виконайте з кореня репозиторію:
+Для генерації документів Word після будь-яких правок використовується прапорець `--profile`:
 
+### Спеціальність 122 «Комп'ютерні науки»:
 ```powershell
-python MAGISTER/scripts/generate_docx.py
+# 1. Збірка специфікації
+python MAGISTER/scripts/build_full_spec.py --profile kn
+# 2. Генерація Word (.docx)
+python MAGISTER/scripts/generate_docx.py --profile kn
 ```
 
-Скрипт зчитає [`MAGISTER/KN/thesis_spec.json`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/MAGISTER/KN/thesis_spec.json) і збереже готовий файл [`MAGISTER/KN/Магістерська_робота_122.docx`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/MAGISTER/KN/Магістерська_робота_122.docx).
+### Спеціальність 014 «Середня освіта (Інформатика)»:
+```powershell
+# 1. Збірка специфікації
+python MAGISTER/scripts/build_full_spec.py --profile info
+# 2. Генерація Word (.docx)
+python MAGISTER/scripts/generate_docx.py --profile info
+# 3. Аудит обсягу та відсутності кліше
+python scripts/audit_informatica_thesis.py
+```
 
 ---
 
@@ -112,22 +128,23 @@ python MAGISTER/scripts/generate_docx.py
 
 ---
 
-## ✏️ 7. Як оновити окремий розділ або підрозділ
+## ✏️ 7. Як оновити текст розділу або підрозділу
 
-Якщо вам зручніше писати великий текст у Python-файлі замість редагування сирого гігантського JSON:
-1. Відкрийте відповідний скрипт у `MAGISTER/scripts/`:
-   - `update_section1.py` для 1-го розділу
-   - `update_section2.py` для 2-го розділу
-   - `update_section3.py` для 3-го розділу
-2. Відредагуйте текст у багаторядкових рядках `r"""..."""`.
-3. Запустіть скрипт:
+Текстовий зміст повністю модульний та ізольований у підпапках:
+- Для спеціальності 122: [`MAGISTER/KN/sections/`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/MAGISTER/KN/sections/) (`intro_conclusions.py`, `section_1.py` ... `section_5.py`)
+- Для спеціальності 014: [`MAGISTER/INFORMATICA/sections/`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/MAGISTER/INFORMATICA/sections/) (`intro_conclusions.py`, `section_1.py` ... `section_5.py`, `bibliography.py`)
+
+### Порядок редагування:
+1. Відкрийте потрібний файл розділу (наприклад, `MAGISTER/INFORMATICA/sections/section_1.py`).
+2. Внесіть зміни у функції `get_section_X()`.
+3. Перевірте обсяг та відсутність заборонених AI-кліше:
    ```powershell
-   python MAGISTER/scripts/update_section1.py
+   python scripts/audit_informatica_thesis.py
    ```
-   Він оновить розділ у `thesis_spec.json`.
-4. Згенеруйте фінальний docx:
+4. Зберіть специфікацію та оновлений Word-документ:
    ```powershell
-   python MAGISTER/scripts/generate_docx.py
+   python MAGISTER/scripts/build_full_spec.py --profile info
+   python MAGISTER/scripts/generate_docx.py --profile info
    ```
 
 ---

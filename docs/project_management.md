@@ -150,6 +150,7 @@
 * `[EP-TC]` — Teacher Portal Next.js (`apps/teacher`)
 * `[EP-AD]` — Admin Portal Next.js (`apps/admin`)
 * `[EP-LD]` — Landing Web Page (`apps/web`)
+* `[EP-MS]` — Master's Thesis Engineering & Academic Text Generation (`MAGISTER/`)
 
 **Дозволені типи (`type`):**
 `feat` (нова фіча), `fix` (виправлення дефекту), `docs` (документація), `style` (стилі/форматування), `refactor` (рефакторинг), `test` (тести), `chore` (налаштування білду, конфігів).
