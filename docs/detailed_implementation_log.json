@@ -120,6 +120,76 @@
           ]
         },
         {
+          "title": "0.1.7.12 Виправлення Статичного Аналізу Імпортів та Конфігурація Пакетів Python (SBC-305, EP-MS)",
+          "level": 3,
+          "paragraphs": [],
+          "code_blocks": [
+            {
+              "lang": "python",
+              "content": "from sections.intro_conclusions import get_intro_content, get_conclusions_content\n    from sections.section_1 import get_section_1\n    from sections.section_2 import get_section_2\n    from sections.section_3 import get_section_3\n    from sections.section_4 import get_section_4"
+            }
+          ],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "**Контекст та інженерна проблема:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "При переході на повністю ізольовану структуру генераторів обох магістерських робіт у директоріях `MAGISTER/KN/` та `MAGISTER/INFORMATICA/` у файлі [`MAGISTER/INFORMATICA/generate_full_text.py`](file:///MAGISTER/INFORMATICA/generate_full_text.py) лінтер Pylance (VS Code / Cursor IDE) сигналізував статичними помилками `reportMissingImports` на рядках імпорту `from sections.intro_conclusions import ...`.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Причиною була відсутність файлу ініціалізації пакета `__init__.py` у підпапці `sections/`, а також відсутність реєстрації кореневих підкаталогів генерації в конфігурації Python-аналізу середовища.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Технічні кроки розв'язання:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Ініціалізація пакетів Python:** Створено порожні маркери пакетів [`MAGISTER/INFORMATICA/sections/__init__.py`](file:///MAGISTER/INFORMATICA/sections/__init__.py) та [`MAGISTER/KN/sections/__init__.py`](file:///MAGISTER/KN/sections/__init__.py), що забезпечує їх стандартне розпізнавання модульними резолверами Python 3.10+.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Налаштування робочого простору (`.vscode/settings.json`):**",
+              "subitems": [
+                "Додано конфігурації статичного аналізатора Pylance:",
+                "`\"python.analysis.extraPaths\": [\"./MAGISTER\", \"./MAGISTER/INFORMATICA\", \"./MAGISTER/KN\", \"./MAGISTER/scripts\"]`",
+                "та дзеркальне розширення для автодоповнення:",
+                "`\"python.autoComplete.extraPaths\": [\"./MAGISTER\", \"./MAGISTER/INFORMATICA\", \"./MAGISTER/KN\", \"./MAGISTER/scripts\"]`."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Очищення імпортів у генераторі:**",
+              "subitems": [
+                "У [`MAGISTER/INFORMATICA/generate_full_text.py`](file:///MAGISTER/INFORMATICA/generate_full_text.py) закріплено чистий синтаксис імпортів:"
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Верифікація:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Проведено тестовий білд специфікації: `python MAGISTER/scripts/build_full_spec.py --profile info` (Exit code: 0).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Усі червоні підкреслення та попередження відсутніх імпортів в редакторі усунуто.",
+              "subitems": []
+            }
+          ]
+        },
+        {
           "title": "0.1.7.11 Генерація Повного Тексту Магістерської Роботи зі Спеціальності 014 «Середня Освіта (Інформатика)» (`SBC-304`, `EP-MS`)",
           "level": 3,
           "paragraphs": [],

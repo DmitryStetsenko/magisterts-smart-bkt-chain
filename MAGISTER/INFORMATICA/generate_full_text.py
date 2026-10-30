@@ -13,11 +13,12 @@ sections_dir = os.path.join(current_dir, 'sections')
 if sections_dir not in sys.path:
     sys.path.insert(0, sections_dir)
 
-from intro_conclusions import get_intro_content, get_conclusions_content
-from section_1 import get_section_1
-from section_2 import get_section_2
-from section_3 import get_section_3
-from section_4 import get_section_4
+# Імпорт модулів розділів із пакету sections
+from sections.intro_conclusions import get_intro_content, get_conclusions_content
+from sections.section_1 import get_section_1
+from sections.section_2 import get_section_2
+from sections.section_3 import get_section_3
+from sections.section_4 import get_section_4
 
 def get_all_info_thesis_sections(apparatus):
     intro = {
