@@ -5,7 +5,19 @@
 ## 📅 30 жовтня 2026 року
 
 ### ✅ Що зроблено за день:
-1. **Брейншторм та розробка стратегії індивідуального треку й адаптивності в `apps/study` (`SBC-306`, `EP-ST`):**
+1. **Реалізація моделі Mastery-Gated Progression та інтерактивного Test-Out челенджу в `apps/study` (`SBC-310`, `EP-ST`):**
+   - **Контекст:** Впровадження принципу доведеної майстерності (Mastery Gating) на основі зв'язків графа навичок `SkillDependency` без кардинальних змін у структурі проєкту.
+   - **Контракти даних (`@sbc/types`):**
+     - Розширено інтерфейси `LessonUnitDto` та `CurriculumModuleDto` полями `isLocked`, `masteryScore`, `isMastered`, `prerequisiteSlugs`, `testOutAvailable`.
+     - Створено DTO `DiagnosticQuestionDto` та `DiagnosticEvaluationResultDto` для діагностики та екстерну.
+   - **Банк діагностичних завдань:**
+     - Створено файл [`apps/study/src/data/diagnostic-questions.ts`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/study/src/data/diagnostic-questions.ts) із цільовими code-орієнтованими задачами на виявлення синтаксичних та логічних оман (let vs const, === vs ==, цикли, стрілочні функції, DOM addEventListener).
+   - **Інтерфейс користувача (`apps/study`):**
+     - Створено компонент [`apps/study/src/components/TestOutModal.tsx`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/study/src/components/TestOutModal.tsx) — модальне вікно експрес-екстерну з інтерактивним вибором, миттєвим розбором пояснень та анімацією розблокування модуля при успіху.
+     - Оновлено бічну панель `apps/study/src/app/page.tsx`: заблоковані теми позначено замочками `Lock`, відображається бейдж відсотка поточної майстерності та кнопка-ліфт ⚡ `Test-Out`.
+   - **Верифікація:** Успішно виконано перевірку типів `npm run typecheck --workspace=@sbc/types` та повну production-збірку `npm run build:study` (0 помилок).
+
+2. **Брейншторм та розробка стратегії індивідуального треку й адаптивності в `apps/study` (`SBC-309`, `EP-ST`):**
    - **Контекст:** Проведено концептуальне проєктування когнітивно-дидактичної адаптивності навчального простору підручника (`apps/study`) на відміну від суто процедурної адаптивності тренажера.
    - **Результат:** Створено стратегічний документ [`docs/brainstorm/adaptive_learning_path_strategy.md`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/docs/brainstorm/adaptive_learning_path_strategy.md), що охоплює:
      - Чотиривимірну матрицю адаптивності підручника (3 рівні глибини матеріалу, мікро-діагностика, динамічний маршрут, Just-in-Time ліквідація оман).

@@ -18,7 +18,45 @@
           "items": [
             {
               "type": "text",
-              "raw_text": "**Брейншторм та розробка стратегії індивідуального треку й адаптивності в `apps/study` (`SBC-306`, `EP-ST`):**",
+              "raw_text": "**Реалізація моделі Mastery-Gated Progression та інтерактивного Test-Out челенджу в `apps/study` (`SBC-310`, `EP-ST`):**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Контекст:** Впровадження принципу доведеної майстерності (Mastery Gating) на основі зв'язків графа навичок `SkillDependency` без кардинальних змін у структурі проєкту.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Контракти даних (`@sbc/types`):**",
+              "subitems": [
+                "Розширено інтерфейси `LessonUnitDto` та `CurriculumModuleDto` полями `isLocked`, `masteryScore`, `isMastered`, `prerequisiteSlugs`, `testOutAvailable`.",
+                "Створено DTO `DiagnosticQuestionDto` та `DiagnosticEvaluationResultDto` для діагностики та екстерну."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Банк діагностичних завдань:**",
+              "subitems": [
+                "Створено файл [`apps/study/src/data/diagnostic-questions.ts`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/study/src/data/diagnostic-questions.ts) із цільовими code-орієнтованими задачами на виявлення синтаксичних та логічних оман (let vs const, === vs ==, цикли, стрілочні функції, DOM addEventListener)."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Інтерфейс користувача (`apps/study`):**",
+              "subitems": [
+                "Створено компонент [`apps/study/src/components/TestOutModal.tsx`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/study/src/components/TestOutModal.tsx) — модальне вікно експрес-екстерну з інтерактивним вибором, миттєвим розбором пояснень та анімацією розблокування модуля при успіху.",
+                "Оновлено бічну панель `apps/study/src/app/page.tsx`: заблоковані теми позначено замочками `Lock`, відображається бейдж відсотка поточної майстерності та кнопка-ліфт ⚡ `Test-Out`."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Верифікація:** Успішно виконано перевірку типів `npm run typecheck --workspace=@sbc/types` та повну production-збірку `npm run build:study` (0 помилок).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Брейншторм та розробка стратегії індивідуального треку й адаптивності в `apps/study` (`SBC-309`, `EP-ST`):**",
               "subitems": []
             },
             {

@@ -120,6 +120,99 @@
           ]
         },
         {
+          "title": "0.1.7.17 Реалізація Архітектури Mastery-Gated Progression та Експрес-Екстерну Test-Out у `apps/study` (SBC-310, EP-ST)",
+          "level": 3,
+          "paragraphs": [],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "**Контекст та інженерне завдання:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Реалізація механізму покрокового розблокування навчальних модулів на основі доведеної майстерності (Mastery Gating) без порушення наявної структури монорепозиторію та без необхідності модифікації схеми БД.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Розширення спільних контрактів даних (`packages/types/src/learning.types.ts`):**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Оновлено `LessonUnitDto` полями: `isLocked?: boolean`, `masteryScore?: number`, `isMastered?: boolean`, `prerequisiteSlugs?: string[]`, `testOutAvailable?: boolean`.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Оновлено `CurriculumModuleDto` полями: `isLocked?: boolean`, `moduleMasteryScore?: number`.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Додано інтерфейси для діагностичного скринінгу: `DiagnosticQuestionDto` та `DiagnosticEvaluationResultDto`.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Банк валідаційних завдань (`apps/study/src/data/diagnostic-questions.ts`):**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Розроблено 5 репрезентативних завдань (Code Output Prediction, Spot the Bug) за ключовими темами 10–11 класів: `let` vs `const`, `===` vs `==`, цикли `for`, стрілочні функції `() => {}`, підписка на події DOM через `addEventListener`.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Компонент експрес-екстерну (`apps/study/src/components/TestOutModal.tsx`):**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Інтерактивне модальне вікно з прогрес-баром, кодовими сниппетами та миттєвим дидактичним фідбеком (пояснення оман `💡`).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "При досягненні порогу успішності ($\\ge 70\\%$) активується анімація розблокування `Unlock`, рівень $P(L_n)$ автоматично підвищується до $0.95$, а залежні теми стають доступними.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Оновлення інтерфейсу підручника (`apps/study/src/app/page.tsx`):**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Сайдбар у межах уніфікованого `DrawerSection`: нерозблоковані модулі отримують іконку `Lock` та напівпрозорий стиль, а активні — точний числовий бейдж майстерності (наприклад, `92%`).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Додано кнопку ⚡ `Test-Out` біля заблокованих модулів для переходу до 2-хвилинного складання екстерном.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Верифікація:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "`npm run typecheck --workspace=@sbc/types` (0 помилок).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "`npm run build:study` (успішна статична збірка Next.js за 6.4 с).",
+              "subitems": []
+            }
+          ]
+        },
+        {
           "title": "0.1.7.16 Стратегія Когнітивно-Дидактичної Адаптивності та Динамічного Треку в `apps/study` (SBC-309, EP-ST)",
           "level": 3,
           "paragraphs": [],

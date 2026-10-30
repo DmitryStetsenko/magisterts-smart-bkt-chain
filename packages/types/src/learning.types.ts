@@ -78,6 +78,16 @@ export interface LessonUnitDto {
   estimatedMinutes: number;
   summary: string;
   sections: LessonSectionDto[];
+  /** Чи заблоковано юніт замком (вимагає опанування попередніх навичок) */
+  isLocked?: boolean;
+  /** Поточний відсоток майстерності P(L_n) * 100 (0..100) */
+  masteryScore?: number;
+  /** Чи зараховано юніт (майстерність досягнуто) */
+  isMastered?: boolean;
+  /** Перелік слігів пререквізитів, які необхідно закрити для доступу */
+  prerequisiteSlugs?: string[];
+  /** Чи доступна можливість скласти екстерном */
+  testOutAvailable?: boolean;
 }
 
 /**
@@ -89,6 +99,39 @@ export interface CurriculumModuleDto {
   title: string;
   description: string;
   units: LessonUnitDto[];
+  /** Чи заблоковано весь модуль */
+  isLocked?: boolean;
+  /** Середній рівень опанування модуля (0..100) */
+  moduleMasteryScore?: number;
+}
+
+/**
+ * Питання експрес-діагностики або тесту-екстерну (Test-Out)
+ */
+export interface DiagnosticQuestionDto {
+  id: string;
+  skillSlug: string;
+  question: string;
+  codeSnippet?: string;
+  options: Array<{
+    id: string;
+    text: string;
+    isCorrect: boolean;
+    explanation?: string;
+  }>;
+  difficulty?: 'EASY' | 'MEDIUM' | 'HARD';
+}
+
+/**
+ * Результат перевірки експрес-діагностики / Test-Out
+ */
+export interface DiagnosticEvaluationResultDto {
+  skillSlug: string;
+  passed: boolean;
+  scorePct: number;
+  newMasteryScore: number;
+  unlockedUnits: string[];
+  feedbackMessage: string;
 }
 
 /**
@@ -101,3 +144,4 @@ export interface CourseCurriculumDto {
   gradeLevel: string;
   modules: CurriculumModuleDto[];
 }
+

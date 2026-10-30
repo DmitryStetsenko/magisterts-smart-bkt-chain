@@ -30,6 +30,25 @@
   5. *Build Next.js Documentation Site* (`npm run build:docs`) — збірка статичного експорту (`output: "export"`, `trailingSlash: true`, `basePath: "/magisterts-smart-bkt-chain"`).
   6. *Upload Artifact & Deploy Pages* (`actions/upload-pages-artifact@v3` + `actions/deploy-pages@v4`).
 
+### 0.1.7.17 Реалізація Архітектури Mastery-Gated Progression та Експрес-Екстерну Test-Out у `apps/study` (SBC-310, EP-ST)
+- **Контекст та інженерне завдання:**
+  - Реалізація механізму покрокового розблокування навчальних модулів на основі доведеної майстерності (Mastery Gating) без порушення наявної структури монорепозиторію та без необхідності модифікації схеми БД.
+- **Розширення спільних контрактів даних (`packages/types/src/learning.types.ts`):**
+  - Оновлено `LessonUnitDto` полями: `isLocked?: boolean`, `masteryScore?: number`, `isMastered?: boolean`, `prerequisiteSlugs?: string[]`, `testOutAvailable?: boolean`.
+  - Оновлено `CurriculumModuleDto` полями: `isLocked?: boolean`, `moduleMasteryScore?: number`.
+  - Додано інтерфейси для діагностичного скринінгу: `DiagnosticQuestionDto` та `DiagnosticEvaluationResultDto`.
+- **Банк валідаційних завдань (`apps/study/src/data/diagnostic-questions.ts`):**
+  - Розроблено 5 репрезентативних завдань (Code Output Prediction, Spot the Bug) за ключовими темами 10–11 класів: `let` vs `const`, `===` vs `==`, цикли `for`, стрілочні функції `() => {}`, підписка на події DOM через `addEventListener`.
+- **Компонент експрес-екстерну (`apps/study/src/components/TestOutModal.tsx`):**
+  - Інтерактивне модальне вікно з прогрес-баром, кодовими сниппетами та миттєвим дидактичним фідбеком (пояснення оман `💡`).
+  - При досягненні порогу успішності ($\ge 70\%$) активується анімація розблокування `Unlock`, рівень $P(L_n)$ автоматично підвищується до $0.95$, а залежні теми стають доступними.
+- **Оновлення інтерфейсу підручника (`apps/study/src/app/page.tsx`):**
+  - Сайдбар у межах уніфікованого `DrawerSection`: нерозблоковані модулі отримують іконку `Lock` та напівпрозорий стиль, а активні — точний числовий бейдж майстерності (наприклад, `92%`).
+  - Додано кнопку ⚡ `Test-Out` біля заблокованих модулів для переходу до 2-хвилинного складання екстерном.
+- **Верифікація:**
+  - `npm run typecheck --workspace=@sbc/types` (0 помилок).
+  - `npm run build:study` (успішна статична збірка Next.js за 6.4 с).
+
 ### 0.1.7.16 Стратегія Когнітивно-Дидактичної Адаптивності та Динамічного Треку в `apps/study` (SBC-309, EP-ST)
 - **Контекст та архітектурне розмежування рівнів адаптивності:**
   - На відміну від `apps/student`, де реалізовано процедурну адаптивність підбору кодинг-завдань за формулою $P(L_n)$, у навчальному просторі теорії `apps/study` спроєктовано систему когнітивно-дидактичної адаптивності.

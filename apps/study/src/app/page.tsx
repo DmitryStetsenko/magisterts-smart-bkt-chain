@@ -22,11 +22,16 @@ import {
   HelpCircle,
   Network,
   Plus,
-  Minus
+  Minus,
+  Lock,
+  Unlock,
+  Zap
 } from 'lucide-react';
 import { DrawerSection } from '@sbc/ui';
 import { SCHOOL_WEB_CURRICULUM, LessonUnit, LessonSection } from '../data/school-web-curriculum';
 import { CodePlayground } from '../components/CodePlayground';
+import { TestOutModal } from '../components/TestOutModal';
+import { DIAGNOSTIC_PREFLIGHT_QUESTIONS } from '../data/diagnostic-questions';
 import { 
   ReaderFloatingToolbar, 
   ReaderSettings, 
@@ -40,6 +45,33 @@ export default function StudyPortalHomePage() {
   const [selectedModuleSlug, setSelectedModuleSlug] = useState<string>('school-alg-basics');
   const [selectedUnitSlug, setSelectedUnitSlug] = useState<string>('variables-and-types');
   const [activeCourseSlug, setActiveCourseSlug] = useState<string>('web-algorithms-school');
+
+  // 🔒 Mastery-Gated Progression State (відслідковування опанованих модулів та P(L))
+  const [unlockedModules, setUnlockedModules] = useState<Record<string, boolean>>({
+    'school-alg-basics': true, // Модуль 1 відкритий за замовчуванням
+    'school-alg-branching': false,
+    'school-alg-loops': false,
+    'school-alg-functions': false,
+    'school-alg-data-structures': false,
+    'school-web-dom': false,
+    'school-web-projects': false,
+  });
+
+  const [moduleMasteryScores, setModuleMasteryScores] = useState<Record<string, number>>({
+    'school-alg-basics': 92, // Модуль 1 уже закріплений на 92%
+    'school-alg-branching': 45,
+    'school-alg-loops': 0,
+    'school-alg-functions': 0,
+    'school-alg-data-structures': 0,
+    'school-web-dom': 0,
+    'school-web-projects': 0,
+  });
+
+  // Стан модалки Test-Out
+  const [testOutTargetModule, setTestOutTargetModule] = useState<{
+    slug: string;
+    title: string;
+  } | null>(null);
 
   // Navigation Rail state
   type StudyTab = 'curriculum' | 'playground' | 'glossary' | 'settings';
@@ -450,34 +482,79 @@ export default function StudyPortalHomePage() {
                     <div className="flex flex-col gap-1.5">
                       {SCHOOL_WEB_CURRICULUM.modules.map((mod) => {
                         const isModActive = mod.moduleSlug === selectedModuleSlug;
+                        const isUnlocked = unlockedModules[mod.moduleSlug] ?? false;
+                        const score = moduleMasteryScores[mod.moduleSlug] ?? 0;
+                        const isMastered = score >= 85;
+
                         return (
                           <div key={mod.moduleSlug} className="flex flex-col gap-1">
-                            <button
-                              onClick={() => {
-                                setSelectedModuleSlug(mod.moduleSlug);
-                                if (mod.units.length > 0) {
-                                  setSelectedUnitSlug(mod.units[0].slug);
-                                }
-                              }}
-                              className={`w-full text-left p-2.5 rounded-xl border text-xs transition-all flex items-center justify-between cursor-pointer ${
-                                isModActive
-                                  ? 'bg-blue-600/20 border-blue-500/60 text-white font-bold shadow-md shadow-blue-900/30'
-                                  : 'bg-slate-950/60 border-slate-800/80 hover:border-slate-700 text-slate-300'
-                              }`}
-                            >
-                              <div className="flex items-center gap-2 truncate pr-2">
-                                <span className={`w-5 h-5 rounded-md flex items-center justify-center text-[10px] font-mono font-bold shrink-0 ${
-                                  isModActive ? 'bg-blue-600 text-white' : 'bg-slate-800 text-slate-400'
-                                }`}>
-                                  {mod.moduleNumber}
-                                </span>
-                                <span className="truncate">{mod.title.split(':')[1] || mod.title}</span>
-                              </div>
-                              <ChevronRight className={`w-3.5 h-3.5 shrink-0 transition-transform ${isModActive ? 'rotate-90 text-blue-400' : 'text-slate-600'}`} />
-                            </button>
+                            <div className="flex items-center gap-1.5">
+                              <button
+                                onClick={() => {
+                                  if (isUnlocked) {
+                                    setSelectedModuleSlug(mod.moduleSlug);
+                                    if (mod.units.length > 0) {
+                                      setSelectedUnitSlug(mod.units[0].slug);
+                                    }
+                                  }
+                                }}
+                                disabled={!isUnlocked}
+                                className={`flex-1 text-left p-2.5 rounded-xl border text-xs transition-all flex items-center justify-between ${
+                                  !isUnlocked 
+                                    ? 'bg-slate-950/40 border-slate-800/40 text-slate-500 opacity-75 cursor-not-allowed'
+                                    : isModActive
+                                      ? 'bg-blue-600/20 border-blue-500/60 text-white font-bold shadow-md shadow-blue-900/30 cursor-pointer'
+                                      : 'bg-slate-950/60 border-slate-800/80 hover:border-slate-700 text-slate-300 cursor-pointer'
+                                }`}
+                              >
+                                <div className="flex items-center gap-2 truncate pr-2">
+                                  <span className={`w-5 h-5 rounded-md flex items-center justify-center text-[10px] font-mono font-bold shrink-0 ${
+                                    !isUnlocked
+                                      ? 'bg-slate-900 text-slate-600 border border-slate-800'
+                                      : isMastered
+                                        ? 'bg-emerald-600/80 text-white'
+                                        : isModActive 
+                                          ? 'bg-blue-600 text-white' 
+                                          : 'bg-slate-800 text-slate-400'
+                                  }`}>
+                                    {!isUnlocked ? <Lock className="w-2.5 h-2.5" /> : mod.moduleNumber}
+                                  </span>
+                                  <span className="truncate">{mod.title.split(':')[1] || mod.title}</span>
+                                </div>
+                                <div className="flex items-center gap-1.5 shrink-0">
+                                  {isUnlocked && (
+                                    <span className={`text-[9px] font-mono px-1.5 py-0.5 rounded border ${
+                                      isMastered
+                                        ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
+                                        : 'bg-blue-500/10 text-blue-300 border-blue-500/20'
+                                    }`}>
+                                      {score}%
+                                    </span>
+                                  )}
+                                  <ChevronRight className={`w-3.5 h-3.5 transition-transform ${
+                                    !isUnlocked 
+                                      ? 'text-slate-700' 
+                                      : isModActive 
+                                        ? 'rotate-90 text-blue-400' 
+                                        : 'text-slate-600'
+                                  }`} />
+                                </div>
+                              </button>
+
+                              {/* Кнопка ⚡ Test-Out для заблокованого модуля */}
+                              {!isUnlocked && (
+                                <button
+                                  onClick={() => setTestOutTargetModule({ slug: mod.moduleSlug, title: mod.title })}
+                                  className="p-2 rounded-xl bg-amber-500/15 border border-amber-500/30 text-amber-300 hover:bg-amber-500/30 hover:text-white transition-all text-xs cursor-pointer shadow-sm"
+                                  title="Скласти цей модуль екстерном (Test-Out) за 2 хвилини"
+                                >
+                                  <Zap className="w-3.5 h-3.5" />
+                                </button>
+                              )}
+                            </div>
 
                             {/* Список уроків для вибраного модуля */}
-                            {isModActive && (
+                            {isUnlocked && isModActive && (
                               <div className="flex flex-col gap-1 pl-4 my-1 border-l-2 border-blue-500/30 ml-3">
                                 {mod.units.map((unit) => {
                                   const isUnitActive = unit.slug === selectedUnitSlug;
@@ -722,6 +799,34 @@ export default function StudyPortalHomePage() {
           />
         </main>
       </div>
+
+      {/* ⚡ МОДАЛЬНЕ ВІКНО ЕКСТЕРНУ (Test-Out Challenge Modal) */}
+      {testOutTargetModule && (
+        <TestOutModal
+          isOpen={true}
+          onClose={() => setTestOutTargetModule(null)}
+          moduleTitle={testOutTargetModule.title}
+          moduleSlug={testOutTargetModule.slug}
+          questions={DIAGNOSTIC_PREFLIGHT_QUESTIONS}
+          onSuccess={(slug) => {
+            // Розблокувати модуль та встановити майстерність P(L) = 95%
+            setUnlockedModules(prev => ({
+              ...prev,
+              [slug]: true,
+            }));
+            setModuleMasteryScores(prev => ({
+              ...prev,
+              [slug]: 95,
+            }));
+            setSelectedModuleSlug(slug);
+            const targetMod = SCHOOL_WEB_CURRICULUM.modules.find(m => m.moduleSlug === slug);
+            if (targetMod && targetMod.units.length > 0) {
+              setSelectedUnitSlug(targetMod.units[0].slug);
+            }
+          }}
+        />
+      )}
     </div>
   );
 }
+
