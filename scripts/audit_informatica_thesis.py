@@ -7,7 +7,9 @@ files = [
     'MAGISTER/INFORMATICA/sections/section_1.py',
     'MAGISTER/INFORMATICA/sections/section_2.py',
     'MAGISTER/INFORMATICA/sections/section_3.py',
-    'MAGISTER/INFORMATICA/sections/section_4.py'
+    'MAGISTER/INFORMATICA/sections/section_4.py',
+    'MAGISTER/INFORMATICA/sections/section_5.py',
+    'MAGISTER/INFORMATICA/sections/bibliography.py'
 ]
 
 banned_cliches = [

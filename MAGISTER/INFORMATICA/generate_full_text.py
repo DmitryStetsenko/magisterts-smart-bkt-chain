@@ -19,6 +19,7 @@ from sections.section_1 import get_section_1
 from sections.section_2 import get_section_2
 from sections.section_3 import get_section_3
 from sections.section_4 import get_section_4
+from sections.section_5 import get_section_5
 from sections.bibliography import get_bibliography_section
 
 def get_all_info_thesis_sections(apparatus):
@@ -34,6 +35,7 @@ def get_all_info_thesis_sections(apparatus):
     sec2 = get_section_2()
     sec3 = get_section_3()
     sec4 = get_section_4()
+    sec5 = get_section_5()
 
     conclusions = {
         "id": "conclusions",
@@ -45,5 +47,6 @@ def get_all_info_thesis_sections(apparatus):
 
     bibliography = get_bibliography_section()
 
-    return [intro, sec1, sec2, sec3, sec4, conclusions, bibliography]
+    return [intro, sec1, sec2, sec3, sec4, sec5, conclusions, bibliography]
+
 

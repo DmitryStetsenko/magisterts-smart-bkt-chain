@@ -237,7 +237,8 @@ SBC-302,SBC-EP-MS,Story,"eliminate exaggerated claims and enforce modest evidenc
 SBC-303,SBC-EP-MS,Story,"establish dual-thesis generator architecture with profile routing for KN 122 and INFO 014",Done,2026-10-30,24e3aad
 SBC-304,SBC-EP-MS,Story,"generate full 4-chapter master thesis with DSTU tables and experiment for specialty 014 Informatica",Done,2026-10-30,84c9ae8
 SBC-305,SBC-EP-MS,Bug,"resolve IDE import static analysis warnings and configure python packages for thesis generators",Done,2026-10-30,cdbd3ef
-SBC-306,SBC-EP-MS,Story,"integrate DSTU 8302:2015 bibliography with 40 sources and contextual in-text citations across thesis chapters for specialty 014",Done,2026-10-30,pending
+SBC-306,SBC-EP-MS,Story,"integrate DSTU 8302:2015 bibliography with 40 sources and contextual in-text citations across thesis chapters for specialty 014",Done,2026-10-30,639b517
+SBC-307,SBC-EP-MS,Story,"scale master thesis for specialty 014 to 5 chapters by introducing dedicated problematics chapter and expanding volume to 65+ pages",Done,2026-10-30,pending
 
 
 

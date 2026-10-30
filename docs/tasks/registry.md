@@ -392,6 +392,8 @@
 | **SBC-303** | `Story` | `MS` | establish dual-thesis generator architecture with profile routing for KN 122 and INFO 014 | 2026-10-30 | `24e3aad` |
 | **SBC-304** | `Story` | `MS` | generate full 4-chapter master thesis with DSTU tables and experiment for specialty 014 Informatica | 2026-10-30 | `84c9ae8` |
 | **SBC-305** | `Fix` | `MS` | resolve IDE import static analysis warnings and configure python packages for thesis generators | 2026-10-30 | `cdbd3ef` |
-| **SBC-306** | `Story` | `MS` | integrate DSTU 8302:2015 bibliography with 40 sources and contextual in-text citations across thesis chapters for specialty 014 | 2026-10-30 | `pending` |
+| **SBC-306** | `Story` | `MS` | integrate DSTU 8302:2015 bibliography with 40 sources and contextual in-text citations across thesis chapters for specialty 014 | 2026-10-30 | `639b517` |
+| **SBC-307** | `Story` | `MS` | scale master thesis for specialty 014 to 5 chapters by introducing dedicated problematics chapter and expanding volume to 65+ pages | 2026-10-30 | `pending` |
+
 
 ---
