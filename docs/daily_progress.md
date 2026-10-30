@@ -2,6 +2,21 @@
 
 Цей документ фіксує щоденний прогрес розробки, архітектурні рішення та планування наступних кроків для системи «Smart-BKT-Chain».
 
+## 📅 30 жовтня 2026 року
+
+### ✅ Що зроблено за день:
+1. **Розділення генератора на дві дисертації та маршрутизація профілів (SBC-303, EP-MS):**
+   - **Контекст та архітектурне рішення:**
+     - Для паралельної роботи над двома магістерськими роботами без ризику модифікації чи пошкодження напрацьованої роботи зі спеціальності 122 («Комп'ютерні науки») розроблено диспетчер профілів та ізольовану файлову структуру.
+     - Зафіксовано спільні нормативні документи: [MAGISTER/THESIS_RULES.md](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/MAGISTER/THESIS_RULES.md) (етика, некатегоричність, анти-AI, вимоги ДСТУ) та [MAGISTER/DUAL_THESIS_WORKFLOW.md](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/MAGISTER/DUAL_THESIS_WORKFLOW.md) (регламент паралельної розробки).
+   - **Реалізація:**
+     - Створено конфігуратор [MAGISTER/scripts/thesis_profile.py](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/MAGISTER/scripts/thesis_profile.py) з підтримкою профілів kn (122 Комп'ютерні науки) та info (014 Середня освіта).
+     - Створено модулі розділів sections_kn/ для першої роботи та ізольовану папку sections_info/ для другої роботи.
+     - Оновлено CLI-інтерфейс генераторів [MAGISTER/scripts/generate_docx.py](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/MAGISTER/scripts/generate_docx.py) та [MAGISTER/scripts/build_full_spec.py](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/MAGISTER/scripts/build_full_spec.py) із підтримкою прапорця --profile kn / --profile info.
+     - Створено складальник специфікації для 014 [MAGISTER/scripts/build_full_spec_info.py](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/MAGISTER/scripts/build_full_spec_info.py) з вихідним шляхом MAGISTER/INFORMATICA/thesis_spec.json.
+   - **Верифікація:**
+     - Виконано перевірочний запуск python MAGISTER/scripts/generate_docx.py --profile kn та python MAGISTER/scripts/build_full_spec.py --profile kn, що підтвердило повну недоторканість та цілісність файлів у MAGISTER/KN/.
+
 ## 📅 29 жовтня 2026 року
 
 ### ✅ Що зроблено за день:

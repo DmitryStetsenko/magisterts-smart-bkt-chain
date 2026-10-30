@@ -129,4 +129,17 @@ def build_full_thesis_spec():
     print(f"Специфікацію успішно записано у {spec_path}")
 
 if __name__ == '__main__':
-    build_full_thesis_spec()
+    import argparse
+    from thesis_profile import get_profile
+
+    parser = argparse.ArgumentParser(description="Build thesis specification")
+    parser.add_argument('--profile', type=str, default='kn', choices=['kn', '122', 'info', '014'],
+                        help="Профіль: 'kn' (122 Комп'ютерні науки) або 'info' (014 Середня освіта)")
+    args = parser.parse_args()
+
+    prof = get_profile(args.profile)
+    if prof['short_name'] == 'info':
+        from build_full_spec_info import build_info_thesis_spec
+        build_info_thesis_spec()
+    else:
+        build_full_thesis_spec()

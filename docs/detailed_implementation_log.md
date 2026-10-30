@@ -30,6 +30,21 @@
   5. *Build Next.js Documentation Site* (`npm run build:docs`) — збірка статичного експорту (`output: "export"`, `trailingSlash: true`, `basePath: "/magisterts-smart-bkt-chain"`).
   6. *Upload Artifact & Deploy Pages* (`actions/upload-pages-artifact@v3` + `actions/deploy-pages@v4`).
 
+### 0.1.7.10 Архітектура Диспетчеризації Генератора для Двох Дисертацій (SBC-303, EP-MS)
+- **Контекст та інженерний виклик:**
+  - У межах проєкту паралельно ведуться дві магістерські дисертації: спеціальність 122 «Комп'ютерні науки» та 014 «Середня освіта (Інформатика)».
+  - Потрібно було гарантувати абсолютну ізоляцію артефактів першої роботи (MAGISTER/KN/thesis_spec.json, Магістерська_робота_122.docx) від розробки другої, зберігши при цьому спільне ядро ДСТУ-верстки Word та академічні правила.
+- **Реалізація архітектури подвійного профілю:**
+  - Створено нормативні документи:
+    - [MAGISTER/THESIS_RULES.md](file:///MAGISTER/THESIS_RULES.md) — звід правил етики, анти-AI та оформлення за ДСТУ 3008:2015.
+    - [MAGISTER/DUAL_THESIS_WORKFLOW.md](file:///MAGISTER/DUAL_THESIS_WORKFLOW.md) — регламент перемикання та архітектура каталогів.
+  - Розроблено конфігуратор [MAGISTER/scripts/thesis_profile.py](file:///MAGISTER/scripts/thesis_profile.py), що визначає метадані, шляхи до специфікацій, вихідних .docx та цільових сторінок для профілів kn та info.
+  - Модернізовано CLI-інтерфейс [MAGISTER/scripts/generate_docx.py](file:///MAGISTER/scripts/generate_docx.py): додано аргументи --profile kn|info, --spec, --out.
+  - Оновлено конвеєр складання специфікацій [MAGISTER/scripts/build_full_spec.py](file:///MAGISTER/scripts/build_full_spec.py) із підтримкою --profile та створено заготовку для другої дисертації [MAGISTER/scripts/build_full_spec_info.py](file:///MAGISTER/scripts/build_full_spec_info.py).
+  - Створено модулі розділів MAGISTER/scripts/sections_kn/ для збереження стану першої роботи та ізольовану директорію MAGISTER/scripts/sections_info/ для методичних розділів.
+- **Верифікація:**
+  - Тестова збірка generate_docx.py --profile kn підтвердила коректне зчитування MAGISTER/KN/ без конфліктів.
+
 ### 0.1.7.9 Ліквідація Голослівних Заяв, «Ура-Патріотизму» та Пом'якшення Академічного Тону (SBC-302, EP-MS)
 - **Контекст та інженерний регламент:**
   - На основі зауважень щодо неприйнятності голослівних тверджень, завищених самозвеличувальних оцінок та залишків категоричності у тексті Вступу (зокрема: «вичерпали свій дидактичний ресурс», «створення якісно нового класу освітнього програмного забезпечення»), до [.agents/AGENTS.md](file:///.agents/AGENTS.md) (Правило 9, пункт 4) внесено сувору заборону «ура-патріотизму» та самопроголошених «якісно нових класів», «революційних систем» чи «докорінних зламів».

@@ -671,6 +671,22 @@ def create_master_thesis_doc(spec_path: str, output_path: str):
     print(f"Документ з повноцінними Word-таблицями успішно створено: {output_path}")
 
 if __name__ == '__main__':
-    spec = os.path.join(os.path.dirname(__file__), '..', 'KN', 'thesis_spec.json')
-    out = os.path.join(os.path.dirname(__file__), '..', 'KN', 'Магістерська_робота_122.docx')
+    import argparse
+    from thesis_profile import get_profile
+
+    parser = argparse.ArgumentParser(description="Word Thesis Generator (DSTU 3008:2015)")
+    parser.add_argument('--profile', type=str, default='kn', choices=['kn', '122', 'info', '014'],
+                        help="Профіль дисертації: 'kn' (122 Комп'ютерні науки) або 'info' (014 Середня освіта)")
+    parser.add_argument('--spec', type=str, default=None, help="Прямий шлях до thesis_spec.json (необов'язково)")
+    parser.add_argument('--out', type=str, default=None, help="Прямий шлях до вихідного .docx (необов'язково)")
+
+    args = parser.parse_args()
+    prof = get_profile(args.profile)
+
+    spec = args.spec or prof['spec_path']
+    out = args.out or prof['docx_path']
+
+    print(f"Генерація дисертації для профілю: [{prof['specialty']}]")
+    print(f"Специфікація: {spec}")
+    print(f"Вихідний DOCX: {out}")
     create_master_thesis_doc(spec, out)

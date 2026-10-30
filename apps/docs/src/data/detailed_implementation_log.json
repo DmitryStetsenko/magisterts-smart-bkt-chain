@@ -120,6 +120,72 @@
           ]
         },
         {
+          "title": "0.1.7.10 Архітектура Диспетчеризації Генератора для Двох Дисертацій (SBC-303, EP-MS)",
+          "level": 3,
+          "paragraphs": [],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "**Контекст та інженерний виклик:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "У межах проєкту паралельно ведуться дві магістерські дисертації: спеціальність 122 «Комп'ютерні науки» та 014 «Середня освіта (Інформатика)».",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Потрібно було гарантувати абсолютну ізоляцію артефактів першої роботи (MAGISTER/KN/thesis_spec.json, Магістерська_робота_122.docx) від розробки другої, зберігши при цьому спільне ядро ДСТУ-верстки Word та академічні правила.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Реалізація архітектури подвійного профілю:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Створено нормативні документи:",
+              "subitems": [
+                "[MAGISTER/THESIS_RULES.md](file:///MAGISTER/THESIS_RULES.md) — звід правил етики, анти-AI та оформлення за ДСТУ 3008:2015.",
+                "[MAGISTER/DUAL_THESIS_WORKFLOW.md](file:///MAGISTER/DUAL_THESIS_WORKFLOW.md) — регламент перемикання та архітектура каталогів."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "Розроблено конфігуратор [MAGISTER/scripts/thesis_profile.py](file:///MAGISTER/scripts/thesis_profile.py), що визначає метадані, шляхи до специфікацій, вихідних .docx та цільових сторінок для профілів kn та info.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Модернізовано CLI-інтерфейс [MAGISTER/scripts/generate_docx.py](file:///MAGISTER/scripts/generate_docx.py): додано аргументи --profile kn|info, --spec, --out.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Оновлено конвеєр складання специфікацій [MAGISTER/scripts/build_full_spec.py](file:///MAGISTER/scripts/build_full_spec.py) із підтримкою --profile та створено заготовку для другої дисертації [MAGISTER/scripts/build_full_spec_info.py](file:///MAGISTER/scripts/build_full_spec_info.py).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Створено модулі розділів MAGISTER/scripts/sections_kn/ для збереження стану першої роботи та ізольовану директорію MAGISTER/scripts/sections_info/ для методичних розділів.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Верифікація:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Тестова збірка generate_docx.py --profile kn підтвердила коректне зчитування MAGISTER/KN/ без конфліктів.",
+              "subitems": []
+            }
+          ]
+        },
+        {
           "title": "0.1.7.9 Ліквідація Голослівних Заяв, «Ура-Патріотизму» та Пом'якшення Академічного Тону (SBC-302, EP-MS)",
           "level": 3,
           "paragraphs": [],
