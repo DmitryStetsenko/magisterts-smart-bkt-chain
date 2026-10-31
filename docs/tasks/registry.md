@@ -280,8 +280,11 @@
 | **SBC-269** | `Fix` | `ST` | persistently display and highlight selected quiz answer upon submission | 2026-10-23 | `27eb4ae` |
 | **SBC-271** | `Story` | `ST` | implement honest persistent disabled states for Socratic hints, study theory, and remediation buttons | 2026-10-24 | `5c096c5` |
 | **SBC-287** | `Story` | `ST` | implement Zen Focus reading mode engine with custom themes and typography controls in apps/study | 2026-10-27 | `dd7227b` |
+| **SBC-310** | `Story` | `ST` | implement mastery-gated progression and competency verification gateway in study portal | 2026-10-30 | `07b47f3` |
+| **SBC-311** | `Story` | `ST` | implement test-out fast-track challenge mode in student testing platform with BKT state sync | 2026-10-31 | `backlog` |
 
 ---
+
 
 ## 🎯 SBC-EP-TC: Teacher Portal & Analytics CRM
 

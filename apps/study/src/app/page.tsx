@@ -24,14 +24,11 @@ import {
   Plus,
   Minus,
   Lock,
-  Unlock,
-  Zap
+  Unlock
 } from 'lucide-react';
 import { DrawerSection } from '@sbc/ui';
 import { SCHOOL_WEB_CURRICULUM, LessonUnit, LessonSection } from '../data/school-web-curriculum';
 import { CodePlayground } from '../components/CodePlayground';
-import { TestOutModal } from '../components/TestOutModal';
-import { DIAGNOSTIC_PREFLIGHT_QUESTIONS } from '../data/diagnostic-questions';
 import { 
   ReaderFloatingToolbar, 
   ReaderSettings, 
@@ -66,12 +63,6 @@ export default function StudyPortalHomePage() {
     'school-web-dom': 0,
     'school-web-projects': 0,
   });
-
-  // Стан модалки Test-Out
-  const [testOutTargetModule, setTestOutTargetModule] = useState<{
-    slug: string;
-    title: string;
-  } | null>(null);
 
   // Navigation Rail state
   type StudyTab = 'curriculum' | 'playground' | 'glossary' | 'settings';
@@ -522,13 +513,18 @@ export default function StudyPortalHomePage() {
                                   <span className="truncate">{mod.title.split(':')[1] || mod.title}</span>
                                 </div>
                                 <div className="flex items-center gap-1.5 shrink-0">
-                                  {isUnlocked && (
+                                  {isUnlocked ? (
                                     <span className={`text-[9px] font-mono px-1.5 py-0.5 rounded border ${
                                       isMastered
                                         ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
                                         : 'bg-blue-500/10 text-blue-300 border-blue-500/20'
                                     }`}>
                                       {score}%
+                                    </span>
+                                  ) : (
+                                    <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-slate-900 text-slate-500 border border-slate-800 flex items-center gap-1">
+                                      <Lock className="w-2.5 h-2.5" />
+                                      <span>Закрито</span>
                                     </span>
                                   )}
                                   <ChevronRight className={`w-3.5 h-3.5 transition-transform ${
@@ -540,17 +536,6 @@ export default function StudyPortalHomePage() {
                                   }`} />
                                 </div>
                               </button>
-
-                              {/* Кнопка ⚡ Test-Out для заблокованого модуля */}
-                              {!isUnlocked && (
-                                <button
-                                  onClick={() => setTestOutTargetModule({ slug: mod.moduleSlug, title: mod.title })}
-                                  className="p-2 rounded-xl bg-amber-500/15 border border-amber-500/30 text-amber-300 hover:bg-amber-500/30 hover:text-white transition-all text-xs cursor-pointer shadow-sm"
-                                  title="Скласти цей модуль екстерном (Test-Out) за 2 хвилини"
-                                >
-                                  <Zap className="w-3.5 h-3.5" />
-                                </button>
-                              )}
                             </div>
 
                             {/* Список уроків для вибраного модуля */}
@@ -767,24 +752,38 @@ export default function StudyPortalHomePage() {
               ))}
             </div>
 
-            {/* Блок переходу до практики у Студентському Тренажері */}
-            <div className="p-6 rounded-2xl bg-gradient-to-r from-blue-950/40 via-indigo-950/40 to-purple-950/40 border border-blue-500/30 flex items-center justify-between gap-4 mt-6">
-              <div className="flex flex-col gap-1">
-                <h4 className="text-sm font-bold text-white flex items-center gap-2">
-                  <Flame className="w-4 h-4 text-amber-400" />
-                  <span>Теорію опановано! Час закріпити навичку на практиці</span>
-                </h4>
-                <p className="text-xs text-slate-300">
-                  Перейдіть до Студентського Кабінету Smart-BKT-Chain для проходження адаптивних завдань та оцінки знань BKT.
-                </p>
+            {/* 🚀 ШЛЮЗ ПІДТВЕРДЖЕННЯ КОМПЕТЕНЦІЇ ТА ВІДКРИТТЯ НАСТУПНИХ ТЕМ */}
+            <div className="p-6 rounded-2xl bg-gradient-to-r from-blue-950/40 via-indigo-950/40 to-emerald-950/40 border border-blue-500/30 flex flex-col md:flex-row items-start md:items-center justify-between gap-5 mt-6 shadow-xl backdrop-blur-md">
+              <div className="flex items-start gap-4">
+                <div className="p-3 rounded-2xl bg-blue-600/20 text-blue-400 border border-blue-500/30 shrink-0">
+                  <GraduationCap className="w-6 h-6" />
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] font-mono uppercase font-bold tracking-wider px-2 py-0.5 rounded-md bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                      Теоретичний блок опрацьовано
+                    </span>
+                    <span className="text-[10px] font-mono text-slate-400">
+                      BKT-поріг для розблокування: ≥ 85%
+                    </span>
+                  </div>
+                  <h4 className="text-sm font-bold text-white">
+                    Відкрито практичний модуль підтвердження компетенції
+                  </h4>
+                  <p className="text-xs text-slate-300 max-w-xl leading-relaxed">
+                    Щоб розблокувати наступний модуль курсу, підтвердіть засвоєння навички в Тренажері. 
+                    Після успішного розв'язання практичних задач BKT-секвенсор автоматично відкриє доступ до наступної теми.
+                  </p>
+                </div>
               </div>
+
               <a
-                href="http://localhost:3002"
+                href={`http://localhost:3002?skill=${currentModule.moduleSlug}&unit=${currentUnit.slug}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs flex items-center gap-2 shadow-lg shadow-blue-600/30 transition-all cursor-pointer shrink-0"
+                className="px-5 py-3 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold text-xs flex items-center gap-2 shadow-lg shadow-blue-600/30 transition-all cursor-pointer shrink-0"
               >
-                <span>Почати тренування</span>
+                <span>Підтвердити компетенцію в Тренажері</span>
                 <ArrowRight className="w-4 h-4" />
               </a>
             </div>
@@ -799,34 +798,8 @@ export default function StudyPortalHomePage() {
           />
         </main>
       </div>
-
-      {/* ⚡ МОДАЛЬНЕ ВІКНО ЕКСТЕРНУ (Test-Out Challenge Modal) */}
-      {testOutTargetModule && (
-        <TestOutModal
-          isOpen={true}
-          onClose={() => setTestOutTargetModule(null)}
-          moduleTitle={testOutTargetModule.title}
-          moduleSlug={testOutTargetModule.slug}
-          questions={DIAGNOSTIC_PREFLIGHT_QUESTIONS}
-          onSuccess={(slug) => {
-            // Розблокувати модуль та встановити майстерність P(L) = 95%
-            setUnlockedModules(prev => ({
-              ...prev,
-              [slug]: true,
-            }));
-            setModuleMasteryScores(prev => ({
-              ...prev,
-              [slug]: 95,
-            }));
-            setSelectedModuleSlug(slug);
-            const targetMod = SCHOOL_WEB_CURRICULUM.modules.find(m => m.moduleSlug === slug);
-            if (targetMod && targetMod.units.length > 0) {
-              setSelectedUnitSlug(targetMod.units[0].slug);
-            }
-          }}
-        />
-      )}
     </div>
   );
 }
+
 

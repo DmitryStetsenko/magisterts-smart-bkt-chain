@@ -2,6 +2,65 @@
   "project_title": "📅 Журнал розробки та прогресу проєкту (Daily Progress Log)",
   "sections": [
     {
+      "title": "📅 31 жовтня 2026 року",
+      "level": 2,
+      "paragraphs": [],
+      "code_blocks": [],
+      "items": [],
+      "subsections": [
+        {
+          "title": "✅ Що зроблено за день:",
+          "level": 3,
+          "paragraphs": [],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "**Архітектурне розмежування зон відповідальності та шлюз підтвердження компетенції в `apps/study` (`SBC-310`, `EP-ST`):**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Контекст та архітектурне рішення:**",
+              "subitems": [
+                "Під час аудиту визнано неприпустимим дублювання тестового функціоналу всередині підручника `apps/study`, оскільки єдиним авторизованим центром оцінювання, збору темпоральної телеметрії та перерахунку BKT $P(L_n)$ є студентський тренажер `apps/student`.",
+                "Завдання розробки режиму екстерну перенесено в майбутній беклог (`SBC-311`) для його чистої реалізації безпосередньо у середовищі тестування `apps/student`."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Реалізація в `apps/study`:**",
+              "subitems": [
+                "Повністю вилучено локальні тестові модулі (`TestOutModal.tsx`, `diagnostic-questions.ts`).",
+                "Очищено бічну панель: знято кнопки блискавок ⚡, заблоковані модулі отримали охайний мінімалістичний індикатор із замочком `Lock` (*«Закрито: очікує підтвердження компетенції»*).",
+                "Розроблено інформативний підвальний блок-шлюз **«Підтвердження компетенції»** наприкінці кожного уроку з чітким роз'ясненням порогу $P(L_n) \\ge 0.85$ та кнопкою прямого переходу в тренажер `apps/student` (`http://localhost:3002`)."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Оновлення документації:**",
+              "subitems": [
+                "Оновлено концептуальний документ [`docs/brainstorm/adaptive_learning_path_strategy.md`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/docs/brainstorm/adaptive_learning_path_strategy.md).",
+                "Додано задачу `SBC-311` до беклогу в [`docs/project_management.md`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/docs/project_management.md) та реєстр задач [`docs/tasks/registry.md`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/docs/tasks/registry.md)."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Верифікація:**",
+              "subitems": [
+                "Збірка `npm run build:study` успішно завершена без жодних зауважень (Next.js Turbopack)."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "---",
+              "subitems": []
+            }
+          ]
+        }
+      ]
+    },
+    {
       "title": "📅 30 жовтня 2026 року",
       "level": 2,
       "paragraphs": [],
