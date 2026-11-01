@@ -2,6 +2,59 @@
   "project_title": "📅 Журнал розробки та прогресу проєкту (Daily Progress Log)",
   "sections": [
     {
+      "title": "📅 1 листопада 2026 року",
+      "level": 2,
+      "paragraphs": [],
+      "code_blocks": [],
+      "items": [],
+      "subsections": [
+        {
+          "title": "✅ Що зроблено за день:",
+          "level": 3,
+          "paragraphs": [],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "**Проєктування Архітектурного Стандарту Семантичної Маршрутизації та SEO (`SBC-312`, `EP-INF` / `EP-ST`):**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Контекст та архітектурний виклик:**",
+              "subitems": [
+                "Виявлено критичне обмеження поточної SPA-структури на базі єдиної кореневої сторінки `page.tsx`: неможливість індексації уроків пошуковими системами (Zero SEO), скидання контексту при F5/кнопці «Назад», неможливість академічного цитування та втрата параметрів навички при міжпортальному переході з підручника `apps/study` до тренажера `apps/student`."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Концептуальне рішення та результати брейншторму:**",
+              "subitems": [
+                "Створено фундаментальний стратегічний документ [`docs/brainstorm/seo_routing_architecture.md`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/docs/brainstorm/seo_routing_architecture.md).",
+                "Розроблено канонічну онтологічну схему вкладеності Next.js App Router:",
+                "Підручник (`apps/study`): `/courses/[courseSlug]/[moduleSlug]/[unitSlug]` з обов'язковою статичною генерацією (SSG `generateStaticParams`) та динамічними метаданими (`generateMetadata`).",
+                "Тренажер (`apps/student`): `/practice/[courseSlug]/[skillSlug]` з автоматичним читанням параметрів і таргетуванням на BKT-задачі заданої навички.",
+                "Описано стандарт міжпортального протоколу Deep Linking (`?source=study&unit=...`)."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Регламентація правил монорепозиторію:**",
+              "subitems": [
+                "У регламент [`.agents/AGENTS.md`](file:///.agents/AGENTS.md) внесено обов'язкове **Правило 10: «Архітектурний Стандарт Семантичної Маршрутизації та SEO (Semantic Routing & Deep Linking Standard)»**.",
+                "Додано задачу `SBC-312` до реєстру [`docs/tasks/registry.md`](file:///docs/tasks/registry.md)."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "---",
+              "subitems": []
+            }
+          ]
+        }
+      ]
+    },
+    {
       "title": "📅 31 жовтня 2026 року",
       "level": 2,
       "paragraphs": [],

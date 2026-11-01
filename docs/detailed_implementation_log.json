@@ -120,6 +120,70 @@
           ]
         },
         {
+          "title": "0.1.7.18 Проєктування Архітектурного Стандарту Семантичної Маршрутизації та SEO платформи (SBC-312, EP-INF / EP-ST)",
+          "level": 3,
+          "paragraphs": [],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "**Контекст та інженерний виклик:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Критичний аналіз поточної односторінкової реалізації (SPA в межах `page.tsx` через `useState`): повна відсутність індексації навчальних уроків у Google (Zero SEO), втрата контексту при перезавантаженні сторінки або навігації через історію браузера, неможливість академічного цитування матеріалів.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Порушення безшовності міжпортальної взаємодії при перенаправленні з `apps/study` до `apps/student`.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Розроблені архітектурні засади ([docs/brainstorm/seo_routing_architecture.md](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/docs/brainstorm/seo_routing_architecture.md)):**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "*Єдина онтологічна тріада роутингу платформи:* $\\text{URL} = f(\\text{CourseSlug}, \\text{Module/SkillSlug}, \\text{Unit/TaskSlug})$.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "*Канонічна матриця вкладеності Next.js App Router:*",
+              "subitems": [
+                "`apps/study`: `/courses/[courseSlug]/[moduleSlug]/[unitSlug]` — кожна тема є окремою SSG-сторінкою з унікальними метаданими, канонічним лінком та мікророзміткою Schema.org (`LearningResource`, `BreadcrumbList`).",
+                "`apps/student`: `/practice/[courseSlug]/[skillSlug]` — прийом контексту з URL, автоматична ініціалізація активного курсу та таргетування BKT-секвенсора на відповідні завдання навички.",
+                "`apps/teacher`: `/curriculum/[courseSlug]/[skillSlug]` — прямий перехід до аналітики навички та когорти."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "*Протокол міжпортальних посилань (Cross-App Deep Linking Protocol):*",
+              "subitems": [
+                "Стандартизація query-параметрів `?source=...&unit=...` для збереження контексту навігації та надання кнопки повернення."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Регламентація правил розробки:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "До монорепозиторію введено обов'язкове **Правило 10: «Архітектурний Стандарт Семантичної Маршрутизації та SEO»** у файлі [`.agents/AGENTS.md`](file:///.agents/AGENTS.md).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Зареєстровано задачу `SBC-312` у реєстрі завдань [`docs/tasks/registry.md`](file:///docs/tasks/registry.md).",
+              "subitems": []
+            }
+          ]
+        },
+        {
           "title": "0.1.7.17 Реалізація Архітектури Mastery-Gated Progression та Шлюзу Підтвердження Компетенції в `apps/study` (SBC-310, EP-ST)",
           "level": 3,
           "paragraphs": [],

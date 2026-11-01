@@ -30,6 +30,22 @@
   5. *Build Next.js Documentation Site* (`npm run build:docs`) — збірка статичного експорту (`output: "export"`, `trailingSlash: true`, `basePath: "/magisterts-smart-bkt-chain"`).
   6. *Upload Artifact & Deploy Pages* (`actions/upload-pages-artifact@v3` + `actions/deploy-pages@v4`).
 
+### 0.1.7.18 Проєктування Архітектурного Стандарту Семантичної Маршрутизації та SEO платформи (SBC-312, EP-INF / EP-ST)
+- **Контекст та інженерний виклик:**
+  - Критичний аналіз поточної односторінкової реалізації (SPA в межах `page.tsx` через `useState`): повна відсутність індексації навчальних уроків у Google (Zero SEO), втрата контексту при перезавантаженні сторінки або навігації через історію браузера, неможливість академічного цитування матеріалів.
+  - Порушення безшовності міжпортальної взаємодії при перенаправленні з `apps/study` до `apps/student`.
+- **Розроблені архітектурні засади ([docs/brainstorm/seo_routing_architecture.md](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/docs/brainstorm/seo_routing_architecture.md)):**
+  1. *Єдина онтологічна тріада роутингу платформи:* $\text{URL} = f(\text{CourseSlug}, \text{Module/SkillSlug}, \text{Unit/TaskSlug})$.
+  2. *Канонічна матриця вкладеності Next.js App Router:*
+     - `apps/study`: `/courses/[courseSlug]/[moduleSlug]/[unitSlug]` — кожна тема є окремою SSG-сторінкою з унікальними метаданими, канонічним лінком та мікророзміткою Schema.org (`LearningResource`, `BreadcrumbList`).
+     - `apps/student`: `/practice/[courseSlug]/[skillSlug]` — прийом контексту з URL, автоматична ініціалізація активного курсу та таргетування BKT-секвенсора на відповідні завдання навички.
+     - `apps/teacher`: `/curriculum/[courseSlug]/[skillSlug]` — прямий перехід до аналітики навички та когорти.
+  3. *Протокол міжпортальних посилань (Cross-App Deep Linking Protocol):*
+     - Стандартизація query-параметрів `?source=...&unit=...` для збереження контексту навігації та надання кнопки повернення.
+- **Регламентація правил розробки:**
+  - До монорепозиторію введено обов'язкове **Правило 10: «Архітектурний Стандарт Семантичної Маршрутизації та SEO»** у файлі [`.agents/AGENTS.md`](file:///.agents/AGENTS.md).
+  - Зареєстровано задачу `SBC-312` у реєстрі завдань [`docs/tasks/registry.md`](file:///docs/tasks/registry.md).
+
 ### 0.1.7.17 Реалізація Архітектури Mastery-Gated Progression та Шлюзу Підтвердження Компетенції в `apps/study` (SBC-310, EP-ST)
 - **Контекст та інженерне рішення щодо чистоти архітектури:**
   - Реалізація механізму покрокового розблокування навчальних модулів на основі доведеної майстерності (Mastery Gating) із суворим дотриманням принципу єдиного джерела правди (Single Source of Truth).
