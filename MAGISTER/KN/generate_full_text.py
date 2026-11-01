@@ -8,6 +8,7 @@ from sections.section_2 import get_section_2
 from sections.section_3 import get_section_3
 from sections.section_4 import get_section_4
 from sections.section_5 import get_section_5
+from sections.bibliography import get_bibliography_section
 
 def get_all_thesis_sections(apparatus):
     intro = {
@@ -32,4 +33,6 @@ def get_all_thesis_sections(apparatus):
         "content": get_conclusions_content()
     }
 
-    return [intro, sec1, sec2, sec3, sec4, sec5, conclusions]
+    bibliography = get_bibliography_section()
+
+    return [intro, sec1, sec2, sec3, sec4, sec5, conclusions, bibliography]
