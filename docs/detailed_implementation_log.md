@@ -34,7 +34,7 @@
 - **Контекст та інженерний виклик:**
   - Критичний аналіз поточної односторінкової реалізації (SPA в межах `page.tsx` через `useState`): повна відсутність індексації навчальних уроків у Google (Zero SEO), втрата контексту при перезавантаженні сторінки або навігації через історію браузера, неможливість академічного цитування матеріалів.
   - Порушення безшовності міжпортальної взаємодії при перенаправленні з `apps/study` до `apps/student`.
-- **Розроблені архітектурні засади ([docs/brainstorm/seo_routing_architecture.md](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/docs/brainstorm/seo_routing_architecture.md)):**
+- **Розроблені архітектурні засади ([docs/brainstorm/12_seo_routing_architecture.md](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/docs/brainstorm/12_seo_routing_architecture.md)):**
   1. *Єдина онтологічна тріада роутингу платформи:* $\text{URL} = f(\text{CourseSlug}, \text{Module/SkillSlug}, \text{Unit/TaskSlug})$.
   2. *Канонічна матриця вкладеності Next.js App Router:*
      - `apps/study`: `/courses/[courseSlug]/[moduleSlug]/[unitSlug]` — кожна тема є окремою SSG-сторінкою з унікальними метаданими, канонічним лінком та мікророзміткою Schema.org (`LearningResource`, `BreadcrumbList`).
@@ -69,7 +69,7 @@
 - **Контекст та архітектурне розмежування рівнів адаптивності:**
   - На відміну від `apps/student`, де реалізовано процедурну адаптивність підбору кодинг-завдань за формулою $P(L_n)$, у навчальному просторі теорії `apps/study` спроєктовано систему когнітивно-дидактичної адаптивності.
   - Мета: забезпечення індивідуалізованого темпу та глибини вивчення матеріалу для учнів 10–11 класів із різним початковим рівнем підготовки без когнітивного перевантаження.
-- **Ключові компоненти стратегії ([docs/brainstorm/adaptive_learning_path_strategy.md](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/docs/brainstorm/adaptive_learning_path_strategy.md)):**
+- **Ключові компоненти стратегії ([docs/brainstorm/11_adaptive_learning_path_strategy.md](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/docs/brainstorm/11_adaptive_learning_path_strategy.md)):**
   1. *Дворівневий адаптивний зріз (2-Phase Adaptive Quick Check):*
      - Експрес-діагностика на 5–8 мікро-запитань (до 5–7 хв) замість громіздких вхідних тестів на 30+ питань.
      - Формати завдань: Code Output Prediction (передбачення виведення), Spot the Trap (пошук прихованої омани в синтаксисі), Fill in the blank (заповнення пропуску).

@@ -9,7 +9,7 @@
    - **Контекст та архітектурний виклик:**
      - Виявлено критичне обмеження поточної SPA-структури на базі єдиної кореневої сторінки `page.tsx`: неможливість індексації уроків пошуковими системами (Zero SEO), скидання контексту при F5/кнопці «Назад», неможливість академічного цитування та втрата параметрів навички при міжпортальному переході з підручника `apps/study` до тренажера `apps/student`.
    - **Концептуальне рішення та результати брейншторму:**
-     - Створено фундаментальний стратегічний документ [`docs/brainstorm/seo_routing_architecture.md`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/docs/brainstorm/seo_routing_architecture.md).
+     - Створено фундаментальний стратегічний документ [`docs/brainstorm/12_seo_routing_architecture.md`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/docs/brainstorm/12_seo_routing_architecture.md).
      - Розроблено канонічну онтологічну схему вкладеності Next.js App Router:
        - Підручник (`apps/study`): `/courses/[courseSlug]/[moduleSlug]/[unitSlug]` з обов'язковою статичною генерацією (SSG `generateStaticParams`) та динамічними метаданими (`generateMetadata`).
        - Тренажер (`apps/student`): `/practice/[courseSlug]/[skillSlug]` з автоматичним читанням параметрів і таргетуванням на BKT-задачі заданої навички.
@@ -32,7 +32,7 @@
      - Очищено бічну панель: знято кнопки блискавок ⚡, заблоковані модулі отримали охайний мінімалістичний індикатор із замочком `Lock` (*«Закрито: очікує підтвердження компетенції»*).
      - Розроблено інформативний підвальний блок-шлюз **«Підтвердження компетенції»** наприкінці кожного уроку з чітким роз'ясненням порогу $P(L_n) \ge 0.85$ та кнопкою прямого переходу в тренажер `apps/student` (`http://localhost:3002`).
    - **Оновлення документації:**
-     - Оновлено концептуальний документ [`docs/brainstorm/adaptive_learning_path_strategy.md`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/docs/brainstorm/adaptive_learning_path_strategy.md).
+     - Оновлено концептуальний документ [`docs/brainstorm/11_adaptive_learning_path_strategy.md`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/docs/brainstorm/11_adaptive_learning_path_strategy.md).
      - Додано задачу `SBC-311` до беклогу в [`docs/project_management.md`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/docs/project_management.md) та реєстр задач [`docs/tasks/registry.md`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/docs/tasks/registry.md).
    - **Верифікація:**
      - Збірка `npm run build:study` успішно завершена без жодних зауважень (Next.js Turbopack).
@@ -56,7 +56,7 @@
 
 2. **Брейншторм та розробка стратегії індивідуального треку й адаптивності в `apps/study` (`SBC-309`, `EP-ST`):**
    - **Контекст:** Проведено концептуальне проєктування когнітивно-дидактичної адаптивності навчального простору підручника (`apps/study`) на відміну від суто процедурної адаптивності тренажера.
-   - **Результат:** Створено стратегічний документ [`docs/brainstorm/adaptive_learning_path_strategy.md`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/docs/brainstorm/adaptive_learning_path_strategy.md), що охоплює:
+   - **Результат:** Створено стратегічний документ [`docs/brainstorm/11_adaptive_learning_path_strategy.md`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/docs/brainstorm/11_adaptive_learning_path_strategy.md), що охоплює:
      - Чотиривимірну матрицю адаптивності підручника (3 рівні глибини матеріалу, мікро-діагностика, динамічний маршрут, Just-in-Time ліквідація оман).
      - Концепцію «Розумного експрес-скринінгу» (2-Phase Adaptive Quick Check на 5–8 мікро-питань замість втомливих довгих тестів).
      - Модель «Mastery-Gated Progression» (покрокове відкриття наступних тем графа при досягненні порогу $P(L_n) \ge 0.85$ на основі зв'язків `SkillDependency`).

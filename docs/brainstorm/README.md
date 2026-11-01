@@ -46,5 +46,10 @@
     - *Дата:* 29 жовтня 2026
     - *Ключові теми:* Принцип єдиного джерела істини (Single Source of Truth), класифікація аналогів за 4 класами з виявленням сліпих зон (CTT, пастка термометра, спідран, copy-paste), математичний рушій BKT з регуляторами $P(S)$ та $P(G)$, нижня асимптота знань ($P_{\min}=0.05$), інтегральний індекс $C_{\text{trust}}$ та 4 класи аномалій, подолання адаптивного тупика (DAG Backtracking + Scaffolding), рольовий розподіл 5 застосунків екосистеми, зменшення RMSE з 0.382 до 0.214 та підтвердження через Soulbound dNFT.
 
+11. [11. Стратегія Адаптивної Траєкторії: Шлюз Компетентності та Розмежування Ролей Підручника й Тренажера](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/docs/brainstorm/11_adaptive_learning_path_strategy.md)
+    - *Дата:* 1 листопада 2026
+    - *Ключові теми:* Розмежування зон відповідальності: `apps/study` як бездистракційний Zen Focus підручник без тривожності оцінювання, `apps/student` як повноцінне середовище калібрування BKT та телеметрії; шлюз підтвердження компетенцій (Competency Verification Gateway) з порогом $P(L_n) \ge 0.85$ для розблокування наступних розділів; беклог режиму Test-Out (`SBC-311`).
 
-
+12. [12. Архітектура Семантичної Маршрутизації та SEO для Next.js App Router](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/docs/brainstorm/12_seo_routing_architecture.md)
+    - *Дата:* 1 листопада 2026
+    - *Ключові теми:* Впровадження вкладених семантичних URL замість односторінкового `useState` (`/courses/[courseSlug]/[moduleSlug]/[unitSlug]` та `/practice/[courseSlug]/[skillSlug]`); динамічні SEO метадані `generateMetadata`, статична генерація `generateStaticParams`, Schema.org JSON-LD; протокол міжпортальних глибоких посилань (Cross-App Deep Linking Protocol) між навчальними сервісами.

@@ -282,7 +282,7 @@
 | **SBC-287** | `Story` | `ST` | implement Zen Focus reading mode engine with custom themes and typography controls in apps/study | 2026-10-27 | `dd7227b` |
 | **SBC-310** | `Story` | `ST` | implement mastery-gated progression and competency verification gateway in study portal | 2026-10-30 | `07b47f3` |
 | **SBC-311** | `Story` | `ST` | implement test-out fast-track challenge mode in student testing platform with BKT state sync | 2026-10-31 | `backlog` |
-| **SBC-312** | `Story` | `ST` | design and implement semantic nested routing and SEO standard across study and student apps | 2026-11-01 | `pending` |
+| **SBC-312** | `Story` | `ST` | design and implement semantic nested routing and SEO standard across study and student apps | 2026-11-01 | `backlog` |
 
 ---
 
