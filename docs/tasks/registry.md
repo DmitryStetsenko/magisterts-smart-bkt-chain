@@ -153,6 +153,7 @@
 | **SBC-280** | `Story` | `SH` | scaffold modular cross-app DTO contracts in packages/types | 2026-10-27 | `35c2d30` |
 | **SBC-281** | `Story` | `ST` | implement standalone interactive study application apps/study with live code playground | 2026-10-27 | `b1914a3` |
 | **SBC-282** | `Story` | `ST` | unify study portal design with opera rail drawer sections and cross app shortcuts | 2026-10-27 | `pending` |
+| **SBC-315** | `Story` | `SH` | construct canonical FSD shared UI kit with Button, Modal, Badge, Tooltip and Select in @sbc/ui | 2026-11-02 | `backlog` |
 
 ---
 
