@@ -27,7 +27,7 @@ import {
   Lock,
   Unlock
 } from 'lucide-react';
-import { DrawerSection } from '@sbc/ui';
+import { DrawerSection, AppShellLayout } from '@sbc/ui';
 import { ROUTES, buildStudyToPracticeUrl } from '@sbc/routes';
 import { SCHOOL_WEB_CURRICULUM, LessonUnit, LessonSection, CurriculumModule } from '../data/school-web-curriculum';
 import { CodePlayground } from './CodePlayground';
@@ -200,30 +200,42 @@ export function StudyAppClient({
     currentModule.moduleSlug
   );
 
-  return (
-    <div className={`min-h-screen ${themeClasses[activeTheme]} ${fontClasses[activeFont]} flex flex-col antialiased transition-colors duration-200 selection:bg-blue-500/20`}>
-      
-      {/* 📌 Sticky Top Navigation Bar (Уніфіковано за стандартом Shell v2.0) */}
-      {!readerSettings.isFocusMode && (
-      <header className="h-14 w-full bg-slate-900 border-b border-slate-800/90 px-4 flex items-center justify-between shrink-0 z-30 shadow-md">
-        {/* Ліва частина: Логотип і версія */}
-        <div className="flex items-center gap-3">
-          <div className="p-1.5 bg-blue-600/20 border border-blue-500/30 rounded-lg text-blue-400">
-            <BookOpen className="w-5 h-5" />
-          </div>
-          <div>
-            <h1 className="text-sm font-bold text-white flex items-center gap-2">
-              <span>Smart-BKT-Chain</span>
-              <span className="px-2 py-0.5 text-[10px] font-mono bg-blue-500/20 text-blue-300 rounded border border-blue-500/30">
-                Study Portal v2.0
-              </span>
-            </h1>
-          </div>
-        </div>
+  // Конфігурація для уніфікованого Drawer
+  const drawerConfig = {
+    curriculum: {
+      title: 'Зміст розділу та уроки',
+      icon: BookOpen,
+      iconColor: 'text-blue-400',
+    },
+    playground: {
+      title: 'Пісочниця коду',
+      icon: Code2,
+      iconColor: 'text-emerald-400',
+    },
+    glossary: {
+      title: 'Атлас оман і понять',
+      icon: Lightbulb,
+      iconColor: 'text-purple-400',
+    },
+    settings: {
+      title: 'Налаштування середовища',
+      icon: Settings,
+      iconColor: 'text-amber-400',
+    },
+  }[activeTab];
 
-        {/* Центральна частина: Контекстна плашка курсу та поточного уроку */}
-        <div className="hidden md:flex items-center gap-2 bg-slate-950/80 px-4 py-1.5 rounded-2xl border border-slate-800 shadow-inner">
-          <div className="flex items-center gap-2 text-xs">
+  return (
+    <AppShellLayout
+      currentApp="study"
+      className={`${themeClasses[activeTheme]} ${fontClasses[activeFont]} antialiased transition-colors duration-200 selection:bg-blue-500/20`}
+      header={{
+        appName: 'Smart-BKT-Chain',
+        badgeText: 'Study Portal v2.0',
+        badgeColor: 'bg-blue-500/20 text-blue-300 border-blue-500/30',
+        logoColor: 'bg-blue-600/20 border-blue-500/30 text-blue-400',
+        hideHeader: readerSettings.isFocusMode,
+        centerSlot: (
+          <div className="flex items-center gap-2 bg-slate-950/80 px-4 py-1.5 rounded-2xl border border-slate-800 shadow-inner">
             <span className="w-2 h-2 rounded-full bg-blue-400 animate-pulse"></span>
             <span className="font-semibold text-slate-300 max-w-[200px] truncate">{SCHOOL_WEB_CURRICULUM.courseTitle}</span>
             <span className="text-slate-600">•</span>
@@ -231,399 +243,250 @@ export function StudyAppClient({
             <span className="text-slate-600">/</span>
             <span className="text-slate-400 max-w-[160px] truncate">{currentUnit.title}</span>
           </div>
-        </div>
-
-        {/* Права частина: Селектор курсу та профіль користувача за стандартом платформи */}
-        <div className="flex items-center gap-3">
-          {/* Селектор курсу */}
-          <div className="relative min-w-[180px] sm:min-w-[240px]">
-            <select
-              id="study-course-select"
-              value={activeCourseSlug}
-              onChange={(e) => {
-                const targetSlug = e.target.value;
-                setActiveCourseSlug(targetSlug);
-              }}
-              className="w-full appearance-none px-3 py-1.5 rounded-xl bg-slate-950 border border-slate-700 text-xs font-semibold text-white focus:outline-none focus:border-blue-500 cursor-pointer pr-8 shadow-inner"
-            >
-              <option value="web-algorithms-school" className="bg-slate-900 text-white py-1">
-                📚 {SCHOOL_WEB_CURRICULUM.courseTitle}
-              </option>
-            </select>
-            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-blue-400">
-              <ChevronDown className="w-3.5 h-3.5" />
+        ),
+        rightSlot: (
+          <div className="flex items-center gap-3">
+            <div className="relative min-w-[180px] sm:min-w-[240px]">
+              <select
+                id="study-course-select"
+                value={activeCourseSlug}
+                onChange={(e) => setActiveCourseSlug(e.target.value)}
+                className="w-full appearance-none px-3 py-1.5 rounded-xl bg-slate-950 border border-slate-700 text-xs font-semibold text-white focus:outline-none focus:border-blue-500 cursor-pointer pr-8 shadow-inner"
+              >
+                <option value="web-algorithms-school" className="bg-slate-900 text-white py-1">
+                  📚 {SCHOOL_WEB_CURRICULUM.courseTitle}
+                </option>
+              </select>
+              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-blue-400">
+                <ChevronDown className="w-3.5 h-3.5" />
+              </div>
             </div>
-          </div>
 
-          {/* Профіль учня */}
-          <div className="flex items-center gap-2 bg-slate-950 px-3 py-1.5 rounded-xl border border-slate-800 text-xs">
-            <User className="w-3.5 h-3.5 text-blue-400" />
-            <span className="font-semibold text-slate-200">Дмитро Стеценко</span>
-            <span className="px-1.5 py-0.2 rounded text-[9px] font-mono bg-blue-500/10 text-blue-400 border border-blue-500/20">
-              Учень
-            </span>
-          </div>
-        </div>
-      </header>
-      )}
-
-      {/* 🚀 ГОЛОВНА РОБОЧА ЗОНА З OPERA RAIL ТА БІЧНОЮ ПАНЕЛЛЮ */}
-      <div className="flex-1 flex overflow-hidden relative">
-
-        {/* 📑 2. ВЕРТИКАЛЬНА ПАНЕЛЬ НАВІГАЦІЇ (Opera-style Vertical Icon Rail) */}
-        {!readerSettings.isFocusMode && (
-        <nav className="w-14 bg-slate-950 border-r border-slate-800 flex flex-col items-center py-3 justify-between shrink-0 z-20 shadow-xl">
-          <div className="flex flex-col items-center gap-2">
-            {/* Навчальний план і уроки */}
-            <button
-              onClick={() => handleTabClick('curriculum')}
-              className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all cursor-pointer relative ${
-                activeTab === 'curriculum'
-                  ? isDrawerOpen
-                    ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/40 ring-1 ring-blue-400/50'
-                    : 'bg-blue-950/80 text-blue-300 border border-blue-500/30 hover:bg-blue-900/90 hover:text-white'
-                  : 'bg-slate-800/60 text-slate-400 hover:bg-slate-800 hover:text-white'
-              }`}
-              title="Зміст курсу та уроки"
-            >
-              <BookOpen className="w-5 h-5" />
-              {activeTab === 'curriculum' && isDrawerOpen && (
-                <span className="absolute -left-1 w-1 h-5 bg-blue-400 rounded-r-full shadow-sm shadow-blue-400"></span>
-              )}
-              {activeTab === 'curriculum' && !isDrawerOpen && (
-                <span className="absolute -left-1 w-1 h-2 bg-blue-400/70 rounded-r-full"></span>
-              )}
-            </button>
-
-            {/* Пісочниця коду */}
-            <button
-              onClick={() => handleTabClick('playground')}
-              className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all cursor-pointer relative ${
-                activeTab === 'playground'
-                  ? isDrawerOpen
-                    ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-600/40 ring-1 ring-emerald-400/50'
-                    : 'bg-emerald-950/80 text-emerald-300 border border-emerald-500/30 hover:bg-emerald-900/90 hover:text-white'
-                  : 'bg-slate-800/60 text-slate-400 hover:bg-slate-800 hover:text-white'
-              }`}
-              title="Інтерактивна пісочниця коду"
-            >
-              <Code2 className="w-5 h-5" />
-              {activeTab === 'playground' && isDrawerOpen && (
-                <span className="absolute -left-1 w-1 h-5 bg-emerald-400 rounded-r-full shadow-sm shadow-emerald-400"></span>
-              )}
-              {activeTab === 'playground' && !isDrawerOpen && (
-                <span className="absolute -left-1 w-1 h-2 bg-emerald-400/70 rounded-r-full"></span>
-              )}
-            </button>
-
-            {/* Глосарій та атлас оман */}
-            <button
-              onClick={() => handleTabClick('glossary')}
-              className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all cursor-pointer relative ${
-                activeTab === 'glossary'
-                  ? isDrawerOpen
-                    ? 'bg-purple-600 text-white shadow-lg shadow-purple-600/40 ring-1 ring-purple-400/50'
-                    : 'bg-purple-950/80 text-purple-300 border border-purple-500/30 hover:bg-purple-900/90 hover:text-white'
-                  : 'bg-slate-800/60 text-slate-400 hover:bg-slate-800 hover:text-white'
-              }`}
-              title="Атлас типових оман та помилок"
-            >
-              <Lightbulb className="w-5 h-5" />
-              {activeTab === 'glossary' && isDrawerOpen && (
-                <span className="absolute -left-1 w-1 h-5 bg-purple-400 rounded-r-full shadow-sm shadow-purple-400"></span>
-              )}
-              {activeTab === 'glossary' && !isDrawerOpen && (
-                <span className="absolute -left-1 w-1 h-2 bg-purple-400/70 rounded-r-full"></span>
-              )}
-            </button>
-          </div>
-
-          <div className="flex flex-col items-center gap-2 mt-auto">
-            <div className="w-8 h-[1px] bg-slate-800/80 my-1"></div>
-
-            {/* Блок переходу до інших застосунків екосистеми (Opera Rail Standard) */}
-            <a
-              href={practiceUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-10 h-10 rounded-xl bg-blue-600/15 text-blue-400 border border-blue-500/20 flex items-center justify-center hover:bg-blue-600/30 hover:border-blue-500/40 transition-all cursor-pointer"
-              title="Інтерактивний Тренажер BKT (Студент - 3002)"
-            >
-              <GraduationCap className="w-4 h-4" />
-            </a>
-
-            <a
-              href="http://localhost:3003"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-10 h-10 rounded-xl bg-purple-600/15 text-purple-400 border border-purple-500/20 flex items-center justify-center hover:bg-purple-600/30 hover:border-purple-500/40 transition-all cursor-pointer"
-              title="Кабінет Викладача (Teacher Portal - 3003)"
-            >
-              <ShieldCheck className="w-4 h-4" />
-            </a>
-
-            <a
-              href="http://localhost:3004"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-10 h-10 rounded-xl bg-emerald-600/15 text-emerald-400 border border-emerald-500/20 flex items-center justify-center hover:bg-emerald-600/30 hover:border-emerald-500/40 transition-all cursor-pointer"
-              title="Панель Адміністратора (CMS DAG - 3004)"
-            >
-              <Code2 className="w-4 h-4" />
-            </a>
-
-            <a
-              href={ROUTES.docs.root}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-10 h-10 rounded-xl bg-slate-800/60 text-slate-400 border border-slate-700/60 flex items-center justify-center hover:bg-slate-800 hover:text-white transition-all cursor-pointer"
-              title="Портал Документації (Docs - 3005)"
-            >
-              <BookOpen className="w-4 h-4" />
-            </a>
-
-            {/* Розділювач перед налаштуваннями */}
-            <div className="w-8 h-[1px] bg-slate-800/80 my-1"></div>
-
-            {/* Налаштування підручника */}
-            <button
-              onClick={() => handleTabClick('settings')}
-              className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all cursor-pointer relative ${
-                activeTab === 'settings'
-                  ? isDrawerOpen
-                    ? 'bg-amber-600 text-white shadow-lg shadow-amber-600/40 ring-1 ring-amber-400/50'
-                    : 'bg-amber-950/80 text-amber-300 border border-amber-500/30 hover:bg-amber-900/90 hover:text-white'
-                  : 'bg-slate-800/60 text-slate-400 hover:bg-slate-800 hover:text-white'
-              }`}
-              title="Налаштування відображення"
-            >
-              <Settings className="w-5 h-5" />
-              {activeTab === 'settings' && isDrawerOpen && (
-                <span className="absolute -left-1 w-1 h-5 bg-amber-400 rounded-r-full shadow-sm shadow-amber-400"></span>
-              )}
-              {activeTab === 'settings' && !isDrawerOpen && (
-                <span className="absolute -left-1 w-1 h-2 bg-amber-400/70 rounded-r-full"></span>
-              )}
-            </button>
-          </div>
-        </nav>
-        )}
-
-        {/* 📂 3. ВИСУВНА БІЧНА ПАНЕЛЬ (Side Drawer з уніфікованими DrawerSection за Правилом 7) */}
-        {isDrawerOpen && !readerSettings.isFocusMode && (
-          <aside className="w-full sm:w-[340px] lg:w-[380px] bg-slate-900/95 border-r border-slate-800 flex flex-col shrink-0 shadow-2xl backdrop-blur-xl animate-fadeIn z-10 overflow-hidden">
-            <div className="p-4 border-b border-slate-800 flex items-center justify-between shrink-0 bg-slate-900/90 backdrop-blur-md">
-              <h2 className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-2">
-                {activeTab === 'curriculum' && (
-                  <>
-                    <BookOpen className="w-4 h-4 text-blue-400" />
-                    <span>Зміст розділу та уроки</span>
-                  </>
-                )}
-                {activeTab === 'playground' && (
-                  <>
-                    <Code2 className="w-4 h-4 text-emerald-400" />
-                    <span>Пісочниця коду</span>
-                  </>
-                )}
-                {activeTab === 'glossary' && (
-                  <>
-                    <Lightbulb className="w-4 h-4 text-purple-400" />
-                    <span>Атлас оман і понять</span>
-                  </>
-                )}
-                {activeTab === 'settings' && (
-                  <>
-                    <Settings className="w-4 h-4 text-amber-400" />
-                    <span>Налаштування середовища</span>
-                  </>
-                )}
-              </h2>
-              <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-slate-800 text-slate-400 border border-slate-700">
-                Модуль {currentModule.moduleNumber}
+            <div className="flex items-center gap-2 bg-slate-950 px-3 py-1.5 rounded-xl border border-slate-800 text-xs">
+              <User className="w-3.5 h-3.5 text-blue-400" />
+              <span className="font-semibold text-slate-200">Дмитро Стеценко</span>
+              <span className="px-1.5 py-0.2 rounded text-[9px] font-mono bg-blue-500/10 text-blue-400 border border-blue-500/20">
+                Учень
               </span>
             </div>
-
-            {/* Вміст бічної панелі: структурований через акордеонні секції DrawerSection */}
-            <div className="flex-1 overflow-y-auto p-3 flex flex-col gap-3">
-              {activeTab === 'curriculum' && (
+          </div>
+        ),
+      }}
+      navigationRail={{
+        hideRail: readerSettings.isFocusMode,
+        activeTab,
+        isDrawerOpen,
+        onTabClick: (tabId) => handleTabClick(tabId as StudyTab),
+        onSettingsClick: () => handleTabClick('settings'),
+        isSettingsActive: activeTab === 'settings',
+        tabs: [
+          {
+            id: 'curriculum',
+            icon: BookOpen,
+            title: 'Зміст курсу та уроки',
+            activeColor: 'bg-blue-600',
+          },
+          {
+            id: 'playground',
+            icon: Code2,
+            title: 'Інтерактивна пісочниця коду',
+            activeColor: 'bg-emerald-600',
+          },
+          {
+            id: 'glossary',
+            icon: Lightbulb,
+            title: 'Атлас типових оман та помилок',
+            activeColor: 'bg-purple-600',
+          },
+        ],
+      }}
+      drawer={
+        !readerSettings.isFocusMode
+          ? {
+              isOpen: isDrawerOpen,
+              title: drawerConfig.title,
+              icon: drawerConfig.icon,
+              iconColor: drawerConfig.iconColor,
+              headerBadge: `Модуль ${currentModule.moduleNumber}`,
+              children: (
                 <>
-                  <DrawerSection
-                    title="Навчальна дисципліна"
-                    icon={GraduationCap}
-                    iconColor="text-blue-400"
-                    badge="10-11 кл"
-                    badgeColor="blue"
-                    defaultOpen={true}
-                  >
-                    <div className="flex flex-col gap-1.5 p-1">
-                      <div className="text-xs font-semibold text-white">
-                        {SCHOOL_WEB_CURRICULUM.courseTitle}
-                      </div>
-                      <div className="text-[11px] text-slate-400 leading-relaxed">
-                        {SCHOOL_WEB_CURRICULUM.description}
-                      </div>
-                    </div>
-                  </DrawerSection>
+                  {activeTab === 'curriculum' && (
+                    <>
+                      <DrawerSection
+                        title="Навчальна дисципліна"
+                        icon={GraduationCap}
+                        iconColor="text-blue-400"
+                        badge="10-11 кл"
+                        badgeColor="blue"
+                        defaultOpen={true}
+                      >
+                        <div className="flex flex-col gap-1.5 p-1">
+                          <div className="text-xs font-semibold text-white">
+                            {SCHOOL_WEB_CURRICULUM.courseTitle}
+                          </div>
+                          <div className="text-[11px] text-slate-400 leading-relaxed">
+                            {SCHOOL_WEB_CURRICULUM.description}
+                          </div>
+                        </div>
+                      </DrawerSection>
 
-                  <DrawerSection
-                    title="Тематичні модулі"
-                    icon={Layers}
-                    iconColor="text-indigo-400"
-                    badge={`${SCHOOL_WEB_CURRICULUM.modules.length}`}
-                    badgeColor="indigo"
-                    defaultOpen={true}
-                  >
-                    <div className="flex flex-col gap-1">
-                      {SCHOOL_WEB_CURRICULUM.modules.map((mod) => {
-                        const isUnlocked = unlockedModules[mod.moduleSlug] ?? false;
-                        const masteryScore = moduleMasteryScores[mod.moduleSlug] ?? 0;
-                        const isCurrent = mod.moduleSlug === selectedModuleSlug;
+                      <DrawerSection
+                        title="Тематичні модулі"
+                        icon={Layers}
+                        iconColor="text-indigo-400"
+                        badge={`${SCHOOL_WEB_CURRICULUM.modules.length}`}
+                        badgeColor="indigo"
+                        defaultOpen={true}
+                      >
+                        <div className="flex flex-col gap-1">
+                          {SCHOOL_WEB_CURRICULUM.modules.map((mod) => {
+                            const isUnlocked = unlockedModules[mod.moduleSlug] ?? false;
+                            const masteryScore = moduleMasteryScores[mod.moduleSlug] ?? 0;
+                            const isCurrent = mod.moduleSlug === selectedModuleSlug;
 
-                        return (
-                          <button
-                            key={mod.moduleSlug}
-                            onClick={() => {
-                              setSelectedModuleSlug(mod.moduleSlug);
-                              if (mod.units.length > 0) {
-                                handleSelectUnit(mod.moduleSlug, mod.units[0].slug);
-                              }
-                            }}
-                            className={`w-full text-left p-2.5 rounded-xl border text-xs transition-all flex flex-col gap-1.5 cursor-pointer relative ${
-                              isCurrent
-                                ? 'bg-blue-600/15 border-blue-500/40 text-blue-200'
-                                : 'bg-slate-800/40 border-slate-800 hover:bg-slate-800/80 text-slate-400 hover:text-slate-200'
-                            }`}
-                          >
-                            <div className="flex items-center justify-between">
-                              <span className="font-mono text-[10px] text-slate-400">
-                                Модуль {mod.moduleNumber}
-                              </span>
-                              <div className="flex items-center gap-1.5">
-                                {isUnlocked ? (
-                                  <span className="flex items-center gap-1 text-[10px] font-mono font-bold text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20">
-                                    <Unlock className="w-2.5 h-2.5" />
-                                    <span>{masteryScore}%</span>
+                            return (
+                              <button
+                                key={mod.moduleSlug}
+                                onClick={() => {
+                                  setSelectedModuleSlug(mod.moduleSlug);
+                                  if (mod.units.length > 0) {
+                                    handleSelectUnit(mod.moduleSlug, mod.units[0].slug);
+                                  }
+                                }}
+                                className={`w-full text-left p-2.5 rounded-xl border text-xs transition-all flex flex-col gap-1.5 cursor-pointer relative ${
+                                  isCurrent
+                                    ? 'bg-blue-600/15 border-blue-500/40 text-blue-200'
+                                    : 'bg-slate-800/40 border-slate-800 hover:bg-slate-800/80 text-slate-400 hover:text-slate-200'
+                                }`}
+                              >
+                                <div className="flex items-center justify-between">
+                                  <span className="font-mono text-[10px] text-slate-400">
+                                    Модуль {mod.moduleNumber}
                                   </span>
-                                ) : (
-                                  <span className="flex items-center gap-1 text-[10px] font-mono text-amber-400/90 bg-amber-500/10 px-1.5 py-0.5 rounded border border-amber-500/20" title="Потрібно опанувати попередній модуль у тренажері (BKT ≥ 85%)">
-                                    <Lock className="w-2.5 h-2.5" />
-                                    <span>Заблоковано</span>
+                                  <div className="flex items-center gap-1.5">
+                                    {isUnlocked ? (
+                                      <span className="flex items-center gap-1 text-[10px] font-mono font-bold text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20">
+                                        <Unlock className="w-2.5 h-2.5" />
+                                        <span>{masteryScore}%</span>
+                                      </span>
+                                    ) : (
+                                      <span className="flex items-center gap-1 text-[10px] font-mono text-amber-400/90 bg-amber-500/10 px-1.5 py-0.5 rounded border border-amber-500/20" title="Потрібно опанувати попередній модуль у тренажері (BKT ≥ 85%)">
+                                        <Lock className="w-2.5 h-2.5" />
+                                        <span>Заблоковано</span>
+                                      </span>
+                                    )}
+                                  </div>
+                                </div>
+                                <span className="font-medium text-xs leading-snug line-clamp-1">
+                                  {mod.title.replace(/^Модуль \d+:\s*/, '')}
+                                </span>
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </DrawerSection>
+
+                      <DrawerSection
+                        title={`Уроки: Модуль ${currentModule.moduleNumber}`}
+                        icon={BookOpen}
+                        iconColor="text-emerald-400"
+                        badge={`${currentModule.units.length}`}
+                        badgeColor="emerald"
+                        defaultOpen={true}
+                      >
+                        <div className="flex flex-col gap-1">
+                          {currentModule.units.map((unit, idx) => {
+                            const isCurrentUnit = unit.slug === selectedUnitSlug;
+                            return (
+                              <button
+                                key={unit.slug}
+                                onClick={() => handleSelectUnit(currentModule.moduleSlug, unit.slug)}
+                                className={`w-full text-left p-2 rounded-xl text-xs transition-all flex items-center justify-between cursor-pointer ${
+                                  isCurrentUnit
+                                    ? 'bg-emerald-600/20 text-emerald-200 border border-emerald-500/40 font-semibold'
+                                    : 'hover:bg-slate-800/60 text-slate-300 hover:text-white'
+                                }`}
+                              >
+                                <div className="flex items-center gap-2 overflow-hidden pr-2">
+                                  <span className="w-5 h-5 rounded-md bg-slate-800 text-slate-400 flex items-center justify-center text-[10px] font-mono shrink-0">
+                                    {idx + 1}
                                   </span>
-                                )}
-                              </div>
-                            </div>
-                            <span className="font-medium text-xs leading-snug line-clamp-1">
-                              {mod.title.replace(/^Модуль \d+:\s*/, '')}
-                            </span>
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </DrawerSection>
+                                  <span className="truncate">{unit.title}</span>
+                                </div>
+                                <span className="text-[10px] font-mono text-slate-400 shrink-0">
+                                  {unit.estimatedMinutes} хв
+                                </span>
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </DrawerSection>
+                    </>
+                  )}
 
-                  <DrawerSection
-                    title={`Уроки: Модуль ${currentModule.moduleNumber}`}
-                    icon={BookOpen}
-                    iconColor="text-emerald-400"
-                    badge={`${currentModule.units.length}`}
-                    badgeColor="emerald"
-                    defaultOpen={true}
-                  >
-                    <div className="flex flex-col gap-1">
-                      {currentModule.units.map((unit, idx) => {
-                        const isCurrentUnit = unit.slug === selectedUnitSlug;
-                        return (
-                          <button
-                            key={unit.slug}
-                            onClick={() => handleSelectUnit(currentModule.moduleSlug, unit.slug)}
-                            className={`w-full text-left p-2 rounded-xl text-xs transition-all flex items-center justify-between cursor-pointer ${
-                              isCurrentUnit
-                                ? 'bg-emerald-600/20 text-emerald-200 border border-emerald-500/40 font-semibold'
-                                : 'hover:bg-slate-800/60 text-slate-300 hover:text-white'
-                            }`}
-                          >
-                            <div className="flex items-center gap-2 overflow-hidden pr-2">
-                              <span className="w-5 h-5 rounded-md bg-slate-800 text-slate-400 flex items-center justify-center text-[10px] font-mono shrink-0">
-                                {idx + 1}
-                              </span>
-                              <span className="truncate">{unit.title}</span>
-                            </div>
-                            <span className="text-[10px] font-mono text-slate-400 shrink-0">
-                              {unit.estimatedMinutes} хв
-                            </span>
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </DrawerSection>
-                </>
-              )}
-
-              {activeTab === 'playground' && (
-                <div className="p-2 flex flex-col gap-3">
-                  <div className="text-xs text-slate-400 leading-relaxed">
-                    Ви можете експериментувати з кодом безпосередньо у бічній панелі. Результат виконання виводиться у реальному часі.
-                  </div>
-                  <CodePlayground
-                    initialCode={`// Спробуйте змінити значення:
+                  {activeTab === 'playground' && (
+                    <div className="p-2 flex flex-col gap-3">
+                      <div className="text-xs text-slate-400 leading-relaxed">
+                        Ви можете експериментувати з кодом безпосередньо у бічній панелі. Результат виконання виводиться у реальному часі.
+                      </div>
+                      <CodePlayground
+                        initialCode={`// Спробуйте змінити значення:
 const greeting = "Привіт, 10 клас!";
 let counter = 1;
 counter = counter + 1;
 console.log(greeting, "Номер спроби:", counter);`}
-                    autoRun={true}
-                  />
-                </div>
-              )}
+                        autoRun={true}
+                      />
+                    </div>
+                  )}
 
-              {activeTab === 'glossary' && (
-                <div className="flex flex-col gap-2 p-1">
-                  <div className="text-xs text-slate-400 mb-1">
-                    Каталог типових оман та алгоритмічних підказок поточного розділу:
-                  </div>
-                  {currentUnit.sections
-                    .filter(s => s.misconceptionAlert)
-                    .map((s, idx) => (
-                      <div key={idx} className="p-3 rounded-xl bg-amber-950/20 border border-amber-500/20 flex flex-col gap-1.5">
-                        <span className="text-amber-400 font-bold text-xs flex items-center gap-1.5">
-                          <AlertTriangle className="w-3.5 h-3.5" />
-                          <span>{s.title}</span>
+                  {activeTab === 'glossary' && (
+                    <div className="flex flex-col gap-2 p-1">
+                      <div className="text-xs text-slate-400 mb-1">
+                        Каталог типових оман та алгоритмічних підказок поточного розділу:
+                      </div>
+                      {currentUnit.sections
+                        .filter(s => s.misconceptionAlert)
+                        .map((s, idx) => (
+                          <div key={idx} className="p-3 rounded-xl bg-amber-950/20 border border-amber-500/20 flex flex-col gap-1.5">
+                            <span className="text-amber-400 font-bold text-xs flex items-center gap-1.5">
+                              <AlertTriangle className="w-3.5 h-3.5" />
+                              <span>{s.title}</span>
+                            </span>
+                            <p className="text-[11px] text-amber-200/90 italic">
+                              {s.misconceptionAlert?.wrongBelief}
+                            </p>
+                            <p className="text-[11px] text-slate-300">
+                              {s.misconceptionAlert?.fixTip}
+                            </p>
+                          </div>
+                        ))}
+                    </div>
+                  )}
+
+                  {activeTab === 'settings' && (
+                    <div className="p-2 flex flex-col gap-4 text-xs text-slate-300">
+                      <div className="p-3 rounded-xl bg-slate-800/40 border border-slate-700/60 flex flex-col gap-2">
+                        <span className="font-bold text-white flex items-center gap-2">
+                          <Sparkles className="w-4 h-4 text-amber-400" />
+                          <span>Режим фокусного читання (Zen Focus)</span>
                         </span>
-                        <p className="text-[11px] text-amber-200/90 italic">
-                          {s.misconceptionAlert?.wrongBelief}
-                        </p>
-                        <p className="text-[11px] text-slate-300">
-                          {s.misconceptionAlert?.fixTip}
+                        <p className="text-[11px] text-slate-400 leading-relaxed">
+                          Натисніть клавішу <kbd className="px-1.5 py-0.5 bg-slate-800 text-amber-300 rounded font-mono border border-slate-700">F</kbd> на клавіатурі або скористайтеся плаваючою панеллю інструментів унизу екрана для приховування меню та вибору теми.
                         </p>
                       </div>
-                    ))}
-                </div>
-              )}
-
-              {activeTab === 'settings' && (
-                <div className="p-2 flex flex-col gap-4 text-xs text-slate-300">
-                  <div className="p-3 rounded-xl bg-slate-800/40 border border-slate-700/60 flex flex-col gap-2">
-                    <span className="font-bold text-white flex items-center gap-2">
-                      <Sparkles className="w-4 h-4 text-amber-400" />
-                      <span>Режим фокусного читання (Zen Focus)</span>
-                    </span>
-                    <p className="text-[11px] text-slate-400 leading-relaxed">
-                      Натисніть клавішу <kbd className="px-1.5 py-0.5 bg-slate-800 text-amber-300 rounded font-mono border border-slate-700">F</kbd> на клавіатурі або скористайтеся плаваючою панеллю інструментів унизу екрана для приховування меню та вибору теми.
-                    </p>
-                  </div>
-                </div>
-              )}
-            </div>
-          </aside>
-        )}
-
-        {/* 📖 4. ГОЛОВНА ОБЛАСТЬ ЧИТАННЯ (Zen Focus Reading Canvas) */}
-        <main
-          onScroll={handleScroll}
-          className={`flex-1 overflow-y-auto px-4 py-8 sm:px-8 lg:px-12 flex flex-col items-center transition-all ${
-            readerSettings.isFocusMode ? 'focus-mode' : ''
-          }`}
-        >
+                    </div>
+                  )}
+                </>
+              ),
+            }
+          : undefined
+      }
+      onMainScroll={handleScroll}
+      mainClassName={`px-4 py-8 sm:px-8 lg:px-12 transition-all ${
+        readerSettings.isFocusMode ? 'focus-mode' : ''
+      }`}
+    >
           <div className={`w-full ${maxWidthClasses[activeMaxWidth]} flex flex-col gap-8`}>
             
             {/* Хлібні крихти та метаінформація уроку */}
@@ -769,16 +632,14 @@ console.log(greeting, "Номер спроби:", counter);`}
               </a>
             </div>
           </div>
-        </main>
-      </div>
 
-      {/* 🛠️ ПЛАВАЮЧА ПАНЕЛЬ ЗРУЧНОГО ЧИТАННЯ (Zen Reading Floating Toolbar) */}
-      <ReaderFloatingToolbar
-        settings={readerSettings}
-        onUpdateSettings={setReaderSettings}
-        scrollProgressPct={scrollProgress}
-        estimatedMinutesLeft={currentUnit.estimatedMinutes}
-      />
-    </div>
+          {/* 🛠️ ПЛАВАЮЧА ПАНЕЛЬ ЗРУЧНОГО ЧИТАННЯ (Zen Reading Floating Toolbar) */}
+          <ReaderFloatingToolbar
+            settings={readerSettings}
+            onUpdateSettings={setReaderSettings}
+            scrollProgressPct={scrollProgress}
+            estimatedMinutesLeft={currentUnit.estimatedMinutes}
+          />
+    </AppShellLayout>
   );
 }

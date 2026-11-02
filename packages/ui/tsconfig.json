@@ -13,7 +13,8 @@
     "isolatedModules": true,
     "jsx": "react-jsx",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@sbc/routes": ["../routes/src/index.ts"]
     }
   },
   "include": ["src/**/*"],

@@ -120,6 +120,58 @@
           ]
         },
         {
+          "title": "0.1.7.22 Розробка Уніфікованого AppShellLayout у @sbc/ui та Інтеграція в Підручник (SBC-312, SBC-315, EP-SH / EP-ST)",
+          "level": 3,
+          "paragraphs": [],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "**Контекст та інженерний мотив:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Ліквідація архітектурної розбіжності між застосунками: раніше `apps/study` скролив усю сторінку цілком (`min-h-screen`), через що навігаційна панель Opera Rail та сайдбар зміщувалися вгору разом із контентом уроку, а також були відсутні швидкі переходи до інших порталів екосистеми.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Реалізація спільного макету `AppShellLayout` у `packages/ui/src/shell/AppShellLayout.tsx` за стандартом Opera Shell v2.0.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Архітектурні особливості AppShellLayout:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Ізоляція скролу (Scroll Isolation):**",
+              "subitems": [
+                "Кореневий контейнер: `h-screen w-screen overflow-hidden`.",
+                "Внутрішній контентний простір: `<main className=\"flex-1 overflow-y-auto\">`.",
+                "Бічна панель: окремий внутрішній скрол `<div className=\"flex-1 overflow-y-auto\">`."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Автоматична навігація екосистеми (Ecosystem Opera Rail):**",
+              "subitems": [
+                "Використовує `getAppBaseUrl()` з пакета `@sbc/routes`.",
+                "Автоматично генерує іконки всіх інших порталів монорепозиторію (`study: 3006`, `student: 3002`, `teacher: 3003`, `admin: 3004`, `docs: 3005`) у нижньому стеку рейки."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Підтримка Zen Reading Mode:**",
+              "subitems": [
+                "Підтримка пропсів `header.hideHeader` та `navigationRail.hideRail` для миттєвого повноекранного режиму фокусного читання без сторонніх елементів інтерфейсу."
+              ]
+            }
+          ]
+        },
+        {
           "title": "0.1.7.21 Реалізація Вкладеної Семантичної Маршрутизації, SSG та SEO у Підручнику apps/study (SBC-312, EP-ST)",
           "level": 3,
           "paragraphs": [],

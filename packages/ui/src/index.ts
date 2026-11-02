@@ -3,3 +3,4 @@ export * from './skill-graph/skill-graph.types';
 export * from './skill-graph/GameSkillTreeWidget';
 export * from './analytics/AnomalyTreeWidget';
 export * from './drawer/DrawerSection';
+export * from './shell/AppShellLayout';

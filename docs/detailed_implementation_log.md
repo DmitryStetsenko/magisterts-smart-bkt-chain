@@ -29,6 +29,21 @@
   4. *Install Monorepo Dependencies* (`npm ci || npm install`) — синхронізація робочих просторів монорепозиторію.
   5. *Build Next.js Documentation Site* (`npm run build:docs`) — збірка статичного експорту (`output: "export"`, `trailingSlash: true`, `basePath: "/magisterts-smart-bkt-chain"`).
   6. *Upload Artifact & Deploy Pages* (`actions/upload-pages-artifact@v3` + `actions/deploy-pages@v4`).
+### 0.1.7.22 Розробка Уніфікованого AppShellLayout у @sbc/ui та Інтеграція в Підручник (SBC-312, SBC-315, EP-SH / EP-ST)
+- **Контекст та інженерний мотив:**
+  - Ліквідація архітектурної розбіжності між застосунками: раніше `apps/study` скролив усю сторінку цілком (`min-h-screen`), через що навігаційна панель Opera Rail та сайдбар зміщувалися вгору разом із контентом уроку, а також були відсутні швидкі переходи до інших порталів екосистеми.
+  - Реалізація спільного макету `AppShellLayout` у `packages/ui/src/shell/AppShellLayout.tsx` за стандартом Opera Shell v2.0.
+- **Архітектурні особливості AppShellLayout:**
+  1. **Ізоляція скролу (Scroll Isolation):**
+     - Кореневий контейнер: `h-screen w-screen overflow-hidden`.
+     - Внутрішній контентний простір: `<main className="flex-1 overflow-y-auto">`.
+     - Бічна панель: окремий внутрішній скрол `<div className="flex-1 overflow-y-auto">`.
+  2. **Автоматична навігація екосистеми (Ecosystem Opera Rail):**
+     - Використовує `getAppBaseUrl()` з пакета `@sbc/routes`.
+     - Автоматично генерує іконки всіх інших порталів монорепозиторію (`study: 3006`, `student: 3002`, `teacher: 3003`, `admin: 3004`, `docs: 3005`) у нижньому стеку рейки.
+  3. **Підтримка Zen Reading Mode:**
+     - Підтримка пропсів `header.hideHeader` та `navigationRail.hideRail` для миттєвого повноекранного режиму фокусного читання без сторонніх елементів інтерфейсу.
+
 ### 0.1.7.21 Реалізація Вкладеної Семантичної Маршрутизації, SSG та SEO у Підручнику apps/study (SBC-312, EP-ST)
 - **Контекст та інженерний мотив:**
   - Ліквідація SPA Anti-Pattern у навчальному порталі `apps/study` шляхом впровадження канонічної онтологічної ієрархії:
