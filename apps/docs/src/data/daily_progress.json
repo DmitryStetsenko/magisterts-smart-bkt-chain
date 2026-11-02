@@ -45,6 +45,45 @@
             },
             {
               "type": "text",
+              "raw_text": "**Впровадження Вкладеної Семантичної Маршрутизації, SSG та SEO у Підручнику `apps/study` (`SBC-312`, `EP-ST`):**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Контекст та реалізація:**",
+              "subitems": [
+                "Реструктуризовано `apps/study` відповідно до **Правила 10**: монолітний односторінковий `page.tsx` замінено на модульний клієнтський каркас `src/components/StudyAppClient.tsx` та вкладену файлову структуру Next.js App Router:",
+                "`src/app/courses/[courseSlug]/[moduleSlug]/[unitSlug]/page.tsx` — повноцінна сторінка уроку.",
+                "`src/app/courses/[courseSlug]/[moduleSlug]/page.tsx` — автоматичний редирект на перший доступний урок модуля.",
+                "`src/app/courses/[courseSlug]/page.tsx` — канонічний редирект на початок курсу.",
+                "`src/app/page.tsx` — кореневий редирект на перший урок першого модуля."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Статична генерація (SSG) та SEO-оптимізація:**",
+              "subitems": [
+                "Реалізовано функцію `generateStaticParams()`, яка на етапі білду компілює 100% сторінок навчальної програми (`/courses/web-algorithms-school/...`).",
+                "Реалізовано функцію `generateMetadata()`: автоматична генерація канонічних `<title>`, `<meta description>`, `alternates.canonical`, OpenGraph та Twitter Cards для кожного окремого уроку.",
+                "Впроваджено структуровану мікророзмітку **Schema.org (JSON-LD)**: сутності `LearningResource` та `BreadcrumbList` для індексації пошуковими роботами Google Освіта."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Інтеграція з `@sbc/routes`:**",
+              "subitems": [
+                "Усі міжпортальні посилання на інтерактивний тренажер `apps/student` та навігація по уроках переведені на типобезпечні хелпери `ROUTES.study.unit()` та `buildStudyToPracticeUrl()`."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Верифікація:**",
+              "subitems": [
+                "Успішно виконано виробничу збірку `npm run build --workspace=@sbc/study` з результатом `● (SSG) prerendered as static HTML (uses generateStaticParams)` для всіх уроків."
+              ]
+            },
+            {
+              "type": "text",
               "raw_text": "---",
               "subitems": []
             }

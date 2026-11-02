@@ -25,6 +25,9 @@
     "paths": {
       "@/*": [
         "./src/*"
+      ],
+      "@sbc/routes": [
+        "../../packages/routes/src/index.ts"
       ]
     }
   },

@@ -7,12 +7,19 @@ interface CodePlaygroundProps {
   initialCode: string;
   language?: string;
   title?: string;
+  autoRun?: boolean;
 }
 
-export function CodePlayground({ initialCode, title = 'Інтерактивна пісочниця коду' }: CodePlaygroundProps) {
+export function CodePlayground({ initialCode, title = 'Інтерактивна пісочниця коду', autoRun = false }: CodePlaygroundProps) {
   const [code, setCode] = useState<string>(initialCode);
   const [logs, setLogs] = useState<string[]>([]);
   const [hasRun, setHasRun] = useState<boolean>(false);
+
+  React.useEffect(() => {
+    if (autoRun) {
+      handleRun();
+    }
+  }, [autoRun]);
 
   const handleRun = () => {
     setLogs([]);

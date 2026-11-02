@@ -29,6 +29,27 @@
   4. *Install Monorepo Dependencies* (`npm ci || npm install`) — синхронізація робочих просторів монорепозиторію.
   5. *Build Next.js Documentation Site* (`npm run build:docs`) — збірка статичного експорту (`output: "export"`, `trailingSlash: true`, `basePath: "/magisterts-smart-bkt-chain"`).
   6. *Upload Artifact & Deploy Pages* (`actions/upload-pages-artifact@v3` + `actions/deploy-pages@v4`).
+### 0.1.7.21 Реалізація Вкладеної Семантичної Маршрутизації, SSG та SEO у Підручнику apps/study (SBC-312, EP-ST)
+- **Контекст та інженерний мотив:**
+  - Ліквідація SPA Anti-Pattern у навчальному порталі `apps/study` шляхом впровадження канонічної онтологічної ієрархії:
+    $$\text{URL} = \text{/courses}/[\text{courseSlug}]/[\text{moduleSlug}]/[\text{unitSlug}]$$
+  - Забезпечення максимального балу в Google Lighthouse за швидкістю (TTFB < 50мс) через Static Site Generation та розкриття навчальних матеріалів для пошукової індексації.
+- **Архітектурні зміни та компоненти:**
+  1. `src/components/StudyAppClient.tsx`:
+     - Відокремлено всю клієнтську логіку (Zen Reading Engine, плаваюча панель `ReaderFloatingToolbar`, DrawerSections, CodePlayground, стан прогресії P(L) і відстеження скролу) від серверного шару Next.js.
+     - Додано синхронізацію з адресним рядком через `router.push(ROUTES.study.unit(...))`.
+  2. `src/app/courses/[courseSlug]/[moduleSlug]/[unitSlug]/page.tsx`:
+     - Серверний компонент сторінки уроку.
+     - **Static Site Generation (`generateStaticParams`):** автоматичний обхід масиву `SCHOOL_WEB_CURRICULUM` та генерація 100% статичних сторінок уроків на етапі білду Next.js.
+     - **Dynamic Metadata API (`generateMetadata`):** формування індивідуальних метаданих для кожного уроку (`title`, `description`, `canonical`, OpenGraph, Twitter Cards).
+     - **Мікророзмітка Schema.org (JSON-LD):** вбудовано скрипт структурованих даних зі схемами `LearningResource` (тип контенту, тривалість у форматі ISO 8601 `PT8M`, навчальний рівень 10–11 класи) та `BreadcrumbList` (навігаційний ланцюжок).
+  3. Каскадні редиректи навігації:
+     - `src/app/page.tsx` ➔ редирект на перший урок першого модуля.
+     - `src/app/courses/[courseSlug]/page.tsx` ➔ редирект на перший доступний урок курсу.
+     - `src/app/courses/[courseSlug]/[moduleSlug]/page.tsx` ➔ редирект на перший урок обраного модуля.
+- **Верифікація:**
+  - `npm run build --workspace=@sbc/study` виконано успішно (згенеровано 9 статичних SSG сторінок).
+
 ### 0.1.7.20 Створення Архітектурного Модуля Реєстру Маршрутів @sbc/routes (SBC-312, EP-INF / EP-ST)
 - **Контекст та інженерний мотив:**
   - На виконання Правила 10 [`.agents/AGENTS.md`](file:///.agents/AGENTS.md) та рішень документу [`docs/brainstorm/12_seo_routing_architecture.md`](file:///docs/brainstorm/12_seo_routing_architecture.md) для подолання SPA Anti-Pattern створено виділений спільний пакет `packages/routes` (`@sbc/routes`).

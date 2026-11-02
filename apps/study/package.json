@@ -9,6 +9,7 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@sbc/routes": "*",
     "@sbc/types": "*",
     "@sbc/ui": "*",
     "clsx": "^2.1.1",

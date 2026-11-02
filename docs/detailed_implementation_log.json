@@ -120,6 +120,73 @@
           ]
         },
         {
+          "title": "0.1.7.21 Реалізація Вкладеної Семантичної Маршрутизації, SSG та SEO у Підручнику apps/study (SBC-312, EP-ST)",
+          "level": 3,
+          "paragraphs": [],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "**Контекст та інженерний мотив:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Ліквідація SPA Anti-Pattern у навчальному порталі `apps/study` шляхом впровадження канонічної онтологічної ієрархії:",
+              "subitems": [
+                "$$\\text{URL} = \\text{/courses}/[\\text{courseSlug}]/[\\text{moduleSlug}]/[\\text{unitSlug}]$$"
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "Забезпечення максимального балу в Google Lighthouse за швидкістю (TTFB < 50мс) через Static Site Generation та розкриття навчальних матеріалів для пошукової індексації.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Архітектурні зміни та компоненти:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "`src/components/StudyAppClient.tsx`:",
+              "subitems": [
+                "Відокремлено всю клієнтську логіку (Zen Reading Engine, плаваюча панель `ReaderFloatingToolbar`, DrawerSections, CodePlayground, стан прогресії P(L) і відстеження скролу) від серверного шару Next.js.",
+                "Додано синхронізацію з адресним рядком через `router.push(ROUTES.study.unit(...))`."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "`src/app/courses/[courseSlug]/[moduleSlug]/[unitSlug]/page.tsx`:",
+              "subitems": [
+                "Серверний компонент сторінки уроку.",
+                "**Static Site Generation (`generateStaticParams`):** автоматичний обхід масиву `SCHOOL_WEB_CURRICULUM` та генерація 100% статичних сторінок уроків на етапі білду Next.js.",
+                "**Dynamic Metadata API (`generateMetadata`):** формування індивідуальних метаданих для кожного уроку (`title`, `description`, `canonical`, OpenGraph, Twitter Cards).",
+                "**Мікророзмітка Schema.org (JSON-LD):** вбудовано скрипт структурованих даних зі схемами `LearningResource` (тип контенту, тривалість у форматі ISO 8601 `PT8M`, навчальний рівень 10–11 класи) та `BreadcrumbList` (навігаційний ланцюжок)."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "Каскадні редиректи навігації:",
+              "subitems": [
+                "`src/app/page.tsx` ➔ редирект на перший урок першого модуля.",
+                "`src/app/courses/[courseSlug]/page.tsx` ➔ редирект на перший доступний урок курсу.",
+                "`src/app/courses/[courseSlug]/[moduleSlug]/page.tsx` ➔ редирект на перший урок обраного модуля."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Верифікація:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "`npm run build --workspace=@sbc/study` виконано успішно (згенеровано 9 статичних SSG сторінок).",
+              "subitems": []
+            }
+          ]
+        },
+        {
           "title": "0.1.7.20 Створення Архітектурного Модуля Реєстру Маршрутів @sbc/routes (SBC-312, EP-INF / EP-ST)",
           "level": 3,
           "paragraphs": [],

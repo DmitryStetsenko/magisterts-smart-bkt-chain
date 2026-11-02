@@ -15,6 +15,21 @@
      - `src/helpers.ts`: Утиліти `buildCrossAppUrl()`, `buildStudyToPracticeUrl()` та `buildPracticeToStudyUrl()` для типобезпечного протоколу Deep Linking (`?source=study&unit=...`).
    - **Верифікація:**
      - Успішно пройдено повну перевірку типів через `npm run typecheck --workspace=@sbc/routes`.
+2. **Впровадження Вкладеної Семантичної Маршрутизації, SSG та SEO у Підручнику `apps/study` (`SBC-312`, `EP-ST`):**
+   - **Контекст та реалізація:**
+     - Реструктуризовано `apps/study` відповідно до **Правила 10**: монолітний односторінковий `page.tsx` замінено на модульний клієнтський каркас `src/components/StudyAppClient.tsx` та вкладену файлову структуру Next.js App Router:
+       - `src/app/courses/[courseSlug]/[moduleSlug]/[unitSlug]/page.tsx` — повноцінна сторінка уроку.
+       - `src/app/courses/[courseSlug]/[moduleSlug]/page.tsx` — автоматичний редирект на перший доступний урок модуля.
+       - `src/app/courses/[courseSlug]/page.tsx` — канонічний редирект на початок курсу.
+       - `src/app/page.tsx` — кореневий редирект на перший урок першого модуля.
+   - **Статична генерація (SSG) та SEO-оптимізація:**
+     - Реалізовано функцію `generateStaticParams()`, яка на етапі білду компілює 100% сторінок навчальної програми (`/courses/web-algorithms-school/...`).
+     - Реалізовано функцію `generateMetadata()`: автоматична генерація канонічних `<title>`, `<meta description>`, `alternates.canonical`, OpenGraph та Twitter Cards для кожного окремого уроку.
+     - Впроваджено структуровану мікророзмітку **Schema.org (JSON-LD)**: сутності `LearningResource` та `BreadcrumbList` для індексації пошуковими роботами Google Освіта.
+   - **Інтеграція з `@sbc/routes`:**
+     - Усі міжпортальні посилання на інтерактивний тренажер `apps/student` та навігація по уроках переведені на типобезпечні хелпери `ROUTES.study.unit()` та `buildStudyToPracticeUrl()`.
+   - **Верифікація:**
+     - Успішно виконано виробничу збірку `npm run build --workspace=@sbc/study` з результатом `● (SSG) prerendered as static HTML (uses generateStaticParams)` для всіх уроків.
 
 ---
 
