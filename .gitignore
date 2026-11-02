@@ -26,3 +26,8 @@ Thumbs.db
 *.njsproj
 *.sln
 *.sw?
+
+# Testing & MCP artifacts
+.playwright-mcp/
+__pycache__/
+*.pyc
