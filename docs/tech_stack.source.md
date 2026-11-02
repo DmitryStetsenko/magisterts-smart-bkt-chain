@@ -59,6 +59,7 @@ smart-bkt-chain/
 │   ├── student/              # Next.js Student Portal (Monaco, RPG Skill Tree, Telemetry) (Порт 3002)
 │   ├── teacher/              # Next.js Teacher Portal (BKT Heatmap, Review Queue) (Порт 3003)
 │   ├── admin/                # Next.js Admin Panel (Skill DAG Builder, CMS) (Порт 3004)
+│   ├── study/                # Next.js Study Portal (Zen Reading, Playgrounds, Theory) (Порт 3006)
 │   ├── api/                  # NestJS Backend API (Hexagonal, BKT Engine, WebSockets) (Порт 3000)
 │   └── docs/                 # Next.js Docs & Architecture Presenter (Порт 3005)
 │       └── package.json
@@ -69,6 +70,9 @@ smart-bkt-chain/
 │   │   └── package.json
 │   ├── contracts/            # Solidity смарт-контракти (Hardhat/Foundry)
 │   │   ├── contracts/
+│   │   └── package.json
+│   ├── routes/               # Єдиний реєстр маршрутів, портів та міжпортальних посилань
+│   │   ├── src/
 │   │   └── package.json
 │   ├── types/                # Спільні інтерфейси та DTO
 │   │   ├── index.ts
