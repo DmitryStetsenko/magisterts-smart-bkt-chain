@@ -2,6 +2,22 @@
 
 Цей документ фіксує щоденний прогрес розробки, архітектурні рішення та планування наступних кроків для системи «Smart-BKT-Chain».
 
+## 📅 2 листопада 2026 року
+
+### ✅ Що зроблено за день:
+1. **Створення незалежного пакета Реєстру Маршрутів `@sbc/routes` (`SBC-312`, `EP-INF` / `EP-ST`):**
+   - **Контекст та архітектурне рішення:**
+     - На виконання Правила 10 [`.agents/AGENTS.md`](file:///.agents/AGENTS.md) та рекомендацій щодо уникнення SPA Anti-Pattern створено ізольований незалежний пакет монорепозиторію `packages/routes` (`@sbc/routes`).
+     - Забезпечено єдине джерело правди (Single Source of Truth) для всіх канонічних адрес екосистеми без хардкоду URL-рядків у клієнтських веб-додатках.
+   - **Складові пакета `@sbc/routes`:**
+     - `src/apps.ts`: Реєстр додатків (`study: 3006`, `student: 3002`, `teacher: 3003`, `admin: 3004`, `docs: 3005`, `api: 3000`, `web: 3001`) та резолвер базових URL з підтримкою локального оточення і продакшн змінних `NEXT_PUBLIC_*_URL`.
+     - `src/routes.ts`: Типізовані структури канонічних шляхів (`ROUTES.study.unit()`, `ROUTES.student.practice()`, `ROUTES.teacher.curriculum()`, `ROUTES.admin.graph()`).
+     - `src/helpers.ts`: Утиліти `buildCrossAppUrl()`, `buildStudyToPracticeUrl()` та `buildPracticeToStudyUrl()` для типобезпечного протоколу Deep Linking (`?source=study&unit=...`).
+   - **Верифікація:**
+     - Успішно пройдено повну перевірку типів через `npm run typecheck --workspace=@sbc/routes`.
+
+---
+
 ## 📅 1 листопада 2026 року
 
 ### ✅ Що зроблено за день:

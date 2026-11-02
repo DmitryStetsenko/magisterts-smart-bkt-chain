@@ -29,6 +29,29 @@
   4. *Install Monorepo Dependencies* (`npm ci || npm install`) — синхронізація робочих просторів монорепозиторію.
   5. *Build Next.js Documentation Site* (`npm run build:docs`) — збірка статичного експорту (`output: "export"`, `trailingSlash: true`, `basePath: "/magisterts-smart-bkt-chain"`).
   6. *Upload Artifact & Deploy Pages* (`actions/upload-pages-artifact@v3` + `actions/deploy-pages@v4`).
+### 0.1.7.20 Створення Архітектурного Модуля Реєстру Маршрутів @sbc/routes (SBC-312, EP-INF / EP-ST)
+- **Контекст та інженерний мотив:**
+  - На виконання Правила 10 [`.agents/AGENTS.md`](file:///.agents/AGENTS.md) та рішень документу [`docs/brainstorm/12_seo_routing_architecture.md`](file:///docs/brainstorm/12_seo_routing_architecture.md) для подолання SPA Anti-Pattern створено виділений спільний пакет `packages/routes` (`@sbc/routes`).
+  - Пакет виконує роль єдиного джерела правди (Single Source of Truth) для всіх веб-порталів монорепозиторію (`apps/study`, `apps/student`, `apps/teacher`, `apps/admin`, `apps/docs`, `apps/web`), усуваючи хардкод рядків шляхів та запобігаючи несинхронізованим URL.
+- **Архітектура та компоненти модуля (`packages/routes/src/`):**
+  1. `apps.ts`:
+     - Реєстр констант `APP_PORTS` (`api: 3000`, `web: 3001`, `student: 3002`, `teacher: 3003`, `admin: 3004`, `docs: 3005`, `study: 3006`).
+     - Функція `getAppBaseUrl(app)` для динамічного визначення хоста як у браузері (`window.location`), так і на сервері Next.js SSR з пріоритетом змінних `NEXT_PUBLIC_*_URL`.
+  2. `routes.ts`:
+     - Типізований об'єкт `ROUTES` з фабриками канонічних шляхів:
+       - `study.course(courseSlug)`: `/courses/${courseSlug}`.
+       - `study.module(courseSlug, moduleSlug)`: `/courses/${courseSlug}/${moduleSlug}`.
+       - `study.unit(courseSlug, moduleSlug, unitSlug)`: `/courses/${courseSlug}/${moduleSlug}/${unitSlug}`.
+       - `study.misconception(...)`: якірне позиціонування на блоці омани.
+       - `student.practice(courseSlug, skillSlug)`: `/practice/${courseSlug}/${skillSlug}`.
+       - `teacher.curriculum(courseSlug, skillSlug?)`, `admin.graph(courseSlug, skillSlug?)`.
+  3. `helpers.ts`:
+     - `buildCrossAppUrl(targetApp, path, query)`: генератор абсолютних міжпортальних URL з безпечною обробкою параметрів запиту `URLSearchParams`.
+     - `buildStudyToPracticeUrl()`: зв'язок підручника з практичним тренажером через `?source=study&unit=...`.
+     - `buildPracticeToStudyUrl()`: зворотний перехід з тренажера до параграфа теорії або конкретної омани `#misconception-...`.
+- **Верифікація:**
+  - Пакет зібрано та перевірено TypeScript компілятором `tsc --noEmit` без помилок.
+
 ### 0.1.7.19 Інтеграція Бібліографічного Апарату, Верифікація Достовірності та Розширення Сучасними Вітчизняними Джерелами (SBC-122, EP-INF)
 - **Контекст та інженерний аудит:**
   - Під час аналізу останньої збірки кваліфікаційної роботи спеціальності 122 «Комп'ютерні науки» (`MAGISTER/KN/RELEASE/V-13.4-Магістерська_робота_122.pdf`, 61 стор.) виявлено відсутність розділу «СПИСОК ВИКОРИСТАНИХ ДЖЕРЕЛ» та посилань [X] у тексті.
