@@ -8,7 +8,8 @@ import {
   Code2, 
   BookOpen, 
   Settings,
-  ChevronDown
+  ChevronDown,
+  X
 } from 'lucide-react';
 import { AppName, APP_PORTS, getAppBaseUrl, ROUTES } from '@sbc/routes';
 
@@ -54,6 +55,7 @@ export interface AppShellLayoutProps {
     headerBadge?: string;
     children: React.ReactNode;
     widthClass?: string; // за замовчуванням 'w-full sm:w-[340px] lg:w-[380px]'
+    onClose?: () => void;
   };
   // Головний робочий простір (Canvas)
   children: React.ReactNode;
@@ -61,6 +63,7 @@ export interface AppShellLayoutProps {
   onMainScroll?: (e: React.UIEvent<HTMLElement>) => void;
   mainClassName?: string;
   className?: string;
+  overlays?: React.ReactNode;
 }
 
 /**
@@ -82,6 +85,7 @@ export function AppShellLayout({
   onMainScroll,
   mainClassName,
   className = '',
+  overlays,
 }: AppShellLayoutProps) {
   const HeaderLogo = header.logoIcon || BookOpen;
 
@@ -252,11 +256,22 @@ export function AppShellLayout({
                 {drawer.icon && <drawer.icon className={`w-4 h-4 ${drawer.iconColor || 'text-blue-400'}`} />}
                 <span>{drawer.title}</span>
               </h2>
-              {drawer.headerBadge && (
-                <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-slate-800 text-slate-400 border border-slate-700">
-                  {drawer.headerBadge}
-                </span>
-              )}
+              <div className="flex items-center gap-2">
+                {drawer.headerBadge && (
+                  <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-slate-800 text-slate-400 border border-slate-700">
+                    {drawer.headerBadge}
+                  </span>
+                )}
+                {drawer.onClose && (
+                  <button
+                    onClick={drawer.onClose}
+                    className="p-1 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-all cursor-pointer"
+                    title="Згорнути бічну панель"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                )}
+              </div>
             </div>
 
             {/* Вміст сайдбара з власним ізольованим скролом */}
@@ -270,11 +285,14 @@ export function AppShellLayout({
         <main
           ref={mainScrollRef as any}
           onScroll={onMainScroll}
-          className={`flex-1 overflow-y-auto relative h-full flex flex-col items-center ${mainClassName || ''}`}
+          className={`flex-1 relative h-full flex flex-col ${mainClassName ? mainClassName : 'overflow-y-auto items-center'}`}
         >
           {children}
         </main>
       </div>
+
+      {/* 🧩 3. OVERLAYS ТА ПЛАВАЮЧІ МОДАЛЬНІ ВІКНА / TOASTS */}
+      {overlays}
     </div>
   );
 }

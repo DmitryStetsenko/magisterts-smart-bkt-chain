@@ -29,6 +29,25 @@
   4. *Install Monorepo Dependencies* (`npm ci || npm install`) — синхронізація робочих просторів монорепозиторію.
   5. *Build Next.js Documentation Site* (`npm run build:docs`) — збірка статичного експорту (`output: "export"`, `trailingSlash: true`, `basePath: "/magisterts-smart-bkt-chain"`).
   6. *Upload Artifact & Deploy Pages* (`actions/upload-pages-artifact@v3` + `actions/deploy-pages@v4`).
+### 0.1.7.23 Впровадження Семантичної Маршрутизації та Протоколу Deep Linking у apps/student та apps/api (SBC-312, EP-ST)
+- **Контекст та інженерний мотив:**
+  - На виконання Правила 10 [AGENTS.md] реалізовано двосторонню взаємодію між Підручником (`apps/study`) та Інтерактивним Тренажером (`apps/student`).
+  - При переході зі сторінки уроку за адресою `/practice/[courseSlug]/[skillSlug]?source=study&unit=[unitSlug]` тренажер автоматично фокусується на відповідній навичці та надає учневі можливість повернення назад до теоретичного матеріалу.
+- **Технічні рішення та архітектура:**
+  1. **Next.js App Router у `apps/student`:**
+     - Файл `src/app/practice/[courseSlug]/[skillSlug]/page.tsx`: асинхронний серверний компонент, що резолвить динамічні параметри маршруту та search-параметри.
+     - Файл `src/components/StudentPortalApp.tsx`: відокремлений клієнтський каркас із підтримкою пропсів `initialCourseSlug`, `initialSkillSlug`, `source`, `unitSlug`.
+     - Файл `src/app/page.tsx`: стандартна точка входу `Page()` без параметрів (відповідність констрейнту `PageProps` Next.js 16).
+  2. **Плашка зворотного переходу (Deep Link Return Banner):**
+     - Відображається вгорі робочої області, якщо `source === 'study'`.
+     - Використовує `resolveStudyUrl()` та `getAppBaseUrl('study')` з пакета `@sbc/routes`.
+  3. **Розширення BKT-секвенсера в NestJS API (`apps/api`):**
+     - `apps/api/src/adapters/inbound/http/task.controller.ts`: додано query-параметр `skillSlug` до ендпоінта `GET /api/v1/tasks/recommended`.
+     - `apps/api/src/domain/sequencing/task-sequencer.ts`: реалізовано фільтрацію завдань за `preferredSkillSlug`. Якщо вказано конкретну навичку, BKT-секвенсер вибирає завдання саме з цього пулу перед загальним алгоритмом графового обходу.
+- **Верифікація:**
+  - Успішна компіляція `npm run build --workspace=@sbc/student` (статичні сторінки + динамічний маршрут `/practice/[courseSlug]/[skillSlug]`).
+  - Успішна компіляція `npm run build --workspace=@sbc/api`.
+
 ### 0.1.7.22 Розробка Уніфікованого AppShellLayout у @sbc/ui та Інтеграція в Підручник (SBC-312, SBC-315, EP-SH / EP-ST)
 - **Контекст та інженерний мотив:**
   - Ліквідація архітектурної розбіжності між застосунками: раніше `apps/study` скролив усю сторінку цілком (`min-h-screen`), через що навігаційна панель Opera Rail та сайдбар зміщувалися вгору разом із контентом уроку, а також були відсутні швидкі переходи до інших порталів екосистеми.

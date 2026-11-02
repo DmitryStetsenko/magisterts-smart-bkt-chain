@@ -53,6 +53,19 @@
      - Збірка `npm run build --workspace=@sbc/study` пройшла бездоганно (0 помилок типізації, 9 з 9 статичних сторінок згенеровано).
 
 
+5. **Впровадження Вкладеної Семантичної Маршрутизації та Протоколу Deep Linking у Тренажері `apps/student` (`SBC-312`, `EP-ST`):**
+   - **Реалізація маршруту Next.js App Router:**
+     - Створено серверний маршрут `apps/student/src/app/practice/[courseSlug]/[skillSlug]/page.tsx`, який парсить динамічні параметри `courseSlug`, `skillSlug` та параметри запиту `source=study&unit=...`.
+     - Винесено логіку тренажера в чистий клієнтський компонент `apps/student/src/components/StudentPortalApp.tsx`, а `apps/student/src/app/page.tsx` зроблено чистим кореневим роутом відповідно до стандартів Next.js 16 (без конфліктів `PageProps`).
+   - **Міжпортальний протокол повернення (Deep Link Return Banner):**
+     - Додано банер повернення до підручника для учнів, які прийшли за посиланням з підручника (`source === 'study'`): інформаційне повідомлення з кнопкою «Повернутися до уроку підручника» через `getAppBaseUrl('study')` та `resolveStudyUrl()`.
+   - **Адаптація BKT-секвенсера у бекенді (`apps/api`):**
+     - Додано підтримку параметрів `skillSlug` та `preferredSkillSlug` в `TaskController.getRecommendedTask` та `TaskSequencer.recommendNextTask`. Якщо учень переходить за посиланням на конкретну навичку з підручника, система надає завдання саме для цього когнітивного вузла.
+   - **Верифікація:**
+     - Успішно зібрано `npm run build --workspace=@sbc/student` (зібрано статичні сторінки та динамічний серверний маршрут `/practice/[courseSlug]/[skillSlug]`).
+     - Успішно скомпільовано NestJS бекенд `npm run build --workspace=@sbc/api`.
+
+
 ---
 
 ## 📅 1 листопада 2026 року

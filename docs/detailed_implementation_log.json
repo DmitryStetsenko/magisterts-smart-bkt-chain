@@ -120,6 +120,74 @@
           ]
         },
         {
+          "title": "0.1.7.23 Впровадження Семантичної Маршрутизації та Протоколу Deep Linking у apps/student та apps/api (SBC-312, EP-ST)",
+          "level": 3,
+          "paragraphs": [],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "**Контекст та інженерний мотив:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "На виконання Правила 10 [AGENTS.md] реалізовано двосторонню взаємодію між Підручником (`apps/study`) та Інтерактивним Тренажером (`apps/student`).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "При переході зі сторінки уроку за адресою `/practice/[courseSlug]/[skillSlug]?source=study&unit=[unitSlug]` тренажер автоматично фокусується на відповідній навичці та надає учневі можливість повернення назад до теоретичного матеріалу.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Технічні рішення та архітектура:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Next.js App Router у `apps/student`:**",
+              "subitems": [
+                "Файл `src/app/practice/[courseSlug]/[skillSlug]/page.tsx`: асинхронний серверний компонент, що резолвить динамічні параметри маршруту та search-параметри.",
+                "Файл `src/components/StudentPortalApp.tsx`: відокремлений клієнтський каркас із підтримкою пропсів `initialCourseSlug`, `initialSkillSlug`, `source`, `unitSlug`.",
+                "Файл `src/app/page.tsx`: стандартна точка входу `Page()` без параметрів (відповідність констрейнту `PageProps` Next.js 16)."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Плашка зворотного переходу (Deep Link Return Banner):**",
+              "subitems": [
+                "Відображається вгорі робочої області, якщо `source === 'study'`.",
+                "Використовує `resolveStudyUrl()` та `getAppBaseUrl('study')` з пакета `@sbc/routes`."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Розширення BKT-секвенсера в NestJS API (`apps/api`):**",
+              "subitems": [
+                "`apps/api/src/adapters/inbound/http/task.controller.ts`: додано query-параметр `skillSlug` до ендпоінта `GET /api/v1/tasks/recommended`.",
+                "`apps/api/src/domain/sequencing/task-sequencer.ts`: реалізовано фільтрацію завдань за `preferredSkillSlug`. Якщо вказано конкретну навичку, BKT-секвенсер вибирає завдання саме з цього пулу перед загальним алгоритмом графового обходу."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Верифікація:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Успішна компіляція `npm run build --workspace=@sbc/student` (статичні сторінки + динамічний маршрут `/practice/[courseSlug]/[skillSlug]`).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Успішна компіляція `npm run build --workspace=@sbc/api`.",
+              "subitems": []
+            }
+          ]
+        },
+        {
           "title": "0.1.7.22 Розробка Уніфікованого AppShellLayout у @sbc/ui та Інтеграція в Підручник (SBC-312, SBC-315, EP-SH / EP-ST)",
           "level": 3,
           "paragraphs": [],

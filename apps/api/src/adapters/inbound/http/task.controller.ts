@@ -37,10 +37,12 @@ export class TaskController {
   @ApiOperation({ summary: 'Get adaptive next recommended task for a student based on BKT mastery' })
   @ApiQuery({ name: 'userId', required: false, description: 'Student User ID' })
   @ApiQuery({ name: 'courseSlug', required: false, description: 'Course slug filter (js-dev, english-b2, ukraine-law)' })
+  @ApiQuery({ name: 'skillSlug', required: false, description: 'Specific skill slug to focus on' })
   @ApiQuery({ name: 'excludeTaskId', required: false, description: 'Task ID to exclude from recommendation (e.g. current task during degradation)' })
   async getRecommendedTask(
     @Query('userId') userId?: string,
     @Query('courseSlug') courseSlug?: string,
+    @Query('skillSlug') skillSlug?: string,
     @Query('excludeTaskId') excludeTaskId?: string,
   ) {
     let targetUserId = userId;
@@ -132,6 +134,7 @@ export class TaskController {
       preferredTopic,
       preferredDifficulty,
       preferredTaskType,
+      preferredSkillSlug: skillSlug,
       excludeTaskId: effectiveExcludeTaskId,
     });
 

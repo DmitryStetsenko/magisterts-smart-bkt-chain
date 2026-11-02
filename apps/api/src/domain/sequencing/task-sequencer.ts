@@ -45,6 +45,7 @@ export class TaskSequencer {
     preferredTopic?: string | null;
     preferredDifficulty?: 'EASY' | 'MEDIUM' | 'HARD' | null;
     preferredTaskType?: string | null;
+    preferredSkillSlug?: string | null;
     excludeTaskId?: string | null;
   }): SequencingRecommendation | null {
     const {
@@ -55,6 +56,7 @@ export class TaskSequencer {
       preferredTopic,
       preferredDifficulty,
       preferredTaskType,
+      preferredSkillSlug,
       excludeTaskId,
     } = params;
 
@@ -79,19 +81,25 @@ export class TaskSequencer {
     const unlockedSkills = skills.filter(isSkillUnlocked);
 
     // 2. Determine current active skill:
-    // A module remains active while it is either:
-    // a) not yet proficient (< 0.75), OR
-    // b) has uncompleted tasks and has not yet achieved mastery (>= 0.90)
-    // This prevents premature leaps to next module while student is still learning the current module!
-    const currentActiveSkill = unlockedSkills.find((skill) => {
-      const mastery = studentStates[skill.id] ?? 0;
-      if (!BktEngine.isProficient(mastery)) return true;
-      if (BktEngine.isMastered(mastery)) return false; // >= 0.90 Mastery: allow advancing to next module
-      // If proficient (0.75 - 0.89), check if this skill still has uncompleted tasks
-      const skillTasks = tasks.filter((t) => t.skillId === skill.id);
-      const hasUncompleted = skillTasks.some((t) => !completedSet.has(t.id));
-      return hasUncompleted;
-    }) || unlockedSkills[0];
+    // If a specific preferredSkillSlug was requested (e.g. from Deep Linking or manual skill selection):
+    let currentActiveSkill: SkillNodeDomain = unlockedSkills[0];
+    if (preferredSkillSlug) {
+      const explicitSkill = skills.find((s) => s.slug === preferredSkillSlug);
+      if (explicitSkill) {
+        currentActiveSkill = explicitSkill;
+      }
+    }
+    if (!preferredSkillSlug || !skills.some((s) => s.slug === preferredSkillSlug)) {
+      currentActiveSkill = unlockedSkills.find((skill) => {
+        const mastery = studentStates[skill.id] ?? 0;
+        if (!BktEngine.isProficient(mastery)) return true;
+        if (BktEngine.isMastered(mastery)) return false; // >= 0.90 Mastery: allow advancing to next module
+        // If proficient (0.75 - 0.89), check if this skill still has uncompleted tasks
+        const skillTasks = tasks.filter((t) => t.skillId === skill.id);
+        const hasUncompleted = skillTasks.some((t) => !completedSet.has(t.id));
+        return hasUncompleted;
+      }) || unlockedSkills[0];
+    }
 
     const isQuizType = (type?: string | null) => type === 'SINGLE_CHOICE' || type === 'MULTIPLE_CHOICE';
     const isTextEssayType = (type?: string | null) => type === 'TEXT_ESSAY' || type === 'OPEN_TEXT';

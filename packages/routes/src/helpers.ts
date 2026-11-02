@@ -52,3 +52,15 @@ export function buildPracticeToStudyUrl(
   const path = `/courses/${courseSlug}/${moduleSlug}/${unitSlug}${hash}`;
   return buildCrossAppUrl('study', path);
 }
+
+/**
+ * Нормалізатор відносного або абсолютного шляху уроку підручника у валідний міжпортальний URL
+ */
+export function resolveStudyUrl(studyUnitUrl: string): string {
+  if (studyUnitUrl.startsWith('http://') || studyUnitUrl.startsWith('https://')) {
+    return studyUnitUrl;
+  }
+  const cleanPath = studyUnitUrl.startsWith('/') ? studyUnitUrl : `/${studyUnitUrl}`;
+  return buildCrossAppUrl('study', cleanPath);
+}
+

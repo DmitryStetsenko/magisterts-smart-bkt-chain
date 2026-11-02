@@ -138,6 +138,41 @@
             },
             {
               "type": "text",
+              "raw_text": "**Впровадження Вкладеної Семантичної Маршрутизації та Протоколу Deep Linking у Тренажері `apps/student` (`SBC-312`, `EP-ST`):**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Реалізація маршруту Next.js App Router:**",
+              "subitems": [
+                "Створено серверний маршрут `apps/student/src/app/practice/[courseSlug]/[skillSlug]/page.tsx`, який парсить динамічні параметри `courseSlug`, `skillSlug` та параметри запиту `source=study&unit=...`.",
+                "Винесено логіку тренажера в чистий клієнтський компонент `apps/student/src/components/StudentPortalApp.tsx`, а `apps/student/src/app/page.tsx` зроблено чистим кореневим роутом відповідно до стандартів Next.js 16 (без конфліктів `PageProps`)."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Міжпортальний протокол повернення (Deep Link Return Banner):**",
+              "subitems": [
+                "Додано банер повернення до підручника для учнів, які прийшли за посиланням з підручника (`source === 'study'`): інформаційне повідомлення з кнопкою «Повернутися до уроку підручника» через `getAppBaseUrl('study')` та `resolveStudyUrl()`."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Адаптація BKT-секвенсера у бекенді (`apps/api`):**",
+              "subitems": [
+                "Додано підтримку параметрів `skillSlug` та `preferredSkillSlug` в `TaskController.getRecommendedTask` та `TaskSequencer.recommendNextTask`. Якщо учень переходить за посиланням на конкретну навичку з підручника, система надає завдання саме для цього когнітивного вузла."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Верифікація:**",
+              "subitems": [
+                "Успішно зібрано `npm run build --workspace=@sbc/student` (зібрано статичні сторінки та динамічний серверний маршрут `/practice/[courseSlug]/[skillSlug]`).",
+                "Успішно скомпільовано NestJS бекенд `npm run build --workspace=@sbc/api`."
+              ]
+            },
+            {
+              "type": "text",
               "raw_text": "---",
               "subitems": []
             }
