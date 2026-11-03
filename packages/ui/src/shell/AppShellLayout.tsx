@@ -49,7 +49,7 @@ export interface AppShellLayoutProps {
   // Висувний сайдбар (Drawer)
   drawer?: {
     isOpen: boolean;
-    title: string;
+    title: React.ReactNode;
     icon?: LucideIcon;
     iconColor?: string;
     headerBadge?: string;
@@ -187,6 +187,11 @@ export function AppShellLayout({
                     title={tab.title}
                   >
                     <TabIcon className="w-5 h-5" />
+                    {tab.badge !== undefined && tab.badge !== 0 && (
+                      <span className="absolute -top-1 -right-1 px-1.5 py-0.2 rounded-full text-[9px] font-bold bg-amber-500 text-slate-950 font-mono shadow-sm">
+                        {tab.badge}
+                      </span>
+                    )}
                     {isActive && isDrawerOpen && (
                       <span className="absolute -left-1 w-1 h-5 bg-blue-400 rounded-r-full shadow-sm shadow-blue-400"></span>
                     )}
@@ -275,7 +280,7 @@ export function AppShellLayout({
             </div>
 
             {/* Вміст сайдбара з власним ізольованим скролом */}
-            <div className="flex-1 overflow-y-auto p-3 flex flex-col gap-3">
+            <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-3">
               {drawer.children}
             </div>
           </aside>

@@ -7,7 +7,7 @@ import { MonacoCodeEditor } from '../features/code-editor/ui/MonacoCodeEditor';
 import { QuizTaskEditor } from '../features/quiz-editor/ui/QuizTaskEditor';
 import { EssayTaskEditor } from '../features/essay-editor/ui/EssayTaskEditor';
 import { SkillDagMap } from '../features/skill-graph/ui/SkillDagMap';
-import { GameSkillTreeWidget, SkillGraphNode, DrawerSection } from '@sbc/ui';
+import { GameSkillTreeWidget, SkillGraphNode, DrawerSection, AppShellLayout } from '@sbc/ui';
 import { TaskDto, CourseDto } from '@sbc/types';
 import { getAppBaseUrl, ROUTES, resolveStudyUrl } from '@sbc/routes';
 
@@ -404,319 +404,38 @@ export function StudentPortalContent({
     recommendation?.isDifficultyDegraded
   );
 
-  return (
-    <div className="h-screen w-screen bg-slate-950 text-slate-100 flex flex-col font-sans overflow-hidden relative">
-      {/* 🔔 Floating Course Switch Toast Notification */}
-      {courseNotification && (
-        <div className="fixed top-16 right-6 z-50 animate-fadeIn flex items-center gap-3 px-4 py-3 rounded-2xl bg-indigo-950/90 border border-indigo-500/50 text-white shadow-2xl backdrop-blur-xl">
-          <Sparkles className="w-4 h-4 text-indigo-400 animate-spin shrink-0" />
-          <div className="text-xs font-medium">
-            <span className="font-bold text-indigo-300 block text-[11px] uppercase tracking-wider">Навчальний контекст</span>
-            {courseNotification}
-          </div>
-          <button
-            onClick={() => setCourseNotification(null)}
-            className="text-slate-400 hover:text-white p-1 rounded-lg ml-1"
-          >
-            <X className="w-3.5 h-3.5" />
-          </button>
-        </div>
-      )}
+  const getDrawerConfig = () => {
+    let title: React.ReactNode = 'Панель';
+    let icon = BookOpen;
+    let iconColor = 'text-indigo-400';
 
-      {/* 📌 Sticky Top Navigation Bar with Prominent Progress Indicator */}
-      <header className="h-14 w-full bg-slate-900 border-b border-slate-800/90 px-4 flex items-center justify-between shrink-0 z-30 shadow-md">
-        <div className="flex items-center gap-3">
-          <div className="p-1.5 bg-indigo-600/20 border border-indigo-500/30 rounded-lg text-indigo-400">
-            <Brain className="w-5 h-5" />
-          </div>
-          <div>
-            <h1 className="text-sm font-bold text-white flex items-center gap-2">
-              <span>Smart-BKT-Chain</span>
-              <span className="px-2 py-0.5 text-[10px] font-mono bg-indigo-500/20 text-indigo-300 rounded border border-indigo-500/30">
-                v2.0 Shell
-              </span>
-            </h1>
-          </div>
-        </div>
+    if (activeTab === 'task') {
+      title = 'Умова та Контекст Завдання';
+      icon = BookOpen;
+      iconColor = 'text-indigo-400';
+    } else if (activeTab === 'bkt') {
+      title = 'Карта Навичок (Skill DAG)';
+      icon = Sparkles;
+      iconColor = 'text-emerald-400';
+    } else if (activeTab === 'tree') {
+      title = 'Деталізація Вузла Дерева';
+      icon = Network;
+      iconColor = 'text-purple-400';
+    } else if (activeTab === 'settings') {
+      title = 'Налаштування Студента';
+      icon = Settings;
+      iconColor = 'text-amber-400';
+    }
 
-        {/* 🏆 Prominent Central Overall Course Progress Display */}
-        <div className="hidden md:flex items-center gap-4 bg-slate-950/80 px-4 py-1.5 rounded-2xl border border-slate-800 shadow-inner">
-          <div className="flex items-center gap-2">
-            <div className="p-1 bg-amber-500/10 border border-amber-500/30 rounded-lg text-amber-400">
-              <Trophy className="w-3.5 h-3.5" />
-            </div>
-            <div className="flex flex-col">
-              <div className="flex items-center gap-1.5 text-[11px] leading-tight font-semibold text-slate-300">
-                <span>Прогрес курсу:</span>
-                <span className="font-mono font-bold text-amber-400">{courseCompletionPct}%</span>
-                <span className="text-[10px] text-slate-500 font-mono">({masteredSkillsCount}/{totalSkillsCount} модулів)</span>
-              </div>
-              <div className="w-32 h-1.5 bg-slate-900 rounded-full overflow-hidden border border-slate-800 mt-1">
-                <div
-                  className="h-full bg-gradient-to-r from-amber-500 via-emerald-500 to-teal-400 rounded-full transition-all duration-500"
-                  style={{ width: `${courseCompletionPct}%` }}
-                />
-              </div>
-            </div>
-          </div>
+    return {
+      isOpen: isDrawerOpen,
+      title,
+      icon,
+      iconColor,
+      onClose: () => setIsDrawerOpen(false),
+      children: (
+        <>
 
-          {activeSkillNode && (
-            <div className="h-6 w-[1px] bg-slate-800"></div>
-          )}
-
-          {activeSkillNode && (
-            <div className="flex items-center gap-2">
-              <div className="p-1 bg-indigo-500/10 border border-indigo-500/30 rounded-lg text-indigo-400">
-                <Target className="w-3.5 h-3.5" />
-              </div>
-              <div className="flex flex-col">
-                <div className="flex items-center gap-1.5 text-[11px] leading-tight font-semibold text-slate-300">
-                  <span className="truncate max-w-[130px]">{activeSkillNode.title.split(':')[0]}:</span>
-                  <span className={`font-mono font-bold ${activeSkillMasteryPct >= 90 ? 'text-emerald-400' : 'text-indigo-400'}`}>
-                    {activeSkillMasteryPct}%
-                  </span>
-                  <span className="text-[10px] text-slate-500 font-mono">(P(L))</span>
-                </div>
-                <div className="w-28 h-1.5 bg-slate-900 rounded-full overflow-hidden border border-slate-800 mt-1">
-                  <div
-                    className={`h-full rounded-full transition-all duration-500 ${
-                      activeSkillMasteryPct >= 90
-                        ? 'bg-emerald-400'
-                        : 'bg-gradient-to-r from-indigo-500 to-purple-500'
-                    }`}
-                    style={{ width: `${Math.min(100, activeSkillMasteryPct)}%` }}
-                  />
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Top Controls: Course Selector & User Profile */}
-        <div className="flex items-center gap-3">
-          <div className="relative min-w-[200px] sm:min-w-[240px]">
-            <select
-              id="student-course-select"
-              value={activeCourseSlug}
-              onChange={(e) => handleSelectCourse(e.target.value)}
-              className="w-full appearance-none px-3 py-1.5 rounded-xl bg-slate-950 border border-slate-700 text-xs font-semibold text-white focus:outline-none focus:border-indigo-500 cursor-pointer pr-8 shadow-inner"
-            >
-              {courses.map((course) => (
-                <option key={course.slug} value={course.slug} className="bg-slate-900 text-white py-1">
-                  📚 {course.title}
-                </option>
-              ))}
-            </select>
-            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-indigo-400">
-              <ChevronDown className="w-3.5 h-3.5" />
-            </div>
-          </div>
-
-          <div className="flex items-center gap-2 bg-slate-950 px-3 py-1.5 rounded-xl border border-slate-800 text-xs">
-            <User className="w-3.5 h-3.5 text-indigo-400" />
-            <span className="font-semibold text-slate-200">Дмитро Стеценко</span>
-          </div>
-        </div>
-      </header>
-
-      {/* 🧭 Main Workspace Area with Left Opera Icon Rail + Expandable Drawer */}
-      <div className="flex-1 flex overflow-hidden">
-        {/* 🎨 Opera-Style Vertical Icon Rail (Slim Left Bar) */}
-        <nav className="w-14 bg-slate-900 border-r border-slate-800 flex flex-col items-center py-4 gap-3 shrink-0 z-20 shadow-xl">
-          {/* Tab 1: Task / Editor */}
-          <button
-            onClick={() => handleTabClick('task')}
-            className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all cursor-pointer relative ${
-              activeTab === 'task'
-                ? isDrawerOpen
-                  ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/40 ring-1 ring-indigo-400/50'
-                  : 'bg-indigo-950/80 text-indigo-300 border border-indigo-500/30 hover:bg-indigo-900/90 hover:text-white'
-                : 'bg-slate-800/60 text-slate-400 hover:bg-slate-800 hover:text-white'
-            }`}
-            title={
-              activeTab === 'task'
-                ? isDrawerOpen
-                  ? 'Редактор відкритий із панеллю умови (клік розгорне редактор на весь екран)'
-                  : 'Редактор на весь екран (клік поверне бічну панель умови)'
-                : 'Перейти до Редактора та завдання'
-            }
-          >
-            <BookOpen className="w-5 h-5" />
-            {activeTab === 'task' && isDrawerOpen && (
-              <span className="absolute -left-1 w-1 h-5 bg-indigo-400 rounded-r-full shadow-sm shadow-indigo-400"></span>
-            )}
-            {activeTab === 'task' && !isDrawerOpen && (
-              <span className="absolute -left-1 w-1 h-2 bg-indigo-400/70 rounded-r-full"></span>
-            )}
-          </button>
-
-          {/* Tab 2: BKT Skill Map */}
-          <button
-            onClick={() => handleTabClick('bkt')}
-            className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all cursor-pointer relative ${
-              activeTab === 'bkt'
-                ? isDrawerOpen
-                  ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-600/40 ring-1 ring-emerald-400/50'
-                  : 'bg-emerald-950/80 text-emerald-300 border border-emerald-500/30 hover:bg-emerald-900/90 hover:text-white'
-                : 'bg-slate-800/60 text-slate-400 hover:bg-slate-800 hover:text-white'
-            }`}
-            title={
-              activeTab === 'bkt'
-                ? isDrawerOpen
-                  ? 'Карта навичок відкрита (клік розгорне редактор на весь екран)'
-                  : 'Редактор на весь екран (клік поверне карту BKT)'
-                : 'Карта Навичок BKT (DAG у бічній панелі)'
-            }
-          >
-            <Sparkles className="w-5 h-5" />
-            {activeTab === 'bkt' && isDrawerOpen && (
-              <span className="absolute -left-1 w-1 h-5 bg-emerald-400 rounded-r-full shadow-sm shadow-emerald-400"></span>
-            )}
-            {activeTab === 'bkt' && !isDrawerOpen && (
-              <span className="absolute -left-1 w-1 h-2 bg-emerald-400/70 rounded-r-full"></span>
-            )}
-          </button>
-
-          {/* Tab 3: Knowledge Tree */}
-          <button
-            onClick={() => handleTabClick('tree')}
-            className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all cursor-pointer relative ${
-              activeTab === 'tree'
-                ? isDrawerOpen
-                  ? 'bg-gradient-to-br from-indigo-600 to-purple-600 text-white shadow-lg shadow-indigo-600/40 border border-indigo-400'
-                  : 'bg-purple-950/80 text-purple-300 border border-purple-500/40 shadow-md hover:bg-purple-900/90 hover:text-white'
-                : 'bg-slate-800/60 text-slate-400 hover:bg-slate-800 hover:text-white'
-            }`}
-            title={
-              activeTab === 'tree'
-                ? isDrawerOpen
-                  ? 'Дерево відкрите із сайдбаром (клік розгорне дерево на весь екран)'
-                  : 'Дерево на весь екран (клік поверне сайдбар деталей вузла)'
-                : 'Перейти до Дерева Знань'
-            }
-          >
-            <Network className="w-5 h-5" />
-            {activeTab === 'tree' && isDrawerOpen && (
-              <span className="absolute -left-1 w-1 h-5 bg-purple-400 rounded-r-full shadow-sm shadow-purple-400"></span>
-            )}
-            {activeTab === 'tree' && !isDrawerOpen && (
-              <span className="absolute -left-1 w-1 h-2 bg-purple-400/70 rounded-r-full"></span>
-            )}
-          </button>
-
-          {/* Bottom Area (External Apps & Settings at very bottom) */}
-          <div className="mt-auto flex flex-col items-center gap-2.5">
-            <div className="w-8 h-[1px] bg-slate-800/80 my-1"></div>
-
-            {/* External Apps Group via unified routes */}
-            <a
-              href={getAppBaseUrl('study')}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-10 h-10 rounded-xl bg-blue-600/15 text-blue-400 border border-blue-500/20 flex items-center justify-center hover:bg-blue-600/30 hover:border-blue-500/40 transition-all"
-              title="Підручник Теорії (Study Portal - 3006)"
-            >
-              <GraduationCap className="w-4 h-4" />
-            </a>
-
-            <a
-              href={getAppBaseUrl('teacher')}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-10 h-10 rounded-xl bg-purple-600/15 text-purple-400 border border-purple-500/20 flex items-center justify-center hover:bg-purple-600/30 hover:border-purple-500/40 transition-all"
-              title="Кабінет Викладача (Teacher Portal - 3003)"
-            >
-              <User className="w-4 h-4" />
-            </a>
-
-            <a
-              href={getAppBaseUrl('admin')}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-10 h-10 rounded-xl bg-emerald-600/15 text-emerald-400 border border-emerald-500/20 flex items-center justify-center hover:bg-emerald-600/30 hover:border-emerald-500/40 transition-all"
-              title="Панель Адміністратора CMS (Admin Portal - 3004)"
-            >
-              <Code2 className="w-4 h-4" />
-            </a>
-
-            <a
-              href={ROUTES.docs.root}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-10 h-10 rounded-xl bg-slate-800/60 text-slate-400 border border-slate-700/60 flex items-center justify-center hover:bg-slate-800 hover:text-white transition-all"
-              title="Портал Документації (Docs - 3005)"
-            >
-              <BookOpen className="w-4 h-4" />
-            </a>
-
-            {/* Separator before Settings block */}
-            <div className="w-8 h-[1px] bg-slate-800/80 my-1"></div>
-
-            {/* Workspace Settings Block (At the very bottom) */}
-            <button
-              onClick={() => handleTabClick('settings')}
-              className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all cursor-pointer relative ${
-                activeTab === 'settings'
-                  ? isDrawerOpen
-                    ? 'bg-amber-600 text-white shadow-lg shadow-amber-600/40 ring-1 ring-amber-400/50'
-                    : 'bg-amber-950/80 text-amber-300 border border-amber-500/30 hover:bg-amber-900/90 hover:text-white'
-                  : 'bg-slate-800/60 text-slate-400 hover:bg-slate-800 hover:text-white'
-              }`}
-              title="Налаштування Workspace"
-            >
-              <Settings className="w-5 h-5" />
-              {activeTab === 'settings' && isDrawerOpen && (
-                <span className="absolute -left-1 w-1 h-5 bg-amber-400 rounded-r-full shadow-sm shadow-amber-400"></span>
-              )}
-              {activeTab === 'settings' && !isDrawerOpen && (
-                <span className="absolute -left-1 w-1 h-2 bg-amber-400/70 rounded-r-full"></span>
-              )}
-            </button>
-          </div>
-        </nav>
-
-        {/* 📂 Expandable Side Drawer Panel */}
-        {isDrawerOpen && (
-          <aside className="w-full sm:w-[380px] lg:w-[420px] bg-slate-900/95 border-r border-slate-800 flex flex-col shrink-0 shadow-2xl backdrop-blur-xl animate-fadeIn z-10 overflow-hidden">
-            {/* 📌 Fixed Drawer Header (Does not scroll) */}
-            <div className="p-4 border-b border-slate-800 flex items-center justify-between shrink-0 bg-slate-900/90 backdrop-blur-md">
-              <h2 className="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
-                {activeTab === 'task' && (
-                  <>
-                    <BookOpen className="w-4 h-4 text-indigo-400" />
-                    <span>Умова та Контекст Завдання</span>
-                  </>
-                )}
-                {activeTab === 'bkt' && (
-                  <>
-                    <Sparkles className="w-4 h-4 text-emerald-400" />
-                    <span>Карта Навичок (Skill DAG)</span>
-                  </>
-                )}
-                {activeTab === 'tree' && (
-                  <>
-                    <Network className="w-4 h-4 text-purple-400" />
-                    <span>Деталізація Вузла Дерева</span>
-                  </>
-                )}
-                {activeTab === 'settings' && (
-                  <>
-                    <Settings className="w-4 h-4 text-amber-400" />
-                    <span>Налаштування Студента</span>
-                  </>
-                )}
-              </h2>
-              <button
-                onClick={() => setIsDrawerOpen(false)}
-                className="p-1.5 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-all cursor-pointer"
-                title="Закрити панель (розгорнути вікно на весь екран)"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-
-            {/* 📜 Scrollable Drawer Body Content */}
-            <div className="flex-1 p-5 overflow-y-auto flex flex-col gap-3">
               {/* Content Drawer 1: Task Condition & Attempt History */}
               {activeTab === 'task' && task && (
                 <div className="flex flex-col gap-3 flex-1">
@@ -1301,12 +1020,225 @@ export function StudentPortalContent({
                   </DrawerSection>
                 </div>
               )}
-            </div>
-          </aside>
-        )}
+            
+        </>
+      ),
+    };
+  };
 
-        {/* 💻 Center Main Canvas: Editor & Evaluation Result */}
-        <main className="flex-1 overflow-hidden flex flex-col bg-slate-950">
+  return (
+    <AppShellLayout
+      currentApp="student"
+      header={{
+        appName: 'Smart-BKT-Chain',
+        badgeText: 'Student Portal v2.0',
+        logoIcon: Brain,
+        logoColor: 'bg-indigo-600/20 border-indigo-500/30 text-indigo-400',
+        badgeColor: 'bg-indigo-500/20 text-indigo-300 border-indigo-500/30',
+        rightSlot: (
+          <div className="flex items-center gap-3">
+            {/* 🏆 Prominent Central Overall Course Progress Display */}
+        <div className="hidden md:flex items-center gap-4 bg-slate-950/80 px-4 py-1.5 rounded-2xl border border-slate-800 shadow-inner">
+          <div className="flex items-center gap-2">
+            <div className="p-1 bg-amber-500/10 border border-amber-500/30 rounded-lg text-amber-400">
+              <Trophy className="w-3.5 h-3.5" />
+            </div>
+            <div className="flex flex-col">
+              <div className="flex items-center gap-1.5 text-[11px] leading-tight font-semibold text-slate-300">
+                <span>Прогрес курсу:</span>
+                <span className="font-mono font-bold text-amber-400">{courseCompletionPct}%</span>
+                <span className="text-[10px] text-slate-500 font-mono">({masteredSkillsCount}/{totalSkillsCount} модулів)</span>
+              </div>
+              <div className="w-32 h-1.5 bg-slate-900 rounded-full overflow-hidden border border-slate-800 mt-1">
+                <div
+                  className="h-full bg-gradient-to-r from-amber-500 via-emerald-500 to-teal-400 rounded-full transition-all duration-500"
+                  style={{ width: `${courseCompletionPct}%` }}
+                />
+              </div>
+            </div>
+          </div>
+
+          {activeSkillNode && (
+            <div className="h-6 w-[1px] bg-slate-800"></div>
+          )}
+
+          {activeSkillNode && (
+            <div className="flex items-center gap-2">
+              <div className="p-1 bg-indigo-500/10 border border-indigo-500/30 rounded-lg text-indigo-400">
+                <Target className="w-3.5 h-3.5" />
+              </div>
+              <div className="flex flex-col">
+                <div className="flex items-center gap-1.5 text-[11px] leading-tight font-semibold text-slate-300">
+                  <span className="truncate max-w-[130px]">{activeSkillNode.title.split(':')[0]}:</span>
+                  <span className={`font-mono font-bold ${activeSkillMasteryPct >= 90 ? 'text-emerald-400' : 'text-indigo-400'}`}>
+                    {activeSkillMasteryPct}%
+                  </span>
+                  <span className="text-[10px] text-slate-500 font-mono">(P(L))</span>
+                </div>
+                <div className="w-28 h-1.5 bg-slate-900 rounded-full overflow-hidden border border-slate-800 mt-1">
+                  <div
+                    className={`h-full rounded-full transition-all duration-500 ${
+                      activeSkillMasteryPct >= 90
+                        ? 'bg-emerald-400'
+                        : 'bg-gradient-to-r from-indigo-500 to-purple-500'
+                    }`}
+                    style={{ width: `${Math.min(100, activeSkillMasteryPct)}%` }}
+                  />
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Top Controls: Course Selector & User Profile */}
+        <div className="flex items-center gap-3">
+          <div className="relative min-w-[200px] sm:min-w-[240px]">
+            <select
+              id="student-course-select"
+              value={activeCourseSlug}
+              onChange={(e) => handleSelectCourse(e.target.value)}
+              className="w-full appearance-none px-3 py-1.5 rounded-xl bg-slate-950 border border-slate-700 text-xs font-semibold text-white focus:outline-none focus:border-indigo-500 cursor-pointer pr-8 shadow-inner"
+            >
+              {courses.map((course) => (
+                <option key={course.slug} value={course.slug} className="bg-slate-900 text-white py-1">
+                  📚 {course.title}
+                </option>
+              ))}
+            </select>
+            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-indigo-400">
+              <ChevronDown className="w-3.5 h-3.5" />
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2 bg-slate-950 px-3 py-1.5 rounded-xl border border-slate-800 text-xs">
+            <User className="w-3.5 h-3.5 text-indigo-400" />
+            <span className="font-semibold text-slate-200">Дмитро Стеценко</span>
+          </div>
+        </div>
+          </div>
+        ),
+      }}
+      navigationRail={{
+        tabs: [
+          {
+            id: 'task',
+            icon: BookOpen,
+            title: activeTab === 'task'
+              ? isDrawerOpen
+                ? 'Редактор відкритий із панеллю умови (клік розгорне редактор на весь екран)'
+                : 'Редактор на весь екран (клік поверне бічну панель умови)'
+              : 'Перейти до Редактора та завдання',
+            activeColor: 'bg-indigo-600',
+          },
+          {
+            id: 'bkt',
+            icon: Sparkles,
+            title: activeTab === 'bkt'
+              ? isDrawerOpen
+                ? 'Карта навичок відкрита (клік розгорне редактор на весь екран)'
+                : 'Редактор на весь екран (клік поверне карту BKT)'
+              : 'Карта Навичок BKT (DAG у бічній панелі)',
+            activeColor: 'bg-emerald-600',
+          },
+          {
+            id: 'tree',
+            icon: Network,
+            title: activeTab === 'tree'
+              ? isDrawerOpen
+                ? 'Дерево відкрите із сайдбаром (клік розгорне дерево на весь екран)'
+                : 'Дерево на весь екран (клік поверне сайдбар деталей вузла)'
+              : 'Перейти до Дерева Знань',
+            activeColor: 'bg-gradient-to-br from-indigo-600 to-purple-600',
+          },
+        ],
+        activeTab: activeTab,
+        isDrawerOpen: isDrawerOpen,
+        onTabClick: (tabId) => handleTabClick(tabId as any),
+        onSettingsClick: () => handleTabClick('settings'),
+        isSettingsActive: activeTab === 'settings',
+      }}
+      drawer={getDrawerConfig()}
+      mainClassName="overflow-hidden flex flex-col bg-slate-950"
+      overlays={
+        <>
+          {/* 🔔 Floating Course Switch Toast Notification */}
+      {courseNotification && (
+        <div className="fixed top-16 right-6 z-50 animate-fadeIn flex items-center gap-3 px-4 py-3 rounded-2xl bg-indigo-950/90 border border-indigo-500/50 text-white shadow-2xl backdrop-blur-xl">
+          <Sparkles className="w-4 h-4 text-indigo-400 animate-spin shrink-0" />
+          <div className="text-xs font-medium">
+            <span className="font-bold text-indigo-300 block text-[11px] uppercase tracking-wider">Навчальний контекст</span>
+            {courseNotification}
+          </div>
+          <button
+            onClick={() => setCourseNotification(null)}
+            className="text-slate-400 hover:text-white p-1 rounded-lg ml-1"
+          >
+            <X className="w-3.5 h-3.5" />
+          </button>
+        </div>
+      )}
+          {/* Exhausted Module Tasks Modal Popup */}
+      {exhaustedModalData && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-md animate-fadeIn">
+          <div className="max-w-md w-full p-6 bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl flex flex-col gap-5 text-center transform transition-all scale-100">
+            <div className="mx-auto p-3.5 bg-amber-500/10 border border-amber-500/30 rounded-full text-amber-400">
+              <AlertTriangle className="w-8 h-8 animate-pulse" />
+            </div>
+            <div className="flex flex-col gap-2">
+              <h3 className="text-lg font-bold text-white">Завдання модуля закінчилися</h3>
+              <p className="text-xs text-slate-300 leading-relaxed">
+                Завдання даного модуля (<strong className="text-indigo-400">"{exhaustedModalData.skillTitle}"</strong>) закінчилися, і ви не набрали необхідну кількість балів (&ge;95%).
+                Ваш прогрес на цьому модулі буде анульований для повторної спроби.
+              </p>
+            </div>
+            <button
+              onClick={handleConfirmSkillReset}
+              className="w-full py-3 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs uppercase tracking-wider shadow-lg shadow-indigo-600/30 transition-all cursor-pointer border border-indigo-400/30"
+            >
+              ОК, анулювати прогрес модуля
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Course Switch Confirmation Modal Popup */}
+      {pendingCourseSlug && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-md animate-fadeIn">
+          <div className="max-w-md w-full p-6 bg-slate-900 border border-indigo-500/40 rounded-2xl shadow-2xl flex flex-col gap-5 text-center transform transition-all scale-100">
+            <div className="mx-auto p-3.5 bg-indigo-500/10 border border-indigo-500/30 rounded-full text-indigo-400">
+              <BookOpen className="w-8 h-8 animate-pulse" />
+            </div>
+            <div className="flex flex-col gap-2">
+              <h3 className="text-lg font-bold text-white">Перемикання Навчального Курсу</h3>
+              <p className="text-xs text-slate-300 leading-relaxed">
+                Ви дійсно бажаєте перейти до вивчення курсу <strong className="text-indigo-300">"{courses.find(c => c.slug === pendingCourseSlug)?.title || pendingCourseSlug}"</strong>?
+              </p>
+              <div className="p-3 bg-slate-950/70 border border-slate-800 rounded-xl text-[11px] text-slate-400 text-left flex flex-col gap-1">
+                <span>⚠️ Незбережені зміни в поточному коді будуть скинуті.</span>
+                <span>📊 Буде завантажено індивідуальну траєкторію BKT нового курсу.</span>
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={cancelCourseSwitch}
+                className="flex-1 py-2.5 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs transition-all cursor-pointer border border-slate-700"
+              >
+                Скасувати
+              </button>
+              <button
+                onClick={confirmCourseSwitch}
+                className="flex-1 py-2.5 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs uppercase tracking-wider shadow-lg shadow-indigo-600/30 transition-all cursor-pointer border border-indigo-400/30"
+              >
+                Підтвердити перехід
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+        </>
+      }
+    >
+      
           {mainView === 'tree' ? (
             <div className="w-full h-full p-4 lg:p-6 overflow-hidden flex flex-col">
               <GameSkillTreeWidget
@@ -1714,68 +1646,8 @@ export function StudentPortalContent({
               Завдань у даному курсі не знайдено.
             </div>
           )}
-        </main>
-      </div>
-
-      {/* Exhausted Module Tasks Modal Popup */}
-      {exhaustedModalData && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-md animate-fadeIn">
-          <div className="max-w-md w-full p-6 bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl flex flex-col gap-5 text-center transform transition-all scale-100">
-            <div className="mx-auto p-3.5 bg-amber-500/10 border border-amber-500/30 rounded-full text-amber-400">
-              <AlertTriangle className="w-8 h-8 animate-pulse" />
-            </div>
-            <div className="flex flex-col gap-2">
-              <h3 className="text-lg font-bold text-white">Завдання модуля закінчилися</h3>
-              <p className="text-xs text-slate-300 leading-relaxed">
-                Завдання даного модуля (<strong className="text-indigo-400">"{exhaustedModalData.skillTitle}"</strong>) закінчилися, і ви не набрали необхідну кількість балів (&ge;95%).
-                Ваш прогрес на цьому модулі буде анульований для повторної спроби.
-              </p>
-            </div>
-            <button
-              onClick={handleConfirmSkillReset}
-              className="w-full py-3 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs uppercase tracking-wider shadow-lg shadow-indigo-600/30 transition-all cursor-pointer border border-indigo-400/30"
-            >
-              ОК, анулювати прогрес модуля
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* Course Switch Confirmation Modal Popup */}
-      {pendingCourseSlug && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-md animate-fadeIn">
-          <div className="max-w-md w-full p-6 bg-slate-900 border border-indigo-500/40 rounded-2xl shadow-2xl flex flex-col gap-5 text-center transform transition-all scale-100">
-            <div className="mx-auto p-3.5 bg-indigo-500/10 border border-indigo-500/30 rounded-full text-indigo-400">
-              <BookOpen className="w-8 h-8 animate-pulse" />
-            </div>
-            <div className="flex flex-col gap-2">
-              <h3 className="text-lg font-bold text-white">Перемикання Навчального Курсу</h3>
-              <p className="text-xs text-slate-300 leading-relaxed">
-                Ви дійсно бажаєте перейти до вивчення курсу <strong className="text-indigo-300">"{courses.find(c => c.slug === pendingCourseSlug)?.title || pendingCourseSlug}"</strong>?
-              </p>
-              <div className="p-3 bg-slate-950/70 border border-slate-800 rounded-xl text-[11px] text-slate-400 text-left flex flex-col gap-1">
-                <span>⚠️ Незбережені зміни в поточному коді будуть скинуті.</span>
-                <span>📊 Буде завантажено індивідуальну траєкторію BKT нового курсу.</span>
-              </div>
-            </div>
-            <div className="flex items-center gap-3">
-              <button
-                onClick={cancelCourseSwitch}
-                className="flex-1 py-2.5 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs transition-all cursor-pointer border border-slate-700"
-              >
-                Скасувати
-              </button>
-              <button
-                onClick={confirmCourseSwitch}
-                className="flex-1 py-2.5 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs uppercase tracking-wider shadow-lg shadow-indigo-600/30 transition-all cursor-pointer border border-indigo-400/30"
-              >
-                Підтвердити перехід
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
+        
+    </AppShellLayout>
   );
 }
 

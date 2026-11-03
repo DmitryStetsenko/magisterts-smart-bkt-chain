@@ -120,6 +120,93 @@
           ]
         },
         {
+          "title": "0.1.7.24 Комплексна Стандартизація Застосунків на базі AppShellLayout (SBC-315, EP-SH / EP-ST / EP-TC / EP-AD)",
+          "level": 3,
+          "paragraphs": [],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "**Контекст та інженерний мотив:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "На вимогу користувача уніфікувати лейаути в чотирьох головних робочих кабінетах платформи («Цей лейаут повинен бути у застосунків Студент, Викладач, Адмінка, Підручник. Документація і основний сайт покищо хай буде як є»).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Запобігання фрагментації інтерфейсів, дублюванню навігаційних панелей та неконсистентному скролінгу між різними ролями (Учень, Студент, Викладач, Адміністратор).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Виконана реструктуризація по застосунках:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**`apps/study` (Підручник - порт 3006):**",
+              "subitems": [
+                "Файл: `apps/study/src/components/StudyAppClient.tsx`.",
+                "Навігаційна рейка: дерево уроків та зміст курсу в `drawer`, центральний віджет Zen Focus у шапці, автоматичні міжпортальні іконки."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**`apps/teacher` (Кабінет Викладача - порт 3003):**",
+              "subitems": [
+                "Файл: `apps/teacher/src/app/page.tsx`.",
+                "Навігаційна рейка: таби `analytics` (BarChart3), `coursemap` (Network), `reviews` (ClipboardCheck із лічильником неперевірених відповідей), `metrics-audit` (FlaskConical), `settings` (ShieldCheck).",
+                "Хедер: селектор навчальних курсів, пошуковий випадаючий список студентів із метриками $P(L)$, ідентифікатор ролі."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**`apps/student` (Інтерактивний Тренажер - порт 3002):**",
+              "subitems": [
+                "Файл: `apps/student/src/components/StudentPortalApp.tsx`.",
+                "Навігаційна рейка: таби `task` (BookOpen - умова завдання та історія спроб), `bkt` (Sparkles - інтерактивний граф навичок DAG), `tree` (Network - гейміфіковане дерево компетенцій), `settings` (Settings - параметри діагностики).",
+                "Хедер: центральний прогрес-бар завершення курсу у відсотках ($P(L)$), бейдж активної навички, селектор курсів та профіль користувача."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**`apps/admin` (Панель Адміністратора - порт 3004):**",
+              "subitems": [
+                "Файл: `apps/admin/src/app/page.tsx`.",
+                "Навігаційна рейка: таби `courses` (Курси), `skills` (Навички та DAG), `bkt` (Матриця параметрів), `telemetry` (Поведінкові логи), `chain` (Верифікація блоків), `settings` (Налаштування)."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Верифікація виробничої цілісності монорепозиторію:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "`npm run build --workspace=@sbc/study` -> Exit code 0.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "`npm run build --workspace=@sbc/teacher` -> Exit code 0.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "`npm run build --workspace=@sbc/student` -> Exit code 0.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "`npm run build --workspace=@sbc/admin` -> Exit code 0.",
+              "subitems": []
+            }
+          ]
+        },
+        {
           "title": "0.1.7.23 Впровадження Семантичної Маршрутизації та Протоколу Deep Linking у apps/student та apps/api (SBC-312, EP-ST)",
           "level": 3,
           "paragraphs": [],

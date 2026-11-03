@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { io } from 'socket.io-client';
 import { ShieldCheck, Network, Users, BarChart3, Code2, BookOpen, Scale, ChevronDown, ChevronUp, X, Search, RotateCcw, AlertTriangle, CheckCircle2, Lock, HelpCircle, Code, FileText, CheckSquare, Sparkles, Keyboard, Copy, Activity, Info, GitBranch, Layers, ClipboardCheck, Tag, FlaskConical, Compass, User, Globe, Plus, Minus, GraduationCap } from 'lucide-react';
 import { StudentAnalyticsItem } from '../features/analytics/model/analytics.types';
-import { AnomalyTreeWidget, GameSkillTreeWidget, SkillGraphNode } from '@sbc/ui';
+import { AnomalyTreeWidget, GameSkillTreeWidget, SkillGraphNode, AppShellLayout } from '@sbc/ui';
 import { CourseDto, TaskDto } from '@sbc/types';
 import { ReviewQueueInspector } from '../features/reviews/ui/ReviewQueueInspector';
 import { CourseGraphViewer } from '../features/course-map/ui/CourseGraphViewer';
@@ -418,362 +418,42 @@ export default function TeacherDashboardPage() {
     }
   };
 
-  return (
-    <div className="h-screen w-screen bg-slate-950 text-slate-100 flex flex-col font-sans overflow-hidden relative">
-      {/* 🔔 Floating Course Switch Toast Notification */}
-      {courseNotification && (
-        <div className="fixed top-16 right-6 z-50 animate-fadeIn flex items-center gap-3 px-4 py-3 rounded-2xl bg-purple-950/90 border border-purple-500/50 text-white shadow-2xl backdrop-blur-xl">
-          <Activity className="w-4 h-4 text-purple-400 animate-pulse shrink-0" />
-          <div className="text-xs font-medium">
-            <span className="font-bold text-purple-300 block text-[11px] uppercase tracking-wider">Фільтр моніторингу</span>
-            {courseNotification}
-          </div>
-          <button
-            onClick={() => setCourseNotification(null)}
-            className="text-slate-400 hover:text-white p-1 rounded-lg ml-1"
-          >
-            <X className="w-3.5 h-3.5" />
-          </button>
-        </div>
-      )}
+  const getDrawerConfig = () => {
+    let title: React.ReactNode = 'Панель';
+    let icon = BarChart3;
+    let iconColor = 'text-purple-400';
 
-      {/* 📌 Sticky Top Navigation Bar */}
-      <header className="h-14 w-full bg-slate-900 border-b border-slate-800/90 px-4 flex items-center justify-between shrink-0 z-30 shadow-md">
-        <div className="flex items-center gap-3">
-          <div className="p-1.5 bg-purple-600/20 border border-purple-500/30 rounded-lg text-purple-400">
-            <ShieldCheck className="w-5 h-5" />
-          </div>
-          <div>
-            <h1 className="text-sm font-bold text-white flex items-center gap-2">
-              <span>Smart-BKT-Chain</span>
-              <span className="px-2 py-0.5 text-[10px] font-mono bg-purple-500/20 text-purple-300 rounded border border-purple-500/30">
-                Teacher Portal v2.0
-              </span>
-            </h1>
-          </div>
-        </div>
+    if (activeTab === 'analytics') {
+      title = 'Огляд Групи & Ризики';
+      icon = BarChart3;
+      iconColor = 'text-purple-400';
+    } else if (activeTab === 'coursemap') {
+      title = 'Педагогічний Пульт Модуля';
+      icon = Network;
+      iconColor = 'text-indigo-400';
+    } else if (activeTab === 'reviews') {
+      title = `Черга Перевірки (${reviewQueue.length})`;
+      icon = ClipboardCheck;
+      iconColor = 'text-amber-400';
+    } else if (activeTab === 'metrics-audit') {
+      title = 'Аудит Метрик & Студенти';
+      icon = FlaskConical;
+      iconColor = 'text-emerald-400';
+    } else if (activeTab === 'settings') {
+      title = 'Параметри Оцінювання';
+      icon = ShieldCheck;
+      iconColor = 'text-amber-400';
+    }
 
-        {/* Top Controls: Course Selector, Searchable Student Selector & Profile */}
-        <div className="flex items-center gap-3">
-          {/* Course Selector */}
-          <div className="relative min-w-[180px] sm:min-w-[240px]">
-            <select
-              id="teacher-course-select"
-              value={activeCourseSlug}
-              onChange={(e) => handleSelectCourse(e.target.value)}
-              className="w-full appearance-none px-3 py-1.5 rounded-xl bg-slate-950 border border-slate-700 text-xs font-semibold text-white focus:outline-none focus:border-purple-500 cursor-pointer pr-8 shadow-inner"
-            >
-              {courses.map((course) => (
-                <option key={course.slug} value={course.slug} className="bg-slate-900 text-white py-1">
-                  🎓 {course.title} ({course.slug})
-                </option>
-              ))}
-            </select>
-            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-purple-400">
-              <ChevronDown className="w-3.5 h-3.5" />
-            </div>
-          </div>
+    return {
+      isOpen: isDrawerOpen,
+      title,
+      icon,
+      iconColor,
+      onClose: () => setIsDrawerOpen(false),
+      children: (
+        <>
 
-          {/* 🔍 Searchable Student Dropdown Selector */}
-          <div className="relative min-w-[200px] sm:min-w-[260px]">
-            <button
-              id="teacher-student-dropdown-btn"
-              onClick={() => setIsStudentDropdownOpen((prev) => !prev)}
-              className="w-full flex items-center justify-between px-3 py-1.5 rounded-xl bg-slate-950 border border-purple-500/40 hover:border-purple-400 text-xs font-semibold text-white transition-all shadow-inner cursor-pointer"
-            >
-              <div className="flex items-center gap-2 truncate">
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shrink-0"></span>
-                <span className="truncate">
-                  {selectedStudent ? selectedStudent.name : 'Обрати студента...'}
-                </span>
-                {selectedStudent && (
-                  <span className="px-1.5 py-0.2 rounded text-[10px] font-mono text-emerald-300 bg-emerald-500/10 border border-emerald-500/20 shrink-0">
-                    {(selectedStudent.averageMastery !== undefined ? (selectedStudent.averageMastery * 100).toFixed(0) : '0')}% P(L)
-                  </span>
-                )}
-              </div>
-              <ChevronDown className={`w-3.5 h-3.5 text-purple-400 shrink-0 transition-transform ${isStudentDropdownOpen ? 'rotate-180' : ''}`} />
-            </button>
-
-            {/* Dropdown Menu with Search */}
-            {isStudentDropdownOpen && (
-              <div className="absolute right-0 top-full mt-1.5 w-72 sm:w-80 bg-slate-900 border border-purple-500/40 rounded-2xl shadow-2xl z-50 overflow-hidden flex flex-col backdrop-blur-xl animate-fadeIn">
-                <div className="p-2.5 border-b border-slate-800 bg-slate-950/80">
-                  <div className="relative">
-                    <Search className="w-3.5 h-3.5 absolute left-3 top-2.5 text-slate-500" />
-                    <input
-                      type="text"
-                      placeholder="Пошук студента за ім'ям чи email..."
-                      value={studentSearch}
-                      onChange={(e) => setStudentSearch(e.target.value)}
-                      autoFocus
-                      className="w-full bg-slate-900 border border-slate-700 rounded-xl pl-9 pr-3 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-purple-500"
-                    />
-                  </div>
-                </div>
-
-                <div className="max-h-60 overflow-y-auto p-1.5 flex flex-col gap-1">
-                  {filteredStudents.length === 0 ? (
-                    <div className="p-4 text-center text-xs text-slate-500">Студентів не знайдено</div>
-                  ) : (
-                    filteredStudents.map((st) => {
-                      const stId = st.id || st.studentId || st.email;
-                      const isSelected = selectedStudentId === stId;
-                      const avgMastery = st.averageMastery !== undefined ? (st.averageMastery * 100).toFixed(0) : '0';
-
-                      return (
-                        <div
-                          key={stId}
-                          onClick={() => {
-                            setSelectedStudentId(stId);
-                            setIsStudentDropdownOpen(false);
-                          }}
-                          className={`p-2.5 rounded-xl transition-all cursor-pointer flex items-center justify-between gap-2 ${
-                            isSelected
-                              ? 'bg-purple-950/60 border border-purple-500/80 text-white shadow-sm'
-                              : 'hover:bg-slate-800 text-slate-300'
-                          }`}
-                        >
-                          <div className="overflow-hidden">
-                            <div className="text-xs font-bold truncate flex items-center gap-1.5">
-                              <span>{st.name}</span>
-                              {isSelected && <span className="text-[10px] text-purple-400">●</span>}
-                            </div>
-                            <div className="text-[11px] text-slate-400 truncate font-mono">{st.email}</div>
-                          </div>
-                          <div className="flex flex-col items-end shrink-0">
-                            <span className="text-xs font-mono font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
-                              {avgMastery}% P(L)
-                            </span>
-                            <span className="text-[10px] text-slate-400 font-mono mt-0.5">
-                              WPM: {st.wpm ?? st.avgWpm ?? 0}
-                            </span>
-                          </div>
-                        </div>
-                      );
-                    })
-                  )}
-                </div>
-              </div>
-            )}
-          </div>
-
-          <div className="flex items-center gap-2 bg-slate-950 px-3 py-1.5 rounded-xl border border-slate-800 text-xs">
-            <Users className="w-3.5 h-3.5 text-purple-400" />
-            <span className="font-semibold text-slate-200">Викладач</span>
-          </div>
-        </div>
-      </header>
-
-      {/* 🧭 Main Workspace Area with Left Opera Icon Rail */}
-      <div className="flex-1 flex overflow-hidden">
-        {/* 🎨 Opera-Style Vertical Icon Rail (Slim Left Bar) */}
-        <nav className="w-14 bg-slate-900 border-r border-slate-800 flex flex-col items-center py-4 gap-3 shrink-0 z-20 shadow-xl">
-          <button
-            onClick={() => handleTabClick('analytics')}
-            className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all cursor-pointer relative ${
-              activeTab === 'analytics'
-                ? isDrawerOpen
-                  ? 'bg-purple-600 text-white shadow-lg shadow-purple-600/40 ring-1 ring-purple-400/50'
-                  : 'bg-purple-950/80 text-purple-300 border border-purple-500/30 hover:bg-purple-900/90 hover:text-white'
-                : 'bg-slate-800/60 text-slate-400 hover:bg-slate-800 hover:text-white'
-            }`}
-            title={
-              activeTab === 'analytics'
-                ? isDrawerOpen
-                  ? 'Огляд групи відкритий (клік згорне сайдбар на весь екран)'
-                  : 'Аналітика на весь екран (клік відкриє огляд групи та радар ризиків)'
-                : 'Огляд Групи & Радар Ризиків'
-            }
-          >
-            <BarChart3 className="w-5 h-5" />
-            {activeTab === 'analytics' && isDrawerOpen && (
-              <span className="absolute -left-1 w-1 h-5 bg-purple-400 rounded-r-full shadow-sm shadow-purple-400"></span>
-            )}
-            {activeTab === 'analytics' && !isDrawerOpen && (
-              <span className="absolute -left-1 w-1 h-2 bg-purple-400/70 rounded-r-full"></span>
-            )}
-          </button>
-
-          <button
-            onClick={() => handleTabClick('coursemap')}
-            className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all cursor-pointer relative ${
-              activeTab === 'coursemap'
-                ? isDrawerOpen
-                  ? 'bg-purple-600 text-white shadow-lg shadow-purple-600/40 ring-1 ring-purple-400/50'
-                  : 'bg-purple-950/80 text-purple-300 border border-purple-500/30 hover:bg-purple-900/90 hover:text-white'
-                : 'bg-slate-800/60 text-slate-400 hover:bg-slate-800 hover:text-white'
-            }`}
-            title={
-              activeTab === 'coursemap'
-                ? isDrawerOpen
-                  ? 'Граф навичок відкритий (клік згорне сайдбар на весь екран)'
-                  : 'Інспектор на весь екран (клік відкриє дерево модулів)'
-                : 'Граф Навичок & Завдання'
-            }
-          >
-            <Network className="w-5 h-5" />
-            {activeTab === 'coursemap' && isDrawerOpen && (
-              <span className="absolute -left-1 w-1 h-5 bg-purple-400 rounded-r-full shadow-sm shadow-purple-400"></span>
-            )}
-            {activeTab === 'coursemap' && !isDrawerOpen && (
-              <span className="absolute -left-1 w-1 h-2 bg-purple-400/70 rounded-r-full"></span>
-            )}
-          </button>
-
-          <button
-            id="teacher-tab-reviews"
-            onClick={() => handleTabClick('reviews')}
-            className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all cursor-pointer relative ${
-              activeTab === 'reviews'
-                ? isDrawerOpen
-                  ? 'bg-purple-600 text-white shadow-lg shadow-purple-600/40 ring-1 ring-purple-400/50'
-                  : 'bg-purple-950/80 text-purple-300 border border-purple-500/30 hover:bg-purple-900/90 hover:text-white'
-                : 'bg-slate-800/60 text-slate-400 hover:bg-slate-800 hover:text-white'
-            }`}
-            title="Черга Перевірки Відкритих Відповідей (Human-in-the-Loop)"
-          >
-            <ClipboardCheck className="w-5 h-5" />
-            {reviewQueue.length > 0 && (
-              <span className="absolute -top-1 -right-1 px-1.5 py-0.2 rounded-full text-[9px] font-bold bg-amber-500 text-slate-950 font-mono shadow-sm">
-                {reviewQueue.length}
-              </span>
-            )}
-            {activeTab === 'reviews' && isDrawerOpen && (
-              <span className="absolute -left-1 w-1 h-5 bg-purple-400 rounded-r-full shadow-sm shadow-purple-400"></span>
-            )}
-            {activeTab === 'reviews' && !isDrawerOpen && (
-              <span className="absolute -left-1 w-1 h-2 bg-purple-400/70 rounded-r-full"></span>
-            )}
-          </button>
-
-          <button
-            id="teacher-tab-metrics-audit"
-            onClick={() => handleTabClick('metrics-audit')}
-            className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all cursor-pointer relative ${
-              activeTab === 'metrics-audit'
-                ? isDrawerOpen
-                  ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-600/40 ring-1 ring-emerald-400/50'
-                  : 'bg-emerald-950/80 text-emerald-300 border border-emerald-500/30 hover:bg-emerald-900/90 hover:text-white'
-                : 'bg-slate-800/60 text-slate-400 hover:bg-slate-800 hover:text-white'
-            }`}
-            title="Математичний Аудит & Симулятор BKT (What-If Sandbox)"
-          >
-            <FlaskConical className="w-5 h-5" />
-            {activeTab === 'metrics-audit' && isDrawerOpen && (
-              <span className="absolute -left-1 w-1 h-5 bg-emerald-400 rounded-r-full shadow-sm shadow-emerald-400"></span>
-            )}
-            {activeTab === 'metrics-audit' && !isDrawerOpen && (
-              <span className="absolute -left-1 w-1 h-2 bg-emerald-400/70 rounded-r-full"></span>
-            )}
-          </button>
-
-          {/* Bottom Area (External Shortcuts & Settings) */}
-          <div className="mt-auto flex flex-col items-center gap-2.5">
-            <div className="w-8 h-[1px] bg-slate-800/80 my-1"></div>
-
-            <a
-              href="http://localhost:3006"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-10 h-10 rounded-xl bg-blue-600/15 text-blue-400 border border-blue-500/20 flex items-center justify-center hover:bg-blue-600/30 hover:border-blue-500/40 transition-all"
-              title="Інтерактивний Підручник (Study Space - 3006)"
-            >
-              <GraduationCap className="w-4 h-4" />
-            </a>
-
-            <a
-              href="http://localhost:3002"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-10 h-10 rounded-xl bg-indigo-600/15 text-indigo-400 border border-indigo-500/20 flex items-center justify-center hover:bg-indigo-600/30 hover:border-indigo-500/40 transition-all"
-              title="Кабінет Студента (Student Portal - 3002)"
-            >
-              <BookOpen className="w-4 h-4" />
-            </a>
-
-            <a
-              href="http://localhost:3004"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-10 h-10 rounded-xl bg-emerald-600/15 text-emerald-400 border border-emerald-500/20 flex items-center justify-center hover:bg-emerald-600/30 hover:border-emerald-500/40 transition-all"
-              title="Панель Адміністратора CMS (Admin Portal - 3004)"
-            >
-              <Code2 className="w-4 h-4" />
-            </a>
-
-            <div className="w-8 h-[1px] bg-slate-800/80 my-1"></div>
-
-            <button
-              onClick={() => handleTabClick('settings')}
-              className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all cursor-pointer relative ${
-                activeTab === 'settings'
-                  ? isDrawerOpen
-                    ? 'bg-amber-600 text-white shadow-lg shadow-amber-600/40 ring-1 ring-amber-400/50'
-                    : 'bg-amber-950/80 text-amber-300 border border-amber-500/30 hover:bg-amber-900/90 hover:text-white'
-                  : 'bg-slate-800/60 text-slate-400 hover:bg-slate-800 hover:text-white'
-              }`}
-              title="Налаштування"
-            >
-              <ShieldCheck className="w-5 h-5" />
-              {activeTab === 'settings' && isDrawerOpen && (
-                <span className="absolute -left-1 w-1 h-5 bg-amber-400 rounded-r-full shadow-sm shadow-amber-400"></span>
-              )}
-              {activeTab === 'settings' && !isDrawerOpen && (
-                <span className="absolute -left-1 w-1 h-2 bg-amber-400/70 rounded-r-full"></span>
-              )}
-            </button>
-          </div>
-        </nav>
-
-        {/* 📂 Expandable Side Drawer Panel (List View) */}
-        {isDrawerOpen && (
-          <aside className="w-full sm:w-[340px] lg:w-[380px] bg-slate-900/95 border-r border-slate-800 flex flex-col shrink-0 shadow-2xl backdrop-blur-xl animate-fadeIn z-10 overflow-hidden">
-            {/* 📌 Fixed Drawer Header */}
-            <div className="p-4 border-b border-slate-800 flex items-center justify-between shrink-0 bg-slate-900/90 backdrop-blur-md">
-              <h2 className="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
-                {activeTab === 'analytics' && (
-                  <>
-                    <BarChart3 className="w-4 h-4 text-purple-400" />
-                    <span>Огляд Групи & Ризики</span>
-                  </>
-                )}
-                {activeTab === 'coursemap' && (
-                  <>
-                    <Network className="w-4 h-4 text-indigo-400" />
-                    <span>Педагогічний Пульт Модуля</span>
-                  </>
-                )}
-                {activeTab === 'reviews' && (
-                  <>
-                    <ClipboardCheck className="w-4 h-4 text-amber-400" />
-                    <span>Черга Перевірки ({reviewQueue.length})</span>
-                  </>
-                )}
-                {activeTab === 'metrics-audit' && (
-                  <>
-                    <FlaskConical className="w-4 h-4 text-emerald-400" />
-                    <span>Аудит Метрик & Студенти</span>
-                  </>
-                )}
-                {activeTab === 'settings' && (
-                  <>
-                    <ShieldCheck className="w-4 h-4 text-amber-400" />
-                    <span>Параметри Оцінювання</span>
-                  </>
-                )}
-              </h2>
-              <button
-                onClick={() => setIsDrawerOpen(false)}
-                className="p-1.5 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-all cursor-pointer"
-                title="Закрити панель (розгорнути вікно на весь екран)"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-
-            {/* 📜 Scrollable Drawer Body Content (Lists) */}
-            <div className="flex-1 p-4 overflow-y-auto flex flex-col gap-3">
               {/* Drawer 1: Cohort Bloom Distribution & Live Risk Feed (Rule 7 Standard) */}
               {activeTab === 'analytics' && (
                 <div className="flex flex-col gap-3">
@@ -1629,12 +1309,441 @@ export default function TeacherDashboardPage() {
                   </div>
                 </div>
               )}
-            </div>
-          </aside>
-        )}
+            
+        </>
+      ),
+    };
+  };
 
-        {/* 💻 Center Main Canvas: Detailed Inspector View */}
-        <main className="flex-1 p-4 lg:p-6 overflow-y-auto flex flex-col gap-6 bg-slate-950">
+  return (
+    <AppShellLayout
+      currentApp="teacher"
+      header={{
+        appName: 'Smart-BKT-Chain',
+        badgeText: 'Teacher Portal v2.0',
+        logoIcon: ShieldCheck,
+        logoColor: 'bg-purple-600/20 border-purple-500/30 text-purple-400',
+        badgeColor: 'bg-purple-500/20 text-purple-300 border-purple-500/30',
+        rightSlot: (
+          <>
+            {/* Top Controls: Course Selector, Searchable Student Selector & Profile */}
+            <div className="flex items-center gap-3">
+          {/* Course Selector */}
+          <div className="relative min-w-[180px] sm:min-w-[240px]">
+            <select
+              id="teacher-course-select"
+              value={activeCourseSlug}
+              onChange={(e) => handleSelectCourse(e.target.value)}
+              className="w-full appearance-none px-3 py-1.5 rounded-xl bg-slate-950 border border-slate-700 text-xs font-semibold text-white focus:outline-none focus:border-purple-500 cursor-pointer pr-8 shadow-inner"
+            >
+              {courses.map((course) => (
+                <option key={course.slug} value={course.slug} className="bg-slate-900 text-white py-1">
+                  🎓 {course.title} ({course.slug})
+                </option>
+              ))}
+            </select>
+            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-purple-400">
+              <ChevronDown className="w-3.5 h-3.5" />
+            </div>
+          </div>
+
+          {/* 🔍 Searchable Student Dropdown Selector */}
+          <div className="relative min-w-[200px] sm:min-w-[260px]">
+            <button
+              id="teacher-student-dropdown-btn"
+              onClick={() => setIsStudentDropdownOpen((prev) => !prev)}
+              className="w-full flex items-center justify-between px-3 py-1.5 rounded-xl bg-slate-950 border border-purple-500/40 hover:border-purple-400 text-xs font-semibold text-white transition-all shadow-inner cursor-pointer"
+            >
+              <div className="flex items-center gap-2 truncate">
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shrink-0"></span>
+                <span className="truncate">
+                  {selectedStudent ? selectedStudent.name : 'Обрати студента...'}
+                </span>
+                {selectedStudent && (
+                  <span className="px-1.5 py-0.2 rounded text-[10px] font-mono text-emerald-300 bg-emerald-500/10 border border-emerald-500/20 shrink-0">
+                    {(selectedStudent.averageMastery !== undefined ? (selectedStudent.averageMastery * 100).toFixed(0) : '0')}% P(L)
+                  </span>
+                )}
+              </div>
+              <ChevronDown className={`w-3.5 h-3.5 text-purple-400 shrink-0 transition-transform ${isStudentDropdownOpen ? 'rotate-180' : ''}`} />
+            </button>
+
+            {/* Dropdown Menu with Search */}
+            {isStudentDropdownOpen && (
+              <div className="absolute right-0 top-full mt-1.5 w-72 sm:w-80 bg-slate-900 border border-purple-500/40 rounded-2xl shadow-2xl z-50 overflow-hidden flex flex-col backdrop-blur-xl animate-fadeIn">
+                <div className="p-2.5 border-b border-slate-800 bg-slate-950/80">
+                  <div className="relative">
+                    <Search className="w-3.5 h-3.5 absolute left-3 top-2.5 text-slate-500" />
+                    <input
+                      type="text"
+                      placeholder="Пошук студента за ім'ям чи email..."
+                      value={studentSearch}
+                      onChange={(e) => setStudentSearch(e.target.value)}
+                      autoFocus
+                      className="w-full bg-slate-900 border border-slate-700 rounded-xl pl-9 pr-3 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-purple-500"
+                    />
+                  </div>
+                </div>
+
+                <div className="max-h-60 overflow-y-auto p-1.5 flex flex-col gap-1">
+                  {filteredStudents.length === 0 ? (
+                    <div className="p-4 text-center text-xs text-slate-500">Студентів не знайдено</div>
+                  ) : (
+                    filteredStudents.map((st) => {
+                      const stId = st.id || st.studentId || st.email;
+                      const isSelected = selectedStudentId === stId;
+                      const avgMastery = st.averageMastery !== undefined ? (st.averageMastery * 100).toFixed(0) : '0';
+
+                      return (
+                        <div
+                          key={stId}
+                          onClick={() => {
+                            setSelectedStudentId(stId);
+                            setIsStudentDropdownOpen(false);
+                          }}
+                          className={`p-2.5 rounded-xl transition-all cursor-pointer flex items-center justify-between gap-2 ${
+                            isSelected
+                              ? 'bg-purple-950/60 border border-purple-500/80 text-white shadow-sm'
+                              : 'hover:bg-slate-800 text-slate-300'
+                          }`}
+                        >
+                          <div className="overflow-hidden">
+                            <div className="text-xs font-bold truncate flex items-center gap-1.5">
+                              <span>{st.name}</span>
+                              {isSelected && <span className="text-[10px] text-purple-400">●</span>}
+                            </div>
+                            <div className="text-[11px] text-slate-400 truncate font-mono">{st.email}</div>
+                          </div>
+                          <div className="flex flex-col items-end shrink-0">
+                            <span className="text-xs font-mono font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
+                              {avgMastery}% P(L)
+                            </span>
+                            <span className="text-[10px] text-slate-400 font-mono mt-0.5">
+                              WPM: {st.wpm ?? st.avgWpm ?? 0}
+                            </span>
+                          </div>
+                        </div>
+                      );
+                    })
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+
+          <div className="flex items-center gap-2 bg-slate-950 px-3 py-1.5 rounded-xl border border-slate-800 text-xs">
+            <Users className="w-3.5 h-3.5 text-purple-400" />
+            <span className="font-semibold text-slate-200">Викладач</span>
+          </div>
+        </div>
+        </>
+        ),
+      }}
+      navigationRail={{
+        tabs: [
+          {
+            id: 'analytics',
+            icon: BarChart3,
+            title: 'Огляд Групи & Радар Ризиків',
+            activeColor: 'bg-purple-600',
+          },
+          {
+            id: 'coursemap',
+            icon: Network,
+            title: 'Граф Навичок & Завдання',
+            activeColor: 'bg-purple-600',
+          },
+          {
+            id: 'reviews',
+            icon: ClipboardCheck,
+            title: 'Черга Перевірки Відкритих Відповідей (Human-in-the-Loop)',
+            badge: reviewQueue.length > 0 ? reviewQueue.length : undefined,
+            activeColor: 'bg-purple-600',
+          },
+          {
+            id: 'metrics-audit',
+            icon: FlaskConical,
+            title: 'Математичний Аудит & Симулятор BKT (What-If Sandbox)',
+            activeColor: 'bg-emerald-600',
+          },
+        ],
+        activeTab: activeTab,
+        isDrawerOpen: isDrawerOpen,
+        onTabClick: (tabId) => handleTabClick(tabId as TeacherTab),
+        onSettingsClick: () => handleTabClick('settings'),
+        isSettingsActive: activeTab === 'settings',
+      }}
+      drawer={getDrawerConfig()}
+      mainClassName="p-4 lg:p-6 overflow-y-auto flex flex-col gap-6 bg-slate-950"
+      overlays={
+        <>
+{/* 🧮 Interactive Metric Explanation Modal */}
+      {metricModal && (
+        <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 animate-fadeIn">
+          <div className="bg-slate-900 border border-slate-800 rounded-2xl max-w-lg w-full p-6 shadow-2xl flex flex-col gap-4 relative">
+            <button
+              onClick={() => setMetricModal(null)}
+              className="absolute top-4 right-4 p-1 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-all"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            {metricModal === 'bkt' && (
+              <>
+                <div className="flex items-center gap-3 text-emerald-400">
+                  <div className="p-2 bg-emerald-500/10 border border-emerald-500/20 rounded-xl">
+                    <Sparkles className="w-5 h-5" />
+                  </div>
+                  <h3 className="text-base font-bold text-white">Середня Майстерність P(L) — Bayesian Knowledge Tracing</h3>
+                </div>
+                <div className="text-xs text-slate-300 flex flex-col gap-3 leading-relaxed">
+                  <p>
+                    Параметр <span className="font-mono text-emerald-400 font-bold">P(L)</span> визначає ймовірність того, що студент повністю засвоїв концепцію конкретного модуля.
+                  </p>
+                  <div className="p-3 bg-slate-950 border border-slate-800 rounded-xl font-mono text-[11px] text-slate-200">
+                    P(L_t | obs) = [ P(L_t-1) * (1 - P(S)) ] / [ P(L_t-1) * (1 - P(S)) + (1 - P(L_t-1)) * P(G) ]
+                  </div>
+                  <ul className="list-disc pl-4 space-y-1 text-slate-400">
+                    <li><strong className="text-slate-200">P(G) = 0.20:</strong> Ймовірність вгадування (Guessing).</li>
+                    <li><strong className="text-slate-200">P(S) = 0.10:</strong> Ймовірність описки/вислизання (Slip).</li>
+                    <li><strong className="text-slate-200">P(T) = 0.15:</strong> Ймовірність засвоєння після спроби (Transition).</li>
+                  </ul>
+                  <p className="text-[11px] text-slate-400 italic">
+                    При досягненні P(L) ≥ 0.95 (95%) модуль вважається успішно засвоєним, і студенту відкривається доступ до наступних вузлів DAG.
+                  </p>
+                </div>
+              </>
+            )}
+
+            {metricModal === 'wpm' && (
+              <>
+                <div className="flex items-center gap-3 text-indigo-400">
+                  <div className="p-2 bg-indigo-500/10 border border-indigo-500/20 rounded-xl">
+                    <Keyboard className="w-5 h-5" />
+                  </div>
+                  <h3 className="text-base font-bold text-white">Швидкість Набору Коду (WPM)</h3>
+                </div>
+                <div className="text-xs text-slate-300 flex flex-col gap-3 leading-relaxed">
+                  <p>
+                    <span className="font-mono text-indigo-400 font-bold">WPM (Words Per Minute)</span> розраховується в реальному часі на основі натискань клавіш у Monaco Editor.
+                  </p>
+                  <div className="p-3 bg-slate-950 border border-slate-800 rounded-xl font-mono text-[11px] text-slate-200">
+                    WPM = (Всього символів / 5) / (Час введення в хвилинах)
+                  </div>
+                  <p className="text-[11px] text-slate-400">
+                    Нормальний темп розробника: 35–65 WPM. Аномально високі стрибки (&gt;150 WPM) вказують на автодоповнення або масовий paste коду.
+                  </p>
+                </div>
+              </>
+            )}
+
+            {metricModal === 'copypaste' && (
+              <>
+                <div className="flex items-center gap-3 text-amber-400">
+                  <div className="p-2 bg-amber-500/10 border border-amber-500/20 rounded-xl">
+                    <Copy className="w-5 h-5" />
+                  </div>
+                  <h3 className="text-base font-bold text-white">Copy-Paste Ratio (Частка Вставленого Коду)</h3>
+                </div>
+                <div className="text-xs text-slate-300 flex flex-col gap-3 leading-relaxed">
+                  <p>
+                    <span className="font-mono text-amber-400 font-bold">Copy-Paste Ratio</span> визначає співвідношення символів, доданих через комбінації Ctrl+V / Command+V, до загального обсягу коду.
+                  </p>
+                  <div className="p-3 bg-slate-950 border border-slate-800 rounded-xl font-mono text-[11px] text-slate-200">
+                    CopyPasteRatio = Символів з Clipboard / Загальна кількість символів рішення
+                  </div>
+                  <p className="text-[11px] text-slate-400">
+                    Показник &gt; 60% може свідчити про списування чи використання сторонніх генераторів коду без самостійного введення.
+                  </p>
+                </div>
+              </>
+            )}
+
+            {metricModal === 'fatigue' && (
+              <>
+                <div className="flex items-center gap-3 text-purple-400">
+                  <div className="p-2 bg-purple-500/10 border border-purple-500/20 rounded-xl">
+                    <Activity className="w-5 h-5" />
+                  </div>
+                  <h3 className="text-base font-bold text-white">Індекс Втоми (Idle Pauses & Cognitive Load)</h3>
+                </div>
+                <div className="text-xs text-slate-300 flex flex-col gap-3 leading-relaxed">
+                  <p>
+                    <span className="font-mono text-purple-400 font-bold">Індекс Втоми</span> відстежує аномально тривалі зупинки редагування (&gt; 15 секунд) та часті видалення великих блоків (Backspace / Delete).
+                  </p>
+                  <div className="p-3 bg-slate-950 border border-slate-800 rounded-xl font-mono text-[11px] text-slate-200">
+                    FatigueIndex = Кількість_Пауз_&gt;15с + (Видалено_Символів / 50)
+                  </div>
+                  <p className="text-[11px] text-slate-400">
+                    Високий показник свідчить про виникнення труднощів, замішання або когнітивного перевантаження під час виконання задачі.
+                  </p>
+                </div>
+              </>
+            )}
+
+            <div className="pt-2 flex justify-end">
+              <button
+                onClick={() => setMetricModal(null)}
+                className="px-4 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold transition-all cursor-pointer"
+              >
+                Зрозуміло
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Course Switch Confirmation Modal Popup */}
+      {pendingCourseSlug && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-md animate-fadeIn">
+          <div className="max-w-md w-full p-6 bg-slate-900 border border-purple-500/40 rounded-2xl shadow-2xl flex flex-col gap-5 text-center transform transition-all scale-100">
+            <div className="mx-auto p-3.5 bg-purple-500/10 border border-purple-500/30 rounded-full text-purple-400">
+              <ShieldCheck className="w-8 h-8 animate-pulse" />
+            </div>
+            <div className="flex flex-col gap-2">
+              <h3 className="text-lg font-bold text-white">Перемикання Дисципліни Моніторингу</h3>
+              <p className="text-xs text-slate-300 leading-relaxed">
+                Перемкнути навчальну аналітику, журнал перевірки та граф навичок на курс <strong className="text-purple-300">"{courses.find(c => c.slug === pendingCourseSlug)?.title || pendingCourseSlug}"</strong>?
+              </p>
+              <div className="p-3 bg-slate-950/70 border border-slate-800 rounded-xl text-[11px] text-slate-400 text-left flex flex-col gap-1">
+                <span>📊 Буде перераховано метрики когорти для обраного курсу.</span>
+                <span>🎓 Список студентів та черга перевірки оновляться відповідно.</span>
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={cancelCourseSwitch}
+                className="flex-1 py-2.5 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs transition-all cursor-pointer border border-slate-700"
+              >
+                Скасувати
+              </button>
+              <button
+                onClick={confirmCourseSwitch}
+                className="flex-1 py-2.5 px-4 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs uppercase tracking-wider shadow-lg shadow-purple-600/30 transition-all cursor-pointer border border-purple-400/30"
+              >
+                Підтвердити перехід
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ⚠️ Reset Student BKT Progress Confirmation Modal (Course-Scoped vs Global with Safety Toggle) */}
+      {resetConfirmStudent && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-md animate-fadeIn">
+          <div className="max-w-md w-full p-6 bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl flex flex-col gap-5 text-center transform transition-all scale-100">
+            <div className="mx-auto p-3.5 bg-amber-500/10 border border-amber-500/30 rounded-full text-amber-400">
+              <RotateCcw className="w-8 h-8" />
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <h3 className="text-lg font-bold text-white">Анулювання Прогресу Студента</h3>
+              <p className="text-xs text-slate-300">
+                Оберіть рівень скидання даних для студента <strong className="text-white">"{resetConfirmStudent.name}"</strong>
+              </p>
+            </div>
+
+            {/* Option 1: Course-Scoped Reset (Primary & Safe) */}
+            <div className="p-3.5 bg-indigo-950/40 border border-indigo-500/40 rounded-xl text-left flex flex-col gap-2">
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] font-bold text-indigo-300 uppercase tracking-wider flex items-center gap-1.5">
+                  <span>🎯 Скинути прогрес поточного курсу</span>
+                </span>
+                <span className="text-[9px] font-mono font-bold px-1.5 py-0.5 rounded bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+                  Рекомендовано
+                </span>
+              </div>
+              <p className="text-xs text-slate-300 leading-relaxed">
+                Скидає відповіді, BKT-оцінки <code className="text-indigo-300 font-mono">P(L)</code> та чернетки <strong className="text-white">лише для дисципліни "{activeCourse.title}"</strong>. Прогрес студента в інших предметах залишиться недоторканим.
+              </p>
+              <button
+                disabled={isResettingStudent}
+                onClick={() => handleResetStudent(resetConfirmStudent.id || resetConfirmStudent.studentId || resetConfirmStudent.email, 'course')}
+                className="w-full mt-1 py-2 px-3 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs shadow-md shadow-indigo-600/30 transition-all cursor-pointer flex items-center justify-center gap-2 disabled:opacity-50"
+              >
+                {isResettingStudent ? (
+                  <>
+                    <RotateCcw className="w-3.5 h-3.5 animate-spin" />
+                    <span>Скидання курсу...</span>
+                  </>
+                ) : (
+                  <>
+                    <RotateCcw className="w-3.5 h-3.5" />
+                    <span>Скинути тільки курс "{activeCourse.title}"</span>
+                  </>
+                )}
+              </button>
+            </div>
+
+            {/* Option 2: Global Account Reset with Safety Toggle */}
+            <div className="p-3.5 bg-rose-950/30 border border-rose-500/30 rounded-xl text-left flex flex-col gap-2.5">
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] font-bold text-rose-300 uppercase tracking-wider flex items-center gap-1.5">
+                  <AlertTriangle className="w-3.5 h-3.5 text-rose-400" />
+                  <span>Повне анулювання акаунта (всі курси)</span>
+                </span>
+              </div>
+              <p className="text-[11px] text-slate-300 leading-relaxed">
+                Безповоротно видаляє всі спроби, історію та BKT-стан по <strong className="text-rose-300">всіх навчальних курсах платформи</strong>.
+              </p>
+
+              {/* Safety Switch Toggle */}
+              <label className="flex items-center gap-2.5 p-2 bg-slate-950/70 border border-slate-800 rounded-lg cursor-pointer hover:border-slate-700 transition-all select-none">
+                <input
+                  type="checkbox"
+                  checked={resetGlobalSafetyToggle}
+                  onChange={(e) => setResetGlobalSafetyToggle(e.target.checked)}
+                  className="w-4 h-4 rounded text-rose-600 focus:ring-rose-500 border-slate-700 bg-slate-900 cursor-pointer"
+                />
+                <span className="text-[11px] font-medium text-slate-300">
+                  Я розумію ризики і підтверджую глобальне скидання
+                </span>
+              </label>
+
+              <button
+                disabled={!resetGlobalSafetyToggle || isResettingStudent}
+                onClick={() => handleResetStudent(resetConfirmStudent.id || resetConfirmStudent.studentId || resetConfirmStudent.email, 'all')}
+                className={`w-full py-2 px-3 rounded-lg font-bold text-xs transition-all flex items-center justify-center gap-2 border ${
+                  resetGlobalSafetyToggle && !isResettingStudent
+                    ? 'bg-rose-600 hover:bg-rose-500 text-white shadow-lg shadow-rose-900/40 border-rose-400/40 cursor-pointer'
+                    : 'bg-slate-800 text-slate-500 border-slate-700/60 cursor-not-allowed opacity-60'
+                }`}
+              >
+                {isResettingStudent ? (
+                  <>
+                    <RotateCcw className="w-3.5 h-3.5 animate-spin" />
+                    <span>Повне скидання...</span>
+                  </>
+                ) : (
+                  <>
+                    <AlertTriangle className="w-3.5 h-3.5" />
+                    <span>Скинути весь прогрес студента</span>
+                  </>
+                )}
+              </button>
+            </div>
+
+            <div className="flex justify-end pt-1">
+              <button
+                disabled={isResettingStudent}
+                onClick={() => {
+                  setResetConfirmStudent(null);
+                  setResetGlobalSafetyToggle(false);
+                }}
+                className="w-full py-2 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold text-xs transition-all cursor-pointer border border-slate-700 disabled:opacity-50"
+              >
+                Закрити без змін
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    
+        </>
+      }
+    >
+      <div className="flex flex-col gap-6">
+
           {/* Main View 1: Student Detailed Analytics & Heatmap */}
           {activeTab === 'analytics' && selectedStudent && (
             <div className="flex flex-col gap-6">
@@ -1955,271 +2064,8 @@ export default function TeacherDashboardPage() {
               </p>
             </div>
           )}
-        </main>
+        
       </div>
-
-      {/* 🧮 Interactive Metric Explanation Modal */}
-      {metricModal && (
-        <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 animate-fadeIn">
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl max-w-lg w-full p-6 shadow-2xl flex flex-col gap-4 relative">
-            <button
-              onClick={() => setMetricModal(null)}
-              className="absolute top-4 right-4 p-1 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-all"
-            >
-              <X className="w-5 h-5" />
-            </button>
-
-            {metricModal === 'bkt' && (
-              <>
-                <div className="flex items-center gap-3 text-emerald-400">
-                  <div className="p-2 bg-emerald-500/10 border border-emerald-500/20 rounded-xl">
-                    <Sparkles className="w-5 h-5" />
-                  </div>
-                  <h3 className="text-base font-bold text-white">Середня Майстерність P(L) — Bayesian Knowledge Tracing</h3>
-                </div>
-                <div className="text-xs text-slate-300 flex flex-col gap-3 leading-relaxed">
-                  <p>
-                    Параметр <span className="font-mono text-emerald-400 font-bold">P(L)</span> визначає ймовірність того, що студент повністю засвоїв концепцію конкретного модуля.
-                  </p>
-                  <div className="p-3 bg-slate-950 border border-slate-800 rounded-xl font-mono text-[11px] text-slate-200">
-                    P(L_t | obs) = [ P(L_t-1) * (1 - P(S)) ] / [ P(L_t-1) * (1 - P(S)) + (1 - P(L_t-1)) * P(G) ]
-                  </div>
-                  <ul className="list-disc pl-4 space-y-1 text-slate-400">
-                    <li><strong className="text-slate-200">P(G) = 0.20:</strong> Ймовірність вгадування (Guessing).</li>
-                    <li><strong className="text-slate-200">P(S) = 0.10:</strong> Ймовірність описки/вислизання (Slip).</li>
-                    <li><strong className="text-slate-200">P(T) = 0.15:</strong> Ймовірність засвоєння після спроби (Transition).</li>
-                  </ul>
-                  <p className="text-[11px] text-slate-400 italic">
-                    При досягненні P(L) ≥ 0.95 (95%) модуль вважається успішно засвоєним, і студенту відкривається доступ до наступних вузлів DAG.
-                  </p>
-                </div>
-              </>
-            )}
-
-            {metricModal === 'wpm' && (
-              <>
-                <div className="flex items-center gap-3 text-indigo-400">
-                  <div className="p-2 bg-indigo-500/10 border border-indigo-500/20 rounded-xl">
-                    <Keyboard className="w-5 h-5" />
-                  </div>
-                  <h3 className="text-base font-bold text-white">Швидкість Набору Коду (WPM)</h3>
-                </div>
-                <div className="text-xs text-slate-300 flex flex-col gap-3 leading-relaxed">
-                  <p>
-                    <span className="font-mono text-indigo-400 font-bold">WPM (Words Per Minute)</span> розраховується в реальному часі на основі натискань клавіш у Monaco Editor.
-                  </p>
-                  <div className="p-3 bg-slate-950 border border-slate-800 rounded-xl font-mono text-[11px] text-slate-200">
-                    WPM = (Всього символів / 5) / (Час введення в хвилинах)
-                  </div>
-                  <p className="text-[11px] text-slate-400">
-                    Нормальний темп розробника: 35–65 WPM. Аномально високі стрибки (&gt;150 WPM) вказують на автодоповнення або масовий paste коду.
-                  </p>
-                </div>
-              </>
-            )}
-
-            {metricModal === 'copypaste' && (
-              <>
-                <div className="flex items-center gap-3 text-amber-400">
-                  <div className="p-2 bg-amber-500/10 border border-amber-500/20 rounded-xl">
-                    <Copy className="w-5 h-5" />
-                  </div>
-                  <h3 className="text-base font-bold text-white">Copy-Paste Ratio (Частка Вставленого Коду)</h3>
-                </div>
-                <div className="text-xs text-slate-300 flex flex-col gap-3 leading-relaxed">
-                  <p>
-                    <span className="font-mono text-amber-400 font-bold">Copy-Paste Ratio</span> визначає співвідношення символів, доданих через комбінації Ctrl+V / Command+V, до загального обсягу коду.
-                  </p>
-                  <div className="p-3 bg-slate-950 border border-slate-800 rounded-xl font-mono text-[11px] text-slate-200">
-                    CopyPasteRatio = Символів з Clipboard / Загальна кількість символів рішення
-                  </div>
-                  <p className="text-[11px] text-slate-400">
-                    Показник &gt; 60% може свідчити про списування чи використання сторонніх генераторів коду без самостійного введення.
-                  </p>
-                </div>
-              </>
-            )}
-
-            {metricModal === 'fatigue' && (
-              <>
-                <div className="flex items-center gap-3 text-purple-400">
-                  <div className="p-2 bg-purple-500/10 border border-purple-500/20 rounded-xl">
-                    <Activity className="w-5 h-5" />
-                  </div>
-                  <h3 className="text-base font-bold text-white">Індекс Втоми (Idle Pauses & Cognitive Load)</h3>
-                </div>
-                <div className="text-xs text-slate-300 flex flex-col gap-3 leading-relaxed">
-                  <p>
-                    <span className="font-mono text-purple-400 font-bold">Індекс Втоми</span> відстежує аномально тривалі зупинки редагування (&gt; 15 секунд) та часті видалення великих блоків (Backspace / Delete).
-                  </p>
-                  <div className="p-3 bg-slate-950 border border-slate-800 rounded-xl font-mono text-[11px] text-slate-200">
-                    FatigueIndex = Кількість_Пауз_&gt;15с + (Видалено_Символів / 50)
-                  </div>
-                  <p className="text-[11px] text-slate-400">
-                    Високий показник свідчить про виникнення труднощів, замішання або когнітивного перевантаження під час виконання задачі.
-                  </p>
-                </div>
-              </>
-            )}
-
-            <div className="pt-2 flex justify-end">
-              <button
-                onClick={() => setMetricModal(null)}
-                className="px-4 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold transition-all cursor-pointer"
-              >
-                Зрозуміло
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Course Switch Confirmation Modal Popup */}
-      {pendingCourseSlug && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-md animate-fadeIn">
-          <div className="max-w-md w-full p-6 bg-slate-900 border border-purple-500/40 rounded-2xl shadow-2xl flex flex-col gap-5 text-center transform transition-all scale-100">
-            <div className="mx-auto p-3.5 bg-purple-500/10 border border-purple-500/30 rounded-full text-purple-400">
-              <ShieldCheck className="w-8 h-8 animate-pulse" />
-            </div>
-            <div className="flex flex-col gap-2">
-              <h3 className="text-lg font-bold text-white">Перемикання Дисципліни Моніторингу</h3>
-              <p className="text-xs text-slate-300 leading-relaxed">
-                Перемкнути навчальну аналітику, журнал перевірки та граф навичок на курс <strong className="text-purple-300">"{courses.find(c => c.slug === pendingCourseSlug)?.title || pendingCourseSlug}"</strong>?
-              </p>
-              <div className="p-3 bg-slate-950/70 border border-slate-800 rounded-xl text-[11px] text-slate-400 text-left flex flex-col gap-1">
-                <span>📊 Буде перераховано метрики когорти для обраного курсу.</span>
-                <span>🎓 Список студентів та черга перевірки оновляться відповідно.</span>
-              </div>
-            </div>
-            <div className="flex items-center gap-3">
-              <button
-                onClick={cancelCourseSwitch}
-                className="flex-1 py-2.5 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs transition-all cursor-pointer border border-slate-700"
-              >
-                Скасувати
-              </button>
-              <button
-                onClick={confirmCourseSwitch}
-                className="flex-1 py-2.5 px-4 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs uppercase tracking-wider shadow-lg shadow-purple-600/30 transition-all cursor-pointer border border-purple-400/30"
-              >
-                Підтвердити перехід
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ⚠️ Reset Student BKT Progress Confirmation Modal (Course-Scoped vs Global with Safety Toggle) */}
-      {resetConfirmStudent && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-md animate-fadeIn">
-          <div className="max-w-md w-full p-6 bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl flex flex-col gap-5 text-center transform transition-all scale-100">
-            <div className="mx-auto p-3.5 bg-amber-500/10 border border-amber-500/30 rounded-full text-amber-400">
-              <RotateCcw className="w-8 h-8" />
-            </div>
-
-            <div className="flex flex-col gap-1.5">
-              <h3 className="text-lg font-bold text-white">Анулювання Прогресу Студента</h3>
-              <p className="text-xs text-slate-300">
-                Оберіть рівень скидання даних для студента <strong className="text-white">"{resetConfirmStudent.name}"</strong>
-              </p>
-            </div>
-
-            {/* Option 1: Course-Scoped Reset (Primary & Safe) */}
-            <div className="p-3.5 bg-indigo-950/40 border border-indigo-500/40 rounded-xl text-left flex flex-col gap-2">
-              <div className="flex items-center justify-between">
-                <span className="text-[11px] font-bold text-indigo-300 uppercase tracking-wider flex items-center gap-1.5">
-                  <span>🎯 Скинути прогрес поточного курсу</span>
-                </span>
-                <span className="text-[9px] font-mono font-bold px-1.5 py-0.5 rounded bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
-                  Рекомендовано
-                </span>
-              </div>
-              <p className="text-xs text-slate-300 leading-relaxed">
-                Скидає відповіді, BKT-оцінки <code className="text-indigo-300 font-mono">P(L)</code> та чернетки <strong className="text-white">лише для дисципліни "{activeCourse.title}"</strong>. Прогрес студента в інших предметах залишиться недоторканим.
-              </p>
-              <button
-                disabled={isResettingStudent}
-                onClick={() => handleResetStudent(resetConfirmStudent.id || resetConfirmStudent.studentId || resetConfirmStudent.email, 'course')}
-                className="w-full mt-1 py-2 px-3 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs shadow-md shadow-indigo-600/30 transition-all cursor-pointer flex items-center justify-center gap-2 disabled:opacity-50"
-              >
-                {isResettingStudent ? (
-                  <>
-                    <RotateCcw className="w-3.5 h-3.5 animate-spin" />
-                    <span>Скидання курсу...</span>
-                  </>
-                ) : (
-                  <>
-                    <RotateCcw className="w-3.5 h-3.5" />
-                    <span>Скинути тільки курс "{activeCourse.title}"</span>
-                  </>
-                )}
-              </button>
-            </div>
-
-            {/* Option 2: Global Account Reset with Safety Toggle */}
-            <div className="p-3.5 bg-rose-950/30 border border-rose-500/30 rounded-xl text-left flex flex-col gap-2.5">
-              <div className="flex items-center justify-between">
-                <span className="text-[11px] font-bold text-rose-300 uppercase tracking-wider flex items-center gap-1.5">
-                  <AlertTriangle className="w-3.5 h-3.5 text-rose-400" />
-                  <span>Повне анулювання акаунта (всі курси)</span>
-                </span>
-              </div>
-              <p className="text-[11px] text-slate-300 leading-relaxed">
-                Безповоротно видаляє всі спроби, історію та BKT-стан по <strong className="text-rose-300">всіх навчальних курсах платформи</strong>.
-              </p>
-
-              {/* Safety Switch Toggle */}
-              <label className="flex items-center gap-2.5 p-2 bg-slate-950/70 border border-slate-800 rounded-lg cursor-pointer hover:border-slate-700 transition-all select-none">
-                <input
-                  type="checkbox"
-                  checked={resetGlobalSafetyToggle}
-                  onChange={(e) => setResetGlobalSafetyToggle(e.target.checked)}
-                  className="w-4 h-4 rounded text-rose-600 focus:ring-rose-500 border-slate-700 bg-slate-900 cursor-pointer"
-                />
-                <span className="text-[11px] font-medium text-slate-300">
-                  Я розумію ризики і підтверджую глобальне скидання
-                </span>
-              </label>
-
-              <button
-                disabled={!resetGlobalSafetyToggle || isResettingStudent}
-                onClick={() => handleResetStudent(resetConfirmStudent.id || resetConfirmStudent.studentId || resetConfirmStudent.email, 'all')}
-                className={`w-full py-2 px-3 rounded-lg font-bold text-xs transition-all flex items-center justify-center gap-2 border ${
-                  resetGlobalSafetyToggle && !isResettingStudent
-                    ? 'bg-rose-600 hover:bg-rose-500 text-white shadow-lg shadow-rose-900/40 border-rose-400/40 cursor-pointer'
-                    : 'bg-slate-800 text-slate-500 border-slate-700/60 cursor-not-allowed opacity-60'
-                }`}
-              >
-                {isResettingStudent ? (
-                  <>
-                    <RotateCcw className="w-3.5 h-3.5 animate-spin" />
-                    <span>Повне скидання...</span>
-                  </>
-                ) : (
-                  <>
-                    <AlertTriangle className="w-3.5 h-3.5" />
-                    <span>Скинути весь прогрес студента</span>
-                  </>
-                )}
-              </button>
-            </div>
-
-            <div className="flex justify-end pt-1">
-              <button
-                disabled={isResettingStudent}
-                onClick={() => {
-                  setResetConfirmStudent(null);
-                  setResetGlobalSafetyToggle(false);
-                }}
-                className="w-full py-2 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold text-xs transition-all cursor-pointer border border-slate-700 disabled:opacity-50"
-              >
-                Закрити без змін
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
+    </AppShellLayout>
   );
 }
-

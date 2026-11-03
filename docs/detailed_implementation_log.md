@@ -29,6 +29,31 @@
   4. *Install Monorepo Dependencies* (`npm ci || npm install`) — синхронізація робочих просторів монорепозиторію.
   5. *Build Next.js Documentation Site* (`npm run build:docs`) — збірка статичного експорту (`output: "export"`, `trailingSlash: true`, `basePath: "/magisterts-smart-bkt-chain"`).
   6. *Upload Artifact & Deploy Pages* (`actions/upload-pages-artifact@v3` + `actions/deploy-pages@v4`).
+### 0.1.7.24 Комплексна Стандартизація Застосунків на базі AppShellLayout (SBC-315, EP-SH / EP-ST / EP-TC / EP-AD)
+- **Контекст та інженерний мотив:**
+  - На вимогу користувача уніфікувати лейаути в чотирьох головних робочих кабінетах платформи («Цей лейаут повинен бути у застосунків Студент, Викладач, Адмінка, Підручник. Документація і основний сайт покищо хай буде як є»).
+  - Запобігання фрагментації інтерфейсів, дублюванню навігаційних панелей та неконсистентному скролінгу між різними ролями (Учень, Студент, Викладач, Адміністратор).
+- **Виконана реструктуризація по застосунках:**
+  1. **`apps/study` (Підручник - порт 3006):**
+     - Файл: `apps/study/src/components/StudyAppClient.tsx`.
+     - Навігаційна рейка: дерево уроків та зміст курсу в `drawer`, центральний віджет Zen Focus у шапці, автоматичні міжпортальні іконки.
+  2. **`apps/teacher` (Кабінет Викладача - порт 3003):**
+     - Файл: `apps/teacher/src/app/page.tsx`.
+     - Навігаційна рейка: таби `analytics` (BarChart3), `coursemap` (Network), `reviews` (ClipboardCheck із лічильником неперевірених відповідей), `metrics-audit` (FlaskConical), `settings` (ShieldCheck).
+     - Хедер: селектор навчальних курсів, пошуковий випадаючий список студентів із метриками $P(L)$, ідентифікатор ролі.
+  3. **`apps/student` (Інтерактивний Тренажер - порт 3002):**
+     - Файл: `apps/student/src/components/StudentPortalApp.tsx`.
+     - Навігаційна рейка: таби `task` (BookOpen - умова завдання та історія спроб), `bkt` (Sparkles - інтерактивний граф навичок DAG), `tree` (Network - гейміфіковане дерево компетенцій), `settings` (Settings - параметри діагностики).
+     - Хедер: центральний прогрес-бар завершення курсу у відсотках ($P(L)$), бейдж активної навички, селектор курсів та профіль користувача.
+  4. **`apps/admin` (Панель Адміністратора - порт 3004):**
+     - Файл: `apps/admin/src/app/page.tsx`.
+     - Навігаційна рейка: таби `courses` (Курси), `skills` (Навички та DAG), `bkt` (Матриця параметрів), `telemetry` (Поведінкові логи), `chain` (Верифікація блоків), `settings` (Налаштування).
+- **Верифікація виробничої цілісності монорепозиторію:**
+  - `npm run build --workspace=@sbc/study` -> Exit code 0.
+  - `npm run build --workspace=@sbc/teacher` -> Exit code 0.
+  - `npm run build --workspace=@sbc/student` -> Exit code 0.
+  - `npm run build --workspace=@sbc/admin` -> Exit code 0.
+
 ### 0.1.7.23 Впровадження Семантичної Маршрутизації та Протоколу Deep Linking у apps/student та apps/api (SBC-312, EP-ST)
 - **Контекст та інженерний мотив:**
   - На виконання Правила 10 [AGENTS.md] реалізовано двосторонню взаємодію між Підручником (`apps/study`) та Інтерактивним Тренажером (`apps/student`).
