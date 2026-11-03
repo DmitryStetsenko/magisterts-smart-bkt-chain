@@ -27,7 +27,7 @@ import {
   Lock,
   Unlock
 } from 'lucide-react';
-import { DrawerSection, AppShellLayout } from '@sbc/ui';
+import { DrawerSection, AppShellLayout, Breadcrumbs } from '@sbc/ui';
 import { ROUTES, buildStudyToPracticeUrl } from '@sbc/routes';
 import { SCHOOL_WEB_CURRICULUM, LessonUnit, LessonSection, CurriculumModule } from '../data/school-web-curriculum';
 import { CodePlayground } from './CodePlayground';
@@ -490,14 +490,24 @@ console.log(greeting, "Номер спроби:", counter);`}
           <div className={`w-full ${maxWidthClasses[activeMaxWidth]} flex flex-col gap-8`}>
             
             {/* Хлібні крихти та метаінформація уроку */}
-            <div className="flex flex-col gap-2 border-b pb-4 opacity-90">
-              <div className="flex items-center gap-2 text-xs font-mono opacity-60">
-                <span>{SCHOOL_WEB_CURRICULUM.courseTitle}</span>
-                <ChevronRight className="w-3 h-3" />
-                <span>Модуль {currentModule.moduleNumber}</span>
-                <ChevronRight className="w-3 h-3" />
-                <span className="font-semibold text-blue-400">{currentUnit.gradeLevel}</span>
-              </div>
+            <div className="flex flex-col gap-2.5 border-b pb-4 opacity-90">
+              <Breadcrumbs
+                items={[
+                  {
+                    label: SCHOOL_WEB_CURRICULUM.courseTitle,
+                    onClick: () => handleSelectUnit(SCHOOL_WEB_CURRICULUM.modules[0].moduleSlug, SCHOOL_WEB_CURRICULUM.modules[0].units[0].slug),
+                  },
+                  {
+                    label: `Модуль ${currentModule.moduleNumber}`,
+                    onClick: () => handleSelectUnit(currentModule.moduleSlug, currentModule.units[0].slug),
+                  },
+                  {
+                    label: currentUnit.title,
+                    badge: currentUnit.gradeLevel,
+                    isCurrent: true,
+                  },
+                ]}
+              />
 
               <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
                 {currentUnit.title}

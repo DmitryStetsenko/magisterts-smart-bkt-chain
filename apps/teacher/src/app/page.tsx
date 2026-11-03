@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { io } from 'socket.io-client';
 import { ShieldCheck, Network, Users, BarChart3, Code2, BookOpen, Scale, ChevronDown, ChevronUp, X, Search, RotateCcw, AlertTriangle, CheckCircle2, Lock, HelpCircle, Code, FileText, CheckSquare, Sparkles, Keyboard, Copy, Activity, Info, GitBranch, Layers, ClipboardCheck, Tag, FlaskConical, Compass, User, Globe, Plus, Minus, GraduationCap } from 'lucide-react';
 import { StudentAnalyticsItem } from '../features/analytics/model/analytics.types';
-import { AnomalyTreeWidget, GameSkillTreeWidget, SkillGraphNode, AppShellLayout } from '@sbc/ui';
+import { AnomalyTreeWidget, GameSkillTreeWidget, SkillGraphNode, AppShellLayout, Breadcrumbs } from '@sbc/ui';
 import { CourseDto, TaskDto } from '@sbc/types';
 import { ReviewQueueInspector } from '../features/reviews/ui/ReviewQueueInspector';
 import { CourseGraphViewer } from '../features/course-map/ui/CourseGraphViewer';
@@ -1743,6 +1743,47 @@ export default function TeacherDashboardPage() {
       }
     >
       <div className="flex flex-col gap-6">
+        {/* 🧭 Єдині хлібні крихти платформи */}
+        <Breadcrumbs
+          items={[
+            {
+              label: activeCourse.title,
+              onClick: () => handleTabClick('coursemap'),
+            },
+            {
+              label: activeTab === 'analytics'
+                ? 'Когортна аналітика'
+                : activeTab === 'coursemap'
+                ? 'Граф компетенцій'
+                : activeTab === 'reviews'
+                ? 'Черга перевірки'
+                : activeTab === 'metrics-audit'
+                ? 'Аудит BKT'
+                : 'Параметри',
+              onClick: () => handleTabClick(activeTab),
+            },
+            ...(selectedStudent && activeTab === 'analytics'
+              ? [
+                  {
+                    label: selectedStudent.name,
+                    badge: `${(selectedStudent.averageMastery !== undefined ? (selectedStudent.averageMastery * 100).toFixed(0) : '0')}% P(L)`,
+                    isCurrent: true,
+                  },
+                ]
+              : [
+                  {
+                    label: activeTab === 'reviews'
+                      ? `Перевірка відповідей (${reviewQueue.length})`
+                      : activeTab === 'coursemap'
+                      ? 'Модулі курсу'
+                      : activeTab === 'metrics-audit'
+                      ? 'What-If Симулятор'
+                      : 'Огляд групи',
+                    isCurrent: true,
+                  },
+                ]),
+          ]}
+        />
 
           {/* Main View 1: Student Detailed Analytics & Heatmap */}
           {activeTab === 'analytics' && selectedStudent && (

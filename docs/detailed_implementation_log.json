@@ -120,6 +120,121 @@
           ]
         },
         {
+          "title": "0.1.7.25 Розробка Уніфікованого Віджета Хлібних Крихт (@sbc/ui) та Інтеграція в Усі Застосунки (SBC-315, EP-SH / EP-ST / EP-TC / EP-AD)",
+          "level": 3,
+          "paragraphs": [],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "**Контекст та інженерний мотив:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "На запит користувача розроблено єдиний, ультра-компактний, охайний та високочитабельний віджет хлібних крихт (`Breadcrumbs`), спільний для всіх робочих кабінетів платформи (`apps/study`, `apps/student`, `apps/teacher`, `apps/admin`).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Віджет розміщено зліва нагорі робочої контентної області, оскільки з точки зору UX/UI очей користувача природно починає пошук контексту саме з верхнього лівого кута (Z-патерн та F-патерн читання).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Архітектурні особливості віджета `Breadcrumbs` ([`packages/ui/src/breadcrumbs/Breadcrumbs.tsx`](file:///packages/ui/src/breadcrumbs/Breadcrumbs.tsx)):**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Компактність та виразна типографіка:**",
+              "subitems": [
+                "Розмір шрифту `text-[11px] font-medium tracking-wide`, що не перевантажує інтерфейс і не конкурує з основними заголовками `h1`.",
+                "Ієрархічні розділювачі `ChevronRight` (`w-2.5 h-2.5 stroke-[2] text-slate-600 shrink-0`).",
+                "Опціональна піктограма `Home` (`w-3 h-3 text-slate-500`) на першому кореневому рівні."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Гнучкість взаємодії:**",
+              "subitems": [
+                "Підтримка як гіперпосилань `href` (Next.js Link), так і інтерактивних колбеків `onClick` або статичного тексту.",
+                "Підтримка мініатюрних бейджів (`badge`) біля елементів крихт (наприклад, рівень складності `MEDIUM/HARD`, клас `10 КЛАС`, відсоток засвоєння навички тощо)."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Статусна диференціація:**",
+              "subitems": [
+                "Батьківські елементи мають колір `text-slate-400 hover:text-white transition-colors`.",
+                "Активний кінцевий елемент має колір `text-slate-200 font-semibold truncate` та атрибут `aria-current=\"page\"`."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Інтеграція по застосунках монорепозиторію:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**`apps/study` (Підручник - порт 3006):**",
+              "subitems": [
+                "Розміщення: над заголовком уроку `h1` зліва.",
+                "Ланцюжок: `Курс > Номер модуля > Назва уроку [Grade badge]`."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**`apps/student` (Інтерактивний Тренажер - порт 3002):**",
+              "subitems": [
+                "Розміщення: нагорі робочого полотна тренажера над плашкою підручника.",
+                "Ланцюжок: `Назва курсу > Назва навички > Назва завдання [Складність: MEDIUM/HARD]`."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**`apps/teacher` (Кабінет Викладача - порт 3003):**",
+              "subitems": [
+                "Розміщення: нагорі аналітичного полотна зліва над метричними картками.",
+                "Ланцюжок: `Курс > Активний розділ кабінету > Обраний студент [X% P(L)]`."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**`apps/admin` (Панель Адміністратора - порт 3004):**",
+              "subitems": [
+                "Розміщення: нагорі контентного блоку над робочими картками.",
+                "Ланцюжок: `CMS Адміністрування > Активна вкладка (DAG Навичок / Курси / Матриця BKT / Телеметрія / Блокчейн)`."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Верифікація виробничих збірок:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "`npm run build --workspace=@sbc/study` -> Exit code 0.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "`npm run build --workspace=@sbc/student` -> Exit code 0.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "`npm run build --workspace=@sbc/teacher` -> Exit code 0.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "`npm run build --workspace=@sbc/admin` -> Exit code 0.",
+              "subitems": []
+            }
+          ]
+        },
+        {
           "title": "0.1.7.24 Комплексна Стандартизація Застосунків на базі AppShellLayout (SBC-315, EP-SH / EP-ST / EP-TC / EP-AD)",
           "level": 3,
           "paragraphs": [],

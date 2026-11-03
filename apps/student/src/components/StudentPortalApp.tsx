@@ -7,7 +7,7 @@ import { MonacoCodeEditor } from '../features/code-editor/ui/MonacoCodeEditor';
 import { QuizTaskEditor } from '../features/quiz-editor/ui/QuizTaskEditor';
 import { EssayTaskEditor } from '../features/essay-editor/ui/EssayTaskEditor';
 import { SkillDagMap } from '../features/skill-graph/ui/SkillDagMap';
-import { GameSkillTreeWidget, SkillGraphNode, DrawerSection, AppShellLayout } from '@sbc/ui';
+import { GameSkillTreeWidget, SkillGraphNode, DrawerSection, AppShellLayout, Breadcrumbs } from '@sbc/ui';
 import { TaskDto, CourseDto } from '@sbc/types';
 import { getAppBaseUrl, ROUTES, resolveStudyUrl } from '@sbc/routes';
 
@@ -1270,6 +1270,25 @@ export function StudentPortalContent({
             </div>
           ) : task ? (
             <div className="flex-1 p-4 lg:p-6 overflow-y-auto flex flex-col gap-4">
+              {/* 🧭 Єдині хлібні крихти платформи */}
+              <Breadcrumbs
+                items={[
+                  {
+                    label: courses.find((c) => c.slug === activeCourseSlug)?.title || activeCourseSlug,
+                    onClick: () => handleTabClick('tree'),
+                  },
+                  {
+                    label: task.skill?.title || 'Навичка',
+                    onClick: () => handleTabClick('bkt'),
+                  },
+                  {
+                    label: task.title,
+                    badge: `${task.difficulty || 'MEDIUM'}`,
+                    isCurrent: true,
+                  },
+                ]}
+              />
+
               {/* 🎓 Міжпортальна плашка повернення до Підручника Теорії (Cross-App Protocol) */}
               {source === 'study' && (
                 <div className="w-full bg-gradient-to-r from-blue-950/80 via-indigo-950/60 to-slate-900 border border-blue-500/40 rounded-2xl p-4 shadow-xl flex items-center justify-between gap-4 animate-fadeIn">

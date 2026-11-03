@@ -10,7 +10,7 @@ import {
   Database,
   Cpu
 } from 'lucide-react';
-import { AppShellLayout } from '@sbc/ui';
+import { AppShellLayout, Breadcrumbs } from '@sbc/ui';
 import { getAppBaseUrl } from '@sbc/routes';
 import { SkillDagEditor } from '../features/skill-editor/ui/SkillDagEditor';
 import { AdminSkillNode } from '../features/skill-editor/model/skill-editor.types';
@@ -157,8 +157,26 @@ export default function AdminCMSDashboard() {
         onSettingsClick: () => handleTabClick('system'),
         isSettingsActive: activeTab === 'system',
       }}
-      mainClassName="p-4 lg:p-6 overflow-y-auto flex flex-col gap-6 bg-slate-950"
+      mainClassName="p-4 lg:p-6 overflow-y-auto flex flex-col gap-4 bg-slate-950"
     >
+      {/* 🧭 Єдині хлібні крихти платформи */}
+      <Breadcrumbs
+        items={[
+          {
+            label: 'CMS Адміністрування',
+            onClick: () => handleTabClick('dag'),
+          },
+          {
+            label: activeTab === 'dag'
+              ? 'Конструктор Skill DAG'
+              : activeTab === 'courses'
+              ? 'Реєстр курсів та завдань'
+              : 'Системні налаштування',
+            isCurrent: true,
+          },
+        ]}
+      />
+
       <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl min-h-[400px]">
         {activeTab === 'dag' && (
           <div className="flex flex-col gap-6">

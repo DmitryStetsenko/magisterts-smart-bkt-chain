@@ -4,3 +4,4 @@ export * from './skill-graph/GameSkillTreeWidget';
 export * from './analytics/AnomalyTreeWidget';
 export * from './drawer/DrawerSection';
 export * from './shell/AppShellLayout';
+export * from './breadcrumbs/Breadcrumbs';
