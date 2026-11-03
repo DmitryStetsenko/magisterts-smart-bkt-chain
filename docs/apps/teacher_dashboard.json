@@ -38,24 +38,56 @@
       "subsections": []
     },
     {
-      "title": "🏛️ 2. Архітектура Інтерфейсу (UI Shell Standard)",
+      "title": "🏛️ 2. Архітектура Інтерфейсу (UI Shell Standard — AppShellLayout v2.0)",
       "level": 2,
-      "paragraphs": [],
+      "paragraphs": [
+        "Інтерфейс застосунка реалізовано на базі канонічного компонента **`AppShellLayout`** (`@sbc/ui`) із суворою ізоляцією скролінгу:"
+      ],
       "code_blocks": [],
       "items": [
         {
           "type": "text",
-          "raw_text": "**Шапка (`h-14`):** вибір навчального курсу, пошуковий рядок учнів, лічильник черги перевірки, індикатор захищеності з'єднання.",
+          "raw_text": "**Кореневий контейнер (`h-screen w-screen overflow-hidden`):** вікно жорстко зафіксоване, браузерний глобальний скрол заблоковано.",
           "subitems": []
         },
         {
           "type": "text",
-          "raw_text": "**Вертикальний рейл (`w-14`):** швидкі вкладки (`analytics` — когортна аналітика, `reviews` — черга ручної перевірки, `graph` — граф курсу, `audit` — блокчейн-аудит, `study` — перехід до підручника).",
+          "raw_text": "**Шапка (`h-14`):** брендинг `Smart-BKT-Chain` із бейджем `Teacher Portal v2.0`, випадаючий селектор навчальних курсів, розширений пошуковий селектор студента з відображенням індивідуального $P(L)$ та статусу, бейдж ролі «Викладач».",
           "subitems": []
         },
         {
           "type": "text",
-          "raw_text": "**Бічна панель (`w-[380px]`):** структурована на базі безрамкових секцій `<DrawerSection>` (Правило 7):",
+          "raw_text": "**Вертикальна рейка Opera Rail (`w-14`):** швидке перемикання робочих табів:",
+          "subitems": []
+        },
+        {
+          "type": "text",
+          "raw_text": "`analytics` (BarChart3): огляд групи та радар ризиків;",
+          "subitems": []
+        },
+        {
+          "type": "text",
+          "raw_text": "`coursemap` (Network): граф навичок та завдання;",
+          "subitems": []
+        },
+        {
+          "type": "text",
+          "raw_text": "`reviews` (ClipboardCheck): черга перевірки відповідей (Human-in-the-Loop) з інтерактивним числовим бейджем кількості робіт (`reviewQueue.length`);",
+          "subitems": []
+        },
+        {
+          "type": "text",
+          "raw_text": "`metrics-audit` (FlaskConical): математичний аудит та пісочниця симулятора BKT (What-If Sandbox);",
+          "subitems": []
+        },
+        {
+          "type": "text",
+          "raw_text": "*Нижній стек екосистеми:* автоматичні швидкі посилання через `@sbc/routes` на Підручник (`apps/study`), Студентський кабінет (`apps/student`), Адмінку (`apps/admin`), Документацію (`apps/docs`) та параметри оцінювання (`settings`).",
+          "subitems": []
+        },
+        {
+          "type": "text",
+          "raw_text": "**Висувний Drawer (`w-[380px]`):** структурований на базі безрамкових секцій `<DrawerSection>` (Правило 7) з незалежним скролом:",
           "subitems": []
         },
         {
@@ -75,7 +107,7 @@
         },
         {
           "type": "text",
-          "raw_text": "**Центральне полотно:**",
+          "raw_text": "**Центральне полотно (`<main className=\"flex-1 overflow-y-auto\">`):**",
           "subitems": []
         },
         {
@@ -90,7 +122,7 @@
         },
         {
           "type": "text",
-          "raw_text": "`AnomalyTreeWidget`: виявлення патернів нечесної поведінки або перевтоми.",
+          "raw_text": "`AnomalyTreeWidget`: виявлення патернів нечесної поведінки або когнітивної втоми.",
           "subitems": []
         },
         {

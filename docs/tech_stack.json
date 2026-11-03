@@ -144,9 +144,16 @@
             },
             {
               "type": "text",
+              "raw_text": "**Канонічний макет екосистеми (`AppShellLayout` у `@sbc/ui`):**",
+              "subitems": [
+                "Уніфікований каркас **Opera Shell v2.0** для 4 ключових порталів (`apps/study`, `apps/student`, `apps/teacher`, `apps/admin`). Забезпечує сувору ізоляцію скролу (`h-screen w-screen overflow-hidden`), фіксовану верхню шапку (`h-14`), вертикальну навігаційну рейку **Opera Vertical Icon Rail (`w-14`)** із динамічними бейджами і автоматичними міжпортальними лінками через `@sbc/routes`, висувний Drawer на базі `<DrawerSection>` та контентне полотно з незалежним скролом."
+              ]
+            },
+            {
+              "type": "text",
               "raw_text": "**Спільні компоненти та дизайн-система (`@sbc/ui`):**",
               "subitems": [
-                "Пакет `packages/ui` містить уніфіковані віджети (`GameSkillTreeWidget`, `AnomalyTreeWidget`, `AnomalyRadarWidget`, `CourseOverviewWidget`), компоненти Radix/Tailwind та Storybook для швидкої розробки в ізоляції."
+                "Пакет `packages/ui` містить уніфікований `AppShellLayout`, спільні віджети (`GameSkillTreeWidget`, `AnomalyTreeWidget`, `AnomalyRadarWidget`, `CourseOverviewWidget`), компоненти Radix/Tailwind та акордеонний контейнер `<DrawerSection>`."
               ]
             },
             {

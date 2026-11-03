@@ -121,8 +121,10 @@ smart-bkt-chain/
     *   *Чому:* Повна сумісність із серверними компонентами (RSC). Для оптимізації застосовується гібридна модель: статична генерація для публічних зон та динамічний SSR/CSR з захистом ролей у кабінетах.
 *   **Архітектурна методологія:** **Feature-Sliced Design (FSD)**.
     *   *Чому:* Забезпечує декомпозицію клієнтського коду на незалежні шари (`shared`, `entities`, `features`, `widgets`, `pages`, `app`), виключаючи спагеті-код та кругові залежності.
+*   **Канонічний макет екосистеми (`AppShellLayout` у `@sbc/ui`):**
+    *   *Чому:* Уніфікований каркас **Opera Shell v2.0** для 4 ключових порталів (`apps/study`, `apps/student`, `apps/teacher`, `apps/admin`). Забезпечує сувору ізоляцію скролу (`h-screen w-screen overflow-hidden`), фіксовану верхню шапку (`h-14`), вертикальну навігаційну рейку **Opera Vertical Icon Rail (`w-14`)** із динамічними бейджами і автоматичними міжпортальними лінками через `@sbc/routes`, висувний Drawer на базі `<DrawerSection>` та контентне полотно з незалежним скролом.
 *   **Спільні компоненти та дизайн-система (`@sbc/ui`):**
-    *   *Чому:* Пакет `packages/ui` містить уніфіковані віджети (`GameSkillTreeWidget`, `AnomalyTreeWidget`, `AnomalyRadarWidget`, `CourseOverviewWidget`), компоненти Radix/Tailwind та Storybook для швидкої розробки в ізоляції.
+    *   *Чому:* Пакет `packages/ui` містить уніфікований `AppShellLayout`, спільні віджети (`GameSkillTreeWidget`, `AnomalyTreeWidget`, `AnomalyRadarWidget`, `CourseOverviewWidget`), компоненти Radix/Tailwind та акордеонний контейнер `<DrawerSection>`.
 *   **Уніфікований стан навігації:**
     *   *Чому:* Усі кабінети використовують спільний 3-стадійний стан навігації (`activeTab` + `isDrawerOpen`), що запобігає втраті фокусу обраної вкладки при згортанні панелей.
 *   **Стилізація та UI:** **Tailwind CSS + shadcn/ui (Radix UI)**.
