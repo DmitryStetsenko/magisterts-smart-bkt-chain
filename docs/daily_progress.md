@@ -36,6 +36,16 @@
      - `npm run build --workspace=@sbc/student` — код 0.
      - `npm run build --workspace=@sbc/admin` — код 0.
 
+2. **Виправлення ізольованого скролу контенту в `AppShellLayout` (`apps/study`) (`SBC-315`, `EP-SH` / `EP-ST`):**
+   - **Діагностика проблеми:**
+     - У компоненті `packages/ui/src/shell/AppShellLayout.tsx` для тегу `<main>` було вказано тернарну умову `${mainClassName ? mainClassName : 'overflow-y-auto items-center'}`.
+     - Оскільки підручник `apps/study` передавав власний `mainClassName="px-4 py-8 ... transition-all"`, клас `overflow-y-auto` не потрапляв на елемент `<main>`, через що скролінг теоретичного матеріалу блокувався кореневим `overflow-hidden`.
+   - **Інженерне рішення:**
+     - У `AppShellLayout.tsx` закріплено безумовний `overflow-y-auto` в базових класах контентного контейнера `<main className="flex-1 relative h-full overflow-y-auto flex flex-col ...">`.
+     - У `apps/study` до `mainClassName` додано `items-center` для ідеального центрування полотна читання.
+   - **Верифікація:**
+     - Повторні успішні білди `@sbc/study` та `@sbc/student`. Скролінг підручника відновлено у повному обсязі із розрахунком прогресу `ReaderFloatingToolbar`.
+
 ---
 
 ## 📅 2 листопада 2026 року

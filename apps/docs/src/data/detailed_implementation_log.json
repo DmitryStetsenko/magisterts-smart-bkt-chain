@@ -203,6 +203,21 @@
               "type": "text",
               "raw_text": "`npm run build --workspace=@sbc/admin` -> Exit code 0.",
               "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Усунення дефекту скролу в AppShellLayout (`apps/study`):**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Виявлено: через умовний вираз `mainClassName ? mainClassName : 'overflow-y-auto items-center'` у `packages/ui/src/shell/AppShellLayout.tsx` при кастомному значенні `mainClassName` клас `overflow-y-auto` втрачався, блокуючи скрол довгого тексту підручника.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Виправлено: клас `overflow-y-auto` внесено до базових незмінних стилів тегу `<main>`, а в `StudyAppClient.tsx` передано `items-center` для центрування полотна уроку. Скролінг та розрахунок прогресу читання працюють штатно.",
+              "subitems": []
             }
           ]
         },

@@ -53,6 +53,9 @@
   - `npm run build --workspace=@sbc/teacher` -> Exit code 0.
   - `npm run build --workspace=@sbc/student` -> Exit code 0.
   - `npm run build --workspace=@sbc/admin` -> Exit code 0.
+- **Усунення дефекту скролу в AppShellLayout (`apps/study`):**
+  - Виявлено: через умовний вираз `mainClassName ? mainClassName : 'overflow-y-auto items-center'` у `packages/ui/src/shell/AppShellLayout.tsx` при кастомному значенні `mainClassName` клас `overflow-y-auto` втрачався, блокуючи скрол довгого тексту підручника.
+  - Виправлено: клас `overflow-y-auto` внесено до базових незмінних стилів тегу `<main>`, а в `StudyAppClient.tsx` передано `items-center` для центрування полотна уроку. Скролінг та розрахунок прогресу читання працюють штатно.
 
 ### 0.1.7.23 Впровадження Семантичної Маршрутизації та Протоколу Deep Linking у apps/student та apps/api (SBC-312, EP-ST)
 - **Контекст та інженерний мотив:**

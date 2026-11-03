@@ -483,7 +483,7 @@ console.log(greeting, "Номер спроби:", counter);`}
           : undefined
       }
       onMainScroll={handleScroll}
-      mainClassName={`px-4 py-8 sm:px-8 lg:px-12 transition-all ${
+      mainClassName={`px-4 py-8 sm:px-8 lg:px-12 items-center transition-all ${
         readerSettings.isFocusMode ? 'focus-mode' : ''
       }`}
     >

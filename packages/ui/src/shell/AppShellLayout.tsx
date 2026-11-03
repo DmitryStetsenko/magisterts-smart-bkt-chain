@@ -290,7 +290,7 @@ export function AppShellLayout({
         <main
           ref={mainScrollRef as any}
           onScroll={onMainScroll}
-          className={`flex-1 relative h-full flex flex-col ${mainClassName ? mainClassName : 'overflow-y-auto items-center'}`}
+          className={`flex-1 relative h-full overflow-y-auto flex flex-col ${mainClassName || 'items-center'}`}
         >
           {children}
         </main>
