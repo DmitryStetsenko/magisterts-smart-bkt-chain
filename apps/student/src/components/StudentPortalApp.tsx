@@ -1035,6 +1035,25 @@ export function StudentPortalContent({
         logoIcon: Brain,
         logoColor: 'bg-indigo-600/20 border-indigo-500/30 text-indigo-400',
         badgeColor: 'bg-indigo-500/20 text-indigo-300 border-indigo-500/30',
+        breadcrumbs: (
+          <Breadcrumbs
+            items={[
+              {
+                label: courses.find((c) => c.slug === activeCourseSlug)?.title || activeCourseSlug,
+                onClick: () => handleTabClick('tree'),
+              },
+              {
+                label: task?.skill?.title || 'Навичка',
+                onClick: () => handleTabClick('bkt'),
+              },
+              ...(task ? [{
+                label: task.title,
+                badge: `${task.difficulty || 'MEDIUM'}`,
+                isCurrent: true,
+              }] : []),
+            ]}
+          />
+        ),
         rightSlot: (
           <div className="flex items-center gap-3">
             {/* 🏆 Prominent Central Overall Course Progress Display */}

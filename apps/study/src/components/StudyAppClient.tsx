@@ -234,15 +234,24 @@ export function StudyAppClient({
         badgeColor: 'bg-blue-500/20 text-blue-300 border-blue-500/30',
         logoColor: 'bg-blue-600/20 border-blue-500/30 text-blue-400',
         hideHeader: readerSettings.isFocusMode,
-        centerSlot: (
-          <div className="flex items-center gap-2 bg-slate-950/80 px-4 py-1.5 rounded-2xl border border-slate-800 shadow-inner">
-            <span className="w-2 h-2 rounded-full bg-blue-400 animate-pulse"></span>
-            <span className="font-semibold text-slate-300 max-w-[200px] truncate">{SCHOOL_WEB_CURRICULUM.courseTitle}</span>
-            <span className="text-slate-600">•</span>
-            <span className="font-mono text-blue-400 font-bold">Модуль {currentModule.moduleNumber}</span>
-            <span className="text-slate-600">/</span>
-            <span className="text-slate-400 max-w-[160px] truncate">{currentUnit.title}</span>
-          </div>
+        breadcrumbs: (
+          <Breadcrumbs
+            items={[
+              {
+                label: SCHOOL_WEB_CURRICULUM.courseTitle,
+                onClick: () => handleSelectUnit(SCHOOL_WEB_CURRICULUM.modules[0].moduleSlug, SCHOOL_WEB_CURRICULUM.modules[0].units[0].slug),
+              },
+              {
+                label: `Модуль ${currentModule.moduleNumber}`,
+                onClick: () => handleSelectUnit(currentModule.moduleSlug, currentModule.units[0].slug),
+              },
+              {
+                label: currentUnit.title,
+                badge: currentUnit.gradeLevel,
+                isCurrent: true,
+              },
+            ]}
+          />
         ),
         rightSlot: (
           <div className="flex items-center gap-3">

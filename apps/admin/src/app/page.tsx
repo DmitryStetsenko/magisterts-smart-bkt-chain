@@ -122,6 +122,25 @@ export default function AdminCMSDashboard() {
         logoIcon: ShieldCheck,
         logoColor: 'bg-emerald-600/20 border-emerald-500/30 text-emerald-400',
         badgeColor: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30',
+        breadcrumbs: (
+          <Breadcrumbs
+            items={[
+              {
+                label: 'CMS Адміністрування',
+                onClick: () => handleTabClick('dag'),
+              },
+              {
+                label: activeTab === 'dag'
+                  ? 'Граф навичок'
+                  : activeTab === 'courses'
+                  ? 'Курси'
+                  : 'Система',
+                badge: `${nodes.length} навичок`,
+                isCurrent: true,
+              },
+            ]}
+          />
+        ),
         rightSlot: (
           <div className="flex items-center gap-3">
             <a

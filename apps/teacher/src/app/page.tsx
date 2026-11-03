@@ -1324,6 +1324,35 @@ export default function TeacherDashboardPage() {
         logoIcon: ShieldCheck,
         logoColor: 'bg-purple-600/20 border-purple-500/30 text-purple-400',
         badgeColor: 'bg-purple-500/20 text-purple-300 border-purple-500/30',
+        breadcrumbs: (
+          <Breadcrumbs
+            items={[
+              {
+                label: activeCourse.title,
+                onClick: () => handleTabClick('coursemap'),
+              },
+              {
+                label: activeTab === 'analytics'
+                  ? 'Аналітика'
+                  : activeTab === 'coursemap'
+                  ? 'Граф навичок'
+                  : activeTab === 'reviews'
+                  ? 'Черга перевірки'
+                  : activeTab === 'metrics-audit'
+                  ? 'Аудит BKT'
+                  : 'Параметри',
+                onClick: () => handleTabClick(activeTab),
+              },
+              ...(selectedStudent && activeTab === 'analytics'
+                ? [{
+                    label: selectedStudent.name,
+                    badge: `${((selectedStudent.averageMastery ?? 0) * 100).toFixed(0)}% P(L)`,
+                    isCurrent: true,
+                  }]
+                : []),
+            ]}
+          />
+        ),
         rightSlot: (
           <>
             {/* Top Controls: Course Selector, Searchable Student Selector & Profile */}
