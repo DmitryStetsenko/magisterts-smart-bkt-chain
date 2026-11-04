@@ -297,7 +297,8 @@
 | **SBC-327** | Style | ST | match breadcrumb slash separator color with text for clear readability | 2026-11-04 | 1b17439 |
 | **SBC-328** | Docs | ST | formalize two-tier header branding and breadcrumbs rules in workspace governance and portal docs | 2026-11-04 | 503ec31 |
 | **SBC-329** | Style | SH | propagate two-tier header standard across study, teacher, and admin web applications | 2026-11-04 | 120efd7 |
-| **SBC-330** | Feat | SH | create reusable UserProfileDrawer component in sbc-ui and integrate across all apps | 2026-11-04 | working-tree |
+| **SBC-330** | Feat | SH | create reusable UserProfileDrawer component in sbc-ui and integrate across all apps | 2026-11-04 | deaf152 |
+| **SBC-331** | Clean | TC | eliminate redundant header course selector in teacher dashboard to enforce single source of truth | 2026-11-04 | working-tree |
 
 ---
 

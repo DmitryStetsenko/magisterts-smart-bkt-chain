@@ -120,6 +120,57 @@
           ]
         },
         {
+          "title": "0.1.7.40 Ліквідація Дублюючого Селектора Курсу в Кабінеті Викладача (SBC-331, EP-TC)",
+          "level": 3,
+          "paragraphs": [],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "**Контекст та інженерний мотив:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "У процесі масштабування дворівневої шапки та уніфікації `UserProfileDrawer` у кабінеті викладача (`apps/teacher`) в правій зоні залишався застарілий `<select id=\"teacher-course-select\">`.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Це створювало візуальний шум і дублювання: активний курс показувався одночасно і в лівому брендинговому поверсі (`courseBadge`), і в окремому дропдауні справа.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Виконані інженерні зміни:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "У [`apps/teacher/src/app/page.tsx`](file:///apps/teacher/src/app/page.tsx) видалено зайвий селектор курсу.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "У правій зоні хедера залишено виключно релевантні інструменти викладача:",
+              "subitems": [
+                "1. Контекстний пошуковий селектор студента для когортного аналізу (`teacher-student-dropdown-btn`);",
+                "2. Кнопка профілю викладача (`UserProfileDrawer`), де зібрано повний перелік курсів, когортні показники та чергу перевірки."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Верифікація:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "`npm run build:teacher` завершився без помилок.",
+              "subitems": []
+            }
+          ]
+        },
+        {
           "title": "0.1.7.39 Спільний Компонент UserProfileDrawer та Правило Уніфікації Профілів (SBC-330, EP-SH)",
           "level": 3,
           "paragraphs": [],

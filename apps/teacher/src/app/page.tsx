@@ -1361,27 +1361,7 @@ export default function TeacherDashboardPage() {
           />
         ),
         rightSlot: (
-          <>
-            {/* Top Controls: Course Selector, Searchable Student Selector & Profile */}
-            <div className="flex items-center gap-3">
-          {/* Course Selector */}
-          <div className="relative min-w-[180px] sm:min-w-[240px]">
-            <select
-              id="teacher-course-select"
-              value={activeCourseSlug}
-              onChange={(e) => handleSelectCourse(e.target.value)}
-              className="w-full appearance-none px-3 py-1.5 rounded-xl bg-slate-950 border border-slate-700 text-xs font-semibold text-white focus:outline-none focus:border-purple-500 cursor-pointer pr-8 shadow-inner"
-            >
-              {courses.map((course) => (
-                <option key={course.slug} value={course.slug} className="bg-slate-900 text-white py-1">
-                  🎓 {course.title} ({course.slug})
-                </option>
-              ))}
-            </select>
-            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-purple-400">
-              <ChevronDown className="w-3.5 h-3.5" />
-            </div>
-          </div>
+          <div className="flex items-center gap-3">
 
           {/* 🔍 Searchable Student Dropdown Selector */}
           <div className="relative min-w-[200px] sm:min-w-[260px]">
@@ -1485,7 +1465,6 @@ export default function TeacherDashboardPage() {
             </span>
           </button>
         </div>
-        </>
         ),
       }}
       navigationRail={{
