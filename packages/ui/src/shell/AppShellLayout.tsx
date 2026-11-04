@@ -149,17 +149,17 @@ export function AppShellLayout({
 
                 {header.courseBadge && (
                   <>
-                    <div className="h-3.5 w-[1px] bg-slate-800 hidden sm:block" />
-                    <div className="hidden sm:flex items-center">
+                    <div className="h-3.5 w-[1px] bg-slate-800 ml-1.5 hidden sm:block" />
+                    <div className="hidden sm:flex items-center pl-1">
                       {header.courseBadge}
                     </div>
                   </>
                 )}
               </div>
 
-              {/* Рядок 2: Хлібні крихти локальної навички/завдання з виразним відступом вниз mt-1 */}
+              {/* Рядок 2: Хлібні крихти локальної навички/завдання з виразним відступом вниз mt-1.5 */}
               {header.breadcrumbs && (
-                <div className="flex items-center mt-1">
+                <div className="flex items-center mt-1.5">
                   {header.breadcrumbs}
                 </div>
               )}

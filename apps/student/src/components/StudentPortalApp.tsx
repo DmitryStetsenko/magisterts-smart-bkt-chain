@@ -1044,7 +1044,7 @@ export function StudentPortalContent({
         badgeColor: 'bg-indigo-500/20 text-indigo-300 border-indigo-500/30',
         courseBadge: (
           <span
-            className="text-xs sm:text-[13px] font-semibold text-slate-200 select-none tracking-wide"
+            className="text-xs sm:text-[12px] font-medium text-slate-400 select-none tracking-wide"
             title={`Активний курс: ${courses.find((c) => c.slug === activeCourseSlug)?.title || activeCourseSlug}`}
           >
             {courses.find((c) => c.slug === activeCourseSlug)?.title || activeCourseSlug}

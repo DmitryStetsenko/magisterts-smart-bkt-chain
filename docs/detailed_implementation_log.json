@@ -120,6 +120,62 @@
           ]
         },
         {
+          "title": "0.1.7.33 Тонке Налаштування Візуальної Ієрархії Хедера Студентського Порталу (SBC-324, EP-ST)",
+          "level": 3,
+          "paragraphs": [
+            "pm run build:student (Turbopack, TypeScript)."
+          ],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "**Контекст та інженерна мета:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Зниження візуального шуму у верхній панелі AppShellLayout студентського тренажера.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Усунення домінування назви обраного курсу та хлібних крихт над робочою областю редактора коду.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Архітектурні та стилістичні зміни:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "*Блок назви курсу біля логотипу (courseBadge):*",
+              "subitems": [
+                "У [packages/ui/src/shell/AppShellLayout.tsx](file:///packages/ui/src/shell/AppShellLayout.tsx) вертикальний розділювач та обгортка courseBadge отримали додатковий відступ ml-1.5 та внутрішній паддінг pl-1.",
+                "У [\u0007pps/student/src/components/StudentPortalApp.tsx](file:///apps/student/src/components/StudentPortalApp.tsx) клас шрифту змінено на \text-xs sm:text-[12px] font-medium text-slate-400 select-none tracking-wide, що створює плавний перехід і не відволікає від умови задачі."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "*Хлібні крихти локального завдання (Breadcrumbs):*",
+              "subitems": [
+                "У [packages/ui/src/shell/AppShellLayout.tsx](file:///packages/ui/src/shell/AppShellLayout.tsx) вертикальний відступ від лінії логотипа збільшено з mt-1 до mt-1.5.",
+                "У [packages/ui/src/breadcrumbs/Breadcrumbs.tsx](file:///packages/ui/src/breadcrumbs/Breadcrumbs.tsx) усунено яскраві кольорові акценти (синій колір іконок та бейджів складності). Поточний елемент отримав \text-slate-300 font-medium та нейтральний бейдж \bg-slate-800 text-slate-400 border-slate-700/60, а попередні ланки — \text-slate-500 hover:text-slate-300."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Верифікація:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Повна успішна збірка",
+              "subitems": []
+            }
+          ]
+        },
+        {
           "title": "0.1.7.32 Специфікація та Архітектура Комплексу Штучного Інтелекту для Персоналізації Траєкторій (SBC-323, EP-LLM / EP-BKT)",
           "level": 3,
           "paragraphs": [],

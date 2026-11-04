@@ -29,6 +29,21 @@
   4. *Install Monorepo Dependencies* (`npm ci || npm install`) — синхронізація робочих просторів монорепозиторію.
   5. *Build Next.js Documentation Site* (`npm run build:docs`) — збірка статичного експорту (`output: "export"`, `trailingSlash: true`, `basePath: "/magisterts-smart-bkt-chain"`).
   6. *Upload Artifact & Deploy Pages* (`actions/upload-pages-artifact@v3` + `actions/deploy-pages@v4`).
+### 0.1.7.33 Тонке Налаштування Візуальної Ієрархії Хедера Студентського Порталу (SBC-324, EP-ST)
+- **Контекст та інженерна мета:**
+  - Зниження візуального шуму у верхній панелі AppShellLayout студентського тренажера.
+  - Усунення домінування назви обраного курсу та хлібних крихт над робочою областю редактора коду.
+- **Архітектурні та стилістичні зміни:**
+  1. *Блок назви курсу біля логотипу (courseBadge):*
+     - У [packages/ui/src/shell/AppShellLayout.tsx](file:///packages/ui/src/shell/AppShellLayout.tsx) вертикальний розділювач та обгортка courseBadge отримали додатковий відступ ml-1.5 та внутрішній паддінг pl-1.
+     - У [pps/student/src/components/StudentPortalApp.tsx](file:///apps/student/src/components/StudentPortalApp.tsx) клас шрифту змінено на 	ext-xs sm:text-[12px] font-medium text-slate-400 select-none tracking-wide, що створює плавний перехід і не відволікає від умови задачі.
+  2. *Хлібні крихти локального завдання (Breadcrumbs):*
+     - У [packages/ui/src/shell/AppShellLayout.tsx](file:///packages/ui/src/shell/AppShellLayout.tsx) вертикальний відступ від лінії логотипа збільшено з mt-1 до mt-1.5.
+     - У [packages/ui/src/breadcrumbs/Breadcrumbs.tsx](file:///packages/ui/src/breadcrumbs/Breadcrumbs.tsx) усунено яскраві кольорові акценти (синій колір іконок та бейджів складності). Поточний елемент отримав 	ext-slate-300 font-medium та нейтральний бейдж g-slate-800 text-slate-400 border-slate-700/60, а попередні ланки — 	ext-slate-500 hover:text-slate-300.
+- **Верифікація:**
+  - Повна успішна збірка 
+pm run build:student (Turbopack, TypeScript).
+
 ### 0.1.7.32 Специфікація та Архітектура Комплексу Штучного Інтелекту для Персоналізації Траєкторій (SBC-323, EP-LLM / EP-BKT)
 - **Контекст та науково-практичне завдання:**
   - На вимогу наукового керівника та згідно із затвердженою темою («Розробка навчальної онлайн-платформи з використанням штучного інтелекту для персоналізації освітніх траєкторій») проведено ретельну систематизацію та опис усіх технологій штучного інтелекту, що функціонують у системі.
