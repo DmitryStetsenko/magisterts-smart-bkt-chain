@@ -120,6 +120,66 @@
           ]
         },
         {
+          "title": "0.1.7.29 Усунення Помилки SSR Hydration Mismatch у apps/student (SBC-320, EP-ST)",
+          "level": 3,
+          "paragraphs": [
+            "pm run build --workspace=@sbc/student пройшла без зауважень."
+          ],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "**Причина дефекту:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "У StudentPortalApp.tsx початковий стан useState виконував пряме синхронне читання localStorage.getItem('sbc_student_active_course').",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Оскільки на етапі серверного рендерингу (SSR / Turbopack) глобальний об'єкт window відсутній, сервер генерував початкове значення 'js-dev'.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "На клієнті під час гідратації React виявляв збережене в браузері значення 'english-b2' і формував відмінний рядок назви курсу в атрибуті \title та тексті хлібних крихт Breadcrumbs, що викликало помилку розбіжності дерев React DOM (Hydration failed).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Технічне вирішення:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Ініціалізація стану \u0007ctiveCourseSlug уніфікована до детермінованого значення initialCourseSlug || 'js-dev'.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Зчитування збереженого вибору студента з localStorage делеговано хуку useEffect, який безпечно мутує стан на етапі клієнтського життєвого циклу без порушення цілісності SSR розмітки.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Результати перевірки:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Збірка",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Попередження гідратації у браузері повністю ліквідовано.",
+              "subitems": []
+            }
+          ]
+        },
+        {
           "title": "0.1.7.28 Реалізація Правого Дровера Профілю та Курсів (Right Profile Drawer) (SBC-319, EP-SH / EP-ST)",
           "level": 3,
           "paragraphs": [

@@ -39,19 +39,22 @@ export function StudentPortalContent({
   unitSlug,
 }: StudentPortalPageProps) {
   const [courses, setCourses] = useState<CourseItem[]>(DEFAULT_COURSES);
-  const [activeCourseSlug, setActiveCourseSlug] = useState<string>(() => {
-    if (initialCourseSlug) return initialCourseSlug;
-    if (typeof window !== 'undefined') {
-      return localStorage.getItem('sbc_student_active_course') || 'js-dev';
-    }
-    return 'js-dev';
-  });
+  // Завжди ініціалізуємо стабільним дефолтним значенням на сервері та клієнті для запобігання Hydration Mismatch
+  const [activeCourseSlug, setActiveCourseSlug] = useState<string>(initialCourseSlug || 'js-dev');
   const [task, setTask] = useState<TaskDetail | null>(null);
   const [exhaustedModalData, setExhaustedModalData] = useState<{ skillId: string; skillTitle: string } | null>(null);
 
+  // Синхронізація збереженого в localStorage курсу виключно після монтування компонента на клієнті
   useEffect(() => {
     if (initialCourseSlug) {
       setActiveCourseSlug(initialCourseSlug);
+      return;
+    }
+    if (typeof window !== 'undefined') {
+      const savedCourse = localStorage.getItem('sbc_student_active_course');
+      if (savedCourse && savedCourse !== activeCourseSlug) {
+        setActiveCourseSlug(savedCourse);
+      }
     }
   }, [initialCourseSlug]);
 

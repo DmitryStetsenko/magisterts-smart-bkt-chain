@@ -29,6 +29,19 @@
   4. *Install Monorepo Dependencies* (`npm ci || npm install`) — синхронізація робочих просторів монорепозиторію.
   5. *Build Next.js Documentation Site* (`npm run build:docs`) — збірка статичного експорту (`output: "export"`, `trailingSlash: true`, `basePath: "/magisterts-smart-bkt-chain"`).
   6. *Upload Artifact & Deploy Pages* (`actions/upload-pages-artifact@v3` + `actions/deploy-pages@v4`).
+### 0.1.7.29 Усунення Помилки SSR Hydration Mismatch у apps/student (SBC-320, EP-ST)
+- **Причина дефекту:**
+  - У StudentPortalApp.tsx початковий стан useState виконував пряме синхронне читання localStorage.getItem('sbc_student_active_course').
+  - Оскільки на етапі серверного рендерингу (SSR / Turbopack) глобальний об'єкт window відсутній, сервер генерував початкове значення 'js-dev'.
+  - На клієнті під час гідратації React виявляв збережене в браузері значення 'english-b2' і формував відмінний рядок назви курсу в атрибуті 	itle та тексті хлібних крихт Breadcrumbs, що викликало помилку розбіжності дерев React DOM (Hydration failed).
+- **Технічне вирішення:**
+  - Ініціалізація стану ctiveCourseSlug уніфікована до детермінованого значення initialCourseSlug || 'js-dev'.
+  - Зчитування збереженого вибору студента з localStorage делеговано хуку useEffect, який безпечно мутує стан на етапі клієнтського життєвого циклу без порушення цілісності SSR розмітки.
+- **Результати перевірки:**
+  - Збірка 
+pm run build --workspace=@sbc/student пройшла без зауважень.
+  - Попередження гідратації у браузері повністю ліквідовано.
+
 ### 0.1.7.28 Реалізація Правого Дровера Профілю та Курсів (Right Profile Drawer) (SBC-319, EP-SH / EP-ST)
 - **Контекст та інженерний мотив:**
   - На базі тестування попередніх ітерацій зафіксовано, що двоетажна шапка та випадаючі селектори всередині хедера створюють візуальний шум і конкурують із робочим простором редактора.
