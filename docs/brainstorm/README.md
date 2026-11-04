@@ -58,3 +58,8 @@
 13. [13. Оптимізація та Декомпозиція Хедера Платформи (Header De-cluttering & Scope Architecture)](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/docs/brainstorm/13_header_decluttering_and_scope_architecture.md)
     - *Дата:* 4 листопада 2026
     - *Ключові теми:* Усунення перевантаження та змішування контекстів (Scope Bleed), ліквідація дублювання назв курсів і модулів, розведення на Top App Header, Workspace Sub-Header та Drawer, інтерактивні мікро-поповери (Pills), перенесення профілю у правий сектор.
+
+14. [14. Відповідність Проєкту Офіційно Затвердженій Темі Магістерської Роботи та Архітектура ШІ для Персоналізації](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/docs/brainstorm/14_thesis_topic_alignment_and_ai_architecture.md)
+    - *Дата:* 4 листопада 2026
+    - *Ключові теми:* Семантичний мапінг офіційно затвердженої теми наказу («Розробка навчальної онлайн-платформи з використанням штучного інтелекту для персоналізації освітніх траєкторій»); наукове обґрунтування BKT (HMM / Dynamic Bayesian Networks) та динамічного секвенування (Automated Planning) як фундаментального ШІ (Explainable AI); архітектура мок-адаптерів для генеративних LLM (Gemini API); план реструктуризації акцентів дисертації.
+

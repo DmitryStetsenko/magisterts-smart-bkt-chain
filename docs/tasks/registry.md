@@ -221,6 +221,7 @@
 
 | Task Key | Type | Scope | Summary | Date | Commit Hash |
 | :--- | :---: | :---: | :--- | :---: | :---: |
+| **SBC-323** | Task | LLM | formalize and document multi-tier AI technologies suite for personalized learning pathways | 2026-11-04 | working-tree |
 | **SBC-111** | `Task` | `LLM` | detail Phase 3 AI evaluation & async queue architecture with Mermaid sequence diagram | 2026-10-05 | `902249f` |
 | **SBC-118** | `Story` | `LLM` | implement universal polyglot BKT evaluation engine and multi-course UI | 2026-10-06 | `37964d6` |
 | **SBC-168** | `Task` | `LLM` | initialize brainstorm hub and document session 01 on multi-task mastery evaluation and telemetry | 2026-10-12 | `20d13cf` |
