@@ -295,7 +295,8 @@
 | **SBC-325** | Style | ST | equalize breadcrumbs styling with lighter font-weight and increased vertical clearance | 2026-11-04 | f3f7a14 |
 | **SBC-326** | Style | ST | use slash separator and compact typography for breadcrumbs with non-bold course title | 2026-11-04 | 76371ac |
 | **SBC-327** | Style | ST | match breadcrumb slash separator color with text for clear readability | 2026-11-04 | 1b17439 |
-| **SBC-328** | Docs | ST | formalize two-tier header branding and breadcrumbs rules in workspace governance and portal docs | 2026-11-04 | working-tree |
+| **SBC-328** | Docs | ST | formalize two-tier header branding and breadcrumbs rules in workspace governance and portal docs | 2026-11-04 | 503ec31 |
+| **SBC-329** | Style | SH | propagate two-tier header standard across study, teacher, and admin web applications | 2026-11-04 | working-tree |
 
 ---
 

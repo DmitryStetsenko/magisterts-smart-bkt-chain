@@ -122,8 +122,17 @@ export default function AdminCMSDashboard() {
         logoIcon: ShieldCheck,
         logoColor: 'bg-emerald-600/20 border-emerald-500/30 text-emerald-400',
         badgeColor: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30',
+        courseBadge: (
+          <span
+            className="text-sm sm:text-[14px] font-normal text-slate-300 select-none tracking-normal"
+            title="Методичний центр управління платформою"
+          >
+            Методичний центр
+          </span>
+        ),
         breadcrumbs: (
           <Breadcrumbs
+            className="text-[11px]"
             items={[
               {
                 label: 'CMS Адміністрування',
@@ -180,6 +189,7 @@ export default function AdminCMSDashboard() {
     >
       {/* 🧭 Єдині хлібні крихти платформи */}
       <Breadcrumbs
+        className="text-[11px]"
         items={[
           {
             label: 'CMS Адміністрування',

@@ -1324,13 +1324,18 @@ export default function TeacherDashboardPage() {
         logoIcon: ShieldCheck,
         logoColor: 'bg-purple-600/20 border-purple-500/30 text-purple-400',
         badgeColor: 'bg-purple-500/20 text-purple-300 border-purple-500/30',
+        courseBadge: (
+          <span
+            className="text-sm sm:text-[14px] font-normal text-slate-300 select-none tracking-normal"
+            title={`Активний курс: ${activeCourse.title}`}
+          >
+            {activeCourse.title}
+          </span>
+        ),
         breadcrumbs: (
           <Breadcrumbs
+            className="text-[11px]"
             items={[
-              {
-                label: activeCourse.title,
-                onClick: () => handleTabClick('coursemap'),
-              },
               {
                 label: activeTab === 'analytics'
                   ? 'Аналітика'
@@ -1774,6 +1779,7 @@ export default function TeacherDashboardPage() {
       <div className="flex flex-col gap-6">
         {/* 🧭 Єдині хлібні крихти платформи */}
         <Breadcrumbs
+          className="text-[11px]"
           items={[
             {
               label: activeCourse.title,

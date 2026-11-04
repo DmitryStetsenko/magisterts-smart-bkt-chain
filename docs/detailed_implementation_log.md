@@ -29,6 +29,21 @@
   4. *Install Monorepo Dependencies* (`npm ci || npm install`) — синхронізація робочих просторів монорепозиторію.
   5. *Build Next.js Documentation Site* (`npm run build:docs`) — збірка статичного експорту (`output: "export"`, `trailingSlash: true`, `basePath: "/magisterts-smart-bkt-chain"`).
   6. *Upload Artifact & Deploy Pages* (`actions/upload-pages-artifact@v3` + `actions/deploy-pages@v4`).
+### 0.1.7.38 Масштабування Дворівневої Шапки на Всі Застосунки Платформи (SBC-329, EP-SH)
+- **Контекст та архітектурна гармонізація:**
+  - На виконання затвердженого пункту 8 Правила 7 у [`.agents/AGENTS.md`](file:///.agents/AGENTS.md) проведено уніфікацію лівої зони шапки в усіх веб-застосунках монорепозиторію (`apps/study`, `apps/teacher`, `apps/admin`).
+- **Виконані зміни по застосунках:**
+  1. *Підручник теорії ([`apps/study/src/components/StudyAppClient.tsx`](file:///apps/study/src/components/StudyAppClient.tsx)):*
+     - Використано `courseBadge` для виведення `SCHOOL_WEB_CURRICULUM.courseTitle` (`text-sm sm:text-[14px] font-normal text-slate-300`).
+     - Хлібні крихти спрощено, прибрано дублювання назви курсу в першій ланці, кегль встановлено на `text-[11px]` із роздільником `/`.
+  2. *Кабінет викладача ([`apps/teacher/src/app/page.tsx`](file:///apps/teacher/src/app/page.tsx)):*
+     - Додано `courseBadge` з назвою `activeCourse.title`.
+     - Хлібні крихти в шапці та робочому просторі синхронізовано з канонічним стилем `text-[11px]`.
+  3. *Панель адміністратора CMS ([`apps/admin/src/app/page.tsx`](file:///apps/admin/src/app/page.tsx)):*
+     - Додано контекстний `courseBadge` («Методичний центр») та компактні хлібні крихти `text-[11px]`.
+- **Верифікація:**
+  - Усі проєкти монорепозиторію успішно зібрані (`build:study`, `build:teacher`, `build:admin`).
+
 ### 0.1.7.37 Закріплення Стандарту Дворівневої Шапки та Хлібних Крихт у Правилах Проєкту (SBC-328, EP-ST)
 - **Контекст та інженерна мета:**
   - Закріплення узгодженого візуального та типографічного дизайну лівої навігаційної зони у нормативних інструкціях монорепозиторію ([`.agents/AGENTS.md`](file:///.agents/AGENTS.md)) та доменній документації застосунку ([`docs/apps/student_portal.md`](file:///docs/apps/student_portal.md)).

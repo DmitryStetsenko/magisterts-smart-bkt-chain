@@ -234,13 +234,18 @@ export function StudyAppClient({
         badgeColor: 'bg-blue-500/20 text-blue-300 border-blue-500/30',
         logoColor: 'bg-blue-600/20 border-blue-500/30 text-blue-400',
         hideHeader: readerSettings.isFocusMode,
+        courseBadge: (
+          <span
+            className="text-sm sm:text-[14px] font-normal text-slate-300 select-none tracking-normal"
+            title={`Активний курс: ${SCHOOL_WEB_CURRICULUM.courseTitle}`}
+          >
+            {SCHOOL_WEB_CURRICULUM.courseTitle}
+          </span>
+        ),
         breadcrumbs: (
           <Breadcrumbs
+            className="text-[11px]"
             items={[
-              {
-                label: SCHOOL_WEB_CURRICULUM.courseTitle,
-                onClick: () => handleSelectUnit(SCHOOL_WEB_CURRICULUM.modules[0].moduleSlug, SCHOOL_WEB_CURRICULUM.modules[0].units[0].slug),
-              },
               {
                 label: `Модуль ${currentModule.moduleNumber}`,
                 onClick: () => handleSelectUnit(currentModule.moduleSlug, currentModule.units[0].slug),
@@ -501,6 +506,7 @@ console.log(greeting, "Номер спроби:", counter);`}
             {/* Хлібні крихти та метаінформація уроку */}
             <div className="flex flex-col gap-2.5 border-b pb-4 opacity-90">
               <Breadcrumbs
+                className="text-[11px]"
                 items={[
                   {
                     label: SCHOOL_WEB_CURRICULUM.courseTitle,

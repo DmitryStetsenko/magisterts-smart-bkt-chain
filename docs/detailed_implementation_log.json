@@ -120,6 +120,62 @@
           ]
         },
         {
+          "title": "0.1.7.38 Масштабування Дворівневої Шапки на Всі Застосунки Платформи (SBC-329, EP-SH)",
+          "level": 3,
+          "paragraphs": [],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "**Контекст та архітектурна гармонізація:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "На виконання затвердженого пункту 8 Правила 7 у [`.agents/AGENTS.md`](file:///.agents/AGENTS.md) проведено уніфікацію лівої зони шапки в усіх веб-застосунках монорепозиторію (`apps/study`, `apps/teacher`, `apps/admin`).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Виконані зміни по застосунках:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "*Підручник теорії ([`apps/study/src/components/StudyAppClient.tsx`](file:///apps/study/src/components/StudyAppClient.tsx)):*",
+              "subitems": [
+                "Використано `courseBadge` для виведення `SCHOOL_WEB_CURRICULUM.courseTitle` (`text-sm sm:text-[14px] font-normal text-slate-300`).",
+                "Хлібні крихти спрощено, прибрано дублювання назви курсу в першій ланці, кегль встановлено на `text-[11px]` із роздільником `/`."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "*Кабінет викладача ([`apps/teacher/src/app/page.tsx`](file:///apps/teacher/src/app/page.tsx)):*",
+              "subitems": [
+                "Додано `courseBadge` з назвою `activeCourse.title`.",
+                "Хлібні крихти в шапці та робочому просторі синхронізовано з канонічним стилем `text-[11px]`."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "*Панель адміністратора CMS ([`apps/admin/src/app/page.tsx`](file:///apps/admin/src/app/page.tsx)):*",
+              "subitems": [
+                "Додано контекстний `courseBadge` («Методичний центр») та компактні хлібні крихти `text-[11px]`."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Верифікація:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Усі проєкти монорепозиторію успішно зібрані (`build:study`, `build:teacher`, `build:admin`).",
+              "subitems": []
+            }
+          ]
+        },
+        {
           "title": "0.1.7.37 Закріплення Стандарту Дворівневої Шапки та Хлібних Крихт у Правилах Проєкту (SBC-328, EP-ST)",
           "level": 3,
           "paragraphs": [],
