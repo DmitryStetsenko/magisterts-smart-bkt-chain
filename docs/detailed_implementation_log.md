@@ -29,6 +29,21 @@
   4. *Install Monorepo Dependencies* (`npm ci || npm install`) — синхронізація робочих просторів монорепозиторію.
   5. *Build Next.js Documentation Site* (`npm run build:docs`) — збірка статичного експорту (`output: "export"`, `trailingSlash: true`, `basePath: "/magisterts-smart-bkt-chain"`).
   6. *Upload Artifact & Deploy Pages* (`actions/upload-pages-artifact@v3` + `actions/deploy-pages@v4`).
+### 0.1.7.35 Канонічний Розділювач Слеш, Зменшений Шрифт Крихт та Збільшена Назва Предмета (SBC-326, EP-ST)
+- **Контекст та інженерний мотив:**
+  - На основі зворотного зв'язку користувача та візуального порівняння зі скріншотами оптимізовано ліву навігаційну зону хедера `AppShellLayout`.
+  - Стрілочні розділювачі `ChevronRight` перевантажували рядок під логотипом і створювали зайвий технічний акцент.
+  - Назву обраного предмета поряд із логотипом потрібно було виділити масштабом, але зберегти спокійний, ненав'язливий вигляд без використання жирного шрифту.
+- **Виконані модифікації:**
+  1. *Розділювач та розмір крихт у [`packages/ui/src/breadcrumbs/Breadcrumbs.tsx`](file:///packages/ui/src/breadcrumbs/Breadcrumbs.tsx):*
+     - За замовчуванням інтегровано текстовий роздільник `/` (`<span className="text-slate-600/80 text-[11px] select-none font-light px-0.5">/</span>`).
+     - Базовий кегль встановлено у `text-[11px]` зі збереженням легкого накреслення `font-normal text-slate-400`.
+     - Збільшено поріг усікання рядків (`max-w-[280px] sm:max-w-[380px]`), що виключає появу трикрапки для довгих назв тем на кшталт «Grammar: Advanced Tenses & Conditionals».
+  2. *Типографіка назви курсу в [`apps/student/src/components/StudentPortalApp.tsx`](file:///apps/student/src/components/StudentPortalApp.tsx):*
+     - Розмір шрифту збільшено до `text-sm sm:text-[14px]` з акуратним накресленням `font-normal text-slate-300 select-none tracking-normal`.
+- **Верифікація:**
+  - Збірка `npm run build:student` пройшла з нульовими помилками.
+
 ### 0.1.7.34 Уніфікація Елементів Хлібних Крихт та Збільшення Вертикального Простору (SBC-325, EP-ST)
 - **Контекст та інженерний задум:**
   - Ліквідація зайвої диференціації між поточною активною темою та попередніми ланками в навігаційному ланцюжку.

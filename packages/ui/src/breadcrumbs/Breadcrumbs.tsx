@@ -18,13 +18,14 @@ export interface BreadcrumbsProps {
   showHome?: boolean;
   onHomeClick?: () => void;
   homeHref?: string;
+  separator?: React.ReactNode;
 }
 
 /**
  * 🧭 Breadcrumbs (Єдині компактні хлібні крихти платформи Smart-BKT-Chain)
  * - Розміщуються зліва над заголовком контенту
  * - Зменшений, акуратний та високочитабельний шрифт (text-[11px] / text-xs)
- * - Тонкі розділювачі ChevronRight
+ * - Тонкі розділювачі (ChevronRight або '/')
  * - Підтримка іконок, клікабельних посилань або дій
  * - Не перевантажують інтерфейс
  */
@@ -34,13 +35,19 @@ export function Breadcrumbs({
   showHome = false,
   onHomeClick,
   homeHref,
+  separator,
 }: BreadcrumbsProps) {
   if (!items || items.length === 0) return null;
+
+  const defaultSeparator = (
+    <span className="text-slate-600/80 text-[11px] select-none font-light px-0.5">/</span>
+  );
+  const activeSeparator = separator !== undefined ? separator : defaultSeparator;
 
   return (
     <nav
       aria-label="Breadcrumb"
-      className={`flex items-center flex-wrap gap-1.5 text-xs sm:text-[13px] leading-none font-normal text-slate-400 select-none ${className}`}
+      className={`flex items-center flex-wrap gap-1 text-[11px] leading-none font-normal text-slate-400 select-none ${className}`}
     >
       {showHome && (
         <>
@@ -62,7 +69,7 @@ export function Breadcrumbs({
               <Home className="w-3 h-3 text-slate-400" />
             </button>
           )}
-          <ChevronRight className="w-2.5 h-2.5 text-slate-600 shrink-0 stroke-[2]" />
+          {activeSeparator}
         </>
       )}
 
@@ -72,20 +79,18 @@ export function Breadcrumbs({
 
         return (
           <React.Fragment key={index}>
-            {index > 0 && (
-              <ChevronRight className="w-2.5 h-2.5 text-slate-600 shrink-0 stroke-[2]" />
-            )}
+            {index > 0 && activeSeparator}
 
             {isLast ? (
               <span
-                className="flex items-center gap-1 text-slate-400 font-normal truncate max-w-[240px] sm:max-w-[340px]"
+                className="flex items-center gap-1 text-slate-400 font-normal truncate max-w-[280px] sm:max-w-[380px]"
                 aria-current="page"
                 title={typeof item.label === 'string' ? item.label : undefined}
               >
-                {ItemIcon && <ItemIcon className="w-3.5 h-3.5 text-slate-500 shrink-0" />}
+                {ItemIcon && <ItemIcon className="w-3 h-3 text-slate-500 shrink-0" />}
                 <span className="truncate">{item.label}</span>
                 {item.badge && (
-                  <span className="ml-1.5 px-1.5 py-0.5 rounded text-[9px] font-mono font-normal bg-slate-800/80 text-slate-400 border border-slate-700/50">
+                  <span className="ml-1 px-1.5 py-0.5 rounded text-[9px] font-mono font-normal bg-slate-800/80 text-slate-400 border border-slate-700/50">
                     {item.badge}
                   </span>
                 )}
@@ -93,13 +98,13 @@ export function Breadcrumbs({
             ) : item.href ? (
               <a
                 href={item.href}
-                className="flex items-center gap-1 text-slate-400 hover:text-slate-200 font-normal transition-colors truncate max-w-[180px] sm:max-w-[240px]"
+                className="flex items-center gap-1 text-slate-400 hover:text-slate-200 font-normal transition-colors truncate max-w-[220px] sm:max-w-[300px]"
                 title={typeof item.label === 'string' ? item.label : undefined}
               >
-                {ItemIcon && <ItemIcon className="w-3.5 h-3.5 text-slate-500 shrink-0" />}
+                {ItemIcon && <ItemIcon className="w-3 h-3 text-slate-500 shrink-0" />}
                 <span className="truncate">{item.label}</span>
                 {item.badge && (
-                  <span className="ml-1.5 px-1.5 py-0.5 rounded text-[9px] font-mono font-normal bg-slate-800/80 text-slate-400 border border-slate-700/50">
+                  <span className="ml-1 px-1.5 py-0.5 rounded text-[9px] font-mono font-normal bg-slate-800/80 text-slate-400 border border-slate-700/50">
                     {item.badge}
                   </span>
                 )}
@@ -108,26 +113,26 @@ export function Breadcrumbs({
               <button
                 type="button"
                 onClick={item.onClick}
-                className="flex items-center gap-1 text-slate-400 hover:text-slate-200 font-normal transition-colors cursor-pointer truncate max-w-[180px] sm:max-w-[240px]"
+                className="flex items-center gap-1 text-slate-400 hover:text-slate-200 font-normal transition-colors cursor-pointer truncate max-w-[220px] sm:max-w-[300px]"
                 title={typeof item.label === 'string' ? item.label : undefined}
               >
-                {ItemIcon && <ItemIcon className="w-3.5 h-3.5 text-slate-500 shrink-0" />}
+                {ItemIcon && <ItemIcon className="w-3 h-3 text-slate-500 shrink-0" />}
                 <span className="truncate">{item.label}</span>
                 {item.badge && (
-                  <span className="ml-1.5 px-1.5 py-0.5 rounded text-[9px] font-mono font-normal bg-slate-800/80 text-slate-400 border border-slate-700/50">
+                  <span className="ml-1 px-1.5 py-0.5 rounded text-[9px] font-mono font-normal bg-slate-800/80 text-slate-400 border border-slate-700/50">
                     {item.badge}
                   </span>
                 )}
               </button>
             ) : (
               <span
-                className="flex items-center gap-1 text-slate-400 font-normal truncate max-w-[180px] sm:max-w-[240px]"
+                className="flex items-center gap-1 text-slate-400 font-normal truncate max-w-[220px] sm:max-w-[300px]"
                 title={typeof item.label === 'string' ? item.label : undefined}
               >
-                {ItemIcon && <ItemIcon className="w-3.5 h-3.5 text-slate-500 shrink-0" />}
+                {ItemIcon && <ItemIcon className="w-3 h-3 text-slate-500 shrink-0" />}
                 <span className="truncate">{item.label}</span>
                 {item.badge && (
-                  <span className="ml-1.5 px-1.5 py-0.5 rounded text-[9px] font-mono font-normal bg-slate-800/80 text-slate-400 border border-slate-700/50">
+                  <span className="ml-1 px-1.5 py-0.5 rounded text-[9px] font-mono font-normal bg-slate-800/80 text-slate-400 border border-slate-700/50">
                     {item.badge}
                   </span>
                 )}

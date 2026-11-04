@@ -120,6 +120,65 @@
           ]
         },
         {
+          "title": "0.1.7.35 Канонічний Розділювач Слеш, Зменшений Шрифт Крихт та Збільшена Назва Предмета (SBC-326, EP-ST)",
+          "level": 3,
+          "paragraphs": [],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "**Контекст та інженерний мотив:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "На основі зворотного зв'язку користувача та візуального порівняння зі скріншотами оптимізовано ліву навігаційну зону хедера `AppShellLayout`.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Стрілочні розділювачі `ChevronRight` перевантажували рядок під логотипом і створювали зайвий технічний акцент.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Назву обраного предмета поряд із логотипом потрібно було виділити масштабом, але зберегти спокійний, ненав'язливий вигляд без використання жирного шрифту.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Виконані модифікації:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "*Розділювач та розмір крихт у [`packages/ui/src/breadcrumbs/Breadcrumbs.tsx`](file:///packages/ui/src/breadcrumbs/Breadcrumbs.tsx):*",
+              "subitems": [
+                "За замовчуванням інтегровано текстовий роздільник `/` (`<span className=\"text-slate-600/80 text-[11px] select-none font-light px-0.5\">/</span>`).",
+                "Базовий кегль встановлено у `text-[11px]` зі збереженням легкого накреслення `font-normal text-slate-400`.",
+                "Збільшено поріг усікання рядків (`max-w-[280px] sm:max-w-[380px]`), що виключає появу трикрапки для довгих назв тем на кшталт «Grammar: Advanced Tenses & Conditionals»."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "*Типографіка назви курсу в [`apps/student/src/components/StudentPortalApp.tsx`](file:///apps/student/src/components/StudentPortalApp.tsx):*",
+              "subitems": [
+                "Розмір шрифту збільшено до `text-sm sm:text-[14px]` з акуратним накресленням `font-normal text-slate-300 select-none tracking-normal`."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Верифікація:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Збірка `npm run build:student` пройшла з нульовими помилками.",
+              "subitems": []
+            }
+          ]
+        },
+        {
           "title": "0.1.7.34 Уніфікація Елементів Хлібних Крихт та Збільшення Вертикального Простору (SBC-325, EP-ST)",
           "level": 3,
           "paragraphs": [

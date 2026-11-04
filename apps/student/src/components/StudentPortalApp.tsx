@@ -1044,7 +1044,7 @@ export function StudentPortalContent({
         badgeColor: 'bg-indigo-500/20 text-indigo-300 border-indigo-500/30',
         courseBadge: (
           <span
-            className="text-xs sm:text-[12px] font-medium text-slate-400 select-none tracking-wide"
+            className="text-sm sm:text-[14px] font-normal text-slate-300 select-none tracking-normal"
             title={`Активний курс: ${courses.find((c) => c.slug === activeCourseSlug)?.title || activeCourseSlug}`}
           >
             {courses.find((c) => c.slug === activeCourseSlug)?.title || activeCourseSlug}
@@ -1052,7 +1052,7 @@ export function StudentPortalContent({
         ),
         breadcrumbs: (
           <Breadcrumbs
-            className="text-xs sm:text-[12.5px]"
+            className="text-[11px]"
             items={[
               ...(task?.skill?.title ? [{
                 label: task.skill.title,
