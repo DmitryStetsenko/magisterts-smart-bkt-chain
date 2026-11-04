@@ -7,6 +7,7 @@ import { MonacoCodeEditor } from '../features/code-editor/ui/MonacoCodeEditor';
 import { QuizTaskEditor } from '../features/quiz-editor/ui/QuizTaskEditor';
 import { EssayTaskEditor } from '../features/essay-editor/ui/EssayTaskEditor';
 import { SkillDagMap } from '../features/skill-graph/ui/SkillDagMap';
+import { StudentProgressPill } from './StudentProgressPill';
 import { GameSkillTreeWidget, SkillGraphNode, DrawerSection, AppShellLayout, Breadcrumbs } from '@sbc/ui';
 import { TaskDto, CourseDto } from '@sbc/types';
 import { getAppBaseUrl, ROUTES, resolveStudyUrl } from '@sbc/routes';
@@ -1055,85 +1056,51 @@ export function StudentPortalContent({
           />
         ),
         rightSlot: (
-          <div className="flex items-center gap-3">
-            {/* 🏆 Prominent Central Overall Course Progress Display */}
-        <div className="hidden md:flex items-center gap-4 bg-slate-950/80 px-4 py-1.5 rounded-2xl border border-slate-800 shadow-inner">
-          <div className="flex items-center gap-2">
-            <div className="p-1 bg-amber-500/10 border border-amber-500/30 rounded-lg text-amber-400">
-              <Trophy className="w-3.5 h-3.5" />
-            </div>
-            <div className="flex flex-col">
-              <div className="flex items-center gap-1.5 text-[11px] leading-tight font-semibold text-slate-300">
-                <span>Прогрес курсу:</span>
-                <span className="font-mono font-bold text-amber-400">{courseCompletionPct}%</span>
-                <span className="text-[10px] text-slate-500 font-mono">({masteredSkillsCount}/{totalSkillsCount} модулів)</span>
-              </div>
-              <div className="w-32 h-1.5 bg-slate-900 rounded-full overflow-hidden border border-slate-800 mt-1">
-                <div
-                  className="h-full bg-gradient-to-r from-amber-500 via-emerald-500 to-teal-400 rounded-full transition-all duration-500"
-                  style={{ width: `${courseCompletionPct}%` }}
-                />
-              </div>
-            </div>
-          </div>
+          <div className="flex items-center gap-2.5 sm:gap-3">
+            {/* 💊 Компактний інтерактивний мікро-віджет прогресу та BKT */}
+            <StudentProgressPill
+              courseTitle={courses.find((c) => c.slug === activeCourseSlug)?.title || activeCourseSlug}
+              courseCompletionPct={courseCompletionPct}
+              masteredSkillsCount={masteredSkillsCount}
+              totalSkillsCount={totalSkillsCount}
+              activeSkillTitle={activeSkillNode ? activeSkillNode.title : task?.skill?.title}
+              activeSkillMasteryPct={activeSkillMasteryPct}
+              onOpenSkillTree={() => handleTabClick('tree')}
+              onOpenSkillDag={() => handleTabClick('bkt')}
+            />
 
-          {activeSkillNode && (
-            <div className="h-6 w-[1px] bg-slate-800"></div>
-          )}
-
-          {activeSkillNode && (
-            <div className="flex items-center gap-2">
-              <div className="p-1 bg-indigo-500/10 border border-indigo-500/30 rounded-lg text-indigo-400">
-                <Target className="w-3.5 h-3.5" />
-              </div>
-              <div className="flex flex-col">
-                <div className="flex items-center gap-1.5 text-[11px] leading-tight font-semibold text-slate-300">
-                  <span className="truncate max-w-[130px]">{activeSkillNode.title.split(':')[0]}:</span>
-                  <span className={`font-mono font-bold ${activeSkillMasteryPct >= 90 ? 'text-emerald-400' : 'text-indigo-400'}`}>
-                    {activeSkillMasteryPct}%
-                  </span>
-                  <span className="text-[10px] text-slate-500 font-mono">(P(L))</span>
-                </div>
-                <div className="w-28 h-1.5 bg-slate-900 rounded-full overflow-hidden border border-slate-800 mt-1">
-                  <div
-                    className={`h-full rounded-full transition-all duration-500 ${
-                      activeSkillMasteryPct >= 90
-                        ? 'bg-emerald-400'
-                        : 'bg-gradient-to-r from-indigo-500 to-purple-500'
-                    }`}
-                    style={{ width: `${Math.min(100, activeSkillMasteryPct)}%` }}
-                  />
-                </div>
+            {/* Селектор курсів (компактний) */}
+            <div className="relative min-w-[140px] sm:min-w-[180px]">
+              <select
+                id="student-course-select"
+                value={activeCourseSlug}
+                onChange={(e) => handleSelectCourse(e.target.value)}
+                className="w-full appearance-none px-2.5 py-1.5 rounded-full bg-slate-950 border border-slate-800 text-xs font-semibold text-slate-200 hover:border-slate-700 focus:outline-none focus:border-indigo-500 cursor-pointer pr-7 shadow-inner truncate transition-colors"
+                title="Змінити активний навчальний курс"
+              >
+                {courses.map((course) => (
+                  <option key={course.slug} value={course.slug} className="bg-slate-900 text-white py-1">
+                    📚 {course.title}
+                  </option>
+                ))}
+              </select>
+              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-slate-400">
+                <ChevronDown className="w-3.5 h-3.5" />
               </div>
             </div>
-          )}
-        </div>
 
-        {/* Top Controls: Course Selector & User Profile */}
-        <div className="flex items-center gap-3">
-          <div className="relative min-w-[200px] sm:min-w-[240px]">
-            <select
-              id="student-course-select"
-              value={activeCourseSlug}
-              onChange={(e) => handleSelectCourse(e.target.value)}
-              className="w-full appearance-none px-3 py-1.5 rounded-xl bg-slate-950 border border-slate-700 text-xs font-semibold text-white focus:outline-none focus:border-indigo-500 cursor-pointer pr-8 shadow-inner"
+            {/* Профіль студента у крайньому правому кутку */}
+            <div
+              className="flex items-center gap-2 bg-slate-950/80 hover:bg-slate-900 px-2.5 py-1 rounded-full border border-slate-800 transition-colors cursor-pointer select-none"
+              title="Профіль здобувача освіти"
             >
-              {courses.map((course) => (
-                <option key={course.slug} value={course.slug} className="bg-slate-900 text-white py-1">
-                  📚 {course.title}
-                </option>
-              ))}
-            </select>
-            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-indigo-400">
-              <ChevronDown className="w-3.5 h-3.5" />
+              <div className="w-6 h-6 rounded-full bg-gradient-to-tr from-indigo-600 to-purple-500 flex items-center justify-center text-[10px] font-bold text-white shadow-sm">
+                ДС
+              </div>
+              <span className="hidden lg:inline text-xs font-semibold text-slate-200">
+                Дмитро Стеценко
+              </span>
             </div>
-          </div>
-
-          <div className="flex items-center gap-2 bg-slate-950 px-3 py-1.5 rounded-xl border border-slate-800 text-xs">
-            <User className="w-3.5 h-3.5 text-indigo-400" />
-            <span className="font-semibold text-slate-200">Дмитро Стеценко</span>
-          </div>
-        </div>
           </div>
         ),
       }}

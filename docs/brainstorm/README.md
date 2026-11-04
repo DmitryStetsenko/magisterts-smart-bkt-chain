@@ -53,3 +53,8 @@
 12. [12. Архітектура Семантичної Маршрутизації та SEO для Next.js App Router](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/docs/brainstorm/12_seo_routing_architecture.md)
     - *Дата:* 1 листопада 2026
     - *Ключові теми:* Впровадження вкладених семантичних URL замість односторінкового `useState` (`/courses/[courseSlug]/[moduleSlug]/[unitSlug]` та `/practice/[courseSlug]/[skillSlug]`); динамічні SEO метадані `generateMetadata`, статична генерація `generateStaticParams`, Schema.org JSON-LD; протокол міжпортальних глибоких посилань (Cross-App Deep Linking Protocol) між навчальними сервісами.
+
+
+13. [13. Оптимізація та Декомпозиція Хедера Платформи (Header De-cluttering & Scope Architecture)](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/docs/brainstorm/13_header_decluttering_and_scope_architecture.md)
+    - *Дата:* 4 листопада 2026
+    - *Ключові теми:* Усунення перевантаження та змішування контекстів (Scope Bleed), ліквідація дублювання назв курсів і модулів, розведення на Top App Header, Workspace Sub-Header та Drawer, інтерактивні мікро-поповери (Pills), перенесення профілю у правий сектор.
