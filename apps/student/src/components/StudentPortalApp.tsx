@@ -8,6 +8,7 @@ import { QuizTaskEditor } from '../features/quiz-editor/ui/QuizTaskEditor';
 import { EssayTaskEditor } from '../features/essay-editor/ui/EssayTaskEditor';
 import { SkillDagMap } from '../features/skill-graph/ui/SkillDagMap';
 import { StudentProgressPill } from './StudentProgressPill';
+import { StudentProfileDrawer } from './StudentProfileDrawer';
 import { GameSkillTreeWidget, SkillGraphNode, DrawerSection, AppShellLayout, Breadcrumbs } from '@sbc/ui';
 import { TaskDto, CourseDto } from '@sbc/types';
 import { getAppBaseUrl, ROUTES, resolveStudyUrl } from '@sbc/routes';
@@ -112,6 +113,7 @@ export function StudentPortalContent({
   const cancelCourseSwitch = () => {
     setPendingCourseSlug(null);
   };
+  const [isProfileDrawerOpen, setIsProfileDrawerOpen] = useState<boolean>(false);
   const [recommendation, setRecommendation] = useState<any>(null);
   const [hasRemediationTask, setHasRemediationTask] = useState<boolean>(true);
   const [code, setCode] = useState<string>('');
@@ -1028,9 +1030,10 @@ export function StudentPortalContent({
   };
 
   return (
-    <AppShellLayout
-      currentApp="student"
-      header={{
+    <>
+      <AppShellLayout
+        currentApp="student"
+        header={{
         appName: 'Smart-BKT-Chain',
         badgeText: 'Student Portal v2.0',
         logoIcon: Brain,
@@ -1041,24 +1044,8 @@ export function StudentPortalContent({
             className="text-xs"
             items={[
               {
-                label: (
-                  <div className="relative inline-flex items-center">
-                    <select
-                      id="student-breadcrumb-course-select"
-                      value={activeCourseSlug}
-                      onChange={(e) => handleSelectCourse(e.target.value)}
-                      className="appearance-none bg-transparent hover:bg-slate-800/80 text-slate-200 hover:text-white font-medium pr-4 pl-1 py-0.5 rounded cursor-pointer focus:outline-none transition-colors max-w-[160px] sm:max-w-[240px] truncate text-xs"
-                      title="Натисніть для вибору навчального курсу"
-                    >
-                      {courses.map((course) => (
-                        <option key={course.slug} value={course.slug} className="bg-slate-900 text-white py-1 text-xs">
-                          📚 {course.title}
-                        </option>
-                      ))}
-                    </select>
-                    <ChevronDown className="w-3 h-3 text-slate-400 pointer-events-none absolute right-0.5 top-1/2 -translate-y-1/2" />
-                  </div>
-                ),
+                label: courses.find((c) => c.slug === activeCourseSlug)?.title || activeCourseSlug,
+                onClick: () => setIsProfileDrawerOpen(true),
               },
               {
                 label: task?.skill?.title || 'Навичка',
@@ -1086,18 +1073,20 @@ export function StudentPortalContent({
               onOpenSkillDag={() => handleTabClick('bkt')}
             />
 
-            {/* Профіль студента у крайньому правому кутку */}
-            <div
-              className="flex items-center gap-2 bg-slate-950/80 hover:bg-slate-900 px-2.5 py-1 rounded-full border border-slate-800 transition-colors cursor-pointer select-none"
-              title="Профіль здобувача освіти"
+            {/* Профіль студента у крайньому правому кутку (відкриває Profile Drawer) */}
+            <button
+              type="button"
+              onClick={() => setIsProfileDrawerOpen(true)}
+              className="flex items-center gap-2 bg-slate-950/80 hover:bg-slate-900 px-2.5 py-1 rounded-full border border-slate-800 hover:border-indigo-500/50 transition-all cursor-pointer select-none text-left group"
+              title="Натисніть для відкриття профілю та вибору курсів"
             >
-              <div className="w-6 h-6 rounded-full bg-gradient-to-tr from-indigo-600 to-purple-500 flex items-center justify-center text-[10px] font-bold text-white shadow-sm">
+              <div className="w-6 h-6 rounded-full bg-gradient-to-tr from-indigo-600 to-purple-500 flex items-center justify-center text-[10px] font-bold text-white shadow-sm ring-1 ring-indigo-500/30 group-hover:scale-105 transition-transform">
                 ДС
               </div>
-              <span className="hidden lg:inline text-xs font-semibold text-slate-200">
+              <span className="hidden lg:inline text-xs font-semibold text-slate-200 group-hover:text-white transition-colors">
                 Дмитро Стеценко
               </span>
-            </div>
+            </button>
           </div>
         ),
       }}
@@ -1649,7 +1638,27 @@ export function StudentPortalContent({
             </div>
           )}
         
-    </AppShellLayout>
+      </AppShellLayout>
+
+      {/* 👤 Права бічна панель (Right Profile & Courses Drawer) */}
+      <StudentProfileDrawer
+        isOpen={isProfileDrawerOpen}
+        onClose={() => setIsProfileDrawerOpen(false)}
+        courses={courses}
+        activeCourseSlug={activeCourseSlug}
+        onSelectCourse={(slug) => {
+          handleSelectCourse(slug);
+          setIsProfileDrawerOpen(false);
+        }}
+        courseCompletionPct={courseCompletionPct}
+        masteredSkillsCount={masteredSkillsCount}
+        totalSkillsCount={totalSkillsCount}
+        onResetBktState={() => {
+          fetchRecommendedTask(activeCourseSlug);
+          setIsProfileDrawerOpen(false);
+        }}
+      />
+    </>
   );
 }
 
