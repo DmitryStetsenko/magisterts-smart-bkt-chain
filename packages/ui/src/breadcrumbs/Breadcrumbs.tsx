@@ -4,7 +4,7 @@ import React from 'react';
 import { ChevronRight, Home, LucideIcon } from 'lucide-react';
 
 export interface BreadcrumbItem {
-  label: string;
+  label: string | React.ReactNode;
   href?: string;
   onClick?: () => void;
   icon?: LucideIcon;
@@ -80,7 +80,7 @@ export function Breadcrumbs({
               <span
                 className="flex items-center gap-1 text-slate-200 font-semibold truncate max-w-[240px] sm:max-w-[340px]"
                 aria-current="page"
-                title={item.label}
+                title={typeof item.label === 'string' ? item.label : undefined}
               >
                 {ItemIcon && <ItemIcon className="w-3 h-3 text-blue-400 shrink-0" />}
                 <span className="truncate">{item.label}</span>
@@ -94,7 +94,7 @@ export function Breadcrumbs({
               <a
                 href={item.href}
                 className="flex items-center gap-1 text-slate-400 hover:text-slate-200 transition-colors truncate max-w-[180px] sm:max-w-[240px]"
-                title={item.label}
+                title={typeof item.label === 'string' ? item.label : undefined}
               >
                 {ItemIcon && <ItemIcon className="w-3 h-3 text-slate-500 shrink-0" />}
                 <span className="truncate">{item.label}</span>
@@ -109,7 +109,7 @@ export function Breadcrumbs({
                 type="button"
                 onClick={item.onClick}
                 className="flex items-center gap-1 text-slate-400 hover:text-slate-200 transition-colors cursor-pointer truncate max-w-[180px] sm:max-w-[240px]"
-                title={item.label}
+                title={typeof item.label === 'string' ? item.label : undefined}
               >
                 {ItemIcon && <ItemIcon className="w-3 h-3 text-slate-500 shrink-0" />}
                 <span className="truncate">{item.label}</span>
@@ -122,7 +122,7 @@ export function Breadcrumbs({
             ) : (
               <span
                 className="flex items-center gap-1 text-slate-400 truncate max-w-[180px] sm:max-w-[240px]"
-                title={item.label}
+                title={typeof item.label === 'string' ? item.label : undefined}
               >
                 {ItemIcon && <ItemIcon className="w-3 h-3 text-slate-500 shrink-0" />}
                 <span className="truncate">{item.label}</span>

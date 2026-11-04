@@ -37,6 +37,21 @@
    - **Збережена документація:**
      - Створено детальний документ [`docs/brainstorm/13_header_decluttering_and_scope_architecture.md`](file:///docs/brainstorm/13_header_decluttering_and_scope_architecture.md) та оновлено реєстр `docs/brainstorm/README.md`.
 
+
+3. **Впровадження дворівневого стеку лівого блоку хедера та інтегрованого селектора в хлібних крихтах (SBC-318, EP-SH / EP-ST):**
+   - **Контекст та задача користувача:**
+     - На розвиток концепції Варіанту Б реорганізовано геометрію лівої зони хедера: замість одного довгого рядка елементи розбито на два компактні поверхи (Верхній поверх: Логотип + Назва системи + Бейдж порталу; Нижній поверх: Зменшені хлібні крихти 	ext-[10px]).
+     - Першу ланку хлібних крихт перетворено на інлайн-селектор активного курсу з випадаючим списком [📚 Назва курсу ▾].
+     - Завдяки цьому повністю ліквідовано окремий дублюючий селектор курсу з правого кутка хедера.
+   - **Виконані інженерні зміни:**
+     - Оновлено AppShellLayout.tsx ([packages/ui/src/shell/AppShellLayout.tsx](file:///packages/ui/src/shell/AppShellLayout.tsx)): контейнер лівого блоку отримав lex-col justify-center, де логотип зліва центровано, а назва та хлібні крихти утворюють чистий двоповерховий інформаційний стек.
+     - Оновлено Breadcrumbs.tsx ([packages/ui/src/breadcrumbs/Breadcrumbs.tsx](file:///packages/ui/src/breadcrumbs/Breadcrumbs.tsx)): тип поля label розширено до string | React.ReactNode для підтримки вбудованих селекторів та динамічних контролів.
+     - Модифіковано StudentPortalApp.tsx ([pps/student/src/components/StudentPortalApp.tsx](file:///apps/student/src/components/StudentPortalApp.tsx)): вбудовано кастомний дропдаун курсу в першу ланку хлібних крихт; правий сектор очищено від сторонніх селектів.
+   - **Тестування та верифікація:**
+     - Успішна збірка 
+pm run build --workspace=@sbc/student (Next.js 16 Turbopack, збірка 9.1s).
+     - Перевірка через Playwright Headless Browser: згенеровано прев'ю оновленого інтерфейсу хедера.
+
 ---
 
 ## 📅 3 листопада 2026 року

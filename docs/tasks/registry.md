@@ -285,6 +285,7 @@
 | **SBC-311** | `Story` | `ST` | implement test-out fast-track challenge mode in student testing platform with BKT state sync | 2026-10-31 | `backlog` |
 | **SBC-312** | `Story` | `ST` | design and implement semantic nested routing and SEO standard across study and student apps | 2026-11-02 | `614af0e` |
 | **SBC-317** | Story | ST | design and implement decluttered header pill-popover architecture in student portal | 2026-11-04 | pending |
+| **SBC-318** | Story | ST | design and implement stacked breadcrumbs with integrated course selector in app shell header | 2026-11-04 | pending |
 
 ---
 

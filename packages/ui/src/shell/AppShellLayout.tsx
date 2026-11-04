@@ -130,28 +130,30 @@ export function AppShellLayout({
       {/* 📌 1. STICKY TOP NAVIGATION BAR (Header Bar h-14) */}
       {!header.hideHeader && (
         <header className="h-14 w-full bg-slate-900 border-b border-slate-800/90 px-4 flex items-center justify-between shrink-0 z-30 shadow-md">
-          {/* Ліва зона: Логотип, бейдж та хлібні крихти зліва */}
+          {/* Ліва зона: Логотип, бейдж та компактні хлібні крихти поверхом нижче */}
           <div className="flex items-center gap-3 shrink-0">
-            <div className={`p-1.5 rounded-lg border ${header.logoColor || 'bg-blue-600/20 border-blue-500/30 text-blue-400'}`}>
+            <div className={`p-1.5 rounded-lg border shrink-0 ${header.logoColor || 'bg-blue-600/20 border-blue-500/30 text-blue-400'}`}>
               <HeaderLogo className="w-5 h-5" />
             </div>
-            <div className="flex items-center gap-2">
-              <h1 className="text-sm font-bold text-white flex items-center gap-2">
-                <span>{header.appName}</span>
-                <span className={`px-2 py-0.5 text-[10px] font-mono rounded border ${header.badgeColor || 'bg-blue-500/20 text-blue-300 border-blue-500/30'}`}>
-                  {header.badgeText}
-                </span>
-              </h1>
-            </div>
 
-            {header.breadcrumbs && (
-              <>
-                <div className="h-5 w-[1px] bg-slate-800 mx-1 hidden sm:block" />
-                <div className="hidden sm:flex items-center">
+            <div className="flex flex-col justify-center">
+              {/* Верхній поверх: Брендинг та бейдж порталу */}
+              <div className="flex items-center gap-2">
+                <h1 className="text-xs sm:text-sm font-bold text-white flex items-center gap-1.5 leading-tight">
+                  <span>{header.appName}</span>
+                  <span className={`px-1.5 py-0.2 text-[9px] font-mono rounded border ${header.badgeColor || 'bg-blue-500/20 text-blue-300 border-blue-500/30'}`}>
+                    {header.badgeText}
+                  </span>
+                </h1>
+              </div>
+
+              {/* Нижній поверх: Компактні хлібні крихти безпосередньо під брендингом */}
+              {header.breadcrumbs && (
+                <div className="flex items-center mt-0.5">
                   {header.breadcrumbs}
                 </div>
-              </>
-            )}
+              )}
+            </div>
           </div>
 
           {/* Центральна зона: Контекстна плашка (хлібні крихти / прогрес) */}

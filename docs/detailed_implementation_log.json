@@ -120,6 +120,79 @@
           ]
         },
         {
+          "title": "0.1.7.27 Дворівневий Стек Лівого Блоку Хедера та Інтегрований Селектор у Хлібних Крихтах (SBC-318, EP-SH / EP-ST)",
+          "level": 3,
+          "paragraphs": [
+            "pm run build --workspace=@sbc/student завершилась без помилок."
+          ],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "**Контекст та інженерна оптимізація:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "На запит користувача розвинуто концепцію Варіанту Б для повного усунення горизонтального нагромадження хедера.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Замість витягнутої в одну смугу структури лівий сектор розділено на два вертикальні компактні рівні:",
+              "subitems": [
+                "1. *Верхній поверх:* Логотип платформи Brain + системна назва Smart-BKT-Chain + бейдж Student Portal v2.0.",
+                "2. *Нижній поверх:* Мініатюрні хлібні крихти Breadcrumbs (\text-[10px] text-slate-400 mt-0.5)."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "Перша ланка хлібних крихт тепер виступає повноцінним селектором активного навчального курсу: [📚 JavaScript & Web Dev ▾].",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Повністю ліквідовано окремий дублюючий селектор курсу з правого слота хедера.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Модифіковані компоненти:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "packages/ui/src/shell/AppShellLayout.tsx: контейнер заголовка отримав гнучку структуру \flex-col justify-center поруч із центрованим логотипом.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "packages/ui/src/breadcrumbs/Breadcrumbs.tsx: поле label тепер підтримує React.ReactNode, що дозволяє вбудовувати селектори та інші інлайн-контроли.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "\u0007pps/student/src/components/StudentPortalApp.tsx: інтегровано селектор у крихти, очищено правий кут (лише StudentProgressPill + аватар [ДС]).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Верифікація:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Збірка",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Скріншот-тестування Playwright підтвердило естетичність, читабельність та відсутність зсуву розмітки.",
+              "subitems": []
+            }
+          ]
+        },
+        {
           "title": "0.1.7.26 Концептуальний Мозковий Штурм та Реалізація Варіанту Б (Header Pill-Popovers) у apps/student (SBC-317, EP-SH / EP-ST)",
           "level": 3,
           "paragraphs": [],

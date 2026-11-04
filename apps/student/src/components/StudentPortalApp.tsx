@@ -1038,10 +1038,27 @@ export function StudentPortalContent({
         badgeColor: 'bg-indigo-500/20 text-indigo-300 border-indigo-500/30',
         breadcrumbs: (
           <Breadcrumbs
+            className="text-[10px]"
             items={[
               {
-                label: courses.find((c) => c.slug === activeCourseSlug)?.title || activeCourseSlug,
-                onClick: () => handleTabClick('tree'),
+                label: (
+                  <div className="relative inline-flex items-center">
+                    <select
+                      id="student-breadcrumb-course-select"
+                      value={activeCourseSlug}
+                      onChange={(e) => handleSelectCourse(e.target.value)}
+                      className="appearance-none bg-transparent hover:bg-slate-800/60 text-slate-300 hover:text-white font-semibold pr-4 pl-1 py-0.5 rounded cursor-pointer focus:outline-none transition-colors max-w-[140px] sm:max-w-[200px] truncate text-[10px]"
+                      title="Натисніть для вибору навчального курсу"
+                    >
+                      {courses.map((course) => (
+                        <option key={course.slug} value={course.slug} className="bg-slate-900 text-white py-1 text-xs">
+                          📚 {course.title}
+                        </option>
+                      ))}
+                    </select>
+                    <ChevronDown className="w-2.5 h-2.5 text-slate-500 pointer-events-none absolute right-0.5 top-1/2 -translate-y-1/2" />
+                  </div>
+                ),
               },
               {
                 label: task?.skill?.title || 'Навичка',
@@ -1068,26 +1085,6 @@ export function StudentPortalContent({
               onOpenSkillTree={() => handleTabClick('tree')}
               onOpenSkillDag={() => handleTabClick('bkt')}
             />
-
-            {/* Селектор курсів (компактний) */}
-            <div className="relative min-w-[140px] sm:min-w-[180px]">
-              <select
-                id="student-course-select"
-                value={activeCourseSlug}
-                onChange={(e) => handleSelectCourse(e.target.value)}
-                className="w-full appearance-none px-2.5 py-1.5 rounded-full bg-slate-950 border border-slate-800 text-xs font-semibold text-slate-200 hover:border-slate-700 focus:outline-none focus:border-indigo-500 cursor-pointer pr-7 shadow-inner truncate transition-colors"
-                title="Змінити активний навчальний курс"
-              >
-                {courses.map((course) => (
-                  <option key={course.slug} value={course.slug} className="bg-slate-900 text-white py-1">
-                    📚 {course.title}
-                  </option>
-                ))}
-              </select>
-              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-slate-400">
-                <ChevronDown className="w-3.5 h-3.5" />
-              </div>
-            </div>
 
             {/* Профіль студента у крайньому правому кутку */}
             <div
