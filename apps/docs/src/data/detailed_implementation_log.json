@@ -120,6 +120,49 @@
           ]
         },
         {
+          "title": "0.1.7.36 Підвищення Видимості Роздільника Хлібних Крихт (SBC-327, EP-ST)",
+          "level": 3,
+          "paragraphs": [],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "**Контекст та інженерний мотив:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Тонкий слеш-роздільник `/` мав низьку контрастність на темному фоні хедера через надмірне затемнення (`text-slate-600/80`).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Виконані зміни:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "У [`packages/ui/src/breadcrumbs/Breadcrumbs.tsx`](file:///packages/ui/src/breadcrumbs/Breadcrumbs.tsx) клас роздільника оновлено до `text-slate-400 text-[11px] select-none font-normal px-0.5`.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Завдяки цьому слеш має таку ж контрастність і легкість сприйняття, як і сусідній текст навігаційного ланцюжка.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Верифікація:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Збірка `npm run build:student` успішно завершена.",
+              "subitems": []
+            }
+          ]
+        },
+        {
           "title": "0.1.7.35 Канонічний Розділювач Слеш, Зменшений Шрифт Крихт та Збільшена Назва Предмета (SBC-326, EP-ST)",
           "level": 3,
           "paragraphs": [],

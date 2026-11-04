@@ -40,7 +40,7 @@ export function Breadcrumbs({
   if (!items || items.length === 0) return null;
 
   const defaultSeparator = (
-    <span className="text-slate-600/80 text-[11px] select-none font-light px-0.5">/</span>
+    <span className="text-slate-400 text-[11px] select-none font-normal px-0.5">/</span>
   );
   const activeSeparator = separator !== undefined ? separator : defaultSeparator;
 

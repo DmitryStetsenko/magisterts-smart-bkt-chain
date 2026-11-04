@@ -29,6 +29,15 @@
   4. *Install Monorepo Dependencies* (`npm ci || npm install`) — синхронізація робочих просторів монорепозиторію.
   5. *Build Next.js Documentation Site* (`npm run build:docs`) — збірка статичного експорту (`output: "export"`, `trailingSlash: true`, `basePath: "/magisterts-smart-bkt-chain"`).
   6. *Upload Artifact & Deploy Pages* (`actions/upload-pages-artifact@v3` + `actions/deploy-pages@v4`).
+### 0.1.7.36 Підвищення Видимості Роздільника Хлібних Крихт (SBC-327, EP-ST)
+- **Контекст та інженерний мотив:**
+  - Тонкий слеш-роздільник `/` мав низьку контрастність на темному фоні хедера через надмірне затемнення (`text-slate-600/80`).
+- **Виконані зміни:**
+  - У [`packages/ui/src/breadcrumbs/Breadcrumbs.tsx`](file:///packages/ui/src/breadcrumbs/Breadcrumbs.tsx) клас роздільника оновлено до `text-slate-400 text-[11px] select-none font-normal px-0.5`.
+  - Завдяки цьому слеш має таку ж контрастність і легкість сприйняття, як і сусідній текст навігаційного ланцюжка.
+- **Верифікація:**
+  - Збірка `npm run build:student` успішно завершена.
+
 ### 0.1.7.35 Канонічний Розділювач Слеш, Зменшений Шрифт Крихт та Збільшена Назва Предмета (SBC-326, EP-ST)
 - **Контекст та інженерний мотив:**
   - На основі зворотного зв'язку користувача та візуального порівняння зі скріншотами оптимізовано ліву навігаційну зону хедера `AppShellLayout`.
