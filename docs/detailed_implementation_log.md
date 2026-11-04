@@ -29,6 +29,20 @@
   4. *Install Monorepo Dependencies* (`npm ci || npm install`) — синхронізація робочих просторів монорепозиторію.
   5. *Build Next.js Documentation Site* (`npm run build:docs`) — збірка статичного експорту (`output: "export"`, `trailingSlash: true`, `basePath: "/magisterts-smart-bkt-chain"`).
   6. *Upload Artifact & Deploy Pages* (`actions/upload-pages-artifact@v3` + `actions/deploy-pages@v4`).
+### 0.1.7.30 Відокремлення Інформаційного Бейджа Курсу від Хлібних Крихт (SBC-321, EP-ST)
+- **Архітектурне обґрунтування:**
+  - Курс є глобальним контекстом поточної сесії, а не навігаційним кроком у межах задачі.
+  - Початкова ланка крихт перевантажувала горизонтальний простір та створювала візуальний шум при збігу назв теми й курсу.
+- **Виконані зміни:**
+  - У AppShellLayout.tsx введено окремий пропс courseBadge, що виводить назву активного курсу як статичний охайний бейдж у верхній лінії брендингу поруч із порталом.
+  - Хлібні крихти Breadcrumbs тепер починаються суто з поточної навички та назви вправи [EASY].
+  - Прибрано дублюючий рендер Breadcrumbs над полотном Monaco Editor у StudentPortalApp.tsx.
+  - З бейджа курсу в хедері знято подію кліку (статичний div), а вся функціональність перемикання курсів централізована у StudentProfileDrawer.
+- **Верифікація:**
+  - Проєкт успішно збирається командою 
+pm run build --workspace=@sbc/student.
+  - Візуальний контроль через Playwright підтвердив завершеність композиції.
+
 ### 0.1.7.29 Усунення Помилки SSR Hydration Mismatch у apps/student (SBC-320, EP-ST)
 - **Причина дефекту:**
   - У StudentPortalApp.tsx початковий стан useState виконував пряме синхронне читання localStorage.getItem('sbc_student_active_course').

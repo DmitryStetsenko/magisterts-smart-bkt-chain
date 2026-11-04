@@ -1042,18 +1042,25 @@ export function StudentPortalContent({
         logoIcon: Brain,
         logoColor: 'bg-indigo-600/20 border-indigo-500/30 text-indigo-400',
         badgeColor: 'bg-indigo-500/20 text-indigo-300 border-indigo-500/30',
+        courseBadge: (
+          <div
+            className="flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-slate-800/60 text-slate-300 border border-slate-700/50 text-xs font-semibold select-none"
+            title={`Активний курс: ${courses.find((c) => c.slug === activeCourseSlug)?.title || activeCourseSlug}`}
+          >
+            <span>📚</span>
+            <span className="truncate max-w-[200px] sm:max-w-[260px]">
+              {courses.find((c) => c.slug === activeCourseSlug)?.title || activeCourseSlug}
+            </span>
+          </div>
+        ),
         breadcrumbs: (
           <Breadcrumbs
-            className="text-xs"
+            className="text-[11px]"
             items={[
-              {
-                label: courses.find((c) => c.slug === activeCourseSlug)?.title || activeCourseSlug,
-                onClick: () => setIsProfileDrawerOpen(true),
-              },
-              {
-                label: task?.skill?.title || 'Навичка',
+              ...(task?.skill?.title ? [{
+                label: task.skill.title,
                 onClick: () => handleTabClick('bkt'),
-              },
+              }] : []),
               ...(task ? [{
                 label: task.title,
                 badge: `${task.difficulty || 'MEDIUM'}`,
@@ -1245,24 +1252,7 @@ export function StudentPortalContent({
             </div>
           ) : task ? (
             <div className="flex-1 p-4 lg:p-6 overflow-y-auto flex flex-col gap-4">
-              {/* 🧭 Єдині хлібні крихти платформи */}
-              <Breadcrumbs
-                items={[
-                  {
-                    label: courses.find((c) => c.slug === activeCourseSlug)?.title || activeCourseSlug,
-                    onClick: () => handleTabClick('tree'),
-                  },
-                  {
-                    label: task.skill?.title || 'Навичка',
-                    onClick: () => handleTabClick('bkt'),
-                  },
-                  {
-                    label: task.title,
-                    badge: `${task.difficulty || 'MEDIUM'}`,
-                    isCurrent: true,
-                  },
-                ]}
-              />
+              {/* Хлібні крихти перенесені в головний AppShellLayout хедер для уникнення дублювання */}
 
               {/* 🎓 Міжпортальна плашка повернення до Підручника Теорії (Cross-App Protocol) */}
               {source === 'study' && (

@@ -120,6 +120,71 @@
           ]
         },
         {
+          "title": "0.1.7.30 Відокремлення Інформаційного Бейджа Курсу від Хлібних Крихт (SBC-321, EP-ST)",
+          "level": 3,
+          "paragraphs": [
+            "pm run build --workspace=@sbc/student."
+          ],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "**Архітектурне обґрунтування:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Курс є глобальним контекстом поточної сесії, а не навігаційним кроком у межах задачі.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Початкова ланка крихт перевантажувала горизонтальний простір та створювала візуальний шум при збігу назв теми й курсу.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Виконані зміни:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "У AppShellLayout.tsx введено окремий пропс courseBadge, що виводить назву активного курсу як статичний охайний бейдж у верхній лінії брендингу поруч із порталом.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Хлібні крихти Breadcrumbs тепер починаються суто з поточної навички та назви вправи [EASY].",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Прибрано дублюючий рендер Breadcrumbs над полотном Monaco Editor у StudentPortalApp.tsx.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "З бейджа курсу в хедері знято подію кліку (статичний div), а вся функціональність перемикання курсів централізована у StudentProfileDrawer.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Верифікація:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Проєкт успішно збирається командою",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Візуальний контроль через Playwright підтвердив завершеність композиції.",
+              "subitems": []
+            }
+          ]
+        },
+        {
           "title": "0.1.7.29 Усунення Помилки SSR Hydration Mismatch у apps/student (SBC-320, EP-ST)",
           "level": 3,
           "paragraphs": [

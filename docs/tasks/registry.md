@@ -288,6 +288,7 @@
 | **SBC-318** | Story | ST | design and implement stacked breadcrumbs with integrated course selector in app shell header | 2026-11-04 | pending |
 | **SBC-319** | Story | ST | design and implement right profile drawer with course switcher and student telemetry | 2026-11-04 | pending |
 | **SBC-320** | Fix | ST | resolve ssr client hydration mismatch by deferring localstorage course sync | 2026-11-04 | pending |
+| **SBC-321** | Refactor | ST | decouple course badge from header breadcrumbs and centralize switcher in profile drawer | 2026-11-04 | pending |
 
 ---
 
