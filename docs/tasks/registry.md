@@ -291,7 +291,8 @@
 | **SBC-320** | Fix | ST | resolve ssr client hydration mismatch by deferring localstorage course sync | 2026-11-04 | pending |
 | **SBC-321** | Refactor | ST | decouple course badge from header breadcrumbs and centralize switcher in profile drawer | 2026-11-04 | pending |
 | **SBC-322** | Style | ST | display active course as clean typography label and adjust vertical spacing for breadcrumbs | 2026-11-04 | pending |
-| **SBC-324** | Style | ST | soften breadcrumbs contrast with extra top offset and de-emphasize course title | 2026-11-04 | working-tree |
+| **SBC-324** | Style | ST | soften breadcrumbs contrast with extra top offset and de-emphasize course title | 2026-11-04 | ced2b44 |
+| **SBC-325** | Style | ST | equalize breadcrumbs styling with lighter font-weight and increased vertical clearance | 2026-11-04 | working-tree |
 
 ---
 

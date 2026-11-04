@@ -1052,7 +1052,7 @@ export function StudentPortalContent({
         ),
         breadcrumbs: (
           <Breadcrumbs
-            className="text-[11px]"
+            className="text-xs sm:text-[12.5px]"
             items={[
               ...(task?.skill?.title ? [{
                 label: task.skill.title,

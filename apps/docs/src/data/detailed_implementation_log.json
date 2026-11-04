@@ -120,6 +120,62 @@
           ]
         },
         {
+          "title": "0.1.7.34 Уніфікація Елементів Хлібних Крихт та Збільшення Вертикального Простору (SBC-325, EP-ST)",
+          "level": 3,
+          "paragraphs": [
+            "pm run build:student пройшла з нульовими помилками."
+          ],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "**Контекст та інженерний задум:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Ліквідація зайвої диференціації між поточною активною темою та попередніми ланками в навігаційному ланцюжку.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Надання хлібним крихтам легкого, журнального вигляду з більшим кеглем шрифту та тоншим накресленням (\font-normal), що відповідає принципу спокійного академічного інтерфейсу.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Технічні модифікації:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "*Уніфікація стилів у [packages/ui/src/breadcrumbs/Breadcrumbs.tsx](file:///packages/ui/src/breadcrumbs/Breadcrumbs.tsx):*",
+              "subitems": [
+                "Базовий контейнер отримав \text-xs sm:text-[13px] leading-none font-normal text-slate-400.",
+                "Останній елемент (isLast) переведено з виділеного стану на єдиний стандартний вигляд: \text-slate-400 font-normal.",
+                "Відступи між текстом і бейджем складності скориговано до ml-1.5 px-1.5 py-0.5 rounded text-[9px] font-mono font-normal bg-slate-800/80 text-slate-400 border border-slate-700/50."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "*Збільшення вертикального зазору в [packages/ui/src/shell/AppShellLayout.tsx](file:///packages/ui/src/shell/AppShellLayout.tsx):*",
+              "subitems": [
+                "Висоту хедера збільшено до h-[62px], а відступ хлібних крихт — до mt-2."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Верифікація:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Збірка",
+              "subitems": []
+            }
+          ]
+        },
+        {
           "title": "0.1.7.33 Тонке Налаштування Візуальної Ієрархії Хедера Студентського Порталу (SBC-324, EP-ST)",
           "level": 3,
           "paragraphs": [

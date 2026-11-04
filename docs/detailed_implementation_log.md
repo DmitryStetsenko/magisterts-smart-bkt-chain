@@ -29,6 +29,21 @@
   4. *Install Monorepo Dependencies* (`npm ci || npm install`) — синхронізація робочих просторів монорепозиторію.
   5. *Build Next.js Documentation Site* (`npm run build:docs`) — збірка статичного експорту (`output: "export"`, `trailingSlash: true`, `basePath: "/magisterts-smart-bkt-chain"`).
   6. *Upload Artifact & Deploy Pages* (`actions/upload-pages-artifact@v3` + `actions/deploy-pages@v4`).
+### 0.1.7.34 Уніфікація Елементів Хлібних Крихт та Збільшення Вертикального Простору (SBC-325, EP-ST)
+- **Контекст та інженерний задум:**
+  - Ліквідація зайвої диференціації між поточною активною темою та попередніми ланками в навігаційному ланцюжку.
+  - Надання хлібним крихтам легкого, журнального вигляду з більшим кеглем шрифту та тоншим накресленням (ont-normal), що відповідає принципу спокійного академічного інтерфейсу.
+- **Технічні модифікації:**
+  1. *Уніфікація стилів у [packages/ui/src/breadcrumbs/Breadcrumbs.tsx](file:///packages/ui/src/breadcrumbs/Breadcrumbs.tsx):*
+     - Базовий контейнер отримав 	ext-xs sm:text-[13px] leading-none font-normal text-slate-400.
+     - Останній елемент (isLast) переведено з виділеного стану на єдиний стандартний вигляд: 	ext-slate-400 font-normal.
+     - Відступи між текстом і бейджем складності скориговано до ml-1.5 px-1.5 py-0.5 rounded text-[9px] font-mono font-normal bg-slate-800/80 text-slate-400 border border-slate-700/50.
+  2. *Збільшення вертикального зазору в [packages/ui/src/shell/AppShellLayout.tsx](file:///packages/ui/src/shell/AppShellLayout.tsx):*
+     - Висоту хедера збільшено до h-[62px], а відступ хлібних крихт — до mt-2.
+- **Верифікація:**
+  - Збірка 
+pm run build:student пройшла з нульовими помилками.
+
 ### 0.1.7.33 Тонке Налаштування Візуальної Ієрархії Хедера Студентського Порталу (SBC-324, EP-ST)
 - **Контекст та інженерна мета:**
   - Зниження візуального шуму у верхній панелі AppShellLayout студентського тренажера.

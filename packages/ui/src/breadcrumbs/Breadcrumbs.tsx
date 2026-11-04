@@ -40,7 +40,7 @@ export function Breadcrumbs({
   return (
     <nav
       aria-label="Breadcrumb"
-      className={`flex items-center flex-wrap gap-1.5 text-[11px] leading-none font-medium text-slate-400 select-none ${className}`}
+      className={`flex items-center flex-wrap gap-1.5 text-xs sm:text-[13px] leading-none font-normal text-slate-400 select-none ${className}`}
     >
       {showHome && (
         <>
@@ -78,14 +78,14 @@ export function Breadcrumbs({
 
             {isLast ? (
               <span
-                className="flex items-center gap-1 text-slate-300 font-medium truncate max-w-[240px] sm:max-w-[340px]"
+                className="flex items-center gap-1 text-slate-400 font-normal truncate max-w-[240px] sm:max-w-[340px]"
                 aria-current="page"
                 title={typeof item.label === 'string' ? item.label : undefined}
               >
-                {ItemIcon && <ItemIcon className="w-3 h-3 text-slate-400 shrink-0" />}
+                {ItemIcon && <ItemIcon className="w-3.5 h-3.5 text-slate-500 shrink-0" />}
                 <span className="truncate">{item.label}</span>
                 {item.badge && (
-                  <span className="ml-1 px-1.5 py-0.2 rounded text-[9px] font-mono font-medium bg-slate-800 text-slate-400 border border-slate-700/60">
+                  <span className="ml-1.5 px-1.5 py-0.5 rounded text-[9px] font-mono font-normal bg-slate-800/80 text-slate-400 border border-slate-700/50">
                     {item.badge}
                   </span>
                 )}
@@ -93,13 +93,13 @@ export function Breadcrumbs({
             ) : item.href ? (
               <a
                 href={item.href}
-                className="flex items-center gap-1 text-slate-500 hover:text-slate-300 transition-colors truncate max-w-[180px] sm:max-w-[240px]"
+                className="flex items-center gap-1 text-slate-400 hover:text-slate-200 font-normal transition-colors truncate max-w-[180px] sm:max-w-[240px]"
                 title={typeof item.label === 'string' ? item.label : undefined}
               >
-                {ItemIcon && <ItemIcon className="w-3 h-3 text-slate-600 shrink-0" />}
+                {ItemIcon && <ItemIcon className="w-3.5 h-3.5 text-slate-500 shrink-0" />}
                 <span className="truncate">{item.label}</span>
                 {item.badge && (
-                  <span className="ml-1 px-1 py-0.2 rounded text-[9px] font-mono bg-slate-850 text-slate-500 border border-slate-800">
+                  <span className="ml-1.5 px-1.5 py-0.5 rounded text-[9px] font-mono font-normal bg-slate-800/80 text-slate-400 border border-slate-700/50">
                     {item.badge}
                   </span>
                 )}
@@ -108,26 +108,26 @@ export function Breadcrumbs({
               <button
                 type="button"
                 onClick={item.onClick}
-                className="flex items-center gap-1 text-slate-500 hover:text-slate-300 transition-colors cursor-pointer truncate max-w-[180px] sm:max-w-[240px]"
+                className="flex items-center gap-1 text-slate-400 hover:text-slate-200 font-normal transition-colors cursor-pointer truncate max-w-[180px] sm:max-w-[240px]"
                 title={typeof item.label === 'string' ? item.label : undefined}
               >
-                {ItemIcon && <ItemIcon className="w-3 h-3 text-slate-600 shrink-0" />}
+                {ItemIcon && <ItemIcon className="w-3.5 h-3.5 text-slate-500 shrink-0" />}
                 <span className="truncate">{item.label}</span>
                 {item.badge && (
-                  <span className="ml-1 px-1 py-0.2 rounded text-[9px] font-mono bg-slate-850 text-slate-500 border border-slate-800">
+                  <span className="ml-1.5 px-1.5 py-0.5 rounded text-[9px] font-mono font-normal bg-slate-800/80 text-slate-400 border border-slate-700/50">
                     {item.badge}
                   </span>
                 )}
               </button>
             ) : (
               <span
-                className="flex items-center gap-1 text-slate-500 truncate max-w-[180px] sm:max-w-[240px]"
+                className="flex items-center gap-1 text-slate-400 font-normal truncate max-w-[180px] sm:max-w-[240px]"
                 title={typeof item.label === 'string' ? item.label : undefined}
               >
-                {ItemIcon && <ItemIcon className="w-3 h-3 text-slate-600 shrink-0" />}
+                {ItemIcon && <ItemIcon className="w-3.5 h-3.5 text-slate-500 shrink-0" />}
                 <span className="truncate">{item.label}</span>
                 {item.badge && (
-                  <span className="ml-1 px-1 py-0.2 rounded text-[9px] font-mono bg-slate-850 text-slate-500 border border-slate-800">
+                  <span className="ml-1.5 px-1.5 py-0.5 rounded text-[9px] font-mono font-normal bg-slate-800/80 text-slate-400 border border-slate-700/50">
                     {item.badge}
                   </span>
                 )}

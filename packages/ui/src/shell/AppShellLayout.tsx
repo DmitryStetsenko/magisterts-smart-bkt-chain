@@ -128,9 +128,9 @@ export function AppShellLayout({
   return (
     <div className={`h-screen w-screen bg-slate-950 text-slate-100 flex flex-col font-sans overflow-hidden relative ${className}`}>
       
-      {/* 📌 1. STICKY TOP NAVIGATION BAR (Header Bar h-[58px]) */}
+      {/* 📌 1. STICKY TOP NAVIGATION BAR (Header Bar h-[62px]) */}
       {!header.hideHeader && (
-        <header className="h-[58px] w-full bg-slate-900 border-b border-slate-800/90 px-4 flex items-center justify-between shrink-0 z-30 shadow-md">
+        <header className="h-[62px] w-full bg-slate-900 border-b border-slate-800/90 px-4 flex items-center justify-between shrink-0 z-30 shadow-md">
           {/* Ліва зона: Логотип + (Назва + Курс зверху) / (Хлібні крихти локального завдання знизу) */}
           <div className="flex items-center gap-3 shrink-0">
             <div className={`p-1.5 rounded-lg border shrink-0 ${header.logoColor || 'bg-blue-600/20 border-blue-500/30 text-blue-400'}`}>
@@ -157,9 +157,9 @@ export function AppShellLayout({
                 )}
               </div>
 
-              {/* Рядок 2: Хлібні крихти локальної навички/завдання з виразним відступом вниз mt-1.5 */}
+              {/* Рядок 2: Хлібні крихти локальної навички/завдання з виразним відступом вниз mt-2 */}
               {header.breadcrumbs && (
-                <div className="flex items-center mt-1.5">
+                <div className="flex items-center mt-2">
                   {header.breadcrumbs}
                 </div>
               )}
