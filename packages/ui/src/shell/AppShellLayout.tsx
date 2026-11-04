@@ -128,9 +128,9 @@ export function AppShellLayout({
   return (
     <div className={`h-screen w-screen bg-slate-950 text-slate-100 flex flex-col font-sans overflow-hidden relative ${className}`}>
       
-      {/* 📌 1. STICKY TOP NAVIGATION BAR (Header Bar h-14 / 56px) */}
+      {/* 📌 1. STICKY TOP NAVIGATION BAR (Header Bar h-[58px]) */}
       {!header.hideHeader && (
-        <header className="h-14 w-full bg-slate-900 border-b border-slate-800/90 px-4 flex items-center justify-between shrink-0 z-30 shadow-md">
+        <header className="h-[58px] w-full bg-slate-900 border-b border-slate-800/90 px-4 flex items-center justify-between shrink-0 z-30 shadow-md">
           {/* Ліва зона: Логотип + (Назва + Курс зверху) / (Хлібні крихти локального завдання знизу) */}
           <div className="flex items-center gap-3 shrink-0">
             <div className={`p-1.5 rounded-lg border shrink-0 ${header.logoColor || 'bg-blue-600/20 border-blue-500/30 text-blue-400'}`}>
@@ -138,8 +138,8 @@ export function AppShellLayout({
             </div>
 
             <div className="flex flex-col justify-center">
-              {/* Рядок 1: Брендинг системи + Бейдж підсистеми + Назва курсу */}
-              <div className="flex items-center gap-2">
+              {/* Рядок 1: Брендинг системи + Бейдж підсистеми + Текстова назва курсу */}
+              <div className="flex items-center gap-2.5">
                 <h1 className="text-xs sm:text-sm font-bold text-white flex items-center gap-1.5 leading-tight">
                   <span>{header.appName}</span>
                   <span className={`px-1.5 py-0.2 text-[9px] font-mono rounded border ${header.badgeColor || 'bg-blue-500/20 text-blue-300 border-blue-500/30'}`}>
@@ -157,9 +157,9 @@ export function AppShellLayout({
                 )}
               </div>
 
-              {/* Рядок 2: Хлібні крихти локальної навички/завдання (під логотипом та назвою курсу) */}
+              {/* Рядок 2: Хлібні крихти локальної навички/завдання з виразним відступом вниз mt-1 */}
               {header.breadcrumbs && (
-                <div className="flex items-center mt-0.5">
+                <div className="flex items-center mt-1">
                   {header.breadcrumbs}
                 </div>
               )}

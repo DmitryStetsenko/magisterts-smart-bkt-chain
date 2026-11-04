@@ -289,6 +289,7 @@
 | **SBC-319** | Story | ST | design and implement right profile drawer with course switcher and student telemetry | 2026-11-04 | pending |
 | **SBC-320** | Fix | ST | resolve ssr client hydration mismatch by deferring localstorage course sync | 2026-11-04 | pending |
 | **SBC-321** | Refactor | ST | decouple course badge from header breadcrumbs and centralize switcher in profile drawer | 2026-11-04 | pending |
+| **SBC-322** | Style | ST | display active course as clean typography label and adjust vertical spacing for breadcrumbs | 2026-11-04 | pending |
 
 ---
 

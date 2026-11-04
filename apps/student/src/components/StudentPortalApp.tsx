@@ -1043,15 +1043,12 @@ export function StudentPortalContent({
         logoColor: 'bg-indigo-600/20 border-indigo-500/30 text-indigo-400',
         badgeColor: 'bg-indigo-500/20 text-indigo-300 border-indigo-500/30',
         courseBadge: (
-          <div
-            className="flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-slate-800/60 text-slate-300 border border-slate-700/50 text-xs font-semibold select-none"
+          <span
+            className="text-xs sm:text-[13px] font-semibold text-slate-200 select-none tracking-wide"
             title={`Активний курс: ${courses.find((c) => c.slug === activeCourseSlug)?.title || activeCourseSlug}`}
           >
-            <span>📚</span>
-            <span className="truncate max-w-[200px] sm:max-w-[260px]">
-              {courses.find((c) => c.slug === activeCourseSlug)?.title || activeCourseSlug}
-            </span>
-          </div>
+            {courses.find((c) => c.slug === activeCourseSlug)?.title || activeCourseSlug}
+          </span>
         ),
         breadcrumbs: (
           <Breadcrumbs
