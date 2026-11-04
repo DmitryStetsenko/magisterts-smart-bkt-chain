@@ -1038,7 +1038,7 @@ export function StudentPortalContent({
         badgeColor: 'bg-indigo-500/20 text-indigo-300 border-indigo-500/30',
         breadcrumbs: (
           <Breadcrumbs
-            className="text-[10px]"
+            className="text-xs"
             items={[
               {
                 label: (
@@ -1047,7 +1047,7 @@ export function StudentPortalContent({
                       id="student-breadcrumb-course-select"
                       value={activeCourseSlug}
                       onChange={(e) => handleSelectCourse(e.target.value)}
-                      className="appearance-none bg-transparent hover:bg-slate-800/60 text-slate-300 hover:text-white font-semibold pr-4 pl-1 py-0.5 rounded cursor-pointer focus:outline-none transition-colors max-w-[140px] sm:max-w-[200px] truncate text-[10px]"
+                      className="appearance-none bg-transparent hover:bg-slate-800/80 text-slate-200 hover:text-white font-medium pr-4 pl-1 py-0.5 rounded cursor-pointer focus:outline-none transition-colors max-w-[160px] sm:max-w-[240px] truncate text-xs"
                       title="Натисніть для вибору навчального курсу"
                     >
                       {courses.map((course) => (
@@ -1056,7 +1056,7 @@ export function StudentPortalContent({
                         </option>
                       ))}
                     </select>
-                    <ChevronDown className="w-2.5 h-2.5 text-slate-500 pointer-events-none absolute right-0.5 top-1/2 -translate-y-1/2" />
+                    <ChevronDown className="w-3 h-3 text-slate-400 pointer-events-none absolute right-0.5 top-1/2 -translate-y-1/2" />
                   </div>
                 ),
               },
