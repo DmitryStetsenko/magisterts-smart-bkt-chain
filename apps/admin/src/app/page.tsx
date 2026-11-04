@@ -10,7 +10,7 @@ import {
   Database,
   Cpu
 } from 'lucide-react';
-import { AppShellLayout, Breadcrumbs } from '@sbc/ui';
+import { AppShellLayout, Breadcrumbs, UserProfileDrawer } from '@sbc/ui';
 import { getAppBaseUrl } from '@sbc/routes';
 import { SkillDagEditor } from '../features/skill-editor/ui/SkillDagEditor';
 import { AdminSkillNode } from '../features/skill-editor/model/skill-editor.types';
@@ -102,6 +102,7 @@ export default function AdminCMSDashboard() {
   type AdminTab = 'dag' | 'courses' | 'system';
   const [activeTab, setActiveTab] = useState<AdminTab>('dag');
   const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(true);
+  const [isProfileDrawerOpen, setIsProfileDrawerOpen] = useState<boolean>(false);
 
   const handleTabClick = (tabId: string) => {
     const tab = tabId as AdminTab;
@@ -114,7 +115,8 @@ export default function AdminCMSDashboard() {
   };
 
   return (
-    <AppShellLayout
+    <>
+      <AppShellLayout
       currentApp="admin"
       header={{
         appName: 'Smart-BKT-Chain',
@@ -161,6 +163,24 @@ export default function AdminCMSDashboard() {
               <span>Кабінет Викладача</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </a>
+
+            {/* 👤 Кнопка профілю адміністратора */}
+            <button
+              type="button"
+              onClick={() => setIsProfileDrawerOpen(true)}
+              className="flex items-center gap-2 bg-slate-950/80 hover:bg-slate-900 px-2.5 py-1 rounded-full border border-slate-800 hover:border-emerald-500/50 transition-all cursor-pointer select-none text-left group"
+              title="Натисніть для відкриття профілю адміністратора"
+            >
+              <div className="w-6 h-6 rounded-full bg-gradient-to-tr from-emerald-600 to-teal-500 flex items-center justify-center text-[10px] font-bold text-white shadow-sm ring-1 ring-emerald-500/30 group-hover:scale-105 transition-transform">
+                АД
+              </div>
+              <span className="hidden lg:inline text-xs font-semibold text-slate-200 group-hover:text-white transition-colors">
+                Адміністратор CMS
+              </span>
+              <span className="px-1.5 py-0.2 rounded text-[9px] font-mono bg-emerald-500/10 text-emerald-300 border border-emerald-500/20">
+                ADMIN
+              </span>
+            </button>
           </div>
         ),
       }}
@@ -242,5 +262,67 @@ export default function AdminCMSDashboard() {
         )}
       </div>
     </AppShellLayout>
+
+    {/* 👤 Спільний уніфікований Drawer профілю адміністратора */}
+    <UserProfileDrawer
+      isOpen={isProfileDrawerOpen}
+      onClose={() => setIsProfileDrawerOpen(false)}
+      user={{
+        name: 'Адміністратор Системи',
+        roleName: 'Методист CMS',
+        roleBadge: 'ADMIN',
+        subtitle: 'Root Governance · ID: sys-admin',
+        initials: 'АД',
+        avatarGradient: 'bg-gradient-to-tr from-emerald-600 to-teal-500',
+      }}
+      courses={[
+        {
+          slug: 'js-dev',
+          title: 'JavaScript & Web Dev',
+          category: 'Програмування',
+          skillsCount: nodes.length,
+          totalSkillsCount: nodes.length,
+          completionPct: 100,
+        },
+      ]}
+      stats={[
+        {
+          label: 'Активних навичок у DAG',
+          value: nodes.length,
+          icon: Network,
+          iconColor: 'text-emerald-400',
+          valueColor: 'text-emerald-400',
+        },
+        {
+          label: 'Конфігурація Релейєра',
+          value: 'ONLINE',
+          icon: ShieldCheck,
+          iconColor: 'text-teal-400',
+          valueColor: 'text-teal-400',
+        },
+      ]}
+      statsTitle="Статус Методичного Центру"
+      quickLinks={[
+        {
+          label: 'Кабінет Викладача',
+          href: getAppBaseUrl('teacher'),
+          icon: BookOpen,
+          iconColor: 'text-purple-400',
+        },
+        {
+          label: 'Підручник Теорії',
+          href: getAppBaseUrl('study'),
+          icon: BookOpen,
+          iconColor: 'text-blue-400',
+        },
+        {
+          label: 'Документація Системи',
+          href: getAppBaseUrl('docs'),
+          icon: Database,
+          iconColor: 'text-slate-400',
+        },
+      ]}
+    />
+    </>
   );
 }

@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { io } from 'socket.io-client';
 import { ShieldCheck, Network, Users, BarChart3, Code2, BookOpen, Scale, ChevronDown, ChevronUp, X, Search, RotateCcw, AlertTriangle, CheckCircle2, Lock, HelpCircle, Code, FileText, CheckSquare, Sparkles, Keyboard, Copy, Activity, Info, GitBranch, Layers, ClipboardCheck, Tag, FlaskConical, Compass, User, Globe, Plus, Minus, GraduationCap } from 'lucide-react';
 import { StudentAnalyticsItem } from '../features/analytics/model/analytics.types';
-import { AnomalyTreeWidget, GameSkillTreeWidget, SkillGraphNode, AppShellLayout, Breadcrumbs } from '@sbc/ui';
+import { AnomalyTreeWidget, GameSkillTreeWidget, SkillGraphNode, AppShellLayout, Breadcrumbs, UserProfileDrawer } from '@sbc/ui';
 import { CourseDto, TaskDto } from '@sbc/types';
 import { ReviewQueueInspector } from '../features/reviews/ui/ReviewQueueInspector';
 import { CourseGraphViewer } from '../features/course-map/ui/CourseGraphViewer';
@@ -49,6 +49,7 @@ export default function TeacherDashboardPage() {
 
   // Modal explanation state for BKT/WPM/CopyPaste/Fatigue metrics
   const [metricModal, setMetricModal] = useState<'bkt' | 'wpm' | 'copypaste' | 'fatigue' | null>(null);
+  const [isProfileDrawerOpen, setIsProfileDrawerOpen] = useState<boolean>(false);
 
   // Modal confirmation state for student BKT reset
   const [resetConfirmStudent, setResetConfirmStudent] = useState<StudentAnalyticsItem | null>(null);
@@ -1316,7 +1317,8 @@ export default function TeacherDashboardPage() {
   };
 
   return (
-    <AppShellLayout
+    <>
+      <AppShellLayout
       currentApp="teacher"
       header={{
         appName: 'Smart-BKT-Chain',
@@ -1465,10 +1467,23 @@ export default function TeacherDashboardPage() {
             )}
           </div>
 
-          <div className="flex items-center gap-2 bg-slate-950 px-3 py-1.5 rounded-xl border border-slate-800 text-xs">
-            <Users className="w-3.5 h-3.5 text-purple-400" />
-            <span className="font-semibold text-slate-200">Викладач</span>
-          </div>
+          {/* 👤 Кнопка профілю викладача (відкриває Profile Drawer) */}
+          <button
+            type="button"
+            onClick={() => setIsProfileDrawerOpen(true)}
+            className="flex items-center gap-2 bg-slate-950/80 hover:bg-slate-900 px-2.5 py-1 rounded-full border border-slate-800 hover:border-purple-500/50 transition-all cursor-pointer select-none text-left group"
+            title="Натисніть для відкриття профілю викладача"
+          >
+            <div className="w-6 h-6 rounded-full bg-gradient-to-tr from-purple-600 to-indigo-500 flex items-center justify-center text-[10px] font-bold text-white shadow-sm ring-1 ring-purple-500/30 group-hover:scale-105 transition-transform">
+              ВК
+            </div>
+            <span className="hidden lg:inline text-xs font-semibold text-slate-200 group-hover:text-white transition-colors">
+              Олександр Коваленко
+            </span>
+            <span className="px-1.5 py-0.2 rounded text-[9px] font-mono bg-purple-500/10 text-purple-300 border border-purple-500/20">
+              ВИКЛАДАЧ
+            </span>
+          </button>
         </div>
         </>
         ),
@@ -2143,5 +2158,61 @@ export default function TeacherDashboardPage() {
         
       </div>
     </AppShellLayout>
+
+    {/* 👤 Спільний уніфікований Drawer профілю викладача */}
+    <UserProfileDrawer
+      isOpen={isProfileDrawerOpen}
+      onClose={() => setIsProfileDrawerOpen(false)}
+      user={{
+        name: 'Олександр Коваленко',
+        roleName: 'Викладач',
+        roleBadge: 'ВИКЛАДАЧ',
+        subtitle: 'Кафедра компʼютерних наук · ID: prof-kovalenko',
+        initials: 'ВК',
+        avatarGradient: 'bg-gradient-to-tr from-purple-600 via-indigo-600 to-pink-500',
+      }}
+      courses={courses.map((c) => ({
+        slug: c.slug,
+        title: c.title,
+        category: 'Навчальний курс',
+      }))}
+      activeCourseSlug={activeCourseSlug}
+      onSelectCourse={(slug) => {
+        handleSelectCourse(slug);
+        setIsProfileDrawerOpen(false);
+      }}
+      stats={[
+        {
+          label: 'Студентів у групі',
+          value: students.length,
+          icon: Users,
+          iconColor: 'text-purple-400',
+          valueColor: 'text-white',
+        },
+        {
+          label: 'Черга на перевірку',
+          value: `${reviewQueue.length} робіт`,
+          icon: ClipboardCheck,
+          iconColor: 'text-amber-400',
+          valueColor: 'text-amber-400',
+        },
+      ]}
+      statsTitle="Огляд Педагогічного Навантаження"
+      quickLinks={[
+        {
+          label: 'Відкрити CMS Адміністратора',
+          href: 'http://localhost:3004',
+          icon: Code2,
+          iconColor: 'text-emerald-400',
+        },
+        {
+          label: 'Документація Платформи',
+          href: 'http://localhost:3005',
+          icon: BookOpen,
+          iconColor: 'text-blue-400',
+        },
+      ]}
+    />
+    </>
   );
 }

@@ -120,6 +120,94 @@
           ]
         },
         {
+          "title": "0.1.7.39 Спільний Компонент UserProfileDrawer та Правило Уніфікації Профілів (SBC-330, EP-SH)",
+          "level": 3,
+          "paragraphs": [],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "**Архітектурне обґрунтування та принцип DRY:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Бічна панель профілю користувача з курсами, аналітикою та керуванням сесією була локалізована в `apps/student`.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Згідно з Правилом 6 (Reusability First) та новим пунктом 9 Правила 7 у [`.agents/AGENTS.md`](file:///.agents/AGENTS.md), панель винесена в спільний пакет `@sbc/ui` як компонент `UserProfileDrawer`.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Склад та функціонал `UserProfileDrawer` ([`packages/ui/src/drawer/UserProfileDrawer.tsx`](file:///packages/ui/src/drawer/UserProfileDrawer.tsx)):**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "*Шапка профілю (висота `h-[62px]`):* круглий аватар з ініціалами та градієнтом, повне ім'я, рольовий бейдж (`УЧЕНЬ`, `ВИКЛАДАЧ`, `ADMIN`) та підзаголовок.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "*Секція «Навчальні Курси»:* підтримка переліку курсів, підсвітка активного, динамічний індикатор кількості навичок та прогрес-бар.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "*Секція «Академічний Статус / Навантаження»:* адаптивна двоколонкова сітка з метриками під будь-яку роль (WPM, доброчесність, стрік, черга робіт, статус вузлів).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "*Секція дій та швидких посилань:* опціональне скидання BKT-стану для симуляції та міжпортальні посилання екосистеми.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "*Футер:* версія платформи та індикатор реального часу WebSocket (`Підключено (WS)`).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Впровадження:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "`apps/student`: підключено уніфікований `UserProfileDrawer`.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "`apps/study`: інтегровано кнопку учня та Drawer із прогресом модулів підручника.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "`apps/teacher`: інтегровано кнопку викладача та Drawer із когортною статистикою.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "`apps/admin`: інтегровано кнопку адміністратора та Drawer зі статусом CMS і релейєра.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Верифікація:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Усі 4 проєкти успішно зібрані через `npm run build:*`.",
+              "subitems": []
+            }
+          ]
+        },
+        {
           "title": "0.1.7.38 Масштабування Дворівневої Шапки на Всі Застосунки Платформи (SBC-329, EP-SH)",
           "level": 3,
           "paragraphs": [],

@@ -27,7 +27,7 @@ import {
   Lock,
   Unlock
 } from 'lucide-react';
-import { DrawerSection, AppShellLayout, Breadcrumbs } from '@sbc/ui';
+import { DrawerSection, AppShellLayout, Breadcrumbs, UserProfileDrawer } from '@sbc/ui';
 import { ROUTES, buildStudyToPracticeUrl } from '@sbc/routes';
 import { SCHOOL_WEB_CURRICULUM, LessonUnit, LessonSection, CurriculumModule } from '../data/school-web-curriculum';
 import { CodePlayground } from './CodePlayground';
@@ -89,6 +89,7 @@ export function StudyAppClient({
   type StudyTab = 'curriculum' | 'playground' | 'glossary' | 'settings';
   const [activeTab, setActiveTab] = useState<StudyTab>('curriculum');
   const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(true);
+  const [isProfileDrawerOpen, setIsProfileDrawerOpen] = useState<boolean>(false);
 
   // 📖 Zen Reading Mode State: початково стандартні налаштування
   const [readerSettings, setReaderSettings] = useState<ReaderSettings>(DEFAULT_READER_SETTINGS);
@@ -225,9 +226,10 @@ export function StudyAppClient({
   }[activeTab];
 
   return (
-    <AppShellLayout
-      currentApp="study"
-      className={`${themeClasses[activeTheme]} ${fontClasses[activeFont]} antialiased transition-colors duration-200 selection:bg-blue-500/20`}
+    <>
+      <AppShellLayout
+        currentApp="study"
+        className={`${themeClasses[activeTheme]} ${fontClasses[activeFont]} antialiased transition-colors duration-200 selection:bg-blue-500/20`}
       header={{
         appName: 'Smart-BKT-Chain',
         badgeText: 'Study Portal v2.0',
@@ -260,29 +262,23 @@ export function StudyAppClient({
         ),
         rightSlot: (
           <div className="flex items-center gap-3">
-            <div className="relative min-w-[180px] sm:min-w-[240px]">
-              <select
-                id="study-course-select"
-                value={activeCourseSlug}
-                onChange={(e) => setActiveCourseSlug(e.target.value)}
-                className="w-full appearance-none px-3 py-1.5 rounded-xl bg-slate-950 border border-slate-700 text-xs font-semibold text-white focus:outline-none focus:border-blue-500 cursor-pointer pr-8 shadow-inner"
-              >
-                <option value="web-algorithms-school" className="bg-slate-900 text-white py-1">
-                  📚 {SCHOOL_WEB_CURRICULUM.courseTitle}
-                </option>
-              </select>
-              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-blue-400">
-                <ChevronDown className="w-3.5 h-3.5" />
+            {/* Кнопка профілю учня */}
+            <button
+              type="button"
+              onClick={() => setIsProfileDrawerOpen(true)}
+              className="flex items-center gap-2 bg-slate-950/80 hover:bg-slate-900 px-2.5 py-1 rounded-full border border-slate-800 hover:border-blue-500/50 transition-all cursor-pointer select-none text-left group"
+              title="Натисніть для відкриття профілю та вибору курсів"
+            >
+              <div className="w-6 h-6 rounded-full bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center text-[10px] font-bold text-white shadow-sm ring-1 ring-blue-500/30 group-hover:scale-105 transition-transform">
+                ДС
               </div>
-            </div>
-
-            <div className="flex items-center gap-2 bg-slate-950 px-3 py-1.5 rounded-xl border border-slate-800 text-xs">
-              <User className="w-3.5 h-3.5 text-blue-400" />
-              <span className="font-semibold text-slate-200">Дмитро Стеценко</span>
-              <span className="px-1.5 py-0.2 rounded text-[9px] font-mono bg-blue-500/10 text-blue-400 border border-blue-500/20">
-                Учень
+              <span className="hidden lg:inline text-xs font-semibold text-slate-200 group-hover:text-white transition-colors">
+                Дмитро Стеценко
               </span>
-            </div>
+              <span className="px-1.5 py-0.2 rounded text-[9px] font-mono bg-blue-500/10 text-blue-300 border border-blue-500/20">
+                УЧЕНЬ
+              </span>
+            </button>
           </div>
         ),
       }}
@@ -666,5 +662,61 @@ console.log(greeting, "Номер спроби:", counter);`}
             estimatedMinutesLeft={currentUnit.estimatedMinutes}
           />
     </AppShellLayout>
+
+    {/* 👤 Спільний уніфікований Drawer профілю користувача */}
+    <UserProfileDrawer
+      isOpen={isProfileDrawerOpen}
+      onClose={() => setIsProfileDrawerOpen(false)}
+      user={{
+        name: 'Дмитро Стеценко',
+        roleName: 'Учень',
+        roleBadge: 'УЧЕНЬ',
+        subtitle: '10–11 класи · Профільний рівень',
+        initials: 'ДС',
+        avatarGradient: 'bg-gradient-to-tr from-blue-600 to-indigo-500',
+      }}
+      courses={[
+        {
+          slug: 'web-algorithms-school',
+          title: SCHOOL_WEB_CURRICULUM.courseTitle,
+          category: 'Інформатика 10-11',
+          skillsCount: Object.values(unlockedModules).filter(Boolean).length,
+          totalSkillsCount: SCHOOL_WEB_CURRICULUM.modules.length,
+          completionPct: Math.round(
+            (Object.values(unlockedModules).filter(Boolean).length / SCHOOL_WEB_CURRICULUM.modules.length) * 100
+          ),
+        },
+      ]}
+      activeCourseSlug={activeCourseSlug}
+      onSelectCourse={(slug) => {
+        setActiveCourseSlug(slug);
+        setIsProfileDrawerOpen(false);
+      }}
+      stats={[
+        {
+          label: 'Ударний стрік',
+          value: '4 дні',
+          icon: Flame,
+          iconColor: 'text-amber-400',
+          valueColor: 'text-white',
+        },
+        {
+          label: 'Опановано модулів',
+          value: `${Object.values(unlockedModules).filter(Boolean).length}/${SCHOOL_WEB_CURRICULUM.modules.length}`,
+          icon: ShieldCheck,
+          iconColor: 'text-blue-400',
+          valueColor: 'text-blue-400',
+        },
+      ]}
+      quickLinks={[
+        {
+          label: 'Перейти до Тренажера BKT',
+          href: practiceUrl,
+          icon: GraduationCap,
+          iconColor: 'text-indigo-400',
+        },
+      ]}
+    />
+    </>
   );
 }

@@ -32,6 +32,10 @@ export default function GoogleHelpView({ isDarkMode, filteredDoc, scrollTo }: Go
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
         components={{
+          div: ({ node, ...props }) => <div {...props} />,
+          blockquote: ({ node, ...props }) => (
+            <blockquote className="border-l-2 border-blue-500 pl-3 my-2 italic text-zinc-400" {...props} />
+          ),
           p: ({ node, ...props }) => <span {...props} />,
           strong: ({ node, ...props }) => (
             <strong className={`font-bold ${isDarkMode ? 'text-zinc-100' : 'text-zinc-900'}`} {...props} />
@@ -172,9 +176,9 @@ export default function GoogleHelpView({ isDarkMode, filteredDoc, scrollTo }: Go
                       }
 
                       return (
-                        <p key={pIdx} className={`text-sm sm:text-base leading-relaxed ${isDarkMode ? 'text-zinc-300' : 'text-zinc-700'}`}>
+                        <div key={pIdx} className={`text-sm sm:text-base leading-relaxed ${isDarkMode ? 'text-zinc-300' : 'text-zinc-700'}`}>
                           {renderMarkdownText(p)}
-                        </p>
+                        </div>
                       );
                     })}
                   </div>
@@ -197,9 +201,9 @@ export default function GoogleHelpView({ isDarkMode, filteredDoc, scrollTo }: Go
 
                         <div className="mt-2 text-sm leading-relaxed space-y-2">
                           {sub.paragraphs && sub.paragraphs.map((p: string, idx: number) => (
-                            <p key={idx} className={isDarkMode ? 'text-zinc-300' : 'text-zinc-700'}>
+                            <div key={idx} className={isDarkMode ? 'text-zinc-300' : 'text-zinc-700'}>
                               {renderMarkdownText(p)}
-                            </p>
+                            </div>
                           ))}
                         </div>
 
