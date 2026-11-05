@@ -120,6 +120,69 @@
           ]
         },
         {
+          "title": "0.1.7.42 Очищення Робочої Області Кабінету Викладача за Принципом Clean Borderless Canvas (SBC-333, EP-TC)",
+          "level": 3,
+          "paragraphs": [],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "**Архітектурна проблема (Nested Boxes Anti-Pattern):**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Внутрішні екрани `apps/teacher` (`CourseGraphViewer`, `StudentAnalytics`, `ReviewQueueInspector`, `MetricsAuditInspector`) мали до 4–5 рівнів вкладених контейнерів із рамками (`border border-slate-800 rounded-3xl/2xl p-6`), великими внутрішніми банерами, що повторювали назву курсу з хедера, та декоративними SVG-кривими.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Виконані інженерні зміни:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**[`apps/teacher/src/features/course-map/ui/CourseGraphViewer.tsx`](file:///apps/teacher/src/features/course-map/ui/CourseGraphViewer.tsx):**",
+              "subitems": [
+                "Злито навігацію режимів (`full` / `tree` / `triads`), пошук, селектор складності та компактний степпер модулів у плоский верхній тулбар (`border-b border-slate-800/80`).",
+                "Видалено дублюючий фіолетовий блок «Навчальна Програма Курсу» та зовнішню картку `rounded-3xl`.",
+                "Введено чистий рендер тріад (`renderTriadRow`), де назва теми та підконцепти виводяться у лівій колонці без зайвої рамки, а справа розташовуються 3 лаконічні картки завдань (`EASY`, `MEDIUM`, `HARD`)."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**[`apps/teacher/src/app/page.tsx`](file:///apps/teacher/src/app/page.tsx):**",
+              "subitems": [
+                "У вкладці `analytics` замінено масивну картку студента на компактний рядок інструментів, знято зовнішню рамку з секції `BKT Mastery Breakdown`."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**[`apps/teacher/src/features/reviews/ui/ReviewQueueInspector.tsx`](file:///apps/teacher/src/features/reviews/ui/ReviewQueueInspector.tsx):**",
+              "subitems": [
+                "Знято зовнішню обгортку `bg-slate-900 border rounded-2xl p-6`, умову завдання та еталонну відповідь розміщено у чистій двоколонковій сітці з вертикальним розділювачем."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**[`apps/teacher/src/features/metrics-audit/ui/MetricsAuditInspector.tsx`](file:///apps/teacher/src/features/metrics-audit/ui/MetricsAuditInspector.tsx):**",
+              "subitems": [
+                "Прибрано багатоповерховий градієнтний банер та зайві плашки статусу студента, переведено на компактний однорядковий тулбар."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Верифікація:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "`npm run build:teacher` пройдено успішно.",
+              "subitems": []
+            }
+          ]
+        },
+        {
           "title": "0.1.7.41 Усунення Дублювання Хлібних Крихт у Тілі Сторінок (SBC-332, EP-TC / EP-AD)",
           "level": 3,
           "paragraphs": [],

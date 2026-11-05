@@ -13,11 +13,11 @@
 | **`SBC-EP-LLM`** | Automated Code Assessment & Open-Text Evaluation | 10 |
 | **`SBC-EP-W3`** | Web3 Infrastructure & Smart Contracts | 0 |
 | **`SBC-EP-ST`** | Student Portal & Skill Tree Map | 30 |
-| **`SBC-EP-TC`** | Teacher Portal & Analytics CRM | 24 |
+| **`SBC-EP-TC`** | Teacher Portal & Analytics CRM | 25 |
 | **`SBC-EP-AD`** | Admin Portal & Knowledge DAG Builder | 8 |
 | **`SBC-EP-LD`** | Landing Web Page | 9 |
 | **`SBC-EP-MS`** | Master's Thesis Engineering & Academic Text Generation | 6 |
-| **ВСЬОГО** | - | **251** |
+| **ВСЬОГО** | - | **252** |
 
 ---
 
@@ -299,7 +299,8 @@
 | **SBC-329** | Style | SH | propagate two-tier header standard across study, teacher, and admin web applications | 2026-11-04 | 120efd7 |
 | **SBC-330** | Feat | SH | create reusable UserProfileDrawer component in sbc-ui and integrate across all apps | 2026-11-04 | deaf152 |
 | **SBC-331** | Clean | TC | eliminate redundant header course selector in teacher dashboard to enforce single source of truth | 2026-11-04 | 7c6ac57 |
-| **SBC-332** | Refactor | TC | remove duplicate breadcrumbs from main canvas in teacher and admin portals | 2026-11-05 | working-tree |
+| **SBC-332** | Refactor | TC | remove duplicate breadcrumbs from main canvas in teacher and admin portals | 2026-11-05 | 306d0de |
+| **SBC-333** | Style | TC | declutter teacher dashboard views into clean borderless canvas layout | 2026-11-05 | working-tree |
 
 ---
 

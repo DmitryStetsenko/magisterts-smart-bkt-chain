@@ -485,144 +485,86 @@ export function MetricsAuditInspector({
   const totalPass = testMatrix.filter((t) => t.pass).length;
 
   return (
-    <div className="flex-1 flex flex-col h-full bg-slate-950 overflow-y-auto">
-      {/* 🔬 Module Header Banner */}
-      <div className="p-6 bg-gradient-to-r from-purple-950/60 via-slate-900 to-indigo-950/60 border-b border-purple-500/20 shrink-0">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div className="flex items-center gap-3.5">
-            <div className="w-12 h-12 rounded-2xl bg-purple-600/20 border border-purple-500/40 text-purple-300 flex items-center justify-center shadow-lg shadow-purple-950/50">
-              <FlaskConical className="w-6 h-6 text-purple-400" />
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <h1 className="text-xl font-black text-white tracking-tight flex items-center gap-2">
-                  <span>Математичний Аудит та Симулятор BKT</span>
-                  <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-emerald-500/10 text-emerald-300 border border-emerald-500/30">
-                    Active Verified
-                  </span>
-                </h1>
-              </div>
-              <p className="text-xs text-slate-400 mt-1 max-w-2xl leading-relaxed">
-                Покрокова верифікація формул Баєса, поведінкових штрафів за швидкість (Rapid Guessing), скорочення оцінки за підказки Сократа та автоматична валідація еталонних тестів.
-              </p>
-            </div>
-          </div>
+    <div className="flex flex-col gap-5">
+      {/* 🔬 Clean Unified Sub-Navigation Toolbar */}
+      <div className="pb-3 border-b border-slate-800/80 flex flex-wrap items-center justify-between gap-3">
+        <div className="flex items-center gap-2.5">
+          <FlaskConical className="w-4 h-4 text-purple-400" />
+          <h1 className="text-sm font-bold text-white">Математичний Аудит та Симулятор BKT</h1>
+        </div>
 
-          {/* Sub-Navigation Buttons with Explicit Separation: Student-Specific vs Global System */}
-          <div className="flex flex-wrap items-center gap-2.5">
-            {/* GROUP 1: Персональний аудит студента */}
-            <div className="flex items-center gap-1 bg-slate-900/90 p-1.5 rounded-2xl border border-purple-500/30 shadow-inner">
-              <span className="text-[10px] font-mono uppercase tracking-wider font-bold text-purple-400 px-2 py-0.5 flex items-center gap-1 border-r border-slate-800 mr-0.5">
-                <User className="w-3 h-3 text-purple-400" />
-                <span>Студент:</span>
+        <div className="flex flex-wrap items-center gap-1.5 bg-slate-900/90 p-1 rounded-lg border border-slate-800/80">
+          <button
+            onClick={() => setActiveSubTab('live-log')}
+            className={`px-2.5 py-1 rounded-md text-xs font-medium flex items-center gap-1.5 transition-all cursor-pointer ${
+              activeSubTab === 'live-log'
+                ? 'bg-purple-600 text-white'
+                : 'text-slate-400 hover:text-white'
+            }`}
+          >
+            <Calculator className="w-3.5 h-3.5" />
+            <span>Формула Студента</span>
+            {student && (
+              <span className="text-[10px] font-mono opacity-80">
+                ({student.name.split(' ')[0]})
               </span>
-              <button
-                onClick={() => setActiveSubTab('live-log')}
-                className={`px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-2 transition-all cursor-pointer ${
-                  activeSubTab === 'live-log'
-                    ? 'bg-purple-600 text-white shadow-md shadow-purple-600/30'
-                    : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
-                }`}
-              >
-                <Calculator className="w-3.5 h-3.5 text-purple-300" />
-                <span>Формула Студента</span>
-                {student && (
-                  <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-purple-950/80 text-purple-200 border border-purple-500/30">
-                    {student.name.split(' ')[0]}
-                  </span>
-                )}
-              </button>
-            </div>
+            )}
+          </button>
 
-            {/* GROUP 2: Загальносистемні алгоритми та верифікація */}
-            <div className="flex items-center gap-1 bg-slate-900/90 p-1.5 rounded-2xl border border-slate-800 shadow-inner">
-              <span className="text-[10px] font-mono uppercase tracking-wider font-bold text-slate-400 px-2 py-0.5 flex items-center gap-1 border-r border-slate-800 mr-0.5">
-                <Globe className="w-3 h-3 text-cyan-400" />
-                <span>Загальні:</span>
-              </span>
+          <button
+            onClick={() => setActiveSubTab('what-if')}
+            className={`px-2.5 py-1 rounded-md text-xs font-medium flex items-center gap-1.5 transition-all cursor-pointer ${
+              activeSubTab === 'what-if'
+                ? 'bg-purple-600 text-white'
+                : 'text-slate-400 hover:text-white'
+            }`}
+          >
+            <Sparkles className="w-3.5 h-3.5" />
+            <span>Пісочниця "What-If"</span>
+          </button>
 
-              <button
-                onClick={() => setActiveSubTab('what-if')}
-                className={`px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
-                  activeSubTab === 'what-if'
-                    ? 'bg-gradient-to-r from-indigo-600 to-cyan-600 text-white shadow-md shadow-indigo-600/30'
-                    : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
-                }`}
-              >
-                <Sparkles className="w-3.5 h-3.5 text-cyan-300" />
-                <span>Пісочниця "What-If"</span>
-              </button>
+          <button
+            onClick={() => setActiveSubTab('test-matrix')}
+            className={`px-2.5 py-1 rounded-md text-xs font-medium flex items-center gap-1.5 transition-all cursor-pointer ${
+              activeSubTab === 'test-matrix'
+                ? 'bg-purple-600 text-white'
+                : 'text-slate-400 hover:text-white'
+            }`}
+          >
+            <ShieldCheck className="w-3.5 h-3.5" />
+            <span>Еталонна Матриця ({totalPass}/{testMatrix.length})</span>
+          </button>
 
-              <button
-                onClick={() => setActiveSubTab('test-matrix')}
-                className={`px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
-                  activeSubTab === 'test-matrix'
-                    ? 'bg-emerald-600 text-white shadow-md shadow-emerald-600/30'
-                    : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
-                }`}
-              >
-                <ShieldCheck className="w-3.5 h-3.5 text-emerald-300" />
-                <span>Еталонна Матриця ({totalPass}/{testMatrix.length})</span>
-              </button>
-
-              <button
-                onClick={() => setActiveSubTab('mechanisms')}
-                className={`px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
-                  activeSubTab === 'mechanisms'
-                    ? 'bg-amber-600 text-white shadow-md shadow-amber-600/30'
-                    : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
-                }`}
-              >
-                <Compass className="w-3.5 h-3.5 text-amber-300" />
-                <span>Реєстр Механізмів (4-in-1)</span>
-              </button>
-            </div>
-          </div>
+          <button
+            onClick={() => setActiveSubTab('mechanisms')}
+            className={`px-2.5 py-1 rounded-md text-xs font-medium flex items-center gap-1.5 transition-all cursor-pointer ${
+              activeSubTab === 'mechanisms'
+                ? 'bg-purple-600 text-white'
+                : 'text-slate-400 hover:text-white'
+            }`}
+          >
+            <Compass className="w-3.5 h-3.5" />
+            <span>Реєстр Механізмів (4-in-1)</span>
+          </button>
         </div>
       </div>
 
       {/* 📌 Main Body Canvas based on activeSubTab */}
-      <div className="p-6 flex-1 flex flex-col gap-6">
+      <div className="flex flex-col gap-5">
 
         {/* ════════ SUB-TAB 1: LIVE STUDENT BAYES BREAKDOWN ════════ */}
         {activeSubTab === 'live-log' && (
-          <div className="flex flex-col gap-6">
-            {/* Scope Breadcrumb */}
-            <div className="bg-purple-950/20 border border-purple-500/30 rounded-xl px-4 py-2.5 flex items-center justify-between">
-              <div className="flex items-center gap-2 text-xs">
-                <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-purple-500/15 text-purple-300 border border-purple-500/30 flex items-center gap-1">
-                  <User className="w-3 h-3 text-purple-400" />
-                  <span>ПЕРСОНАЛЬНИЙ АУДИТ СТУДЕНТА</span>
-                </span>
-                <span className="text-slate-400">•</span>
-                <span className="text-slate-300 font-medium">Аналіз відповідей та декомпозиція Баєса для: <strong className="text-white">{student?.name || 'не обрано'}</strong></span>
+          <div className="flex flex-col gap-4">
+            {/* Compact Student Status Bar */}
+            <div className="pb-3 border-b border-slate-800/80 flex flex-wrap items-center justify-between gap-3 text-xs">
+              <div className="flex items-center gap-2.5">
+                <span className="font-bold text-white">{student?.name || 'Студент не обраний'}</span>
+                <span className="text-slate-500 font-mono">({student?.email})</span>
               </div>
-            </div>
-
-            {/* Student Selector Card */}
-            <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-xl">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-purple-500/10 border border-purple-500/20 text-purple-400 flex items-center justify-center font-bold text-sm">
-                  {student?.name?.charAt(0) || 'S'}
-                </div>
-                <div>
-                  <div className="text-sm font-bold text-white flex items-center gap-2">
-                    <span>{student?.name || 'Студент не обраний'}</span>
-                    <span className="text-xs text-slate-400 font-mono">({student?.email})</span>
-                  </div>
-                  <div className="text-xs text-slate-400 flex items-center gap-3 mt-0.5">
-                    <span>Середнє P(L): <strong className="text-emerald-400 font-mono">{((student?.averageMastery || 0) * 100).toFixed(1)}%</strong></span>
-                    <span>•</span>
-                    <span>WPM: <strong className="text-indigo-400 font-mono">{student?.wpm ?? student?.avgWpm ?? 0}</strong></span>
-                    <span>•</span>
-                    <span>Copy-Paste: <strong className="text-slate-200 font-mono">{((student?.copyPasteRatio || 0) * 100).toFixed(0)}%</strong></span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-2 text-xs text-slate-400 bg-slate-950 px-3 py-1.5 rounded-xl border border-slate-800">
-                <Info className="w-4 h-4 text-purple-400" />
-                <span>Оберіть іншого студента у верхньому меню сторінки для миттєвого аудиту його відповідей</span>
+              <div className="flex items-center gap-4 text-slate-400 font-mono">
+                <span>Середнє P(L): <strong className="text-emerald-400">{((student?.averageMastery || 0) * 100).toFixed(1)}%</strong></span>
+                <span>WPM: <strong className="text-indigo-400">{student?.wpm ?? student?.avgWpm ?? 0}</strong></span>
+                <span>Copy-Paste: <strong className="text-slate-200">{((student?.copyPasteRatio || 0) * 100).toFixed(0)}%</strong></span>
               </div>
             </div>
 

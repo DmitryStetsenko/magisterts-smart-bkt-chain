@@ -1774,35 +1774,28 @@ export default function TeacherDashboardPage() {
 
           {/* Main View 1: Student Detailed Analytics & Heatmap */}
           {activeTab === 'analytics' && selectedStudent && (
-            <div className="flex flex-col gap-6">
-              {/* Student Header Summary Card */}
-              <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-2xl bg-purple-600/20 border border-purple-500/30 flex items-center justify-center text-purple-400 text-lg font-bold">
+            <div className="flex flex-col gap-5">
+              {/* Clean Borderless Student Toolbar */}
+              <div className="pb-3 border-b border-slate-800/80 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-lg bg-purple-600/20 border border-purple-500/30 flex items-center justify-center text-purple-400 text-sm font-bold shrink-0">
                     {selectedStudent.name ? selectedStudent.name.charAt(0) : 'S'}
                   </div>
-                  <div>
-                    <h2 className="text-lg font-bold text-white flex items-center gap-2">
-                      <span>{selectedStudent.name}</span>
-                      <span className="px-2 py-0.5 text-[10px] font-mono bg-purple-500/10 text-purple-300 rounded border border-purple-500/20">
-                        {selectedStudent.email}
-                      </span>
-                    </h2>
-                    <p className="text-xs text-slate-400 mt-0.5">
-                      Курс: <span className="text-slate-200 font-semibold">{activeCourse.title}</span>
-                    </p>
+                  <div className="flex items-center gap-2.5 flex-wrap">
+                    <h2 className="text-base font-bold text-white">{selectedStudent.name}</h2>
+                    <span className="text-xs font-mono text-slate-400">{selectedStudent.email}</span>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2.5">
                   {/* View Mode Toggle: Metrics Heatmap vs RPG Skill Tree */}
-                  <div className="bg-slate-950 p-1 rounded-xl border border-slate-800 flex items-center gap-1 shadow-inner">
+                  <div className="bg-slate-900/90 p-1 rounded-lg border border-slate-800/80 flex items-center gap-1">
                     <button
                       onClick={() => setActiveStudentView('metrics')}
-                      className={`px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
+                      className={`px-2.5 py-1 rounded-md text-xs font-medium flex items-center gap-1.5 transition-all cursor-pointer ${
                         activeStudentView === 'metrics'
-                          ? 'bg-purple-600 text-white shadow-md shadow-purple-600/30'
-                          : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                          ? 'bg-purple-600 text-white'
+                          : 'text-slate-400 hover:text-white'
                       }`}
                     >
                       <BarChart3 className="w-3.5 h-3.5" />
@@ -1810,31 +1803,31 @@ export default function TeacherDashboardPage() {
                     </button>
                     <button
                       onClick={() => setActiveStudentView('tree')}
-                      className={`px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
+                      className={`px-2.5 py-1 rounded-md text-xs font-medium flex items-center gap-1.5 transition-all cursor-pointer ${
                         activeStudentView === 'tree'
-                          ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-md shadow-purple-600/30'
-                          : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                          ? 'bg-purple-600 text-white'
+                          : 'text-slate-400 hover:text-white'
                       }`}
                     >
                       <GitBranch className="w-3.5 h-3.5" />
-                      <span>Дерево Знань Студента</span>
+                      <span>Дерево Знань</span>
                     </button>
                   </div>
 
                   <button
                     onClick={() => setResetConfirmStudent(selectedStudent)}
-                    className="px-3 py-2 rounded-xl bg-rose-600/20 text-rose-300 border border-rose-500/30 hover:bg-rose-600/30 transition-all text-xs font-bold flex items-center gap-2 cursor-pointer shadow-md"
+                    className="px-2.5 py-1.5 rounded-lg bg-rose-500/10 text-rose-300 border border-rose-500/25 hover:bg-rose-500/20 transition-all text-xs font-medium flex items-center gap-1.5 cursor-pointer"
                     title="Анулювати всі BKT-оцінки та історію спроб для цього студента"
                   >
                     <RotateCcw className="w-3.5 h-3.5" />
-                    <span>Скинути BKT Прогрес</span>
+                    <span>Скинути прогрес</span>
                   </button>
                 </div>
               </div>
 
               {/* 🌟 Dynamic View Mode: RPG Game Skill Tree vs Traditional Metrics */}
               {activeStudentView === 'tree' ? (
-                <div className="w-full h-[680px] rounded-2xl overflow-hidden border border-purple-500/30 shadow-2xl">
+                <div className="w-full h-[680px] rounded-xl overflow-hidden border border-slate-800/80">
                   <GameSkillTreeWidget
                     nodes={studentGraphNodes}
                     courseTitle={activeCourse.title}
@@ -1852,186 +1845,176 @@ export default function TeacherDashboardPage() {
                 </div>
               ) : (
                 <>
-                  {/* Compact Student Metrics Grid with Icons & Metric Explanations */}
+                  {/* Clean Student Metrics Grid */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-                {/* Metric 1: P(L) Mastery */}
-                <div className="bg-slate-900 border border-slate-800 rounded-xl p-3 flex flex-col justify-between gap-2 shadow-md relative group">
-                  <div className="flex items-start justify-between gap-1">
-                    <span className="text-[10px] font-semibold uppercase text-slate-400 leading-tight">Середня Майстерність P(L)</span>
-                    <div className="p-1.5 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 shrink-0">
-                      <Sparkles className="w-3.5 h-3.5" />
-                    </div>
-                  </div>
-                  <div className="flex items-baseline justify-between mt-0.5">
-                    <div className="text-xl font-bold text-emerald-400 font-mono">
-                      {selectedStudent.averageMastery !== undefined ? `${(selectedStudent.averageMastery * 100).toFixed(1)}%` : '0.0%'}
-                    </div>
-                    <button
-                      onClick={() => setMetricModal('bkt')}
-                      className="text-[10px] text-indigo-400 hover:text-indigo-300 font-semibold cursor-pointer underline flex items-center gap-0.5"
-                    >
-                      <Info className="w-3 h-3" />
-                      <span>Формула ➔</span>
-                    </button>
-                  </div>
-                </div>
-
-                {/* Metric 2: WPM (Course Median) */}
-                <div className="bg-slate-900 border border-slate-800 rounded-xl p-3 flex flex-col justify-between gap-2 shadow-md relative group">
-                  <div className="flex items-start justify-between gap-1">
-                    <span className="text-[10px] font-semibold uppercase text-slate-400 leading-tight">Медіана WPM (Курс)</span>
-                    <div className="p-1.5 rounded-lg bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 shrink-0">
-                      <Keyboard className="w-3.5 h-3.5" />
-                    </div>
-                  </div>
-                  <div className="flex items-baseline justify-between mt-0.5">
-                    <div className="text-xl font-bold text-indigo-400 font-mono">
-                      {selectedStudent.wpm ?? selectedStudent.avgWpm ?? 0} <span className="text-[10px] font-normal text-slate-400">WPM</span>
-                    </div>
-                    <button
-                      onClick={() => setMetricModal('wpm')}
-                      className="text-[10px] text-indigo-400 hover:text-indigo-300 font-semibold cursor-pointer underline flex items-center gap-0.5"
-                    >
-                      <Info className="w-3 h-3" />
-                      <span>Розрахунок ➔</span>
-                    </button>
-                  </div>
-                </div>
-
-                {/* Metric 3: Copy-Paste Ratio (Course Median & Peak Anomaly) */}
-                <div className="bg-slate-900 border border-slate-800 rounded-xl p-3 flex flex-col justify-between gap-2 shadow-md relative group">
-                  <div className="flex items-start justify-between gap-1">
-                    <div className="flex flex-col">
-                      <span className="text-[10px] font-semibold uppercase text-slate-400 leading-tight">Медіана Copy-Paste (Курс)</span>
-                      {selectedStudent.peakAnomaly?.hasAnomaly && (
-                        <span className="text-[9px] font-bold text-red-400 bg-red-500/10 px-1.5 py-0.5 rounded border border-red-500/30 mt-1 flex items-center gap-1 animate-pulse">
-                          <AlertTriangle className="w-2.5 h-2.5 shrink-0" />
-                          <span>Пік: {selectedStudent.peakAnomaly.peakSkillTitle || selectedStudent.peakAnomaly.peakSkillSlug} ({(selectedStudent.peakAnomaly.copyPasteRatio * 100).toFixed(0)}%)</span>
-                        </span>
-                      )}
-                    </div>
-                    <div className="p-1.5 rounded-lg bg-amber-500/10 text-amber-400 border border-amber-500/20 shrink-0">
-                      <Copy className="w-3.5 h-3.5" />
-                    </div>
-                  </div>
-                  <div className="flex items-baseline justify-between mt-0.5">
-                    <div className="text-xl font-bold text-amber-400 font-mono">
-                      {selectedStudent.copyPasteRatio !== undefined ? `${(selectedStudent.copyPasteRatio * 100).toFixed(0)}%` : '0%'}
-                    </div>
-                    <button
-                      onClick={() => setMetricModal('copypaste')}
-                      className="text-[10px] text-indigo-400 hover:text-indigo-300 font-semibold cursor-pointer underline flex items-center gap-0.5"
-                    >
-                      <Info className="w-3 h-3" />
-                      <span>Аналіз ➔</span>
-                    </button>
-                  </div>
-                </div>
-
-                {/* Metric 4: Fatigue Index (Course Median) */}
-                <div className="bg-slate-900 border border-slate-800 rounded-xl p-3 flex flex-col justify-between gap-2 shadow-md relative group">
-                  <div className="flex items-start justify-between gap-1">
-                    <span className="text-[10px] font-semibold uppercase text-slate-400 leading-tight">Медіана Втоми (Курс)</span>
-                    <div className="p-1.5 rounded-lg bg-purple-500/10 text-purple-400 border border-purple-500/20 shrink-0">
-                      <Activity className="w-3.5 h-3.5" />
-                    </div>
-                  </div>
-                  <div className="flex items-baseline justify-between mt-0.5">
-                    <div className="text-xl font-bold text-purple-400 font-mono">
-                      {selectedStudent.fatigueIndex ?? 0}
-                    </div>
-                    <button
-                      onClick={() => setMetricModal('fatigue')}
-                      className="text-[10px] text-indigo-400 hover:text-indigo-300 font-semibold cursor-pointer underline flex items-center gap-0.5"
-                    >
-                      <Info className="w-3 h-3" />
-                      <span>Пояснення ➔</span>
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              {/* Dynamic Behavioral Telemetry & Anomaly Tree (Teacher Only) */}
-              {selectedStudent.recentAdjustments && selectedStudent.recentAdjustments.length > 0 && (
-                <AnomalyTreeWidget
-                  adjustments={selectedStudent.recentAdjustments}
-                  nodes={studentGraphNodes}
-                  title="Дерево Аномалій та Когнітивних Відхилень"
-                  subtitle="Ієрархічний огляд інцидентів студента за категоріями, навичками та запитаннями"
-                  onNavigateToTask={(taskId, skillSlug) => {
-                    setActiveTab('coursemap');
-                    setIsDrawerOpen(true);
-                    if (skillSlug) setSelectedSkillSlug(skillSlug);
-                    setSelectedTaskId(taskId);
-                  }}
-                />
-              )}
-
-              {/* Compact BKT Skill Mastery Heatmap Table with Per-Module Telemetry */}
-              <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-xl flex flex-col gap-3">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-2">
-                    <BarChart3 className="w-3.5 h-3.5 text-purple-400" />
-                    <span>BKT Mastery Breakdown & Модульна Телеметрія</span>
-                  </h3>
-                  <span className="text-[10px] font-mono text-slate-400 bg-slate-950 px-2 py-0.5 rounded border border-slate-800">
-                    Per-Module Telemetry Level
-                  </span>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
-                  {activeCourse.skillSlugs.map((slug) => {
-                    const masteryMap = selectedStudent.bktBySkill || selectedStudent.skillMastery || {};
-                    const p = masteryMap[slug] ?? 0;
-                    const isMastered = p >= 0.95;
-                    const skillTelemetry = selectedStudent.telemetryBySkill?.[slug];
-                    const isPeakAnomaly = skillTelemetry && skillTelemetry.copyPasteRatio >= 0.60;
-
-                    return (
-                      <div
-                        key={slug}
-                        className={`p-2.5 bg-slate-950 border rounded-lg flex flex-col gap-1.5 transition-all ${
-                          isPeakAnomaly
-                            ? 'border-red-500/60 bg-red-950/20 shadow-md shadow-red-950/30'
-                            : 'border-slate-800/80'
-                        }`}
-                      >
-                        <div className="flex items-center justify-between text-[11px]">
-                          <span className="font-mono text-slate-300 font-bold uppercase truncate flex items-center gap-1">
-                            <span>{slug}</span>
-                            {isPeakAnomaly && (
-                              <span className="text-[8px] font-bold text-red-400 bg-red-500/20 px-1 rounded border border-red-500/30">
-                                ⚠️ Списування
-                              </span>
-                            )}
-                          </span>
-                          <span className={`font-mono font-bold text-xs ${isMastered ? 'text-emerald-400' : 'text-amber-400'}`}>
-                            {(p * 100).toFixed(1)}%
-                          </span>
-                        </div>
-
-                        {/* Progress bar */}
-                        <div className="w-full h-1.5 bg-slate-900 rounded-full overflow-hidden border border-slate-800">
-                          <div
-                            className={`h-full transition-all duration-500 ${isMastered ? 'bg-emerald-400' : 'bg-amber-400'}`}
-                            style={{ width: `${Math.min(100, p * 100)}%` }}
-                          />
-                        </div>
-
-                        {/* Per-Module Telemetry Badge */}
-                        <div className="flex items-center justify-between text-[9px] font-mono text-slate-400 pt-0.5 border-t border-slate-800/50 mt-0.5">
-                          <span>WPM: <strong className="text-slate-200">{skillTelemetry ? skillTelemetry.wpm : 0}</strong></span>
-                          <span>Copy-Paste: <strong className={isPeakAnomaly ? 'text-red-400 font-bold' : 'text-slate-200'}>{skillTelemetry ? `${(skillTelemetry.copyPasteRatio * 100).toFixed(0)}%` : '0%'}</strong></span>
-                        </div>
+                    {/* Metric 1: P(L) Mastery */}
+                    <div className="bg-slate-900/50 border border-slate-800/80 rounded-lg p-3 flex flex-col justify-between gap-2">
+                      <div className="flex items-center justify-between gap-1">
+                        <span className="text-[10px] font-medium uppercase text-slate-400">Середня Майстерність P(L)</span>
+                        <Sparkles className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
                       </div>
-                    );
-                  })}
-                </div>
-              </div>
-            </>
+                      <div className="flex items-baseline justify-between mt-0.5">
+                        <div className="text-xl font-bold text-emerald-400 font-mono">
+                          {selectedStudent.averageMastery !== undefined ? `${(selectedStudent.averageMastery * 100).toFixed(1)}%` : '0.0%'}
+                        </div>
+                        <button
+                          onClick={() => setMetricModal('bkt')}
+                          className="text-[10px] text-slate-400 hover:text-indigo-300 cursor-pointer flex items-center gap-0.5"
+                        >
+                          <Info className="w-3 h-3" />
+                          <span>Формула</span>
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Metric 2: WPM (Course Median) */}
+                    <div className="bg-slate-900/50 border border-slate-800/80 rounded-lg p-3 flex flex-col justify-between gap-2">
+                      <div className="flex items-center justify-between gap-1">
+                        <span className="text-[10px] font-medium uppercase text-slate-400">Медіана WPM (Курс)</span>
+                        <Keyboard className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
+                      </div>
+                      <div className="flex items-baseline justify-between mt-0.5">
+                        <div className="text-xl font-bold text-indigo-400 font-mono">
+                          {selectedStudent.wpm ?? selectedStudent.avgWpm ?? 0} <span className="text-[10px] font-normal text-slate-400">WPM</span>
+                        </div>
+                        <button
+                          onClick={() => setMetricModal('wpm')}
+                          className="text-[10px] text-slate-400 hover:text-indigo-300 cursor-pointer flex items-center gap-0.5"
+                        >
+                          <Info className="w-3 h-3" />
+                          <span>Розрахунок</span>
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Metric 3: Copy-Paste Ratio */}
+                    <div className="bg-slate-900/50 border border-slate-800/80 rounded-lg p-3 flex flex-col justify-between gap-2">
+                      <div className="flex items-start justify-between gap-1">
+                        <div className="flex flex-col">
+                          <span className="text-[10px] font-medium uppercase text-slate-400">Медіана Copy-Paste</span>
+                          {selectedStudent.peakAnomaly?.hasAnomaly && (
+                            <span className="text-[9px] text-red-400 mt-0.5 flex items-center gap-1">
+                              <AlertTriangle className="w-2.5 h-2.5 shrink-0" />
+                              <span>Пік: {selectedStudent.peakAnomaly.peakSkillTitle || selectedStudent.peakAnomaly.peakSkillSlug} ({(selectedStudent.peakAnomaly.copyPasteRatio * 100).toFixed(0)}%)</span>
+                            </span>
+                          )}
+                        </div>
+                        <Copy className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                      </div>
+                      <div className="flex items-baseline justify-between mt-0.5">
+                        <div className="text-xl font-bold text-amber-400 font-mono">
+                          {selectedStudent.copyPasteRatio !== undefined ? `${(selectedStudent.copyPasteRatio * 100).toFixed(0)}%` : '0%'}
+                        </div>
+                        <button
+                          onClick={() => setMetricModal('copypaste')}
+                          className="text-[10px] text-slate-400 hover:text-indigo-300 cursor-pointer flex items-center gap-0.5"
+                        >
+                          <Info className="w-3 h-3" />
+                          <span>Аналіз</span>
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Metric 4: Fatigue Index */}
+                    <div className="bg-slate-900/50 border border-slate-800/80 rounded-lg p-3 flex flex-col justify-between gap-2">
+                      <div className="flex items-center justify-between gap-1">
+                        <span className="text-[10px] font-medium uppercase text-slate-400">Медіана Втоми</span>
+                        <Activity className="w-3.5 h-3.5 text-purple-400 shrink-0" />
+                      </div>
+                      <div className="flex items-baseline justify-between mt-0.5">
+                        <div className="text-xl font-bold text-purple-400 font-mono">
+                          {selectedStudent.fatigueIndex ?? 0}
+                        </div>
+                        <button
+                          onClick={() => setMetricModal('fatigue')}
+                          className="text-[10px] text-slate-400 hover:text-indigo-300 cursor-pointer flex items-center gap-0.5"
+                        >
+                          <Info className="w-3 h-3" />
+                          <span>Пояснення</span>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Dynamic Behavioral Telemetry & Anomaly Tree */}
+                  {selectedStudent.recentAdjustments && selectedStudent.recentAdjustments.length > 0 && (
+                    <AnomalyTreeWidget
+                      adjustments={selectedStudent.recentAdjustments}
+                      nodes={studentGraphNodes}
+                      title="Дерево Аномалій та Когнітивних Відхилень"
+                      subtitle="Ієрархічний огляд інцидентів студента за категоріями, навичками та запитаннями"
+                      onNavigateToTask={(taskId, skillSlug) => {
+                        setActiveTab('coursemap');
+                        setIsDrawerOpen(true);
+                        if (skillSlug) setSelectedSkillSlug(skillSlug);
+                        setSelectedTaskId(taskId);
+                      }}
+                    />
+                  )}
+
+                  {/* Flat BKT Skill Mastery Section (No Heavy Outer Box) */}
+                  <div className="flex flex-col gap-3 pt-2 border-t border-slate-800/80">
+                    <div className="flex items-center justify-between">
+                      <h3 className="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-2">
+                        <BarChart3 className="w-3.5 h-3.5 text-purple-400" />
+                        <span>BKT Mastery Breakdown & Модульна Телеметрія</span>
+                      </h3>
+                      <span className="text-[10px] font-mono text-slate-500">
+                        Per-Module Telemetry Level
+                      </span>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
+                      {activeCourse.skillSlugs.map((slug) => {
+                        const masteryMap = selectedStudent.bktBySkill || selectedStudent.skillMastery || {};
+                        const p = masteryMap[slug] ?? 0;
+                        const isMastered = p >= 0.95;
+                        const skillTelemetry = selectedStudent.telemetryBySkill?.[slug];
+                        const isPeakAnomaly = skillTelemetry && skillTelemetry.copyPasteRatio >= 0.60;
+
+                        return (
+                          <div
+                            key={slug}
+                            className={`p-3 bg-slate-900/40 border rounded-lg flex flex-col gap-1.5 transition-all ${
+                              isPeakAnomaly
+                                ? 'border-red-500/50 bg-red-950/15'
+                                : 'border-slate-800/80'
+                            }`}
+                          >
+                            <div className="flex items-center justify-between text-[11px]">
+                              <span className="font-mono text-slate-200 font-semibold truncate flex items-center gap-1.5">
+                                <span>{slug}</span>
+                                {isPeakAnomaly && (
+                                  <span className="text-[9px] font-medium text-red-400">
+                                    ⚠️ Списування
+                                  </span>
+                                )}
+                              </span>
+                              <span className={`font-mono font-bold text-xs ${isMastered ? 'text-emerald-400' : 'text-amber-400'}`}>
+                                {(p * 100).toFixed(1)}%
+                              </span>
+                            </div>
+
+                            <div className="w-full h-1.5 bg-slate-950 rounded-full overflow-hidden">
+                              <div
+                                className={`h-full transition-all duration-500 ${isMastered ? 'bg-emerald-400' : 'bg-amber-400'}`}
+                                style={{ width: `${Math.min(100, p * 100)}%` }}
+                              />
+                            </div>
+
+                            <div className="flex items-center justify-between text-[10px] font-mono text-slate-400 pt-1">
+                              <span>WPM: <strong className="text-slate-200">{skillTelemetry ? skillTelemetry.wpm : 0}</strong></span>
+                              <span>Copy-Paste: <strong className={isPeakAnomaly ? 'text-red-400 font-bold' : 'text-slate-200'}>{skillTelemetry ? `${(skillTelemetry.copyPasteRatio * 100).toFixed(0)}%` : '0%'}</strong></span>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
           )}
-        </div>
-      )}
 
           {/* Main View 2: Course & Tasks Detail Inspector via Interactive CourseGraphViewer */}
           {activeTab === 'coursemap' && (

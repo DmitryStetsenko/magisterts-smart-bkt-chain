@@ -29,6 +29,23 @@
   4. *Install Monorepo Dependencies* (`npm ci || npm install`) — синхронізація робочих просторів монорепозиторію.
   5. *Build Next.js Documentation Site* (`npm run build:docs`) — збірка статичного експорту (`output: "export"`, `trailingSlash: true`, `basePath: "/magisterts-smart-bkt-chain"`).
   6. *Upload Artifact & Deploy Pages* (`actions/upload-pages-artifact@v3` + `actions/deploy-pages@v4`).
+### 0.1.7.42 Очищення Робочої Області Кабінету Викладача за Принципом Clean Borderless Canvas (SBC-333, EP-TC)
+- **Архітектурна проблема (Nested Boxes Anti-Pattern):**
+  - Внутрішні екрани `apps/teacher` (`CourseGraphViewer`, `StudentAnalytics`, `ReviewQueueInspector`, `MetricsAuditInspector`) мали до 4–5 рівнів вкладених контейнерів із рамками (`border border-slate-800 rounded-3xl/2xl p-6`), великими внутрішніми банерами, що повторювали назву курсу з хедера, та декоративними SVG-кривими.
+- **Виконані інженерні зміни:**
+  1. **[`apps/teacher/src/features/course-map/ui/CourseGraphViewer.tsx`](file:///apps/teacher/src/features/course-map/ui/CourseGraphViewer.tsx):**
+     - Злито навігацію режимів (`full` / `tree` / `triads`), пошук, селектор складності та компактний степпер модулів у плоский верхній тулбар (`border-b border-slate-800/80`).
+     - Видалено дублюючий фіолетовий блок «Навчальна Програма Курсу» та зовнішню картку `rounded-3xl`.
+     - Введено чистий рендер тріад (`renderTriadRow`), де назва теми та підконцепти виводяться у лівій колонці без зайвої рамки, а справа розташовуються 3 лаконічні картки завдань (`EASY`, `MEDIUM`, `HARD`).
+  2. **[`apps/teacher/src/app/page.tsx`](file:///apps/teacher/src/app/page.tsx):**
+     - У вкладці `analytics` замінено масивну картку студента на компактний рядок інструментів, знято зовнішню рамку з секції `BKT Mastery Breakdown`.
+  3. **[`apps/teacher/src/features/reviews/ui/ReviewQueueInspector.tsx`](file:///apps/teacher/src/features/reviews/ui/ReviewQueueInspector.tsx):**
+     - Знято зовнішню обгортку `bg-slate-900 border rounded-2xl p-6`, умову завдання та еталонну відповідь розміщено у чистій двоколонковій сітці з вертикальним розділювачем.
+  4. **[`apps/teacher/src/features/metrics-audit/ui/MetricsAuditInspector.tsx`](file:///apps/teacher/src/features/metrics-audit/ui/MetricsAuditInspector.tsx):**
+     - Прибрано багатоповерховий градієнтний банер та зайві плашки статусу студента, переведено на компактний однорядковий тулбар.
+- **Верифікація:**
+  - `npm run build:teacher` пройдено успішно.
+
 ### 0.1.7.41 Усунення Дублювання Хлібних Крихт у Тілі Сторінок (SBC-332, EP-TC / EP-AD)
 - **Контекст виявлення:**
   - Після винесення хлібних крихт у другий поверх стандартизованого хедера `AppShellLayout` у кабінеті викладача (`apps/teacher`) над карточкою обраного студента залишався старий рудиментарний блок `<Breadcrumbs>`, що дублював відображення `Курс / Когортна аналітика / Студент % P(L)`.

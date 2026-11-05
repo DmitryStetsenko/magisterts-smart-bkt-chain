@@ -27,18 +27,17 @@ export const ReviewQueueInspector: React.FC<ReviewQueueInspectorProps> = ({
 }) => {
   const [selectedAttemptIndex, setSelectedAttemptIndex] = React.useState<number | null>(null);
 
-  // Reset selected attempt index when current review changes
   React.useEffect(() => {
     setSelectedAttemptIndex(null);
   }, [currentReview?.submissionId]);
 
   if (!currentReview) {
     return (
-      <div className="bg-slate-900 border border-slate-800 rounded-2xl p-12 text-center text-slate-400 flex flex-col items-center justify-center gap-3">
-        <div className="w-12 h-12 rounded-full bg-slate-800 flex items-center justify-center text-slate-400 font-bold text-lg">
+      <div className="py-16 text-center text-slate-400 flex flex-col items-center justify-center gap-2">
+        <div className="w-10 h-10 rounded-full bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-400 font-bold text-base">
           ✓
         </div>
-        <h3 className="text-base font-bold text-slate-300">Усі відкриті відповіді перевірено</h3>
+        <h3 className="text-sm font-bold text-slate-300">Усі відкриті відповіді перевірено</h3>
         <p className="text-xs text-slate-500 max-w-md">
           Наразі немає робіт, які очікують верифікації викладачем або потрапили у сіру зону автоматичного оцінювання.
         </p>
@@ -61,12 +60,12 @@ export const ReviewQueueInspector: React.FC<ReviewQueueInspectorProps> = ({
   const keywords = Array.isArray(currentReview.rubrics?.keywords) ? currentReview.rubrics.keywords : [];
 
   return (
-    <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl flex flex-col gap-6">
-      {/* Header */}
-      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-800 pb-4">
+    <div className="flex flex-col gap-5">
+      {/* Header Toolbar */}
+      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-800/80 pb-3.5">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <span className={`text-[10px] font-mono uppercase px-2 py-0.5 rounded border font-bold ${
+            <span className={`text-[10px] font-mono uppercase px-2 py-0.5 rounded border font-semibold ${
               currentReview.teacherReviewStatus === 'APPROVED'
                 ? 'bg-emerald-500/10 text-emerald-300 border-emerald-500/30'
                 : currentReview.teacherReviewStatus === 'REJECTED'
@@ -79,13 +78,13 @@ export const ReviewQueueInspector: React.FC<ReviewQueueInspectorProps> = ({
                 ? '✕ Відхилено'
                 : '⏳ Очікує верифікації'}
             </span>
-            <span className="text-[10px] font-mono text-slate-400">
+            <span className="text-[10px] font-mono text-slate-500">
               Здано: {new Date(currentReview.submittedAt).toLocaleString()}
             </span>
           </div>
-          <h2 className="text-xl font-bold text-white">{currentReview.taskTitle}</h2>
+          <h2 className="text-base font-bold text-white">{currentReview.taskTitle}</h2>
           <p className="text-xs text-slate-400 mt-0.5">
-            Студент: <strong className="text-purple-300">{currentReview.studentName}</strong> ({currentReview.studentEmail}) • Модуль: <strong className="text-indigo-300">{currentReview.skillTitle}</strong>
+            Студент: <span className="text-slate-200 font-medium">{currentReview.studentName}</span> ({currentReview.studentEmail}) · Модуль: <span className="text-purple-300 font-medium">{currentReview.skillTitle}</span>
           </p>
         </div>
 
@@ -93,30 +92,30 @@ export const ReviewQueueInspector: React.FC<ReviewQueueInspectorProps> = ({
           <button
             onClick={() => onDecision('REJECT')}
             disabled={isSubmitting}
-            className="px-4 py-2 rounded-xl bg-rose-950/60 text-rose-300 border border-rose-500/30 hover:bg-rose-900/60 font-bold text-xs transition-all cursor-pointer disabled:opacity-50"
+            className="px-3.5 py-1.5 rounded-lg bg-rose-500/10 text-rose-300 border border-rose-500/25 hover:bg-rose-500/20 font-medium text-xs transition-all cursor-pointer disabled:opacity-50"
           >
-            ✕ Відхилити відповідь
+            ✕ Відхилити
           </button>
           <button
             onClick={() => onDecision('APPROVE')}
             disabled={isSubmitting}
-            className="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-lg shadow-emerald-600/30 transition-all cursor-pointer disabled:opacity-50 flex items-center gap-1.5"
+            className="px-4 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-medium text-xs transition-all cursor-pointer disabled:opacity-50 flex items-center gap-1.5"
           >
             <span>✓ Затвердити відповідь</span>
           </button>
         </div>
       </div>
 
-      {/* Task Description & Reference Answer */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <div className="flex flex-col gap-2 p-4 bg-slate-950/80 border border-slate-800 rounded-xl">
-          <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Умова завдання:</span>
+      {/* Task Description & Reference Answer (Clean Two-Column Layout) */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 pb-4 border-b border-slate-800/80">
+        <div className="flex flex-col gap-1.5">
+          <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Умова завдання</span>
           <p className="text-xs text-slate-200 leading-relaxed">{currentReview.taskDescription}</p>
         </div>
 
-        <div className="flex flex-col gap-2 p-4 bg-indigo-950/20 border border-indigo-500/20 rounded-xl">
-          <span className="text-xs font-semibold text-indigo-300 uppercase tracking-wider">Еталонне пояснення (Reference Answer):</span>
-          <p className="text-xs text-indigo-100 leading-relaxed font-sans">
+        <div className="flex flex-col gap-1.5 lg:pl-4 lg:border-l lg:border-slate-800/80">
+          <span className="text-[11px] font-semibold text-indigo-300 uppercase tracking-wider">Еталонне пояснення (Reference Answer)</span>
+          <p className="text-xs text-slate-300 leading-relaxed font-sans">
             {currentReview.referenceAnswer || 'Еталонна відповідь не задана для даного завдання.'}
           </p>
         </div>
@@ -124,18 +123,11 @@ export const ReviewQueueInspector: React.FC<ReviewQueueInspectorProps> = ({
 
       {/* Attempts History Version Tabs */}
       {history.length > 1 && (
-        <div className="flex flex-col gap-2 p-3 bg-slate-950/70 border border-slate-800 rounded-xl">
-          <div className="flex items-center justify-between text-xs">
-            <span className="font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
-              <span>🕒 Історія спроб студента:</span>
-              <span className="font-mono text-purple-300">({history.length} версій)</span>
+        <div className="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-slate-800/80">
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mr-1">
+              Історія спроб ({history.length}):
             </span>
-            <span className="text-[11px] text-slate-500">
-              Попередні спроби автоматично архівовано (Superseded)
-            </span>
-          </div>
-
-          <div className="flex flex-wrap gap-2 pt-1">
             {history.map((att, idx) => {
               const isSelected =
                 selectedAttemptIndex === idx ||
@@ -147,29 +139,28 @@ export const ReviewQueueInspector: React.FC<ReviewQueueInspectorProps> = ({
                 <button
                   key={att.id}
                   onClick={() => setSelectedAttemptIndex(idx)}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-mono transition-all flex items-center gap-2 cursor-pointer ${
+                  className={`px-2.5 py-1 rounded-md text-xs font-mono transition-all flex items-center gap-1.5 cursor-pointer ${
                     isSelected
-                      ? 'bg-purple-600 text-white shadow-md shadow-purple-600/30 border border-purple-400 font-bold'
-                      : 'bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800'
+                      ? 'bg-purple-600/20 text-purple-300 border border-purple-500/40 font-semibold'
+                      : 'bg-slate-900/60 hover:bg-slate-800 text-slate-400 border border-slate-800/80'
                   }`}
                 >
                   <span>
-                    Спроба {att.attemptNumber || idx + 1}
-                    {idx === history.length - 1 ? ' • Остання' : ''}
+                    Спроба #{att.attemptNumber || idx + 1}
                   </span>
                   <span
-                    className={`text-[9px] px-1 rounded uppercase font-bold ${
+                    className={`text-[9px] px-1 rounded uppercase ${
                       att.teacherReviewStatus === 'PENDING_REVIEW'
-                        ? 'bg-amber-400/20 text-amber-300'
+                        ? 'text-amber-300'
                         : isSuperseded
-                        ? 'bg-slate-800 text-slate-400'
-                        : 'bg-emerald-400/20 text-emerald-300'
+                        ? 'text-slate-500'
+                        : 'text-emerald-300'
                     }`}
                   >
                     {att.teacherReviewStatus === 'PENDING_REVIEW'
                       ? 'В черзі'
                       : isSuperseded
-                      ? 'Superseded'
+                      ? 'Архів'
                       : att.teacherReviewStatus}
                   </span>
                 </button>
@@ -181,26 +172,26 @@ export const ReviewQueueInspector: React.FC<ReviewQueueInspectorProps> = ({
 
       {/* Student's Answer */}
       <div className="flex flex-col gap-2">
-        <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider flex items-center justify-between">
+        <div className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <span>Письмова відповідь студента:</span>
-            <span className="px-2 py-0.5 rounded bg-indigo-500/10 border border-indigo-500/20 text-indigo-300 text-[11px] font-mono font-bold">
-              Спроба #{displayedAttemptNumber}
+            <span>Письмова відповідь студента</span>
+            <span className="text-purple-300 font-mono">
+              (Спроба #{displayedAttemptNumber})
             </span>
             {isViewingHistoricalAttempt && (
-              <span className="px-2 py-0.5 rounded bg-slate-800 text-slate-400 text-[10px] font-mono">
-                ⚠️ Перегляд попередньої версії (архів)
+              <span className="text-amber-400 text-[10px] font-mono normal-case">
+                · Перегляд архівної версії
               </span>
             )}
           </div>
-          <span className="text-[11px] font-mono text-slate-400">
-            Кількість слів: {wordCount} • Час: {new Date(displayedSubmittedAt).toLocaleTimeString()}
+          <span className="text-[11px] font-mono text-slate-500 normal-case">
+            {wordCount} слів · {new Date(displayedSubmittedAt).toLocaleTimeString()}
           </span>
         </div>
-        <div className={`p-4 rounded-xl text-slate-100 text-xs font-sans leading-relaxed whitespace-pre-wrap ${
+        <div className={`p-3.5 rounded-lg text-slate-100 text-xs font-sans leading-relaxed whitespace-pre-wrap ${
           isViewingHistoricalAttempt
-            ? 'bg-slate-950/60 border border-purple-500/30'
-            : 'bg-slate-950 border border-slate-800'
+            ? 'bg-slate-900/40 border border-purple-500/30'
+            : 'bg-slate-900/50 border border-slate-800/80'
         }`}>
           {displayedAnswer}
         </div>
@@ -208,34 +199,32 @@ export const ReviewQueueInspector: React.FC<ReviewQueueInspectorProps> = ({
 
       {/* Rubrics & Keywords Breakdown */}
       {keywords.length > 0 && (
-        <div className="p-4 bg-slate-950/60 border border-slate-800 rounded-xl flex flex-col gap-2">
-          <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Критерії оцінювання (Rubrics):</span>
-          <div className="flex flex-wrap items-center gap-2">
-            {keywords.map((kw: string, idx: number) => {
-              const kwLabel = String(kw).split('|')[0];
-              return (
-                <span key={idx} className="px-2 py-0.5 rounded bg-slate-900 border border-slate-700 text-slate-300 text-xs font-mono">
-                  🔑 {kwLabel}
-                </span>
-              );
-            })}
-          </div>
+        <div className="flex flex-wrap items-center gap-1.5">
+          <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mr-1">Критерії (Rubrics):</span>
+          {keywords.map((kw: string, idx: number) => {
+            const kwLabel = String(kw).split('|')[0];
+            return (
+              <span key={idx} className="px-2 py-0.5 rounded bg-slate-900/80 border border-slate-800 text-slate-300 text-[11px] font-mono">
+                {kwLabel}
+              </span>
+            );
+          })}
         </div>
       )}
 
       {/* Teacher Feedback & Score Override Form */}
-      <div className="p-4 bg-purple-950/20 border border-purple-500/30 rounded-xl flex flex-col gap-3">
-        <span className="text-xs font-bold text-purple-300 uppercase tracking-wider">
-          Рішення та Відгук Викладача:
+      <div className="pt-3 border-t border-slate-800/80 flex flex-col gap-2.5">
+        <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
+          Рішення та Відгук Викладача
         </span>
-        <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-4 gap-2.5">
           <div className="sm:col-span-3">
             <input
               type="text"
               placeholder="Коментар для студента (пояснення оцінки, зауваження або порада)..."
               value={reviewComment}
               onChange={(e) => setReviewComment(e.target.value)}
-              className="w-full p-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-slate-200 focus:outline-none focus:border-purple-500"
+              className="w-full px-3 py-2 bg-slate-900/60 border border-slate-800 rounded-lg text-xs text-slate-200 focus:outline-none focus:border-purple-500"
             />
           </div>
           <div>
@@ -247,7 +236,7 @@ export const ReviewQueueInspector: React.FC<ReviewQueueInspectorProps> = ({
               placeholder="Бал (0.0..1.0, опціонально)"
               value={reviewScoreOverride}
               onChange={(e) => setReviewScoreOverride(e.target.value === '' ? '' : Number(e.target.value))}
-              className="w-full p-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-slate-200 font-mono focus:outline-none focus:border-purple-500"
+              className="w-full px-3 py-2 bg-slate-900/60 border border-slate-800 rounded-lg text-xs text-slate-200 font-mono focus:outline-none focus:border-purple-500"
             />
           </div>
         </div>
