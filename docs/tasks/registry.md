@@ -156,7 +156,8 @@
 | **SBC-315** | `Story` | `SH` | construct canonical FSD shared UI kit with Button, Modal, Badge, Tooltip and Select in @sbc/ui | 2026-11-02 | `backlog` |
 | **SBC-330** | `Story` | `SH` | create reusable UserProfileDrawer in @sbc/ui and integrate across all apps | 2026-11-04 | `c1d4c3e` |
 | **SBC-334** | `Style` | `SH` | refine navigation rail and side drawers into minimalist borderless style | 2026-11-05 | `3d83ece` |
-| **SBC-335** | `Style` | `SH` | refine AppShellLayout header, breadcrumbs badges and right-slot triggers into minimalist borderless style | 2026-11-05 | `pending` |
+| **SBC-335** | `Style` | `SH` | refine AppShellLayout header, breadcrumbs badges and right-slot triggers into minimalist borderless style | 2026-11-05 | `daed737` |
+| **SBC-336** | `Style` | `SH` | scale minimalist borderless design to student, study and admin portals and update Rule 7 in AGENTS.md | 2026-11-05 | `pending` |
 
 ---
 

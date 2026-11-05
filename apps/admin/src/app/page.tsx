@@ -208,20 +208,22 @@ export default function AdminCMSDashboard() {
         onSettingsClick: () => handleTabClick('system'),
         isSettingsActive: activeTab === 'system',
       }}
-      mainClassName="p-4 lg:p-6 overflow-y-auto flex flex-col gap-4 bg-slate-950"
+      mainClassName="p-4 lg:p-6 overflow-y-auto flex flex-col gap-6 bg-slate-950"
     >
 
-      <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl min-h-[400px]">
+      <div className="flex flex-col gap-6 min-h-[400px]">
         {activeTab === 'dag' && (
-          <div className="flex flex-col gap-6">
-            <div>
-              <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                <Network className="w-5 h-5 text-emerald-400" />
-                <span>Конструктор Графа Навичок (Skill DAG Editor)</span>
-              </h3>
-              <p className="text-xs text-slate-400 mt-1">
-                Налаштування початкових BKT-параметрів ($P(L_0), P(T), P(S), P(G)$) та управління вузлами графа
-              </p>
+          <div className="flex flex-col gap-4">
+            <div className="pb-3 border-b border-slate-800/80 flex items-center justify-between">
+              <div>
+                <h3 className="text-sm font-bold text-white flex items-center gap-2">
+                  <Network className="w-4 h-4 text-emerald-400" />
+                  <span>Конструктор Графа Навичок (Skill DAG Editor)</span>
+                </h3>
+                <p className="text-xs text-slate-400 mt-0.5">
+                  Налаштування початкових BKT-параметрів ($P(L_0), P(T), P(S), P(G)$) та управління вузлами графа
+                </p>
+              </div>
             </div>
 
             <SkillDagEditor
@@ -236,13 +238,15 @@ export default function AdminCMSDashboard() {
 
         {activeTab === 'system' && (
           <div className="flex flex-col gap-4">
-            <h3 className="text-lg font-bold text-white flex items-center gap-2">
-              <Settings className="w-5 h-5 text-purple-400" />
-              <span>Конфігурація Релейєра Web3 & Смарт-Контрактів</span>
-            </h3>
-            <p className="text-xs text-slate-400">
-              Статус підключення Hardhat/Foundry, гаманців релейєра для Gasless SBT мінтингу.
-            </p>
+            <div className="pb-3 border-b border-slate-800/80">
+              <h3 className="text-sm font-bold text-white flex items-center gap-2">
+                <Settings className="w-4 h-4 text-purple-400" />
+                <span>Конфігурація Релейєра Web3 & Смарт-Контрактів</span>
+              </h3>
+              <p className="text-xs text-slate-400 mt-0.5">
+                Статус підключення Hardhat/Foundry, гаманців релейєра для Gasless SBT мінтингу.
+              </p>
+            </div>
           </div>
         )}
       </div>

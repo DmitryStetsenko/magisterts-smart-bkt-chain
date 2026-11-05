@@ -120,6 +120,59 @@
           ]
         },
         {
+          "title": "0.1.7.45 Уніфікація Minimalist Borderless UI в Порталах Студента, Підручника, Адміна та Регламенті `.agents/AGENTS.md` (SBC-336, EP-SH / EP-ST / EP-AD)",
+          "level": 3,
+          "paragraphs": [],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "**Виконані інженерні зміни:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**[`apps/student/src/components/StudentPortalApp.tsx`](file:///apps/student/src/components/StudentPortalApp.tsx) та [`apps/student/src/components/StudentProgressPill.tsx`](file:///apps/student/src/components/StudentProgressPill.tsx):**",
+              "subitems": [
+                "Очищено всі секції бічної панелі (`condition`, `history`, `tree`, `settings`) від вкладених рамок `bg-slate-950/70 border border-slate-800 rounded-xl`; списки тест-кейсів, підказок Сократа та спроб переведено на `divide-y divide-slate-800/50`.",
+                "Важкий HUD-банер над редактором замінено на компактний безрамковий тулбар `pb-3 border-b border-slate-800/80`.",
+                "Внутрішні секції поповера `StudentProgressPill` переведено з окремих карток на чистий стек `divide-y divide-slate-800/60`."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**[`apps/study/src/components/StudyAppClient.tsx`](file:///apps/study/src/components/StudyAppClient.tsx):**",
+              "subitems": [
+                "Видалено дублюючий рендер `<Breadcrumbs>` у тілі уроку; елементи модулів та уроків у сайдбарі переведено з карток із рамками на чисті рядки з `divide-y divide-slate-800/50`."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**[`apps/admin/src/app/page.tsx`](file:///apps/admin/src/app/page.tsx):**",
+              "subitems": [
+                "Знято зовнішню картку-обгортку `bg-slate-900 border border-slate-800 rounded-2xl p-6` навколо робочої області конструктора графа та управління курсами."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**[`.agents/AGENTS.md`](file:///.agents/AGENTS.md):**",
+              "subitems": [
+                "Офіційно закріплено параметри Minimalist Borderless Design у Правилі 7 (висота хедера `h-[56px]`, рейка `w-12`, бейджі `({badge})` без рамок, `divide-y` замість вкладених коробок)."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Верифікація:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Збірки `build:student`, `build:study`, `build:admin` пройдені успішно.",
+              "subitems": []
+            }
+          ]
+        },
+        {
           "title": "0.1.7.44 Мінімалістичний Безрамковий Редизайн Хедера Платформи та Breadcrumbs (SBC-335, EP-SH / EP-TC / EP-ST / EP-AD)",
           "level": 3,
           "paragraphs": [],

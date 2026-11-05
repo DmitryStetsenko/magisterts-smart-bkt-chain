@@ -349,7 +349,7 @@ export function StudyAppClient({
                         badgeColor="indigo"
                         defaultOpen={true}
                       >
-                        <div className="flex flex-col gap-1">
+                        <div className="flex flex-col divide-y divide-slate-800/50">
                           {SCHOOL_WEB_CURRICULUM.modules.map((mod) => {
                             const isUnlocked = unlockedModules[mod.moduleSlug] ?? false;
                             const masteryScore = moduleMasteryScores[mod.moduleSlug] ?? 0;
@@ -364,24 +364,24 @@ export function StudyAppClient({
                                     handleSelectUnit(mod.moduleSlug, mod.units[0].slug);
                                   }
                                 }}
-                                className={`w-full text-left p-2.5 rounded-xl border text-xs transition-all flex flex-col gap-1.5 cursor-pointer relative ${
+                                className={`w-full text-left py-2.5 px-2 rounded-lg text-xs transition-colors flex flex-col gap-1 cursor-pointer relative ${
                                   isCurrent
-                                    ? 'bg-blue-600/15 border-blue-500/40 text-blue-200'
-                                    : 'bg-slate-800/40 border-slate-800 hover:bg-slate-800/80 text-slate-400 hover:text-slate-200'
+                                    ? 'bg-blue-500/10 text-blue-200'
+                                    : 'hover:bg-slate-800/50 text-slate-400 hover:text-slate-200'
                                 }`}
                               >
                                 <div className="flex items-center justify-between">
-                                  <span className="font-mono text-[10px] text-slate-400">
+                                  <span className="font-mono text-[10px] text-slate-500">
                                     Модуль {mod.moduleNumber}
                                   </span>
                                   <div className="flex items-center gap-1.5">
                                     {isUnlocked ? (
-                                      <span className="flex items-center gap-1 text-[10px] font-mono font-bold text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20">
+                                      <span className="flex items-center gap-1 text-[10px] font-mono font-bold text-emerald-400">
                                         <Unlock className="w-2.5 h-2.5" />
                                         <span>{masteryScore}%</span>
                                       </span>
                                     ) : (
-                                      <span className="flex items-center gap-1 text-[10px] font-mono text-amber-400/90 bg-amber-500/10 px-1.5 py-0.5 rounded border border-amber-500/20" title="Потрібно опанувати попередній модуль у тренажері (BKT ≥ 85%)">
+                                      <span className="flex items-center gap-1 text-[10px] font-mono text-amber-400/90" title="Потрібно опанувати попередній модуль у тренажері (BKT ≥ 85%)">
                                         <Lock className="w-2.5 h-2.5" />
                                         <span>Заблоковано</span>
                                       </span>
@@ -405,26 +405,26 @@ export function StudyAppClient({
                         badgeColor="emerald"
                         defaultOpen={true}
                       >
-                        <div className="flex flex-col gap-1">
+                        <div className="flex flex-col divide-y divide-slate-800/50">
                           {currentModule.units.map((unit, idx) => {
                             const isCurrentUnit = unit.slug === selectedUnitSlug;
                             return (
                               <button
                                 key={unit.slug}
                                 onClick={() => handleSelectUnit(currentModule.moduleSlug, unit.slug)}
-                                className={`w-full text-left p-2 rounded-xl text-xs transition-all flex items-center justify-between cursor-pointer ${
+                                className={`w-full text-left py-2 px-2 rounded-lg text-xs transition-colors flex items-center justify-between cursor-pointer ${
                                   isCurrentUnit
-                                    ? 'bg-emerald-600/20 text-emerald-200 border border-emerald-500/40 font-semibold'
-                                    : 'hover:bg-slate-800/60 text-slate-300 hover:text-white'
+                                    ? 'bg-emerald-500/10 text-emerald-200 font-semibold'
+                                    : 'hover:bg-slate-800/50 text-slate-300 hover:text-white'
                                 }`}
                               >
                                 <div className="flex items-center gap-2 overflow-hidden pr-2">
-                                  <span className="w-5 h-5 rounded-md bg-slate-800 text-slate-400 flex items-center justify-center text-[10px] font-mono shrink-0">
-                                    {idx + 1}
+                                  <span className="w-4 text-[10px] font-mono text-slate-500 shrink-0">
+                                    {idx + 1}.
                                   </span>
                                   <span className="truncate">{unit.title}</span>
                                 </div>
-                                <span className="text-[10px] font-mono text-slate-400 shrink-0">
+                                <span className="text-[10px] font-mono text-slate-500 shrink-0">
                                   {unit.estimatedMinutes} хв
                                 </span>
                               </button>
@@ -500,27 +500,8 @@ console.log(greeting, "Номер спроби:", counter);`}
     >
           <div className={`w-full ${maxWidthClasses[activeMaxWidth]} flex flex-col gap-8`}>
             
-            {/* Хлібні крихти та метаінформація уроку */}
-            <div className="flex flex-col gap-2.5 border-b pb-4 opacity-90">
-              <Breadcrumbs
-                className="text-[11px]"
-                items={[
-                  {
-                    label: SCHOOL_WEB_CURRICULUM.courseTitle,
-                    onClick: () => handleSelectUnit(SCHOOL_WEB_CURRICULUM.modules[0].moduleSlug, SCHOOL_WEB_CURRICULUM.modules[0].units[0].slug),
-                  },
-                  {
-                    label: `Модуль ${currentModule.moduleNumber}`,
-                    onClick: () => handleSelectUnit(currentModule.moduleSlug, currentModule.units[0].slug),
-                  },
-                  {
-                    label: currentUnit.title,
-                    badge: currentUnit.gradeLevel,
-                    isCurrent: true,
-                  },
-                ]}
-              />
-
+            {/* Заголовок та метаінформація уроку */}
+            <div className="flex flex-col gap-2 border-b border-slate-800/80 pb-4">
               <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
                 {currentUnit.title}
               </h1>

@@ -29,6 +29,21 @@
   4. *Install Monorepo Dependencies* (`npm ci || npm install`) — синхронізація робочих просторів монорепозиторію.
   5. *Build Next.js Documentation Site* (`npm run build:docs`) — збірка статичного експорту (`output: "export"`, `trailingSlash: true`, `basePath: "/magisterts-smart-bkt-chain"`).
   6. *Upload Artifact & Deploy Pages* (`actions/upload-pages-artifact@v3` + `actions/deploy-pages@v4`).
+### 0.1.7.45 Уніфікація Minimalist Borderless UI в Порталах Студента, Підручника, Адміна та Регламенті `.agents/AGENTS.md` (SBC-336, EP-SH / EP-ST / EP-AD)
+- **Виконані інженерні зміни:**
+  1. **[`apps/student/src/components/StudentPortalApp.tsx`](file:///apps/student/src/components/StudentPortalApp.tsx) та [`apps/student/src/components/StudentProgressPill.tsx`](file:///apps/student/src/components/StudentProgressPill.tsx):**
+     - Очищено всі секції бічної панелі (`condition`, `history`, `tree`, `settings`) від вкладених рамок `bg-slate-950/70 border border-slate-800 rounded-xl`; списки тест-кейсів, підказок Сократа та спроб переведено на `divide-y divide-slate-800/50`.
+     - Важкий HUD-банер над редактором замінено на компактний безрамковий тулбар `pb-3 border-b border-slate-800/80`.
+     - Внутрішні секції поповера `StudentProgressPill` переведено з окремих карток на чистий стек `divide-y divide-slate-800/60`.
+  2. **[`apps/study/src/components/StudyAppClient.tsx`](file:///apps/study/src/components/StudyAppClient.tsx):**
+     - Видалено дублюючий рендер `<Breadcrumbs>` у тілі уроку; елементи модулів та уроків у сайдбарі переведено з карток із рамками на чисті рядки з `divide-y divide-slate-800/50`.
+  3. **[`apps/admin/src/app/page.tsx`](file:///apps/admin/src/app/page.tsx):**
+     - Знято зовнішню картку-обгортку `bg-slate-900 border border-slate-800 rounded-2xl p-6` навколо робочої області конструктора графа та управління курсами.
+  4. **[`.agents/AGENTS.md`](file:///.agents/AGENTS.md):**
+     - Офіційно закріплено параметри Minimalist Borderless Design у Правилі 7 (висота хедера `h-[56px]`, рейка `w-12`, бейджі `({badge})` без рамок, `divide-y` замість вкладених коробок).
+- **Верифікація:**
+  - Збірки `build:student`, `build:study`, `build:admin` пройдені успішно.
+
 ### 0.1.7.44 Мінімалістичний Безрамковий Редизайн Хедера Платформи та Breadcrumbs (SBC-335, EP-SH / EP-TC / EP-ST / EP-AD)
 - **Архітектурна концепція:**
   - Завершення цілісної візуальної трансформації інтерфейсу шляхом очищення шапки (`AppShellLayout` header), хлібних крихт (`Breadcrumbs`) та правих контролів (`rightSlot`) від вкладених рамок і важких капсул.

@@ -446,13 +446,13 @@ export function StudentPortalContent({
               {activeTab === 'task' && task && (
                 <div className="flex flex-col gap-3 flex-1">
                   {/* Sub-tab navigation: Condition vs History */}
-                  <div className="bg-slate-950 p-1 rounded-xl border border-slate-800 flex items-center gap-1 shadow-inner">
+                  <div className="bg-slate-800/60 p-0.5 rounded-lg flex items-center gap-0.5">
                     <button
                       onClick={() => setTaskDrawerSubTab('condition')}
-                      className={`flex-1 py-1.5 px-3 rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
+                      className={`flex-1 py-1.5 px-2.5 rounded-md text-xs font-medium flex items-center justify-center gap-1.5 transition-colors cursor-pointer ${
                         taskDrawerSubTab === 'condition'
-                          ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30'
-                          : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                          ? 'bg-indigo-600 text-white'
+                          : 'text-slate-400 hover:text-white'
                       }`}
                     >
                       <BookOpen className="w-3.5 h-3.5" />
@@ -460,21 +460,21 @@ export function StudentPortalContent({
                     </button>
                     <button
                       onClick={() => setTaskDrawerSubTab('history')}
-                      className={`flex-1 py-1.5 px-3 rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer relative ${
+                      className={`flex-1 py-1.5 px-2.5 rounded-md text-xs font-medium flex items-center justify-center gap-1.5 transition-colors cursor-pointer relative ${
                         taskDrawerSubTab === 'history'
-                          ? 'bg-purple-600 text-white shadow-md shadow-purple-600/30'
-                          : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                          ? 'bg-purple-600 text-white'
+                          : 'text-slate-400 hover:text-white'
                       }`}
                     >
                       <History className="w-3.5 h-3.5" />
                       <span>Історія спроб</span>
                       {taskSubmissions.length > 0 && (
-                        <span className={`px-1.5 py-0.2 rounded-full text-[9px] font-mono font-bold ${
+                        <span className={`text-[10px] font-mono ${
                           taskSubmissions.some((s) => s.teacherComment)
-                            ? 'bg-amber-400 text-slate-950 animate-pulse'
-                            : 'bg-slate-800 text-slate-300'
+                            ? 'text-amber-300 font-bold'
+                            : 'text-slate-300'
                         }`}>
-                          {taskSubmissions.length}
+                          ({taskSubmissions.length})
                         </span>
                       )}
                     </button>
@@ -489,12 +489,11 @@ export function StudentPortalContent({
                         iconColor="text-indigo-400"
                         titleColor="text-indigo-400 group-hover:text-indigo-300"
                         badge={`${Math.round(activeSkillMasteryPct)}%`}
-                        badgeColor={activeSkillMasteryPct >= 90 ? 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30' : 'bg-indigo-500/15 text-indigo-300 border-indigo-500/30'}
                         defaultOpen={true}
                       >
-                        <div className="flex flex-col gap-2 p-3 bg-slate-950/80 rounded-xl border border-slate-800 shadow-inner">
+                        <div className="flex flex-col gap-2 py-1">
                           <div className="flex items-center justify-between">
-                            <span className="px-2.5 py-0.5 rounded-full text-[11px] font-mono font-bold uppercase tracking-wider bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
+                            <span className="text-xs font-mono font-bold text-indigo-400">
                               {task.skill?.title || 'Навичка'}
                             </span>
                             <div className="flex items-center gap-2">
@@ -503,7 +502,7 @@ export function StudentPortalContent({
                                   <button
                                     type="button"
                                     onClick={() => setIsDegradationTooltipOpen((prev) => !prev)}
-                                    className="p-1 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 flex items-center justify-center transition-all cursor-pointer shadow-sm group hover:scale-105 active:scale-95"
+                                    className="p-1 rounded-md bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 flex items-center justify-center transition-colors cursor-pointer group"
                                     title="Адаптивне допоміжне завдання (натисніть для деталей)"
                                     aria-label="Пояснення допоміжного рівня"
                                   >
@@ -516,13 +515,13 @@ export function StudentPortalContent({
                                         className="fixed inset-0 z-40"
                                         onClick={() => setIsDegradationTooltipOpen(false)}
                                       />
-                                      <div className="absolute right-0 top-full mt-2 w-72 p-3 bg-slate-900/95 border border-amber-500/40 rounded-xl shadow-2xl z-50 animate-fadeIn backdrop-blur-md">
-                                        <div className="flex items-center justify-between gap-2 pb-2 mb-2 border-b border-amber-500/20 text-amber-300 font-bold text-xs">
+                                      <div className="absolute right-0 top-full mt-2 w-72 p-3 bg-slate-900 border border-slate-800 rounded-xl shadow-2xl z-50 animate-fadeIn">
+                                        <div className="flex items-center justify-between gap-2 pb-2 mb-2 border-b border-slate-800 text-amber-300 font-bold text-xs">
                                           <div className="flex items-center gap-1.5">
                                             <AlertCircle className="w-3.5 h-3.5 text-amber-400" />
                                             <span>Допоміжне завдання</span>
                                           </div>
-                                          <span className="text-[10px] px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-200 border border-amber-500/30 font-mono">
+                                          <span className="text-[10px] text-amber-400 font-mono">
                                             Ліміт: {recommendation?.maxScoreCap ?? 70}%
                                           </span>
                                         </div>
@@ -543,12 +542,12 @@ export function StudentPortalContent({
                               </span>
                             </div>
                           </div>
-                          <div className="w-full h-1.5 bg-slate-900 rounded-full overflow-hidden border border-slate-800">
+                          <div className="w-full h-1.5 bg-slate-800 rounded-full overflow-hidden">
                             <div
                               className={`h-full rounded-full transition-all duration-500 ${
                                 activeSkillMasteryPct >= 90
                                   ? 'bg-emerald-400'
-                                  : 'bg-gradient-to-r from-indigo-500 to-purple-500'
+                                  : 'bg-indigo-500'
                               }`}
                               style={{ width: `${Math.min(100, activeSkillMasteryPct)}%` }}
                             />
@@ -565,8 +564,8 @@ export function StudentPortalContent({
                         defaultOpen={true}
                         className="border-t border-slate-800/80 pt-2.5"
                       >
-                        <div className="p-3 bg-slate-950/70 border border-slate-800/80 rounded-xl flex flex-col gap-2">
-                          <h3 className="text-sm font-bold text-white">{task.title}</h3>
+                        <div className="flex flex-col gap-1.5 py-1">
+                          <h3 className="text-xs font-bold text-white">{task.title}</h3>
                           <p className="text-xs text-slate-300 leading-relaxed">{task.description}</p>
                         </div>
                       </DrawerSection>
@@ -581,10 +580,10 @@ export function StudentPortalContent({
                           defaultOpen={true}
                           className="border-t border-slate-800/80 pt-2.5"
                         >
-                          <div className="p-3 bg-indigo-950/30 border border-indigo-500/30 rounded-xl flex items-start gap-2.5">
-                            <Sparkles className="w-4 h-4 text-indigo-400 shrink-0 mt-0.5" />
-                            <div className="text-[11px] text-indigo-200">
-                              <span className="font-bold text-indigo-300 block mb-0.5">Логіка підбору:</span>
+                          <div className="py-1 flex items-start gap-2">
+                            <Sparkles className="w-3.5 h-3.5 text-indigo-400 shrink-0 mt-0.5" />
+                            <div className="text-[11px] text-slate-300 leading-relaxed">
+                              <span className="font-semibold text-indigo-300">Логіка підбору: </span>
                               {recommendation.reason || 'Завдання обрано відповідно до вашого рівня засвоєння.'}
                             </div>
                           </div>
@@ -599,15 +598,14 @@ export function StudentPortalContent({
                           iconColor="text-emerald-400"
                           titleColor="text-emerald-400 group-hover:text-emerald-300"
                           badge={task.testCases?.length || 0}
-                          badgeColor="bg-emerald-500/10 text-emerald-300 border-emerald-500/20"
                           defaultOpen={true}
                           className="border-t border-slate-800/80 pt-2.5"
                         >
-                          <div className="flex flex-col gap-2">
+                          <div className="flex flex-col divide-y divide-slate-800/50">
                             {(task.testCases || []).map((tc, idx) => (
                               <div
                                 key={idx}
-                                className="p-2.5 bg-slate-950/70 border border-slate-800 rounded-lg text-xs font-mono flex flex-col gap-0.5"
+                                className="py-2 text-xs font-mono flex flex-col gap-0.5"
                               >
                                 {tc.input && (
                                   <span className="text-slate-400 text-[11px]">
@@ -634,12 +632,11 @@ export function StudentPortalContent({
                         iconColor={task.socraticHints && task.socraticHints.length > 0 ? "text-amber-400" : "text-slate-500"}
                         titleColor={task.socraticHints && task.socraticHints.length > 0 ? "text-amber-400 group-hover:text-amber-300" : "text-slate-500"}
                         badge={task.socraticHints && task.socraticHints.length > 0 ? (revealedHintLevel > 0 ? `-${task.socraticHints[revealedHintLevel - 1]?.penaltyPct ?? 0}%` : `${task.socraticHints.length}`) : "0"}
-                        badgeColor={task.socraticHints && task.socraticHints.length > 0 ? "bg-amber-500/15 text-amber-300 border-amber-500/30" : "bg-slate-800 text-slate-500 border-slate-700"}
                         defaultOpen={Boolean(hasFailedAttemptOnCurrentTask && task.socraticHints && task.socraticHints.length > 0)}
                         className="border-t border-slate-800/80 pt-2.5"
                       >
                         {task.socraticHints && task.socraticHints.length > 0 ? (
-                          <div className="flex flex-col gap-2">
+                          <div className="flex flex-col divide-y divide-slate-800/50">
                             {task.socraticHints.map((hintObj, idx) => {
                               const isRevealed = revealedHintLevel >= hintObj.level;
                               const canUnlock = revealedHintLevel === idx;
@@ -649,16 +646,12 @@ export function StudentPortalContent({
                               return (
                                 <div
                                   key={idx}
-                                  className={`p-3 rounded-xl border transition-all text-xs ${
-                                    isRevealed
-                                      ? 'bg-amber-950/30 border-amber-500/40 text-amber-200'
-                                      : 'bg-slate-900/60 border-slate-800 text-slate-400'
-                                  }`}
+                                  className="py-2 text-xs"
                                 >
                                   {isRevealed ? (
                                     <div className="flex flex-col gap-1">
                                       <div className="flex items-center justify-between font-bold text-[11px] text-amber-300">
-                                        <span>💡 Підказка {hintObj.level} (Рівень {hintObj.level}):</span>
+                                        <span>💡 Підказка {hintObj.level}:</span>
                                         <span className="text-[10px] font-mono text-amber-400/80">-{hintObj.penaltyPct}% балу</span>
                                       </div>
                                       <p className="text-[11px] leading-relaxed text-slate-200">{hintObj.hint}</p>
@@ -667,7 +660,7 @@ export function StudentPortalContent({
                                     <button
                                       type="button"
                                       onClick={() => setRevealedHintLevel(hintObj.level)}
-                                      className="w-full py-1 px-2.5 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 font-semibold text-xs flex items-center justify-between transition-all cursor-pointer"
+                                      className="w-full py-1.5 px-2.5 rounded-lg bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 font-medium text-xs flex items-center justify-between transition-colors cursor-pointer"
                                     >
                                       <span className="flex items-center gap-1.5">
                                         <Sparkles className="w-3.5 h-3.5 text-amber-400" />
@@ -681,9 +674,9 @@ export function StudentPortalContent({
                             })}
                           </div>
                         ) : (
-                          <div className="p-3 bg-slate-950/50 border border-slate-800/80 rounded-xl flex items-center gap-2 text-slate-500 text-xs">
-                            <HelpCircle className="w-4 h-4 shrink-0 opacity-60" />
-                            <span>Підказки Сократа не закладені автором для цієї вправи.</span>
+                          <div className="py-2 flex items-center gap-2 text-slate-500 text-xs">
+                            <HelpCircle className="w-3.5 h-3.5 shrink-0 opacity-60" />
+                            <span>Підказки Сократа не закладені для цієї вправи.</span>
                           </div>
                         )}
                       </DrawerSection>
@@ -698,19 +691,16 @@ export function StudentPortalContent({
                         className="border-t border-slate-800/80 pt-2.5"
                       >
                         {task.studyUnitUrl ? (
-                          <div className="p-3 bg-gradient-to-r from-blue-950/40 to-indigo-950/40 border border-blue-500/30 rounded-xl flex items-center justify-between gap-3 animate-fadeIn">
-                            <div className="flex items-center gap-2">
-                              <BookOpen className="w-4 h-4 text-blue-400 shrink-0" />
-                              <div className="flex flex-col">
-                                <span className="text-xs font-bold text-blue-200">Повторити теоретичну тему</span>
-                                <span className="text-[10px] text-slate-400">Урок в інтерактивному підручнику</span>
-                              </div>
+                          <div className="py-1.5 flex items-center justify-between gap-3">
+                            <div className="flex flex-col">
+                              <span className="text-xs font-medium text-slate-200">Теоретичний урок</span>
+                              <span className="text-[10px] text-slate-500">Інтерактивний підручник</span>
                             </div>
                             <a
                               href={resolveStudyUrl(task.studyUnitUrl)}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="px-2.5 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs flex items-center gap-1 shadow-md shadow-blue-600/30 transition-all cursor-pointer shrink-0"
+                              className="px-2.5 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-medium text-xs flex items-center gap-1 transition-colors cursor-pointer shrink-0"
                               title="Відкрити урок в інтерактивному підручнику"
                             >
                               <span>До уроку</span>
@@ -718,17 +708,8 @@ export function StudentPortalContent({
                             </a>
                           </div>
                         ) : (
-                          <div className="p-3 bg-slate-950/50 border border-slate-800/80 rounded-xl flex items-center justify-between gap-2 text-slate-500 text-xs">
-                            <div className="flex items-center gap-2">
-                              <BookOpen className="w-4 h-4 shrink-0 opacity-60" />
-                              <span>Теоретичний конспект не прив'язаний</span>
-                            </div>
-                            <button
-                              disabled
-                              className="px-2 py-1 rounded bg-slate-900 border border-slate-800 text-[10px] text-slate-600 cursor-not-allowed"
-                            >
-                              Немає посилання
-                            </button>
+                          <div className="py-2 flex items-center justify-between gap-2 text-slate-500 text-xs">
+                            <span>Теоретичний конспект не прив'язаний</span>
                           </div>
                         )}
                       </DrawerSection>
@@ -736,7 +717,7 @@ export function StudentPortalContent({
                       {/* Action Button */}
                       <button
                         onClick={() => fetchRecommendedTask(activeCourseSlug)}
-                        className="inline-flex items-center justify-center gap-2 px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold border border-slate-700 transition-all cursor-pointer mt-2"
+                        className="inline-flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-slate-800/70 hover:bg-slate-800 text-slate-200 text-xs font-medium transition-colors cursor-pointer mt-2"
                       >
                         <RefreshCw className="w-3.5 h-3.5" />
                         <span>Оновити рекомендоване завдання</span>
@@ -751,7 +732,6 @@ export function StudentPortalContent({
                         iconColor="text-purple-400"
                         titleColor="text-purple-400 group-hover:text-purple-300"
                         badge={taskSubmissions.length}
-                        badgeColor="bg-purple-500/10 text-purple-300 border-purple-500/20"
                         defaultOpen={true}
                         action={
                           <button
@@ -765,12 +745,12 @@ export function StudentPortalContent({
                         }
                       >
                         {taskSubmissions.length === 0 ? (
-                          <div className="p-6 bg-slate-950/70 border border-slate-800 rounded-xl text-center text-xs text-slate-400 flex flex-col items-center gap-2">
-                            <History className="w-6 h-6 text-slate-600" />
+                          <div className="py-6 text-center text-xs text-slate-500 flex flex-col items-center gap-2">
+                            <History className="w-5 h-5 text-slate-600" />
                             <span>Ви ще не надсилали спроб для цього завдання.</span>
                           </div>
                         ) : (
-                          <div className="flex flex-col gap-3 max-h-[calc(100vh-320px)] overflow-y-auto pr-1">
+                          <div className="flex flex-col divide-y divide-slate-800/50 max-h-[calc(100vh-320px)] overflow-y-auto pr-1">
                             {taskSubmissions.map((sub, idx) => {
                               const isLatest = idx === 0;
                               const isApproved = sub.teacherReviewStatus === 'APPROVED' || sub.status === 'ACCEPTED';
@@ -780,35 +760,27 @@ export function StudentPortalContent({
                               return (
                                 <div
                                   key={sub.id}
-                                  className={`p-3.5 rounded-xl border flex flex-col gap-2.5 transition-all ${
-                                    isLatest
-                                      ? isApproved
-                                        ? 'bg-emerald-950/30 border-emerald-500/40 shadow-lg shadow-emerald-950/30'
-                                        : isPending
-                                        ? 'bg-amber-950/30 border-amber-500/40 shadow-lg shadow-amber-950/30'
-                                        : 'bg-purple-950/30 border-purple-500/40'
-                                      : 'bg-slate-950/60 border-slate-800 opacity-80'
-                                  }`}
+                                  className="py-2.5 flex flex-col gap-1.5"
                                 >
                                   <div className="flex items-center justify-between">
                                     <div className="flex items-center gap-1.5">
-                                      <span className="text-xs font-bold text-white">
+                                      <span className="text-xs font-medium text-white">
                                         Спроба #{sub.attemptNumber || taskSubmissions.length - idx}
                                       </span>
                                       {isLatest && (
-                                        <span className="text-[9px] font-mono px-1.5 py-0.2 rounded font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
-                                          Остання
+                                        <span className="text-[10px] font-mono text-indigo-400">
+                                          (остання)
                                         </span>
                                       )}
                                     </div>
-                                    <span className={`text-[10px] font-bold font-mono px-2 py-0.5 rounded-full border ${
+                                    <span className={`text-[10px] font-mono font-bold ${
                                       isApproved
-                                        ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30'
+                                        ? 'text-emerald-400'
                                         : isPending
-                                        ? 'bg-amber-500/10 text-amber-300 border border-amber-500/30'
+                                        ? 'text-amber-400'
                                         : isSuperseded
-                                        ? 'bg-slate-800 text-slate-400 border-slate-700'
-                                        : 'bg-rose-500/10 text-rose-400 border-rose-500/30'
+                                        ? 'text-slate-500'
+                                        : 'text-rose-400'
                                     }`}>
                                       {isApproved
                                         ? '✓ Зараховано'
@@ -821,17 +793,16 @@ export function StudentPortalContent({
                                   </div>
 
                                   <div className="text-[10px] text-slate-500 font-mono">
-                                    Час: {new Date(sub.createdAt).toLocaleString()}
+                                    {new Date(sub.createdAt).toLocaleString()}
                                   </div>
 
                                   {/* Teacher Comment Banner if present */}
                                   {sub.teacherComment && (
-                                    <div className="p-2.5 rounded-lg bg-purple-950/40 border border-purple-500/40 flex flex-col gap-1">
-                                      <div className="flex items-center gap-1.5 text-purple-300 font-bold text-[11px]">
-                                        <MessageSquareQuote className="w-3.5 h-3.5 shrink-0" />
-                                        <span>Коментар викладача:</span>
-                                      </div>
-                                      <p className="text-xs text-purple-100 font-sans italic leading-relaxed pl-5">
+                                    <div className="pl-2.5 border-l-2 border-purple-500/50 flex flex-col gap-0.5 my-1">
+                                      <span className="text-purple-300 font-semibold text-[10px]">
+                                        Коментар викладача:
+                                      </span>
+                                      <p className="text-xs text-purple-100 italic leading-relaxed">
                                         "{sub.teacherComment}"
                                       </p>
                                     </div>
@@ -843,7 +814,7 @@ export function StudentPortalContent({
                                       <summary className="cursor-pointer hover:text-slate-200 select-none">
                                         Переглянути код відповіді
                                       </summary>
-                                      <pre className="mt-1 p-2 bg-slate-900 border border-slate-800 rounded text-slate-300 font-mono text-[10px] overflow-x-auto max-h-36">
+                                      <pre className="mt-1 p-2 bg-slate-950/80 rounded text-slate-300 font-mono text-[10px] overflow-x-auto max-h-36">
                                         {sub.code}
                                       </pre>
                                     </details>
@@ -868,7 +839,6 @@ export function StudentPortalContent({
                     iconColor="text-emerald-400"
                     titleColor="text-emerald-400 group-hover:text-emerald-300"
                     badge={graphNodes.length}
-                    badgeColor="bg-emerald-500/10 text-emerald-300 border-emerald-500/20"
                     defaultOpen={true}
                   >
                     <SkillDagMap nodes={graphNodes} activeSkillSlug={task?.skill?.slug} />
@@ -877,9 +847,9 @@ export function StudentPortalContent({
                       onClick={() => {
                         handleTabClick('tree');
                       }}
-                      className="w-full py-2.5 px-3 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-lg shadow-indigo-600/30 transition-all cursor-pointer mt-2"
+                      className="w-full py-2 px-3 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-xs flex items-center justify-center gap-2 transition-colors cursor-pointer mt-2"
                     >
-                      <Network className="w-4 h-4" />
+                      <Network className="w-3.5 h-3.5" />
                       <span>Відкрити Дерево Знань на Екрані</span>
                     </button>
                   </DrawerSection>
@@ -898,21 +868,16 @@ export function StudentPortalContent({
                         iconColor="text-purple-400"
                         titleColor="text-purple-400 group-hover:text-purple-300"
                         badge={inspectedSkill.pMastery >= 0.95 ? 'Опановано' : inspectedSkill.status === 'LOCKED' ? 'Заблоковано' : 'У процесі'}
-                        badgeColor={inspectedSkill.pMastery >= 0.95 ? 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30' : inspectedSkill.status === 'LOCKED' ? 'bg-rose-500/15 text-rose-300 border-rose-500/30' : 'bg-indigo-500/15 text-indigo-300 border-indigo-500/30'}
                         defaultOpen={true}
                       >
-                        <div className="flex flex-col gap-2 p-3 bg-slate-950/70 border border-slate-800/80 rounded-xl">
-                          <h3 className="text-sm font-bold text-white">{inspectedSkill.title}</h3>
+                        <div className="flex flex-col gap-1.5 py-1">
+                          <h3 className="text-xs font-bold text-white">{inspectedSkill.title}</h3>
                           <p className="text-xs text-slate-300 leading-relaxed">
                             {inspectedSkill.description || 'Ключовий модуль курсу для набуття практичних навичок.'}
                           </p>
                           {inspectedSkill.status === 'LOCKED' && (
-                            <div className="p-2.5 bg-rose-950/30 border border-rose-500/40 rounded-lg flex items-start gap-2 mt-1">
-                              <AlertTriangle className="w-3.5 h-3.5 text-rose-400 shrink-0 mt-0.5" />
-                              <div className="text-[11px] text-rose-200">
-                                <strong className="text-rose-300 block mb-0.5">Вузол Наразі Заблоковано!</strong>
-                                Необхідно спершу засвоїти попередні залежні модулі до рівня P(L) ≥ 0.75.
-                              </div>
+                            <div className="pl-2.5 border-l-2 border-rose-500/50 text-[11px] text-rose-300 mt-1">
+                              Необхідно спершу засвоїти попередні залежні модулі до рівня P(L) ≥ 0.75.
                             </div>
                           )}
                         </div>
@@ -925,34 +890,33 @@ export function StudentPortalContent({
                         iconColor="text-emerald-400"
                         titleColor="text-emerald-400 group-hover:text-emerald-300"
                         badge={`${(inspectedSkill.pMastery * 100).toFixed(1)}%`}
-                        badgeColor={inspectedSkill.pMastery >= 0.90 ? 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30' : 'bg-indigo-500/15 text-indigo-300 border-indigo-500/30'}
                         defaultOpen={true}
                         className="border-t border-slate-800/80 pt-2.5"
                       >
-                        <div className="bg-slate-950/80 border border-slate-800 rounded-xl p-3.5 flex flex-col gap-2.5">
+                        <div className="py-1 flex flex-col gap-2">
                           <div className="flex justify-between items-center text-xs">
-                            <span className="text-slate-400 font-semibold">Рівень Майстерності P(L):</span>
-                            <span className={`font-mono font-bold text-sm ${
+                            <span className="text-slate-400">Рівень P(L):</span>
+                            <span className={`font-mono font-bold ${
                               inspectedSkill.pMastery >= 0.90 ? 'text-emerald-400' : 'text-indigo-400'
                             }`}>
                               {(inspectedSkill.pMastery * 100).toFixed(1)}%
                             </span>
                           </div>
-                          <div className="w-full h-2 bg-slate-900 rounded-full overflow-hidden border border-slate-800">
+                          <div className="w-full h-1.5 bg-slate-800 rounded-full overflow-hidden">
                             <div
                               className={`h-full transition-all duration-500 ${
                                 inspectedSkill.pMastery >= 0.90
                                   ? 'bg-emerald-400'
                                   : inspectedSkill.status === 'LOCKED'
                                   ? 'bg-slate-700'
-                                  : 'bg-gradient-to-r from-amber-500 to-indigo-500'
+                                  : 'bg-indigo-500'
                               }`}
                               style={{ width: `${Math.min(100, inspectedSkill.pMastery * 100)}%` }}
                             />
                           </div>
                           <div className="flex justify-between text-[10px] text-slate-500 font-mono">
                             <span>0%</span>
-                            <span className="text-emerald-400">Поріг: ≥ 90.0% (Gold) / 75.0% (Відкрито)</span>
+                            <span>Поріг: ≥ 90%</span>
                           </div>
                         </div>
                       </DrawerSection>
@@ -966,7 +930,7 @@ export function StudentPortalContent({
                         defaultOpen={true}
                         className="border-t border-slate-800/80 pt-2.5"
                       >
-                        <div className="text-[11px] text-slate-300 bg-slate-950/70 p-2.5 rounded-lg border border-slate-800">
+                        <div className="text-[11px] text-slate-300 py-1">
                           {inspectedSkill.parentSkillIds.length === 0
                             ? '🟢 Базовий стартовий вузол курсу.'
                             : inspectedSkill.status === 'LOCKED'
@@ -984,12 +948,12 @@ export function StudentPortalContent({
                           setIsDrawerOpen(true);
                           fetchRecommendedTask(activeCourseSlug);
                         }}
-                        className={`w-full py-2.5 px-4 rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer shadow-lg mt-2 ${
+                        className={`w-full py-2 px-3 rounded-lg font-medium text-xs flex items-center justify-center gap-2 transition-colors cursor-pointer mt-2 ${
                           inspectedSkill.status === 'LOCKED'
-                            ? 'bg-slate-800 text-slate-500 cursor-not-allowed shadow-none'
+                            ? 'bg-slate-800 text-slate-500 cursor-not-allowed'
                             : inspectedSkill.pMastery >= 0.90
-                            ? 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-emerald-600/30'
-                            : 'bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white shadow-indigo-600/40'
+                            ? 'bg-emerald-600 hover:bg-emerald-500 text-white'
+                            : 'bg-indigo-600 hover:bg-indigo-500 text-white'
                         }`}
                       >
                         <span>{inspectedSkill.status === 'LOCKED' ? '🔒 Заблоковано' : inspectedSkill.pMastery >= 0.90 ? 'Повторити тему' : 'Розпочати вправу вузла →'}</span>
@@ -1013,11 +977,11 @@ export function StudentPortalContent({
                     titleColor="text-amber-400 group-hover:text-amber-300"
                     defaultOpen={true}
                   >
-                    <div className="flex flex-col gap-3 text-xs text-slate-300 p-3 bg-slate-950/70 border border-slate-800/80 rounded-xl">
+                    <div className="flex flex-col gap-3 text-xs text-slate-300 py-1">
                       <p>Параметри середовища розробки та актуалізації моделі знань.</p>
                       <button
                         onClick={() => fetchRecommendedTask(activeCourseSlug)}
-                        className="w-full py-2.5 bg-indigo-600 text-white rounded-xl font-bold cursor-pointer hover:bg-indigo-500 transition-all flex items-center justify-center gap-2"
+                        className="w-full py-2 bg-indigo-600 text-white rounded-lg font-medium cursor-pointer hover:bg-indigo-500 transition-colors flex items-center justify-center gap-2"
                       >
                         <RefreshCw className="w-3.5 h-3.5" />
                         <span>Перезавантажити стан BKT</span>
@@ -1314,94 +1278,49 @@ export function StudentPortalContent({
                 </div>
               )}
 
-              {/* 📊 Active Course & Module Progress HUD */}
-              <div className="w-full bg-slate-900/90 border border-slate-800 rounded-2xl p-4 shadow-xl backdrop-blur-xl flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div className="flex items-center gap-3">
-                  <div className="p-2.5 rounded-xl bg-gradient-to-br from-indigo-600/20 to-purple-600/20 border border-indigo-500/30 text-indigo-400 shrink-0">
-                    <Trophy className="w-5 h-5 text-amber-400" />
-                  </div>
-                  <div className="flex flex-col">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <span className="text-xs font-mono font-bold uppercase tracking-wider text-indigo-400">
-                        {task.skill?.title || 'Навичка'}
-                      </span>
-                      {task.topic && (
-                        <span className="px-2 py-0.5 rounded-md text-[10px] font-mono bg-slate-800 text-slate-300 border border-slate-700">
+              {/* 📊 Active Task Compact Toolbar */}
+              <div className="w-full pb-3 border-b border-slate-800/80 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div className="flex flex-col gap-0.5">
+                  <div className="flex items-center gap-2 flex-wrap text-xs">
+                    <span className="font-mono font-semibold text-indigo-400">
+                      {task.skill?.title || 'Навичка'}
+                    </span>
+                    {task.topic && (
+                      <>
+                        <span className="text-slate-600">/</span>
+                        <span className="font-mono text-[11px] text-slate-400">
                           {task.topic}
                         </span>
-                      )}
-                    </div>
-                    <div className="text-sm font-bold text-white mt-0.5 flex items-center gap-2">
-                      <span>{task.title}</span>
-                    </div>
+                      </>
+                    )}
                   </div>
+                  <h2 className="text-sm sm:text-base font-bold text-white">
+                    {task.title}
+                  </h2>
                 </div>
 
-                {/* Progress Indicators & Quick Navigation to Skill Tree */}
-                <div className="flex items-center gap-6 shrink-0 border-t md:border-t-0 md:border-l border-slate-800 pt-3 md:pt-0 md:pl-6 justify-between md:justify-end">
-                  {/* Active Module Mastery */}
-                  <div className="flex flex-col min-w-[120px]">
-                    <div className="flex justify-between items-center text-xs mb-1">
-                      <span className="text-[11px] text-slate-400 font-semibold">Модуль P(L):</span>
-                      <span className={`font-mono font-bold text-xs ${activeSkillMasteryPct >= 90 ? 'text-emerald-400' : 'text-indigo-400'}`}>
-                        {activeSkillMasteryPct}%
-                      </span>
-                    </div>
-                    <div className="w-full h-1.5 bg-slate-950 rounded-full overflow-hidden border border-slate-800">
-                      <div
-                        className={`h-full rounded-full transition-all duration-500 ${
-                          activeSkillMasteryPct >= 90 ? 'bg-emerald-400' : 'bg-gradient-to-r from-indigo-500 to-purple-500'
-                        }`}
-                        style={{ width: `${Math.min(100, activeSkillMasteryPct)}%` }}
-                      />
-                    </div>
-                  </div>
-
-                  {/* Overall Course Progress */}
-                  <div className="flex flex-col min-w-[120px]">
-                    <div className="flex justify-between items-center text-xs mb-1">
-                      <span className="text-[11px] text-slate-400 font-semibold">Курс:</span>
-                      <span className="font-mono font-bold text-xs text-amber-400">
-                        {courseCompletionPct}%
-                      </span>
-                    </div>
-                    <div className="w-full h-1.5 bg-slate-950 rounded-full overflow-hidden border border-slate-800">
-                      <div
-                        className="h-full bg-gradient-to-r from-amber-500 to-emerald-400 rounded-full transition-all duration-500"
-                        style={{ width: `${courseCompletionPct}%` }}
-                      />
-                    </div>
-                  </div>
-
-                  {/* Quick Theory / Study Link */}
-                  {task.studyUnitUrl ? (
+                {/* Quick Navigation to Theory & Skill Tree */}
+                <div className="flex items-center gap-2 shrink-0">
+                  {task.studyUnitUrl && (
                     <a
-                      href={task.studyUnitUrl}
+                      href={resolveStudyUrl(task.studyUnitUrl)}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="p-2 rounded-xl bg-blue-950/60 hover:bg-blue-900/60 text-blue-300 hover:text-white border border-blue-500/40 transition-all cursor-pointer flex items-center gap-1.5 text-xs font-semibold"
+                      className="px-2.5 py-1.5 rounded-lg bg-slate-800/70 hover:bg-slate-800 text-blue-300 hover:text-white transition-colors cursor-pointer flex items-center gap-1.5 text-xs font-medium"
                       title="Відкрити урок в інтерактивному підручнику"
                     >
-                      <BookOpen className="w-4 h-4 text-blue-400" />
-                      <span className="hidden lg:inline text-[11px]">Теорія</span>
+                      <BookOpen className="w-3.5 h-3.5 text-blue-400" />
+                      <span>Теорія</span>
                     </a>
-                  ) : (
-                    <div
-                      className="p-2 rounded-xl bg-slate-950/40 text-slate-600 border border-slate-800/80 cursor-not-allowed flex items-center gap-1.5 text-xs select-none"
-                      title="Теоретичний конспект не прив'язаний автором курсу"
-                    >
-                      <BookOpen className="w-4 h-4 opacity-50" />
-                      <span className="hidden lg:inline text-[11px]">Теорія (—)</span>
-                    </div>
                   )}
 
-                  {/* Button to open Tree */}
                   <button
                     onClick={() => handleTabClick('tree')}
-                    className="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700/80 transition-all cursor-pointer"
+                    className="px-2.5 py-1.5 rounded-lg bg-slate-800/70 hover:bg-slate-800 text-slate-300 hover:text-white transition-colors cursor-pointer flex items-center gap-1.5 text-xs font-medium"
                     title="Відкрити Дерево Знань"
                   >
-                    <Network className="w-4 h-4" />
+                    <Network className="w-3.5 h-3.5 text-indigo-400" />
+                    <span className="hidden sm:inline">Дерево знань</span>
                   </button>
                 </div>
               </div>
