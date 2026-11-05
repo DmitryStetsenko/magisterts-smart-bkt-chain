@@ -120,13 +120,12 @@ export default function AdminCMSDashboard() {
       currentApp="admin"
       header={{
         appName: 'Smart-BKT-Chain',
-        badgeText: 'Admin CMS Shell v2.0',
+        badgeText: 'Admin',
         logoIcon: ShieldCheck,
-        logoColor: 'bg-emerald-600/20 border-emerald-500/30 text-emerald-400',
-        badgeColor: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30',
+        logoColor: 'bg-emerald-500/15 text-emerald-400',
         courseBadge: (
           <span
-            className="text-sm sm:text-[14px] font-normal text-slate-300 select-none tracking-normal"
+            className="text-xs sm:text-[13px] font-normal text-slate-300 select-none tracking-normal"
             title="Методичний центр управління платформою"
           >
             Методичний центр
@@ -153,33 +152,37 @@ export default function AdminCMSDashboard() {
           />
         ),
         rightSlot: (
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
             <a
               href={getAppBaseUrl('teacher')}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold border border-slate-700 transition-all cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-slate-800/60 hover:bg-slate-800 text-slate-200 text-xs font-medium transition-colors cursor-pointer"
             >
               <span>Кабінет Викладача</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </a>
 
+            <div className="h-4 w-[1px] bg-slate-800" />
+
             {/* 👤 Кнопка профілю адміністратора */}
             <button
               type="button"
               onClick={() => setIsProfileDrawerOpen(true)}
-              className="flex items-center gap-2 bg-slate-950/80 hover:bg-slate-900 px-2.5 py-1 rounded-full border border-slate-800 hover:border-emerald-500/50 transition-all cursor-pointer select-none text-left group"
+              className="flex items-center gap-2 hover:bg-slate-800/60 px-2 py-1 rounded-lg transition-colors cursor-pointer select-none text-left group"
               title="Натисніть для відкриття профілю адміністратора"
             >
-              <div className="w-6 h-6 rounded-full bg-gradient-to-tr from-emerald-600 to-teal-500 flex items-center justify-center text-[10px] font-bold text-white shadow-sm ring-1 ring-emerald-500/30 group-hover:scale-105 transition-transform">
+              <div className="w-6 h-6 rounded-full bg-gradient-to-tr from-emerald-600 to-teal-500 flex items-center justify-center text-[10px] font-bold text-white shrink-0">
                 АД
               </div>
-              <span className="hidden lg:inline text-xs font-semibold text-slate-200 group-hover:text-white transition-colors">
-                Адміністратор CMS
-              </span>
-              <span className="px-1.5 py-0.2 rounded text-[9px] font-mono bg-emerald-500/10 text-emerald-300 border border-emerald-500/20">
-                ADMIN
-              </span>
+              <div className="hidden lg:flex flex-col leading-none">
+                <span className="text-xs font-medium text-slate-200 group-hover:text-white transition-colors">
+                  Адміністратор CMS
+                </span>
+                <span className="text-[9px] font-mono text-emerald-400 mt-0.5">
+                  ADMIN
+                </span>
+              </div>
             </button>
           </div>
         ),

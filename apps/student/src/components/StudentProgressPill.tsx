@@ -54,12 +54,12 @@ export const StudentProgressPill: React.FC<StudentProgressPillProps> = ({
 
   return (
     <div className="relative" ref={popoverRef}>
-      {/* 💊 Компактна інтерактивна пігулка в хедері */}
+      {/* 💊 Компактна безрамкова інтерактивна пігулка в хедері */}
       <button
         onClick={() => setIsOpen((prev) => !prev)}
-        className={`flex items-center gap-2 px-3 py-1.5 rounded-full border transition-all cursor-pointer select-none text-xs font-semibold shadow-inner ${isOpen
-            ? 'bg-slate-900 border-indigo-500/80 text-white ring-2 ring-indigo-500/20'
-            : 'bg-slate-950/80 hover:bg-slate-900/90 border-slate-800 hover:border-slate-700 text-slate-200'
+        className={`flex items-center gap-2 px-2.5 py-1.5 rounded-lg transition-colors cursor-pointer select-none text-xs font-medium ${isOpen
+            ? 'bg-slate-800 text-white'
+            : 'bg-slate-800/50 hover:bg-slate-800/80 text-slate-200'
           }`}
         title="Натисніть для перегляду аналітики прогресу та стану BKT"
         aria-expanded={isOpen}

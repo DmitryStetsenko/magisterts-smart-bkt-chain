@@ -1130,13 +1130,12 @@ export default function TeacherDashboardPage() {
       currentApp="teacher"
       header={{
         appName: 'Smart-BKT-Chain',
-        badgeText: 'Teacher Portal v2.0',
+        badgeText: 'Teacher',
         logoIcon: ShieldCheck,
-        logoColor: 'bg-purple-600/20 border-purple-500/30 text-purple-400',
-        badgeColor: 'bg-purple-500/20 text-purple-300 border-purple-500/30',
+        logoColor: 'bg-purple-500/15 text-purple-400',
         courseBadge: (
           <span
-            className="text-sm sm:text-[14px] font-normal text-slate-300 select-none tracking-normal"
+            className="text-xs sm:text-[13px] font-normal text-slate-300 select-none tracking-normal"
             title={`Активний курс: ${activeCourse.title}`}
           >
             {activeCourse.title}
@@ -1169,47 +1168,47 @@ export default function TeacherDashboardPage() {
           />
         ),
         rightSlot: (
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
 
           {/* 🔍 Searchable Student Dropdown Selector */}
-          <div className="relative min-w-[200px] sm:min-w-[260px]">
+          <div className="relative min-w-[190px] sm:min-w-[230px]">
             <button
               id="teacher-student-dropdown-btn"
               onClick={() => setIsStudentDropdownOpen((prev) => !prev)}
-              className="w-full flex items-center justify-between px-3 py-1.5 rounded-xl bg-slate-950 border border-purple-500/40 hover:border-purple-400 text-xs font-semibold text-white transition-all shadow-inner cursor-pointer"
+              className="w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg bg-slate-800/50 hover:bg-slate-800/80 text-xs font-medium text-slate-200 transition-colors cursor-pointer"
             >
               <div className="flex items-center gap-2 truncate">
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shrink-0"></span>
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0"></span>
                 <span className="truncate">
                   {selectedStudent ? selectedStudent.name : 'Обрати студента...'}
                 </span>
                 {selectedStudent && (
-                  <span className="px-1.5 py-0.2 rounded text-[10px] font-mono text-emerald-300 bg-emerald-500/10 border border-emerald-500/20 shrink-0">
-                    {(selectedStudent.averageMastery !== undefined ? (selectedStudent.averageMastery * 100).toFixed(0) : '0')}% P(L)
+                  <span className="text-[11px] font-mono text-emerald-400 shrink-0">
+                    {(selectedStudent.averageMastery !== undefined ? (selectedStudent.averageMastery * 100).toFixed(0) : '0')}%
                   </span>
                 )}
               </div>
-              <ChevronDown className={`w-3.5 h-3.5 text-purple-400 shrink-0 transition-transform ${isStudentDropdownOpen ? 'rotate-180' : ''}`} />
+              <ChevronDown className={`w-3.5 h-3.5 text-slate-400 shrink-0 transition-transform ${isStudentDropdownOpen ? 'rotate-180' : ''}`} />
             </button>
 
             {/* Dropdown Menu with Search */}
             {isStudentDropdownOpen && (
-              <div className="absolute right-0 top-full mt-1.5 w-72 sm:w-80 bg-slate-900 border border-purple-500/40 rounded-2xl shadow-2xl z-50 overflow-hidden flex flex-col backdrop-blur-xl animate-fadeIn">
-                <div className="p-2.5 border-b border-slate-800 bg-slate-950/80">
+              <div className="absolute right-0 top-full mt-1.5 w-72 sm:w-80 bg-slate-900 border border-slate-800 rounded-xl shadow-2xl z-50 overflow-hidden flex flex-col animate-fadeIn">
+                <div className="p-2 border-b border-slate-800/80">
                   <div className="relative">
-                    <Search className="w-3.5 h-3.5 absolute left-3 top-2.5 text-slate-500" />
+                    <Search className="w-3.5 h-3.5 absolute left-2.5 top-2 text-slate-500" />
                     <input
                       type="text"
                       placeholder="Пошук студента за ім'ям чи email..."
                       value={studentSearch}
                       onChange={(e) => setStudentSearch(e.target.value)}
                       autoFocus
-                      className="w-full bg-slate-900 border border-slate-700 rounded-xl pl-9 pr-3 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-purple-500"
+                      className="w-full bg-slate-800/60 rounded-lg pl-8 pr-3 py-1.5 text-xs text-slate-200 placeholder:text-slate-500 focus:outline-none focus:bg-slate-800"
                     />
                   </div>
                 </div>
 
-                <div className="max-h-60 overflow-y-auto p-1.5 flex flex-col gap-1">
+                <div className="max-h-60 overflow-y-auto divide-y divide-slate-800/50">
                   {filteredStudents.length === 0 ? (
                     <div className="p-4 text-center text-xs text-slate-500">Студентів не знайдено</div>
                   ) : (
@@ -1225,25 +1224,25 @@ export default function TeacherDashboardPage() {
                             setSelectedStudentId(stId);
                             setIsStudentDropdownOpen(false);
                           }}
-                          className={`p-2.5 rounded-xl transition-all cursor-pointer flex items-center justify-between gap-2 ${
+                          className={`px-3 py-2 transition-colors cursor-pointer flex items-center justify-between gap-2 ${
                             isSelected
-                              ? 'bg-purple-950/60 border border-purple-500/80 text-white shadow-sm'
-                              : 'hover:bg-slate-800 text-slate-300'
+                              ? 'bg-purple-500/10 text-white'
+                              : 'hover:bg-slate-800/50 text-slate-300'
                           }`}
                         >
                           <div className="overflow-hidden">
-                            <div className="text-xs font-bold truncate flex items-center gap-1.5">
+                            <div className="text-xs font-medium truncate flex items-center gap-1.5">
                               <span>{st.name}</span>
                               {isSelected && <span className="text-[10px] text-purple-400">●</span>}
                             </div>
-                            <div className="text-[11px] text-slate-400 truncate font-mono">{st.email}</div>
+                            <div className="text-[10px] text-slate-500 truncate font-mono">{st.email}</div>
                           </div>
                           <div className="flex flex-col items-end shrink-0">
-                            <span className="text-xs font-mono font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
-                              {avgMastery}% P(L)
+                            <span className="text-xs font-mono font-bold text-emerald-400">
+                              {avgMastery}%
                             </span>
-                            <span className="text-[10px] text-slate-400 font-mono mt-0.5">
-                              WPM: {st.wpm ?? st.avgWpm ?? 0}
+                            <span className="text-[10px] text-slate-500 font-mono">
+                              {st.wpm ?? st.avgWpm ?? 0} WPM
                             </span>
                           </div>
                         </div>
@@ -1255,22 +1254,26 @@ export default function TeacherDashboardPage() {
             )}
           </div>
 
+          <div className="h-4 w-[1px] bg-slate-800" />
+
           {/* 👤 Кнопка профілю викладача (відкриває Profile Drawer) */}
           <button
             type="button"
             onClick={() => setIsProfileDrawerOpen(true)}
-            className="flex items-center gap-2 bg-slate-950/80 hover:bg-slate-900 px-2.5 py-1 rounded-full border border-slate-800 hover:border-purple-500/50 transition-all cursor-pointer select-none text-left group"
+            className="flex items-center gap-2 hover:bg-slate-800/60 px-2 py-1 rounded-lg transition-colors cursor-pointer select-none text-left group"
             title="Натисніть для відкриття профілю викладача"
           >
-            <div className="w-6 h-6 rounded-full bg-gradient-to-tr from-purple-600 to-indigo-500 flex items-center justify-center text-[10px] font-bold text-white shadow-sm ring-1 ring-purple-500/30 group-hover:scale-105 transition-transform">
+            <div className="w-6 h-6 rounded-full bg-gradient-to-tr from-purple-600 to-indigo-500 flex items-center justify-center text-[10px] font-bold text-white shrink-0">
               ВК
             </div>
-            <span className="hidden lg:inline text-xs font-semibold text-slate-200 group-hover:text-white transition-colors">
-              Олександр Коваленко
-            </span>
-            <span className="px-1.5 py-0.2 rounded text-[9px] font-mono bg-purple-500/10 text-purple-300 border border-purple-500/20">
-              ВИКЛАДАЧ
-            </span>
+            <div className="hidden lg:flex flex-col leading-none">
+              <span className="text-xs font-medium text-slate-200 group-hover:text-white transition-colors">
+                Олександр Коваленко
+              </span>
+              <span className="text-[9px] font-mono text-purple-400 mt-0.5">
+                ВИКЛАДАЧ
+              </span>
+            </div>
           </button>
         </div>
         ),

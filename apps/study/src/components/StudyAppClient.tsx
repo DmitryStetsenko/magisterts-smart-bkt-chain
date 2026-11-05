@@ -232,13 +232,12 @@ export function StudyAppClient({
         className={`${themeClasses[activeTheme]} ${fontClasses[activeFont]} antialiased transition-colors duration-200 selection:bg-blue-500/20`}
       header={{
         appName: 'Smart-BKT-Chain',
-        badgeText: 'Study Portal v2.0',
-        badgeColor: 'bg-blue-500/20 text-blue-300 border-blue-500/30',
-        logoColor: 'bg-blue-600/20 border-blue-500/30 text-blue-400',
+        badgeText: 'Study',
+        logoColor: 'bg-blue-500/15 text-blue-400',
         hideHeader: readerSettings.isFocusMode,
         courseBadge: (
           <span
-            className="text-sm sm:text-[14px] font-normal text-slate-300 select-none tracking-normal"
+            className="text-xs sm:text-[13px] font-normal text-slate-300 select-none tracking-normal"
             title={`Активний курс: ${SCHOOL_WEB_CURRICULUM.courseTitle}`}
           >
             {SCHOOL_WEB_CURRICULUM.courseTitle}
@@ -261,23 +260,25 @@ export function StudyAppClient({
           />
         ),
         rightSlot: (
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
             {/* Кнопка профілю учня */}
             <button
               type="button"
               onClick={() => setIsProfileDrawerOpen(true)}
-              className="flex items-center gap-2 bg-slate-950/80 hover:bg-slate-900 px-2.5 py-1 rounded-full border border-slate-800 hover:border-blue-500/50 transition-all cursor-pointer select-none text-left group"
+              className="flex items-center gap-2 hover:bg-slate-800/60 px-2 py-1 rounded-lg transition-colors cursor-pointer select-none text-left group"
               title="Натисніть для відкриття профілю та вибору курсів"
             >
-              <div className="w-6 h-6 rounded-full bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center text-[10px] font-bold text-white shadow-sm ring-1 ring-blue-500/30 group-hover:scale-105 transition-transform">
+              <div className="w-6 h-6 rounded-full bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center text-[10px] font-bold text-white shrink-0">
                 ДС
               </div>
-              <span className="hidden lg:inline text-xs font-semibold text-slate-200 group-hover:text-white transition-colors">
-                Дмитро Стеценко
-              </span>
-              <span className="px-1.5 py-0.2 rounded text-[9px] font-mono bg-blue-500/10 text-blue-300 border border-blue-500/20">
-                УЧЕНЬ
-              </span>
+              <div className="hidden lg:flex flex-col leading-none">
+                <span className="text-xs font-medium text-slate-200 group-hover:text-white transition-colors">
+                  Дмитро Стеценко
+                </span>
+                <span className="text-[9px] font-mono text-blue-400 mt-0.5">
+                  УЧЕНЬ
+                </span>
+              </div>
             </button>
           </div>
         ),

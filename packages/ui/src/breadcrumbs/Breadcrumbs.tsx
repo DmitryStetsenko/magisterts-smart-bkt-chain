@@ -90,8 +90,8 @@ export function Breadcrumbs({
                 {ItemIcon && <ItemIcon className="w-3 h-3 text-slate-500 shrink-0" />}
                 <span className="truncate">{item.label}</span>
                 {item.badge && (
-                  <span className="ml-1 px-1.5 py-0.5 rounded text-[9px] font-mono font-normal bg-slate-800/80 text-slate-400 border border-slate-700/50">
-                    {item.badge}
+                  <span className="ml-1 text-[10px] font-mono font-normal text-slate-500">
+                    ({item.badge})
                   </span>
                 )}
               </span>
@@ -104,8 +104,8 @@ export function Breadcrumbs({
                 {ItemIcon && <ItemIcon className="w-3 h-3 text-slate-500 shrink-0" />}
                 <span className="truncate">{item.label}</span>
                 {item.badge && (
-                  <span className="ml-1 px-1.5 py-0.5 rounded text-[9px] font-mono font-normal bg-slate-800/80 text-slate-400 border border-slate-700/50">
-                    {item.badge}
+                  <span className="ml-1 text-[10px] font-mono font-normal text-slate-500">
+                    ({item.badge})
                   </span>
                 )}
               </a>
@@ -119,8 +119,8 @@ export function Breadcrumbs({
                 {ItemIcon && <ItemIcon className="w-3 h-3 text-slate-500 shrink-0" />}
                 <span className="truncate">{item.label}</span>
                 {item.badge && (
-                  <span className="ml-1 px-1.5 py-0.5 rounded text-[9px] font-mono font-normal bg-slate-800/80 text-slate-400 border border-slate-700/50">
-                    {item.badge}
+                  <span className="ml-1 text-[10px] font-mono font-normal text-slate-500">
+                    ({item.badge})
                   </span>
                 )}
               </button>
@@ -132,8 +132,8 @@ export function Breadcrumbs({
                 {ItemIcon && <ItemIcon className="w-3 h-3 text-slate-500 shrink-0" />}
                 <span className="truncate">{item.label}</span>
                 {item.badge && (
-                  <span className="ml-1 px-1.5 py-0.5 rounded text-[9px] font-mono font-normal bg-slate-800/80 text-slate-400 border border-slate-700/50">
-                    {item.badge}
+                  <span className="ml-1 text-[10px] font-mono font-normal text-slate-500">
+                    ({item.badge})
                   </span>
                 )}
               </span>

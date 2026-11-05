@@ -1038,13 +1038,12 @@ export function StudentPortalContent({
         currentApp="student"
         header={{
         appName: 'Smart-BKT-Chain',
-        badgeText: 'Student Portal v2.0',
+        badgeText: 'Student',
         logoIcon: Brain,
-        logoColor: 'bg-indigo-600/20 border-indigo-500/30 text-indigo-400',
-        badgeColor: 'bg-indigo-500/20 text-indigo-300 border-indigo-500/30',
+        logoColor: 'bg-indigo-500/15 text-indigo-400',
         courseBadge: (
           <span
-            className="text-sm sm:text-[14px] font-normal text-slate-300 select-none tracking-normal"
+            className="text-xs sm:text-[13px] font-normal text-slate-300 select-none tracking-normal"
             title={`Активний курс: ${courses.find((c) => c.slug === activeCourseSlug)?.title || activeCourseSlug}`}
           >
             {courses.find((c) => c.slug === activeCourseSlug)?.title || activeCourseSlug}
@@ -1067,7 +1066,7 @@ export function StudentPortalContent({
           />
         ),
         rightSlot: (
-          <div className="flex items-center gap-2.5 sm:gap-3">
+          <div className="flex items-center gap-2">
             {/* 💊 Компактний інтерактивний мікро-віджет прогресу та BKT */}
             <StudentProgressPill
               courseTitle={courses.find((c) => c.slug === activeCourseSlug)?.title || activeCourseSlug}
@@ -1080,19 +1079,26 @@ export function StudentPortalContent({
               onOpenSkillDag={() => handleTabClick('bkt')}
             />
 
+            <div className="h-4 w-[1px] bg-slate-800" />
+
             {/* Профіль студента у крайньому правому кутку (відкриває Profile Drawer) */}
             <button
               type="button"
               onClick={() => setIsProfileDrawerOpen(true)}
-              className="flex items-center gap-2 bg-slate-950/80 hover:bg-slate-900 px-2.5 py-1 rounded-full border border-slate-800 hover:border-indigo-500/50 transition-all cursor-pointer select-none text-left group"
+              className="flex items-center gap-2 hover:bg-slate-800/60 px-2 py-1 rounded-lg transition-colors cursor-pointer select-none text-left group"
               title="Натисніть для відкриття профілю та вибору курсів"
             >
-              <div className="w-6 h-6 rounded-full bg-gradient-to-tr from-indigo-600 to-purple-500 flex items-center justify-center text-[10px] font-bold text-white shadow-sm ring-1 ring-indigo-500/30 group-hover:scale-105 transition-transform">
+              <div className="w-6 h-6 rounded-full bg-gradient-to-tr from-indigo-600 to-purple-500 flex items-center justify-center text-[10px] font-bold text-white shrink-0">
                 ДС
               </div>
-              <span className="hidden lg:inline text-xs font-semibold text-slate-200 group-hover:text-white transition-colors">
-                Дмитро Стеценко
-              </span>
+              <div className="hidden lg:flex flex-col leading-none">
+                <span className="text-xs font-medium text-slate-200 group-hover:text-white transition-colors">
+                  Дмитро Стеценко
+                </span>
+                <span className="text-[9px] font-mono text-indigo-400 mt-0.5">
+                  УЧЕНЬ
+                </span>
+              </div>
             </button>
           </div>
         ),

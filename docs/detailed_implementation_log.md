@@ -29,6 +29,20 @@
   4. *Install Monorepo Dependencies* (`npm ci || npm install`) — синхронізація робочих просторів монорепозиторію.
   5. *Build Next.js Documentation Site* (`npm run build:docs`) — збірка статичного експорту (`output: "export"`, `trailingSlash: true`, `basePath: "/magisterts-smart-bkt-chain"`).
   6. *Upload Artifact & Deploy Pages* (`actions/upload-pages-artifact@v3` + `actions/deploy-pages@v4`).
+### 0.1.7.44 Мінімалістичний Безрамковий Редизайн Хедера Платформи та Breadcrumbs (SBC-335, EP-SH / EP-TC / EP-ST / EP-AD)
+- **Архітектурна концепція:**
+  - Завершення цілісної візуальної трансформації інтерфейсу шляхом очищення шапки (`AppShellLayout` header), хлібних крихт (`Breadcrumbs`) та правих контролів (`rightSlot`) від вкладених рамок і важких капсул.
+- **Виконані інженерні зміни:**
+  1. **[`packages/ui/src/shell/AppShellLayout.tsx`](file:///packages/ui/src/shell/AppShellLayout.tsx):**
+     - Висота хедера оптимізована до `h-[56px]`, іконка бренду переведена на чистий квадрат `w-7 h-7 rounded-lg` без рамки (`border`), а бейдж порталу — на лаконічний текстовий індикатор `text-[10px] font-mono text-slate-500`.
+  2. **[`packages/ui/src/breadcrumbs/Breadcrumbs.tsx`](file:///packages/ui/src/breadcrumbs/Breadcrumbs.tsx):**
+     - Бейджі елементів хлібних крихт переведені з рамочних тегів `border border-slate-700/50` на чистий моноширинний текст `({item.badge})`.
+  3. **Правий слот хедера у [`apps/teacher/src/app/page.tsx`](file:///apps/teacher/src/app/page.tsx), [`apps/student/src/components/StudentPortalApp.tsx`](file:///apps/student/src/components/StudentPortalApp.tsx), [`apps/student/src/components/StudentProgressPill.tsx`](file:///apps/student/src/components/StudentProgressPill.tsx), [`apps/study/src/components/StudyAppClient.tsx`](file:///apps/study/src/components/StudyAppClient.tsx) та [`apps/admin/src/app/page.tsx`](file:///apps/admin/src/app/page.tsx):**
+     - Селектор студента (`#teacher-student-dropdown-btn`) та пігулка прогресу (`StudentProgressPill`) оформлені як плоскі інтерактивні кнопки `bg-slate-800/50 hover:bg-slate-800/80 rounded-lg` без рамок, а список студентів у випадаючому меню організовано через `divide-y divide-slate-800/50`.
+     - Тригер профілю користувача у всіх порталах уніфіковано як безрамковий елемент (`hover:bg-slate-800/60 px-2 py-1 rounded-lg`) з аватаром, ім'ям та підписом ролі без вкладеної рамки.
+- **Верифікація:**
+  - `npm run build:teacher` пройдено успішно.
+
 ### 0.1.7.43 Мінімалістичний Редизайн Бічного Меню та Бічних Панелей (SBC-334, EP-SH / EP-TC)
 - **Архітектурна концепція:**
   - Позбавлення лівого бічного меню (`navigationRail`), висувних панелей (`drawer`, `UserProfileDrawer`) та внутрішніх списків від важких рамок, тіней та вкладених карток.

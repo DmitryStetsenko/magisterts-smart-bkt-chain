@@ -154,6 +154,9 @@
 | **SBC-281** | `Story` | `ST` | implement standalone interactive study application apps/study with live code playground | 2026-10-27 | `b1914a3` |
 | **SBC-282** | `Story` | `ST` | unify study portal design with opera rail drawer sections and cross app shortcuts | 2026-10-27 | `pending` |
 | **SBC-315** | `Story` | `SH` | construct canonical FSD shared UI kit with Button, Modal, Badge, Tooltip and Select in @sbc/ui | 2026-11-02 | `backlog` |
+| **SBC-330** | `Story` | `SH` | create reusable UserProfileDrawer in @sbc/ui and integrate across all apps | 2026-11-04 | `c1d4c3e` |
+| **SBC-334** | `Style` | `SH` | refine navigation rail and side drawers into minimalist borderless style | 2026-11-05 | `3d83ece` |
+| **SBC-335** | `Style` | `SH` | refine AppShellLayout header, breadcrumbs badges and right-slot triggers into minimalist borderless style | 2026-11-05 | `pending` |
 
 ---
 
@@ -361,6 +364,9 @@
 | **SBC-268** | `Fix` | `BKT` | prevent repeated submission spamming and duplicate BKT score inflation | 2026-10-23 | `738bad0` |
 | **SBC-275** | `Story` | `TC` | implement global student BKT reset confirmation modal with clear scope warnings | 2026-10-25 | `1128b73` |
 | **SBC-276** | `Story` | `TC` | implement course-scoped BKT reset and safety toggle for global student reset | 2026-10-25 | `dafdb7b` |
+| **SBC-331** | `Fix` | `TC` | remove duplicate course selector dropdown in teacher portal header | 2026-11-04 | `f9a0e4d` |
+| **SBC-332** | `Fix` | `TC` | remove duplicate breadcrumbs inside main canvas of teacher and admin portals | 2026-11-05 | `306d0de` |
+| **SBC-333** | `Style` | `TC` | declutter teacher portal workspace into clean borderless canvas | 2026-11-05 | `7e94eb6` |
 
 
 ---

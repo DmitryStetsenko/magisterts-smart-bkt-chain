@@ -121,27 +121,27 @@ export function AppShellLayout({
   return (
     <div className={`h-screen w-screen bg-slate-950 text-slate-100 flex flex-col font-sans overflow-hidden relative ${className}`}>
       
-      {/* 📌 1. STICKY TOP NAVIGATION BAR (Header Bar h-[62px]) */}
+      {/* 📌 1. STICKY TOP NAVIGATION BAR (Minimalist Borderless Header h-[56px]) */}
       {!header.hideHeader && (
-        <header className="h-[62px] w-full bg-slate-900 border-b border-slate-800/80 px-4 flex items-center justify-between shrink-0 z-30">
-          <div className="flex items-center gap-3 shrink-0">
-            <div className={`p-1.5 rounded-lg border shrink-0 ${header.logoColor || 'bg-blue-600/20 border-blue-500/30 text-blue-400'}`}>
-              <HeaderLogo className="w-5 h-5" />
+        <header className="h-[56px] w-full bg-slate-900 border-b border-slate-800/80 px-4 flex items-center justify-between shrink-0 z-30">
+          <div className="flex items-center gap-2.5 shrink-0">
+            <div className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 ${header.logoColor || 'bg-blue-500/15 text-blue-400'}`}>
+              <HeaderLogo className="w-4 h-4" />
             </div>
 
             <div className="flex flex-col justify-center">
-              <div className="flex items-center gap-2.5">
-                <h1 className="text-xs sm:text-sm font-bold text-white flex items-center gap-1.5 leading-tight">
+              <div className="flex items-center gap-2">
+                <h1 className="text-xs sm:text-[13px] font-bold text-white flex items-center gap-1.5 leading-none">
                   <span>{header.appName}</span>
-                  <span className={`px-1.5 py-0.2 text-[9px] font-mono rounded border ${header.badgeColor || 'bg-blue-500/20 text-blue-300 border-blue-500/30'}`}>
+                  <span className="text-[10px] font-mono font-normal text-slate-500">
                     {header.badgeText}
                   </span>
                 </h1>
 
                 {header.courseBadge && (
                   <>
-                    <div className="h-3.5 w-[1px] bg-slate-800 ml-1.5 hidden sm:block" />
-                    <div className="hidden sm:flex items-center pl-1">
+                    <div className="h-3 w-[1px] bg-slate-800 ml-1 hidden sm:block" />
+                    <div className="hidden sm:flex items-center pl-1 leading-none">
                       {header.courseBadge}
                     </div>
                   </>
@@ -149,7 +149,7 @@ export function AppShellLayout({
               </div>
 
               {header.breadcrumbs && (
-                <div className="flex items-center mt-2">
+                <div className="flex items-center mt-1.5">
                   {header.breadcrumbs}
                 </div>
               )}
@@ -163,7 +163,7 @@ export function AppShellLayout({
           )}
 
           {header.rightSlot && (
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2.5">
               {header.rightSlot}
             </div>
           )}

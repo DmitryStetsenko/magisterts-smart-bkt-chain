@@ -120,6 +120,61 @@
           ]
         },
         {
+          "title": "0.1.7.44 Мінімалістичний Безрамковий Редизайн Хедера Платформи та Breadcrumbs (SBC-335, EP-SH / EP-TC / EP-ST / EP-AD)",
+          "level": 3,
+          "paragraphs": [],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "**Архітектурна концепція:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Завершення цілісної візуальної трансформації інтерфейсу шляхом очищення шапки (`AppShellLayout` header), хлібних крихт (`Breadcrumbs`) та правих контролів (`rightSlot`) від вкладених рамок і важких капсул.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Виконані інженерні зміни:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**[`packages/ui/src/shell/AppShellLayout.tsx`](file:///packages/ui/src/shell/AppShellLayout.tsx):**",
+              "subitems": [
+                "Висота хедера оптимізована до `h-[56px]`, іконка бренду переведена на чистий квадрат `w-7 h-7 rounded-lg` без рамки (`border`), а бейдж порталу — на лаконічний текстовий індикатор `text-[10px] font-mono text-slate-500`."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**[`packages/ui/src/breadcrumbs/Breadcrumbs.tsx`](file:///packages/ui/src/breadcrumbs/Breadcrumbs.tsx):**",
+              "subitems": [
+                "Бейджі елементів хлібних крихт переведені з рамочних тегів `border border-slate-700/50` на чистий моноширинний текст `({item.badge})`."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Правий слот хедера у [`apps/teacher/src/app/page.tsx`](file:///apps/teacher/src/app/page.tsx), [`apps/student/src/components/StudentPortalApp.tsx`](file:///apps/student/src/components/StudentPortalApp.tsx), [`apps/student/src/components/StudentProgressPill.tsx`](file:///apps/student/src/components/StudentProgressPill.tsx), [`apps/study/src/components/StudyAppClient.tsx`](file:///apps/study/src/components/StudyAppClient.tsx) та [`apps/admin/src/app/page.tsx`](file:///apps/admin/src/app/page.tsx):**",
+              "subitems": [
+                "Селектор студента (`#teacher-student-dropdown-btn`) та пігулка прогресу (`StudentProgressPill`) оформлені як плоскі інтерактивні кнопки `bg-slate-800/50 hover:bg-slate-800/80 rounded-lg` без рамок, а список студентів у випадаючому меню організовано через `divide-y divide-slate-800/50`.",
+                "Тригер профілю користувача у всіх порталах уніфіковано як безрамковий елемент (`hover:bg-slate-800/60 px-2 py-1 rounded-lg`) з аватаром, ім'ям та підписом ролі без вкладеної рамки."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Верифікація:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "`npm run build:teacher` пройдено успішно.",
+              "subitems": []
+            }
+          ]
+        },
+        {
           "title": "0.1.7.43 Мінімалістичний Редизайн Бічного Меню та Бічних Панелей (SBC-334, EP-SH / EP-TC)",
           "level": 3,
           "paragraphs": [],
