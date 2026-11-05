@@ -29,6 +29,16 @@
   4. *Install Monorepo Dependencies* (`npm ci || npm install`) — синхронізація робочих просторів монорепозиторію.
   5. *Build Next.js Documentation Site* (`npm run build:docs`) — збірка статичного експорту (`output: "export"`, `trailingSlash: true`, `basePath: "/magisterts-smart-bkt-chain"`).
   6. *Upload Artifact & Deploy Pages* (`actions/upload-pages-artifact@v3` + `actions/deploy-pages@v4`).
+### 0.1.7.41 Усунення Дублювання Хлібних Крихт у Тілі Сторінок (SBC-332, EP-TC / EP-AD)
+- **Контекст виявлення:**
+  - Після винесення хлібних крихт у другий поверх стандартизованого хедера `AppShellLayout` у кабінеті викладача (`apps/teacher`) над карточкою обраного студента залишався старий рудиментарний блок `<Breadcrumbs>`, що дублював відображення `Курс / Когортна аналітика / Студент % P(L)`.
+  - У порталі адміністратора (`apps/admin`) перед контейнером вкладок також знаходився застарілий виклик `<Breadcrumbs>`.
+- **Виконані зміни:**
+  - З [`apps/teacher/src/app/page.tsx`](file:///apps/teacher/src/app/page.tsx) вилучено внутрішньосторінковий виклик `<Breadcrumbs>`. Хлібні крихти тепер відображаються централізовано виключно у пропі `header.breadcrumbs` компонента `AppShellLayout`.
+  - З [`apps/admin/src/app/page.tsx`](file:///apps/admin/src/app/page.tsx) вилучено внутрішньосторінковий виклик `<Breadcrumbs>`.
+- **Верифікація:**
+  - Успішна збірка `npm run build:teacher` та `npm run build:admin`.
+
 ### 0.1.7.40 Ліквідація Дублюючого Селектора Курсу в Кабінеті Викладача (SBC-331, EP-TC)
 - **Контекст та інженерний мотив:**
   - У процесі масштабування дворівневої шапки та уніфікації `UserProfileDrawer` у кабінеті викладача (`apps/teacher`) в правій зоні залишався застарілий `<select id="teacher-course-select">`.

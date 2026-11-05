@@ -120,6 +120,54 @@
           ]
         },
         {
+          "title": "0.1.7.41 Усунення Дублювання Хлібних Крихт у Тілі Сторінок (SBC-332, EP-TC / EP-AD)",
+          "level": 3,
+          "paragraphs": [],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "**Контекст виявлення:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Після винесення хлібних крихт у другий поверх стандартизованого хедера `AppShellLayout` у кабінеті викладача (`apps/teacher`) над карточкою обраного студента залишався старий рудиментарний блок `<Breadcrumbs>`, що дублював відображення `Курс / Когортна аналітика / Студент % P(L)`.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "У порталі адміністратора (`apps/admin`) перед контейнером вкладок також знаходився застарілий виклик `<Breadcrumbs>`.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Виконані зміни:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "З [`apps/teacher/src/app/page.tsx`](file:///apps/teacher/src/app/page.tsx) вилучено внутрішньосторінковий виклик `<Breadcrumbs>`. Хлібні крихти тепер відображаються централізовано виключно у пропі `header.breadcrumbs` компонента `AppShellLayout`.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "З [`apps/admin/src/app/page.tsx`](file:///apps/admin/src/app/page.tsx) вилучено внутрішньосторінковий виклик `<Breadcrumbs>`.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Верифікація:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Успішна збірка `npm run build:teacher` та `npm run build:admin`.",
+              "subitems": []
+            }
+          ]
+        },
+        {
           "title": "0.1.7.40 Ліквідація Дублюючого Селектора Курсу в Кабінеті Викладача (SBC-331, EP-TC)",
           "level": 3,
           "paragraphs": [],

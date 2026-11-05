@@ -1771,48 +1771,6 @@ export default function TeacherDashboardPage() {
       }
     >
       <div className="flex flex-col gap-6">
-        {/* 🧭 Єдині хлібні крихти платформи */}
-        <Breadcrumbs
-          className="text-[11px]"
-          items={[
-            {
-              label: activeCourse.title,
-              onClick: () => handleTabClick('coursemap'),
-            },
-            {
-              label: activeTab === 'analytics'
-                ? 'Когортна аналітика'
-                : activeTab === 'coursemap'
-                ? 'Граф компетенцій'
-                : activeTab === 'reviews'
-                ? 'Черга перевірки'
-                : activeTab === 'metrics-audit'
-                ? 'Аудит BKT'
-                : 'Параметри',
-              onClick: () => handleTabClick(activeTab),
-            },
-            ...(selectedStudent && activeTab === 'analytics'
-              ? [
-                  {
-                    label: selectedStudent.name,
-                    badge: `${(selectedStudent.averageMastery !== undefined ? (selectedStudent.averageMastery * 100).toFixed(0) : '0')}% P(L)`,
-                    isCurrent: true,
-                  },
-                ]
-              : [
-                  {
-                    label: activeTab === 'reviews'
-                      ? `Перевірка відповідей (${reviewQueue.length})`
-                      : activeTab === 'coursemap'
-                      ? 'Модулі курсу'
-                      : activeTab === 'metrics-audit'
-                      ? 'What-If Симулятор'
-                      : 'Огляд групи',
-                    isCurrent: true,
-                  },
-                ]),
-          ]}
-        />
 
           {/* Main View 1: Student Detailed Analytics & Heatmap */}
           {activeTab === 'analytics' && selectedStudent && (

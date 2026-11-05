@@ -207,24 +207,6 @@ export default function AdminCMSDashboard() {
       }}
       mainClassName="p-4 lg:p-6 overflow-y-auto flex flex-col gap-4 bg-slate-950"
     >
-      {/* 🧭 Єдині хлібні крихти платформи */}
-      <Breadcrumbs
-        className="text-[11px]"
-        items={[
-          {
-            label: 'CMS Адміністрування',
-            onClick: () => handleTabClick('dag'),
-          },
-          {
-            label: activeTab === 'dag'
-              ? 'Конструктор Skill DAG'
-              : activeTab === 'courses'
-              ? 'Реєстр курсів та завдань'
-              : 'Системні налаштування',
-            isCurrent: true,
-          },
-        ]}
-      />
 
       <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl min-h-[400px]">
         {activeTab === 'dag' && (
