@@ -7,7 +7,7 @@
 | Епік | Назва | Кількість завдань |
 | :--- | :--- | :---: |
 | **`SBC-EP-INF`** | Monorepo & CI/CD Setup | 91 |
-| **`SBC-EP-SH`** | Database Modeling & Shared Packages | 22 |
+| **`SBC-EP-SH`** | Database Modeling & Shared Packages | 23 |
 | **`SBC-EP-BK`** | Authentication & Core API | 14 |
 | **`SBC-EP-BKT`** | Bayesian Knowledge Tracing & Behavioral Telemetry | 29 |
 | **`SBC-EP-LLM`** | Automated Code Assessment & Open-Text Evaluation | 10 |
@@ -17,7 +17,7 @@
 | **`SBC-EP-AD`** | Admin Portal & Knowledge DAG Builder | 8 |
 | **`SBC-EP-LD`** | Landing Web Page | 9 |
 | **`SBC-EP-MS`** | Master's Thesis Engineering & Academic Text Generation | 6 |
-| **ВСЬОГО** | - | **252** |
+| **ВСЬОГО** | - | **253** |
 
 ---
 
@@ -300,7 +300,8 @@
 | **SBC-330** | Feat | SH | create reusable UserProfileDrawer component in sbc-ui and integrate across all apps | 2026-11-04 | deaf152 |
 | **SBC-331** | Clean | TC | eliminate redundant header course selector in teacher dashboard to enforce single source of truth | 2026-11-04 | 7c6ac57 |
 | **SBC-332** | Refactor | TC | remove duplicate breadcrumbs from main canvas in teacher and admin portals | 2026-11-05 | 306d0de |
-| **SBC-333** | Style | TC | declutter teacher dashboard views into clean borderless canvas layout | 2026-11-05 | working-tree |
+| **SBC-333** | Style | TC | declutter teacher dashboard views into clean borderless canvas layout | 2026-11-05 | 7e94eb6 |
+| **SBC-334** | Style | SH | refine navigation rail and side drawers into minimalist borderless style | 2026-11-05 | working-tree |
 
 ---
 

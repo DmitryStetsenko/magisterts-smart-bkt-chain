@@ -23,16 +23,14 @@ export interface DrawerSectionProps {
 /**
  * 📐 DrawerSection (Rule 7 Standard)
  * Reusable, borderless, collapsible accordion section for Side Drawers across Teacher, Student, and Admin portals.
- * Conforms strictly to Rule 7 (Side Drawer Sections Standard) in .agents/AGENTS.md.
  */
 export function DrawerSection({
   id,
   title,
   icon: Icon,
-  iconColor = 'text-purple-400',
-  titleColor = 'text-purple-400 group-hover:text-purple-300',
+  iconColor = 'text-slate-400',
+  titleColor = 'text-slate-400 group-hover:text-slate-200',
   badge,
-  badgeColor = 'bg-purple-500/10 text-purple-300 border-purple-500/20',
   defaultOpen = true,
   isOpen: controlledIsOpen,
   onToggle,
@@ -56,34 +54,32 @@ export function DrawerSection({
   };
 
   return (
-    <div id={id} className={`flex flex-col gap-2 ${className}`}>
-      {/* 📌 Header button matching Rule 7 */}
+    <div id={id} className={`flex flex-col gap-1.5 ${className}`}>
       <button
         type="button"
         onClick={handleToggle}
         className="w-full flex items-center justify-between text-left px-0.5 py-1 text-slate-400 hover:text-white transition-colors cursor-pointer group"
       >
-        <span className={`text-[11px] font-bold uppercase tracking-wider flex items-center gap-1.5 transition-colors ${titleColor}`}>
+        <span className={`text-[11px] font-semibold uppercase tracking-wider flex items-center gap-1.5 transition-colors ${titleColor}`}>
           {Icon && <Icon className={`w-3.5 h-3.5 ${iconColor}`} />}
           <span>{title}</span>
           {badge !== undefined && (
-            <span className={`px-1.5 py-0.2 rounded text-[9px] font-mono border ${badgeColor}`}>
-              {badge}
+            <span className="text-[10px] font-mono text-slate-500 font-normal">
+              ({badge})
             </span>
           )}
         </span>
 
         <div className="flex items-center gap-1.5">
           {action && <div onClick={(e) => e.stopPropagation()}>{action}</div>}
-          <span className="p-0.5 rounded text-slate-400 group-hover:text-white group-hover:bg-slate-800 transition-all flex items-center justify-center">
-            {open ? <Minus className="w-4 h-4 stroke-[2.5]" /> : <Plus className="w-4 h-4 stroke-[2.5]" />}
+          <span className="p-0.5 rounded text-slate-500 group-hover:text-white transition-colors flex items-center justify-center">
+            {open ? <Minus className="w-3.5 h-3.5 stroke-[2]" /> : <Plus className="w-3.5 h-3.5 stroke-[2]" />}
           </span>
         </div>
       </button>
 
-      {/* 📜 Content with animated entrance */}
       {open && (
-        <div className={`animate-fadeIn flex flex-col gap-2 ${contentClassName}`}>
+        <div className={`animate-fadeIn flex flex-col gap-1.5 ${contentClassName}`}>
           {children}
         </div>
       )}

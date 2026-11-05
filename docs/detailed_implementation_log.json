@@ -120,6 +120,62 @@
           ]
         },
         {
+          "title": "0.1.7.43 Мінімалістичний Редизайн Бічного Меню та Бічних Панелей (SBC-334, EP-SH / EP-TC)",
+          "level": 3,
+          "paragraphs": [],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "**Архітектурна концепція:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Позбавлення лівого бічного меню (`navigationRail`), висувних панелей (`drawer`, `UserProfileDrawer`) та внутрішніх списків від важких рамок, тіней та вкладених карток.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Виконані інженерні зміни:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**[`packages/ui/src/shell/AppShellLayout.tsx`](file:///packages/ui/src/shell/AppShellLayout.tsx):**",
+              "subitems": [
+                "Вертикальна рейка звужена до `w-12`, кнопки вкладок та міжпортальні іконки переведені на безрамковий стиль (`w-9 h-9 rounded-lg`) з м'якою підсвіткою активного стану (`bg-slate-800/90 text-white`) і тонким індикатором `w-0.5`.",
+                "Ширина сайдбара оптимізована до `sm:w-[300px] lg:w-[320px]`."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**[`packages/ui/src/drawer/DrawerSection.tsx`](file:///packages/ui/src/drawer/DrawerSection.tsx) та [`packages/ui/src/drawer/UserProfileDrawer.tsx`](file:///packages/ui/src/drawer/UserProfileDrawer.tsx):**",
+              "subitems": [
+                "Лічильники у заголовках секцій оформлені як чисті текстові індикатори `({badge})` без рамок.",
+                "Елементи курсів, статистики та посилань у `UserProfileDrawer` організовані через `divide-y divide-slate-800/50`."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**[`apps/teacher/src/app/page.tsx`](file:///apps/teacher/src/app/page.tsx):**",
+              "subitems": [
+                "Списки учнів, радар ризиків, когнітивні пастки, черга перевірки та інструменти аудиту в бічній панелі переведені з рамочних карток на чисті рядки з розділювачами `divide-y divide-slate-800/50`."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Верифікація:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "`npm run build:teacher` пройдено успішно.",
+              "subitems": []
+            }
+          ]
+        },
+        {
           "title": "0.1.7.42 Очищення Робочої Області Кабінету Викладача за Принципом Clean Borderless Canvas (SBC-333, EP-TC)",
           "level": 3,
           "paragraphs": [],

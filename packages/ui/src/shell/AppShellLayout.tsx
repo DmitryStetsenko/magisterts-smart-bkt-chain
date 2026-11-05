@@ -8,47 +8,42 @@ import {
   Code2, 
   BookOpen, 
   Settings,
-  ChevronDown,
   X
 } from 'lucide-react';
-import { AppName, APP_PORTS, getAppBaseUrl, ROUTES } from '@sbc/routes';
+import { AppName, getAppBaseUrl } from '@sbc/routes';
 
 export interface NavTabItem {
   id: string;
   icon: LucideIcon;
   title: string;
   badge?: string | number;
-  activeColor?: string; // наприклад, 'bg-blue-600', 'bg-indigo-600'
+  activeColor?: string;
 }
 
 export interface AppShellLayoutProps {
   currentApp: AppName;
-  // Шапка (Header Bar)
   header: {
     logoIcon?: LucideIcon;
-    logoColor?: string; // наприклад, 'bg-blue-600/20 text-blue-400 border-blue-500/30'
-    appName: string; // наприклад, 'Smart-BKT-Chain'
-    badgeText: string; // наприклад, 'Study Portal v2.0'
+    logoColor?: string;
+    appName: string;
+    badgeText: string;
     badgeColor?: string;
-    courseBadge?: React.ReactNode; // Назва активного курсу праворуч від логотипа/порталу
-    breadcrumbs?: React.ReactNode; // Хлібні крихти, що відображаються нижнім рядком під логотипом
+    courseBadge?: React.ReactNode;
+    breadcrumbs?: React.ReactNode;
     centerSlot?: React.ReactNode;
     rightSlot?: React.ReactNode;
     hideHeader?: boolean;
   };
-  // Вертикальна рейка (Opera Rail)
   navigationRail: {
     tabs: NavTabItem[];
     activeTab: string;
     isDrawerOpen: boolean;
     onTabClick: (tabId: string) => void;
-    // Налаштування (шестерня на дні)
     settingsTabId?: string;
     onSettingsClick?: () => void;
     isSettingsActive?: boolean;
     hideRail?: boolean;
   };
-  // Висувний сайдбар (Drawer)
   drawer?: {
     isOpen: boolean;
     title: React.ReactNode;
@@ -56,10 +51,9 @@ export interface AppShellLayoutProps {
     iconColor?: string;
     headerBadge?: string;
     children: React.ReactNode;
-    widthClass?: string; // за замовчуванням 'w-full sm:w-[340px] lg:w-[380px]'
+    widthClass?: string;
     onClose?: () => void;
   };
-  // Головний робочий простір (Canvas)
   children: React.ReactNode;
   mainScrollRef?: React.Ref<HTMLElement>;
   onMainScroll?: (e: React.UIEvent<HTMLElement>) => void;
@@ -72,10 +66,10 @@ export interface AppShellLayoutProps {
  * 🏛️ AppShellLayout (Opera Shell v2.0 Standard)
  * Єдиний уніфікований лейаут для всіх застосунків екосистеми Smart-BKT-Chain:
  * - Фіксована висота екрану: h-screen w-screen overflow-hidden.
- * - Стандартизований верхній Header Bar (h-14).
- * - Ліва тонка рейка Opera Vertical Icon Rail (w-14) з авто-генерацією іконок інших порталів.
- * - Висувний Side Drawer для DrawerSection із незалежним скролом.
- * - Головний Main Content Canvas з окремим ізольованим скролом (ніколи не скролить навігацію).
+ * - Стандартизований верхній Header Bar (h-[62px]).
+ * - Ліва тонка рейка Opera Vertical Icon Rail (w-12) у мінімалістичному безрамковому стилі.
+ * - Висувний Side Drawer для DrawerSection із чистими розділювачами та власним скролом.
+ * - Головний Main Content Canvas з окремим ізольованим скролом.
  */
 export function AppShellLayout({
   currentApp,
@@ -91,37 +85,36 @@ export function AppShellLayout({
 }: AppShellLayoutProps) {
   const HeaderLogo = header.logoIcon || BookOpen;
 
-  // Конфігурація швидких міжпортальних переходів для нижнього стеку Opera Rail
-  const ecosystemPortals: { app: AppName; icon: LucideIcon; title: string; colorClasses: string }[] = [
+  const ecosystemPortals: { app: AppName; icon: LucideIcon; title: string; hoverColor: string }[] = [
     {
       app: 'study',
       icon: BookOpen,
       title: 'Підручник Теорії (Study Portal - 3006)',
-      colorClasses: 'bg-blue-600/15 text-blue-400 border-blue-500/20 hover:bg-blue-600/30 hover:border-blue-500/40',
+      hoverColor: 'hover:text-blue-400 hover:bg-slate-800/60',
     },
     {
       app: 'student',
       icon: GraduationCap,
       title: 'Інтерактивний Тренажер BKT (Student Portal - 3002)',
-      colorClasses: 'bg-indigo-600/15 text-indigo-400 border-indigo-500/20 hover:bg-indigo-600/30 hover:border-indigo-500/40',
+      hoverColor: 'hover:text-indigo-400 hover:bg-slate-800/60',
     },
     {
       app: 'teacher',
       icon: User,
       title: 'Кабінет Викладача (Teacher Portal - 3003)',
-      colorClasses: 'bg-purple-600/15 text-purple-400 border-purple-500/20 hover:bg-purple-600/30 hover:border-purple-500/40',
+      hoverColor: 'hover:text-purple-400 hover:bg-slate-800/60',
     },
     {
       app: 'admin',
       icon: Code2,
       title: 'Панель Адміністратора CMS (Admin Portal - 3004)',
-      colorClasses: 'bg-emerald-600/15 text-emerald-400 border-emerald-500/20 hover:bg-emerald-600/30 hover:border-emerald-500/40',
+      hoverColor: 'hover:text-emerald-400 hover:bg-slate-800/60',
     },
     {
       app: 'docs',
       icon: BookOpen,
       title: 'Портал Системної Документації (Docs - 3005)',
-      colorClasses: 'bg-slate-800/60 text-slate-400 border-slate-700/60 hover:bg-slate-800 hover:text-white',
+      hoverColor: 'hover:text-slate-200 hover:bg-slate-800/60',
     },
   ];
 
@@ -130,15 +123,13 @@ export function AppShellLayout({
       
       {/* 📌 1. STICKY TOP NAVIGATION BAR (Header Bar h-[62px]) */}
       {!header.hideHeader && (
-        <header className="h-[62px] w-full bg-slate-900 border-b border-slate-800/90 px-4 flex items-center justify-between shrink-0 z-30 shadow-md">
-          {/* Ліва зона: Логотип + (Назва + Курс зверху) / (Хлібні крихти локального завдання знизу) */}
+        <header className="h-[62px] w-full bg-slate-900 border-b border-slate-800/80 px-4 flex items-center justify-between shrink-0 z-30">
           <div className="flex items-center gap-3 shrink-0">
             <div className={`p-1.5 rounded-lg border shrink-0 ${header.logoColor || 'bg-blue-600/20 border-blue-500/30 text-blue-400'}`}>
               <HeaderLogo className="w-5 h-5" />
             </div>
 
             <div className="flex flex-col justify-center">
-              {/* Рядок 1: Брендинг системи + Бейдж підсистеми + Текстова назва курсу */}
               <div className="flex items-center gap-2.5">
                 <h1 className="text-xs sm:text-sm font-bold text-white flex items-center gap-1.5 leading-tight">
                   <span>{header.appName}</span>
@@ -157,7 +148,6 @@ export function AppShellLayout({
                 )}
               </div>
 
-              {/* Рядок 2: Хлібні крихти локальної навички/завдання з виразним відступом вниз mt-2 */}
               {header.breadcrumbs && (
                 <div className="flex items-center mt-2">
                   {header.breadcrumbs}
@@ -166,14 +156,12 @@ export function AppShellLayout({
             </div>
           </div>
 
-          {/* Центральна зона: Контекстна плашка (хлібні крихти / прогрес) */}
           {header.centerSlot && (
             <div className="hidden md:flex items-center gap-2">
               {header.centerSlot}
             </div>
           )}
 
-          {/* Права зона: Селектор курсу та профіль */}
           {header.rightSlot && (
             <div className="flex items-center gap-3">
               {header.rightSlot}
@@ -185,11 +173,11 @@ export function AppShellLayout({
       {/* 🚀 2. ГОЛОВНИЙ РОБОЧИЙ ПРОСТІР (Opera Rail + Side Drawer + Main Canvas) */}
       <div className="flex-1 flex overflow-hidden relative">
 
-        {/* 📑 2.1 ВЕРТИКАЛЬНА РЕЙКА НАВІГАЦІЇ (Opera Vertical Icon Rail w-14) */}
+        {/* 📑 2.1 ВЕРТИКАЛЬНА РЕЙКА НАВІГАЦІЇ (Minimalist Borderless Icon Rail w-12) */}
         {!navigationRail.hideRail && (
-          <nav className="w-14 bg-slate-900 border-r border-slate-800 flex flex-col items-center py-3 justify-between shrink-0 z-20 shadow-xl select-none">
+          <nav className="w-12 bg-slate-900 border-r border-slate-800/80 flex flex-col items-center py-2.5 justify-between shrink-0 z-20 select-none">
             {/* Верхній блок: Таби поточного застосунку */}
-            <div className="flex flex-col items-center gap-2">
+            <div className="flex flex-col items-center gap-1.5">
               {navigationRail.tabs.map((tab) => {
                 const TabIcon = tab.icon;
                 const isActive = navigationRail.activeTab === tab.id;
@@ -199,26 +187,25 @@ export function AppShellLayout({
                   <button
                     key={tab.id}
                     onClick={() => navigationRail.onTabClick(tab.id)}
-                    className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all cursor-pointer relative ${
+                    className={`w-9 h-9 rounded-lg flex items-center justify-center transition-colors cursor-pointer relative ${
                       isActive
-                        ? isDrawerOpen
-                          ? `${tab.activeColor || 'bg-blue-600'} text-white shadow-lg shadow-blue-600/40 ring-1 ring-blue-400/50`
-                          : 'bg-blue-950/80 text-blue-300 border border-blue-500/30 hover:bg-blue-900/90 hover:text-white'
-                        : 'bg-slate-800/60 text-slate-400 hover:bg-slate-800 hover:text-white'
+                        ? 'bg-slate-800/90 text-white'
+                        : 'text-slate-500 hover:bg-slate-800/50 hover:text-slate-200'
                     }`}
                     title={tab.title}
                   >
-                    <TabIcon className="w-5 h-5" />
+                    <TabIcon className="w-[18px] h-[18px]" />
                     {tab.badge !== undefined && tab.badge !== 0 && (
-                      <span className="absolute -top-1 -right-1 px-1.5 py-0.2 rounded-full text-[9px] font-bold bg-amber-500 text-slate-950 font-mono shadow-sm">
+                      <span className="absolute -top-0.5 -right-0.5 px-1 py-0.1 rounded-full text-[8px] font-bold bg-amber-500 text-slate-950 font-mono">
                         {tab.badge}
                       </span>
                     )}
-                    {isActive && isDrawerOpen && (
-                      <span className="absolute -left-1 w-1 h-5 bg-blue-400 rounded-r-full shadow-sm shadow-blue-400"></span>
-                    )}
-                    {isActive && !isDrawerOpen && (
-                      <span className="absolute -left-1 w-1 h-2 bg-blue-400/70 rounded-r-full"></span>
+                    {isActive && (
+                      <span
+                        className={`absolute -left-1.5 w-0.5 rounded-r-full transition-all ${
+                          isDrawerOpen ? 'h-5 bg-purple-400' : 'h-2.5 bg-purple-400/60'
+                        }`}
+                      />
                     )}
                   </button>
                 );
@@ -226,10 +213,9 @@ export function AppShellLayout({
             </div>
 
             {/* Нижній блок: Міжпортальні переходи монорепозиторію + Налаштування */}
-            <div className="flex flex-col items-center gap-2 mt-auto">
-              <div className="w-8 h-[1px] bg-slate-800/80 my-1"></div>
+            <div className="flex flex-col items-center gap-1 mt-auto">
+              <div className="w-6 h-[1px] bg-slate-800/80 my-1"></div>
 
-              {/* Автоматична генерація іконок екосистеми (крім поточного застосунку) */}
               {ecosystemPortals
                 .filter((p) => p.app !== currentApp)
                 .map((portal) => {
@@ -242,7 +228,7 @@ export function AppShellLayout({
                       href={portalUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className={`w-10 h-10 rounded-xl flex items-center justify-center border transition-all cursor-pointer ${portal.colorClasses}`}
+                      className={`w-8 h-8 rounded-lg flex items-center justify-center text-slate-500 transition-colors cursor-pointer ${portal.hoverColor}`}
                       title={portal.title}
                     >
                       <PortalIcon className="w-4 h-4" />
@@ -250,65 +236,64 @@ export function AppShellLayout({
                   );
                 })}
 
-              {/* Розділювач перед налаштуваннями */}
-              <div className="w-8 h-[1px] bg-slate-800/80 my-1"></div>
-
-              {/* Кнопка налаштувань */}
               {navigationRail.onSettingsClick && (
-                <button
-                  onClick={navigationRail.onSettingsClick}
-                  className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all cursor-pointer relative ${
-                    navigationRail.isSettingsActive
-                      ? 'bg-amber-600 text-white shadow-lg shadow-amber-600/40 ring-1 ring-amber-400/50'
-                      : 'bg-slate-800/60 text-slate-400 hover:bg-slate-800 hover:text-white'
-                  }`}
-                  title="Налаштування"
-                >
-                  <Settings className="w-5 h-5" />
-                  {navigationRail.isSettingsActive && (
-                    <span className="absolute -left-1 w-1 h-5 bg-amber-400 rounded-r-full shadow-sm shadow-amber-400"></span>
-                  )}
-                </button>
+                <>
+                  <div className="w-6 h-[1px] bg-slate-800/80 my-1"></div>
+                  <button
+                    onClick={navigationRail.onSettingsClick}
+                    className={`w-9 h-9 rounded-lg flex items-center justify-center transition-colors cursor-pointer relative ${
+                      navigationRail.isSettingsActive
+                        ? 'bg-slate-800/90 text-amber-400'
+                        : 'text-slate-500 hover:bg-slate-800/50 hover:text-slate-200'
+                    }`}
+                    title="Налаштування"
+                  >
+                    <Settings className="w-[18px] h-[18px]" />
+                    {navigationRail.isSettingsActive && (
+                      <span className="absolute -left-1.5 w-0.5 h-5 bg-amber-400 rounded-r-full" />
+                    )}
+                  </button>
+                </>
               )}
             </div>
           </nav>
         )}
 
-        {/* 📂 2.2 ВИСУВНИЙ САЙДБАР (Side Drawer Shell) */}
+        {/* 📂 2.2 ВИСУВНИЙ САЙДБАР (Clean Side Drawer Shell) */}
         {drawer && drawer.isOpen && (
-          <aside className={`${drawer.widthClass || 'w-full sm:w-[340px] lg:w-[380px]'} bg-slate-900/95 border-r border-slate-800 flex flex-col shrink-0 shadow-2xl backdrop-blur-xl animate-fadeIn z-10 overflow-hidden`}>
+          <aside className={`${drawer.widthClass || 'w-full sm:w-[300px] lg:w-[320px]'} bg-slate-900 border-r border-slate-800/80 flex flex-col shrink-0 animate-fadeIn z-10 overflow-hidden`}>
             {/* Шапка сайдбара */}
-            <div className="p-4 border-b border-slate-800 flex items-center justify-between shrink-0 bg-slate-900/90 backdrop-blur-md">
-              <h2 className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-2">
-                {drawer.icon && <drawer.icon className={`w-4 h-4 ${drawer.iconColor || 'text-blue-400'}`} />}
+            <div className="px-3.5 py-2.5 border-b border-slate-800/80 flex items-center justify-between shrink-0">
+              <h2 className="text-[11px] font-semibold text-slate-300 uppercase tracking-wider flex items-center gap-2">
+                {drawer.icon && <drawer.icon className={`w-3.5 h-3.5 ${drawer.iconColor || 'text-purple-400'}`} />}
                 <span>{drawer.title}</span>
               </h2>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1.5">
                 {drawer.headerBadge && (
-                  <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-slate-800 text-slate-400 border border-slate-700">
+                  <span className="px-1.5 py-0.5 rounded text-[9px] font-mono text-slate-400 bg-slate-800/60">
                     {drawer.headerBadge}
                   </span>
                 )}
                 {drawer.onClose && (
                   <button
                     onClick={drawer.onClose}
-                    className="p-1 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-all cursor-pointer"
+                    className="p-1 text-slate-500 hover:text-white hover:bg-slate-800/60 rounded transition-colors cursor-pointer"
                     title="Згорнути бічну панель"
                   >
-                    <X className="w-4 h-4" />
+                    <X className="w-3.5 h-3.5" />
                   </button>
                 )}
               </div>
             </div>
 
             {/* Вміст сайдбара з власним ізольованим скролом */}
-            <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-3">
+            <div className="flex-1 overflow-y-auto px-3.5 py-3 flex flex-col gap-3">
               {drawer.children}
             </div>
           </aside>
         )}
 
-        {/* 📖 2.3 ГОЛОВНИЙ РОБОЧИЙ ПРОСТІР (Main Content Canvas з гарантованим ізольованим скролом) */}
+        {/* 📖 2.3 ГОЛОВНИЙ РОБОЧИЙ ПРОСТІР */}
         <main
           ref={mainScrollRef as any}
           onScroll={onMainScroll}
@@ -318,7 +303,7 @@ export function AppShellLayout({
         </main>
       </div>
 
-      {/* 🧩 3. OVERLAYS ТА ПЛАВАЮЧІ МОДАЛЬНІ ВІКНА / TOASTS */}
+      {/* 🧩 3. OVERLAYS */}
       {overlays}
     </div>
   );

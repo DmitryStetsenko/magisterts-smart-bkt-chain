@@ -454,765 +454,214 @@ export default function TeacherDashboardPage() {
       onClose: () => setIsDrawerOpen(false),
       children: (
         <>
+          {/* Drawer 1: Cohort Bloom Distribution & Live Risk Feed */}
+          {activeTab === 'analytics' && (
+            <div className="flex flex-col divide-y divide-slate-800/70">
+              {/* 📊 Section 1: Cohort Mastery Distribution */}
+              <div className="pb-3 flex flex-col gap-2">
+                <button
+                  onClick={() => setIsCohortDistributionOpen((prev) => !prev)}
+                  className="w-full flex items-center justify-between text-left py-1 text-slate-400 hover:text-white transition-colors cursor-pointer group"
+                >
+                  <span className="text-[11px] font-semibold uppercase tracking-wider flex items-center gap-1.5">
+                    <BarChart3 className="w-3.5 h-3.5 text-purple-400" />
+                    <span>Розподіл Групи</span>
+                    <span className="text-[10px] font-mono text-slate-500 font-normal">({students.length})</span>
+                  </span>
+                  <span className="text-slate-500 group-hover:text-white">
+                    {isCohortDistributionOpen ? <Minus className="w-3.5 h-3.5" /> : <Plus className="w-3.5 h-3.5" />}
+                  </span>
+                </button>
 
-              {/* Drawer 1: Cohort Bloom Distribution & Live Risk Feed (Rule 7 Standard) */}
-              {activeTab === 'analytics' && (
-                <div className="flex flex-col gap-3">
-                  {/* 📊 Section 1: Cohort Mastery Distribution (Bloom Tiers) */}
-                  <div className="flex flex-col gap-2">
-                    <button
-                      onClick={() => setIsCohortDistributionOpen((prev) => !prev)}
-                      className="w-full flex items-center justify-between text-left px-0.5 py-1 text-slate-400 hover:text-white transition-colors cursor-pointer group"
-                    >
-                      <span className="text-[11px] font-bold uppercase tracking-wider text-purple-400 flex items-center gap-1.5 group-hover:text-purple-300 transition-colors">
-                        <BarChart3 className="w-3.5 h-3.5 text-purple-400" />
-                        <span>Розподіл Групи (Блум)</span>
-                        <span className="px-1.5 py-0.2 rounded text-[9px] font-mono bg-purple-500/10 text-purple-300 border border-purple-500/20">
-                          {students.length}
-                        </span>
-                      </span>
-                      <span className="p-0.5 rounded text-slate-400 group-hover:text-white group-hover:bg-slate-800 transition-all flex items-center justify-center">
-                        {isCohortDistributionOpen ? <Minus className="w-4 h-4 stroke-[2.5]" /> : <Plus className="w-4 h-4 stroke-[2.5]" />}
-                      </span>
-                    </button>
+                {isCohortDistributionOpen && (
+                  <div className="flex flex-col gap-2 animate-fadeIn">
+                    <div className="w-full h-1.5 rounded-full bg-slate-950 overflow-hidden flex">
+                      <div
+                        style={{ width: `${students.length ? (cohortMasteryStudents.length / students.length) * 100 : 0}%` }}
+                        className="bg-amber-400 transition-all"
+                        title={`Mastery: ${cohortMasteryStudents.length}`}
+                      />
+                      <div
+                        style={{ width: `${students.length ? (cohortProficientStudents.length / students.length) * 100 : 0}%` }}
+                        className="bg-emerald-500 transition-all"
+                        title={`Proficient: ${cohortProficientStudents.length}`}
+                      />
+                      <div
+                        style={{ width: `${students.length ? (cohortBasicStudents.length / students.length) * 100 : 0}%` }}
+                        className="bg-blue-500 transition-all"
+                        title={`Basic: ${cohortBasicStudents.length}`}
+                      />
+                      <div
+                        style={{ width: `${students.length ? (cohortAtRiskStudents.length / students.length) * 100 : 0}%` }}
+                        className="bg-rose-500 transition-all"
+                        title={`At Risk: ${cohortAtRiskStudents.length}`}
+                      />
+                    </div>
 
-                    {isCohortDistributionOpen && (
-                      <div className="flex flex-col gap-2.5 animate-fadeIn">
-                        {/* Progress Bar of Cohorts */}
-                        <div className="w-full h-2 rounded-full bg-slate-800 overflow-hidden flex shadow-inner">
-                          <div
-                            style={{ width: `${students.length ? (cohortMasteryStudents.length / students.length) * 100 : 0}%` }}
-                            className="bg-amber-400 transition-all"
-                            title={`Mastery: ${cohortMasteryStudents.length}`}
-                          />
-                          <div
-                            style={{ width: `${students.length ? (cohortProficientStudents.length / students.length) * 100 : 0}%` }}
-                            className="bg-emerald-500 transition-all"
-                            title={`Proficient: ${cohortProficientStudents.length}`}
-                          />
-                          <div
-                            style={{ width: `${students.length ? (cohortBasicStudents.length / students.length) * 100 : 0}%` }}
-                            className="bg-blue-500 transition-all"
-                            title={`Basic: ${cohortBasicStudents.length}`}
-                          />
-                          <div
-                            style={{ width: `${students.length ? (cohortAtRiskStudents.length / students.length) * 100 : 0}%` }}
-                            className="bg-rose-500 transition-all"
-                            title={`At Risk: ${cohortAtRiskStudents.length}`}
-                          />
-                        </div>
+                    <div className="grid grid-cols-2 gap-1.5">
+                      <button
+                        onClick={() => setCohortFilter((prev) => (prev === 'mastery' ? 'all' : 'mastery'))}
+                        className={`py-1.5 px-2.5 rounded-md text-left transition-colors cursor-pointer flex items-center justify-between text-xs ${
+                          cohortFilter === 'mastery'
+                            ? 'bg-amber-500/15 text-amber-300 font-medium'
+                            : 'bg-slate-950/40 hover:bg-slate-800/50 text-slate-400'
+                        }`}
+                      >
+                        <span className="text-[11px] text-amber-400">🏆 Mastery</span>
+                        <span className="font-mono text-[11px] font-bold text-slate-200">{cohortMasteryStudents.length}</span>
+                      </button>
 
-                        {/* Interactive Filter Pills */}
-                        <div className="grid grid-cols-2 gap-1.5 pt-0.5">
-                          <button
-                            onClick={() => setCohortFilter((prev) => (prev === 'mastery' ? 'all' : 'mastery'))}
-                            className={`p-2 rounded-xl border text-left transition-all cursor-pointer flex flex-col gap-0.5 ${
-                              cohortFilter === 'mastery'
-                                ? 'bg-amber-500/20 border-amber-500/80 text-white shadow-sm'
-                                : 'bg-slate-950/80 border-slate-800/80 hover:border-slate-700 text-slate-300'
-                            }`}
-                          >
-                            <div className="flex items-center justify-between text-[11px] font-semibold text-amber-400">
-                              <span>🏆 Mastery</span>
-                              <span className="font-mono font-bold bg-amber-500/10 px-1.5 py-0.2 rounded border border-amber-500/20">
-                                {cohortMasteryStudents.length}
-                              </span>
-                            </div>
-                            <span className="text-[10px] text-slate-400 font-mono">P(L) ≥ 0.90</span>
-                          </button>
+                      <button
+                        onClick={() => setCohortFilter((prev) => (prev === 'proficient' ? 'all' : 'proficient'))}
+                        className={`py-1.5 px-2.5 rounded-md text-left transition-colors cursor-pointer flex items-center justify-between text-xs ${
+                          cohortFilter === 'proficient'
+                            ? 'bg-emerald-500/15 text-emerald-300 font-medium'
+                            : 'bg-slate-950/40 hover:bg-slate-800/50 text-slate-400'
+                        }`}
+                      >
+                        <span className="text-[11px] text-emerald-400">🟢 Proficient</span>
+                        <span className="font-mono text-[11px] font-bold text-slate-200">{cohortProficientStudents.length}</span>
+                      </button>
 
-                          <button
-                            onClick={() => setCohortFilter((prev) => (prev === 'proficient' ? 'all' : 'proficient'))}
-                            className={`p-2 rounded-xl border text-left transition-all cursor-pointer flex flex-col gap-0.5 ${
-                              cohortFilter === 'proficient'
-                                ? 'bg-emerald-500/20 border-emerald-500/80 text-white shadow-sm'
-                                : 'bg-slate-950/80 border-slate-800/80 hover:border-slate-700 text-slate-300'
-                            }`}
-                          >
-                            <div className="flex items-center justify-between text-[11px] font-semibold text-emerald-400">
-                              <span>🟢 Proficient</span>
-                              <span className="font-mono font-bold bg-emerald-500/10 px-1.5 py-0.2 rounded border border-emerald-500/20">
-                                {cohortProficientStudents.length}
-                              </span>
-                            </div>
-                            <span className="text-[10px] text-slate-400 font-mono">0.75 - 0.89</span>
-                          </button>
+                      <button
+                        onClick={() => setCohortFilter((prev) => (prev === 'basic' ? 'all' : 'basic'))}
+                        className={`py-1.5 px-2.5 rounded-md text-left transition-colors cursor-pointer flex items-center justify-between text-xs ${
+                          cohortFilter === 'basic'
+                            ? 'bg-blue-500/15 text-blue-300 font-medium'
+                            : 'bg-slate-950/40 hover:bg-slate-800/50 text-slate-400'
+                        }`}
+                      >
+                        <span className="text-[11px] text-blue-400">🟡 Basic</span>
+                        <span className="font-mono text-[11px] font-bold text-slate-200">{cohortBasicStudents.length}</span>
+                      </button>
 
-                          <button
-                            onClick={() => setCohortFilter((prev) => (prev === 'basic' ? 'all' : 'basic'))}
-                            className={`p-2 rounded-xl border text-left transition-all cursor-pointer flex flex-col gap-0.5 ${
-                              cohortFilter === 'basic'
-                                ? 'bg-blue-500/20 border-blue-500/80 text-white shadow-sm'
-                                : 'bg-slate-950/80 border-slate-800/80 hover:border-slate-700 text-slate-300'
-                            }`}
-                          >
-                            <div className="flex items-center justify-between text-[11px] font-semibold text-blue-400">
-                              <span>🟡 Basic</span>
-                              <span className="font-mono font-bold bg-blue-500/10 px-1.5 py-0.2 rounded border border-blue-500/20">
-                                {cohortBasicStudents.length}
-                              </span>
-                            </div>
-                            <span className="text-[10px] text-slate-400 font-mono">0.50 - 0.74</span>
-                          </button>
+                      <button
+                        onClick={() => setCohortFilter((prev) => (prev === 'at_risk' ? 'all' : 'at_risk'))}
+                        className={`py-1.5 px-2.5 rounded-md text-left transition-colors cursor-pointer flex items-center justify-between text-xs ${
+                          cohortFilter === 'at_risk'
+                            ? 'bg-rose-500/15 text-rose-300 font-medium'
+                            : 'bg-slate-950/40 hover:bg-slate-800/50 text-slate-400'
+                        }`}
+                      >
+                        <span className="text-[11px] text-rose-400">🔴 At Risk</span>
+                        <span className="font-mono text-[11px] font-bold text-slate-200">{cohortAtRiskStudents.length}</span>
+                      </button>
+                    </div>
 
-                          <button
-                            onClick={() => setCohortFilter((prev) => (prev === 'at_risk' ? 'all' : 'at_risk'))}
-                            className={`p-2 rounded-xl border text-left transition-all cursor-pointer flex flex-col gap-0.5 ${
-                              cohortFilter === 'at_risk'
-                                ? 'bg-rose-500/20 border-rose-500/80 text-white shadow-sm'
-                                : 'bg-slate-950/80 border-slate-800/80 hover:border-slate-700 text-slate-300'
-                            }`}
-                          >
-                            <div className="flex items-center justify-between text-[11px] font-semibold text-rose-400">
-                              <span>🔴 At Risk</span>
-                              <span className="font-mono font-bold bg-rose-500/10 px-1.5 py-0.2 rounded border border-rose-500/20">
-                                {cohortAtRiskStudents.length}
-                              </span>
-                            </div>
-                            <span className="text-[10px] text-slate-400 font-mono">P(L) &lt; 0.50</span>
-                          </button>
-                        </div>
-
-                        {cohortFilter !== 'all' && (
-                          <button
-                            onClick={() => setCohortFilter('all')}
-                            className="text-[10px] text-purple-400 hover:text-purple-300 transition-colors text-right pt-0.5 cursor-pointer underline"
-                          >
-                            ✕ Скинути фільтр групи
-                          </button>
-                        )}
-                      </div>
+                    {cohortFilter !== 'all' && (
+                      <button
+                        onClick={() => setCohortFilter('all')}
+                        className="text-[10px] text-purple-400 hover:text-purple-300 transition-colors text-right cursor-pointer"
+                      >
+                        ✕ Скинути фільтр
+                      </button>
                     )}
                   </div>
+                )}
+              </div>
 
-                  {/* 🚨 Section 2: Live Risk Feed (Anomalies & Wheel-Spinning) */}
-                  <div className="flex flex-col gap-2 pt-2 border-t border-slate-800/80">
-                    <button
-                      onClick={() => setIsRiskFeedOpen((prev) => !prev)}
-                      className="w-full flex items-center justify-between text-left px-0.5 py-1 text-slate-400 hover:text-white transition-colors cursor-pointer group"
-                    >
-                      <span className="text-[11px] font-bold uppercase tracking-wider text-amber-400 flex items-center gap-1.5 group-hover:text-amber-300 transition-colors">
-                        <AlertTriangle className="w-3.5 h-3.5 text-amber-400" />
-                        <span>Радар Ризиків & Аномалій</span>
-                        <span className="px-1.5 py-0.2 rounded text-[9px] font-mono bg-amber-500/10 text-amber-300 border border-amber-500/20">
-                          {riskFeedStudents.length}
-                        </span>
-                      </span>
-                      <span className="p-0.5 rounded text-slate-400 group-hover:text-white group-hover:bg-slate-800 transition-all flex items-center justify-center">
-                        {isRiskFeedOpen ? <Minus className="w-4 h-4 stroke-[2.5]" /> : <Plus className="w-4 h-4 stroke-[2.5]" />}
-                      </span>
-                    </button>
+              {/* 🚨 Section 2: Live Risk Feed */}
+              <div className="py-3 flex flex-col gap-2">
+                <button
+                  onClick={() => setIsRiskFeedOpen((prev) => !prev)}
+                  className="w-full flex items-center justify-between text-left py-1 text-slate-400 hover:text-white transition-colors cursor-pointer group"
+                >
+                  <span className="text-[11px] font-semibold uppercase tracking-wider flex items-center gap-1.5">
+                    <AlertTriangle className="w-3.5 h-3.5 text-amber-400" />
+                    <span>Радар Ризиків</span>
+                    <span className="text-[10px] font-mono text-slate-500 font-normal">({riskFeedStudents.length})</span>
+                  </span>
+                  <span className="text-slate-500 group-hover:text-white">
+                    {isRiskFeedOpen ? <Minus className="w-3.5 h-3.5" /> : <Plus className="w-3.5 h-3.5" />}
+                  </span>
+                </button>
 
-                    {isRiskFeedOpen && (
-                      <div className="flex flex-col gap-2 animate-fadeIn">
-                        {riskFeedStudents.length === 0 ? (
-                          <div className="p-3 text-center text-xs text-slate-500 bg-slate-950/60 rounded-xl border border-slate-800/80">
-                            ✓ Аномалій не зафіксовано. Усі метрики студентів у межах норми.
-                          </div>
-                        ) : (
-                          <div className="flex flex-col gap-2">
-                            {riskFeedStudents.slice(0, 3).map((st) => {
-                              const stId = st.id || st.studentId || st.email;
-                              const isCopyPaste = (st.copyPasteRatio ?? 0) >= 0.60;
-                              const isGuess = st.hasGuessAlert || (st.recentAdjustments?.some((a) => (a.pGuessUsed ?? 0) > 0.30) ?? false);
-                              const isFatigue = (st.fatigueIndex ?? 0) >= 5;
-
-                              return (
-                                <div
-                                  key={`risk-${stId}`}
-                                  onClick={() => setSelectedStudentId(stId)}
-                                  className="p-2.5 rounded-xl bg-slate-950/80 border border-amber-500/30 hover:border-amber-400 transition-all cursor-pointer flex flex-col gap-1.5 shadow-sm"
-                                >
-                                  <div className="flex items-center justify-between">
-                                    <span className="text-xs font-bold text-white truncate max-w-[170px]">{st.name}</span>
-                                    <span className="text-[10px] font-mono text-purple-300">
-                                      {((st.averageMastery ?? 0) * 100).toFixed(0)}% P(L)
-                                    </span>
-                                  </div>
-                                  <div className="flex flex-wrap gap-1">
-                                    {isCopyPaste && (
-                                      <span className="px-1.5 py-0.2 rounded text-[9px] font-mono bg-rose-500/15 text-rose-300 border border-rose-500/30 flex items-center gap-1">
-                                        <Copy className="w-2.5 h-2.5" />
-                                        <span>Вставка {((st.copyPasteRatio ?? 0) * 100).toFixed(0)}%</span>
-                                      </span>
-                                    )}
-                                    {isGuess && (
-                                      <span className="px-1.5 py-0.2 rounded text-[9px] font-mono bg-amber-500/15 text-amber-300 border border-amber-500/30 flex items-center gap-1">
-                                        <Activity className="w-2.5 h-2.5" />
-                                        <span>P(G) Вгадування</span>
-                                      </span>
-                                    )}
-                                    {isFatigue && (
-                                      <span className="px-1.5 py-0.2 rounded text-[9px] font-mono bg-purple-500/15 text-purple-300 border border-purple-500/30 flex items-center gap-1">
-                                        <Activity className="w-2.5 h-2.5" />
-                                        <span>Втома F={st.fatigueIndex}</span>
-                                      </span>
-                                    )}
-                                  </div>
-                                </div>
-                              );
-                            })}
-                          </div>
-                        )}
+                {isRiskFeedOpen && (
+                  <div className="flex flex-col divide-y divide-slate-800/50 animate-fadeIn">
+                    {riskFeedStudents.length === 0 ? (
+                      <div className="py-2 text-xs text-slate-500">
+                        ✓ Аномалій не зафіксовано
                       </div>
-                    )}
-                  </div>
+                    ) : (
+                      riskFeedStudents.slice(0, 3).map((st) => {
+                        const stId = st.id || st.studentId || st.email;
+                        const isCopyPaste = (st.copyPasteRatio ?? 0) >= 0.60;
+                        const isGuess = st.hasGuessAlert || (st.recentAdjustments?.some((a) => (a.pGuessUsed ?? 0) > 0.30) ?? false);
+                        const isFatigue = (st.fatigueIndex ?? 0) >= 5;
 
-                  {/* 🔍 Section 3: Filtered Students Roster */}
-                  <div className="flex flex-col gap-2 pt-2 border-t border-slate-800/80">
-                    <button
-                      onClick={() => setIsFilteredRosterOpen((prev) => !prev)}
-                      className="w-full flex items-center justify-between text-left px-0.5 py-1 text-slate-400 hover:text-white transition-colors cursor-pointer group"
-                    >
-                      <span className="text-[11px] font-bold uppercase tracking-wider text-indigo-400 flex items-center gap-1.5 group-hover:text-indigo-300 transition-colors">
-                        <Users className="w-3.5 h-3.5 text-indigo-400" />
-                        <span>Список Учнів</span>
-                        <span className="px-1.5 py-0.2 rounded text-[9px] font-mono bg-indigo-500/10 text-indigo-300 border border-indigo-500/20">
-                          {filteredStudents.length}
-                        </span>
-                      </span>
-                      <span className="p-0.5 rounded text-slate-400 group-hover:text-white group-hover:bg-slate-800 transition-all flex items-center justify-center">
-                        {isFilteredRosterOpen ? <Minus className="w-4 h-4 stroke-[2.5]" /> : <Plus className="w-4 h-4 stroke-[2.5]" />}
-                      </span>
-                    </button>
-
-                    {isFilteredRosterOpen && (
-                      <div className="flex flex-col gap-2 animate-fadeIn">
-                        <div className="relative">
-                          <Search className="w-3.5 h-3.5 absolute left-3 top-2.5 text-slate-500" />
-                          <input
-                            type="text"
-                            placeholder="Пошук серед учнів..."
-                            value={studentSearch}
-                            onChange={(e) => setStudentSearch(e.target.value)}
-                            className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-3 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-purple-500 shadow-inner"
-                          />
-                        </div>
-
-                        <div className="flex flex-col gap-1.5 max-h-52 overflow-y-auto pr-0.5">
-                          {filteredStudents.length === 0 ? (
-                            <div className="p-3 text-center text-xs text-slate-500 bg-slate-950/60 rounded-xl border border-slate-800">
-                              Учнів за обраним критерієм не знайдено
+                        return (
+                          <div
+                            key={`risk-${stId}`}
+                            onClick={() => setSelectedStudentId(stId)}
+                            className="py-2 px-1.5 hover:bg-slate-800/40 rounded transition-colors cursor-pointer flex flex-col gap-1"
+                          >
+                            <div className="flex items-center justify-between">
+                              <span className="text-xs font-medium text-slate-200 truncate max-w-[170px]">{st.name}</span>
+                              <span className="text-[10px] font-mono text-amber-400">
+                                {((st.averageMastery ?? 0) * 100).toFixed(0)}% P(L)
+                              </span>
                             </div>
-                          ) : (
-                            filteredStudents.map((st) => {
-                              const stId = st.id || st.studentId || st.email;
-                              const isSelected = selectedStudentId === stId;
-                              const avgMastery = st.averageMastery !== undefined ? (st.averageMastery * 100).toFixed(0) : '0';
-
-                              return (
-                                <div
-                                  key={stId}
-                                  onClick={() => setSelectedStudentId(stId)}
-                                  className={`p-2.5 rounded-xl border transition-all cursor-pointer flex items-center justify-between gap-2.5 ${
-                                    isSelected
-                                      ? 'bg-purple-950/50 border-purple-500 shadow-sm ring-1 ring-purple-500/50 text-white'
-                                      : 'bg-slate-950/80 border-slate-800/80 hover:bg-slate-800/50 hover:border-slate-700 text-slate-300'
-                                  }`}
-                                >
-                                  <div className="overflow-hidden">
-                                    <div className="text-xs font-bold truncate flex items-center gap-1.5">
-                                      <span>{st.name}</span>
-                                      {isSelected && <span className="text-[10px] text-purple-400">●</span>}
-                                    </div>
-                                    <div className="text-[10px] text-slate-400 truncate font-mono">{st.email}</div>
-                                  </div>
-                                  <div className="flex flex-col items-end shrink-0">
-                                    <span className="text-xs font-mono font-bold text-emerald-400 bg-emerald-500/10 px-1.5 py-0.2 rounded border border-emerald-500/20">
-                                      {avgMastery}% P(L)
-                                    </span>
-                                    <span className="text-[9px] text-slate-400 font-mono mt-0.5">
-                                      WPM: {st.wpm ?? st.avgWpm ?? 0}
-                                    </span>
-                                  </div>
-                                </div>
-                              );
-                            })
-                          )}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
-
-              {/* Drawer 2: Pedagogical Control Panel (Rule 7 Standard) */}
-              {activeTab === 'coursemap' && courseDetails && (
-                <div className="flex flex-col gap-3">
-                  {/* 1. 🏆 Section 1: Bloom Triad Coverage & Anti-Gaming Audit Widget */}
-                  {(() => {
-                    const currentSkill = courseDetails.skills?.find((s: any) => s.slug === (selectedSkillSlug || courseDetails.skills[0]?.slug)) || courseDetails.skills[0];
-                    const skillTasks = allTasks.filter((t) => t.skillId === currentSkill?.id || t.skill?.id === currentSkill?.id);
-
-                    // Compute unique topics and triad completeness
-                    const topicsMap: Record<string, { easy: number; medium: number; hard: number; total: number }> = {};
-                    let codeTasks = 0;
-                    let quizTasks = 0;
-                    let secretTestsCount = 0;
-
-                    skillTasks.forEach((tk) => {
-                      const top = tk.topic || 'general';
-                      if (!topicsMap[top]) topicsMap[top] = { easy: 0, medium: 0, hard: 0, total: 0 };
-                      topicsMap[top].total++;
-                      if (tk.difficulty === 'EASY') topicsMap[top].easy++;
-                      if (tk.difficulty === 'MEDIUM') topicsMap[top].medium++;
-                      if (tk.difficulty === 'HARD') topicsMap[top].hard++;
-
-                      if (tk.taskType === 'CODE') codeTasks++;
-                      else quizTasks++;
-
-                      if (tk.testCases && tk.testCases.some((tc: any) => tc.isSecret)) secretTestsCount++;
-                    });
-
-                    const totalTopics = Object.keys(topicsMap).length;
-                    const completeTriads = Object.values(topicsMap).filter((t) => t.easy > 0 && t.medium > 0 && t.hard > 0).length;
-                    const completePercent = totalTopics > 0 ? Math.round((completeTriads / totalTopics) * 100) : 0;
-
-                    return (
-                      <div className="flex flex-col gap-2">
-                        <button
-                          onClick={() => setIsTriadAuditOpen((prev) => !prev)}
-                          className="w-full flex items-center justify-between text-left px-0.5 py-1 text-slate-400 hover:text-white transition-colors cursor-pointer group"
-                        >
-                          <span className="text-[11px] font-bold uppercase tracking-wider text-purple-400 flex items-center gap-1.5 group-hover:text-purple-300 transition-colors">
-                            <Sparkles className="w-3.5 h-3.5 text-purple-400" />
-                            <span>Аудит Балансу Тріад</span>
-                            <span className="px-1.5 py-0.2 rounded text-[9px] font-mono bg-purple-500/10 text-purple-300 border border-purple-500/20">
-                              {currentSkill?.slug || 'all'}
-                            </span>
-                          </span>
-                          <span className="p-0.5 rounded text-slate-400 group-hover:text-white group-hover:bg-slate-800 transition-all flex items-center justify-center">
-                            {isTriadAuditOpen ? <Minus className="w-4 h-4 stroke-[2.5]" /> : <Plus className="w-4 h-4 stroke-[2.5]" />}
-                          </span>
-                        </button>
-
-                        {isTriadAuditOpen && (
-                          <div className="flex flex-col gap-2.5 animate-fadeIn">
-                            {/* Triad Completeness Gauge */}
-                            <div className="flex flex-col gap-1.5">
-                              <div className="flex items-center justify-between text-xs">
-                                <span className="text-slate-400 text-[11px]">Повнота Тріад (3/3):</span>
-                                <span className="font-mono font-bold text-emerald-400">
-                                  {completeTriads} / {totalTopics} тем ({completePercent}%)
+                            <div className="flex flex-wrap gap-1.5 text-[10px] font-mono">
+                              {isCopyPaste && (
+                                <span className="text-rose-400">
+                                  Copy {((st.copyPasteRatio ?? 0) * 100).toFixed(0)}%
                                 </span>
-                              </div>
-                              <div className="w-full h-2 rounded-full bg-slate-900 border border-slate-800 overflow-hidden">
-                                <div
-                                  className="h-full bg-gradient-to-r from-indigo-500 via-purple-500 to-emerald-400 transition-all"
-                                  style={{ width: `${completePercent}%` }}
-                                />
-                              </div>
-                            </div>
-
-                            {/* Practical Code vs Diagnosis Ratio */}
-                            <div className="grid grid-cols-2 gap-2 pt-0.5 text-[11px] font-mono">
-                              <div className="p-2 rounded-xl bg-slate-950/80 border border-slate-800/80 flex flex-col gap-0.5">
-                                <span className="text-slate-500 text-[9px] uppercase">Практика (Код)</span>
-                                <span className="text-emerald-400 font-bold text-xs">{codeTasks} завдань</span>
-                              </div>
-                              <div className="p-2 rounded-xl bg-slate-950/80 border border-slate-800/80 flex flex-col gap-0.5">
-                                <span className="text-slate-500 text-[9px] uppercase">Тести (Вибір)</span>
-                                <span className="text-blue-400 font-bold text-xs">{quizTasks} завдань</span>
-                              </div>
-                            </div>
-
-                            {/* Anti-gaming protection ratio */}
-                            <div className="p-2 rounded-xl bg-rose-950/20 border border-rose-500/30 flex items-center justify-between text-[11px] font-mono">
-                              <span className="text-slate-300 text-[10px] flex items-center gap-1">
-                                <ShieldCheck className="w-3.5 h-3.5 text-rose-400" />
-                                <span>Приховані тести (Secret):</span>
-                              </span>
-                              <span className="text-rose-300 font-bold">{secretTestsCount} задач</span>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })()}
-
-                  {/* 2. ⚡ Section 2: Cognitive Traps & Wheel-Spinning Radar */}
-                  <div className="flex flex-col gap-2 pt-2 border-t border-slate-800/80">
-                    <button
-                      onClick={() => setIsCognitiveTrapsOpen((prev) => !prev)}
-                      className="w-full flex items-center justify-between text-left px-0.5 py-1 text-slate-400 hover:text-white transition-colors cursor-pointer group"
-                    >
-                      <span className="text-[11px] font-bold uppercase tracking-wider text-amber-400 flex items-center gap-1.5 group-hover:text-amber-300 transition-colors">
-                        <Activity className="w-3.5 h-3.5 text-amber-400" />
-                        <span>Когнітивні Пастки Модуля</span>
-                        <span className="px-1.5 py-0.2 rounded text-[9px] font-mono bg-amber-500/10 text-amber-300 border border-amber-500/20">
-                          3 теми
-                        </span>
-                      </span>
-                      <span className="p-0.5 rounded text-slate-400 group-hover:text-white group-hover:bg-slate-800 transition-all flex items-center justify-center">
-                        {isCognitiveTrapsOpen ? <Minus className="w-4 h-4 stroke-[2.5]" /> : <Plus className="w-4 h-4 stroke-[2.5]" />}
-                      </span>
-                    </button>
-
-                    {isCognitiveTrapsOpen && (
-                      <div className="flex flex-col gap-2 animate-fadeIn">
-                        <div
-                          onClick={() => {
-                            const task = allTasks.find((t) => t.subConcept?.includes('dead-zone') || t.title.includes('Temporal Dead Zone'));
-                            if (task) setSelectedTaskId(task.id);
-                          }}
-                          className="p-2.5 rounded-xl bg-slate-950/80 border border-amber-500/30 hover:border-amber-400 transition-all cursor-pointer flex flex-col gap-1 shadow-sm"
-                        >
-                          <div className="flex items-center justify-between text-xs">
-                            <span className="font-bold text-white truncate max-w-[170px]">Temporal Dead Zone (TDZ)</span>
-                            <span className="text-[10px] font-mono font-bold text-rose-400 bg-rose-500/10 px-1.5 py-0.2 rounded border border-rose-500/20">
-                              🔴 42% помилок
-                            </span>
-                          </div>
-                          <span className="text-[10px] text-slate-400 font-mono">Часте перемикання на EASY (70% бал)</span>
-                        </div>
-
-                        <div
-                          onClick={() => {
-                            const task = allTasks.find((t) => t.subConcept?.includes('coercion') || t.title.includes('приведення'));
-                            if (task) setSelectedTaskId(task.id);
-                          }}
-                          className="p-2.5 rounded-xl bg-slate-950/80 border border-amber-500/30 hover:border-amber-400 transition-all cursor-pointer flex flex-col gap-1 shadow-sm"
-                        >
-                          <div className="flex items-center justify-between text-xs">
-                            <span className="font-bold text-white truncate max-w-[170px]">Strict Equality & Coercion</span>
-                            <span className="text-[10px] font-mono font-bold text-amber-400 bg-amber-500/10 px-1.5 py-0.2 rounded border border-amber-500/20">
-                              🟡 35% помилок
-                            </span>
-                          </div>
-                          <span className="text-[10px] text-slate-400 font-mono">Плутанина між == та === при об'єктах</span>
-                        </div>
-
-                        <div
-                          onClick={() => {
-                            const task = allTasks.find((t) => t.subConcept?.includes('closure') || t.title.includes('замикан'));
-                            if (task) setSelectedTaskId(task.id);
-                          }}
-                          className="p-2.5 rounded-xl bg-slate-950/80 border border-amber-500/30 hover:border-amber-400 transition-all cursor-pointer flex flex-col gap-1 shadow-sm"
-                        >
-                          <div className="flex items-center justify-between text-xs">
-                            <span className="font-bold text-white truncate max-w-[170px]">Lexical Scope & Closures</span>
-                            <span className="text-[10px] font-mono font-bold text-amber-400 bg-amber-500/10 px-1.5 py-0.2 rounded border border-amber-500/20">
-                              🟡 28% помилок
-                            </span>
-                          </div>
-                          <span className="text-[10px] text-slate-400 font-mono">Збереження стану при декількох викликах</span>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* 3. ⚙️ Section 3: BKT Adaptive Tuner & Thresholds */}
-                  <div className="flex flex-col gap-2 pt-2 border-t border-slate-800/80">
-                    <button
-                      onClick={() => setIsAdaptiveParamsOpen((prev) => !prev)}
-                      className="w-full flex items-center justify-between text-left px-0.5 py-1 text-slate-400 hover:text-white transition-colors cursor-pointer group"
-                    >
-                      <span className="text-[11px] font-bold uppercase tracking-wider text-indigo-400 flex items-center gap-1.5 group-hover:text-indigo-300 transition-colors">
-                        <Network className="w-3.5 h-3.5 text-indigo-400" />
-                        <span>Параметри Адаптації</span>
-                        <span className="px-1.5 py-0.2 rounded text-[9px] font-mono bg-indigo-500/10 text-indigo-300 border border-indigo-500/20">
-                          3 пороги
-                        </span>
-                      </span>
-                      <span className="p-0.5 rounded text-slate-400 group-hover:text-white group-hover:bg-slate-800 transition-all flex items-center justify-center">
-                        {isAdaptiveParamsOpen ? <Minus className="w-4 h-4 stroke-[2.5]" /> : <Plus className="w-4 h-4 stroke-[2.5]" />}
-                      </span>
-                    </button>
-
-                    {isAdaptiveParamsOpen && (
-                      <div className="flex flex-col gap-1.5 font-mono text-[11px] animate-fadeIn">
-                        <div className="flex justify-between items-center bg-slate-950/80 p-2.5 rounded-xl border border-slate-800/80">
-                          <span className="text-slate-400">Розблокування DAG (Proficient):</span>
-                          <span className="text-indigo-400 font-bold">P(L) ≥ 0.75</span>
-                        </div>
-                        <div className="flex justify-between items-center bg-slate-950/80 p-2.5 rounded-xl border border-slate-800/80">
-                          <span className="text-slate-400">Золота Майстерність (Mastery):</span>
-                          <span className="text-emerald-400 font-bold">P(L) ≥ 0.90</span>
-                        </div>
-                        <div className="flex justify-between items-center bg-slate-950/80 p-2.5 rounded-xl border border-slate-800/80">
-                          <span className="text-slate-400">Штраф за легкий рівень (Cap):</span>
-                          <span className="text-amber-400 font-bold">Max 70%</span>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
-
-              {/* Drawer: Review Queue List (Rule 7 Standard) */}
-              {activeTab === 'reviews' && (
-                <div className="flex flex-col gap-3">
-                  {/* Section 1: Режими Черги (Фільтрація) */}
-                  <div className="flex flex-col gap-2">
-                    <button
-                      onClick={() => setIsReviewFilterOpen((prev) => !prev)}
-                      className="w-full flex items-center justify-between text-left px-0.5 py-1 text-slate-400 hover:text-white transition-colors cursor-pointer group"
-                    >
-                      <span className="text-[11px] font-bold uppercase tracking-wider text-amber-400 flex items-center gap-1.5 group-hover:text-amber-300 transition-colors">
-                        <ClipboardCheck className="w-3.5 h-3.5 text-amber-400" />
-                        <span>Режим Черги</span>
-                        <span className="px-1.5 py-0.2 rounded text-[9px] font-mono bg-amber-500/10 text-amber-300 border border-amber-500/20">
-                          {reviewFilterTab === 'pending' ? 'В черзі' : 'Архів'}
-                        </span>
-                      </span>
-                      <span className="p-0.5 rounded text-slate-400 group-hover:text-white group-hover:bg-slate-800 transition-all flex items-center justify-center">
-                        {isReviewFilterOpen ? <Minus className="w-4 h-4 stroke-[2.5]" /> : <Plus className="w-4 h-4 stroke-[2.5]" />}
-                      </span>
-                    </button>
-
-                    {isReviewFilterOpen && (
-                      <div className="flex flex-col gap-2 animate-fadeIn">
-                        {/* Review Queue Filter Tabs: Pending vs Reviewed Archive */}
-                        <div className="bg-slate-950 p-1 rounded-xl border border-slate-800 flex items-center gap-1 shadow-inner">
-                          <button
-                            onClick={() => setReviewFilterTab('pending')}
-                            className={`flex-1 py-1.5 px-3 rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
-                              reviewFilterTab === 'pending'
-                                ? 'bg-amber-600 text-white shadow-md shadow-amber-600/30'
-                                : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
-                            }`}
-                          >
-                            <span>⏳ В черзі</span>
-                          </button>
-                          <button
-                            onClick={() => setReviewFilterTab('reviewed')}
-                            className={`flex-1 py-1.5 px-3 rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
-                              reviewFilterTab === 'reviewed'
-                                ? 'bg-purple-600 text-white shadow-md shadow-purple-600/30'
-                                : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
-                            }`}
-                          >
-                            <span>✓ Перевірені</span>
-                          </button>
-                        </div>
-
-                        <div className="text-[11px] text-slate-400 px-0.5">
-                          {reviewFilterTab === 'pending'
-                            ? 'Відповіді, що потрапили у «сіру зону» або вимагають верифікації викладачем:'
-                            : 'Архів уже перевірених та оцінених викладачем відкритих робіт:'}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Section 2: Роботи Студентів для Оцінювання */}
-                  <div className="flex flex-col gap-2 pt-2 border-t border-slate-800/80">
-                    <button
-                      onClick={() => setIsReviewItemsOpen((prev) => !prev)}
-                      className="w-full flex items-center justify-between text-left px-0.5 py-1 text-slate-400 hover:text-white transition-colors cursor-pointer group"
-                    >
-                      <span className="text-[11px] font-bold uppercase tracking-wider text-purple-400 flex items-center gap-1.5 group-hover:text-purple-300 transition-colors">
-                        <User className="w-3.5 h-3.5 text-purple-400" />
-                        <span>Роботи Студентів</span>
-                        <span className="px-1.5 py-0.2 rounded text-[9px] font-mono bg-purple-500/10 text-purple-300 border border-purple-500/20">
-                          {reviewQueue.length}
-                        </span>
-                      </span>
-                      <span className="p-0.5 rounded text-slate-400 group-hover:text-white group-hover:bg-slate-800 transition-all flex items-center justify-center">
-                        {isReviewItemsOpen ? <Minus className="w-4 h-4 stroke-[2.5]" /> : <Plus className="w-4 h-4 stroke-[2.5]" />}
-                      </span>
-                    </button>
-
-                    {isReviewItemsOpen && (
-                      <div className="flex flex-col gap-2 animate-fadeIn">
-                        {reviewQueue.length === 0 ? (
-                          <div className="p-6 text-center text-xs text-slate-500 bg-slate-950/60 rounded-xl border border-slate-800/80">
-                            {reviewFilterTab === 'pending'
-                              ? 'Черга перевірки порожня. Усі відкриті відповіді оцінені.'
-                              : 'Немає перевірених робіт в архіві.'}
-                          </div>
-                        ) : (
-                          <div className="flex flex-col gap-2">
-                            {reviewQueue.map((item) => {
-                              const isSelected = selectedReviewId === item.submissionId;
-                              const isApproved = item.teacherReviewStatus === 'APPROVED';
-                              const isRejected = item.teacherReviewStatus === 'REJECTED';
-
-                              return (
-                                <div
-                                  key={item.submissionId}
-                                  onClick={() => setSelectedReviewId(item.submissionId)}
-                                  className={`p-3 rounded-xl border transition-all cursor-pointer flex flex-col gap-1.5 ${
-                                    isSelected
-                                      ? isApproved
-                                        ? 'bg-emerald-950/40 border-emerald-500 shadow-md shadow-emerald-950/50 ring-1 ring-emerald-500/50'
-                                        : isRejected
-                                        ? 'bg-rose-950/40 border-rose-500 shadow-md shadow-rose-950/50 ring-1 ring-rose-500/50'
-                                        : 'bg-amber-950/40 border-amber-500 shadow-md shadow-amber-950/50 ring-1 ring-amber-500/50'
-                                      : 'bg-slate-950/80 border-slate-800/80 hover:bg-slate-800/50 hover:border-slate-700'
-                                  }`}
-                                >
-                                  <div className="flex items-center justify-between">
-                                    <span className="text-xs font-bold text-white truncate">{item.studentName}</span>
-                                    <div className="flex items-center gap-1">
-                                      {(item.attemptNumber || (item.attemptsHistory && item.attemptsHistory.length > 1)) && (
-                                        <span className="px-1.5 py-0.5 rounded text-[9px] font-mono font-bold bg-purple-500/10 text-purple-300 border border-purple-500/30">
-                                          Спроба {item.attemptNumber || item.attemptsHistory?.length}
-                                        </span>
-                                      )}
-                                      <span className={`px-1.5 py-0.5 rounded text-[9px] font-mono font-bold ${
-                                        isApproved
-                                          ? 'bg-emerald-500/10 text-emerald-300 border border-emerald-500/30'
-                                          : isRejected
-                                          ? 'bg-rose-500/10 text-rose-300 border border-rose-500/30'
-                                          : 'bg-amber-500/10 text-amber-300 border border-amber-500/30'
-                                      }`}>
-                                        {isApproved
-                                          ? '✓ Затверджено'
-                                          : isRejected
-                                          ? '✕ Відхилено'
-                                          : 'В черзі'}
-                                      </span>
-                                    </div>
-                                  </div>
-                                  <div className="text-[11px] text-slate-300 font-semibold truncate">{item.taskTitle}</div>
-                                  <div className="text-[10px] text-slate-500 font-mono flex items-center justify-between">
-                                    <span>{item.skillTitle}</span>
-                                    <span>{new Date(item.submittedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
-                                  </div>
-                                </div>
-                              );
-                            })}
-                          </div>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
-
-              {/* Drawer: Metrics Audit - Clean minimalist sections with +/- collapse toggles */}
-              {activeTab === 'metrics-audit' && (
-                <div className="flex flex-col gap-4">
-                  {/* SECTION 1: Загальні системні інструменти (Не прив'язані до студента) */}
-                  <div className="flex flex-col gap-2">
-                    <button
-                      onClick={() => setIsGeneralToolsOpen((prev) => !prev)}
-                      className="w-full flex items-center justify-between text-left px-0.5 py-1 text-slate-400 hover:text-white transition-colors cursor-pointer group"
-                    >
-                      <span className="text-[11px] font-bold uppercase tracking-wider text-cyan-400 flex items-center gap-1.5 group-hover:text-cyan-300 transition-colors">
-                        <Globe className="w-3.5 h-3.5 text-cyan-400" />
-                        <span>Загальні інструменти</span>
-                        <span className="px-1.5 py-0.2 rounded text-[9px] font-mono bg-cyan-500/10 text-cyan-300 border border-cyan-500/20">3</span>
-                      </span>
-                      <span className="p-0.5 rounded text-slate-400 group-hover:text-white group-hover:bg-slate-800 transition-all flex items-center justify-center">
-                        {isGeneralToolsOpen ? <Minus className="w-4 h-4 stroke-[2.5]" /> : <Plus className="w-4 h-4 stroke-[2.5]" />}
-                      </span>
-                    </button>
-
-                    {isGeneralToolsOpen && (
-                      <div className="flex flex-col gap-2 animate-fadeIn">
-                        {/* Quick-Access to Mechanisms Catalog */}
-                        <button
-                          onClick={() => {
-                            setAuditSubTab('mechanisms');
-                          }}
-                          className={`w-full p-2.5 rounded-xl border text-left flex items-center justify-between transition-all cursor-pointer shadow-sm ${
-                            auditSubTab === 'mechanisms'
-                              ? 'bg-amber-950/60 border-amber-500 text-white shadow-amber-950/40 ring-1 ring-amber-500/50'
-                              : 'bg-slate-950/80 border-slate-800/80 hover:border-amber-500/40 text-slate-300'
-                          }`}
-                        >
-                          <div className="flex items-center gap-2.5 overflow-hidden">
-                            <div className="p-1.5 rounded-lg bg-amber-500/20 text-amber-300 shrink-0">
-                              <Compass className="w-4 h-4" />
-                            </div>
-                            <div className="overflow-hidden">
-                              <div className="text-xs font-bold text-white truncate flex items-center gap-1.5">
-                                <span>Реєстр Механізмів</span>
-                                <span className="px-1.5 py-0.2 rounded text-[9px] font-mono bg-amber-500/20 text-amber-300 border border-amber-500/30">
-                                  4-in-1
+                              )}
+                              {isGuess && (
+                                <span className="text-amber-400">
+                                  P(G) Вгадування
                                 </span>
-                              </div>
-                              <div className="text-[10px] text-slate-400 truncate">
-                                Спрощення, підказки, телеметрія
-                              </div>
-                            </div>
-                          </div>
-                          <span className="text-[11px] text-amber-400 font-bold shrink-0">➔</span>
-                        </button>
-
-                        {/* Quick-Access to Gold Standard Matrix */}
-                        <button
-                          onClick={() => {
-                            setAuditSubTab('test-matrix');
-                          }}
-                          className={`w-full p-2.5 rounded-xl border text-left flex items-center justify-between transition-all cursor-pointer shadow-sm ${
-                            auditSubTab === 'test-matrix'
-                              ? 'bg-emerald-950/60 border-emerald-500 text-white shadow-emerald-950/40 ring-1 ring-emerald-500/50'
-                              : 'bg-slate-950/80 border-slate-800/80 hover:border-emerald-500/40 text-slate-300'
-                          }`}
-                        >
-                          <div className="flex items-center gap-2.5 overflow-hidden">
-                            <div className="p-1.5 rounded-lg bg-emerald-500/20 text-emerald-300 shrink-0">
-                              <ShieldCheck className="w-4 h-4" />
-                            </div>
-                            <div className="overflow-hidden">
-                              <div className="text-xs font-bold text-white truncate flex items-center gap-1.5">
-                                <span>Еталонна Матриця</span>
-                                <span className="px-1.5 py-0.2 rounded text-[9px] font-mono bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-                                  6/6 PASS
+                              )}
+                              {isFatigue && (
+                                <span className="text-purple-400">
+                                  Втома F={st.fatigueIndex}
                                 </span>
-                              </div>
-                              <div className="text-[10px] text-slate-400 truncate">
-                                Автоматична верифікація правил
-                              </div>
+                              )}
                             </div>
                           </div>
-                          <span className="text-[11px] text-emerald-400 font-bold shrink-0">➔</span>
-                        </button>
-
-                        {/* Quick-Access to What-If Sandbox */}
-                        <button
-                          onClick={() => {
-                            setAuditSubTab('what-if');
-                          }}
-                          className={`w-full p-2.5 rounded-xl border text-left flex items-center justify-between transition-all cursor-pointer shadow-sm ${
-                            auditSubTab === 'what-if'
-                              ? 'bg-indigo-950/60 border-indigo-500 text-white shadow-indigo-950/40 ring-1 ring-indigo-500/50'
-                              : 'bg-slate-950/80 border-slate-800/80 hover:border-indigo-500/40 text-slate-300'
-                          }`}
-                        >
-                          <div className="flex items-center gap-2.5 overflow-hidden">
-                            <div className="p-1.5 rounded-lg bg-indigo-500/20 text-indigo-300 shrink-0">
-                              <Sparkles className="w-4 h-4" />
-                            </div>
-                            <div className="overflow-hidden">
-                              <div className="text-xs font-bold text-white truncate flex items-center gap-1.5">
-                                <span>Пісочниця "What-If"</span>
-                              </div>
-                              <div className="text-[10px] text-slate-400 truncate">
-                                Інтерактивний тренажер параметрів
-                              </div>
-                            </div>
-                          </div>
-                          <span className="text-[11px] text-indigo-400 font-bold shrink-0">➔</span>
-                        </button>
-                      </div>
+                        );
+                      })
                     )}
                   </div>
+                )}
+              </div>
 
-                  {/* SECTION 2: Персональний аудит конкретного студента */}
-                  <div className="flex flex-col gap-2 pt-2 border-t border-slate-800/80">
-                    <button
-                      onClick={() => setIsStudentsListOpen((prev) => !prev)}
-                      className="w-full flex items-center justify-between text-left px-0.5 py-1 text-slate-400 hover:text-white transition-colors cursor-pointer group"
-                    >
-                      <div className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-purple-400 group-hover:text-purple-300 transition-colors">
-                        <User className="w-3.5 h-3.5 text-purple-400" />
-                        <span>Студенти для аудиту</span>
-                        <span className="font-mono text-[9px] text-slate-400 font-normal px-1.5 py-0.2 rounded bg-purple-500/10 border border-purple-500/20">
-                          {students.length}
-                        </span>
-                      </div>
-                      <span className="p-0.5 rounded text-slate-400 group-hover:text-white group-hover:bg-slate-800 transition-all flex items-center justify-center">
-                        {isStudentsListOpen ? <Minus className="w-4 h-4 stroke-[2.5]" /> : <Plus className="w-4 h-4 stroke-[2.5]" />}
-                      </span>
-                    </button>
+              {/* 🔍 Section 3: Filtered Students Roster */}
+              <div className="pt-3 flex flex-col gap-2">
+                <button
+                  onClick={() => setIsFilteredRosterOpen((prev) => !prev)}
+                  className="w-full flex items-center justify-between text-left py-1 text-slate-400 hover:text-white transition-colors cursor-pointer group"
+                >
+                  <span className="text-[11px] font-semibold uppercase tracking-wider flex items-center gap-1.5">
+                    <Users className="w-3.5 h-3.5 text-indigo-400" />
+                    <span>Список Учнів</span>
+                    <span className="text-[10px] font-mono text-slate-500 font-normal">({filteredStudents.length})</span>
+                  </span>
+                  <span className="text-slate-500 group-hover:text-white">
+                    {isFilteredRosterOpen ? <Minus className="w-3.5 h-3.5" /> : <Plus className="w-3.5 h-3.5" />}
+                  </span>
+                </button>
 
-                    {isStudentsListOpen && (
-                      <div className="flex flex-col gap-1.5 max-h-[calc(100vh-380px)] overflow-y-auto pr-1 animate-fadeIn">
-                        {students.map((st) => {
+                {isFilteredRosterOpen && (
+                  <div className="flex flex-col gap-2 animate-fadeIn">
+                    <div className="relative">
+                      <Search className="w-3.5 h-3.5 absolute left-2.5 top-2 text-slate-500" />
+                      <input
+                        type="text"
+                        placeholder="Пошук серед учнів..."
+                        value={studentSearch}
+                        onChange={(e) => setStudentSearch(e.target.value)}
+                        className="w-full bg-slate-950/60 border border-slate-800/80 rounded-lg pl-8 pr-2.5 py-1 text-xs text-slate-200 focus:outline-none focus:border-purple-500"
+                      />
+                    </div>
+
+                    <div className="flex flex-col divide-y divide-slate-800/50 max-h-60 overflow-y-auto pr-0.5">
+                      {filteredStudents.length === 0 ? (
+                        <div className="py-3 text-center text-xs text-slate-500">
+                          Учнів не знайдено
+                        </div>
+                      ) : (
+                        filteredStudents.map((st) => {
                           const stId = st.id || st.studentId || st.email;
                           const isSelected = selectedStudentId === stId;
                           const avgMastery = st.averageMastery !== undefined ? (st.averageMastery * 100).toFixed(0) : '0';
@@ -1220,97 +669,456 @@ export default function TeacherDashboardPage() {
                           return (
                             <div
                               key={stId}
-                              onClick={() => {
-                                setSelectedStudentId(stId);
-                                setAuditSubTab('live-log');
-                              }}
-                              className={`p-2.5 rounded-xl border transition-all cursor-pointer flex items-center justify-between gap-2 ${
-                                isSelected && auditSubTab === 'live-log'
-                                  ? 'bg-purple-950/40 border-purple-500 shadow-md ring-1 ring-purple-500/50 text-white'
-                                  : 'bg-slate-950/80 border-slate-800/80 hover:bg-slate-800/50 hover:border-slate-700 text-slate-300'
+                              onClick={() => setSelectedStudentId(stId)}
+                              className={`py-2 px-2 rounded-md transition-colors cursor-pointer flex items-center justify-between gap-2 ${
+                                isSelected
+                                  ? 'bg-purple-500/15 text-white'
+                                  : 'hover:bg-slate-800/40 text-slate-300'
                               }`}
                             >
                               <div className="overflow-hidden">
-                                <div className="text-xs font-bold truncate flex items-center gap-1.5">
-                                  <span>{st.name}</span>
-                                  {isSelected && auditSubTab === 'live-log' && <span className="text-[10px] text-purple-400">●</span>}
+                                <div className="text-xs font-medium truncate flex items-center gap-1.5">
+                                  {isSelected && <span className="w-1.5 h-1.5 rounded-full bg-purple-400 shrink-0" />}
+                                  <span className="truncate">{st.name}</span>
                                 </div>
-                                <div className="text-[11px] text-slate-400 truncate font-mono">{st.email}</div>
+                                <div className="text-[10px] text-slate-500 truncate font-mono">{st.email}</div>
                               </div>
-                              <div className="flex flex-col items-end shrink-0">
-                                <span className="text-xs font-mono font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
-                                  {avgMastery}% P(L)
+                              <div className="flex flex-col items-end shrink-0 font-mono">
+                                <span className="text-xs font-bold text-emerald-400">
+                                  {avgMastery}%
                                 </span>
-                                <span className="text-[10px] text-slate-400 font-mono mt-0.5">
-                                  Спроб: {st.recentAdjustments?.length || 0}
+                                <span className="text-[9px] text-slate-500">
+                                  {st.wpm ?? st.avgWpm ?? 0} WPM
                                 </span>
                               </div>
                             </div>
                           );
-                        })}
-                      </div>
-                    )}
+                        })
+                      )}
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
+              </div>
+            </div>
+          )}
 
-              {/* Drawer 3: Settings (Rule 7 Standard) */}
-              {activeTab === 'settings' && (
-                <div className="flex flex-col gap-3 text-xs text-slate-300">
-                  {/* Section 1: Пороги Майстерності */}
-                  <div className="flex flex-col gap-2">
+          {/* Drawer 2: Pedagogical Control Panel */}
+          {activeTab === 'coursemap' && courseDetails && (
+            <div className="flex flex-col divide-y divide-slate-800/70">
+              {/* 1. 🏆 Section 1: Bloom Triad Coverage */}
+              {(() => {
+                const currentSkill = courseDetails.skills?.find((s: any) => s.slug === (selectedSkillSlug || courseDetails.skills[0]?.slug)) || courseDetails.skills[0];
+                const skillTasks = allTasks.filter((t) => t.skillId === currentSkill?.id || t.skill?.id === currentSkill?.id);
+
+                const topicsMap: Record<string, { easy: number; medium: number; hard: number; total: number }> = {};
+                let codeTasks = 0;
+                let quizTasks = 0;
+                let secretTestsCount = 0;
+
+                skillTasks.forEach((tk) => {
+                  const top = tk.topic || 'general';
+                  if (!topicsMap[top]) topicsMap[top] = { easy: 0, medium: 0, hard: 0, total: 0 };
+                  topicsMap[top].total++;
+                  if (tk.difficulty === 'EASY') topicsMap[top].easy++;
+                  if (tk.difficulty === 'MEDIUM') topicsMap[top].medium++;
+                  if (tk.difficulty === 'HARD') topicsMap[top].hard++;
+
+                  if (tk.taskType === 'CODE') codeTasks++;
+                  else quizTasks++;
+
+                  if (tk.testCases && tk.testCases.some((tc: any) => tc.isSecret)) secretTestsCount++;
+                });
+
+                const totalTopics = Object.keys(topicsMap).length;
+                const completeTriads = Object.values(topicsMap).filter((t) => t.easy > 0 && t.medium > 0 && t.hard > 0).length;
+                const completePercent = totalTopics > 0 ? Math.round((completeTriads / totalTopics) * 100) : 0;
+
+                return (
+                  <div className="pb-3 flex flex-col gap-2">
                     <button
-                      onClick={() => setIsBktThresholdsOpen((prev) => !prev)}
-                      className="w-full flex items-center justify-between text-left px-0.5 py-1 text-slate-400 hover:text-white transition-colors cursor-pointer group"
+                      onClick={() => setIsTriadAuditOpen((prev) => !prev)}
+                      className="w-full flex items-center justify-between text-left py-1 text-slate-400 hover:text-white transition-colors cursor-pointer group"
                     >
-                      <span className="text-[11px] font-bold uppercase tracking-wider text-amber-400 flex items-center gap-1.5 group-hover:text-amber-300 transition-colors">
-                        <ShieldCheck className="w-3.5 h-3.5 text-amber-400" />
-                        <span>Поріг Майстерності BKT</span>
-                        <span className="px-1.5 py-0.2 rounded text-[9px] font-mono bg-amber-500/10 text-amber-300 border border-amber-500/20">
-                          P(L) ≥ 0.95
-                        </span>
+                      <span className="text-[11px] font-semibold uppercase tracking-wider flex items-center gap-1.5">
+                        <Sparkles className="w-3.5 h-3.5 text-purple-400" />
+                        <span>Баланс Тріад</span>
+                        <span className="text-[10px] font-mono text-slate-500 font-normal">({currentSkill?.slug || 'all'})</span>
                       </span>
-                      <span className="p-0.5 rounded text-slate-400 group-hover:text-white group-hover:bg-slate-800 transition-all flex items-center justify-center">
-                        {isBktThresholdsOpen ? <Minus className="w-4 h-4 stroke-[2.5]" /> : <Plus className="w-4 h-4 stroke-[2.5]" />}
+                      <span className="text-slate-500 group-hover:text-white">
+                        {isTriadAuditOpen ? <Minus className="w-3.5 h-3.5" /> : <Plus className="w-3.5 h-3.5" />}
                       </span>
                     </button>
 
-                    {isBktThresholdsOpen && (
-                      <div className="p-3 bg-slate-950/80 border border-slate-800/80 rounded-xl animate-fadeIn">
-                        <span className="font-bold text-white block mb-1">Поточний поріг переходу між модулями</span>
-                        <p className="text-[11px] text-slate-400">P(L) ≥ 0.95 відкриває залежні вершини графа навичок</p>
+                    {isTriadAuditOpen && (
+                      <div className="flex flex-col gap-2 animate-fadeIn">
+                        <div className="flex flex-col gap-1">
+                          <div className="flex items-center justify-between text-xs">
+                            <span className="text-slate-400 text-[11px]">Повнота Тріад (3/3):</span>
+                            <span className="font-mono font-bold text-emerald-400">
+                              {completeTriads}/{totalTopics} ({completePercent}%)
+                            </span>
+                          </div>
+                          <div className="w-full h-1.5 rounded-full bg-slate-950 overflow-hidden">
+                            <div
+                              className="h-full bg-emerald-400 transition-all"
+                              style={{ width: `${completePercent}%` }}
+                            />
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-2 pt-1 text-[11px] font-mono">
+                          <div className="py-1.5 px-2 rounded bg-slate-950/40 flex items-center justify-between">
+                            <span className="text-slate-500 text-[10px]">Код:</span>
+                            <span className="text-emerald-400 font-bold">{codeTasks}</span>
+                          </div>
+                          <div className="py-1.5 px-2 rounded bg-slate-950/40 flex items-center justify-between">
+                            <span className="text-slate-500 text-[10px]">Тести:</span>
+                            <span className="text-blue-400 font-bold">{quizTasks}</span>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center justify-between text-[11px] font-mono pt-0.5 text-slate-400">
+                          <span>Приховані тести (Secret):</span>
+                          <span className="text-rose-400 font-bold">{secretTestsCount} задач</span>
+                        </div>
                       </div>
                     )}
                   </div>
+                );
+              })()}
 
-                  {/* Section 2: Штрафи за Вгадування */}
-                  <div className="flex flex-col gap-2 pt-2 border-t border-slate-800/80">
-                    <button
-                      onClick={() => setIsGuessPenaltiesOpen((prev) => !prev)}
-                      className="w-full flex items-center justify-between text-left px-0.5 py-1 text-slate-400 hover:text-white transition-colors cursor-pointer group"
+              {/* 2. ⚡ Section 2: Cognitive Traps */}
+              <div className="py-3 flex flex-col gap-2">
+                <button
+                  onClick={() => setIsCognitiveTrapsOpen((prev) => !prev)}
+                  className="w-full flex items-center justify-between text-left py-1 text-slate-400 hover:text-white transition-colors cursor-pointer group"
+                >
+                  <span className="text-[11px] font-semibold uppercase tracking-wider flex items-center gap-1.5">
+                    <Activity className="w-3.5 h-3.5 text-amber-400" />
+                    <span>Когнітивні Пастки</span>
+                  </span>
+                  <span className="text-slate-500 group-hover:text-white">
+                    {isCognitiveTrapsOpen ? <Minus className="w-3.5 h-3.5" /> : <Plus className="w-3.5 h-3.5" />}
+                  </span>
+                </button>
+
+                {isCognitiveTrapsOpen && (
+                  <div className="flex flex-col divide-y divide-slate-800/50 animate-fadeIn">
+                    <div
+                      onClick={() => {
+                        const task = allTasks.find((t) => t.subConcept?.includes('dead-zone') || t.title.includes('Temporal Dead Zone'));
+                        if (task) setSelectedTaskId(task.id);
+                      }}
+                      className="py-2 px-1.5 hover:bg-slate-800/40 rounded transition-colors cursor-pointer flex flex-col gap-0.5"
                     >
-                      <span className="text-[11px] font-bold uppercase tracking-wider text-purple-400 flex items-center gap-1.5 group-hover:text-purple-300 transition-colors">
-                        <Activity className="w-3.5 h-3.5 text-purple-400" />
-                        <span>Штраф за Згадування</span>
-                        <span className="px-1.5 py-0.2 rounded text-[9px] font-mono bg-purple-500/10 text-purple-300 border border-purple-500/20">
-                          P(G)
-                        </span>
-                      </span>
-                      <span className="p-0.5 rounded text-slate-400 group-hover:text-white group-hover:bg-slate-800 transition-all flex items-center justify-center">
-                        {isGuessPenaltiesOpen ? <Minus className="w-4 h-4 stroke-[2.5]" /> : <Plus className="w-4 h-4 stroke-[2.5]" />}
-                      </span>
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="font-medium text-slate-200 truncate">Temporal Dead Zone (TDZ)</span>
+                        <span className="text-[10px] font-mono text-rose-400">42% пом.</span>
+                      </div>
+                      <span className="text-[10px] text-slate-500">Часте перемикання на EASY (70%)</span>
+                    </div>
+
+                    <div
+                      onClick={() => {
+                        const task = allTasks.find((t) => t.subConcept?.includes('coercion') || t.title.includes('приведення'));
+                        if (task) setSelectedTaskId(task.id);
+                      }}
+                      className="py-2 px-1.5 hover:bg-slate-800/40 rounded transition-colors cursor-pointer flex flex-col gap-0.5"
+                    >
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="font-medium text-slate-200 truncate">Strict Equality & Coercion</span>
+                        <span className="text-[10px] font-mono text-amber-400">35% пом.</span>
+                      </div>
+                      <span className="text-[10px] text-slate-500">Плутанина між == та ===</span>
+                    </div>
+
+                    <div
+                      onClick={() => {
+                        const task = allTasks.find((t) => t.subConcept?.includes('closure') || t.title.includes('замикан'));
+                        if (task) setSelectedTaskId(task.id);
+                      }}
+                      className="py-2 px-1.5 hover:bg-slate-800/40 rounded transition-colors cursor-pointer flex flex-col gap-0.5"
+                    >
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="font-medium text-slate-200 truncate">Lexical Scope & Closures</span>
+                        <span className="text-[10px] font-mono text-amber-400">28% пом.</span>
+                      </div>
+                      <span className="text-[10px] text-slate-500">Збереження стану при викликах</span>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* 3. ⚙️ Section 3: BKT Adaptive Tuner */}
+              <div className="pt-3 flex flex-col gap-2">
+                <button
+                  onClick={() => setIsAdaptiveParamsOpen((prev) => !prev)}
+                  className="w-full flex items-center justify-between text-left py-1 text-slate-400 hover:text-white transition-colors cursor-pointer group"
+                >
+                  <span className="text-[11px] font-semibold uppercase tracking-wider flex items-center gap-1.5">
+                    <Network className="w-3.5 h-3.5 text-indigo-400" />
+                    <span>Пороги Адаптації</span>
+                  </span>
+                  <span className="text-slate-500 group-hover:text-white">
+                    {isAdaptiveParamsOpen ? <Minus className="w-3.5 h-3.5" /> : <Plus className="w-3.5 h-3.5" />}
+                  </span>
+                </button>
+
+                {isAdaptiveParamsOpen && (
+                  <div className="flex flex-col divide-y divide-slate-800/50 font-mono text-[11px] animate-fadeIn">
+                    <div className="flex justify-between items-center py-1.5">
+                      <span className="text-slate-400">Proficient (DAG):</span>
+                      <span className="text-indigo-400 font-bold">P(L) ≥ 0.75</span>
+                    </div>
+                    <div className="flex justify-between items-center py-1.5">
+                      <span className="text-slate-400">Gold Mastery:</span>
+                      <span className="text-emerald-400 font-bold">P(L) ≥ 0.90</span>
+                    </div>
+                    <div className="flex justify-between items-center py-1.5">
+                      <span className="text-slate-400">Ліміт EASY:</span>
+                      <span className="text-amber-400 font-bold">Max 70%</span>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Drawer: Review Queue List */}
+          {activeTab === 'reviews' && (
+            <div className="flex flex-col divide-y divide-slate-800/70">
+              {/* Section 1: Режими Черги */}
+              <div className="pb-3 flex flex-col gap-2">
+                <div className="bg-slate-950/60 p-1 rounded-lg border border-slate-800/80 flex items-center gap-1">
+                  <button
+                    onClick={() => setReviewFilterTab('pending')}
+                    className={`flex-1 py-1 px-2.5 rounded-md text-xs font-medium flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
+                      reviewFilterTab === 'pending'
+                        ? 'bg-purple-600 text-white'
+                        : 'text-slate-400 hover:text-white'
+                    }`}
+                  >
+                    <span>В черзі</span>
+                  </button>
+                  <button
+                    onClick={() => setReviewFilterTab('reviewed')}
+                    className={`flex-1 py-1 px-2.5 rounded-md text-xs font-medium flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
+                      reviewFilterTab === 'reviewed'
+                        ? 'bg-purple-600 text-white'
+                        : 'text-slate-400 hover:text-white'
+                    }`}
+                  >
+                    <span>Перевірені</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Section 2: Роботи Студентів */}
+              <div className="pt-3 flex flex-col gap-2">
+                <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-400 flex items-center justify-between">
+                  <span>Роботи Студентів</span>
+                  <span className="font-mono text-[10px] text-slate-500">({reviewQueue.length})</span>
+                </span>
+
+                {reviewQueue.length === 0 ? (
+                  <div className="py-6 text-center text-xs text-slate-500">
+                    {reviewFilterTab === 'pending'
+                      ? 'Черга перевірки порожня'
+                      : 'Немає перевірених робіт'}
+                  </div>
+                ) : (
+                  <div className="flex flex-col divide-y divide-slate-800/50">
+                    {reviewQueue.map((item) => {
+                      const isSelected = selectedReviewId === item.submissionId;
+                      const isApproved = item.teacherReviewStatus === 'APPROVED';
+                      const isRejected = item.teacherReviewStatus === 'REJECTED';
+
+                      return (
+                        <div
+                          key={item.submissionId}
+                          onClick={() => setSelectedReviewId(item.submissionId)}
+                          className={`py-2.5 px-2 rounded-md transition-colors cursor-pointer flex flex-col gap-1 ${
+                            isSelected
+                              ? 'bg-purple-500/15 text-white'
+                              : 'hover:bg-slate-800/40 text-slate-300'
+                          }`}
+                        >
+                          <div className="flex items-center justify-between">
+                            <span className="text-xs font-medium text-white truncate">{item.studentName}</span>
+                            <span className={`text-[10px] font-mono ${
+                              isApproved
+                                ? 'text-emerald-400'
+                                : isRejected
+                                ? 'text-rose-400'
+                                : 'text-amber-400'
+                            }`}>
+                              {isApproved ? '✓ Затверджено' : isRejected ? '✕ Відхилено' : 'В черзі'}
+                            </span>
+                          </div>
+                          <div className="text-[11px] text-slate-400 truncate">{item.taskTitle}</div>
+                          <div className="text-[10px] text-slate-500 font-mono flex items-center justify-between">
+                            <span>{item.skillTitle}</span>
+                            <span>{new Date(item.submittedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Drawer: Metrics Audit */}
+          {activeTab === 'metrics-audit' && (
+            <div className="flex flex-col divide-y divide-slate-800/70">
+              {/* SECTION 1: Загальні системні інструменти */}
+              <div className="pb-3 flex flex-col gap-1.5">
+                <button
+                  onClick={() => setIsGeneralToolsOpen((prev) => !prev)}
+                  className="w-full flex items-center justify-between text-left py-1 text-slate-400 hover:text-white transition-colors cursor-pointer group"
+                >
+                  <span className="text-[11px] font-semibold uppercase tracking-wider flex items-center gap-1.5">
+                    <Globe className="w-3.5 h-3.5 text-cyan-400" />
+                    <span>Інструменти Системи</span>
+                  </span>
+                  <span className="text-slate-500 group-hover:text-white">
+                    {isGeneralToolsOpen ? <Minus className="w-3.5 h-3.5" /> : <Plus className="w-3.5 h-3.5" />}
+                  </span>
+                </button>
+
+                {isGeneralToolsOpen && (
+                  <div className="flex flex-col divide-y divide-slate-800/50 animate-fadeIn">
+                    <button
+                      onClick={() => setAuditSubTab('mechanisms')}
+                      className={`w-full py-2 px-2 rounded-md text-left flex items-center justify-between transition-colors cursor-pointer ${
+                        auditSubTab === 'mechanisms'
+                          ? 'bg-purple-500/15 text-white'
+                          : 'hover:bg-slate-800/40 text-slate-300'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2 overflow-hidden">
+                        <Compass className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                        <span className="text-xs font-medium truncate">Реєстр Механізмів (4-in-1)</span>
+                      </div>
+                      <span className="text-[10px] text-slate-500 font-mono">➔</span>
                     </button>
 
-                    {isGuessPenaltiesOpen && (
-                      <div className="p-3 bg-slate-950/80 border border-slate-800/80 rounded-xl animate-fadeIn">
-                        <span className="font-bold text-white block mb-1">Динамічне підвищення P(G)</span>
-                        <p className="text-[11px] text-slate-400">При швидкості відповіді &lt; 2.0 сек активується захист від випадкового вгадування</p>
+                    <button
+                      onClick={() => setAuditSubTab('test-matrix')}
+                      className={`w-full py-2 px-2 rounded-md text-left flex items-center justify-between transition-colors cursor-pointer ${
+                        auditSubTab === 'test-matrix'
+                          ? 'bg-purple-500/15 text-white'
+                          : 'hover:bg-slate-800/40 text-slate-300'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2 overflow-hidden">
+                        <ShieldCheck className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                        <span className="text-xs font-medium truncate">Еталонна Матриця</span>
                       </div>
-                    )}
+                      <span className="text-[10px] text-emerald-400 font-mono">6/6</span>
+                    </button>
+
+                    <button
+                      onClick={() => setAuditSubTab('what-if')}
+                      className={`w-full py-2 px-2 rounded-md text-left flex items-center justify-between transition-colors cursor-pointer ${
+                        auditSubTab === 'what-if'
+                          ? 'bg-purple-500/15 text-white'
+                          : 'hover:bg-slate-800/40 text-slate-300'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2 overflow-hidden">
+                        <Sparkles className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
+                        <span className="text-xs font-medium truncate">Пісочниця "What-If"</span>
+                      </div>
+                      <span className="text-[10px] text-slate-500 font-mono">➔</span>
+                    </button>
                   </div>
-                </div>
-              )}
-            
+                )}
+              </div>
+
+              {/* SECTION 2: Студенти для аудиту */}
+              <div className="pt-3 flex flex-col gap-2">
+                <button
+                  onClick={() => setIsStudentsListOpen((prev) => !prev)}
+                  className="w-full flex items-center justify-between text-left py-1 text-slate-400 hover:text-white transition-colors cursor-pointer group"
+                >
+                  <span className="text-[11px] font-semibold uppercase tracking-wider flex items-center gap-1.5">
+                    <User className="w-3.5 h-3.5 text-purple-400" />
+                    <span>Студенти для Аудиту</span>
+                    <span className="text-[10px] font-mono text-slate-500 font-normal">({students.length})</span>
+                  </span>
+                  <span className="text-slate-500 group-hover:text-white">
+                    {isStudentsListOpen ? <Minus className="w-3.5 h-3.5" /> : <Plus className="w-3.5 h-3.5" />}
+                  </span>
+                </button>
+
+                {isStudentsListOpen && (
+                  <div className="flex flex-col divide-y divide-slate-800/50 max-h-[calc(100vh-340px)] overflow-y-auto pr-0.5 animate-fadeIn">
+                    {students.map((st) => {
+                      const stId = st.id || st.studentId || st.email;
+                      const isSelected = selectedStudentId === stId;
+                      const avgMastery = st.averageMastery !== undefined ? (st.averageMastery * 100).toFixed(0) : '0';
+
+                      return (
+                        <div
+                          key={stId}
+                          onClick={() => {
+                            setSelectedStudentId(stId);
+                            setAuditSubTab('live-log');
+                          }}
+                          className={`py-2 px-2 rounded-md transition-colors cursor-pointer flex items-center justify-between gap-2 ${
+                            isSelected && auditSubTab === 'live-log'
+                              ? 'bg-purple-500/15 text-white'
+                              : 'hover:bg-slate-800/40 text-slate-300'
+                          }`}
+                        >
+                          <div className="overflow-hidden">
+                            <div className="text-xs font-medium truncate flex items-center gap-1.5">
+                              {isSelected && auditSubTab === 'live-log' && <span className="w-1.5 h-1.5 rounded-full bg-purple-400 shrink-0" />}
+                              <span className="truncate">{st.name}</span>
+                            </div>
+                            <div className="text-[10px] text-slate-500 truncate font-mono">{st.email}</div>
+                          </div>
+                          <div className="flex flex-col items-end shrink-0 font-mono">
+                            <span className="text-xs font-bold text-emerald-400">
+                              {avgMastery}%
+                            </span>
+                            <span className="text-[9px] text-slate-500">
+                              Спроб: {st.recentAdjustments?.length || 0}
+                            </span>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Drawer 3: Settings */}
+          {activeTab === 'settings' && (
+            <div className="flex flex-col divide-y divide-slate-800/70 text-xs text-slate-300">
+              <div className="pb-3 flex flex-col gap-1.5">
+                <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">
+                  Поріг Майстерності BKT
+                </span>
+                <p className="text-[11px] text-slate-500 leading-relaxed">
+                  P(L) ≥ 0.95 відкриває залежні вершини графа навичок.
+                </p>
+              </div>
+
+              <div className="pt-3 flex flex-col gap-1.5">
+                <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">
+                  Штраф за Вгадування P(G)
+                </span>
+                <p className="text-[11px] text-slate-500 leading-relaxed">
+                  При швидкості відповіді &lt; 3.5 сек активується захист від випадкового вгадування.
+                </p>
+              </div>
+            </div>
+          )}
         </>
       ),
     };

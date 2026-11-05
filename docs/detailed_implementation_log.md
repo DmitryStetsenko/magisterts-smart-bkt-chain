@@ -29,6 +29,21 @@
   4. *Install Monorepo Dependencies* (`npm ci || npm install`) — синхронізація робочих просторів монорепозиторію.
   5. *Build Next.js Documentation Site* (`npm run build:docs`) — збірка статичного експорту (`output: "export"`, `trailingSlash: true`, `basePath: "/magisterts-smart-bkt-chain"`).
   6. *Upload Artifact & Deploy Pages* (`actions/upload-pages-artifact@v3` + `actions/deploy-pages@v4`).
+### 0.1.7.43 Мінімалістичний Редизайн Бічного Меню та Бічних Панелей (SBC-334, EP-SH / EP-TC)
+- **Архітектурна концепція:**
+  - Позбавлення лівого бічного меню (`navigationRail`), висувних панелей (`drawer`, `UserProfileDrawer`) та внутрішніх списків від важких рамок, тіней та вкладених карток.
+- **Виконані інженерні зміни:**
+  1. **[`packages/ui/src/shell/AppShellLayout.tsx`](file:///packages/ui/src/shell/AppShellLayout.tsx):**
+     - Вертикальна рейка звужена до `w-12`, кнопки вкладок та міжпортальні іконки переведені на безрамковий стиль (`w-9 h-9 rounded-lg`) з м'якою підсвіткою активного стану (`bg-slate-800/90 text-white`) і тонким індикатором `w-0.5`.
+     - Ширина сайдбара оптимізована до `sm:w-[300px] lg:w-[320px]`.
+  2. **[`packages/ui/src/drawer/DrawerSection.tsx`](file:///packages/ui/src/drawer/DrawerSection.tsx) та [`packages/ui/src/drawer/UserProfileDrawer.tsx`](file:///packages/ui/src/drawer/UserProfileDrawer.tsx):**
+     - Лічильники у заголовках секцій оформлені як чисті текстові індикатори `({badge})` без рамок.
+     - Елементи курсів, статистики та посилань у `UserProfileDrawer` організовані через `divide-y divide-slate-800/50`.
+  3. **[`apps/teacher/src/app/page.tsx`](file:///apps/teacher/src/app/page.tsx):**
+     - Списки учнів, радар ризиків, когнітивні пастки, черга перевірки та інструменти аудиту в бічній панелі переведені з рамочних карток на чисті рядки з розділювачами `divide-y divide-slate-800/50`.
+- **Верифікація:**
+  - `npm run build:teacher` пройдено успішно.
+
 ### 0.1.7.42 Очищення Робочої Області Кабінету Викладача за Принципом Clean Borderless Canvas (SBC-333, EP-TC)
 - **Архітектурна проблема (Nested Boxes Anti-Pattern):**
   - Внутрішні екрани `apps/teacher` (`CourseGraphViewer`, `StudentAnalytics`, `ReviewQueueInspector`, `MetricsAuditInspector`) мали до 4–5 рівнів вкладених контейнерів із рамками (`border border-slate-800 rounded-3xl/2xl p-6`), великими внутрішніми банерами, що повторювали назву курсу з хедера, та декоративними SVG-кривими.
