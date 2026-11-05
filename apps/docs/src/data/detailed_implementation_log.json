@@ -155,9 +155,10 @@
             },
             {
               "type": "text",
-              "raw_text": "**[`.agents/AGENTS.md`](file:///.agents/AGENTS.md):**",
+              "raw_text": "**[`.agents/AGENTS.md`](file:///.agents/AGENTS.md) та `next.config.ts` (`student`, `teacher`, `study`, `admin`):**",
               "subitems": [
-                "Офіційно закріплено параметри Minimalist Borderless Design у Правилі 7 (висота хедера `h-[56px]`, рейка `w-12`, бейджі `({badge})` без рамок, `divide-y` замість вкладених коробок)."
+                "Офіційно закріплено параметри Minimalist Borderless Design у Правилі 7 (висота хедера `h-[56px]`, рейка `w-12`, бейджі `({badge})` без рамок, `divide-y` замість вкладених коробок).",
+                "Додано `transpilePackages: ['@sbc/ui', '@sbc/routes']` у `next.config.ts` всіх клієнтських порталів, щоб зміни в спільному пакеті `@sbc/ui` гарантовано підхоплювалися dev-серверами без кешування старих бандлів у `.next`."
               ]
             },
             {

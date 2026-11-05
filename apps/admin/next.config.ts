@@ -1,7 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  transpilePackages: ['@sbc/ui', '@sbc/routes'],
+  devIndicators: false,
 };
 
 export default nextConfig;

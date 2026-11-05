@@ -39,8 +39,9 @@
      - Видалено дублюючий рендер `<Breadcrumbs>` у тілі уроку; елементи модулів та уроків у сайдбарі переведено з карток із рамками на чисті рядки з `divide-y divide-slate-800/50`.
   3. **[`apps/admin/src/app/page.tsx`](file:///apps/admin/src/app/page.tsx):**
      - Знято зовнішню картку-обгортку `bg-slate-900 border border-slate-800 rounded-2xl p-6` навколо робочої області конструктора графа та управління курсами.
-  4. **[`.agents/AGENTS.md`](file:///.agents/AGENTS.md):**
+  4. **[`.agents/AGENTS.md`](file:///.agents/AGENTS.md) та `next.config.ts` (`student`, `teacher`, `study`, `admin`):**
      - Офіційно закріплено параметри Minimalist Borderless Design у Правилі 7 (висота хедера `h-[56px]`, рейка `w-12`, бейджі `({badge})` без рамок, `divide-y` замість вкладених коробок).
+     - Додано `transpilePackages: ['@sbc/ui', '@sbc/routes']` у `next.config.ts` всіх клієнтських порталів, щоб зміни в спільному пакеті `@sbc/ui` гарантовано підхоплювалися dev-серверами без кешування старих бандлів у `.next`.
 - **Верифікація:**
   - Збірки `build:student`, `build:study`, `build:admin` пройдені успішно.
 
