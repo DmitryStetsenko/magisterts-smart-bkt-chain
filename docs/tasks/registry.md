@@ -16,7 +16,7 @@
 | **`SBC-EP-TC`** | Teacher Portal & Analytics CRM | 25 |
 | **`SBC-EP-AD`** | Admin Portal & Knowledge DAG Builder | 8 |
 | **`SBC-EP-LD`** | Landing Web Page | 9 |
-| **`SBC-EP-MS`** | Master's Thesis Engineering & Academic Text Generation | 7 |
+| **`SBC-EP-MS`** | Master's Thesis Engineering & Academic Text Generation | 8 |
 | **ВСЬОГО** | - | **254** |
 
 ---
@@ -428,6 +428,7 @@
 | **SBC-307** | `Story` | `MS` | scale master thesis for specialty 014 to 5 chapters by introducing dedicated problematics chapter and expanding volume to 65+ pages | 2026-10-30 | pending |
 | **SBC-308** | `Story` | `MS` | calibrate page density coefficient to 175 words/page and expand master thesis for specialty 014 to 60+ pages in Google Docs | 2026-10-30 | pending |
 | **SBC-339** | `Docs` | `MS` | establish iterative refinement standard, release comments preservation and AI-first topic alignment rules | 2026-11-06 | `c4c68b8` |
+| **SBC-340** | `Story` | `MS` | reorder bibliography alphabetically, re-map citations and add author comments for removed references | 2026-11-06 | `cde9cfb` |
 
 
 ---
