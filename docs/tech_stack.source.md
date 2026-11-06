@@ -121,10 +121,10 @@ smart-bkt-chain/
     *   *Чому:* Повна сумісність із серверними компонентами (RSC). Для оптимізації застосовується гібридна модель: статична генерація для публічних зон та динамічний SSR/CSR з захистом ролей у кабінетах.
 *   **Архітектурна методологія:** **Feature-Sliced Design (FSD)**.
     *   *Чому:* Забезпечує декомпозицію клієнтського коду на незалежні шари (`shared`, `entities`, `features`, `widgets`, `pages`, `app`), виключаючи спагеті-код та кругові залежності.
-*   **Канонічний макет екосистеми (`AppShellLayout` у `@sbc/ui`):**
-    *   *Чому:* Уніфікований каркас **Opera Shell v2.0** для 4 ключових порталів (`apps/study`, `apps/student`, `apps/teacher`, `apps/admin`). Забезпечує сувору ізоляцію скролу (`h-screen w-screen overflow-hidden`), фіксовану верхню шапку (`h-14`), вертикальну навігаційну рейку **Opera Vertical Icon Rail (`w-14`)** із динамічними бейджами і автоматичними міжпортальними лінками через `@sbc/routes`, висувний Drawer на базі `<DrawerSection>` та контентне полотно з незалежним скролом.
+*   **Канонічний макет екосистеми (`AppShellLayout` у `@sbc/ui` — Minimalist Borderless Design):**
+    *   *Чому:* Уніфікований безрамковий каркас **Opera Shell v2.0** для 4 ключових порталів (`apps/study`, `apps/student`, `apps/teacher`, `apps/admin`). Забезпечує сувору ізоляцію скролу (`h-screen w-screen overflow-hidden`), компактну дворівневу верхню шапку (`h-[56px]`) з єдиним рендером `<Breadcrumbs>` і безрамковим тригером спільного `UserProfileDrawer`, лаконічну вертикальну рейку **Minimalist Borderless Icon Rail (`w-12`)** з автоматичними міжпортальними лінками через `@sbc/routes`, висувний Drawer (`sm:w-[300px] lg:w-[320px]`) на базі `<DrawerSection>` з розділювачами `divide-y divide-slate-800/50` та чисте контентне полотно (Clean Borderless Canvas) без вкладених рамок-«матрьошок».
 *   **Спільні компоненти та дизайн-система (`@sbc/ui`):**
-    *   *Чому:* Пакет `packages/ui` містить уніфікований `AppShellLayout`, спільні віджети (`GameSkillTreeWidget`, `AnomalyTreeWidget`, `AnomalyRadarWidget`, `CourseOverviewWidget`), компоненти Radix/Tailwind та акордеонний контейнер `<DrawerSection>`.
+    *   *Чому:* Пакет `packages/ui` містить уніфікований `AppShellLayout`, спільну панель профілю та перемикання курсів `UserProfileDrawer`, хлібні крихти `Breadcrumbs`, акордеонні секції `<DrawerSection>` та спільні аналітичні/ігрові віджети (`GameSkillTreeWidget`, `AnomalyTreeWidget`, `AnomalyRadarWidget`, `CourseOverviewWidget`).
 *   **Уніфікований стан навігації:**
     *   *Чому:* Усі кабінети використовують спільний 3-стадійний стан навігації (`activeTab` + `isDrawerOpen`), що запобігає втраті фокусу обраної вкладки при згортанні панелей.
 *   **Стилізація та UI:** **Tailwind CSS + shadcn/ui (Radix UI)**.

@@ -144,16 +144,16 @@
             },
             {
               "type": "text",
-              "raw_text": "**Канонічний макет екосистеми (`AppShellLayout` у `@sbc/ui`):**",
+              "raw_text": "**Канонічний макет екосистеми (`AppShellLayout` у `@sbc/ui` — Minimalist Borderless Design):**",
               "subitems": [
-                "Уніфікований каркас **Opera Shell v2.0** для 4 ключових порталів (`apps/study`, `apps/student`, `apps/teacher`, `apps/admin`). Забезпечує сувору ізоляцію скролу (`h-screen w-screen overflow-hidden`), фіксовану верхню шапку (`h-14`), вертикальну навігаційну рейку **Opera Vertical Icon Rail (`w-14`)** із динамічними бейджами і автоматичними міжпортальними лінками через `@sbc/routes`, висувний Drawer на базі `<DrawerSection>` та контентне полотно з незалежним скролом."
+                "Уніфікований безрамковий каркас **Opera Shell v2.0** для 4 ключових порталів (`apps/study`, `apps/student`, `apps/teacher`, `apps/admin`). Забезпечує сувору ізоляцію скролу (`h-screen w-screen overflow-hidden`), компактну дворівневу верхню шапку (`h-[56px]`) з єдиним рендером `<Breadcrumbs>` і безрамковим тригером спільного `UserProfileDrawer`, лаконічну вертикальну рейку **Minimalist Borderless Icon Rail (`w-12`)** з автоматичними міжпортальними лінками через `@sbc/routes`, висувний Drawer (`sm:w-[300px] lg:w-[320px]`) на базі `<DrawerSection>` з розділювачами `divide-y divide-slate-800/50` та чисте контентне полотно (Clean Borderless Canvas) без вкладених рамок-«матрьошок»."
               ]
             },
             {
               "type": "text",
               "raw_text": "**Спільні компоненти та дизайн-система (`@sbc/ui`):**",
               "subitems": [
-                "Пакет `packages/ui` містить уніфікований `AppShellLayout`, спільні віджети (`GameSkillTreeWidget`, `AnomalyTreeWidget`, `AnomalyRadarWidget`, `CourseOverviewWidget`), компоненти Radix/Tailwind та акордеонний контейнер `<DrawerSection>`."
+                "Пакет `packages/ui` містить уніфікований `AppShellLayout`, спільну панель профілю та перемикання курсів `UserProfileDrawer`, хлібні крихти `Breadcrumbs`, акордеонні секції `<DrawerSection>` та спільні аналітичні/ігрові віджети (`GameSkillTreeWidget`, `AnomalyTreeWidget`, `AnomalyRadarWidget`, `CourseOverviewWidget`)."
               ]
             },
             {

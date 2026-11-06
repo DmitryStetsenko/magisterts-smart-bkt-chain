@@ -2,6 +2,22 @@
 
 Цей документ фіксує щоденний прогрес розробки, архітектурні рішення та планування наступних кроків для системи «Smart-BKT-Chain».
 
+## 📅 6 листопада 2026 року
+
+### ✅ Що зроблено за день:
+1. **Синхронізація всіх документів платформи (`docs/apps/*.md`, `docs/tech_stack.source.md`) із затвердженим підходом Minimalist Borderless UI (SBC-337, EP-SH / EP-INF):**
+   - **Контекст та задача користувача:**
+     - Зафіксувати новий затверджений підхід до інтерфейсу не лише у правилах `.agents/AGENTS.md`, а й у всіх доменних специфікаціях застосунків та архітектурній документації порталу `apps/docs`.
+   - **Виконані зміни:**
+     - Оновлено розділи «Архітектура Інтерфейсу» у файлах:
+       - [`docs/apps/teacher_dashboard.md`](file:///docs/apps/teacher_dashboard.md)
+       - [`docs/apps/student_portal.md`](file:///docs/apps/student_portal.md)
+       - [`docs/apps/study_portal.md`](file:///docs/apps/study_portal.md)
+       - [`docs/apps/admin_portal.md`](file:///docs/apps/admin_portal.md)
+       - [`docs/tech_stack.source.md`](file:///docs/tech_stack.source.md)
+     - У всіх специфікаціях відображено: компактну дворівневу шапку `h-[56px]`, лаконічну вертикальну рейку `w-12`, бічну панель `sm:w-[300px] lg:w-[320px]`, текстові бейджі `({badge})` без рамок, розділювачі списків `divide-y divide-slate-800/50`, спільний `UserProfileDrawer` та чисте робоче полотно (Clean Borderless Canvas).
+     - Перекомпільовано всі JSON-файли для порталу документації `apps/docs` через `python scripts/compile_docs.py`.
+
 ## 📅 5 листопада 2026 року
 
 ### ✅ Що зроблено за день:

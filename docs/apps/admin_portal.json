@@ -38,10 +38,10 @@
       "subsections": []
     },
     {
-      "title": "🏛️ 2. Архітектура Інтерфейсу (UI Shell Standard — AppShellLayout v2.0)",
+      "title": "🏛️ 2. Архітектура Інтерфейсу (Minimalist Borderless UI — AppShellLayout v2.0)",
       "level": 2,
       "paragraphs": [
-        "Інтерфейс застосунка реалізовано на базі канонічного компонента **`AppShellLayout`** (`@sbc/ui`) із суворою ізоляцією скролінгу:"
+        "Інтерфейс застосунка реалізовано на базі канонічного компонента **`AppShellLayout`** (`@sbc/ui`) за принципом **Minimalist Borderless Design** із суворою ізоляцією скролінгу:"
       ],
       "code_blocks": [],
       "items": [
@@ -52,67 +52,37 @@
         },
         {
           "type": "text",
-          "raw_text": "**Шапка (`h-14`):** брендинг `Smart-BKT-Chain` із бейджем `Admin Portal v2.0`, вибір активного курсу, глобальні налаштування системи та статус підключення до API.",
+          "raw_text": "**Дворівнева шапка (`h-[56px]` — Minimalist Two-Tier Header):** брендинг `Smart-BKT-Chain` із моноширинним підписом `Admin`, назва `Методичний центр`, другий поверх хлібних крихт `Breadcrumbs` з текстовим лічильником `({N} навичок)`, плоска кнопка переходу до Кабінету Викладача та безрамковий тригер спільного **`UserProfileDrawer`**.",
           "subitems": []
         },
         {
           "type": "text",
-          "raw_text": "**Вертикальна рейка Opera Rail (`w-14`):** швидкі вкладки:",
+          "raw_text": "**Вертикальна рейка Minimalist Borderless Icon Rail (`w-12`):** швидкі безрамкові вкладки (`w-9 h-9 rounded-lg`):",
           "subitems": []
         },
         {
           "type": "text",
-          "raw_text": "`courses` (Курси): реєстр навчальних дисциплін;",
+          "raw_text": "`dag` (Network): конструювання графу компетенцій (Skill DAG Editor);",
           "subitems": []
         },
         {
           "type": "text",
-          "raw_text": "`skills` (Навички): конструювання графу компетенцій (Skill DAG);",
+          "raw_text": "`courses` (BookOpen): реєстр навчальних дисциплін та управління курсами;",
           "subitems": []
         },
         {
           "type": "text",
-          "raw_text": "`bkt` (BKT Параметри): калібрувальна матриця ймовірностей;",
+          "raw_text": "*Нижній стек екосистеми:* автоматичні безрамкові посилання через `@sbc/routes` на Підручник (`apps/study`), Студентський кабінет (`apps/student`), Кабінет Викладача (`apps/teacher`), Документацію (`apps/docs`) та системні налаштування (`system`).",
           "subitems": []
         },
         {
           "type": "text",
-          "raw_text": "`telemetry` (Телеметрія): моніторинг поведінкових стримів;",
+          "raw_text": "**Висувний Drawer (`sm:w-[300px] lg:w-[320px]`) та `UserProfileDrawer`:** структуровані на базі безрамкових секцій `<DrawerSection>` (Правило 7) з текстовими лічильниками `({badge})` та розділювачами `divide-y divide-slate-800/50`.",
           "subitems": []
         },
         {
           "type": "text",
-          "raw_text": "`chain` (Блокчейн): верифікація блоків та транзакцій;",
-          "subitems": []
-        },
-        {
-          "type": "text",
-          "raw_text": "*Нижній стек екосистеми:* автоматичні швидкі посилання через `@sbc/routes` на Підручник (`apps/study`), Студентський кабінет (`apps/student`), Кабінет Викладача (`apps/teacher`), Документацію (`apps/docs`) та системні налаштування (`settings`).",
-          "subitems": []
-        },
-        {
-          "type": "text",
-          "raw_text": "**Висувний Drawer (`w-[380px]`):** структурований на базі безрамкових секцій `<DrawerSection>` (Правило 7) з незалежним скролом:",
-          "subitems": []
-        },
-        {
-          "type": "text",
-          "raw_text": "*Секція 1: Перелік навчальних курсів платформи*",
-          "subitems": []
-        },
-        {
-          "type": "text",
-          "raw_text": "*Секція 2: Вузли навичок активного курсу*",
-          "subitems": []
-        },
-        {
-          "type": "text",
-          "raw_text": "*Секція 3: Фільтри завдань за модальностями та складністю*",
-          "subitems": []
-        },
-        {
-          "type": "text",
-          "raw_text": "**Центральне полотно (`<main className=\"flex-1 overflow-y-auto\">`):** редактори графу, таблиці параметрів моделі та системні консолі.",
+          "raw_text": "**Центральне полотно (`<main className=\"flex-1 overflow-y-auto\">` — Clean Borderless Canvas):** редактори графу `SkillDagEditor`, менеджер курсів `CourseManager` та системні консолі без зайвої зовнішньої картки-обгортки, розділені тонкими лініями `border-b border-slate-800/80`.",
           "subitems": []
         },
         {

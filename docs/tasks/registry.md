@@ -157,7 +157,8 @@
 | **SBC-330** | `Story` | `SH` | create reusable UserProfileDrawer in @sbc/ui and integrate across all apps | 2026-11-04 | `c1d4c3e` |
 | **SBC-334** | `Style` | `SH` | refine navigation rail and side drawers into minimalist borderless style | 2026-11-05 | `3d83ece` |
 | **SBC-335** | `Style` | `SH` | refine AppShellLayout header, breadcrumbs badges and right-slot triggers into minimalist borderless style | 2026-11-05 | `daed737` |
-| **SBC-336** | `Style` | `SH` | scale minimalist borderless design to student, study and admin portals and update Rule 7 in AGENTS.md | 2026-11-05 | `pending` |
+| **SBC-336** | `Style` | `SH` | scale minimalist borderless design to student, study and admin portals and update Rule 7 in AGENTS.md | 2026-11-05 | `01c396b` |
+| **SBC-337** | `Docs` | `SH` | synchronize app domain specifications and tech stack docs with approved Minimalist Borderless UI standard | 2026-11-06 | `pending` |
 
 ---
 

@@ -29,6 +29,11 @@
   4. *Install Monorepo Dependencies* (`npm ci || npm install`) — синхронізація робочих просторів монорепозиторію.
   5. *Build Next.js Documentation Site* (`npm run build:docs`) — збірка статичного експорту (`output: "export"`, `trailingSlash: true`, `basePath: "/magisterts-smart-bkt-chain"`).
   6. *Upload Artifact & Deploy Pages* (`actions/upload-pages-artifact@v3` + `actions/deploy-pages@v4`).
+### 0.1.7.46 Офіційна Синхронізація Доменної Документації Порталів зі Стандартом Minimalist Borderless UI (SBC-337, EP-SH / EP-INF)
+- **Виконані зміни:**
+  - Синхронізовано технічні специфікації інтерфейсу в [`docs/apps/teacher_dashboard.md`](file:///docs/apps/teacher_dashboard.md), [`docs/apps/student_portal.md`](file:///docs/apps/student_portal.md), [`docs/apps/study_portal.md`](file:///docs/apps/study_portal.md), [`docs/apps/admin_portal.md`](file:///docs/apps/admin_portal.md) та [`docs/tech_stack.source.md`](file:///docs/tech_stack.source.md) з актуальною реалізацією `AppShellLayout`, `Breadcrumbs`, `DrawerSection` та `UserProfileDrawer`.
+  - Виконано компіляцію `python scripts/compile_docs.py` для публікації оновлених специфікацій у `apps/docs/src/data/apps_*.json` та `tech_stack.json`.
+
 ### 0.1.7.45 Уніфікація Minimalist Borderless UI в Порталах Студента, Підручника, Адміна та Регламенті `.agents/AGENTS.md` (SBC-336, EP-SH / EP-ST / EP-AD)
 - **Виконані інженерні зміни:**
   1. **[`apps/student/src/components/StudentPortalApp.tsx`](file:///apps/student/src/components/StudentPortalApp.tsx) та [`apps/student/src/components/StudentProgressPill.tsx`](file:///apps/student/src/components/StudentProgressPill.tsx):**
