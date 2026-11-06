@@ -433,6 +433,7 @@
 | **SBC-342** | `Story` | `MS` | resolve supervisor remarks, expand sections 2-3 to 25-30 pages and add chapter conclusions | 2026-11-06 | `57eef1a` |
 | **SBC-343** | `Fix` | `MS` | replace hash terminology, fix comment threading in Google Docs, justify test time limits and release V-14.0 | 2026-11-06 | `159b71c` |
 | **SBC-344** | `Fix` | `MS` | eliminate plural modestiae and artificial author labels for pure academic style in V-14.1 | 2026-11-06 | `eed1937` |
+| **SBC-345** | `Fix` | `MS` | embed in-text citations and empirical context for dropout statistics in V-14.2 | 2026-11-06 | pending |
 
 
 ---
