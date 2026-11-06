@@ -430,7 +430,7 @@
 | **SBC-339** | `Docs` | `MS` | establish iterative refinement standard, release comments preservation and AI-first topic alignment rules | 2026-11-06 | `c4c68b8` |
 | **SBC-340** | `Story` | `MS` | reorder bibliography alphabetically, re-map citations and add author comments for removed references | 2026-11-06 | `0109cfe` |
 | **SBC-341** | `Story` | `MS` | fix section numbering, align TOC and rephrase author comments to first person | 2026-11-06 | `c894a36` |
-| **SBC-342** | `Story` | `MS` | resolve supervisor remarks, expand sections 2-3 to 25-30 pages and add chapter conclusions | 2026-11-06 | pending |
+| **SBC-342** | `Story` | `MS` | resolve supervisor remarks, expand sections 2-3 to 25-30 pages and add chapter conclusions | 2026-11-06 | `57eef1a` |
 
 
 ---
