@@ -1361,72 +1361,71 @@ export function StudentPortalContent({
                 />
               )}
 
-              {/* Evaluation Result Toast Panel */}
+              {/* Evaluation Result Panel */}
               {evalResult && (
                 <div
-                  className={`p-4 rounded-2xl border flex flex-col gap-3 transition-all shadow-xl shrink-0 ${
+                  className={`pl-3.5 py-2.5 border-l-2 flex flex-col gap-3 shrink-0 ${
                     evalResult.isPassed
-                      ? 'bg-emerald-950/40 border-emerald-500/40 text-emerald-100'
-                      : 'bg-rose-950/40 border-rose-500/40 text-rose-100'
+                      ? 'border-l-emerald-400 text-emerald-100'
+                      : 'border-l-rose-400 text-rose-100'
                   }`}
                 >
-                  <div className="flex items-center gap-3">
-                    {evalResult.isPassed ? (
-                      <CheckCircle className="w-5 h-5 text-emerald-400 shrink-0" />
-                    ) : (
-                      <AlertCircle className="w-5 h-5 text-rose-400 shrink-0" />
-                    )}
-                    <div>
-                      <h4 className="font-bold text-sm">
-                        {evalResult.isPassed ? 'Вітаємо! Перевірку пройдено' : 'Необхідне доопрацювання'}
-                      </h4>
-                      <p className="text-xs opacity-90">{evalResult.feedback}</p>
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="flex items-start gap-2.5">
+                      {evalResult.isPassed ? (
+                        <CheckCircle className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+                      ) : (
+                        <AlertCircle className="w-4 h-4 text-rose-400 shrink-0 mt-0.5" />
+                      )}
+                      <div className="flex flex-col gap-0.5">
+                        <h4 className="font-bold text-xs text-white">
+                          {evalResult.isPassed ? 'Вітаємо! Перевірку пройдено' : 'Необхідне доопрацювання'}
+                        </h4>
+                        <p className="text-xs text-slate-300 leading-relaxed">{evalResult.feedback}</p>
+                      </div>
                     </div>
-                  </div>
 
-                  {evalResult.bktUpdate && (
-                    <div className="p-2.5 bg-slate-950/60 rounded-xl border border-slate-800/80 flex items-center justify-between text-xs font-mono">
-                      <span>Оновлення рівня засвоєння для "{evalResult.bktUpdate.skillTitle}":</span>
-                      <div className="flex items-center gap-2 font-bold">
+                    {evalResult.bktUpdate && (
+                      <div className="flex items-center gap-1.5 text-xs font-mono shrink-0">
+                        <span className="text-slate-500">P(L):</span>
                         <span className="text-slate-400">{(evalResult.bktUpdate.pMasteryBefore * 100).toFixed(1)}%</span>
-                        <span>➔</span>
-                        <span className={evalResult.bktUpdate.pMasteryChange >= 0 ? 'text-emerald-400' : 'text-rose-400'}>
+                        <span className="text-slate-600">➔</span>
+                        <span className={`font-bold ${evalResult.bktUpdate.pMasteryChange >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
                           {(evalResult.bktUpdate.pMasteryAfter * 100).toFixed(1)}%
                         </span>
                       </div>
-                    </div>
-                  )}
+                    )}
+                  </div>
 
                   {/* 🧪 Code Test Details Breakdown */}
                   {evalResult.testDetails && evalResult.testDetails.length > 0 && (
-                    <div className="flex flex-col gap-2 p-3 bg-slate-950/60 rounded-xl border border-slate-800/80 text-xs font-mono">
+                    <div className="flex flex-col gap-1.5 pt-2 border-t border-slate-800/80 text-xs font-mono">
                       <span className="font-semibold text-slate-400 uppercase tracking-wider text-[10px]">
                         Результати перевірки тестів:
                       </span>
-                      <div className="flex flex-col gap-1.5">
+                      <div className="flex flex-col divide-y divide-slate-800/50">
                         {evalResult.testDetails.map((td: any, i: number) => (
                           <div
                             key={i}
-                            className={`p-2 rounded-lg border flex items-center justify-between gap-2 text-[11px] ${
-                              td.passed
-                                ? 'bg-emerald-950/30 border-emerald-500/30 text-emerald-200'
-                                : 'bg-rose-950/30 border-rose-500/40 text-rose-200'
-                            }`}
+                            className="py-1.5 flex items-center justify-between gap-2 text-[11px]"
                           >
                             <div className="flex items-center gap-2">
-                              <span>{td.passed ? '✓' : '✕'}</span>
+                              <span className={td.passed ? 'text-emerald-400' : 'text-rose-400'}>
+                                {td.passed ? '✓' : '✕'}
+                              </span>
                               <span className="text-slate-300">
                                 {td.input && td.input.startsWith('"') && !td.input.includes('eval:')
                                   ? `Змінна ${td.input.replace(/"/g, '')}`
                                   : `Тест #${i + 1}`}:
                               </span>
-                              <span className="text-slate-400">Очікувалось:</span>
+                              <span className="text-slate-500">Очікувалось:</span>
                               <code className="text-emerald-300">{td.expected}</code>
-                              <span className="text-slate-400">| Отримано:</span>
+                              <span className="text-slate-600">|</span>
+                              <span className="text-slate-500">Отримано:</span>
                               <code className={td.passed ? 'text-emerald-300' : 'text-rose-300'}>{td.actual}</code>
                             </div>
-                            <span className={`px-1.5 py-0.2 rounded font-bold text-[9px] ${
-                              td.passed ? 'bg-emerald-500/20 text-emerald-300' : 'bg-rose-500/20 text-rose-300'
+                            <span className={`font-bold text-[10px] ${
+                              td.passed ? 'text-emerald-400' : 'text-rose-400'
                             }`}>
                               {td.passed ? 'PASSED' : 'FAILED'}
                             </span>
@@ -1438,52 +1437,52 @@ export function StudentPortalContent({
 
                   {/* 🔬 Semantic Evaluation & Teacher Review Details */}
                   {(evalResult.semanticScore !== undefined || evalResult.semanticDetails) && (
-                    <div className="p-3 bg-slate-950/70 rounded-xl border border-slate-800/90 flex flex-col gap-2.5 text-xs">
-                      <div className="flex items-center justify-between border-b border-slate-800/80 pb-2">
-                        <span className="font-semibold text-slate-300 flex items-center gap-1.5">
-                          <span>📊 Семантична оцінка відповіді:</span>
+                    <div className="pt-2 border-t border-slate-800/80 flex flex-col gap-2 text-xs">
+                      <div className="flex items-center justify-between">
+                        <span className="font-medium text-slate-300 flex items-center gap-1.5">
+                          <span>Семантична оцінка:</span>
                           <span className="font-mono font-bold text-indigo-400">
                             {evalResult.semanticScore !== undefined ? `${Math.round(evalResult.semanticScore * 100)}%` : '—'}
                           </span>
                         </span>
 
                         {evalResult.teacherReviewStatus === 'PENDING_REVIEW' ? (
-                          <span className="px-2 py-0.5 rounded-full text-[10px] font-bold font-mono bg-amber-500/10 text-amber-300 border border-amber-500/30 flex items-center gap-1">
-                            <span>⏳</span> Очікує верифікації викладачем
+                          <span className="text-[11px] font-mono text-amber-400">
+                            ⏳ Очікує верифікації викладачем
                           </span>
                         ) : evalResult.teacherReviewStatus === 'APPROVED' ? (
-                          <span className="px-2 py-0.5 rounded-full text-[10px] font-bold font-mono bg-emerald-500/10 text-emerald-300 border border-emerald-500/30 flex items-center gap-1">
-                            <span>✓</span> Підтверджено викладачем
+                          <span className="text-[11px] font-mono text-emerald-400">
+                            ✓ Підтверджено викладачем
                           </span>
                         ) : null}
                       </div>
 
                       {evalResult.semanticDetails && (
-                        <div className="flex flex-col gap-1.5">
+                        <div className="flex flex-col gap-1">
                           {evalResult.semanticDetails.keyConceptsCovered?.length > 0 && (
-                            <div className="flex flex-wrap items-center gap-1 text-[11px]">
+                            <div className="flex flex-wrap items-center gap-1.5 text-[11px]">
                               <span className="text-slate-400">Розкрито поняття:</span>
                               {evalResult.semanticDetails.keyConceptsCovered.map((kw: string, i: number) => (
-                                <span key={i} className="px-1.5 py-0.5 rounded bg-emerald-950/60 border border-emerald-500/30 text-emerald-300 font-mono">
-                                  {kw.split('|')[0]}
+                                <span key={i} className="text-emerald-300 font-mono">
+                                  #{kw.split('|')[0]}
                                 </span>
                               ))}
                             </div>
                           )}
 
                           {evalResult.semanticDetails.missingConcepts?.length > 0 && (
-                            <div className="flex flex-wrap items-center gap-1 text-[11px]">
+                            <div className="flex flex-wrap items-center gap-1.5 text-[11px]">
                               <span className="text-slate-400">Варто додати:</span>
                               {evalResult.semanticDetails.missingConcepts.map((kw: string, i: number) => (
-                                <span key={i} className="px-1.5 py-0.5 rounded bg-rose-950/60 border border-rose-500/30 text-rose-300 font-mono">
-                                  {kw.split('|')[0]}
+                                <span key={i} className="text-rose-300 font-mono">
+                                  #{kw.split('|')[0]}
                                 </span>
                               ))}
                             </div>
                           )}
 
                           {evalResult.semanticDetails.detectedMisconceptions?.length > 0 && (
-                            <div className="p-2 bg-rose-950/30 border border-rose-500/30 rounded text-rose-200 text-[11px]">
+                            <div className="text-rose-300 text-[11px]">
                               ⚠️ Виявлено когнітивну помилку: зверніть увагу на точність формулювання щодо теми.
                             </div>
                           )}
@@ -1492,12 +1491,11 @@ export function StudentPortalContent({
 
                       {/* Teacher Comment Banner in Toast if reviewed */}
                       {evalResult.teacherComment && (
-                        <div className="p-3 rounded-xl bg-purple-950/40 border border-purple-500/40 flex flex-col gap-1.5 mt-1">
-                          <div className="flex items-center gap-1.5 text-purple-300 font-bold text-xs">
-                            <MessageSquareQuote className="w-4 h-4 text-purple-400 shrink-0" />
-                            <span>Відгук та зауваження викладача:</span>
-                          </div>
-                          <p className="text-xs text-purple-100 italic leading-relaxed pl-5">
+                        <div className="pl-2.5 border-l-2 border-purple-500/50 flex flex-col gap-0.5 mt-1">
+                          <span className="text-purple-300 font-semibold text-[11px]">
+                            Відгук викладача:
+                          </span>
+                          <p className="text-xs text-purple-100 italic leading-relaxed">
                             "{evalResult.teacherComment}"
                           </p>
                         </div>
@@ -1507,17 +1505,13 @@ export function StudentPortalContent({
 
                   {/* ⚡ Adaptive Graceful Degradation Action Prompt */}
                   {!evalResult.isPassed && (
-                    <div className="pt-2 border-t border-rose-500/20 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-rose-950/20 p-3 rounded-xl">
+                    <div className="pt-2.5 border-t border-slate-800/80 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
                       <div className="flex items-center gap-2">
-                        <span className={`p-1 rounded-lg border ${
-                          hasRemediationTask
-                            ? 'bg-amber-500/20 text-amber-300 border-amber-500/30'
-                            : 'bg-slate-800 text-slate-500 border-slate-700'
-                        }`}>
-                          <AlertTriangle className="w-4 h-4" />
-                        </span>
+                        <AlertTriangle className={`w-4 h-4 shrink-0 ${
+                          hasRemediationTask ? 'text-amber-400' : 'text-slate-500'
+                        }`} />
                         <div className="flex flex-col">
-                          <span className="text-xs font-bold text-slate-200">
+                          <span className="text-xs font-medium text-slate-200">
                             {consecutiveFailures >= 2 ? 'Помічено системні труднощі' : 'Складно з цим завданням?'}
                           </span>
                           <span className="text-[11px] text-slate-400">
@@ -1531,10 +1525,10 @@ export function StudentPortalContent({
                       <button
                         onClick={() => hasRemediationTask && fetchRecommendedTask(activeCourseSlug, task?.id)}
                         disabled={!hasRemediationTask}
-                        className={`px-3.5 py-2 rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition-all shrink-0 border ${
+                        className={`px-3 py-1.5 rounded-lg font-medium text-xs flex items-center justify-center gap-1.5 transition-colors shrink-0 ${
                           hasRemediationTask
-                            ? 'bg-amber-500 hover:bg-amber-400 text-slate-950 shadow-lg shadow-amber-500/20 cursor-pointer border-amber-300'
-                            : 'bg-slate-900 text-slate-500 border-slate-800 cursor-not-allowed opacity-60'
+                            ? 'bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 cursor-pointer'
+                            : 'bg-slate-900 text-slate-600 cursor-not-allowed opacity-60'
                         }`}
                         title={hasRemediationTask ? 'Перейти до легшого завдання' : 'Допоміжне завдання відсутнє в курсі'}
                       >

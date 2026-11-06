@@ -29,6 +29,16 @@
   4. *Install Monorepo Dependencies* (`npm ci || npm install`) — синхронізація робочих просторів монорепозиторію.
   5. *Build Next.js Documentation Site* (`npm run build:docs`) — збірка статичного експорту (`output: "export"`, `trailingSlash: true`, `basePath: "/magisterts-smart-bkt-chain"`).
   6. *Upload Artifact & Deploy Pages* (`actions/upload-pages-artifact@v3` + `actions/deploy-pages@v4`).
+### 0.1.7.47 Безрамковий Редизайн Тестових Завдань (`QuizTaskEditor`), Есе (`EssayTaskEditor`), Редактора Коду та Панелі Результатів у `apps/student` (SBC-338, EP-ST)
+- **Виконані інженерні зміни:**
+  1. **[`apps/student/src/features/quiz-editor/ui/QuizTaskEditor.tsx`](file:///apps/student/src/features/quiz-editor/ui/QuizTaskEditor.tsx):**
+     - Прибрано зовнішній контейнер `p-6 bg-slate-900/90 border border-slate-800 rounded-2xl shadow-xl`.
+     - Варіанти відповідей (`A, B, C, D`) переведено з рамочних блоків на чистий список `divide-y divide-slate-800/60 border-b border-slate-800/80` із м'якою підсвіткою обраного рядка (`bg-indigo-500/10 border-l-2 border-l-indigo-400`) та безрамковими круглими/квадратними маркерами літер.
+  2. **[`apps/student/src/features/essay-editor/ui/EssayTaskEditor.tsx`](file:///apps/student/src/features/essay-editor/ui/EssayTaskEditor.tsx) та [`apps/student/src/features/code-editor/ui/MonacoCodeEditor.tsx`](file:///apps/student/src/features/code-editor/ui/MonacoCodeEditor.tsx):**
+     - Очищено від зовнішніх карток і переведено метрики телеметрії (`WPM`, `Pause`, `Deletes`, `Pastes`) на лаконічні безрамкові однорядкові тулбари (`pb-2.5 border-b border-slate-800/80`).
+  3. **[`apps/student/src/components/StudentPortalApp.tsx`](file:///apps/student/src/components/StudentPortalApp.tsx):**
+     - Панель результатів перевірки (`evalResult`) переведена з багатошарової картки у чистий блок із лівим семантичним індикатором (`border-l-2 border-l-emerald-400` / `border-l-rose-400`) та плоским списком проходження тестів (`divide-y divide-slate-800/50`).
+
 ### 0.1.7.46 Офіційна Синхронізація Доменної Документації Порталів зі Стандартом Minimalist Borderless UI (SBC-337, EP-SH / EP-INF)
 - **Виконані зміни:**
   - Синхронізовано технічні специфікації інтерфейсу в [`docs/apps/teacher_dashboard.md`](file:///docs/apps/teacher_dashboard.md), [`docs/apps/student_portal.md`](file:///docs/apps/student_portal.md), [`docs/apps/study_portal.md`](file:///docs/apps/study_portal.md), [`docs/apps/admin_portal.md`](file:///docs/apps/admin_portal.md) та [`docs/tech_stack.source.md`](file:///docs/tech_stack.source.md) з актуальною реалізацією `AppShellLayout`, `Breadcrumbs`, `DrawerSection` та `UserProfileDrawer`.

@@ -120,6 +120,41 @@
           ]
         },
         {
+          "title": "0.1.7.47 Безрамковий Редизайн Тестових Завдань (`QuizTaskEditor`), Есе (`EssayTaskEditor`), Редактора Коду та Панелі Результатів у `apps/student` (SBC-338, EP-ST)",
+          "level": 3,
+          "paragraphs": [],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "**Виконані інженерні зміни:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**[`apps/student/src/features/quiz-editor/ui/QuizTaskEditor.tsx`](file:///apps/student/src/features/quiz-editor/ui/QuizTaskEditor.tsx):**",
+              "subitems": [
+                "Прибрано зовнішній контейнер `p-6 bg-slate-900/90 border border-slate-800 rounded-2xl shadow-xl`.",
+                "Варіанти відповідей (`A, B, C, D`) переведено з рамочних блоків на чистий список `divide-y divide-slate-800/60 border-b border-slate-800/80` із м'якою підсвіткою обраного рядка (`bg-indigo-500/10 border-l-2 border-l-indigo-400`) та безрамковими круглими/квадратними маркерами літер."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**[`apps/student/src/features/essay-editor/ui/EssayTaskEditor.tsx`](file:///apps/student/src/features/essay-editor/ui/EssayTaskEditor.tsx) та [`apps/student/src/features/code-editor/ui/MonacoCodeEditor.tsx`](file:///apps/student/src/features/code-editor/ui/MonacoCodeEditor.tsx):**",
+              "subitems": [
+                "Очищено від зовнішніх карток і переведено метрики телеметрії (`WPM`, `Pause`, `Deletes`, `Pastes`) на лаконічні безрамкові однорядкові тулбари (`pb-2.5 border-b border-slate-800/80`)."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**[`apps/student/src/components/StudentPortalApp.tsx`](file:///apps/student/src/components/StudentPortalApp.tsx):**",
+              "subitems": [
+                "Панель результатів перевірки (`evalResult`) переведена з багатошарової картки у чистий блок із лівим семантичним індикатором (`border-l-2 border-l-emerald-400` / `border-l-rose-400`) та плоским списком проходження тестів (`divide-y divide-slate-800/50`)."
+              ]
+            }
+          ]
+        },
+        {
           "title": "0.1.7.46 Офіційна Синхронізація Доменної Документації Порталів зі Стандартом Minimalist Borderless UI (SBC-337, EP-SH / EP-INF)",
           "level": 3,
           "paragraphs": [],

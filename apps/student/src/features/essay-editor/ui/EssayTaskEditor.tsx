@@ -52,28 +52,30 @@ export function EssayTaskEditor({
   const wordCount = essayText.trim().split(/\s+/).filter(Boolean).length;
 
   return (
-    <div className="flex flex-col gap-6 p-6 bg-slate-900/90 border border-slate-800 rounded-2xl shadow-xl backdrop-blur-xl">
+    <div className="flex flex-col gap-4">
       {/* Telemetry Bar */}
-      <div className="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-slate-800">
+      <div className="flex flex-wrap items-center justify-between gap-4 pb-2.5 border-b border-slate-800/80">
         <div className="flex items-center gap-2 text-purple-400">
-          <FileText className="w-5 h-5" />
-          <h3 className="font-bold text-white text-base">Аналітичне Есе & Відкрита Відповідь</h3>
+          <FileText className="w-4 h-4" />
+          <h3 className="font-semibold text-slate-200 text-xs uppercase tracking-wider">
+            Аналітичне есе & Відкрита відповідь
+          </h3>
         </div>
 
-        <div className="flex items-center gap-3 text-xs font-mono">
-          <div className="px-3 py-1 bg-slate-950 border border-slate-800 rounded-lg flex items-center gap-1.5 text-indigo-400">
-            <Zap className="w-3.5 h-3.5" />
+        <div className="flex items-center gap-4 text-[11px] font-mono text-slate-400">
+          <div className="flex items-center gap-1 text-indigo-400">
+            <Zap className="w-3 h-3" />
             <span>WPM: {metrics.wpm}</span>
           </div>
 
-          <div className="px-3 py-1 bg-slate-950 border border-slate-800 rounded-lg flex items-center gap-1.5 text-amber-400">
-            <Activity className="w-3.5 h-3.5" />
+          <div className="flex items-center gap-1 text-amber-400">
+            <Activity className="w-3 h-3" />
             <span>Паузи: {(metrics.lastPauseMs / 1000).toFixed(1)}s</span>
           </div>
 
-          <div className="px-3 py-1 bg-slate-950 border border-slate-800 rounded-lg flex items-center gap-1.5 text-rose-400">
-            <Clipboard className="w-3.5 h-3.5" />
-            <span>Copy-Paste: {metrics.pasteEvents}</span>
+          <div className="flex items-center gap-1 text-rose-400">
+            <Clipboard className="w-3 h-3" />
+            <span>Paste: {metrics.pasteEvents}</span>
           </div>
         </div>
       </div>
@@ -85,28 +87,28 @@ export function EssayTaskEditor({
           onChange={handleChange}
           onKeyDown={handleTextareaKeyDown}
           onPaste={handleTextareaPaste}
-          placeholder="Введіть ваш детальний юридичний аналіз або розгорнуту відповідь..."
-          className="w-full min-h-[220px] p-4 bg-slate-950/80 border border-slate-800 rounded-xl text-slate-100 text-sm focus:outline-none focus:border-indigo-500 font-sans leading-relaxed resize-y"
+          placeholder="Введіть вашу розгорнуту відповідь або аналіз..."
+          className="w-full min-h-[220px] p-3.5 bg-slate-900/60 border border-slate-800/80 rounded-lg text-slate-100 text-sm focus:outline-none focus:border-indigo-500/60 font-sans leading-relaxed resize-y"
         />
 
-        <div className="flex items-center justify-between text-xs text-slate-400 font-mono">
+        <div className="flex items-center justify-between text-[11px] text-slate-500 font-mono">
           <span>Слів написано: {wordCount}</span>
           <span>Телеметрія вводу активна</span>
         </div>
       </div>
 
-      <div className="flex items-center justify-end gap-3">
+      <div className="flex items-center justify-end gap-2.5">
         <button
           onClick={onNextTask}
           disabled={!isPassed}
-          className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-xs transition-all ${
+          className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-xs transition-colors ${
             isPassed
-              ? 'bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-500 hover:from-emerald-500 hover:to-teal-400 text-white shadow-lg shadow-emerald-900/40 cursor-pointer border border-emerald-400/40 ring-2 ring-emerald-500/30'
-              : 'bg-slate-950 text-slate-600 border border-slate-800/80 cursor-not-allowed opacity-50'
+              ? 'bg-emerald-600 hover:bg-emerald-500 text-white cursor-pointer'
+              : 'bg-slate-900 text-slate-600 cursor-not-allowed opacity-50'
           }`}
         >
           <span>Наступне завдання</span>
-          <ArrowRight className="w-4 h-4" />
+          <ArrowRight className="w-3.5 h-3.5" />
         </button>
 
         <button
@@ -124,21 +126,21 @@ export function EssayTaskEditor({
             });
           }}
           disabled={wordCount === 0 || isSubmitting}
-          className={`inline-flex items-center gap-2 px-6 py-2.5 rounded-xl font-bold text-xs transition-all ${
+          className={`inline-flex items-center gap-2 px-5 py-2 rounded-lg font-medium text-xs transition-colors ${
             wordCount > 0 && !isSubmitting
               ? isPendingReview
-                ? 'bg-amber-600 hover:bg-amber-500 text-white shadow-lg shadow-amber-600/30 cursor-pointer border border-amber-400/40'
-                : 'bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-600/30 cursor-pointer'
-              : 'bg-slate-800 text-slate-500 cursor-not-allowed border border-slate-700'
+                ? 'bg-amber-600 hover:bg-amber-500 text-white cursor-pointer'
+                : 'bg-indigo-600 hover:bg-indigo-500 text-white cursor-pointer'
+              : 'bg-slate-800/70 text-slate-500 cursor-not-allowed'
           }`}
         >
-          <Send className="w-4 h-4" />
+          <Send className="w-3.5 h-3.5" />
           <span>
             {isSubmitting
               ? 'Оцінювання есе...'
               : isPendingReview
-              ? 'Оновити відповідь у викладача (Нова спроба)'
-              : 'Відправити На Перевірку'}
+              ? 'Оновити відповідь (нова спроба)'
+              : 'Відправити на перевірку'}
           </span>
         </button>
       </div>

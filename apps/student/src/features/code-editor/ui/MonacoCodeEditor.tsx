@@ -66,10 +66,10 @@ export function MonacoCodeEditor({
   };
 
   return (
-    <div className="flex flex-col h-full bg-slate-900 border border-slate-800 rounded-xl overflow-hidden shadow-2xl">
+    <div className="flex flex-col h-full">
       {/* 📊 Live Telemetry Bar */}
-      <div className="flex flex-wrap items-center justify-between px-4 py-2 bg-slate-950/80 border-b border-slate-800 text-xs font-mono text-slate-400 gap-4">
-        <div className="flex items-center gap-4">
+      <div className="flex flex-wrap items-center justify-between pb-2.5 mb-2.5 border-b border-slate-800/80 text-xs font-mono text-slate-400 gap-4">
+        <div className="flex items-center gap-4 text-[11px]">
           <div className="flex items-center gap-1.5 text-emerald-400">
             <Zap className="w-3.5 h-3.5" />
             <span>{metrics.wpm} WPM</span>
@@ -91,14 +91,14 @@ export function MonacoCodeEditor({
           </div>
         </div>
 
-        <div className="flex items-center gap-2.5">
+        <div className="flex items-center gap-2">
           <button
             onClick={onNextTask}
             disabled={!isPassed}
-            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
               isPassed
-                ? 'bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-500 hover:to-teal-400 text-white shadow-md shadow-emerald-900/40 cursor-pointer border border-emerald-400/30'
-                : 'bg-slate-950 text-slate-600 border border-slate-800/80 cursor-not-allowed opacity-50'
+                ? 'bg-emerald-600 hover:bg-emerald-500 text-white cursor-pointer'
+                : 'bg-slate-900 text-slate-600 cursor-not-allowed opacity-50'
             }`}
           >
             <span>Наступне завдання</span>
@@ -108,10 +108,10 @@ export function MonacoCodeEditor({
           <button
             onClick={onSubmit}
             disabled={isSubmitting || isPassed}
-            className={`inline-flex items-center gap-2 px-4 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+            className={`inline-flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-xs font-medium transition-colors ${
               isPassed
-                ? 'bg-slate-900 text-slate-500 cursor-not-allowed border border-slate-800 opacity-60'
-                : 'bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white shadow-lg shadow-emerald-900/30 cursor-pointer'
+                ? 'bg-slate-900 text-slate-500 cursor-not-allowed opacity-60'
+                : 'bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white cursor-pointer'
             }`}
           >
             <Play className="w-3.5 h-3.5 fill-current" />
@@ -121,7 +121,7 @@ export function MonacoCodeEditor({
       </div>
 
       {/* 💻 Monaco Code Editor */}
-      <div className="flex-1 min-h-[350px]">
+      <div className="flex-1 min-h-[360px] rounded-lg overflow-hidden border border-slate-800/80">
         <Editor
           height="100%"
           defaultLanguage="javascript"

@@ -82,22 +82,22 @@ export function QuizTaskEditor({
     taskType === 'SINGLE_CHOICE' ? Boolean(selectedSingleId) : selectedMultipleIds.length > 0;
 
   return (
-    <div className="flex flex-col gap-6 p-6 bg-slate-900/90 border border-slate-800 rounded-2xl shadow-xl backdrop-blur-xl">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2.5 text-indigo-400">
-          <HelpCircle className="w-5 h-5" />
-          <h3 className="font-bold text-white text-base">
-            {taskType === 'SINGLE_CHOICE' ? 'Тестове Завдання (Один варіант)' : 'Тестове Завдання (Кілька варіантів)'}
+    <div className="flex flex-col gap-4">
+      <div className="flex items-center justify-between pb-2.5 border-b border-slate-800/80">
+        <div className="flex items-center gap-2 text-indigo-400">
+          <HelpCircle className="w-4 h-4" />
+          <h3 className="font-semibold text-slate-200 text-xs uppercase tracking-wider">
+            {taskType === 'SINGLE_CHOICE' ? 'Тестове завдання · Один варіант' : 'Тестове завдання · Кілька варіантів'}
           </h3>
         </div>
 
-        <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-800/80 border border-slate-700/60 text-xs font-mono text-slate-400">
-          <Clock className="w-3.5 h-3.5 text-indigo-400" />
+        <div className="flex items-center gap-1.5 text-[11px] font-mono text-slate-500">
+          <Clock className="w-3 h-3 text-indigo-400" />
           <span>Телеметрія активна</span>
         </div>
       </div>
 
-      <div className="flex flex-col gap-3">
+      <div className="flex flex-col divide-y divide-slate-800/60 border-b border-slate-800/80">
         {shuffledOptions.map((opt, idx) => {
           const active = isSelected(opt.id);
           const letter = String.fromCharCode(65 + idx); // A, B, C, D
@@ -110,82 +110,82 @@ export function QuizTaskEditor({
                   ? setSelectedSingleId(opt.id)
                   : handleToggleMultiple(opt.id);
               }}
-              className={`p-4 rounded-xl border transition-all flex items-center justify-between gap-4 ${
+              className={`py-3.5 px-3 transition-colors flex items-center justify-between gap-4 ${
                 isPassed
                   ? active
-                    ? 'bg-emerald-950/60 border-emerald-500 text-white shadow-xl shadow-emerald-950/50 ring-2 ring-emerald-500/40 cursor-default'
-                    : 'bg-slate-950/40 border-slate-900 text-slate-400 cursor-not-allowed'
+                    ? 'bg-emerald-500/10 border-l-2 border-l-emerald-400 text-white cursor-default'
+                    : 'text-slate-500 cursor-not-allowed'
                   : active
-                  ? 'bg-indigo-950/50 border-indigo-500 text-white shadow-lg shadow-indigo-500/10 cursor-pointer'
-                  : 'bg-slate-950/60 border-slate-800 hover:border-slate-700 text-slate-300 cursor-pointer'
+                  ? 'bg-indigo-500/10 border-l-2 border-l-indigo-400 text-white cursor-pointer'
+                  : 'hover:bg-slate-900/60 text-slate-300 cursor-pointer'
               }`}
             >
               <div className="flex items-center gap-3 flex-1">
                 <div
-                  className={`w-6 h-6 rounded-${
+                  className={`w-5 h-5 rounded-${
                     taskType === 'SINGLE_CHOICE' ? 'full' : 'md'
-                  } border flex items-center justify-center font-mono font-bold text-xs transition-all shrink-0 ${
+                  } flex items-center justify-center font-mono font-bold text-[11px] transition-colors shrink-0 ${
                     isPassed
                       ? active
-                        ? 'bg-emerald-500 border-emerald-300 text-slate-950 font-black shadow-md'
-                        : 'border-slate-800 bg-slate-900 text-slate-600'
+                        ? 'bg-emerald-500 text-slate-950'
+                        : 'bg-slate-800/70 text-slate-500'
                       : active
-                      ? 'bg-indigo-600 border-indigo-400 text-white'
-                      : 'border-slate-700 bg-slate-900 text-slate-400'
+                      ? 'bg-indigo-600 text-white'
+                      : 'bg-slate-800/80 text-slate-400'
                   }`}
                 >
-                  {active ? <CheckCircle2 className="w-4 h-4 stroke-[3]" /> : letter}
+                  {active ? <CheckCircle2 className="w-3.5 h-3.5 stroke-[2.5]" /> : letter}
                 </div>
-                <span className={`text-sm ${active ? 'font-bold text-white' : 'font-medium text-slate-300'}`}>
+                <span className={`text-sm leading-relaxed ${active ? 'font-semibold text-white' : 'font-normal text-slate-300'}`}>
                   {opt.text}
                 </span>
               </div>
 
               <div className="flex items-center gap-2 shrink-0">
                 {isPassed && active && (
-                  <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase tracking-wider bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 animate-pulse">
-                    ✓ Обрано вами
+                  <span className="text-[10px] font-mono font-semibold text-emerald-400">
+                    ✓ Обрано
                   </span>
                 )}
-                <span className="text-xs font-mono text-slate-600 font-semibold">{letter}</span>
+                <span className="text-[11px] font-mono text-slate-600">{letter}</span>
               </div>
             </div>
           );
         })}
       </div>
 
-      <div className="flex items-center justify-end gap-3 pt-2">
+      <div className="flex items-center justify-end gap-2.5 pt-1">
         <button
           onClick={onNextTask}
           disabled={!isPassed}
-          className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-xs transition-all ${
+          className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-xs transition-colors ${
             isPassed
-              ? 'bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-500 hover:from-emerald-500 hover:to-teal-400 text-white shadow-lg shadow-emerald-900/40 cursor-pointer border border-emerald-400/40 ring-2 ring-emerald-500/30 animate-pulse'
-              : 'bg-slate-950 text-slate-600 border border-slate-800/80 cursor-not-allowed opacity-50'
+              ? 'bg-emerald-600 hover:bg-emerald-500 text-white cursor-pointer'
+              : 'bg-slate-900 text-slate-600 cursor-not-allowed opacity-50'
           }`}
         >
           <span>Наступне завдання</span>
-          <ArrowRight className="w-4 h-4" />
+          <ArrowRight className="w-3.5 h-3.5" />
         </button>
 
         <button
           onClick={handleSubmit}
           disabled={!canSubmit || isSubmitting || isPassed}
-          className={`inline-flex items-center gap-2 px-6 py-2.5 rounded-xl font-bold text-xs transition-all ${
+          className={`inline-flex items-center gap-2 px-5 py-2 rounded-lg font-medium text-xs transition-colors ${
             isPassed
-              ? 'bg-slate-900 text-slate-500 cursor-not-allowed border border-slate-800 opacity-60'
+              ? 'bg-slate-900 text-slate-500 cursor-not-allowed opacity-60'
               : canSubmit && !isSubmitting
-              ? 'bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-600/30 cursor-pointer'
-              : 'bg-slate-800 text-slate-500 cursor-not-allowed border border-slate-700'
+              ? 'bg-indigo-600 hover:bg-indigo-500 text-white cursor-pointer'
+              : 'bg-slate-800/70 text-slate-500 cursor-not-allowed'
           }`}
         >
-          <Send className="w-4 h-4" />
+          <Send className="w-3.5 h-3.5" />
           <span>
             {isPassed
               ? '✓ Відповідь зараховано'
               : isSubmitting
               ? 'Відправка відповіді...'
-              : 'Відправити Відповідь'}
+              : 'Відправити відповідь'}
           </span>
         </button>
       </div>
