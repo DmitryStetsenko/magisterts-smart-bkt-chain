@@ -32,6 +32,29 @@ export const schoolAlgBasicsTasks: SeedTask[] = [
       { id: '3', text: 'var', isCorrect: false },
       { id: '4', text: 'static', isCorrect: false }
     ],
+    misconceptions: [
+      {
+        id: 'school-let-for-constant',
+        triggerOptionId: '2',
+        title: 'Використання let для незмінних величин',
+        explanation: 'Ключове слово let дозволяє подальше переприсвоєння значення, що небезпечно для констант (число Пі, ставка податку). Для незмінних величин завжди використовують const.',
+        recommendedReviewUrl: '/courses/web-algorithms-school/school-alg-basics/variables-and-types#let-vs-const'
+      },
+      {
+        id: 'school-legacy-var',
+        triggerOptionId: '3',
+        title: 'Застосування застарілого var замість const',
+        explanation: 'Ключове слово var є застарілим стандартом до ES6: воно не захищає змінну від перезапису та не підтримує блочну область видимості.',
+        recommendedReviewUrl: '/courses/web-algorithms-school/school-alg-basics/variables-and-types#let-vs-const'
+      },
+      {
+        id: 'school-static-keyword',
+        triggerOptionId: '4',
+        title: 'Плутанина зі службовим словом static з класів ООП',
+        explanation: 'Модифікатор static позначає статичні методи класу, а не константи у звичайних алгоритмах. Для оголошення констант у JavaScript слугує const.',
+        recommendedReviewUrl: '/courses/web-algorithms-school/school-alg-basics/variables-and-types#let-vs-const'
+      }
+    ],
     socraticHints: [
       { level: 1, hint: 'Згадайте слово "константа" з математики. Яке ключове слово є його скороченням?', penaltyPct: 15 },
       { level: 2, hint: 'У сучасному стандарті JS для постійних значень вживають саме const.', penaltyPct: 30 }
@@ -50,6 +73,15 @@ export const schoolAlgBasicsTasks: SeedTask[] = [
       { id: '2', text: 'Ціле число (number)', isCorrect: false },
       { id: '3', text: 'Логічний тип (boolean)', isCorrect: false },
       { id: '4', text: 'Невизначений тип (undefined)', isCorrect: false }
+    ],
+    misconceptions: [
+      {
+        id: 'school-quoted-number-trap',
+        triggerOptionId: '2',
+        title: 'Сприйняття цифр у лапках як числа (number)',
+        explanation: 'Будь-які символи всередині лапок ("12") для інтерпретатора є текстом (string). Спроба додати "12" + 5 дасть "125", а не 17.',
+        recommendedReviewUrl: '/courses/web-algorithms-school/school-alg-basics/variables-and-types#primitive-types'
+      }
     ],
     socraticHints: [
       { level: 1, hint: 'Будь-який текст або числові символи, взяті в лапки "", є текстовим типом.', penaltyPct: 15 },
@@ -73,6 +105,22 @@ export const schoolAlgBasicsTasks: SeedTask[] = [
       { input: JSON.stringify([4150, 41.5]), expectedOutput: '100' },
       { input: JSON.stringify([830, 41.5]), expectedOutput: '20' },
       { input: JSON.stringify([1000, 40]), expectedOutput: '25', isSecret: true }
+    ],
+    misconceptions: [
+      {
+        id: 'school-currency-multiply-instead-of-divide',
+        triggerPattern: 'uahAmount\\s*\\*\\s*exchangeRate',
+        title: 'Множення замість ділення при конвертації гривень у долари',
+        explanation: 'Щоб перевести суму з гривень у валюту за курсом (грн за 1 USD), потрібно ділити uahAmount / exchangeRate, а не множити.',
+        recommendedReviewUrl: '/courses/web-algorithms-school/school-alg-basics/linear-calculations#linear-flow'
+      },
+      {
+        id: 'school-tofixed-returns-string',
+        triggerPattern: '"100\\.00"',
+        title: 'Метод .toFixed(2) повертає рядок замість числа',
+        explanation: 'Виклик .toFixed(2) перетворює число на текстовий рядок ("100.00"). Обгорніть вираз у Number(...) — наприклад: Number((uahAmount / exchangeRate).toFixed(2)).',
+        recommendedReviewUrl: '/courses/web-algorithms-school/school-alg-basics/variables-and-types#primitive-types'
+      }
     ],
     socraticHints: [
       { level: 1, hint: 'Щоб перевести гривні в долари, потрібно суму в гривнях поділити на курс обміну.', penaltyPct: 15 },

@@ -28,6 +28,15 @@ export interface SocraticHint {
   penaltyPct: number;
 }
 
+export interface SeedMisconception {
+  id: string;
+  triggerOptionId?: string;
+  triggerPattern?: string;
+  title: string;
+  explanation: string;
+  recommendedReviewUrl?: string;
+}
+
 export interface SeedTask {
   topic: string;
   subConcept: string;
@@ -41,6 +50,7 @@ export interface SeedTask {
   referenceAnswer?: string;
   rubrics?: any;
   socraticHints?: SocraticHint[];
+  misconceptions?: SeedMisconception[];
   studyUnitUrl?: string;
 }
 
@@ -63,6 +73,29 @@ export const jsBasicsTasks: SeedTask[] = [
       { id: 'opt2', text: 'Значення успішно перепишеться на нове', isCorrect: false },
       { id: 'opt3', text: 'Значення стане undefined', isCorrect: false },
       { id: 'opt4', text: 'Код виконається без помилки, але значення залишиться 3.14', isCorrect: false },
+    ],
+    misconceptions: [
+      {
+        id: 'js-const-like-let',
+        triggerOptionId: 'opt2',
+        title: 'Ототожнення const із змінною let',
+        explanation: 'Ви припустили, що const поводиться як звичайна змінна let. Насправді const фіксує прив’язку ідентифікатора, і будь-яке переприсвоєння через = негайно перериває виконання помилкою TypeError.',
+        recommendedReviewUrl: '/courses/web-algorithms-school/school-alg-basics/variables-and-types#let-vs-const',
+      },
+      {
+        id: 'js-const-reset-undefined',
+        triggerOptionId: 'opt3',
+        title: 'Хибне уявлення про скидання в undefined при помилці',
+        explanation: 'У JavaScript невдале присвоєння константі не очищує змінну до undefined, а генерує виняток часу виконання TypeError: Assignment to constant variable.',
+        recommendedReviewUrl: '/courses/web-algorithms-school/school-alg-basics/variables-and-types#let-vs-const',
+      },
+      {
+        id: 'js-const-silent-ignore',
+        triggerOptionId: 'opt4',
+        title: 'Міф про «тихе ігнорування» запису в константу',
+        explanation: 'Сучасний рушій ECMAScript ніколи не ігнорує спробу змінити const мовчки — програма зупиняється на рядку переприсвоєння з помилкою TypeError.',
+        recommendedReviewUrl: '/courses/web-algorithms-school/school-alg-basics/variables-and-types#let-vs-const',
+      },
     ],
     socraticHints: [
       { level: 1, hint: 'Зверніть увагу на саму назву "const" (константа). Чи дозволяє мова змінювати звʼязку ідентифікатора з новим значенням після ініціалізації?', penaltyPct: 15 },
@@ -121,6 +154,22 @@ export const jsBasicsTasks: SeedTask[] = [
     testCases: [
       { input: '"city"', expectedOutput: '"Kyiv"', isSecret: false },
       { input: '"temperature"', expectedOutput: '25', isSecret: false },
+    ],
+    misconceptions: [
+      {
+        id: 'js-let-string-concat',
+        triggerPattern: 'temperature\\s*\\+?=[\\s"\']+3["\']',
+        title: 'Додавання рядка "3" замість числа 3 (конкатенація)',
+        explanation: 'Ви додали символ "3" у лапках, через що число 22 перетворилося на рядок "223". Для арифметичного додавання записуйте число без лапок: temperature += 3.',
+        recommendedReviewUrl: '/courses/web-algorithms-school/school-alg-basics/variables-and-types#primitive-types',
+      },
+      {
+        id: 'js-let-missing-update',
+        triggerPattern: '^22$',
+        title: 'Значення temperature залишилось незмінним (22)',
+        explanation: 'Вираз temperature + 3 без оператора присвоєння (= або +=) не зберігає новий результат у змінній. Використайте temperature = temperature + 3; або temperature += 3;.',
+        recommendedReviewUrl: '/courses/web-algorithms-school/school-alg-basics/variables-and-types#let-vs-const',
+      },
     ],
     socraticHints: [
       { level: 1, hint: 'Як збільшити числове значення змінної на 3? Можна використати скорочений оператор += 3 або пряме додавання temperature = temperature + 3.', penaltyPct: 15 },

@@ -182,6 +182,7 @@ async function main() {
           options: t.options ? (t.options as any) : undefined,
           referenceAnswer: t.referenceAnswer,
           rubrics: t.rubrics ? (t.rubrics as any) : undefined,
+          misconceptions: t.misconceptions ? (t.misconceptions as any) : undefined,
           socraticHints: t.socraticHints ? (t.socraticHints as any) : undefined,
           studyUnitUrl: t.studyUnitUrl,
           testCases: t.testCases && t.testCases.length > 0
@@ -278,6 +279,23 @@ async function main() {
         { id: 'b', text: 'has been', isCorrect: false },
         { id: 'c', text: 'was being', isCorrect: false },
         { id: 'd', text: 'is', isCorrect: false },
+      ],
+      misconceptions: [
+        {
+          id: 'eng-present-perfect-for-prior-past',
+          triggerOptionId: 'b',
+          title: 'Плутанина між Present Perfect (has been) та Past Perfect (had been)',
+          explanation: 'Маркер "By the time the server crashed" вказує на дію, що завершилася ДО іншої минулої події. Тут потрібен Past Perfect Passive (had been backed up), а не Present Perfect.',
+        },
+        {
+          id: 'eng-past-continuous-instead-of-perfect',
+          triggerOptionId: 'c',
+          title: 'Використання тривалого часу (was being) замість завершеного результату',
+          explanation: 'Прислівник "completely" підкреслює повну завершеність резервного копіювання до моменту збою, тому потрібен Past Perfect (had been), а не Past Continuous.',
+        },
+      ],
+      socraticHints: [
+        { level: 1, hint: 'Зверніть увагу на конструкцію "By the time + Past Simple" — який час описує попередню завершену дію у минулому?', penaltyPct: 15 },
       ],
     },
   });
@@ -393,6 +411,23 @@ async function main() {
         { id: 'b', text: 'Закони України', isCorrect: false },
         { id: 'c', text: 'Укази Президента України', isCorrect: false },
         { id: 'd', text: 'Постанови Кабінету Міністрів України', isCorrect: false },
+      ],
+      misconceptions: [
+        {
+          id: 'law-statute-over-constitution',
+          triggerOptionId: 'b',
+          title: 'Прирівнювання звичайних Законів України до Основного Закону',
+          explanation: 'Відповідно до ст. 8 Конституції України, саме Конституція має найвищу юридичну силу, а всі закони та інші нормативно-правові акти приймаються на її основі і повинні відповідати їй.',
+        },
+        {
+          id: 'law-subordinate-acts',
+          triggerOptionId: 'c',
+          title: 'Плутанина між підзаконними актами та Основним Законом',
+          explanation: 'Укази Президента України є підзаконними нормативно-правовими актами і видаються на основі та на виконання Конституції і законів України (ст. 106 КУ).',
+        },
+      ],
+      socraticHints: [
+        { level: 1, hint: 'Згадайте статтю 8 Основного Закону України (принцип верховенства права та ієрархія нормативно-правових актів).', penaltyPct: 15 },
       ],
     },
   });
