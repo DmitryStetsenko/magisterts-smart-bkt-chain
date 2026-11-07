@@ -58,6 +58,7 @@
     *   Створено `BehavioralAdjuster` для динамічного коригування $P(Guess)$ та $P(Slip)$ на основі швидкості (WPM), пауз, подій вставки (`pasteEvents`) та видалень (`deletionRatio`).
     *   Впроваджено модульну телеметрію (Per-Module Telemetry), розрахунок курсової медіани та виявлення локальних сплесків несамостійної роботи.
     *   Алгоритм «Холодного старту» (Cold Start) та генерація адаптивного треку на основі графа навичок.
+    *   Доменний рушій діагностики когнітивних оман `MisconceptionMatcher` (`SINGLE_CHOICE`, `MULTIPLE_CHOICE`, `CODE`, `TEXT_ESSAY`) та калібрування приросту $P(L_t)$ при використанні Сократівських підказок (`SBC-347`).
 
 ### `SBC-EP-LLM` | [LLM] Automated Code Assessment & Open-Text Evaluation
 *   **Опис:** Реалізація системи автоматичної перевірки практичних завдань з програмування та відкритих есе (`OPEN_TEXT`).
@@ -83,6 +84,7 @@
     *   Уніфікований 3-стадійний стан навігації сайдбара (`activeTab` + `isDrawerOpen`).
     *   Шлюз підтвердження компетенції (Competency Verification Gateway) між підручником `apps/study` та тренажером `apps/student` з відкриттям наступних тем за порогом $P(L_n) \ge 0.85$.
     *   Впроваджено семантичну файлову маршрутизацію Next.js App Router, SSG/SEO-метадані та міжпортальний Deep Linking в `apps/study` та `apps/student` (`SBC-312`).
+    *   Впроваджено вбудований мікро-модуль експрес-теорії `JustInTimeTheoryDrawer` (`TheoryCapsuleDto`) та персоналізований блок діагностики когнітивних оман (`MisconceptionDto`) у `apps/student` (`SBC-347`).
     *   *(Беклог — Пріоритет №2)* Режим експрес-екстерну `Test-Out Fast-Track` безпосередньо у середовищі тестування `apps/student` (`SBC-311`).
 
 ### `SBC-EP-TC` | [TC] Teacher Portal & Analytics CRM

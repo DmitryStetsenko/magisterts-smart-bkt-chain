@@ -30,6 +30,34 @@
   5. *Build Next.js Documentation Site* (`npm run build:docs`) — збірка статичного експорту (`output: "export"`, `trailingSlash: true`, `basePath: "/magisterts-smart-bkt-chain"`).
   6. *Upload Artifact & Deploy Pages* (`actions/upload-pages-artifact@v3` + `actions/deploy-pages@v4`).
 
+### 0.1.7.52 Реалізація Інтерактивного Дидактичного Шару: `MisconceptionMatcher`, Калібрування Сократівських Підказок у BKT та Мікро-Модуль `JustInTimeTheoryDrawer` (`SBC-347`, `[BACKLOG-7]`, `EP-BKT` / `EP-ST` / `EP-SH`)
+- **Педагогічна та архітектурна постановка задачі:**
+  - Для переходу від класичного адаптивного тестування (CAT) до повноцінного інтелектуального навчального середовища (ITS) необхідно поєднати три механізми підтримки студента: 1) діагностику конкретної когнітивної омани замість бінарного вердикту «Невірно»; 2) подачу стислої теоретичної довідки безпосередньо в робочому вікні тренажера при виявленні труднощів ($P(L_n) < 0.35$ або фіксації омани); 3) математично чесне врахування підказок Сократа при перерахунку апостеріорної ймовірності засвоєння навички.
+- **1. Доменний сервіс діагностики когнітивних оман ([`apps/api/src/domain/evaluation/misconception-matcher.ts`](file:///apps/api/src/domain/evaluation/misconception-matcher.ts)):**
+  - Спроєктовано чистий безстановий клас `MisconceptionMatcher` відповідно до гексагональної архітектури бекенду:
+    - `matchSubmission(rawMisconceptions, context): MisconceptionDto | null` — виконує детерміноване зіставлення лише для неуспішних спроб (`!context.isPassed`):
+      - `SINGLE_CHOICE`: точний збіг обраного дистрактора `selectedOptionId === m.triggerOptionId`;
+      - `MULTIPLE_CHOICE`: виявлення обраного хибного дистрактора (`selectedOptionIds.includes(m.triggerOptionId)`) або пропущеного обов'язкового елемента за префіксом `missing:<optionId>`;
+      - `CODE`: перевірка `triggerPattern` (підтримка регулярних виразів `/pattern/flags` або стандартного `RegExp` із безпечним `try/catch` fallback на регістронезалежний підрядок) одночасно по початковому коду `dto.code` та по потоку помилок часу виконання `failedOutputs`;
+      - `TEXT_ESSAY` / `OPEN_TEXT`: зіставлення за шаблоном у тексті відповіді або адаптація семантичних збігів із `OpenAnswerEvaluatorService`.
+    - `normalizeForOpenText(rawMisconceptions): string[]` — забезпечує 100% зворотну сумісність між legacy-масивами `string[]` та структурованими об'єктами `MisconceptionDto[]` для N-грамної косинусної оцінки у `OpenAnswerEvaluatorService`.
+  - Покрито модульними тестами у [`misconception-matcher.spec.ts`](file:///apps/api/src/domain/evaluation/misconception-matcher.spec.ts).
+- **2. Розширення контрактів `@sbc/types` та BKT-оцінювання (`POST /api/v1/bkt/evaluate`):**
+  - У [`packages/types/src/tasks.types.ts`](file:///packages/types/src/tasks.types.ts) розширено вхідний контракт `SubmitTaskPayloadDto` полями `revealedHintLevel?: number` та `appliedPenaltyPct?: number`, а вихідний контракт `TaskEvaluationResponseDto` — полями `detectedMisconception?: MisconceptionDto | null`, `recommendedTheoryUrl?: string | null`, `offerJustInTimeTheory?: boolean`, `appliedHintPenaltyPct?: number`.
+  - У [`bkt.controller.ts`](file:///apps/api/src/adapters/inbound/http/bkt.controller.ts) впроваджено формулу демпфування приросту знання при використанні Сократівських підказок на першому успішному проходженні задачі:
+    $$P(L_t)^{\text{penalized}} = P(L_{t-1}) + \left(P(L_t)^{\text{raw}} - P(L_{t-1})\right) \cdot \left(1 - \frac{\text{clamp}(\text{penaltyPct}, 0, 80)}{100}\right)$$
+    із логуванням маркера `socratic_hint_penalty_<N>pct` у масив `adjustReasons` таблиці `BktHistory`.
+- **3. Наповнення банків завдань та нормалізація міжпортальних маршрутів:**
+  - Оновлено інтерфейс `SeedTask` у [`js-tasks.data.ts`](file:///packages/database/prisma/data/js-tasks.data.ts), пайплайн `insertModuleTasks` у [`seed.ts`](file:///packages/database/prisma/seed.ts) та додано педагогічно вивірені `MisconceptionDto[]` для курсів `js-dev`, `web-algorithms-school`, `english-b2` і `ukraine-law`.
+  - У [`packages/routes/src/helpers.ts`](file:///packages/routes/src/helpers.ts) вдосконалено функцію `resolveStudyUrl`, яка відображає тематичні посилання `/learn/...` на реальні SSG-маршрути App Router підручника `apps/study` (`/courses/web-algorithms-school/...`) зі збереженням якорів `#hash`.
+- **4. Вбудований мікро-модуль експрес-теорії в `apps/student` (Minimalist Borderless UI):**
+  - Створено базу теоретичних капсул [`theory-capsules.ts`](file:///apps/student/src/features/theory-capsule/model/theory-capsules.ts) (`TheoryCapsuleDto`) для всіх 4 дисциплін із динамічним синтезом капсули для кастомних задач адміністратора.
+  - Створено компонент [`JustInTimeTheoryDrawer.tsx`](file:///apps/student/src/features/theory-capsule/ui/JustInTimeTheoryDrawer.tsx) на базі канонічних секцій `<DrawerSection>` (`@sbc/ui`, індикатори `Plus` / `Minus`, розділювачі `divide-y divide-slate-800/80`, без вкладених рамок), інтегрований у [`StudentPortalApp.tsx`](file:///apps/student/src/components/StudentPortalApp.tsx) разом із блоком діагностики омани (`data-testid="misconception-alert"`) та автоматичною пропозицією експрес-теорії (`data-testid="jit-theory-offer"`).
+- **5. Верифікація:**
+  - `npm run test:api`: 8/8 тест-сьютів (44/44 тести) успішно пройдено.
+  - `tsc --noEmit`: 0 помилок типізації по всіх пакетах та застосунках.
+  - `npm run test:e2e`: наскрізний Playwright E2E-сценарій `Just-in-Time Theory Drawer & Misconception Engine E2E Flow` у [`e2e/full-flow.spec.ts`](file:///e2e/full-flow.spec.ts) підтвердив відкриття шторки експрес-теорії, перехоплення хибного дистрактора та відображення персоналізованого розбору когнітивної омани в реальному браузері Chromium.
+
 ### 0.1.7.51 Завершення Наскрізної Інтеграції DTO-Контрактів `@sbc/types` у Всіх Застосунках Монорепозиторію та Закриття `[BACKLOG-6]` (`SBC-346`, `EP-SH`)
 - **Контекст та результати аудиту кодової бази:**
   - Хоча модульний каркас `packages/types/src/*` був закладений у `SBC-280` і частково застосований у `SBC-284`, у бекенді `apps/api` та адміністративній панелі `apps/admin` фактичних імпортів `from '@sbc/types'` не було (`0` входжень), а локальні доменні інтерфейси дублювалися у 9+ файлах. Крім того, `packages/types/package.json` вказував `"types": "./src/index.ts"`, що при підключенні до NestJS (`apps/api/tsconfig.json` без явного `rootDir`) ризикувало зміщувати кореневу директорію виводу `dist/`.

@@ -12,12 +12,12 @@
 | **`SBC-EP-BKT`** | Bayesian Knowledge Tracing & Behavioral Telemetry | 29 |
 | **`SBC-EP-LLM`** | Automated Code Assessment & Open-Text Evaluation | 10 |
 | **`SBC-EP-W3`** | Web3 Infrastructure & Smart Contracts | 0 |
-| **`SBC-EP-ST`** | Student Portal & Skill Tree Map | 30 |
+| **`SBC-EP-ST`** | Student Portal & Skill Tree Map | 31 |
 | **`SBC-EP-TC`** | Teacher Portal & Analytics CRM | 25 |
 | **`SBC-EP-AD`** | Admin Portal & Knowledge DAG Builder | 8 |
 | **`SBC-EP-LD`** | Landing Web Page | 9 |
 | **`SBC-EP-MS`** | Master's Thesis Engineering & Academic Text Generation | 9 |
-| **ВСЬОГО** | - | **255** |
+| **ВСЬОГО** | - | **256** |
 
 ---
 
@@ -309,6 +309,7 @@
 | **SBC-332** | Refactor | TC | remove duplicate breadcrumbs from main canvas in teacher and admin portals | 2026-11-05 | 306d0de |
 | **SBC-333** | Style | TC | declutter teacher dashboard views into clean borderless canvas layout | 2026-11-05 | 7e94eb6 |
 | **SBC-334** | Style | SH | refine navigation rail and side drawers into minimalist borderless style | 2026-11-05 | working-tree |
+| **SBC-347** | `Story` | `ST` | implement MisconceptionMatcher engine, Socratic hint BKT penalty, and inline JustInTimeTheoryDrawer in student portal | 2026-11-07 | `0027995` |
 
 ---
 

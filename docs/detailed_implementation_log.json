@@ -120,6 +120,114 @@
           ]
         },
         {
+          "title": "0.1.7.52 Реалізація Інтерактивного Дидактичного Шару: `MisconceptionMatcher`, Калібрування Сократівських Підказок у BKT та Мікро-Модуль `JustInTimeTheoryDrawer` (`SBC-347`, `[BACKLOG-7]`, `EP-BKT` / `EP-ST` / `EP-SH`)",
+          "level": 3,
+          "paragraphs": [],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "**Педагогічна та архітектурна постановка задачі:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Для переходу від класичного адаптивного тестування (CAT) до повноцінного інтелектуального навчального середовища (ITS) необхідно поєднати три механізми підтримки студента: 1) діагностику конкретної когнітивної омани замість бінарного вердикту «Невірно»; 2) подачу стислої теоретичної довідки безпосередньо в робочому вікні тренажера при виявленні труднощів ($P(L_n) < 0.35$ або фіксації омани); 3) математично чесне врахування підказок Сократа при перерахунку апостеріорної ймовірності засвоєння навички.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**1. Доменний сервіс діагностики когнітивних оман ([`apps/api/src/domain/evaluation/misconception-matcher.ts`](file:///apps/api/src/domain/evaluation/misconception-matcher.ts)):**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Спроєктовано чистий безстановий клас `MisconceptionMatcher` відповідно до гексагональної архітектури бекенду:",
+              "subitems": [
+                "`matchSubmission(rawMisconceptions, context): MisconceptionDto | null` — виконує детерміноване зіставлення лише для неуспішних спроб (`!context.isPassed`):",
+                "`SINGLE_CHOICE`: точний збіг обраного дистрактора `selectedOptionId === m.triggerOptionId`;",
+                "`MULTIPLE_CHOICE`: виявлення обраного хибного дистрактора (`selectedOptionIds.includes(m.triggerOptionId)`) або пропущеного обов'язкового елемента за префіксом `missing:<optionId>`;",
+                "`CODE`: перевірка `triggerPattern` (підтримка регулярних виразів `/pattern/flags` або стандартного `RegExp` із безпечним `try/catch` fallback на регістронезалежний підрядок) одночасно по початковому коду `dto.code` та по потоку помилок часу виконання `failedOutputs`;",
+                "`TEXT_ESSAY` / `OPEN_TEXT`: зіставлення за шаблоном у тексті відповіді або адаптація семантичних збігів із `OpenAnswerEvaluatorService`.",
+                "`normalizeForOpenText(rawMisconceptions): string[]` — забезпечує 100% зворотну сумісність між legacy-масивами `string[]` та структурованими об'єктами `MisconceptionDto[]` для N-грамної косинусної оцінки у `OpenAnswerEvaluatorService`."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "Покрито модульними тестами у [`misconception-matcher.spec.ts`](file:///apps/api/src/domain/evaluation/misconception-matcher.spec.ts).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**2. Розширення контрактів `@sbc/types` та BKT-оцінювання (`POST /api/v1/bkt/evaluate`):**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "У [`packages/types/src/tasks.types.ts`](file:///packages/types/src/tasks.types.ts) розширено вхідний контракт `SubmitTaskPayloadDto` полями `revealedHintLevel?: number` та `appliedPenaltyPct?: number`, а вихідний контракт `TaskEvaluationResponseDto` — полями `detectedMisconception?: MisconceptionDto | null`, `recommendedTheoryUrl?: string | null`, `offerJustInTimeTheory?: boolean`, `appliedHintPenaltyPct?: number`.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "У [`bkt.controller.ts`](file:///apps/api/src/adapters/inbound/http/bkt.controller.ts) впроваджено формулу демпфування приросту знання при використанні Сократівських підказок на першому успішному проходженні задачі:",
+              "subitems": [
+                "$$P(L_t)^{\\text{penalized}} = P(L_{t-1}) + \\left(P(L_t)^{\\text{raw}} - P(L_{t-1})\\right) \\cdot \\left(1 - \\frac{\\text{clamp}(\\text{penaltyPct}, 0, 80)}{100}\\right)$$",
+                "із логуванням маркера `socratic_hint_penalty_<N>pct` у масив `adjustReasons` таблиці `BktHistory`."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**3. Наповнення банків завдань та нормалізація міжпортальних маршрутів:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Оновлено інтерфейс `SeedTask` у [`js-tasks.data.ts`](file:///packages/database/prisma/data/js-tasks.data.ts), пайплайн `insertModuleTasks` у [`seed.ts`](file:///packages/database/prisma/seed.ts) та додано педагогічно вивірені `MisconceptionDto[]` для курсів `js-dev`, `web-algorithms-school`, `english-b2` і `ukraine-law`.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "У [`packages/routes/src/helpers.ts`](file:///packages/routes/src/helpers.ts) вдосконалено функцію `resolveStudyUrl`, яка відображає тематичні посилання `/learn/...` на реальні SSG-маршрути App Router підручника `apps/study` (`/courses/web-algorithms-school/...`) зі збереженням якорів `#hash`.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**4. Вбудований мікро-модуль експрес-теорії в `apps/student` (Minimalist Borderless UI):**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Створено базу теоретичних капсул [`theory-capsules.ts`](file:///apps/student/src/features/theory-capsule/model/theory-capsules.ts) (`TheoryCapsuleDto`) для всіх 4 дисциплін із динамічним синтезом капсули для кастомних задач адміністратора.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Створено компонент [`JustInTimeTheoryDrawer.tsx`](file:///apps/student/src/features/theory-capsule/ui/JustInTimeTheoryDrawer.tsx) на базі канонічних секцій `<DrawerSection>` (`@sbc/ui`, індикатори `Plus` / `Minus`, розділювачі `divide-y divide-slate-800/80`, без вкладених рамок), інтегрований у [`StudentPortalApp.tsx`](file:///apps/student/src/components/StudentPortalApp.tsx) разом із блоком діагностики омани (`data-testid=\"misconception-alert\"`) та автоматичною пропозицією експрес-теорії (`data-testid=\"jit-theory-offer\"`).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**5. Верифікація:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "`npm run test:api`: 8/8 тест-сьютів (44/44 тести) успішно пройдено.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "`tsc --noEmit`: 0 помилок типізації по всіх пакетах та застосунках.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "`npm run test:e2e`: наскрізний Playwright E2E-сценарій `Just-in-Time Theory Drawer & Misconception Engine E2E Flow` у [`e2e/full-flow.spec.ts`](file:///e2e/full-flow.spec.ts) підтвердив відкриття шторки експрес-теорії, перехоплення хибного дистрактора та відображення персоналізованого розбору когнітивної омани в реальному браузері Chromium.",
+              "subitems": []
+            }
+          ]
+        },
+        {
           "title": "0.1.7.51 Завершення Наскрізної Інтеграції DTO-Контрактів `@sbc/types` у Всіх Застосунках Монорепозиторію та Закриття `[BACKLOG-6]` (`SBC-346`, `EP-SH`)",
           "level": 3,
           "paragraphs": [],
