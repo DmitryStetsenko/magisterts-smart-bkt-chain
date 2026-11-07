@@ -11160,6 +11160,66 @@
               "type": "text",
               "raw_text": "Оновлено Playwright E2E-тест у `e2e/full-flow.spec.ts` для перевірки початкового блокування з тултіпом та розблокування після помилки.",
               "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "---",
+              "subitems": []
+            }
+          ]
+        },
+        {
+          "title": "11.59. Фіксація Брейншторму з Дидактичної Моделі Експрес-Теорії в Базі Знань (SBC-349, EP-ST)",
+          "level": 3,
+          "paragraphs": [
+            "Відповідно до правила 5 інструкції `.agents/AGENTS.md` (Brainstorm & Ideation Fidelity), всі ідеї, аналогії, таблиці та висновки концептуального обговорення збережено без втрат у документі [`docs/brainstorm/15_just_in_time_theory_and_progressive_scaffolding.md`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/docs/brainstorm/15_just_in_time_theory_and_progressive_scaffolding.md)."
+          ],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "**Контекст та вимоги регламенту:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Структура документа:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "*Аналіз дилеми когнітивної підтримки:* Help Avoidance vs Help Arbitrage (Gaming the System).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "*Матриця розмежування:* Task-Specific (Сократ) vs Domain-Level (Теорія).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "*Три моделі інтеграції з BKT:* Transfer Task, Analogical Cognitive Transfer, Behavioral Timing.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "*Формалізація протоколу прогресивної ескалації:* розблокування після Сократа 2+ або першої помилки.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "*Математичний апарат BKT:* формула демпфування $\\Delta P(L)_{\\text{eff}}$ та формула $\\text{isTheoryUnlocked}$.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "*Педагогічне значення для дисертації:* спеціальності 122 та 014.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "*Реєстрація у каталозі:* додано запис #15 до [`docs/brainstorm/README.md`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/docs/brainstorm/README.md).",
+              "subitems": []
             }
           ]
         }

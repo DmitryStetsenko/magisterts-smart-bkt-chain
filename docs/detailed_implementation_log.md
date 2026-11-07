@@ -3105,6 +3105,21 @@ eferenceAnswer, критерії options.keywords (microtask|мікротаск|
   - `npm run build:student` успішно зібрано (Next.js 16.2.9 Turbopack).
   - Оновлено Playwright E2E-тест у `e2e/full-flow.spec.ts` для перевірки початкового блокування з тултіпом та розблокування після помилки.
 
+---
+
+### 11.59. Фіксація Брейншторму з Дидактичної Моделі Експрес-Теорії в Базі Знань (SBC-349, EP-ST)
+- **Контекст та вимоги регламенту:**
+  Відповідно до правила 5 інструкції `.agents/AGENTS.md` (Brainstorm & Ideation Fidelity), всі ідеї, аналогії, таблиці та висновки концептуального обговорення збережено без втрат у документі [`docs/brainstorm/15_just_in_time_theory_and_progressive_scaffolding.md`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/docs/brainstorm/15_just_in_time_theory_and_progressive_scaffolding.md).
+- **Структура документа:**
+  1. *Аналіз дилеми когнітивної підтримки:* Help Avoidance vs Help Arbitrage (Gaming the System).
+  2. *Матриця розмежування:* Task-Specific (Сократ) vs Domain-Level (Теорія).
+  3. *Три моделі інтеграції з BKT:* Transfer Task, Analogical Cognitive Transfer, Behavioral Timing.
+  4. *Формалізація протоколу прогресивної ескалації:* розблокування після Сократа 2+ або першої помилки.
+  5. *Математичний апарат BKT:* формула демпфування $\Delta P(L)_{\text{eff}}$ та формула $\text{isTheoryUnlocked}$.
+  6. *Педагогічне значення для дисертації:* спеціальності 122 та 014.
+  7. *Реєстрація у каталозі:* додано запис #15 до [`docs/brainstorm/README.md`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/docs/brainstorm/README.md).
+
+
 
 
 

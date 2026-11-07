@@ -40,6 +40,17 @@
    - **Верифікація:**
      - Успішна збірка `npm run build:student`, проходження всіх unit-тестів API (44/44) та валідація E2E flow.
 
+4. **Оформлення результатів брейншторму щодо педагогічної моделі експрес-теорії та прогресивної ескалації риштування (`SBC-349`, `EP-ST`):**
+   - **Дотримання регламенту Brainstorm & Ideation Fidelity (Правило 5):**
+     - Усі обговорені в діалозі концептуальні ідеї, дидактичні дилеми, математичні моделі та архітектурні рішення збережено у новому документі [`docs/brainstorm/15_just_in_time_theory_and_progressive_scaffolding.md`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/docs/brainstorm/15_just_in_time_theory_and_progressive_scaffolding.md).
+   - **Зміст зафіксованого матеріалу:**
+     - Детальний аналіз дилеми *Help Avoidance* (уникнення допомоги через страх покарання) vs *Help Arbitrage* (зловживання безкоштовним списанням зразків).
+     - Порівняльна матриця функцій: локальний *Task-Specific Scaffolding* (Сократ) проти концептуального *Domain-Level Mental Model Repair* (Капсула теорії).
+     - Формалізований протокол ескалації (Рівень 0 $\to$ Рівень 1 $\to$ Рівень 2 $\to$ Капсула $\to$ Transfer Task), формула $\text{isTheoryUnlocked} = (\text{revealedHintLevel} \ge 2) \lor \text{hasFailedAttemptOnCurrentTask}$ та Mermaid-діаграма когнітивної траєкторії.
+     - Академічне значення для дисертаційних досліджень за спеціальностями 122 «Комп'ютерні науки» та 014 «Середня освіта (Інформатика)».
+   - **Реєстрація:**
+     - Оновлено загальний реєстр сесій у [`docs/brainstorm/README.md`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/docs/brainstorm/README.md).
+
 ## 📅 6 листопада 2026 року
 
 ### ✅ Що зроблено за день:
