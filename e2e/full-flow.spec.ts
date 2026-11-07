@@ -87,18 +87,13 @@ test.describe('Smart-BKT-Chain Multi-Discipline E2E Suite', () => {
       timeout: 30000,
     });
 
-    // 3. Open inline Just-in-Time Theory Drawer via toolbar button and verify content
+    // 3. Verify that Just-in-Time Theory button is initially locked with progressive escalation tooltip
     const openTheoryBtn = page.getByTestId('open-jit-theory-btn');
     await expect(openTheoryBtn).toBeVisible({ timeout: 15000 });
-    await openTheoryBtn.click();
+    await expect(openTheoryBtn).toBeDisabled();
+    await expect(page.getByTestId('jit-theory-locked-tooltip')).toBeAttached();
 
-    const theoryDrawer = page.getByTestId('jit-theory-drawer');
-    await expect(theoryDrawer).toBeVisible();
-    await expect(theoryDrawer).toContainText('Експрес-теорія');
-    await page.getByTestId('close-jit-theory-btn').click();
-    await expect(theoryDrawer).toBeHidden();
-
-    // 4. Select a misconception distractor in QuizTaskEditor and submit
+    // 4. Select a misconception distractor in QuizTaskEditor and submit (triggers failed attempt)
     const distractorOption = page.getByText('Значення успішно перепишеться на нове');
     await expect(distractorOption).toBeVisible({ timeout: 10000 });
     await distractorOption.click();
@@ -112,11 +107,25 @@ test.describe('Smart-BKT-Chain Multi-Discipline E2E Suite', () => {
     await expect(misconceptionAlert).toBeVisible({ timeout: 10000 });
     await expect(misconceptionAlert).toContainText('Ототожнення const із змінною let');
 
+    // 6. After failed attempt, verify that Theory button is now unlocked and functional
+    await expect(openTheoryBtn).toBeEnabled();
+    await openTheoryBtn.click();
+
+    const theoryDrawer = page.getByTestId('jit-theory-drawer');
+    await expect(theoryDrawer).toBeVisible();
+    await expect(theoryDrawer).toContainText('Експрес-теорія');
+    await expect(theoryDrawer).toContainText('Розбір вашої помилки');
+    await page.getByTestId('close-jit-theory-btn').click();
+    await expect(theoryDrawer).toBeHidden();
+
+    // 7. Verify opening theory via reactive Just-in-Time offer banner
     const jitOfferBtn = page.getByTestId('jit-theory-offer-btn');
     await expect(jitOfferBtn).toBeVisible();
     await jitOfferBtn.click();
 
     await expect(theoryDrawer).toBeVisible();
     await expect(theoryDrawer).toContainText('Розбір вашої помилки');
+    await page.getByTestId('close-jit-theory-btn').click();
+    await expect(theoryDrawer).toBeHidden();
   });
 });

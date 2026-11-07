@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { io } from 'socket.io-client';
-import { Brain, Sparkles, CheckCircle, AlertCircle, RefreshCw, User, Code2, BookOpen, Scale, ChevronDown, ArrowRight, AlertTriangle, X, Settings, Network, Compass, Flame, History, MessageSquareQuote, CheckCircle2, Trophy, Target, MessageSquare, Info, HelpCircle, GraduationCap } from 'lucide-react';
+import { Brain, Sparkles, CheckCircle, AlertCircle, RefreshCw, User, Code2, BookOpen, Scale, ChevronDown, ArrowRight, AlertTriangle, X, Settings, Network, Compass, Flame, History, MessageSquareQuote, CheckCircle2, Trophy, Target, MessageSquare, Info, HelpCircle, GraduationCap, Lock, Unlock } from 'lucide-react';
 import { MonacoCodeEditor } from '../features/code-editor/ui/MonacoCodeEditor';
 import { QuizTaskEditor } from '../features/quiz-editor/ui/QuizTaskEditor';
 import { EssayTaskEditor } from '../features/essay-editor/ui/EssayTaskEditor';
@@ -432,6 +432,13 @@ export function StudentPortalContent({
     recommendation?.isDifficultyDegraded
   );
 
+  // 📘 Progressive Scaffolding Escalation for Just-in-Time Theory:
+  // Theory capsule is locked initially to encourage independent problem solving.
+  // It unlocks ONLY if:
+  // 1. Student revealed Socratic hints to Level 2 or higher (revealedHintLevel >= 2)
+  // 2. OR student experienced at least one failed attempt on current task (hasFailedAttemptOnCurrentTask)
+  const isTheoryUnlocked = revealedHintLevel >= 2 || hasFailedAttemptOnCurrentTask;
+
   const getDrawerConfig = () => {
     let title: React.ReactNode = 'Панель';
     let icon = BookOpen;
@@ -673,7 +680,15 @@ export function StudentPortalContent({
                                   {isRevealed ? (
                                     <div className="flex flex-col gap-1">
                                       <div className="flex items-center justify-between font-bold text-[11px] text-amber-300">
-                                        <span>💡 Підказка {hintObj.level}:</span>
+                                        <span className="flex items-center gap-1.5">
+                                          <span>💡 Підказка {hintObj.level}:</span>
+                                          {hintObj.level >= 2 && (
+                                            <span className="text-[10px] font-normal text-emerald-400 flex items-center gap-0.5">
+                                              <Unlock className="w-2.5 h-2.5" />
+                                              <span>Теорію розблоковано</span>
+                                            </span>
+                                          )}
+                                        </span>
                                         <span className="text-[10px] font-mono text-amber-400/80">-{hintObj.penaltyPct}% балу</span>
                                       </div>
                                       <p className="text-[11px] leading-relaxed text-slate-200">{hintObj.hint}</p>
@@ -687,6 +702,12 @@ export function StudentPortalContent({
                                       <span className="flex items-center gap-1.5">
                                         <Sparkles className="w-3.5 h-3.5 text-amber-400" />
                                         <span>Розкрити підказку {hintObj.level}</span>
+                                        {hintObj.level === 2 && !isTheoryUnlocked && (
+                                          <span className="text-[10px] text-blue-300 font-normal flex items-center gap-0.5">
+                                            <Unlock className="w-2.5 h-2.5" />
+                                            <span>розблокує теорію</span>
+                                          </span>
+                                        )}
                                       </span>
                                       <span className="text-[10px] font-mono text-amber-400">(-{hintObj.penaltyPct}%)</span>
                                     </button>
@@ -716,15 +737,41 @@ export function StudentPortalContent({
                           <div className="flex items-center justify-between gap-2">
                             <div className="flex flex-col">
                               <span className="text-xs font-medium text-slate-200">Експрес-теорія (Just-in-Time)</span>
-                              <span className="text-[10px] text-slate-500">Стисла довідка прямо в тренажері</span>
+                              <span className="text-[10px] text-slate-500">
+                                {isTheoryUnlocked
+                                  ? 'Стисла довідка прямо в тренажері'
+                                  : 'Потрібна підказка Сократа 2+ або помилка'}
+                              </span>
                             </div>
                             <button
                               type="button"
-                              onClick={() => setIsTheoryDrawerOpen(true)}
-                              className="px-2.5 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-medium text-xs flex items-center gap-1 transition-colors cursor-pointer shrink-0"
+                              disabled={!isTheoryUnlocked}
+                              onClick={() => {
+                                if (isTheoryUnlocked) setIsTheoryDrawerOpen(true);
+                              }}
+                              data-testid="drawer-jit-theory-btn"
+                              className={`px-2.5 py-1.5 rounded-lg font-medium text-xs flex items-center gap-1 transition-colors shrink-0 ${
+                                isTheoryUnlocked
+                                  ? 'bg-blue-600 hover:bg-blue-500 text-white cursor-pointer'
+                                  : 'bg-slate-800/60 text-slate-500 cursor-not-allowed border border-slate-700/40'
+                              }`}
+                              title={
+                                isTheoryUnlocked
+                                  ? 'Читати теоретичну капсулу'
+                                  : 'Заблоковано: активуйте підказку Сократа 2+ або зробіть спробу розв\'язання'
+                              }
                             >
-                              <span>Читати</span>
-                              <ArrowRight className="w-3 h-3" />
+                              {isTheoryUnlocked ? (
+                                <>
+                                  <span>Читати</span>
+                                  <ArrowRight className="w-3 h-3" />
+                                </>
+                              ) : (
+                                <>
+                                  <Lock className="w-3 h-3 text-slate-500" />
+                                  <span>Заблоковано</span>
+                                </>
+                              )}
                             </button>
                           </div>
                           {task.studyUnitUrl && (
@@ -1331,16 +1378,54 @@ export function StudentPortalContent({
 
                 {/* Quick Navigation to Theory & Skill Tree */}
                 <div className="flex items-center gap-2 shrink-0">
-                  <button
-                    type="button"
-                    data-testid="open-jit-theory-btn"
-                    onClick={() => setIsTheoryDrawerOpen(true)}
-                    className="px-2.5 py-1.5 rounded-lg bg-slate-800/70 hover:bg-slate-800 text-blue-300 hover:text-white transition-colors cursor-pointer flex items-center gap-1.5 text-xs font-medium"
-                    title="Відкрити вбудовану теоретичну капсулу без переходу на іншу вкладку"
-                  >
-                    <BookOpen className="w-3.5 h-3.5 text-blue-400" />
-                    <span>Теорія</span>
-                  </button>
+                  <div className="relative group">
+                    <button
+                      type="button"
+                      data-testid="open-jit-theory-btn"
+                      disabled={!isTheoryUnlocked}
+                      onClick={() => {
+                        if (isTheoryUnlocked) setIsTheoryDrawerOpen(true);
+                      }}
+                      className={`px-2.5 py-1.5 rounded-lg text-xs font-medium flex items-center gap-1.5 transition-all select-none ${
+                        isTheoryUnlocked
+                          ? 'bg-blue-950/40 border border-blue-800/60 text-blue-300 hover:bg-blue-900/60 hover:text-white cursor-pointer shadow-sm shadow-blue-950/50'
+                          : 'bg-slate-800/40 border border-slate-700/40 text-slate-500 cursor-not-allowed opacity-75'
+                      }`}
+                      title={
+                        isTheoryUnlocked
+                          ? 'Відкрити вбудовану теоретичну капсулу без переходу на іншу вкладку'
+                          : '🔒 Експрес-теорія заблокована. Спочатку скористайтеся підказками Сократа (рівень 2+) або спробуйте розв\'язати самостійно.'
+                      }
+                    >
+                      {isTheoryUnlocked ? (
+                        <BookOpen className="w-3.5 h-3.5 text-blue-400" />
+                      ) : (
+                        <Lock className="w-3.5 h-3.5 text-slate-500" />
+                      )}
+                      <span>Теорія</span>
+                      {!isTheoryUnlocked && (
+                        <span className="text-[10px] font-mono px-1 py-0.2 rounded bg-slate-800 text-slate-400">
+                          2+
+                        </span>
+                      )}
+                    </button>
+
+                    {/* Tooltip for locked theory button */}
+                    {!isTheoryUnlocked && (
+                      <div
+                        data-testid="jit-theory-locked-tooltip"
+                        className="absolute right-0 top-full mt-1.5 hidden group-hover:flex flex-col gap-1 w-64 p-2.5 rounded-lg bg-slate-900/95 border border-slate-700/80 shadow-2xl backdrop-blur-md z-30 text-[11px] text-slate-300 leading-snug animate-fadeIn pointer-events-none"
+                      >
+                        <div className="flex items-center gap-1.5 font-semibold text-amber-400">
+                          <Lock className="w-3 h-3 shrink-0" />
+                          <span>Експрес-теорія обмежена</span>
+                        </div>
+                        <p className="text-slate-400 text-[10px]">
+                          Спробуйте розв'язати самостійно. Теорія розблокується після 2-ї підказки Сократа або при першій невдалій спробі.
+                        </p>
+                      </div>
+                    )}
+                  </div>
 
                   <button
                     onClick={() => handleTabClick('tree')}
