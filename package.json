@@ -6,6 +6,8 @@
     "packages/*"
   ],
   "scripts": {
+    "postinstall": "npm run build --workspace=@sbc/types",
+    "build:types": "npm run build --workspace=@sbc/types",
     "db:studio": "prisma studio --schema=packages/database/prisma/schema.prisma",
     "db:seed": "npm run prisma:seed --workspace=@sbc/database",
     "dev:api": "npm run dev --workspace=apps/api",

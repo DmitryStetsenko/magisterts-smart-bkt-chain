@@ -1,3 +1,5 @@
+import type { BktEvaluationUpdateDto } from './bkt.types';
+
 /**
  * Модальності та типи завдань платформи Smart-BKT-Chain
  */
@@ -136,4 +138,75 @@ export interface ReviewQueueItemDto {
   rubrics: any | null;
   misconceptions: any | null;
   attemptsHistory?: ReviewAttemptDto[];
+}
+
+/**
+ * Вхідний контракт запиту на перевірку завдання (POST /api/v1/bkt/evaluate)
+ */
+export interface SubmitTaskPayloadDto {
+  userId?: string;
+  taskId: string;
+  code?: string;
+  selectedOptionId?: string;
+  selectedOptionIds?: string[];
+  essayAnswer?: string;
+  reactionLatencyMs?: number;
+  deletionRatio?: number;
+  pauseCount?: number;
+  pasteEvents?: number;
+  typingWpm?: number;
+}
+
+/**
+ * Результат виконання окремого тест-кейсу для задачі з кодом
+ */
+export interface CodeTestDetailDto {
+  input: string;
+  expected: string;
+  actual: string;
+  passed: boolean;
+}
+
+/**
+ * Конфігурація рубрик для багаторівневого семантичного оцінювання відкритих відповідей
+ */
+export interface SemanticJudgeRubricsDto {
+  keywords?: string[];
+  minWords?: number;
+  maxWords?: number;
+  criteria?: Array<{ name: string; weight: number; description: string }>;
+}
+
+/**
+ * Вихідний контракт семантичного оцінювача (OpenAnswerEvaluatorService)
+ */
+export interface SemanticEvaluationOutputDto {
+  tierUsed: 'TIER_1_HEURISTICS' | 'TIER_2_SIMILARITY' | 'TIER_3_LLM_JUDGE';
+  isPassed: boolean;
+  score: number;
+  confidenceScore: number;
+  correctness: number;
+  completeness: number;
+  keyConceptsCovered: string[];
+  missingConcepts: string[];
+  detectedMisconceptions: string[];
+  studentFeedback: string;
+  needsTeacherReview: boolean;
+  reasons: string[];
+}
+
+/**
+ * Повна відповідь ендпоінту POST /api/v1/bkt/evaluate для кабінету студента
+ */
+export interface TaskEvaluationResponseDto {
+  submissionId: string;
+  isPassed: boolean;
+  feedback: string;
+  semanticScore?: number;
+  teacherReviewStatus: TeacherReviewStatus | string;
+  semanticDetails?: SemanticEvaluationOutputDto | null;
+  testDetails?: CodeTestDetailDto[];
+  taskType: TaskType | string;
+  bktUpdate?: BktEvaluationUpdateDto;
+  teacherComment?: string | null;
 }

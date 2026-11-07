@@ -66,3 +66,120 @@ export interface BktAuditRecordDto {
   };
   timestamp: string | Date;
 }
+
+/**
+ * Доменні параметри розрахунку одного кроку BKT-рушія (BktEngine)
+ */
+export interface BktEngineParametersDto {
+  pMastery: number; // P(L_t) - поточна ймовірність володіння навичкою
+  pTransit: number; // P(T) - ймовірність переходу у стан знання
+  pSlip: number;    // P(S) - ймовірність випадкової помилки
+  pGuess: number;   // P(G) - ймовірність вгадування
+}
+
+/**
+ * Результат чистого математичного оновлення апостеріорної ймовірності в BktEngine
+ */
+export interface BktEngineStateResultDto {
+  pMasteryPrior: number;
+  pMasteryPosterior: number;
+  isCorrect: boolean;
+  timestamp: Date;
+}
+
+/**
+ * Вхідні поведінкові сигнали для динамічної корекції P(S) та P(G) (BehavioralAdjuster)
+ */
+export interface BehavioralSignalsDto {
+  taskType: string;
+  isCorrect: boolean;
+  currentMastery: number;
+  reactionLatencyMs?: number;
+  deletionRatio?: number;
+  pauseCount?: number;
+  passedTestsRatio?: number;
+  pasteEvents?: number;
+  typingWpm?: number;
+  conceptCoverageRatio?: number;
+}
+
+export interface BaseSlipGuessDto {
+  pSlip: number;
+  pGuess: number;
+}
+
+export interface AdjustedSlipGuessDto extends BaseSlipGuessDto {
+  reasons: string[];
+}
+
+/**
+ * Payload оновлення BKT-стану у відповіді ендпоінту POST /api/v1/bkt/evaluate
+ */
+export interface BktEvaluationUpdateDto {
+  skillId: string;
+  skillTitle: string;
+  pMasteryBefore: number;
+  pMasteryAfter: number;
+  pMasteryPosterior: number;
+  pMasteryChange: number;
+  isMastered: boolean;
+  pSlipUsed: number;
+  pGuessUsed: number;
+  adjustReasons: string[];
+}
+
+/**
+ * Модульні телеметричні показники студента в розрізі конкретної навички
+ */
+export interface SkillTelemetryMetricsDto {
+  wpm: number;
+  copyPasteRatio: number;
+  fatigueIndex: number;
+}
+
+/**
+ * Запис історії динамічної корекції BKT-параметрів для аналітики викладача та студента
+ */
+export interface StudentAdjustmentDto {
+  id?: string;
+  skillSlug: string;
+  skillTitle: string;
+  taskId?: string;
+  taskTitle?: string;
+  taskType?: string;
+  taskDescription?: string;
+  taskOptions?: any;
+  pSlipUsed?: number | null;
+  pGuessUsed?: number | null;
+  adjustReasons: string[];
+  isCorrect: boolean;
+  createdAt: string;
+}
+
+/**
+ * Уніфікований елемент когортної аналітики студента (GET /api/v1/bkt/analytics/students)
+ */
+export interface StudentAnalyticsItemDto {
+  id?: string;
+  studentId?: string;
+  name: string;
+  email: string;
+  averageMastery?: number;
+  bktBySkill?: Record<string, number>;
+  skillMastery?: Record<string, number>;
+  telemetryBySkill?: Record<string, SkillTelemetryMetricsDto>;
+  wpm?: number;
+  avgWpm?: number;
+  copyPasteRatio: number;
+  fatigueIndex: number;
+  peakAnomaly?: {
+    hasAnomaly: boolean;
+    peakSkillSlug?: string;
+    peakSkillTitle?: string;
+    copyPasteRatio: number;
+  };
+  hasGuessAlert?: boolean;
+  recentAdjustments?: StudentAdjustmentDto[];
+  unstarted?: boolean;
+  lastActive?: string;
+}

@@ -1,4 +1,4 @@
-import { TaskDifficulty, TaskType } from './tasks.types';
+import { TaskDifficulty, TaskDto, TaskType } from './tasks.types';
 
 /**
  * Тип адаптивного кроку, який рекомендує секвенсор
@@ -11,7 +11,69 @@ export type AdaptiveStepType =
   | 'BLOCKED';         // Блокування через невиконані пререквізити
 
 /**
- * Рекомендація секвенсора завдань (TaskSequencer)
+ * Доменне представлення вузла навички для алгоритму секвенування (TaskSequencer)
+ */
+export interface SkillNodeDomainDto {
+  id: string;
+  slug: string;
+  title: string;
+  parentSkillIds: string[];
+}
+
+/**
+ * Доменне представлення завдання для алгоритму секвенування (TaskSequencer)
+ */
+export interface TaskDomainDto {
+  id: string;
+  skillId: string;
+  title: string;
+  difficulty: string;
+  taskType?: string | null;
+  topic?: string | null;
+  subConcept?: string | null;
+}
+
+/**
+ * Стан засвоєння навички студентом для секвенсора
+ */
+export interface StudentSkillStateDto {
+  skillId: string;
+  pMastery: number;
+}
+
+/**
+ * Причина вибору завдання алгоритмом TaskSequencer
+ */
+export type SequencerReasonType =
+  | 'PRACTICE_CURRENT_SKILL'
+  | 'ADVANCE_NEXT_SKILL'
+  | 'REVIEW_COMPLETED'
+  | 'MODULE_TASKS_EXHAUSTED';
+
+/**
+ * Фактичний результат роботи доменного алгоритму TaskSequencer.recommendNextTask
+ */
+export interface TaskSequencerResultDto {
+  recommendedSkill: SkillNodeDomainDto;
+  recommendedTask: TaskDomainDto;
+  reason: SequencerReasonType;
+  currentMastery: number;
+  isExhausted?: boolean;
+  isDifficultyDegraded?: boolean;
+  maxScoreCap?: number;
+}
+
+/**
+ * Відповідь ендпоінту GET /api/v1/tasks/recommended
+ */
+export interface RecommendedTaskResponseDto {
+  task: TaskDto;
+  recommendation: TaskSequencerResultDto | null;
+  hasRemediationTask: boolean;
+}
+
+/**
+ * Рекомендація секвенсора завдань (розширений високорівневий контракт)
  */
 export interface SequencingRecommendationDto {
   nextTaskId: string | null;
@@ -34,11 +96,13 @@ export interface SkillNodeDto {
   courseId?: string | null;
   slug: string;
   title: string;
-  description: string;
-  category: string;
-  difficulty: TaskDifficulty;
+  description?: string;
+  category?: string;
+  difficulty?: TaskDifficulty | string;
   parentSkillIds?: string[];
   childSkillIds?: string[];
+  parentDependencies?: Array<{ parentSkillId: string }>;
+  tasks?: Array<Partial<TaskDto> & { id: string; title: string }>;
   requiredMastery?: number;
   pInit?: number;
   pTransit?: number;
@@ -50,11 +114,12 @@ export interface SkillNodeDto {
  * Курс або навчальна дисципліна
  */
 export interface CourseDto {
-  id: string;
+  id?: string;
   slug: string;
   title: string;
-  description: string;
+  description?: string;
   category?: string;
   icon?: string | null;
   skills?: SkillNodeDto[];
+  createdAt?: string | Date;
 }
