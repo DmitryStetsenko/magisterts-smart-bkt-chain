@@ -54,13 +54,63 @@ export function buildPracticeToStudyUrl(
 }
 
 /**
- * Нормалізатор відносного або абсолютного шляху уроку підручника у валідний міжпортальний URL
+ * Нормалізатор відносного або абсолютного шляху уроку підручника у валідний міжпортальний URL.
+ * Автоматично відображає legacy-шляхи `/learn/...` із банків завдань на актуальні маршрути App Router `apps/study`.
  */
 export function resolveStudyUrl(studyUnitUrl: string): string {
   if (studyUnitUrl.startsWith('http://') || studyUnitUrl.startsWith('https://')) {
     return studyUnitUrl;
   }
-  const cleanPath = studyUnitUrl.startsWith('/') ? studyUnitUrl : `/${studyUnitUrl}`;
-  return buildCrossAppUrl('study', cleanPath);
+
+  const [rawPath, hashPart] = studyUnitUrl.split('#');
+  let cleanPath = rawPath.startsWith('/') ? rawPath : `/${rawPath}`;
+
+  if (cleanPath.startsWith('/learn/')) {
+    const lower = cleanPath.toLowerCase();
+    if (
+      lower.includes('variables-and-types') ||
+      lower.includes('variables-declaration') ||
+      lower.includes('primitive-types') ||
+      lower.includes('type-coercion')
+    ) {
+      cleanPath = '/courses/web-algorithms-school/school-alg-basics/variables-and-types';
+    } else if (
+      lower.includes('linear-calculations') ||
+      lower.includes('string-templates') ||
+      lower.includes('operators')
+    ) {
+      cleanPath = '/courses/web-algorithms-school/school-alg-basics/linear-calculations';
+    } else if (
+      lower.includes('boolean-conditions') ||
+      lower.includes('grade-evaluation') ||
+      lower.includes('branching') ||
+      lower.includes('conditional')
+    ) {
+      cleanPath = '/courses/web-algorithms-school/school-alg-branching/conditional-logic';
+    } else if (
+      lower.includes('loop') ||
+      lower.includes('iteration') ||
+      lower.includes('array') ||
+      lower.includes('collection') ||
+      lower.includes('function')
+    ) {
+      cleanPath = '/courses/web-algorithms-school/school-alg-loops/loops-and-iteration';
+    } else if (lower.includes('dom') || lower.includes('event')) {
+      cleanPath = '/courses/web-algorithms-school/school-web-dom-events/dom-manipulation-events';
+    } else if (
+      lower.includes('project') ||
+      lower.includes('validation') ||
+      lower.includes('search') ||
+      lower.includes('async') ||
+      lower.includes('oop')
+    ) {
+      cleanPath = '/courses/web-algorithms-school/school-web-applied-projects/form-validation-search';
+    } else {
+      cleanPath = '/courses/web-algorithms-school';
+    }
+  }
+
+  const baseResolved = buildCrossAppUrl('study', cleanPath);
+  return hashPart ? `${baseResolved}#${hashPart}` : baseResolved;
 }
 

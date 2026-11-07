@@ -9,6 +9,8 @@ import { EssayTaskEditor } from '../features/essay-editor/ui/EssayTaskEditor';
 import { SkillDagMap } from '../features/skill-graph/ui/SkillDagMap';
 import { StudentProgressPill } from './StudentProgressPill';
 import { StudentProfileDrawer } from './StudentProfileDrawer';
+import { JustInTimeTheoryDrawer } from '../features/theory-capsule/ui/JustInTimeTheoryDrawer';
+import { resolveTheoryCapsule } from '../features/theory-capsule/model/theory-capsules';
 import { GameSkillTreeWidget, SkillGraphNode, DrawerSection, AppShellLayout, Breadcrumbs } from '@sbc/ui';
 import {
   TaskDto,
@@ -125,6 +127,7 @@ export function StudentPortalContent({
     setPendingCourseSlug(null);
   };
   const [isProfileDrawerOpen, setIsProfileDrawerOpen] = useState<boolean>(false);
+  const [isTheoryDrawerOpen, setIsTheoryDrawerOpen] = useState<boolean>(false);
   const [recommendation, setRecommendation] = useState<TaskSequencerResultDto | null>(null);
   const [hasRemediationTask, setHasRemediationTask] = useState<boolean>(true);
   const [code, setCode] = useState<string>('');
@@ -237,6 +240,7 @@ export function StudentPortalContent({
         setCode(data.task.starterCode || '');
         setEssayAnswer('');
         setRevealedHintLevel(0);
+        setIsTheoryDrawerOpen(false);
 
         if (data.recommendation?.isExhausted || data.recommendation?.reason === 'MODULE_TASKS_EXHAUSTED') {
           setExhaustedModalData({
@@ -339,6 +343,10 @@ export function StudentPortalContent({
         code,
         essayAnswer,
       };
+      const activeHintPenaltyPct =
+        revealedHintLevel > 0 && task.socraticHints
+          ? task.socraticHints.find((h) => h.level === revealedHintLevel)?.penaltyPct ?? 0
+          : 0;
 
       const res = await fetch(`${API_URL}/api/v1/bkt/evaluate`, {
         method: 'POST',
@@ -346,6 +354,12 @@ export function StudentPortalContent({
         body: JSON.stringify({
           taskId: task.id,
           ...payload,
+          ...(revealedHintLevel > 0
+            ? {
+                revealedHintLevel,
+                appliedPenaltyPct: activeHintPenaltyPct,
+              }
+            : {}),
         }),
       });
 
@@ -693,33 +707,41 @@ export function StudentPortalContent({
                       <DrawerSection
                         title="Матеріал для повторення"
                         icon={BookOpen}
-                        iconColor={task.studyUnitUrl ? "text-blue-400" : "text-slate-500"}
-                        titleColor={task.studyUnitUrl ? "text-blue-400 group-hover:text-blue-300" : "text-slate-500"}
-                        defaultOpen={Boolean(task.studyUnitUrl)}
+                        iconColor="text-blue-400"
+                        titleColor="text-blue-400 group-hover:text-blue-300"
+                        defaultOpen={true}
                         className="border-t border-slate-800/80 pt-2.5"
                       >
-                        {task.studyUnitUrl ? (
-                          <div className="py-1.5 flex items-center justify-between gap-3">
+                        <div className="py-1.5 flex flex-col gap-2">
+                          <div className="flex items-center justify-between gap-2">
                             <div className="flex flex-col">
-                              <span className="text-xs font-medium text-slate-200">Теоретичний урок</span>
-                              <span className="text-[10px] text-slate-500">Інтерактивний підручник</span>
+                              <span className="text-xs font-medium text-slate-200">Експрес-теорія (Just-in-Time)</span>
+                              <span className="text-[10px] text-slate-500">Стисла довідка прямо в тренажері</span>
                             </div>
-                            <a
-                              href={resolveStudyUrl(task.studyUnitUrl)}
-                              target="_blank"
-                              rel="noopener noreferrer"
+                            <button
+                              type="button"
+                              onClick={() => setIsTheoryDrawerOpen(true)}
                               className="px-2.5 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-medium text-xs flex items-center gap-1 transition-colors cursor-pointer shrink-0"
-                              title="Відкрити урок в інтерактивному підручнику"
                             >
-                              <span>До уроку</span>
+                              <span>Читати</span>
                               <ArrowRight className="w-3 h-3" />
-                            </a>
+                            </button>
                           </div>
-                        ) : (
-                          <div className="py-2 flex items-center justify-between gap-2 text-slate-500 text-xs">
-                            <span>Теоретичний конспект не прив'язаний</span>
-                          </div>
-                        )}
+                          {task.studyUnitUrl && (
+                            <div className="pt-2 border-t border-slate-800/50 flex items-center justify-between gap-2 text-[11px]">
+                              <span className="text-slate-400">Повний інтерактивний підручник</span>
+                              <a
+                                href={resolveStudyUrl(task.studyUnitUrl)}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-blue-400 hover:text-blue-300 font-mono flex items-center gap-1 transition-colors"
+                              >
+                                <span>Zen-урок</span>
+                                <ArrowRight className="w-3 h-3" />
+                              </a>
+                            </div>
+                          )}
+                        </div>
                       </DrawerSection>
 
                       {/* Action Button */}
@@ -1309,18 +1331,16 @@ export function StudentPortalContent({
 
                 {/* Quick Navigation to Theory & Skill Tree */}
                 <div className="flex items-center gap-2 shrink-0">
-                  {task.studyUnitUrl && (
-                    <a
-                      href={resolveStudyUrl(task.studyUnitUrl)}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="px-2.5 py-1.5 rounded-lg bg-slate-800/70 hover:bg-slate-800 text-blue-300 hover:text-white transition-colors cursor-pointer flex items-center gap-1.5 text-xs font-medium"
-                      title="Відкрити урок в інтерактивному підручнику"
-                    >
-                      <BookOpen className="w-3.5 h-3.5 text-blue-400" />
-                      <span>Теорія</span>
-                    </a>
-                  )}
+                  <button
+                    type="button"
+                    data-testid="open-jit-theory-btn"
+                    onClick={() => setIsTheoryDrawerOpen(true)}
+                    className="px-2.5 py-1.5 rounded-lg bg-slate-800/70 hover:bg-slate-800 text-blue-300 hover:text-white transition-colors cursor-pointer flex items-center gap-1.5 text-xs font-medium"
+                    title="Відкрити вбудовану теоретичну капсулу без переходу на іншу вкладку"
+                  >
+                    <BookOpen className="w-3.5 h-3.5 text-blue-400" />
+                    <span>Теорія</span>
+                  </button>
 
                   <button
                     onClick={() => handleTabClick('tree')}
@@ -1511,6 +1531,60 @@ export function StudentPortalContent({
                     </div>
                   )}
 
+                  {/* 🧠 Personalized Cognitive Misconception Diagnostic Block */}
+                  {!evalResult.isPassed && evalResult.detectedMisconception && (
+                    <div
+                      data-testid="misconception-alert"
+                      className="pt-2.5 border-t border-slate-800/80 flex flex-col gap-1.5"
+                    >
+                      <div className="pl-3 border-l-2 border-l-amber-400 flex flex-col gap-1">
+                        <span className="text-[11px] font-bold uppercase tracking-wider text-amber-300 flex items-center gap-1.5">
+                          <AlertTriangle className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                          <span>Діагностика помилки: {evalResult.detectedMisconception.title}</span>
+                        </span>
+                        <p className="text-xs text-slate-200 leading-relaxed">
+                          {evalResult.detectedMisconception.explanation}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* 📘 Automatic Just-in-Time Theory Micro-Module Offer */}
+                  {!evalResult.isPassed &&
+                    (evalResult.offerJustInTimeTheory ||
+                      (evalResult.bktUpdate?.pMasteryAfter ?? 1) < 0.35 ||
+                      Boolean(evalResult.detectedMisconception)) && (
+                      <div
+                        data-testid="jit-theory-offer"
+                        className="pt-2.5 border-t border-slate-800/80 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3"
+                      >
+                        <div className="flex items-center gap-2">
+                          <BookOpen className="w-4 h-4 text-blue-400 shrink-0" />
+                          <div className="flex flex-col">
+                            <span className="text-xs font-medium text-slate-200">
+                              {(evalResult.bktUpdate?.pMasteryAfter ?? 1) < 0.35
+                                ? 'Рівень опанування P(L) нижче 35% — рекомендуємо експрес-теорію'
+                                : 'Швидке теоретичне пояснення за темою'}
+                            </span>
+                            <span className="text-[11px] text-slate-400">
+                              Перегляньте стислу теоретичну капсулу та зразок коду прямо в тренажері без втрати відповіді.
+                            </span>
+                          </div>
+                        </div>
+
+                        <button
+                          type="button"
+                          data-testid="jit-theory-offer-btn"
+                          onClick={() => setIsTheoryDrawerOpen(true)}
+                          className="px-3 py-1.5 rounded-lg bg-blue-500/20 hover:bg-blue-500/30 text-blue-300 font-medium text-xs flex items-center justify-center gap-1.5 transition-colors shrink-0 cursor-pointer"
+                        >
+                          <BookOpen className="w-3.5 h-3.5" />
+                          <span>Відкрити експрес-теорію</span>
+                          <ArrowRight className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    )}
+
                   {/* ⚡ Adaptive Graceful Degradation Action Prompt */}
                   {!evalResult.isPassed && (
                     <div className="pt-2.5 border-t border-slate-800/80 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
@@ -1556,6 +1630,21 @@ export function StudentPortalContent({
           )}
         
       </AppShellLayout>
+
+      {/* 📘 Права бічна панель експрес-теорії (Just-in-Time Theory Micro-Module) */}
+      <JustInTimeTheoryDrawer
+        isOpen={isTheoryDrawerOpen}
+        onClose={() => setIsTheoryDrawerOpen(false)}
+        capsule={resolveTheoryCapsule(task, activeCourseSlug)}
+        detectedMisconception={evalResult?.detectedMisconception}
+        fullLessonUrl={
+          evalResult?.recommendedTheoryUrl
+            ? resolveStudyUrl(evalResult.recommendedTheoryUrl)
+            : task?.studyUnitUrl
+            ? resolveStudyUrl(task.studyUnitUrl)
+            : null
+        }
+      />
 
       {/* 👤 Права бічна панель (Right Profile & Courses Drawer) */}
       <StudentProfileDrawer
