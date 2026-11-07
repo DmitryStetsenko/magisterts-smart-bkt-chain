@@ -310,7 +310,7 @@
 | **SBC-333** | Style | TC | declutter teacher dashboard views into clean borderless canvas layout | 2026-11-05 | 7e94eb6 |
 | **SBC-334** | Style | SH | refine navigation rail and side drawers into minimalist borderless style | 2026-11-05 | working-tree |
 | **SBC-347** | `Story` | `ST` | implement MisconceptionMatcher engine, Socratic hint BKT penalty, and inline JustInTimeTheoryDrawer in student portal | 2026-11-07 | `0027995` |
-| **SBC-348** | `Story` | `ST` | implement progressive escalation unlocking for just-in-time theory button based on Socratic hints and failed submissions | 2026-11-07 | pending |
+| **SBC-348** | `Story` | `ST` | implement progressive escalation unlocking for just-in-time theory button based on Socratic hints and failed submissions | 2026-11-07 | `ee3b650` |
 
 ---
 
