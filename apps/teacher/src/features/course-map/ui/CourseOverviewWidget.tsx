@@ -2,36 +2,14 @@
 
 import React, { useState, useEffect } from 'react';
 import { Network, HelpCircle, CheckCircle2, ChevronRight, ChevronDown, Code, CheckSquare, FileText, List, Layers, Search, Sparkles } from 'lucide-react';
+import type { CourseDto, SkillNodeDto, TaskDto } from '@sbc/types';
 
-export interface TaskItem {
+export type TaskItem = TaskDto;
+export type SkillNodeItem = SkillNodeDto;
+export type CourseData = Omit<CourseDto, 'id' | 'skills'> & {
   id: string;
-  taskType: 'CODE' | 'SINGLE_CHOICE' | 'MULTIPLE_CHOICE' | 'TEXT_ESSAY';
-  title: string;
-  description: string;
-  difficulty: string;
-  options?: any;
-  testCases?: Array<{ input: string; expectedOutput: string }>;
-}
-
-export interface SkillNodeItem {
-  id: string;
-  slug: string;
-  title: string;
-  description?: string;
-  category?: string;
-  difficulty?: string;
-  parentDependencies?: Array<{ parentSkillId: string }>;
-  tasks?: TaskItem[];
-}
-
-export interface CourseData {
-  id: string;
-  slug: string;
-  title: string;
-  description?: string;
-  icon?: string;
   skills: SkillNodeItem[];
-}
+};
 
 interface CourseOverviewWidgetProps {
   courseSlug: string;

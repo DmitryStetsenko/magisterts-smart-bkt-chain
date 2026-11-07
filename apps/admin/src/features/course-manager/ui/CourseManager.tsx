@@ -1,17 +1,10 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { BookOpen, Plus, Sparkles, CheckCircle2, ShieldAlert } from 'lucide-react';
+import { BookOpen, Plus, Sparkles, CheckCircle2 } from 'lucide-react';
+import type { CourseDto } from '@sbc/types';
 
-export interface CourseData {
-  id?: string;
-  slug: string;
-  title: string;
-  description: string;
-  icon?: string;
-  skills?: any[];
-  createdAt?: string;
-}
+export type CourseData = CourseDto;
 
 export const CourseManager: React.FC = () => {
   const [courses, setCourses] = useState<CourseData[]>([]);

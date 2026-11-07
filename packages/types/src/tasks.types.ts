@@ -111,7 +111,7 @@ export interface ReviewAttemptDto {
   status: string;
   teacherReviewStatus: string;
   teacherComment?: string | null;
-  submittedAt: string;
+  submittedAt: string | Date;
 }
 
 /**
@@ -131,9 +131,10 @@ export interface ReviewQueueItemDto {
   answerText: string;
   attemptNumber?: number;
   totalAttempts?: number;
-  submittedAt: string;
+  submittedAt: string | Date;
   semanticScore?: number;
   teacherReviewStatus: string;
+  teacherComment?: string | null;
   referenceAnswer: string | null;
   rubrics: any | null;
   misconceptions: any | null;

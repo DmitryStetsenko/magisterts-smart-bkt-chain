@@ -10,16 +10,12 @@ import {
 import { Logger } from '@nestjs/common';
 import { Server, Socket } from 'socket.io';
 import { PrismaService } from '../../outbound/persistence/prisma.service';
+import type {
+  TelemetrySocketPayloadDto,
+  StudentSubmissionWsNotificationDto,
+} from '@sbc/types';
 
-export interface TelemetryPayload {
-  sessionId?: string;
-  userId: string;
-  taskId: string;
-  keystrokePauseMs: number;
-  wpm: number;
-  deleteCount: number;
-  pasteEvents: number;
-}
+export type TelemetryPayload = TelemetrySocketPayloadDto;
 
 @WebSocketGateway({
   cors: { origin: '*' },
@@ -161,14 +157,7 @@ export class TelemetryGateway implements OnGatewayConnection, OnGatewayDisconnec
     this.server.emit('bkt_state_reset', { userId, skillId });
   }
 
-  notifyStudentSubmission(payload: {
-    userId: string;
-    taskId: string;
-    skillId: string;
-    isPassed: boolean;
-    teacherReviewStatus: string;
-    submissionId: string;
-  }) {
+  notifyStudentSubmission(payload: StudentSubmissionWsNotificationDto) {
     this.logger.log(
       `Emitting student_submitted event for user ${payload.userId}, task ${payload.taskId}, reviewStatus: ${payload.teacherReviewStatus}`,
     );

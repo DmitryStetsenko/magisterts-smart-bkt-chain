@@ -1,36 +1,15 @@
 import { BktEngine } from '../bkt/bkt-engine';
+import type {
+  SkillNodeDomainDto,
+  TaskDomainDto,
+  StudentSkillStateDto,
+  TaskSequencerResultDto,
+} from '@sbc/types';
 
-export interface SkillNodeDomain {
-  id: string;
-  slug: string;
-  title: string;
-  parentSkillIds: string[];
-}
-
-export interface TaskDomain {
-  id: string;
-  skillId: string;
-  title: string;
-  difficulty: string;
-  taskType?: string | null;
-  topic?: string | null;
-  subConcept?: string | null;
-}
-
-export interface StudentSkillState {
-  skillId: string;
-  pMastery: number;
-}
-
-export interface SequencingRecommendation {
-  recommendedSkill: SkillNodeDomain;
-  recommendedTask: TaskDomain;
-  reason: 'PRACTICE_CURRENT_SKILL' | 'ADVANCE_NEXT_SKILL' | 'REVIEW_COMPLETED' | 'MODULE_TASKS_EXHAUSTED';
-  currentMastery: number;
-  isExhausted?: boolean;
-  isDifficultyDegraded?: boolean;
-  maxScoreCap?: number; // e.g. 70 for degraded level, 100 for standard
-}
+export type SkillNodeDomain = SkillNodeDomainDto;
+export type TaskDomain = TaskDomainDto;
+export type StudentSkillState = StudentSkillStateDto;
+export type SequencingRecommendation = TaskSequencerResultDto;
 
 export class TaskSequencer {
   /**

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useMemo } from 'react';
-import { TaskDto } from '@sbc/types';
+import { SkillNodeDto, TaskDto } from '@sbc/types';
 import {
   HelpCircle,
   CheckCircle2,
@@ -20,15 +20,7 @@ import {
 } from 'lucide-react';
 
 export type TaskItem = TaskDto;
-
-export interface SkillNodeItem {
-  id: string;
-  slug: string;
-  title: string;
-  description?: string;
-  category?: string;
-  difficulty?: string;
-}
+export type SkillNodeItem = Pick<SkillNodeDto, 'id' | 'slug' | 'title' | 'description' | 'category' | 'difficulty'>;
 
 export interface CourseGraphViewerProps {
   courseTitle: string;

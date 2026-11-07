@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
+import type { SubmitTaskPayloadDto } from '@sbc/types';
 
-export class SubmitTaskDto {
+export class SubmitTaskDto implements SubmitTaskPayloadDto {
   @ApiProperty({ description: 'ID of the student submitting the response (optional)', example: 'clx123student', required: false })
   userId?: string;
 

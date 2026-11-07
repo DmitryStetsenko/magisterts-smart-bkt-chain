@@ -3,13 +3,13 @@ import {
   OpenTextHeuristicEvaluator,
   OpenTextRubricConfig,
 } from '../../domain/evaluation/open-text-heuristic-evaluator';
+import type {
+  SemanticJudgeRubricsDto,
+  SemanticEvaluationOutputDto,
+} from '@sbc/types';
 
-export interface SemanticJudgeRubrics {
-  keywords?: string[];
-  minWords?: number;
-  maxWords?: number;
-  criteria?: Array<{ name: string; weight: number; description: string }>;
-}
+export type SemanticJudgeRubrics = SemanticJudgeRubricsDto;
+export type SemanticEvaluationOutput = SemanticEvaluationOutputDto;
 
 export interface EvaluateOpenAnswerParams {
   answerText: string;
@@ -18,21 +18,6 @@ export interface EvaluateOpenAnswerParams {
   referenceAnswer?: string;
   rubrics?: SemanticJudgeRubrics;
   misconceptions?: string[];
-}
-
-export interface SemanticEvaluationOutput {
-  tierUsed: 'TIER_1_HEURISTICS' | 'TIER_2_SIMILARITY' | 'TIER_3_LLM_JUDGE';
-  isPassed: boolean;
-  score: number; // 0..1
-  confidenceScore: number; // 0..1
-  correctness: number;
-  completeness: number;
-  keyConceptsCovered: string[];
-  missingConcepts: string[];
-  detectedMisconceptions: string[];
-  studentFeedback: string;
-  needsTeacherReview: boolean;
-  reasons: string[];
 }
 
 @Injectable()

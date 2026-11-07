@@ -6,38 +6,15 @@
  * Скориговані значення НЕ мають зберігатися як базові параметри у bkt_states.
  */
 
-export interface BehavioralSignals {
-  /** Тип завдання (SINGLE_CHOICE, MULTIPLE_CHOICE, CODE, ESSAY, OPEN_TEXT, ...) */
-  taskType: string;
-  /** Чи правильна відповідь */
-  isCorrect: boolean;
-  /** Поточна ймовірність засвоєння P(L) */
-  currentMastery: number;
-  /** Час від показу завдання до відповіді, мс */
-  reactionLatencyMs?: number;
-  /** Частка стирань серед усіх натискань (0..1) */
-  deletionRatio?: number;
-  /** Кількість довгих пауз під час набору */
-  pauseCount?: number;
-  /** Частка пройдених тестів для CODE (0..1) */
-  passedTestsRatio?: number;
-  /** Кількість подій вставки з буфера обміну (Paste events) */
-  pasteEvents?: number;
-  /** Швидкість набору тексту (WPM) */
-  typingWpm?: number;
-  /** Частка покриття ключових понять для TEXT_ESSAY / OPEN_TEXT (0..1) */
-  conceptCoverageRatio?: number;
-}
+import type {
+  BehavioralSignalsDto,
+  BaseSlipGuessDto,
+  AdjustedSlipGuessDto,
+} from '@sbc/types';
 
-export interface BaseSlipGuess {
-  pSlip: number;
-  pGuess: number;
-}
-
-export interface AdjustedSlipGuess extends BaseSlipGuess {
-  /** Людинозрозумілі пояснення корекцій (для bkt_histories / викладача) */
-  reasons: string[];
-}
+export type BehavioralSignals = BehavioralSignalsDto;
+export type BaseSlipGuess = BaseSlipGuessDto;
+export type AdjustedSlipGuess = AdjustedSlipGuessDto;
 
 export const ADJUSTER_CONFIG = {
   FAST_CHOICE_LATENCY_MS: 3500,

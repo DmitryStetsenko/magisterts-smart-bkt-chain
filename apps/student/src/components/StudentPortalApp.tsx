@@ -10,7 +10,15 @@ import { SkillDagMap } from '../features/skill-graph/ui/SkillDagMap';
 import { StudentProgressPill } from './StudentProgressPill';
 import { StudentProfileDrawer } from './StudentProfileDrawer';
 import { GameSkillTreeWidget, SkillGraphNode, DrawerSection, AppShellLayout, Breadcrumbs } from '@sbc/ui';
-import { TaskDto, CourseDto } from '@sbc/types';
+import {
+  TaskDto,
+  CourseDto,
+  CodeTestDetailDto,
+  StudentAdjustmentDto,
+  StudentAnalyticsItemDto,
+  TaskEvaluationResponseDto,
+  TaskSequencerResultDto,
+} from '@sbc/types';
 import { getAppBaseUrl, ROUTES, resolveStudyUrl } from '@sbc/routes';
 
 // Перевикористовуємо уніфіковані типи DTO платформи
@@ -117,15 +125,15 @@ export function StudentPortalContent({
     setPendingCourseSlug(null);
   };
   const [isProfileDrawerOpen, setIsProfileDrawerOpen] = useState<boolean>(false);
-  const [recommendation, setRecommendation] = useState<any>(null);
+  const [recommendation, setRecommendation] = useState<TaskSequencerResultDto | null>(null);
   const [hasRemediationTask, setHasRemediationTask] = useState<boolean>(true);
   const [code, setCode] = useState<string>('');
   const [essayAnswer, setEssayAnswer] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
-  const [evalResult, setEvalResult] = useState<any>(null);
+  const [evalResult, setEvalResult] = useState<TaskEvaluationResponseDto | null>(null);
   const [graphNodes, setGraphNodes] = useState<SkillGraphNode[]>([]);
-  const [studentAdjustments, setStudentAdjustments] = useState<any[]>([]);
+  const [studentAdjustments, setStudentAdjustments] = useState<StudentAdjustmentDto[]>([]);
 
   // Task Submissions History & Drawer Sub-tab ('condition' | 'history')
   const [taskSubmissions, setTaskSubmissions] = useState<any[]>([]);
@@ -160,10 +168,10 @@ export function StudentPortalContent({
         });
       }
 
-      let adjustments: any[] = [];
+      let adjustments: StudentAdjustmentDto[] = [];
       let telemetryBySkill: Record<string, any> = {};
       if (analyticsRes.ok) {
-        const studentsList: any[] = await analyticsRes.json();
+        const studentsList: StudentAnalyticsItemDto[] = await analyticsRes.json();
         const demoStudent = studentsList.find((s) => s.id === 'demo-student' || s.email?.includes('demo') || s.name?.includes('Demo')) || studentsList[0];
         if (demoStudent) {
           adjustments = demoStudent.recentAdjustments || [];
@@ -300,7 +308,7 @@ export function StudentPortalContent({
         // If decision matches current active task or submission, update live evalResult
         if (task && (!data.taskId || data.taskId === task.id)) {
           const isApproved = data.decision === 'APPROVE';
-          setEvalResult((prev: any) => {
+          setEvalResult((prev) => {
             if (!prev) return null;
             return {
               ...prev,
@@ -1404,7 +1412,7 @@ export function StudentPortalContent({
                         Результати перевірки тестів:
                       </span>
                       <div className="flex flex-col divide-y divide-slate-800/50">
-                        {evalResult.testDetails.map((td: any, i: number) => (
+                        {evalResult.testDetails.map((td: CodeTestDetailDto, i: number) => (
                           <div
                             key={i}
                             className="py-1.5 flex items-center justify-between gap-2 text-[11px]"

@@ -1,17 +1,7 @@
-export interface TelemetryMetrics {
-  wpm: number;
-  lastPauseMs: number;
-  deleteCount: number;
-  pasteEvents: number;
-  totalKeystrokes: number;
-}
+import type {
+  TelemetryMetricsDto,
+  TelemetrySocketPayloadDto,
+} from '@sbc/types';
 
-export interface TelemetrySocketPayload {
-  sessionId?: string;
-  userId: string;
-  taskId: string;
-  keystrokePauseMs: number;
-  wpm: number;
-  deleteCount: number;
-  pasteEvents: number;
-}
+export type TelemetryMetrics = TelemetryMetricsDto;
+export type TelemetrySocketPayload = TelemetrySocketPayloadDto;

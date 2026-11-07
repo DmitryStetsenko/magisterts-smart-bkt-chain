@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { Network, Plus, Trash2, Edit3, ArrowRight, Save, Layers } from 'lucide-react';
+import type { TaskDifficulty } from '@sbc/types';
 import { AdminSkillNode } from '../model/skill-editor.types';
 
 interface SkillDagEditorProps {
@@ -180,7 +181,12 @@ export const SkillDagEditor: React.FC<SkillDagEditorProps> = ({
                 <label className="text-xs font-semibold text-slate-300">Складність</label>
                 <select
                   value={formData.difficulty}
-                  onChange={(e) => setFormData({ ...formData, difficulty: e.target.value as any })}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      difficulty: e.target.value as Extract<TaskDifficulty, 'EASY' | 'MEDIUM' | 'HARD'>,
+                    })
+                  }
                   className="px-3.5 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-slate-100 focus:outline-none focus:border-indigo-500"
                 >
                   <option value="EASY">EASY</option>

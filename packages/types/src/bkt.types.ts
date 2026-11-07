@@ -152,6 +152,10 @@ export interface StudentAdjustmentDto {
   pSlipUsed?: number | null;
   pGuessUsed?: number | null;
   adjustReasons: string[];
+  semanticScore?: number;
+  feedbackText?: string;
+  teacherReviewStatus?: string;
+  teacherComment?: string;
   isCorrect: boolean;
   createdAt: string;
 }

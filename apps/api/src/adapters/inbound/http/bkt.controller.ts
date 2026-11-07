@@ -9,6 +9,12 @@ import { OpenTextHeuristicEvaluator } from '../../../domain/evaluation/open-text
 import { OpenAnswerEvaluatorService } from '../../../domain/evaluation/open-answer-evaluator.service';
 import { SubmitTaskDto } from './dto/submit-task.dto';
 import { SubmissionStatus, TaskType, TeacherReviewStatus } from '@sbc/database';
+import type {
+  CodeTestDetailDto,
+  ReviewQueueItemDto,
+  StudentAnalyticsItemDto,
+  TaskEvaluationResponseDto,
+} from '@sbc/types';
 
 @ApiTags('BKT')
 @Controller('bkt')
@@ -22,7 +28,7 @@ export class BktController {
   @Post('evaluate')
   @ApiOperation({ summary: 'Evaluate student submission across task types (CODE, SINGLE_CHOICE, MULTIPLE_CHOICE, TEXT_ESSAY) and update BKT P(L_t)' })
   @ApiResponse({ status: 200, description: 'Evaluation result and updated BKT mastery probability' })
-  async evaluateSubmission(@Body() dto: SubmitTaskDto) {
+  async evaluateSubmission(@Body() dto: SubmitTaskDto): Promise<TaskEvaluationResponseDto> {
     const task = await this.prisma.task.findUnique({
       where: { id: dto.taskId },
       include: {
@@ -46,7 +52,7 @@ export class BktController {
 
     let isPassed = false;
     let feedback = '';
-    let testDetails: any[] = [];
+    let testDetails: CodeTestDetailDto[] = [];
     let passedTestsRatio: number | undefined = undefined;
     let conceptCoverageRatio: number | undefined = undefined;
     let semanticScore: number | undefined = undefined;
@@ -456,7 +462,7 @@ export class BktController {
   @Get('analytics/students')
   @ApiOperation({ summary: 'Get real-time analytics for all students' })
   @ApiQuery({ name: 'courseSlug', required: false })
-  async getStudentsAnalytics(@Query('courseSlug') courseSlug?: string) {
+  async getStudentsAnalytics(@Query('courseSlug') courseSlug?: string): Promise<StudentAnalyticsItemDto[]> {
     let courseSkillIds: string[] = [];
     let courseSkillSlugs: string[] = [];
     if (courseSlug) {
@@ -623,7 +629,7 @@ export class BktController {
         teacherReviewStatus: h.teacherReviewStatus,
         teacherComment: h.teacherComment ?? undefined,
         isCorrect: h.isCorrect,
-        createdAt: h.createdAt,
+        createdAt: h.createdAt instanceof Date ? h.createdAt.toISOString() : String(h.createdAt),
       }));
 
       const hasGuessAlert = (s.bktHistories || []).some(
@@ -785,7 +791,7 @@ export class BktController {
   async getTeacherReviewQueue(
     @Query('courseSlug') courseSlug?: string,
     @Query('status') statusFilter?: string,
-  ) {
+  ): Promise<ReviewQueueItemDto[]> {
     let reviewStatusCondition: any = TeacherReviewStatus.PENDING_REVIEW;
     if (statusFilter === 'REVIEWED') {
       reviewStatusCondition = { in: [TeacherReviewStatus.APPROVED, TeacherReviewStatus.REJECTED] };
