@@ -34,4 +34,10 @@ export class SubmitTaskDto implements SubmitTaskPayloadDto {
 
   @ApiProperty({ description: 'Typing speed in words per minute (WPM), from editor telemetry', required: false })
   typingWpm?: number;
+
+  @ApiProperty({ description: 'Highest Socratic hint level revealed by the student during this attempt', required: false })
+  revealedHintLevel?: number;
+
+  @ApiProperty({ description: 'Cumulative mastery/score penalty percentage from revealed Socratic hints (0..100)', required: false })
+  appliedPenaltyPct?: number;
 }

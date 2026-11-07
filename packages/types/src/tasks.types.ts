@@ -156,6 +156,8 @@ export interface SubmitTaskPayloadDto {
   pauseCount?: number;
   pasteEvents?: number;
   typingWpm?: number;
+  revealedHintLevel?: number;
+  appliedPenaltyPct?: number;
 }
 
 /**
@@ -210,4 +212,8 @@ export interface TaskEvaluationResponseDto {
   taskType: TaskType | string;
   bktUpdate?: BktEvaluationUpdateDto;
   teacherComment?: string | null;
+  detectedMisconception?: MisconceptionDto | null;
+  recommendedTheoryUrl?: string | null;
+  offerJustInTimeTheory?: boolean;
+  appliedHintPenaltyPct?: number;
 }

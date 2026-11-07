@@ -7,6 +7,7 @@ import { BktEngine } from '../../../domain/bkt/bkt-engine';
 import { BehavioralAdjuster } from '../../../domain/bkt/behavioral-adjuster';
 import { OpenTextHeuristicEvaluator } from '../../../domain/evaluation/open-text-heuristic-evaluator';
 import { OpenAnswerEvaluatorService } from '../../../domain/evaluation/open-answer-evaluator.service';
+import { MisconceptionMatcher } from '../../../domain/evaluation/misconception-matcher';
 import { SubmitTaskDto } from './dto/submit-task.dto';
 import { SubmissionStatus, TaskType, TeacherReviewStatus } from '@sbc/database';
 import type {
@@ -95,6 +96,7 @@ export class BktController {
         const options = (task.options as { keywords?: string[]; minWords?: number; maxWords?: number }) || {};
 
         // Багаторівневе оцінювання через OpenAnswerEvaluatorService (Tier 1 -> Tier 2 -> Tier 3)
+        const normalizedMisconceptions = MisconceptionMatcher.normalizeForOpenText(task.misconceptions);
         const evalRes = await this.openAnswerEvaluator.evaluate({
           answerText: essayText,
           taskTitle: task.title,
@@ -105,7 +107,7 @@ export class BktController {
             minWords: options.minWords ?? 5,
             maxWords: options.maxWords,
           },
-          misconceptions: (task.misconceptions as string[]) || undefined,
+          misconceptions: normalizedMisconceptions.length > 0 ? normalizedMisconceptions : undefined,
         });
 
         isPassed = evalRes.isPassed;
@@ -356,6 +358,31 @@ export class BktController {
     // If the student already successfully passed this task previously (isAlreadyPassedBefore && isPassed),
     // we do NOT re-apply BKT knowledge gain for the same task over and over again to prevent spamming mastery up to 100%.
     let calcResult: any;
+    // Match structured cognitive misconceptions on failed submissions
+    const detectedMisconception = MisconceptionMatcher.matchSubmission(task.misconceptions, {
+      taskType: task.taskType,
+      isPassed,
+      selectedOptionId: dto.selectedOptionId,
+      selectedOptionIds: dto.selectedOptionIds,
+      code: dto.code,
+      essayAnswer: dto.essayAnswer,
+      failedOutputs: testDetails.filter((td) => !td.passed).map((td) => td.actual),
+      semanticDetectedMisconceptions: semanticDetails?.detectedMisconceptions,
+    });
+
+    // Resolve Socratic hint penalty percentage (explicit or derived from revealedHintLevel)
+    let appliedHintPenaltyPct = 0;
+    if (typeof dto.appliedPenaltyPct === 'number' && dto.appliedPenaltyPct > 0) {
+      appliedHintPenaltyPct = Math.min(80, Math.max(0, dto.appliedPenaltyPct));
+    } else if (typeof dto.revealedHintLevel === 'number' && dto.revealedHintLevel > 0 && Array.isArray(task.socraticHints)) {
+      const hintEntry = (task.socraticHints as Array<{ level?: number; penaltyPct?: number }>).find(
+        (h) => h && h.level === dto.revealedHintLevel,
+      );
+      if (hintEntry && typeof hintEntry.penaltyPct === 'number') {
+        appliedHintPenaltyPct = Math.min(80, Math.max(0, hintEntry.penaltyPct));
+      }
+    }
+
     if (isAlreadyPassedBefore && isPassed) {
       feedback += ' ℹ️ (Завдання вже було зараховано раніше: показник P(L) збережено без повторного нарахування)';
       calcResult = {
@@ -375,6 +402,18 @@ export class BktController {
         },
         isPassed,
       );
+
+      // Apply Socratic hint penalty to positive mastery gain on first-time passed tasks
+      if (isPassed && appliedHintPenaltyPct > 0 && calcResult.pMasteryPosterior > bktState.pMastery) {
+        const rawGain = calcResult.pMasteryPosterior - bktState.pMastery;
+        const penalizedGain = rawGain * (1 - appliedHintPenaltyPct / 100);
+        calcResult = {
+          ...calcResult,
+          pMasteryPosterior: Number((bktState.pMastery + penalizedGain).toFixed(4)),
+        };
+        adjusted.reasons.push(`socratic_hint_penalty_${appliedHintPenaltyPct}pct`);
+        feedback += ` 💡 (Враховано підказку Сократа: -${appliedHintPenaltyPct}% приросту P(L))`;
+      }
 
       const isMastered = BktEngine.isMastered(calcResult.pMasteryPosterior);
 
@@ -418,6 +457,14 @@ export class BktController {
       submissionId: submission.id,
     });
 
+    const recommendedTheoryUrl =
+      detectedMisconception?.recommendedReviewUrl || task.studyUnitUrl || null;
+    const offerJustInTimeTheory =
+      !isPassed &&
+      (updatedState.pMastery < 0.35 ||
+        Boolean(detectedMisconception) ||
+        Boolean(recommendedTheoryUrl));
+
     return {
       submissionId: submission.id,
       isPassed,
@@ -427,6 +474,10 @@ export class BktController {
       semanticDetails,
       testDetails,
       taskType: task.taskType,
+      detectedMisconception,
+      recommendedTheoryUrl,
+      offerJustInTimeTheory,
+      appliedHintPenaltyPct: appliedHintPenaltyPct > 0 ? appliedHintPenaltyPct : undefined,
       bktUpdate: {
         skillId: task.skillId,
         skillTitle: task.skill.title,
