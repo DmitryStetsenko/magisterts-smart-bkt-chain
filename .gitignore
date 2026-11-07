@@ -29,5 +29,8 @@ Thumbs.db
 
 # Testing & MCP artifacts
 .playwright-mcp/
+test-results/
+playwright-report/
+*.tsbuildinfo
 __pycache__/
 *.pyc

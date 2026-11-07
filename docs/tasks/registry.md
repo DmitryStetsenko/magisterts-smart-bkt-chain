@@ -7,7 +7,7 @@
 | Епік | Назва | Кількість завдань |
 | :--- | :--- | :---: |
 | **`SBC-EP-INF`** | Monorepo & CI/CD Setup | 91 |
-| **`SBC-EP-SH`** | Database Modeling & Shared Packages | 23 |
+| **`SBC-EP-SH`** | Database Modeling & Shared Packages | 24 |
 | **`SBC-EP-BK`** | Authentication & Core API | 14 |
 | **`SBC-EP-BKT`** | Bayesian Knowledge Tracing & Behavioral Telemetry | 29 |
 | **`SBC-EP-LLM`** | Automated Code Assessment & Open-Text Evaluation | 10 |
@@ -17,7 +17,7 @@
 | **`SBC-EP-AD`** | Admin Portal & Knowledge DAG Builder | 8 |
 | **`SBC-EP-LD`** | Landing Web Page | 9 |
 | **`SBC-EP-MS`** | Master's Thesis Engineering & Academic Text Generation | 9 |
-| **ВСЬОГО** | - | **254** |
+| **ВСЬОГО** | - | **255** |
 
 ---
 
@@ -159,7 +159,8 @@
 | **SBC-335** | `Style` | `SH` | refine AppShellLayout header, breadcrumbs badges and right-slot triggers into minimalist borderless style | 2026-11-05 | `daed737` |
 | **SBC-336** | `Style` | `SH` | scale minimalist borderless design to student, study and admin portals and update Rule 7 in AGENTS.md | 2026-11-05 | `01c396b` |
 | **SBC-337** | `Docs` | `SH` | synchronize app domain specifications and tech stack docs with approved Minimalist Borderless UI standard | 2026-11-06 | `794532f` |
-| **SBC-338** | `Style` | `ST` | redesign QuizTaskEditor, EssayTaskEditor, MonacoCodeEditor and evaluation feedback in student portal to minimalist borderless UI | 2026-11-06 | `pending` |
+| **SBC-338** | `Style` | `ST` | redesign QuizTaskEditor, EssayTaskEditor, MonacoCodeEditor and evaluation feedback in student portal to minimalist borderless UI | 2026-11-06 | `2edb113` |
+| **SBC-346** | `Story` | `SH` | complete end-to-end @sbc/types DTO contract integration across api, admin, student and teacher apps (BACKLOG-6) | 2026-11-07 | `ef22e4e` |
 
 ---
 

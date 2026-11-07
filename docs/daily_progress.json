@@ -2,6 +2,52 @@
   "project_title": "📅 Журнал розробки та прогресу проєкту (Daily Progress Log)",
   "sections": [
     {
+      "title": "📅 7 листопада 2026 року",
+      "level": 2,
+      "paragraphs": [],
+      "code_blocks": [],
+      "items": [],
+      "subsections": [
+        {
+          "title": "✅ Що зроблено за день:",
+          "level": 3,
+          "paragraphs": [],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "**Завершення наскрізної інтеграції спільних DTO-контрактів `@sbc/types` у всі застосунки монорепозиторію та закриття `[BACKLOG-6]` (`SBC-346`, `EP-SH`):**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Контекст та аудит беклогу:**",
+              "subitems": [
+                "Проведено повний кодовий аудит задач `[BACKLOG-6]` і `[BACKLOG-7]`. Виявлено, що базова модульна бібліотека `@sbc/types` була створена раніше у `SBC-280` та частково підключена у `SBC-284`, проте `apps/api` та `apps/admin` не мали жодного імпорту з `@sbc/types` і продовжували утримувати локальні дублі інтерфейсів (`BktParameters`, `BehavioralSignals`, `SequencingRecommendation`, `TelemetryPayload`, `CourseData`, `AdminSkillNode`), а в `apps/student` стани оцінювання та рекомендацій типізувалися як `any`."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Виконані інженерні зміни:**",
+              "subitems": [
+                "**Пайплайн збірки та експорту `@sbc/types` (`packages/types`):** налаштовано компіляцію декларацій у `dist/index.d.ts` та `dist/index.js` (`CommonJS`), додано скрипти `build:types` і `postinstall` у кореневий `package.json`, а також включено `@sbc/types` до `transpilePackages` у `next.config.ts` усіх 4 клієнтських порталів (`student`, `teacher`, `admin`, `study`).",
+                "**Розширення контрактів даних (`packages/types/src/*`):** додано наскрізні доменні та мережеві контракти `BktEngineParametersDto`, `BktEngineStateResultDto`, `BehavioralSignalsDto`, `AdjustedSlipGuessDto`, `BktEvaluationUpdateDto`, `StudentAdjustmentDto`, `StudentAnalyticsItemDto`, `SubmitTaskPayloadDto`, `CodeTestDetailDto`, `SemanticJudgeRubricsDto`, `SemanticEvaluationOutputDto`, `TaskEvaluationResponseDto`, `TaskSequencerResultDto`, `RecommendedTaskResponseDto`, `TelemetryMetricsDto`, `TelemetrySocketPayloadDto`, `StudentSubmissionWsNotificationDto`.",
+                "**Уніфікація бекенду та клієнтських порталів:** підключено `@sbc/types` у `apps/api` (`bkt-types.ts`, `behavioral-adjuster.ts`, `task-sequencer.ts`, `open-answer-evaluator.service.ts`, `telemetry.gateway.ts`, `submit-task.dto.ts`, `bkt.controller.ts`), `apps/admin` (`skill-editor.types.ts`, `SkillDagEditor.tsx`, `CourseManager.tsx`), `apps/student` (`StudentPortalApp.tsx`, `telemetry.types.ts`) та `apps/teacher` (`analytics.types.ts`, `CourseOverviewWidget.tsx`, `CourseGraphViewer.tsx`).",
+                "**Оновлення E2E тестів та синхронізація беклогу:** актуалізовано Playwright E2E-набір `e2e/full-flow.spec.ts` відповідно до Minimalist Borderless `AppShellLayout` по всіх 4 порталах (`student`, `teacher`, `admin`, `study`) та синхронізовано реєстри `docs/backlog/README.md` (`[BACKLOG-6]` і `[BACKLOG-8]` переведено у `DONE`), `docs/project_management.md` і `docs/tasks/registry.md`."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Верифікація:**",
+              "subitems": [
+                "Успішне проходження `tsc --noEmit` у всіх 5 застосунках (`api`, `admin`, `student`, `teacher`, `study` — 0 помилок), всіх 38 unit-тестів `npm run test:api` (7/7 тест-сьютів) та скрізних Playwright E2E тестів `npm run test:e2e`."
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
       "title": "📅 6 листопада 2026 року",
       "level": 2,
       "paragraphs": [],

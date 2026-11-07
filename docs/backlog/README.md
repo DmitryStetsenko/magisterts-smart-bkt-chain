@@ -9,15 +9,15 @@
 
 | ID | Jira Key | Пріоритет | Статус | Цільовий компонент / модуль | Короткий опис задачі |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| **`[BACKLOG-8]`** | `SBC-312` | 🔴 **P1 (Critical)** | `ACCEPTED` | `apps/study`, `apps/student` | **Семантична вкладена маршрутизація Next.js App Router, повна SEO-оптимізація та протокол Deep Linking** |
 | **`[BACKLOG-10]`** | `SBC-315` | 🔴 **P1 (Critical)** | `ACCEPTED` | `packages/ui`, `apps/*` | **Побудова канонічного FSD Shared UI-Kit (Button, Modal, Badge, Tooltip, Select) у `@sbc/ui`** |
 | **`[BACKLOG-9]`** | `SBC-311` | 🟠 **P2 (High)** | `ACCEPTED` | `apps/student` | **Режим експрес-підтвердження знань екстерном (Test-Out Fast-Track) у тренажері без проходження всієї теорії** |
+| **`[BACKLOG-7]`** | `TBD` | 🟡 **P2 (High)** | `IN_PROGRESS` | `apps/student`, `domain/learning` | Інтерактивний дидактичний шар навчання: доопрацювання inline-капсули теорії ($P(L_n) < 0.35$) та Misconception Engine для квізів/коду (база створена в `SBC-271`, `SBC-281`, `SBC-287`) |
 | **`[BACKLOG-1]`** | `SBC-313` | 🟡 **P2 (High)** | `PROPOSED` | `apps/admin` | Інструмент аудиту та валідації курсів на відповідність педагогічним стандартам (Linter & Validator) |
-| **`[BACKLOG-4]`** | `SBC-314` | 🟢 **P3 (Medium)** | `PROPOSED` | `aapps/student`, `apps/teacher` | Ергономіка та безпечний протокол перемикання навчальних курсів у режимі тестування й демонстрації |
-| **`[BACKLOG-6]`** | `SBC-305` | 🟡 **P2 (High)** | `ACCEPTED` | `packages/types` | Наповнення спільного пакета `@sbc/types` наскрізними DTO контрактами для ліквідації дублювання типів |
-| **`[BACKLOG-7]`** | `SBC-306` | 🟡 **P2 (High)** | `ACCEPTED` | `aapps/student`, `domain/learning` | Інтерактивний дидактичний шар навчання (Just-in-Time Theory, Misconception Engine, Scaffolding) |
+| **`[BACKLOG-4]`** | `SBC-314` | 🟢 **P3 (Medium)** | `PROPOSED` | `apps/student`, `apps/teacher` | Ергономіка та безпечний протокол перемикання навчальних курсів у режимі тестування й демонстрації |
+| **`[BACKLOG-8]`** | `SBC-312` | ⚪ **P1 (Critical)** | `DONE` | `apps/study`, `apps/student` | Семантична вкладена маршрутизація Next.js App Router, повна SEO-оптимізація та протокол Deep Linking |
+| **`[BACKLOG-6]`** | `SBC-346` | ⚪ **P2 (High)** | `DONE` | `packages/types`, `apps/*` | Наповнення спільного пакета `@sbc/types` наскрізними DTO контрактами та повна інтеграція в усі застосунки (`SBC-280`, `SBC-284`, `SBC-346`) |
 | **`[BACKLOG-2]`** | `SBC-278` | ⚪ **P2 (High)** | `DONE` | `apps/api` (`TaskSequencer`) | Запобіжники модальності у алгоритмі вибору завдань (Fallback Modality Guard) |
-| **`[BACKLOG-3]`** | `SBC-271` | ⚪ **P3 (Medium)** | `DONE` | `aapps/student` (UI) | Чесна візуалізація адаптивних дій та приглушений стан відсутнього авторського контенту |
+| **`[BACKLOG-3]`** | `SBC-271` | ⚪ **P3 (Medium)** | `DONE` | `apps/student` (UI) | Чесна візуалізація адаптивних дій та приглушений стан відсутнього авторського контенту |
 | **`[BACKLOG-5]`** | `SBC-276` | ⚪ **P1 (Critical)** | `DONE` | `apps/api`, `apps/teacher` | Курс-ізольоване скидання прогресу студента (Course-Scoped Student BKT Reset) замість глобального |
 
 ---
@@ -121,20 +121,19 @@
 
 ## 🏗️ 6. Наскрізні контракти монорепозиторію та дидактичний шар адаптивного навчання (Adaptive Learning Layer)
 
-### 🧩 [BACKLOG-6] Наповнення спільного пакета `@sbc/types` наскрізними DTO контрактами для всіх застосунків
+### 🧩 [BACKLOG-6] Наповнення спільного пакета `@sbc/types` наскрізними DTO контрактами для всіх застосунків — ВПРОВАДЖЕНО (SBC-280, SBC-284, SBC-346)
 
-- **Контекст та проблема:**
-  У монорепозиторії наразі існує пакет `packages/types`, проте він містить лише `package.json`. Через це застосунки (`aapps/student`, `apps/teacher`, `apps/admin`) вимушені локально дублювати TypeScript-інтерфейси завдань, результатів оцінювання, BKT-стану або використовувати послаблену типізацію (`any`). При зміні моделей даних на бекенді фронтенди ризикують розсинхронізуватися.
-- **Цільова архітектура:**
-  1. Реалізувати в `packages/types/src/` модульну структуру типів:
-     - `tasks.types.ts`: `TaskDto`, `TaskType`, `QuizOptionDto`, `TestCaseDto`, `SocraticHintDto`, `MisconceptionDto`, `TaskModality`.
-     - `bkt.types.ts`: `BktStateDto`, `BktUpdateResultDto`, `BktAuditParamsDto`, `BktTelemetryMetricsDto`.
-     - `sequencing.types.ts`: `SkillNodeDomainDto`, `SequencingRecommendationDto`, `AdaptiveStepType`.
-     - `telemetry.types.ts`: `TelemetryEventDto`, `BehavioralMetricsDto`, `WSEventPayloads`.
-     - `learning.types.ts`: `ConceptCapsuleDto`, `ScaffoldingStepDto`, `LearningPathwayDto`.
-     - `index.ts`: єдина точка реекспорту всіх доменних контрактів.
-  2. Налаштувати правильний експорт та скрипти збірки у `packages/types/package.json`.
-  3. Підключити `@sbc/types` у `apps/api`, `aapps/student`, `apps/teacher`, `apps/admin`, замінивши локальні дублі на наскрізні спільні контракти.
+- **Проблема:**
+  Початково пакет `packages/types` містив лише базовий каркас, через що застосунки (`apps/api`, `apps/student`, `apps/teacher`, `apps/admin`) дублювали локальні TypeScript-інтерфейси завдань, результатів оцінювання, BKT-стану, сокетів телеметрії або використовували `any`.
+- **Впроваджене рішення (`SBC-280`, `SBC-284`, `SBC-346`):**
+  1. Реалізовано модульну структуру доменних контрактів у `packages/types/src/`:
+     - `tasks.types.ts`: `TaskDto`, `TaskType`, `QuizOptionDto`, `TestCaseDto`, `SocraticHintDto`, `MisconceptionDto`, `SubmitTaskPayloadDto`, `CodeTestDetailDto`, `SemanticJudgeRubricsDto`, `SemanticEvaluationOutputDto`, `TaskEvaluationResponseDto`, `ReviewQueueItemDto`.
+     - `bkt.types.ts`: `BktParametersDto`, `BktEngineParametersDto`, `BktEngineStateResultDto`, `BehavioralSignalsDto`, `AdjustedSlipGuessDto`, `BktEvaluationUpdateDto`, `StudentAdjustmentDto`, `StudentAnalyticsItemDto`.
+     - `sequencing.types.ts`: `SkillNodeDomainDto`, `TaskDomainDto`, `TaskSequencerResultDto`, `RecommendedTaskResponseDto`, `SkillNodeDto`, `CourseDto`.
+     - `telemetry.types.ts`: `TelemetryEventDto`, `BehavioralMetricsDto`, `TelemetryMetricsDto`, `TelemetrySocketPayloadDto`, `StudentSubmissionWsNotificationDto`.
+     - `learning.types.ts`: `TheoryCapsuleDto`, `ScaffoldingStateDto`, `AdaptiveFeedbackDto`, `LessonUnitDto`, `CourseCurriculumDto`.
+  2. Налаштовано комбінований пайплайн компіляції `packages/types` (`dist/index.js` + `dist/index.d.ts`, автоматичний `postinstall` та `transpilePackages` у `next.config.ts` усіх клієнтських порталів).
+  3. Повністю уніфіковано контракти у `apps/api` (контролери, `BktEngine`, `BehavioralAdjuster`, `TaskSequencer`, `OpenAnswerEvaluatorService`, `TelemetryGateway`), `apps/admin` (`SkillDagEditor`, `CourseManager`), `apps/student`, `apps/teacher` та `apps/study` з ліквідацією локальних дублів та `any`-станів.
 
 ---
 
@@ -158,9 +157,9 @@
 
 ## 🌐 7. Архітектура семантичного роутингу, SEO та міжпортальних переходів
 
-### 🧩 [BACKLOG-8] (SBC-312) Семантична вкладена маршрутизація Next.js App Router, повна SEO-оптимізація та протокол Deep Linking
-- **Пріоритет:** 🔴 **Пріоритет №1 (Critical)**
-- **Статус:** ACCEPTED
+### 🧩 [BACKLOG-8] (SBC-312) Семантична вкладена маршрутизація Next.js App Router, повна SEO-оптимізація та протокол Deep Linking — ВПРОВАДЖЕНО (SBC-312)
+- **Пріоритет:** ⚪ **Пріоритет №1 (Critical)**
+- **Статус:** DONE
 - **Документ брейншторму:** [docs/brainstorm/12_seo_routing_architecture.md](file:///docs/brainstorm/12_seo_routing_architecture.md)
 - **Цільові застосунки:** apps/study (порт 3006), apps/student (порт 3002).
 - **Контекст та інженерна проблема:**

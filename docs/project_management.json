@@ -80,7 +80,7 @@
               "subitems": [
                 "Описано Prisma схему у `packages/database` (користувачі, курси, навички, задачі типів `CODE`, `CHOICE`, `OPEN_TEXT`, таблиці `TelemetryLog`, `BehavioralProfile`, `BktHistory`, `Submission`).",
                 "Створено спільний UI-пакет `@sbc/ui` з Storybook, віджетами `GameSkillTreeWidget`, `AnomalyTreeWidget`, `AnomalyRadarWidget` та `CourseOverviewWidget`.",
-                "Створено спільний пакет типів `@sbc/types`."
+                "Створено спільний пакет наскрізних DTO-контрактів `@sbc/types` із повною компіляцією декларацій (`dist/index.d.ts`) та інтеграцією між бекендом `apps/api` і всіма клієнтськими порталами (`apps/student`, `apps/teacher`, `apps/admin`, `apps/study`) (`SBC-280`, `SBC-284`, `SBC-346`)."
               ]
             }
           ]
@@ -195,7 +195,7 @@
                 "Візуалізація семантичних рубрик та фідбеку для відкритих завдань.",
                 "Уніфікований 3-стадійний стан навігації сайдбара (`activeTab` + `isDrawerOpen`).",
                 "Шлюз підтвердження компетенції (Competency Verification Gateway) між підручником `apps/study` та тренажером `apps/student` з відкриттям наступних тем за порогом $P(L_n) \\ge 0.85$.",
-                "*(Беклог — Пріоритет №1)* Впровадження семантичної файлової маршрутизації Next.js App Router та SEO-стандарту в `apps/study` та `apps/student` (`SBC-312`).",
+                "Впроваджено семантичну файлову маршрутизацію Next.js App Router, SSG/SEO-метадані та міжпортальний Deep Linking в `apps/study` та `apps/student` (`SBC-312`).",
                 "*(Беклог — Пріоритет №2)* Режим експрес-екстерну `Test-Out Fast-Track` безпосередньо у середовищі тестування `apps/student` (`SBC-311`)."
               ]
             }

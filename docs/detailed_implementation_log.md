@@ -29,6 +29,26 @@
   4. *Install Monorepo Dependencies* (`npm ci || npm install`) — синхронізація робочих просторів монорепозиторію.
   5. *Build Next.js Documentation Site* (`npm run build:docs`) — збірка статичного експорту (`output: "export"`, `trailingSlash: true`, `basePath: "/magisterts-smart-bkt-chain"`).
   6. *Upload Artifact & Deploy Pages* (`actions/upload-pages-artifact@v3` + `actions/deploy-pages@v4`).
+
+### 0.1.7.51 Завершення Наскрізної Інтеграції DTO-Контрактів `@sbc/types` у Всіх Застосунках Монорепозиторію та Закриття `[BACKLOG-6]` (`SBC-346`, `EP-SH`)
+- **Контекст та результати аудиту кодової бази:**
+  - Хоча модульний каркас `packages/types/src/*` був закладений у `SBC-280` і частково застосований у `SBC-284`, у бекенді `apps/api` та адміністративній панелі `apps/admin` фактичних імпортів `from '@sbc/types'` не було (`0` входжень), а локальні доменні інтерфейси дублювалися у 9+ файлах. Крім того, `packages/types/package.json` вказував `"types": "./src/index.ts"`, що при підключенні до NestJS (`apps/api/tsconfig.json` без явного `rootDir`) ризикувало зміщувати кореневу директорію виводу `dist/`.
+- **Архітектура пакета `@sbc/types` та пайплайн компіляції:**
+  - Налаштовано `packages/types/tsconfig.json` (`module: "CommonJS"`, `declaration: true`, `rootDir: "src"`, `outDir: "./dist"`) та точки входу `"main": "./dist/index.js"`, `"types": "./dist/index.d.ts"` за аналогією з `@sbc/database`.
+  - У кореневий `package.json` додано скрипти `"build:types"` та `"postinstall": "npm run build --workspace=@sbc/types"`, а в `next.config.ts` усіх клієнтських порталів (`student`, `teacher`, `admin`, `study`) додано `'@sbc/types'` до масиву `transpilePackages`.
+- **Нові та узгоджені DTO-контракти (`packages/types/src/*`):**
+  1. `bkt.types.ts`: `BktEngineParametersDto`, `BktEngineStateResultDto`, `BehavioralSignalsDto`, `BaseSlipGuessDto`, `AdjustedSlipGuessDto`, `BktEvaluationUpdateDto`, `SkillTelemetryMetricsDto`, `StudentAdjustmentDto` (із серіалізацією `createdAt: string` у форматі ISO-8601), `StudentAnalyticsItemDto`.
+  2. `tasks.types.ts`: `SubmitTaskPayloadDto`, `CodeTestDetailDto`, `SemanticJudgeRubricsDto`, `SemanticEvaluationOutputDto`, `TaskEvaluationResponseDto`, розширення `ReviewQueueItemDto` та `ReviewAttemptDto`.
+  3. `sequencing.types.ts`: `SkillNodeDomainDto`, `TaskDomainDto`, `StudentSkillStateDto`, `SequencerReasonType`, `TaskSequencerResultDto`, `RecommendedTaskResponseDto`, розширення `SkillNodeDto` та `CourseDto`.
+  4. `telemetry.types.ts`: `TelemetryMetricsDto`, `TelemetrySocketPayloadDto`, `StudentSubmissionWsNotificationDto`.
+- **Наскрізна заміна локальних дублів у застосунках:**
+  - `apps/api`: уніфіковано типи в `bkt-types.ts`, `behavioral-adjuster.ts`, `task-sequencer.ts`, `open-answer-evaluator.service.ts`, `telemetry.gateway.ts`, `submit-task.dto.ts` (`implements SubmitTaskPayloadDto`) та сигнатури методів `BktController` (`Promise<TaskEvaluationResponseDto>`, `Promise<StudentAnalyticsItemDto[]>`, `Promise<ReviewQueueItemDto[]>`).
+  - `apps/admin`: `AdminSkillNode` сконструйовано шляхом композиції `SkillNodeDto` та `BktParametersDto`; у `CourseManager.tsx` локальний `CourseData` замінено на `CourseDto`; у `SkillDagEditor.tsx` прибрано `as any` на користь `TaskDifficulty`.
+  - `apps/student` та `apps/teacher`: у `StudentPortalApp.tsx` усунено `useState<any>` для `recommendation`, `evalResult` та `studentAdjustments`; у `telemetry.types.ts`, `analytics.types.ts`, `CourseOverviewWidget.tsx` та `CourseGraphViewer.tsx` локальні інтерфейси замінено на реекспорти з `@sbc/types`.
+- **Верифікація та синхронізація беклогу (Правила 1, 4, 11):**
+  - `tsc --noEmit` успішно пройдено на всіх 5 застосунках (`api`, `admin`, `student`, `teacher`, `study`), `npm run test:api` — 38/38 тестів зелені, `npm run test:e2e` — наскрізна перевірка всіх 4 порталів і REST DTO ендпоінтів у Chromium.
+  - Забезпечено триєдність синхронізації беклогу у `docs/backlog/README.md`, `docs/project_management.md` та `docs/tasks/registry.md`.
+
 ### 0.1.7.50 Виправлення Нумерації Підрозділів (2.1..2.6, 3.1..3.5), Наскрізна Синхронізація Змісту та Переведення Коментарів Авторства у Першу Особу (SBC-341, EP-MS)
 - **Контекст та зауваження користувача:**
   - Під час перегляду документу у навігаційній панелі Word (Navigation Pane) виявлено дублювання номера `2.3` у Розділі 2: заголовки читалися як `2.1, 2.2, 2.3, 2.3, 2.4, 2.5`.
