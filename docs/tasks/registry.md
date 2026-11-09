@@ -313,6 +313,7 @@
 | **SBC-348** | `Story` | `ST` | implement progressive escalation unlocking for just-in-time theory button based on Socratic hints and failed submissions | 2026-11-07 | `ee3b650` |
 | **SBC-349** | `Docs` | `ST` | document pedagogical model of quick theory and progressive scaffolding escalation protocol in brainstorm hub | 2026-11-07 | `9f12c93` |
 | **SBC-350** | `Story` | `ST` | implement strict task abandonment modal with BKT failure penalty when exiting to full textbook | 2026-11-09 | `e6546e0` |
+| **SBC-351** | `Fix` | `ST` | perform full skill BKT state and attempts reset when abandoning task to study theory | 2026-11-09 | pending |
 
 ---
 

@@ -75,15 +75,15 @@ export function AbandonTaskModal({
 
             <ul className="space-y-2 text-[11px] text-slate-300">
               <li className="flex items-start gap-2">
-                <TrendingDown className="w-4 h-4 text-rose-400 shrink-0 mt-0.5" />
+                <RotateCcw className="w-4 h-4 text-rose-400 shrink-0 mt-0.5" />
                 <span>
-                  <strong className="text-white">Фіксація в BKT:</strong> поточну спробу буде зараховано як нездану (<code className="font-mono text-rose-300">O_t = 0</code>), рівень засвоєння <code className="font-mono text-indigo-300">P(L)</code> знизиться.
+                  <strong className="text-white">Скидання прогресу модуля:</strong> увесь прогрес та історія спроб за поточною навичкою буде анульовано (<code className="font-mono text-rose-300">0%</code>).
                 </span>
               </li>
               <li className="flex items-start gap-2">
-                <RotateCcw className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+                <TrendingDown className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
                 <span>
-                  <strong className="text-white">Скидання стану:</strong> набраний код та відповіді поточної вправи буде скинуто без збереження чернетки.
+                  <strong className="text-white">Скидання стану:</strong> набраний код, обрані варіанти та підказки буде очищено без збереження чернетки.
                 </span>
               </li>
               <li className="flex items-start gap-2">
@@ -115,10 +115,10 @@ export function AbandonTaskModal({
               className="px-4 py-2 rounded-xl bg-amber-600 hover:bg-amber-500 disabled:opacity-50 text-white text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer shadow-lg shadow-amber-900/30"
             >
               {isSubmitting ? (
-                <span>Фіксація в BKT...</span>
+                <span>Скидання прогресу...</span>
               ) : (
                 <>
-                  <span>Здатись і відкрити підручник</span>
+                  <span>Скинути прогрес і відкрити підручник</span>
                   <ArrowRight className="w-3.5 h-3.5" />
                 </>
               )}

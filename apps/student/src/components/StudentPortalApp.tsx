@@ -394,22 +394,34 @@ export function StudentPortalContent({
     if (!fullLessonConfirmUrl || !task) return;
     setIsAbandoning(true);
     try {
-      // ⚠️ Режим строгої відмови: надсилаємо запит на фіксацію незданої спроби в BKT (Ot = 0)
-      await handleEvaluate({
-        code: code || '',
-        essayAnswer: essayAnswer || '',
-        isAbandoned: true,
+      // 1. Повне скидання BKT-стану, спроб та історії для цієї навички/модуля
+      await fetch(`${API_URL}/api/v1/bkt/reset-skill`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId: 'demo-student',
+          skillId: task.skillId,
+        }),
       });
 
-      // Скидаємо робочу чернетку та підказки Сократа
+      // 2. Очищення локального стану тренажера
       setCode('');
       setEssayAnswer('');
       setRevealedHintLevel(0);
+      setEvalResult(null);
+      setTaskSubmissions([]);
+      setConsecutiveFailures(0);
 
-      // Відкриваємо повний Zen-урок підручника
+      // 3. Синхронізація оновленого стану курсу та завантаження чистого завдання
+      await Promise.all([
+        fetchCourseStructureAndState(activeCourseSlug),
+        fetchRecommendedTask(activeCourseSlug),
+      ]);
+
+      // 4. Відкриття повного Zen-уроку підручника
       window.open(fullLessonConfirmUrl, '_blank');
     } catch (err) {
-      console.error('Error during task abandonment:', err);
+      console.error('Error during task abandonment and reset:', err);
     } finally {
       setIsAbandoning(false);
       setFullLessonConfirmUrl(null);
