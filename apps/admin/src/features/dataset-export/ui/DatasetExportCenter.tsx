@@ -17,26 +17,72 @@ import {
   Code2,
   RotateCcw,
   Sparkles,
-  ExternalLink
+  Search,
+  X,
+  Copy,
+  Check,
+  ChevronRight,
+  ExternalLink,
+  User
 } from 'lucide-react';
 import { StudentActivityLogDto } from '@sbc/types';
 
+export interface DatasetStats {
+  total: number;
+  submissions: number;
+  annulled: number;
+  hints: number;
+  theory: number;
+  resets: number;
+}
+
 interface DatasetExportCenterProps {
   apiUrl?: string;
+  activeFilter?: 'ALL' | 'SUBMISSIONS' | 'HINTS' | 'THEORY' | 'ANNULMENTS' | 'RESETS';
+  onFilterChange?: (filter: 'ALL' | 'SUBMISSIONS' | 'HINTS' | 'THEORY' | 'ANNULMENTS' | 'RESETS') => void;
+  userFilter?: string;
+  onUserFilterChange?: (user: string) => void;
+  onStatsChange?: (stats: DatasetStats) => void;
 }
 
 export const DatasetExportCenter: React.FC<DatasetExportCenterProps> = ({
   apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000',
+  activeFilter: controlledFilter,
+  onFilterChange,
+  userFilter: controlledUserFilter,
+  onUserFilterChange,
+  onStatsChange,
 }) => {
   const [logs, setLogs] = useState<StudentActivityLogDto[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [activeFilter, setActiveFilter] = useState<'ALL' | 'SUBMISSIONS' | 'HINTS' | 'THEORY' | 'ANNULMENTS' | 'RESETS'>('ALL');
-  const [userFilter, setUserFilter] = useState<string>('');
+  const [internalFilter, setInternalFilter] = useState<'ALL' | 'SUBMISSIONS' | 'HINTS' | 'THEORY' | 'ANNULMENTS' | 'RESETS'>('ALL');
+  const [internalUserFilter, setInternalUserFilter] = useState<string>('');
+  const [inspectingLog, setInspectingLog] = useState<StudentActivityLogDto | null>(null);
+  const [isCopied, setIsCopied] = useState<boolean>(false);
+
+  const activeFilter = controlledFilter !== undefined ? controlledFilter : internalFilter;
+  const userFilter = controlledUserFilter !== undefined ? controlledUserFilter : internalUserFilter;
+
+  const handleFilterSelect = (filter: 'ALL' | 'SUBMISSIONS' | 'HINTS' | 'THEORY' | 'ANNULMENTS' | 'RESETS') => {
+    if (onFilterChange) {
+      onFilterChange(filter);
+    } else {
+      setInternalFilter(filter);
+    }
+  };
+
+  const handleUserFilterChange = (val: string) => {
+    if (onUserFilterChange) {
+      onUserFilterChange(val);
+    } else {
+      setInternalUserFilter(val);
+    }
+  };
 
   const fetchRecentLogs = async () => {
     setIsLoading(true);
     try {
-      const res = await fetch(`${apiUrl}/api/v1/bkt/activity-logs/recent?limit=100`);
+      const res = await fetch(`${apiUrl}/api/v1/bkt/activity-logs/recent?limit=150`);
       if (res.ok) {
         const data = await res.json();
         setLogs(data);
@@ -51,6 +97,24 @@ export const DatasetExportCenter: React.FC<DatasetExportCenterProps> = ({
   useEffect(() => {
     fetchRecentLogs();
   }, []);
+
+  // Stats calculation
+  const stats: DatasetStats = useMemo(() => {
+    return {
+      total: logs.length,
+      submissions: logs.filter((l) => l.eventType.includes('SUBMIT')).length,
+      annulled: logs.filter((l) => l.eventType.includes('ANNUL')).length,
+      hints: logs.filter((l) => l.eventType.includes('HINT')).length,
+      theory: logs.filter((l) => l.eventType.includes('THEORY')).length,
+      resets: logs.filter((l) => l.eventType.includes('RESET') || l.eventType.includes('ABANDON') || l.eventType.includes('REVOKE')).length,
+    };
+  }, [logs]);
+
+  useEffect(() => {
+    if (onStatsChange) {
+      onStatsChange(stats);
+    }
+  }, [stats, onStatsChange]);
 
   const filteredLogs = useMemo(() => {
     return logs.filter((log) => {
@@ -67,47 +131,46 @@ export const DatasetExportCenter: React.FC<DatasetExportCenterProps> = ({
     });
   }, [logs, activeFilter, userFilter]);
 
-  // Statistics calculation
-  const totalLogsCount = logs.length;
-  const submissionsCount = logs.filter((l) => l.eventType.includes('SUBMIT')).length;
-  const annulledCount = logs.filter((l) => l.eventType.includes('ANNUL')).length;
-  const hintsCount = logs.filter((l) => l.eventType.includes('HINT')).length;
-  const theoryDwellCount = logs.filter((l) => l.eventType.includes('THEORY')).length;
-  const resetsCount = logs.filter((l) => l.eventType.includes('RESET') || l.eventType.includes('ABANDON')).length;
-
   const getEventBadge = (eventType: string) => {
     if (eventType.includes('ANNUL')) {
       return {
         label: 'Анульовано викладачем',
-        color: 'bg-rose-500/20 text-rose-300 border-rose-500/30',
+        color: 'bg-rose-500/15 text-rose-300 border-rose-500/30',
         icon: AlertTriangle,
       };
     }
     if (eventType.includes('HINT')) {
       return {
         label: 'Підказка Сократа',
-        color: 'bg-amber-500/20 text-amber-300 border-amber-500/30',
+        color: 'bg-amber-500/15 text-amber-300 border-amber-500/30',
         icon: HelpCircle,
       };
     }
-    if (eventType.includes('THEORY')) {
+    if (eventType === 'THEORY_DRAWER_OPENED') {
       return {
-        label: 'Експрес-теорія',
-        color: 'bg-blue-500/20 text-blue-300 border-blue-500/30',
+        label: 'Відкриття теорії',
+        color: 'bg-blue-500/15 text-blue-300 border-blue-500/30',
+        icon: BookOpen,
+      };
+    }
+    if (eventType === 'THEORY_DRAWER_CLOSED') {
+      return {
+        label: 'Вивчення теорії',
+        color: 'bg-cyan-500/15 text-cyan-300 border-cyan-500/30',
         icon: BookOpen,
       };
     }
     if (eventType.includes('RESET') || eventType.includes('REVOKE') || eventType.includes('ABANDON')) {
       return {
         label: 'Скидання / Відмова',
-        color: 'bg-purple-500/20 text-purple-300 border-purple-500/30',
+        color: 'bg-purple-500/15 text-purple-300 border-purple-500/30',
         icon: RotateCcw,
       };
     }
     if (eventType.includes('SUBMIT') || eventType.includes('EVALUAT')) {
       return {
         label: 'Спроба розв\'язку',
-        color: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30',
+        color: 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30',
         icon: Code2,
       };
     }
@@ -122,237 +185,288 @@ export const DatasetExportCenter: React.FC<DatasetExportCenterProps> = ({
     try {
       const d = new Date(dateStr);
       return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }) +
-        ' ' + d.toLocaleDateString([], { day: '2-digit', month: '2-digit' });
+        ' (' + d.toLocaleDateString([], { day: '2-digit', month: '2-digit' }) + ')';
     } catch {
       return dateStr;
     }
   };
 
+  const formatUserName = (userId: string) => {
+    if (userId === 'demo-student') return 'Дмитро Стеценко (demo-student)';
+    if (userId.length > 20) {
+      return `Учень #${userId.slice(0, 6)}...${userId.slice(-4)}`;
+    }
+    return userId;
+  };
+
+  const formatCognitiveContext = (log: StudentActivityLogDto) => {
+    const payload = log.payload || {};
+    if (log.eventType === 'THEORY_DRAWER_CLOSED') {
+      const secs = payload.dwellTimeSeconds !== undefined ? payload.dwellTimeSeconds : 0;
+      return <span className="text-cyan-300 font-mono">⏱️ {secs} сек вивчення</span>;
+    }
+    if (log.eventType === 'THEORY_DRAWER_OPENED') {
+      return <span className="text-slate-400">тригер: <span className="text-slate-200">{payload.trigger || 'ручний'}</span></span>;
+    }
+    if (log.eventType === 'HINT_REQUESTED') {
+      return (
+        <span className="text-amber-300 font-mono">
+          💡 Підказка #{payload.level ?? 1} {payload.penaltyPct ? `(-${payload.penaltyPct}% BKT)` : ''}
+        </span>
+      );
+    }
+    if (log.eventType.includes('SUBMIT')) {
+      const isPassed = payload.isPassed;
+      const change = payload.pMasteryChange;
+      return (
+        <div className="flex items-center gap-1.5 flex-wrap">
+          <span className={isPassed ? 'text-emerald-400 font-medium' : 'text-rose-400 font-medium'}>
+            {isPassed ? '✅ Зараховано' : '❌ Не здано'}
+          </span>
+          {change !== undefined && (
+            <span className={`font-mono text-[10px] ${change >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
+              ({change >= 0 ? `+${(change * 100).toFixed(1)}%` : `${(change * 100).toFixed(1)}%`} P(L))
+            </span>
+          )}
+        </div>
+      );
+    }
+    if (log.eventType.includes('ANNUL')) {
+      return (
+        <span className="text-rose-300 font-medium truncate" title={payload.comment}>
+          ⚠️ {payload.reason || 'Академічна недоброчесність'}
+        </span>
+      );
+    }
+    if (log.eventType.includes('RESET') || log.eventType.includes('ABANDON') || log.eventType.includes('REVOKE')) {
+      return <span className="text-purple-300">🔄 Скидання навички</span>;
+    }
+    return <span className="text-slate-500 font-mono text-[10px] truncate max-w-[200px]">{JSON.stringify(payload)}</span>;
+  };
+
+  const handleCopyPayload = () => {
+    if (!inspectingLog) return;
+    navigator.clipboard.writeText(JSON.stringify(inspectingLog.payload || {}, null, 2));
+    setIsCopied(true);
+    setTimeout(() => setIsCopied(false), 2000);
+  };
+
   return (
-    <div className="flex flex-col gap-6">
-      {/* 🚀 Header & Subtitle */}
+    <div className="flex flex-col gap-4">
+      {/* 🚀 Sleek Minimalist Borderless Header & Action Bar */}
       <div className="pb-3 border-b border-slate-800/80 flex flex-col md:flex-row md:items-center justify-between gap-3">
         <div>
-          <h2 className="text-base font-bold text-white flex items-center gap-2">
-            <BrainCircuit className="w-5 h-5 text-emerald-400" />
+          <h2 className="text-sm font-bold text-white flex items-center gap-2">
+            <BrainCircuit className="w-4 h-4 text-emerald-400" />
             <span>Центр Експорту Датасетів для ШІ & Незмінний Аудит-Лог</span>
           </h2>
-          <p className="text-xs text-slate-400 mt-1 max-w-3xl leading-relaxed">
-            Автоматизований збір дискретних когнітивних подій учнів та експертних педагогічних інтервенцій для навчання моделей Deep Knowledge Tracing (DKT), SAKT та класифікаторів академічної доброчесності.
+          <p className="text-xs text-slate-400 mt-0.5">
+            Дискретні когнітивні події учнів та педагогічні інтервенції для моделей Deep Knowledge Tracing (DKT), SAKT та класифікаторів доброчесності
           </p>
         </div>
 
-        <button
-          type="button"
-          onClick={fetchRecentLogs}
-          disabled={isLoading}
-          className="self-start md:self-auto px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-800 hover:bg-slate-800 text-slate-200 text-xs font-medium flex items-center gap-1.5 transition-colors cursor-pointer"
-        >
-          <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin' : ''}`} />
-          <span>Оновити потік</span>
-        </button>
-      </div>
-
-      {/* 📦 1-Click ML Export Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {/* Card 1: JSONL Export */}
-        <div className="bg-slate-900/50 border border-slate-800/80 hover:border-emerald-500/40 rounded-xl p-4 flex flex-col justify-between gap-3 transition-all">
-          <div className="flex items-start justify-between gap-3">
-            <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-lg bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
-                <BrainCircuit className="w-4 h-4" />
-              </div>
-              <div>
-                <h3 className="text-sm font-bold text-white">JSONL Формат (Lines of JSON)</h3>
-                <span className="text-[10px] font-mono text-emerald-400 uppercase tracking-wider">Для DKT, PyTorch & TensorFlow</span>
-              </div>
-            </div>
-            <span className="px-2 py-0.5 rounded text-[10px] font-mono font-semibold bg-emerald-950/60 text-emerald-300 border border-emerald-800/50">
-              .jsonl
-            </span>
-          </div>
-
-          <p className="text-xs text-slate-400 leading-relaxed">
-            Порядковий часовий ряд, де кожен рядок є самостійним JSON-об'єктом. Ідеально підходить для потокового завантаження в Python-даталоадери (`torch.utils.data.IterableDataset`) без вичерпання RAM.
-          </p>
-
+        {/* 1-Click Sleek Export Actions */}
+        <div className="flex items-center gap-2 flex-wrap">
           <a
             href={`${apiUrl}/api/v1/bkt/activity-logs/export?format=jsonl`}
             target="_blank"
             rel="noopener noreferrer"
-            className="w-full py-2 px-3 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold flex items-center justify-center gap-2 transition-all cursor-pointer shadow-lg shadow-emerald-950/50"
+            className="px-3 py-1.5 rounded-lg bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 border border-emerald-500/30 text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer"
+            title="Завантажити повний датасет у форматі JSONL для моделей DKT / PyTorch"
           >
-            <Download className="w-4 h-4" />
-            <span>Завантажити повний датасет JSONL</span>
+            <Download className="w-3.5 h-3.5" />
+            <span>JSONL (DKT/ШІ)</span>
+            <span className="text-[10px] font-mono opacity-70">.jsonl</span>
           </a>
-        </div>
-
-        {/* Card 2: CSV Export */}
-        <div className="bg-slate-900/50 border border-slate-800/80 hover:border-blue-500/40 rounded-xl p-4 flex flex-col justify-between gap-3 transition-all">
-          <div className="flex items-start justify-between gap-3">
-            <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-lg bg-blue-500/15 border border-blue-500/30 flex items-center justify-center text-blue-400">
-                <FileSpreadsheet className="w-4 h-4" />
-              </div>
-              <div>
-                <h3 className="text-sm font-bold text-white">CSV Формат (Tabular Data)</h3>
-                <span className="text-[10px] font-mono text-blue-400 uppercase tracking-wider">Для Pandas, Excel & PowerBI</span>
-              </div>
-            </div>
-            <span className="px-2 py-0.5 rounded text-[10px] font-mono font-semibold bg-blue-950/60 text-blue-300 border border-blue-800/50">
-              .csv
-            </span>
-          </div>
-
-          <p className="text-xs text-slate-400 leading-relaxed">
-            Класична таблична структура з розділювачами-комами та екрануванням JSON-пейлоадів. Оптимальна для статистичного регресійного аналізу, візуалізацій в Jupyter Notebook та імпорту в реляційні СУБД.
-          </p>
 
           <a
             href={`${apiUrl}/api/v1/bkt/activity-logs/export?format=csv`}
             target="_blank"
             rel="noopener noreferrer"
-            className="w-full py-2 px-3 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold flex items-center justify-center gap-2 transition-all cursor-pointer shadow-lg shadow-blue-950/50"
+            className="px-3 py-1.5 rounded-lg bg-blue-500/15 hover:bg-blue-500/25 text-blue-300 border border-blue-500/30 text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer"
+            title="Завантажити табличний датасет у форматі CSV для Pandas / Excel"
           >
-            <Download className="w-4 h-4" />
-            <span>Завантажити повний датасет CSV</span>
+            <FileSpreadsheet className="w-3.5 h-3.5" />
+            <span>CSV (Pandas)</span>
+            <span className="text-[10px] font-mono opacity-70">.csv</span>
           </a>
+
+          <button
+            type="button"
+            onClick={fetchRecentLogs}
+            disabled={isLoading}
+            className="px-2.5 py-1.5 rounded-lg bg-slate-900 border border-slate-800 hover:bg-slate-800 text-slate-300 text-xs font-medium flex items-center gap-1.5 transition-colors cursor-pointer"
+            title="Оновити потік подій з сервера"
+          >
+            <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin text-emerald-400' : ''}`} />
+            <span>Оновити</span>
+          </button>
         </div>
       </div>
 
-      {/* 📊 KPI Summary Grid */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5">
-        <div className="bg-slate-900/40 border border-slate-800/80 rounded-lg p-3 flex flex-col justify-between gap-1">
-          <span className="text-[10px] font-semibold text-slate-400 uppercase">Всього подій</span>
-          <span className="text-xl font-bold font-mono text-white">{totalLogsCount}</span>
+      {/* 📊 Minimalist Borderless KPI Strip */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2">
+        <div className="bg-slate-900/60 border border-slate-800/80 rounded-lg p-2.5 flex flex-col justify-between">
+          <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Всього подій</span>
+          <span className="text-lg font-bold font-mono text-white mt-1">{stats.total}</span>
         </div>
-        <div className="bg-slate-900/40 border border-slate-800/80 rounded-lg p-3 flex flex-col justify-between gap-1">
-          <span className="text-[10px] font-semibold text-slate-400 uppercase">Спроб коду</span>
-          <span className="text-xl font-bold font-mono text-emerald-400">{submissionsCount}</span>
+        <div className="bg-slate-900/60 border border-slate-800/80 rounded-lg p-2.5 flex flex-col justify-between">
+          <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Спроб коду</span>
+          <span className="text-lg font-bold font-mono text-emerald-400 mt-1">{stats.submissions}</span>
         </div>
-        <div className="bg-slate-900/40 border border-slate-800/80 rounded-lg p-3 flex flex-col justify-between gap-1">
-          <span className="text-[10px] font-semibold text-slate-400 uppercase">Анулювань</span>
-          <span className="text-xl font-bold font-mono text-rose-400">{annulledCount}</span>
+        <div className="bg-slate-900/60 border border-slate-800/80 rounded-lg p-2.5 flex flex-col justify-between">
+          <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Анулювань (Hard Neg)</span>
+          <span className="text-lg font-bold font-mono text-rose-400 mt-1">{stats.annulled}</span>
         </div>
-        <div className="bg-slate-900/40 border border-slate-800/80 rounded-lg p-3 flex flex-col justify-between gap-1">
-          <span className="text-[10px] font-semibold text-slate-400 uppercase">Підказок Сократа</span>
-          <span className="text-xl font-bold font-mono text-amber-400">{hintsCount}</span>
+        <div className="bg-slate-900/60 border border-slate-800/80 rounded-lg p-2.5 flex flex-col justify-between">
+          <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Підказок Сократа</span>
+          <span className="text-lg font-bold font-mono text-amber-400 mt-1">{stats.hints}</span>
         </div>
-        <div className="bg-slate-900/40 border border-slate-800/80 rounded-lg p-3 flex flex-col justify-between gap-1">
-          <span className="text-[10px] font-semibold text-slate-400 uppercase">Сесій теорії</span>
-          <span className="text-xl font-bold font-mono text-blue-400">{theoryDwellCount}</span>
+        <div className="bg-slate-900/60 border border-slate-800/80 rounded-lg p-2.5 flex flex-col justify-between">
+          <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Вивчення теорії</span>
+          <span className="text-lg font-bold font-mono text-blue-400 mt-1">{stats.theory}</span>
         </div>
-        <div className="bg-slate-900/40 border border-slate-800/80 rounded-lg p-3 flex flex-col justify-between gap-1">
-          <span className="text-[10px] font-semibold text-slate-400 uppercase">Скидань навичок</span>
-          <span className="text-xl font-bold font-mono text-purple-400">{resetsCount}</span>
+        <div className="bg-slate-900/60 border border-slate-800/80 rounded-lg p-2.5 flex flex-col justify-between">
+          <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Скидань навичок</span>
+          <span className="text-lg font-bold font-mono text-purple-400 mt-1">{stats.resets}</span>
         </div>
       </div>
 
-      {/* 🔍 Filters & Live Table Stream */}
-      <div className="flex flex-col gap-3">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2.5 pb-2 border-b border-slate-800/80">
-          <div className="flex items-center gap-1.5 overflow-x-auto text-xs select-none">
-            <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider flex items-center gap-1 mr-1">
-              <Filter className="w-3 h-3" />
-              <span>Фільтр:</span>
-            </span>
-            {[
-              { key: 'ALL', label: 'Всі події' },
-              { key: 'SUBMISSIONS', label: 'Спроби' },
-              { key: 'ANNULMENTS', label: 'Анулювання' },
-              { key: 'HINTS', label: 'Підказки' },
-              { key: 'THEORY', label: 'Теорія' },
-              { key: 'RESETS', label: 'Скидання' },
-            ].map((tab) => (
-              <button
-                key={tab.key}
-                type="button"
-                onClick={() => setActiveFilter(tab.key as any)}
-                className={`px-2.5 py-1 rounded-md font-medium transition-all cursor-pointer ${
-                  activeFilter === tab.key
-                    ? 'bg-emerald-600 text-white'
-                    : 'bg-slate-900/80 text-slate-400 hover:text-white border border-slate-800/80'
-                }`}
-              >
-                {tab.label}
-              </button>
-            ))}
-          </div>
+      {/* 🔍 Interactive Filter Toolbar & Search */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2.5 pt-1">
+        <div className="flex items-center gap-1.5 overflow-x-auto text-xs select-none">
+          <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider flex items-center gap-1 mr-1 shrink-0">
+            <Filter className="w-3 h-3" />
+            <span>Фільтр:</span>
+          </span>
+          {[
+            { key: 'ALL', label: 'Всі події' },
+            { key: 'SUBMISSIONS', label: 'Спроби' },
+            { key: 'ANNULMENTS', label: 'Анулювання' },
+            { key: 'HINTS', label: 'Підказки' },
+            { key: 'THEORY', label: 'Теорія' },
+            { key: 'RESETS', label: 'Скидання' },
+          ].map((tab) => (
+            <button
+              key={tab.key}
+              type="button"
+              onClick={() => handleFilterSelect(tab.key as any)}
+              className={`px-2.5 py-1 rounded-md text-xs font-medium transition-all cursor-pointer whitespace-nowrap ${
+                activeFilter === tab.key
+                  ? 'bg-emerald-600 text-white'
+                  : 'bg-slate-900/80 text-slate-400 hover:text-white border border-slate-800/80'
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
 
-          <div className="flex items-center gap-2 w-full sm:w-auto">
+        <div className="flex items-center gap-2 w-full sm:w-auto">
+          <div className="relative w-full sm:w-48">
+            <Search className="w-3.5 h-3.5 absolute left-2.5 top-2 text-slate-500" />
             <input
               type="text"
               placeholder="Фільтр за userId..."
               value={userFilter}
-              onChange={(e) => setUserFilter(e.target.value)}
-              className="px-2.5 py-1 bg-slate-950 border border-slate-800 rounded-lg text-xs text-slate-200 placeholder-slate-600 focus:outline-none focus:border-emerald-500 w-full sm:w-44"
+              onChange={(e) => handleUserFilterChange(e.target.value)}
+              className="w-full pl-8 pr-2.5 py-1 bg-slate-950 border border-slate-800 rounded-lg text-xs text-slate-200 placeholder-slate-600 focus:outline-none focus:border-emerald-500"
             />
-            <span className="text-[11px] font-mono text-slate-500 shrink-0">
-              Показано: {filteredLogs.length}
-            </span>
           </div>
+          <span className="text-[11px] font-mono text-slate-500 shrink-0">
+            Записів: {filteredLogs.length}
+          </span>
         </div>
+      </div>
 
-        {/* Table view */}
-        <div className="overflow-x-auto border border-slate-800/80 rounded-xl bg-slate-950/40">
+      {/* 📋 Minimalist Borderless Data Table */}
+      <div className="border border-slate-800/80 rounded-xl overflow-hidden bg-slate-950/60">
+        <div className="max-h-[calc(100vh-290px)] overflow-y-auto">
           <table className="w-full text-left border-collapse text-xs">
-            <thead>
-              <tr className="border-b border-slate-800/80 bg-slate-900/60 text-slate-400 font-semibold text-[11px] uppercase tracking-wider">
+            <thead className="sticky top-0 z-10 bg-slate-900/95 backdrop-blur-sm border-b border-slate-800/80 text-slate-400 font-semibold text-[10px] uppercase tracking-wider">
+              <tr>
                 <th className="py-2.5 px-3">Час</th>
                 <th className="py-2.5 px-3">Користувач / Роль</th>
                 <th className="py-2.5 px-3">Тип події</th>
-                <th className="py-2.5 px-3">Навичка / Завдання</th>
-                <th className="py-2.5 px-3">Когнітивний Пейлоад</th>
+                <th className="py-2.5 px-3">Навичка / Модуль</th>
+                <th className="py-2.5 px-3">Когнітивний контекст</th>
+                <th className="py-2.5 px-3 text-right">JSON</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-800/50 font-mono text-[11px]">
+            <tbody className="divide-y divide-slate-800/60 font-sans text-xs">
               {isLoading && logs.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="py-8 text-center text-slate-500 font-sans">
+                  <td colSpan={6} className="py-12 text-center text-slate-500 text-xs font-mono">
                     <RefreshCw className="w-4 h-4 animate-spin inline-block mr-2 text-emerald-400" />
-                    Завантаження подій аудиту...
+                    Завантаження подій незмінного аудит-логу...
                   </td>
                 </tr>
               ) : filteredLogs.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="py-8 text-center text-slate-500 font-sans">
-                    Жодних подій не знайдено за заданим фільтром.
+                  <td colSpan={6} className="py-12 text-center text-slate-400 text-xs">
+                    Жодних подій не знайдено за заданим критерієм фільтрації.
                   </td>
                 </tr>
               ) : (
                 filteredLogs.map((log) => {
                   const badge = getEventBadge(log.eventType);
                   const Icon = badge.icon;
-                  const payloadStr = JSON.stringify(log.payload || {});
 
                   return (
                     <tr key={log.id} className="hover:bg-slate-900/40 transition-colors">
-                      <td className="py-2.5 px-3 text-slate-400 whitespace-nowrap">
+                      {/* Timestamp */}
+                      <td className="py-2.5 px-3 text-slate-400 font-mono text-[11px] whitespace-nowrap">
                         {formatTimestamp(log.createdAt)}
                       </td>
+
+                      {/* User & Role */}
                       <td className="py-2.5 px-3 whitespace-nowrap">
-                        <span className="text-slate-200 font-medium">{log.userId}</span>
-                        {log.actorRole && (
-                          <span className="ml-1.5 px-1.5 py-0.5 rounded text-[9px] font-bold bg-slate-800 text-slate-400">
-                            {log.actorRole}
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-slate-200 font-medium text-xs" title={log.userId}>
+                            {formatUserName(log.userId)}
                           </span>
-                        )}
+                          {log.actorRole && (
+                            <span className="px-1.5 py-0.2 rounded text-[9px] font-mono font-bold bg-slate-800 text-slate-400 border border-slate-700/60">
+                              {log.actorRole}
+                            </span>
+                          )}
+                        </div>
                       </td>
+
+                      {/* Event Type Badge */}
                       <td className="py-2.5 px-3 whitespace-nowrap">
                         <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold border ${badge.color}`}>
                           <Icon className="w-3 h-3" />
                           <span>{badge.label}</span>
                         </span>
                       </td>
-                      <td className="py-2.5 px-3 text-slate-400 whitespace-nowrap">
+
+                      {/* Skill / Task */}
+                      <td className="py-2.5 px-3 whitespace-nowrap">
                         {log.skillId ? (
-                          <span className="text-purple-300">/{log.skillId}</span>
+                          <span className="text-purple-300 font-mono text-[11px]">
+                            {log.skillId.length > 20 ? `/${log.skillId.slice(0, 8)}...` : `/${log.skillId}`}
+                          </span>
                         ) : (
                           <span className="text-slate-600">—</span>
                         )}
                       </td>
-                      <td className="py-2.5 px-3 max-w-xs truncate text-slate-400 font-mono text-[10px]" title={payloadStr}>
-                        {payloadStr}
+
+                      {/* Cognitive Context */}
+                      <td className="py-2.5 px-3 text-xs leading-relaxed max-w-sm truncate">
+                        {formatCognitiveContext(log)}
+                      </td>
+
+                      {/* Inspect JSON Button */}
+                      <td className="py-2.5 px-3 text-right whitespace-nowrap">
+                        <button
+                          type="button"
+                          onClick={() => setInspectingLog(log)}
+                          className="px-2 py-1 rounded bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white text-[11px] font-mono transition-colors cursor-pointer"
+                          title="Переглянути повний незмінний JSON-пейлоад події"
+                        >
+                          {'{ }'}
+                        </button>
                       </td>
                     </tr>
                   );
@@ -362,6 +476,60 @@ export const DatasetExportCenter: React.FC<DatasetExportCenterProps> = ({
           </table>
         </div>
       </div>
+
+      {/* 🔍 Raw Payload Modal Inspector */}
+      {inspectingLog && (
+        <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 animate-fadeIn">
+          <div className="bg-slate-900 border border-slate-800 rounded-xl max-w-2xl w-full p-5 shadow-2xl flex flex-col gap-4 relative">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-800/80">
+              <div className="flex items-center gap-2">
+                <Database className="w-4 h-4 text-emerald-400" />
+                <h3 className="text-sm font-bold text-white">
+                  JSON Пейлоад Події: <code className="text-emerald-400 text-xs font-mono">{inspectingLog.eventType}</code>
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setInspectingLog(null)}
+                className="p-1 text-slate-400 hover:text-white rounded-lg transition-colors cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="grid grid-cols-2 gap-2 text-[11px] font-mono text-slate-400 bg-slate-950/60 p-3 rounded-lg border border-slate-800/80">
+              <div>ID: <span className="text-slate-200">{inspectingLog.id}</span></div>
+              <div>Час: <span className="text-slate-200">{inspectingLog.createdAt}</span></div>
+              <div>User: <span className="text-slate-200">{inspectingLog.userId}</span></div>
+              <div>Роль: <span className="text-slate-200">{inspectingLog.actorRole || 'STUDENT'}</span></div>
+            </div>
+
+            <div className="relative">
+              <pre className="p-3 bg-slate-950 rounded-lg border border-slate-800/80 text-emerald-300 font-mono text-xs overflow-x-auto max-h-72 leading-relaxed">
+                {JSON.stringify(inspectingLog.payload || {}, null, 2)}
+              </pre>
+              <button
+                type="button"
+                onClick={handleCopyPayload}
+                className="absolute top-2.5 right-2.5 px-2.5 py-1 rounded bg-slate-800/80 hover:bg-slate-700 text-slate-200 text-[11px] flex items-center gap-1 transition-colors cursor-pointer"
+              >
+                {isCopied ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
+                <span>{isCopied ? 'Скопійовано' : 'Копіювати'}</span>
+              </button>
+            </div>
+
+            <div className="flex items-center justify-end pt-2 border-t border-slate-800/80">
+              <button
+                type="button"
+                onClick={() => setInspectingLog(null)}
+                className="px-4 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-medium transition-colors cursor-pointer"
+              >
+                Закрити
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
