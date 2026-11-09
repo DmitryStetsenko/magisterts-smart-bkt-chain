@@ -316,7 +316,7 @@
 | **SBC-351** | `Fix` | `ST` | perform full skill BKT state and attempts reset when abandoning task to study theory | 2026-11-09 | `12e9626` |
 | **SBC-358** | `Story` | `ST` | enforce strict socratic hint level 2 prerequisite for express theory unlocking and auto-unfold hints accordion | 2026-11-09 | `2c1d8ce` |
 | **SBC-359** | `Fix` | `ST` | resolve nested button hydration error in DrawerSection by decoupling action slot from toggle header | 2026-11-09 | `b8dd325` |
-| **SBC-360** | `Fix` | `ST` | render task condition and question prompt centrally in main workspace across quiz, essay and code editors | 2026-11-09 | `pending` |
+| **SBC-360** | `Fix` | `ST` | render task condition and question prompt centrally in main workspace across quiz, essay and code editors | 2026-11-09 | `63e00ff` |
 
 ---
 
