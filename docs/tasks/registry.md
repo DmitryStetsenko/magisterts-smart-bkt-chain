@@ -319,7 +319,7 @@
 | **SBC-360** | `Fix` | `ST` | render task condition and question prompt centrally in main workspace across quiz, essay and code editors | 2026-11-09 | `63e00ff` |
 | **SBC-361** | `Refactor` | `ST` | replace redundant task description drawer section with test metadata and render styled condition callout under theory | 2026-11-09 | `aaaad9a` |
 | **SBC-362** | `Style` | `ST` | constrain task condition, options and content column to optimal typographic line length | 2026-11-09 | `d6de49c` |
-| **SBC-363** | `Refactor` | `ST` | remove asymmetric layout capping and implement 2x2 responsive quiz options grid with full-width condition banner | 2026-11-09 | `pending` |
+| **SBC-363** | `Refactor` | `ST` | remove asymmetric layout capping and implement 2x2 responsive quiz options grid with full-width condition banner | 2026-11-09 | `3d79a82` |
 
 ---
 
