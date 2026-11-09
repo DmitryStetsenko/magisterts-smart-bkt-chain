@@ -120,6 +120,74 @@
           ]
         },
         {
+          "title": "0.1.7.61 Відновлення Строгого Дидактичного Порогу Розблокування Експрес-Теорії за Підказками Сократа (`SBC-358`, `EP-ST`)",
+          "level": 3,
+          "paragraphs": [],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "**Інженерна та педагогічна постановка:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "*Усунення передчасного відкриття теорії:* У `apps/student` кнопка «Експрес-теорія» помилково розблоковувалася відразу після першої невдалої спроби (`hasFailedAttemptOnCurrentTask`), оминаючи Сократівські підказки. Відновлено строге правило прогресивного скаффолдингу: теорія спочатку заблокована (`🔒`) і відкривається виключно після відкриття щонайменше 2 рівнів підказок Сократа (`revealedHintLevel >= 2`).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "*Керований стан та авто-розгортання акордеона підказок:* Введено стан `isSocraticHintsOpen` у `StudentPortalApp.tsx` для Секції 5 сайдбара (`DrawerSection title=\"Сократівські підказки\"`), який автоматично розгортає акордеон при кліку на новий банер `jit-hint-guide` або після невдалої спроби.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "*Очищення кешу та актуалізація конфігурації `apps/admin`:* Виправлено конфігурацію TypeScript у `apps/admin/tsconfig.json` (виключено деструктивний автогенератор Next dev валідатора) та підтверджено бездоганну спільну збірку `npm run build:admin`.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Файли змін:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "[`apps/student/src/components/StudentPortalApp.tsx`](file:///apps/student/src/components/StudentPortalApp.tsx): строгий поріг `isTheoryUnlocked = revealedHintLevel >= 2;`, керований `isOpen={isSocraticHintsOpen || ...}`, банер скеровування на підказки Сократа.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "[`apps/admin/tsconfig.json`](file:///apps/admin/tsconfig.json): очищення include шляхів від dev валідатора.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "[`e2e/full-flow.spec.ts`](file:///e2e/full-flow.spec.ts): повна актуалізація кроків тестування відмови від завдання та покрокового відкриття підказок Сократа.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Верифікація:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "100% успішне проходження повного E2E-сьюту Playwright (`npm run test:e2e`, 3/3 тестів: API REST, мультипортальний UI-флоу та розширений JIT Theory / Misconception Engine flow).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "100% проходження unit-тестів API (`npm run test:api`, 55/55 тестів у 9 сьютах).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Успішна виробнича збірка `npm run build:student` та `npm run build:admin`.",
+              "subitems": []
+            }
+          ]
+        },
+        {
           "title": "0.1.7.60 Реалізація Безпечного Очищення Бази Аудит-Логу та Остаточна Фіксація Стилів Адмін-Панелі (`SBC-357`, `EP-AD`)",
           "level": 3,
           "paragraphs": [],

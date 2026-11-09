@@ -147,6 +147,7 @@ export function StudentPortalContent({
   const [consecutiveFailures, setConsecutiveFailures] = useState<number>(0);
   const [isDegradationTooltipOpen, setIsDegradationTooltipOpen] = useState<boolean>(false);
   const [revealedHintLevel, setRevealedHintLevel] = useState<number>(0);
+  const [isSocraticHintsOpen, setIsSocraticHintsOpen] = useState<boolean>(false);
   const [annulmentAlert, setAnnulmentAlert] = useState<{
     reason: string;
     comment?: string;
@@ -534,10 +535,8 @@ export function StudentPortalContent({
 
   // 📘 Progressive Scaffolding Escalation for Just-in-Time Theory:
   // Theory capsule is locked initially to encourage independent problem solving.
-  // It unlocks ONLY if:
-  // 1. Student revealed Socratic hints to Level 2 or higher (revealedHintLevel >= 2)
-  // 2. OR student experienced at least one failed attempt on current task (hasFailedAttemptOnCurrentTask)
-  const isTheoryUnlocked = revealedHintLevel >= 2 || hasFailedAttemptOnCurrentTask;
+  // It unlocks ONLY when student revealed Socratic hints to Level 2 or higher (revealedHintLevel >= 2).
+  const isTheoryUnlocked = revealedHintLevel >= 2;
 
   const getDrawerConfig = () => {
     let title: React.ReactNode = 'Панель';
@@ -761,7 +760,8 @@ export function StudentPortalContent({
                         iconColor={task.socraticHints && task.socraticHints.length > 0 ? "text-amber-400" : "text-slate-500"}
                         titleColor={task.socraticHints && task.socraticHints.length > 0 ? "text-amber-400 group-hover:text-amber-300" : "text-slate-500"}
                         badge={task.socraticHints && task.socraticHints.length > 0 ? (revealedHintLevel > 0 ? `-${task.socraticHints[revealedHintLevel - 1]?.penaltyPct ?? 0}%` : `${task.socraticHints.length}`) : "0"}
-                        defaultOpen={Boolean(hasFailedAttemptOnCurrentTask && task.socraticHints && task.socraticHints.length > 0)}
+                        isOpen={isSocraticHintsOpen || Boolean(task.socraticHints && task.socraticHints.length > 0 && (hasFailedAttemptOnCurrentTask || revealedHintLevel > 0))}
+                        onToggle={(openState) => setIsSocraticHintsOpen(openState)}
                         className="border-t border-slate-800/80 pt-2.5"
                       >
                         {task.socraticHints && task.socraticHints.length > 0 ? (
@@ -846,7 +846,7 @@ export function StudentPortalContent({
                               <span className="text-[10px] text-slate-500">
                                 {isTheoryUnlocked
                                   ? 'Стисла довідка прямо в тренажері'
-                                  : 'Потрібна підказка Сократа 2+ або помилка'}
+                                  : 'Потрібна підказка Сократа 2+'}
                               </span>
                             </div>
                             <button
@@ -1530,7 +1530,7 @@ export function StudentPortalContent({
                       title={
                         isTheoryUnlocked
                           ? 'Відкрити вбудовану теоретичну капсулу без переходу на іншу вкладку'
-                          : '🔒 Експрес-теорія заблокована. Спочатку скористайтеся підказками Сократа (рівень 2+) або спробуйте розв\'язати самостійно.'
+                          : '🔒 Експрес-теорія заблокована. Спочатку відкрийте підказки Сократа (рівень 2+) у бічній панелі.'
                       }
                     >
                       {isTheoryUnlocked ? (
@@ -1557,7 +1557,7 @@ export function StudentPortalContent({
                           <span>Експрес-теорія обмежена</span>
                         </div>
                         <p className="text-slate-400 text-[10px]">
-                          Спробуйте розв'язати самостійно. Теорія розблокується після 2-ї підказки Сократа або при першій невдалій спробі.
+                          Спробуйте розв'язати самостійно або скористайтеся підказками Сократа. Теорія розблокується після розкриття 2-ї підказки.
                         </p>
                       </div>
                     )}
@@ -1809,44 +1809,78 @@ export function StudentPortalContent({
                     </div>
                   )}
 
-                  {/* 📘 Automatic Just-in-Time Theory Micro-Module Offer */}
+                  {/* 📘 Automatic Just-in-Time Theory or Socratic Hint Scaffolding Offer */}
                   {!evalResult.isPassed &&
                     (evalResult.offerJustInTimeTheory ||
                       (evalResult.bktUpdate?.pMasteryAfter ?? 1) < 0.35 ||
                       Boolean(evalResult.detectedMisconception)) && (
-                      <div
-                        data-testid="jit-theory-offer"
-                        className="pt-2.5 border-t border-slate-800/80 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3"
-                      >
-                        <div className="flex items-center gap-2">
-                          <BookOpen className="w-4 h-4 text-blue-400 shrink-0" />
-                          <div className="flex flex-col">
-                            <span className="text-xs font-medium text-slate-200">
-                              {(evalResult.bktUpdate?.pMasteryAfter ?? 1) < 0.35
-                                ? 'Рівень опанування P(L) нижче 35% — рекомендуємо експрес-теорію'
-                                : 'Швидке теоретичне пояснення за темою'}
-                            </span>
-                            <span className="text-[11px] text-slate-400">
-                              Перегляньте стислу теоретичну капсулу та зразок коду прямо в тренажері без втрати відповіді.
-                            </span>
-                          </div>
-                        </div>
-
-                        <button
-                          type="button"
-                          data-testid="jit-theory-offer-btn"
-                          onClick={() => {
-                            setTheoryOpenStartTime(Date.now());
-                            setIsTheoryDrawerOpen(true);
-                            logActivity('THEORY_DRAWER_OPENED', { trigger: 'evaluation_offer' });
-                          }}
-                          className="px-3 py-1.5 rounded-lg bg-blue-500/20 hover:bg-blue-500/30 text-blue-300 font-medium text-xs flex items-center justify-center gap-1.5 transition-colors shrink-0 cursor-pointer"
+                      isTheoryUnlocked ? (
+                        <div
+                          data-testid="jit-theory-offer"
+                          className="pt-2.5 border-t border-slate-800/80 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3"
                         >
-                          <BookOpen className="w-3.5 h-3.5" />
-                          <span>Відкрити експрес-теорію</span>
-                          <ArrowRight className="w-3.5 h-3.5" />
-                        </button>
-                      </div>
+                          <div className="flex items-center gap-2">
+                            <BookOpen className="w-4 h-4 text-blue-400 shrink-0" />
+                            <div className="flex flex-col">
+                              <span className="text-xs font-medium text-slate-200">
+                                {(evalResult.bktUpdate?.pMasteryAfter ?? 1) < 0.35
+                                  ? 'Рівень опанування P(L) нижче 35% — рекомендуємо експрес-теорію'
+                                  : 'Швидке теоретичне пояснення за темою'}
+                              </span>
+                              <span className="text-[11px] text-slate-400">
+                                Перегляньте стислу теоретичну капсулу та зразок коду прямо в тренажері без втрати відповіді.
+                              </span>
+                            </div>
+                          </div>
+
+                          <button
+                            type="button"
+                            data-testid="jit-theory-offer-btn"
+                            onClick={() => {
+                              setTheoryOpenStartTime(Date.now());
+                              setIsTheoryDrawerOpen(true);
+                              logActivity('THEORY_DRAWER_OPENED', { trigger: 'evaluation_offer' });
+                            }}
+                            className="px-3 py-1.5 rounded-lg bg-blue-500/20 hover:bg-blue-500/30 text-blue-300 font-medium text-xs flex items-center justify-center gap-1.5 transition-colors shrink-0 cursor-pointer"
+                          >
+                            <BookOpen className="w-3.5 h-3.5" />
+                            <span>Відкрити експрес-теорію</span>
+                            <ArrowRight className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      ) : (
+                        <div
+                          data-testid="jit-hint-guide"
+                          className="pt-2.5 border-t border-slate-800/80 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3"
+                        >
+                          <div className="flex items-center gap-2">
+                            <Sparkles className="w-4 h-4 text-amber-400 shrink-0" />
+                            <div className="flex flex-col">
+                              <span className="text-xs font-medium text-slate-200">
+                                Потрібна допомога? Скористайтеся підказками Сократа
+                              </span>
+                              <span className="text-[11px] text-slate-400">
+                                Навідні запитання у бічній панелі допоможуть знайти розв&apos;язок самостійно без втрати завдання.
+                              </span>
+                            </div>
+                          </div>
+
+                          <button
+                            type="button"
+                            data-testid="jit-hint-guide-btn"
+                            onClick={() => {
+                              setIsDrawerOpen(true);
+                              setTaskDrawerSubTab('condition');
+                              setIsSocraticHintsOpen(true);
+                            }}
+                            className="px-3 py-1.5 rounded-lg bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/30 text-amber-300 font-medium text-xs flex items-center justify-center gap-1.5 transition-colors shrink-0 cursor-pointer"
+                          >
+                            <Sparkles className="w-3.5 h-3.5" />
+                            <span>Переглянути підказку Сократа</span>
+                            <ArrowRight className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      )
                     )}
 
                   {/* ⚡ Adaptive Graceful Degradation Action Prompt */}

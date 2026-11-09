@@ -12,12 +12,12 @@
 | **`SBC-EP-BKT`** | Bayesian Knowledge Tracing & Behavioral Telemetry | 29 |
 | **`SBC-EP-LLM`** | Automated Code Assessment & Open-Text Evaluation | 10 |
 | **`SBC-EP-W3`** | Web3 Infrastructure & Smart Contracts | 0 |
-| **`SBC-EP-ST`** | Student Portal & Skill Tree Map | 31 |
+| **`SBC-EP-ST`** | Student Portal & Skill Tree Map | 32 |
 | **`SBC-EP-TC`** | Teacher Portal & Analytics CRM | 27 |
 | **`SBC-EP-AD`** | Admin Portal & Knowledge DAG Builder | 10 |
 | **`SBC-EP-LD`** | Landing Web Page | 9 |
 | **`SBC-EP-MS`** | Master's Thesis Engineering & Academic Text Generation | 9 |
-| **ВСЬОГО** | - | **260** |
+| **ВСЬОГО** | - | **261** |
 
 ---
 
@@ -314,6 +314,7 @@
 | **SBC-349** | `Docs` | `ST` | document pedagogical model of quick theory and progressive scaffolding escalation protocol in brainstorm hub | 2026-11-07 | `9f12c93` |
 | **SBC-350** | `Story` | `ST` | implement strict task abandonment modal with BKT failure penalty when exiting to full textbook | 2026-11-09 | `e6546e0` |
 | **SBC-351** | `Fix` | `ST` | perform full skill BKT state and attempts reset when abandoning task to study theory | 2026-11-09 | `12e9626` |
+| **SBC-358** | `Story` | `ST` | enforce strict socratic hint level 2 prerequisite for express theory unlocking and auto-unfold hints accordion | 2026-11-09 | pending |
 
 ---
 

@@ -30,6 +30,20 @@
   5. *Build Next.js Documentation Site* (`npm run build:docs`) — збірка статичного експорту (`output: "export"`, `trailingSlash: true`, `basePath: "/magisterts-smart-bkt-chain"`).
   6. *Upload Artifact & Deploy Pages* (`actions/upload-pages-artifact@v3` + `actions/deploy-pages@v4`).
 
+### 0.1.7.61 Відновлення Строгого Дидактичного Порогу Розблокування Експрес-Теорії за Підказками Сократа (`SBC-358`, `EP-ST`)
+- **Інженерна та педагогічна постановка:**
+  - 1. *Усунення передчасного відкриття теорії:* У `apps/student` кнопка «Експрес-теорія» помилково розблоковувалася відразу після першої невдалої спроби (`hasFailedAttemptOnCurrentTask`), оминаючи Сократівські підказки. Відновлено строге правило прогресивного скаффолдингу: теорія спочатку заблокована (`🔒`) і відкривається виключно після відкриття щонайменше 2 рівнів підказок Сократа (`revealedHintLevel >= 2`).
+  - 2. *Керований стан та авто-розгортання акордеона підказок:* Введено стан `isSocraticHintsOpen` у `StudentPortalApp.tsx` для Секції 5 сайдбара (`DrawerSection title="Сократівські підказки"`), який автоматично розгортає акордеон при кліку на новий банер `jit-hint-guide` або після невдалої спроби.
+  - 3. *Очищення кешу та актуалізація конфігурації `apps/admin`:* Виправлено конфігурацію TypeScript у `apps/admin/tsconfig.json` (виключено деструктивний автогенератор Next dev валідатора) та підтверджено бездоганну спільну збірку `npm run build:admin`.
+- **Файли змін:**
+  - [`apps/student/src/components/StudentPortalApp.tsx`](file:///apps/student/src/components/StudentPortalApp.tsx): строгий поріг `isTheoryUnlocked = revealedHintLevel >= 2;`, керований `isOpen={isSocraticHintsOpen || ...}`, банер скеровування на підказки Сократа.
+  - [`apps/admin/tsconfig.json`](file:///apps/admin/tsconfig.json): очищення include шляхів від dev валідатора.
+  - [`e2e/full-flow.spec.ts`](file:///e2e/full-flow.spec.ts): повна актуалізація кроків тестування відмови від завдання та покрокового відкриття підказок Сократа.
+- **Верифікація:**
+  - 100% успішне проходження повного E2E-сьюту Playwright (`npm run test:e2e`, 3/3 тестів: API REST, мультипортальний UI-флоу та розширений JIT Theory / Misconception Engine flow).
+  - 100% проходження unit-тестів API (`npm run test:api`, 55/55 тестів у 9 сьютах).
+  - Успішна виробнича збірка `npm run build:student` та `npm run build:admin`.
+
 ### 0.1.7.60 Реалізація Безпечного Очищення Бази Аудит-Логу та Остаточна Фіксація Стилів Адмін-Панелі (`SBC-357`, `EP-AD`)
 - **Інженерна постановка:**
   - 1. *Усунення першопричини стильової деформації адмінки:* З'ясовано, що у Tailwind CSS v4 файлі `apps/admin/src/app/globals.css` була відсутня директива `@source "../../../../packages/ui/src"`, через що рушій Next.js Turbopack не генерував класи ширини та акордеонів пакета `@sbc/ui` (`sm:w-80`, `DrawerSection` стилі). У поєднанні з мобільним фолбеком `w-full` у `packages/ui/src/shell/AppShellLayout.tsx` це призводило до розтягування бічної панелі на 100% ширини в'юпорту та витіснення контенту.

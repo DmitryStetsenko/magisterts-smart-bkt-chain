@@ -48,10 +48,14 @@ test.describe('Smart-BKT-Chain Multi-Discipline E2E Suite', () => {
     await expect(teacherPage.locator('h1')).toContainText('Smart-BKT-Chain');
     await expect(teacherPage.locator('h1')).toContainText('Teacher');
 
+    // Wait for hydration before clicking
+    await expect(teacherPage.locator('header button[title*="профіл"]')).toBeVisible({ timeout: 15000 });
+    await teacherPage.waitForTimeout(1000);
+
     const reviewTabBtn = teacherPage.locator('nav button[title*="Черга Перевірки"]');
     await expect(reviewTabBtn).toBeVisible();
     await reviewTabBtn.click();
-    await expect(teacherPage.locator('aside h2')).toContainText('Черга Перевірки', { timeout: 10000 });
+    await expect(teacherPage.locator('aside h2')).toContainText('Черга Перевірки', { timeout: 15000 });
 
     // 4. Open Admin Portal (3004) and verify Skill DAG & Course CMS tabs
     const adminPage = await context.newPage();
@@ -86,6 +90,8 @@ test.describe('Smart-BKT-Chain Multi-Discipline E2E Suite', () => {
       waitUntil: 'domcontentloaded',
       timeout: 30000,
     });
+    // Wait for task to finish loading from BKT API
+    await expect(page.getByText('Завантаження адаптивного завдання')).toBeHidden({ timeout: 30000 });
 
     // 3. Verify that Just-in-Time Theory button is initially locked with progressive escalation tooltip
     const openTheoryBtn = page.getByTestId('open-jit-theory-btn');
@@ -102,12 +108,29 @@ test.describe('Smart-BKT-Chain Multi-Discipline E2E Suite', () => {
     await expect(submitQuizBtn).toBeEnabled();
     await submitQuizBtn.click();
 
-    // 5. Verify personalized cognitive misconception alert & Just-in-Time Theory offer
+    // 5. Verify personalized cognitive misconception alert & Socratic Hint Scaffolding offer
     const misconceptionAlert = page.getByTestId('misconception-alert');
     await expect(misconceptionAlert).toBeVisible({ timeout: 10000 });
     await expect(misconceptionAlert).toContainText('Ототожнення const із змінною let');
 
-    // 6. After failed attempt, verify that Theory button is now unlocked and functional
+    // 6. After failed attempt without hints, verify that Theory button remains strictly locked
+    await expect(openTheoryBtn).toBeDisabled();
+
+    // Verify that post-eval guide banner directs student to Socratic hints first
+    const jitHintGuideBtn = page.getByTestId('jit-hint-guide-btn');
+    await expect(jitHintGuideBtn).toBeVisible();
+    await jitHintGuideBtn.click();
+
+    // 7. Reveal Socratic Hints up to Level 2 to legitimately unlock Express Theory
+    const hint1Btn = page.getByRole('button', { name: /Розкрити підказку 1/i });
+    await expect(hint1Btn).toBeVisible({ timeout: 10000 });
+    await hint1Btn.click();
+
+    const hint2Btn = page.getByRole('button', { name: /Розкрити підказку 2/i });
+    await expect(hint2Btn).toBeVisible({ timeout: 10000 });
+    await hint2Btn.click();
+
+    // 8. Now verify that Theory button is unlocked and functional
     await expect(openTheoryBtn).toBeEnabled();
     await openTheoryBtn.click();
 
@@ -118,7 +141,7 @@ test.describe('Smart-BKT-Chain Multi-Discipline E2E Suite', () => {
     await page.getByTestId('close-jit-theory-btn').click();
     await expect(theoryDrawer).toBeHidden();
 
-    // 7. Verify opening theory via reactive Just-in-Time offer banner
+    // 9. Verify opening theory via reactive Just-in-Time offer banner (now unlocked)
     const jitOfferBtn = page.getByTestId('jit-theory-offer-btn');
     await expect(jitOfferBtn).toBeVisible();
     await jitOfferBtn.click();
@@ -126,14 +149,14 @@ test.describe('Smart-BKT-Chain Multi-Discipline E2E Suite', () => {
     await expect(theoryDrawer).toBeVisible();
     await expect(theoryDrawer).toContainText('Розбір вашої помилки');
 
-    // 8. Verify strict abandonment confirmation modal before opening full lesson
+    // 10. Verify strict abandonment confirmation modal before opening full lesson
     const openFullLessonBtn = page.getByTestId('jit-theory-open-full-lesson-btn');
     if (await openFullLessonBtn.isVisible()) {
       await openFullLessonBtn.click();
       const abandonModal = page.getByTestId('abandon-task-modal');
       await expect(abandonModal).toBeVisible();
       await expect(abandonModal).toContainText('Перехід до повного підручника');
-      await expect(abandonModal).toContainText('Фіксація в BKT');
+      await expect(abandonModal).toContainText('Скидання прогресу модуля');
       await page.getByTestId('cancel-abandon-btn').click();
       await expect(abandonModal).toBeHidden();
     }
