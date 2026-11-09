@@ -30,6 +30,25 @@
   5. *Build Next.js Documentation Site* (`npm run build:docs`) — збірка статичного експорту (`output: "export"`, `trailingSlash: true`, `basePath: "/magisterts-smart-bkt-chain"`).
   6. *Upload Artifact & Deploy Pages* (`actions/upload-pages-artifact@v3` + `actions/deploy-pages@v4`).
 
+### 0.1.7.65 Оптимізація Ергономічної Довжини Рядків Тексту та Робочої Колонки (`SBC-362`, `EP-ST`)
+- **Інженерна та ергономічна постановка:**
+  - На широких екранах текстові рядки умов, запитань та варіантів відповідей розтягувалися на всю ширину робочої області (до 1550px), створюючи надмірно довгі рядки (понад 180 символів), що суперечить правилам веб-типографіки (Bringhurst, WCAG) та викликає втому зорового апарату учня.
+  - Потрібно було ввести пропорційне обмеження ширини блоків читання (`max-w-3xl` для контейнерів та `max-w-2xl` для текстових абзаців) для досягнення золотого стандарту 65–80 символів на рядок.
+- **Виконані інженерні зміни:**
+  - **Контейнер робочого простору ([`apps/student/src/components/StudentPortalApp.tsx`](file:///apps/student/src/components/StudentPortalApp.tsx)):**
+    - Основний блок завдань огорнуто в контейнер `max-w-3xl` (для тестів та есе) та `max-w-5xl` (для кодингу з Monaco Editor).
+    - Тулбар теми, плашку повернення з підручника та адаптивний банер обмежено `max-w-3xl`, а текст опису деградації — `max-w-2xl`.
+  - **Картка умови завдання ([`apps/student/src/components/StudentPortalApp.tsx`](file:///apps/student/src/components/StudentPortalApp.tsx)):**
+    - Саму картку `task-condition-card` обмежено шириною `max-w-3xl`, а внутрішній текстовий блок умови — `max-w-2xl` (~672px, 70–75 символів на рядок).
+  - **Редактори тестів та есе ([`apps/student/src/features/quiz-editor/ui/QuizTaskEditor.tsx`](file:///apps/student/src/features/quiz-editor/ui/QuizTaskEditor.tsx), [`apps/student/src/features/essay-editor/ui/EssayTaskEditor.tsx`](file:///apps/student/src/features/essay-editor/ui/EssayTaskEditor.tsx)):**
+    - У `QuizTaskEditor`: список варіантів обмежено `max-w-3xl`, а текст кожного варіанта `opt.text` — `max-w-2xl` із класом `min-w-0` для коректного перенесення рядків.
+    - У `EssayTaskEditor`: поле введення `textarea` та супутній блок обмежено `max-w-3xl`.
+- **Верифікація:**
+  - 100% успішне проходження E2E-тестів Playwright (`npm run test:e2e`, 3/3 тестів, 23.5s).
+  - 100% проходження unit-тестів API (`npm run test:api`, 55/55 тестів у 9 сьютах).
+  - Успішна виробнича збірка `npm run build:student` (Next.js 16.2.9 Turbopack).
+  - Візуальна фіксація через Playwright MCP: текст умови та варіантів не розтягується по всій ширині, довжина рядка становить оптимальні 70–75 символів.
+
 ### 0.1.7.64 Винесення Параметрів Тестування в Сайдбар та Стилізована Картка Умови під Теорією (`SBC-361`, `EP-ST`)
 - **Інженерна та педагогічна постановка:**
   - 1. *Усунення дублювання в бічній панелі:* Виведення тексту умови в лівому сайдбарі було надлишковим та засмічувало простір. Сайдбар має слугувати діагностично-інформаційною панеллю, де учень бачить параметри тестування, калібрування BKT та доступні підказки.

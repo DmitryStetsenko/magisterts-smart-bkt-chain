@@ -1485,11 +1485,12 @@ export function StudentPortalContent({
             </div>
           ) : task ? (
             <div className="flex-1 p-4 lg:p-6 overflow-y-auto flex flex-col gap-4">
+              <div className={`w-full flex flex-col gap-4 ${task.taskType === 'CODE' ? 'max-w-5xl' : 'max-w-3xl'}`}>
               {/* Хлібні крихти перенесені в головний AppShellLayout хедер для уникнення дублювання */}
 
               {/* 🎓 Міжпортальна плашка повернення до Підручника Теорії (Cross-App Protocol) */}
               {source === 'study' && (
-                <div className="w-full bg-gradient-to-r from-blue-950/80 via-indigo-950/60 to-slate-900 border border-blue-500/40 rounded-2xl p-4 shadow-xl flex items-center justify-between gap-4 animate-fadeIn">
+                <div className="w-full max-w-3xl bg-gradient-to-r from-blue-950/80 via-indigo-950/60 to-slate-900 border border-blue-500/40 rounded-2xl p-4 shadow-xl flex items-center justify-between gap-4 animate-fadeIn">
                   <div className="flex items-center gap-3">
                     <div className="p-2 rounded-xl bg-blue-500/20 border border-blue-500/30 text-blue-400 shrink-0">
                       <GraduationCap className="w-5 h-5 animate-pulse" />
@@ -1519,7 +1520,7 @@ export function StudentPortalContent({
 
               {/* ⚠️ Top Adaptive Degradation Notice Banner */}
               {recommendation?.isDifficultyDegraded && (
-                <div className="w-full bg-gradient-to-r from-amber-950/70 via-amber-900/40 to-slate-900 border border-amber-500/40 rounded-2xl p-4 shadow-xl flex items-start sm:items-center justify-between gap-4 animate-fadeIn">
+                <div className="w-full max-w-3xl bg-gradient-to-r from-amber-950/70 via-amber-900/40 to-slate-900 border border-amber-500/40 rounded-2xl p-4 shadow-xl flex items-start sm:items-center justify-between gap-4 animate-fadeIn">
                   <div className="flex items-start sm:items-center gap-3">
                     <div className="p-2 rounded-xl bg-amber-500/20 border border-amber-500/30 text-amber-400 shrink-0 mt-0.5 sm:mt-0">
                       <AlertTriangle className="w-5 h-5 animate-pulse" />
@@ -1531,7 +1532,7 @@ export function StudentPortalContent({
                           Максимальний бал: {recommendation?.maxScoreCap ?? 70}%
                         </span>
                       </div>
-                      <p className="text-xs text-amber-200/90 mt-0.5 leading-relaxed">
+                      <p className="text-xs text-amber-200/90 mt-0.5 leading-relaxed max-w-2xl">
                         Система помітила труднощі в попередніх завданнях і тимчасово надала допоміжні питання для закріплення базових концепцій. Ви зможете повернутися до 100% балу після успішного освоєння теми.
                       </p>
                     </div>
@@ -1545,7 +1546,7 @@ export function StudentPortalContent({
               )}
 
               {/* 📊 Active Task Compact Toolbar */}
-              <div className="w-full pb-3 border-b border-slate-800/80 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div className="w-full max-w-3xl pb-3 border-b border-slate-800/80 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div className="flex flex-col gap-0.5">
                   <div className="flex items-center gap-2 flex-wrap text-xs">
                     <span className="font-mono font-semibold text-indigo-400">
@@ -1674,7 +1675,7 @@ export function StudentPortalContent({
               {task.description && (
                 <div
                   data-testid="task-condition-card"
-                  className="rounded-xl bg-slate-900/60 border border-slate-800/90 p-4 sm:p-5 relative overflow-hidden group hover:border-slate-700/80 transition-all shadow-sm"
+                  className="rounded-xl bg-slate-900/60 border border-slate-800/90 p-4 sm:p-5 relative overflow-hidden group hover:border-slate-700/80 transition-all shadow-sm max-w-3xl"
                 >
                   <div className="absolute top-0 left-0 bottom-0 w-1 bg-gradient-to-b from-indigo-500 via-indigo-400 to-purple-500 rounded-l" />
                   <div className="flex items-center justify-between gap-3 mb-2.5">
@@ -1690,7 +1691,7 @@ export function StudentPortalContent({
                         : 'Тестове опитування'}
                     </span>
                   </div>
-                  <div className="text-sm sm:text-[15px] font-medium text-slate-100 leading-relaxed pl-0.5 font-sans">
+                  <div className="text-sm sm:text-[15px] font-medium text-slate-100 leading-relaxed pl-0.5 font-sans max-w-2xl">
                     {task.description.split(/(`[^`]+`)/g).map((part, i) =>
                       part.startsWith('`') && part.endsWith('`') ? (
                         <code
@@ -2016,6 +2017,7 @@ export function StudentPortalContent({
                   )}
                 </div>
               )}
+              </div>
             </div>
           ) : (
             <div className="p-12 bg-slate-900/50 border border-slate-800 rounded-2xl text-center text-slate-400 text-sm my-auto">

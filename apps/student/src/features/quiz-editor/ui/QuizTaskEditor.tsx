@@ -99,7 +99,7 @@ export function QuizTaskEditor({
         </div>
       </div>
 
-      <div className="flex flex-col divide-y divide-slate-800/60 border-b border-slate-800/80">
+      <div className="flex flex-col divide-y divide-slate-800/60 border-b border-slate-800/80 max-w-3xl">
         {shuffledOptions.map((opt, idx) => {
           const active = isSelected(opt.id);
           const letter = String.fromCharCode(65 + idx); // A, B, C, D
@@ -122,7 +122,7 @@ export function QuizTaskEditor({
                   : 'hover:bg-slate-900/60 text-slate-300 cursor-pointer'
               }`}
             >
-              <div className="flex items-center gap-3 flex-1">
+              <div className="flex items-center gap-3 flex-1 min-w-0">
                 <div
                   className={`w-5 h-5 rounded-${
                     taskType === 'SINGLE_CHOICE' ? 'full' : 'md'
@@ -138,7 +138,7 @@ export function QuizTaskEditor({
                 >
                   {active ? <CheckCircle2 className="w-3.5 h-3.5 stroke-[2.5]" /> : letter}
                 </div>
-                <span className={`text-sm leading-relaxed ${active ? 'font-semibold text-white' : 'font-normal text-slate-300'}`}>
+                <span className={`text-sm leading-relaxed max-w-2xl ${active ? 'font-semibold text-white' : 'font-normal text-slate-300'}`}>
                   {opt.text}
                 </span>
               </div>
