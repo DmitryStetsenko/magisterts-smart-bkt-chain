@@ -147,6 +147,31 @@ export function StudentPortalContent({
   const [consecutiveFailures, setConsecutiveFailures] = useState<number>(0);
   const [isDegradationTooltipOpen, setIsDegradationTooltipOpen] = useState<boolean>(false);
   const [revealedHintLevel, setRevealedHintLevel] = useState<number>(0);
+  const [annulmentAlert, setAnnulmentAlert] = useState<{
+    reason: string;
+    comment?: string;
+    pMasteryUpdated?: number;
+  } | null>(null);
+  const [theoryOpenStartTime, setTheoryOpenStartTime] = useState<number | null>(null);
+
+  const logActivity = async (eventType: string, payload: Record<string, any> = {}) => {
+    try {
+      await fetch(`${API_URL}/api/v1/bkt/activity-logs`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId: 'demo-student',
+          courseId: activeCourseSlug,
+          skillId: task?.skillId,
+          taskId: task?.id,
+          eventType,
+          payload,
+        }),
+      });
+    } catch (e) {
+      // Non-blocking activity logging
+    }
+  };
 
   const fetchTaskSubmissions = async (taskId: string) => {
     try {
@@ -330,6 +355,29 @@ export function StudentPortalContent({
           });
         }
       });
+
+      socket.on('submission_annulled', (data: any) => {
+        console.log('⚠️ [StudentPortal] Submission annulled via WebSocket:', data);
+        fetchCourseStructureAndState(activeCourseSlug);
+        if (task?.id) {
+          fetchTaskSubmissions(task.id);
+        }
+        setAnnulmentAlert({
+          reason: data.reason,
+          comment: data.comment,
+          pMasteryUpdated: data.pMasteryUpdated,
+        });
+        setEvalResult((prev) => {
+          if (!prev) return null;
+          return {
+            ...prev,
+            isPassed: false,
+            teacherReviewStatus: 'ANNULLED',
+            feedback: `⚠️ Спробу анульовано викладачем (причина: ${data.reason}). ${data.comment ? `"${data.comment}"` : ''}`,
+            teacherComment: data.comment,
+          };
+        });
+      });
     }
 
     return () => {
@@ -387,6 +435,12 @@ export function StudentPortalContent({
   };
 
   const handleRequestFullLesson = (url: string) => {
+    const currentSkill = graphNodes.find((n) => n.slug === task?.skill?.slug);
+    logActivity('TASK_ABANDON_PROMPTED', {
+      destinationUrl: url,
+      attemptsCount: taskSubmissions.length,
+      currentMastery: currentSkill?.pMastery,
+    });
     setFullLessonConfirmUrl(url);
   };
 
@@ -742,7 +796,13 @@ export function StudentPortalContent({
                                   ) : (
                                     <button
                                       type="button"
-                                      onClick={() => setRevealedHintLevel(hintObj.level)}
+                                      onClick={() => {
+                                        setRevealedHintLevel(hintObj.level);
+                                        logActivity('HINT_REQUESTED', {
+                                          level: hintObj.level,
+                                          penaltyPct: hintObj.penaltyPct,
+                                        });
+                                      }}
                                       className="w-full py-1.5 px-2.5 rounded-lg bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 font-medium text-xs flex items-center justify-between transition-colors cursor-pointer"
                                     >
                                       <span className="flex items-center gap-1.5">
@@ -793,7 +853,11 @@ export function StudentPortalContent({
                               type="button"
                               disabled={!isTheoryUnlocked}
                               onClick={() => {
-                                if (isTheoryUnlocked) setIsTheoryDrawerOpen(true);
+                                if (isTheoryUnlocked) {
+                                  setTheoryOpenStartTime(Date.now());
+                                  setIsTheoryDrawerOpen(true);
+                                  logActivity('THEORY_DRAWER_OPENED', { trigger: 'sidebar_button' });
+                                }
                               }}
                               data-testid="drawer-jit-theory-btn"
                               className={`px-2.5 py-1.5 rounded-lg font-medium text-xs flex items-center gap-1 transition-colors shrink-0 ${
@@ -876,9 +940,10 @@ export function StudentPortalContent({
                           <div className="flex flex-col divide-y divide-slate-800/50 max-h-[calc(100vh-320px)] overflow-y-auto pr-1">
                             {taskSubmissions.map((sub, idx) => {
                               const isLatest = idx === 0;
-                              const isApproved = sub.teacherReviewStatus === 'APPROVED' || sub.status === 'ACCEPTED';
-                              const isPending = sub.teacherReviewStatus === 'PENDING_REVIEW';
-                              const isSuperseded = sub.teacherReviewStatus === 'SUPERSEDED';
+                              const isAnnulled = sub.teacherReviewStatus === 'ANNULLED' || sub.status === 'ANNULLED';
+                              const isApproved = !isAnnulled && (sub.teacherReviewStatus === 'APPROVED' || sub.status === 'ACCEPTED');
+                              const isPending = !isAnnulled && sub.teacherReviewStatus === 'PENDING_REVIEW';
+                              const isSuperseded = !isAnnulled && sub.teacherReviewStatus === 'SUPERSEDED';
 
                               return (
                                 <div
@@ -897,7 +962,9 @@ export function StudentPortalContent({
                                       )}
                                     </div>
                                     <span className={`text-[10px] font-mono font-bold ${
-                                      isApproved
+                                      isAnnulled
+                                        ? 'text-rose-400 bg-rose-950/40 px-1 rounded'
+                                        : isApproved
                                         ? 'text-emerald-400'
                                         : isPending
                                         ? 'text-amber-400'
@@ -905,7 +972,9 @@ export function StudentPortalContent({
                                         ? 'text-slate-500'
                                         : 'text-rose-400'
                                     }`}>
-                                      {isApproved
+                                      {isAnnulled
+                                        ? '⚠️ Анульовано'
+                                        : isApproved
                                         ? '✓ Зараховано'
                                         : isPending
                                         ? '⏳ В черзі'
@@ -919,8 +988,25 @@ export function StudentPortalContent({
                                     {new Date(sub.createdAt).toLocaleString()}
                                   </div>
 
-                                  {/* Teacher Comment Banner if present */}
-                                  {sub.teacherComment && (
+                                  {/* Annulment Notice with reason */}
+                                  {isAnnulled && (
+                                    <div className="p-2 rounded-lg bg-rose-950/30 border border-rose-800/40 flex items-start gap-1.5 my-0.5">
+                                      <AlertTriangle className="w-3.5 h-3.5 text-rose-400 shrink-0 mt-0.5" />
+                                      <div className="flex flex-col text-[11px] text-rose-200">
+                                        <span className="font-semibold text-rose-300">
+                                          Спробу анульовано викладачем
+                                        </span>
+                                        {sub.teacherComment && (
+                                          <p className="italic text-rose-300/90 text-[10px] mt-0.5">
+                                            "{sub.teacherComment}"
+                                          </p>
+                                        )}
+                                      </div>
+                                    </div>
+                                  )}
+
+                                  {/* Teacher Comment Banner if present (non-annulled) */}
+                                  {!isAnnulled && sub.teacherComment && (
                                     <div className="pl-2.5 border-l-2 border-purple-500/50 flex flex-col gap-0.5 my-1">
                                       <span className="text-purple-300 font-semibold text-[10px]">
                                         Коментар викладача:
@@ -1430,7 +1516,11 @@ export function StudentPortalContent({
                       data-testid="open-jit-theory-btn"
                       disabled={!isTheoryUnlocked}
                       onClick={() => {
-                        if (isTheoryUnlocked) setIsTheoryDrawerOpen(true);
+                        if (isTheoryUnlocked) {
+                          setTheoryOpenStartTime(Date.now());
+                          setIsTheoryDrawerOpen(true);
+                          logActivity('THEORY_DRAWER_OPENED', { trigger: 'header_button' });
+                        }
                       }}
                       className={`px-2.5 py-1.5 rounded-lg text-xs font-medium flex items-center gap-1.5 transition-all select-none ${
                         isTheoryUnlocked
@@ -1463,7 +1553,7 @@ export function StudentPortalContent({
                         className="absolute right-0 top-full mt-1.5 hidden group-hover:flex flex-col gap-1 w-64 p-2.5 rounded-lg bg-slate-900/95 border border-slate-700/80 shadow-2xl backdrop-blur-md z-30 text-[11px] text-slate-300 leading-snug animate-fadeIn pointer-events-none"
                       >
                         <div className="flex items-center gap-1.5 font-semibold text-amber-400">
-                          <Lock className="w-3 h-3 shrink-0" />
+                          <Lock className="w-3.5 h-3.5 shrink-0" />
                           <span>Експрес-теорія обмежена</span>
                         </div>
                         <p className="text-slate-400 text-[10px]">
@@ -1483,6 +1573,45 @@ export function StudentPortalContent({
                   </button>
                 </div>
               </div>
+
+              {/* ⚠️ Сповіщення про анулювання спроби викладачем (Live Invalidation Alert) */}
+              {annulmentAlert && (
+                <div
+                  data-testid="annulment-alert"
+                  className="mb-4 p-3.5 rounded-xl bg-rose-950/40 border border-rose-500/40 text-rose-200 flex items-start justify-between gap-3 animate-fadeIn"
+                >
+                  <div className="flex items-start gap-2.5">
+                    <AlertTriangle className="w-4 h-4 text-rose-400 shrink-0 mt-0.5" />
+                    <div className="flex flex-col gap-0.5">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="font-bold text-white text-xs">
+                          Вашу попередню відповідь анульовано викладачем
+                        </span>
+                        <span className="px-1.5 py-0.5 rounded text-[10px] font-mono bg-rose-900/60 text-rose-300 border border-rose-700/50">
+                          Причина: {annulmentAlert.reason}
+                        </span>
+                      </div>
+                      {annulmentAlert.comment && (
+                        <p className="text-xs text-rose-300 italic mt-0.5">
+                          "{annulmentAlert.comment}"
+                        </p>
+                      )}
+                      {annulmentAlert.pMasteryUpdated !== undefined && (
+                        <span className="text-[10px] font-mono text-slate-400 mt-0.5">
+                          Показник P(L) перераховано до: {(annulmentAlert.pMasteryUpdated * 100).toFixed(1)}%
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => setAnnulmentAlert(null)}
+                    className="text-slate-400 hover:text-white p-1 rounded-lg transition-colors cursor-pointer shrink-0"
+                    title="Закрити сповіщення"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              )}
 
               {task.taskType === 'SINGLE_CHOICE' || task.taskType === 'MULTIPLE_CHOICE' ? (
                 <QuizTaskEditor
@@ -1706,7 +1835,11 @@ export function StudentPortalContent({
                         <button
                           type="button"
                           data-testid="jit-theory-offer-btn"
-                          onClick={() => setIsTheoryDrawerOpen(true)}
+                          onClick={() => {
+                            setTheoryOpenStartTime(Date.now());
+                            setIsTheoryDrawerOpen(true);
+                            logActivity('THEORY_DRAWER_OPENED', { trigger: 'evaluation_offer' });
+                          }}
                           className="px-3 py-1.5 rounded-lg bg-blue-500/20 hover:bg-blue-500/30 text-blue-300 font-medium text-xs flex items-center justify-center gap-1.5 transition-colors shrink-0 cursor-pointer"
                         >
                           <BookOpen className="w-3.5 h-3.5" />
@@ -1765,7 +1898,14 @@ export function StudentPortalContent({
       {/* 📘 Права бічна панель експрес-теорії (Just-in-Time Theory Micro-Module) */}
       <JustInTimeTheoryDrawer
         isOpen={isTheoryDrawerOpen}
-        onClose={() => setIsTheoryDrawerOpen(false)}
+        onClose={() => {
+          setIsTheoryDrawerOpen(false);
+          const dwellSeconds = theoryOpenStartTime
+            ? Math.round((Date.now() - theoryOpenStartTime) / 1000)
+            : 0;
+          logActivity('THEORY_DRAWER_CLOSED', { dwellTimeSeconds: dwellSeconds });
+          setTheoryOpenStartTime(null);
+        }}
         capsule={resolveTheoryCapsule(task, activeCourseSlug)}
         detectedMisconception={evalResult?.detectedMisconception}
         fullLessonUrl={

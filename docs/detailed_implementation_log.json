@@ -120,6 +120,91 @@
           ]
         },
         {
+          "title": "0.1.7.57 Інтеграція Наскрізного Логування та Механізму Анулювання Спроб у Клієнтських Порталах Учня та Викладача (`SBC-354`, `EP-TC`)",
+          "level": 3,
+          "paragraphs": [],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "**Інженерна постановка:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "У розвиток бекенд-інфраструктури `StudentActivityLog` та `AuditLogService` (`SBC-353`) виконано інтеграцію наскрізного клієнтського функціоналу в порталах учня (`apps/student`) та викладача (`apps/teacher`), реалізувавши замкнений контур аудиту дій, реактивне сповіщення про анулювання спроб та інструменти вчителя для протидії академічній недоброчесності.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**1. Кабінет викладача (`apps/teacher`):**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Інспектор перевірки робіт ([`apps/teacher/src/features/reviews/ui/ReviewQueueInspector.tsx`](file:///apps/teacher/src/features/reviews/ui/ReviewQueueInspector.tsx)):**",
+              "subitems": [
+                "Додано проп `onAnnul?: (submissionId: string, reason: string, comment: string, multiplier?: number) => void`.",
+                "Додано кнопку швидкої дії `⚠️ Анулювати` поруч із рішеннями «Схвалити» та «Відхилити».",
+                "Створено модальне вікно `AnnulSubmissionModal` із полями:",
+                "Селектор причини: `PLAGIARISM` (Списування / плагіат коду), `AI_GENERATED_SUSPECTED` (Підозра на генерацію стороннім ШІ), `IRRESPONSIBLE_GUESS` (Бездумне вгадування / спам спроб), `CODE_MISMATCH` (Невідповідність розв'язку завданню), `OTHER` (Інше порушення).",
+                "Числовий інпут штрафного коефіцієнта BKT (за замовчуванням `1.25`, крок 0.05, діапазон 1.0 – 2.0).",
+                "Текстове поле обов'язкового педагогічного коментаря для студента.",
+                "Оновлено стиль відображення статусу `ANNULLED` у списку завдань та вкладці історії (`bg-rose-500/20 text-rose-300 border-rose-500/30`)."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Головний екран та WebSocket підключення ([`apps/teacher/src/app/page.tsx`](file:///apps/teacher/src/app/page.tsx)):**",
+              "subitems": [
+                "Реалізовано функцію `handleAnnulDecision`, що звертається до ендпоінта `POST /api/v1/bkt/submissions/:id/annul`.",
+                "Підключено реактивні слухачі WebSocket-подій `activity_log` та `submission_annulled` для миттєвої синхронізації черги перевірок та списку спроб без перезавантаження сторінки."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**2. Кабінет учня (`apps/student`):**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Фіксація когнітивних дій учня ([`apps/student/src/components/StudentPortalApp.tsx`](file:///apps/student/src/components/StudentPortalApp.tsx)):**",
+              "subitems": [
+                "Реалізовано метод `logActivity(eventType, payload)`, що надсилає неблокуючі POST-запити до `/api/v1/bkt/activity-logs`.",
+                "Інтегровано логування подій:",
+                "`HINT_REQUESTED` — при розкритті чергової підказки Сократа (фіксується рівень підказки та штрафний відсоток).",
+                "`THEORY_DRAWER_OPENED` — при відкритті експрес-теорії з бічної панелі, верхнього хедера або кнопки пропозиції після помилки.",
+                "`THEORY_DRAWER_CLOSED` — при закритті шторки теорії із точним розрахунком часу вивчення (`dwellTimeSeconds`).",
+                "`TASK_ABANDON_PROMPTED` — при відкритті модального вікна виходу в підручник із фіксацією кількості спроб та поточного $P(L)$."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Реактивна реакція на анулювання спроби викладачем:**",
+              "subitems": [
+                "Додано слухач сокет-події `submission_annulled`: автоматично оновлює стан BKT навички через `fetchCourseStructureAndState`, перезавантажує історію спроб завдання та встановлює стан `annulmentAlert`.",
+                "Інтерфейс виводить учневі фірмовий попереджувальний банер із причиною анулювання, коментарем викладача та перерахованим рівнем $P(L)$.",
+                "В історії спроб завдання (`Історія спроб`) спроби зі статусом `ANNULLED` позначаються червоним бейджем `⚠️ Анульовано` із відображенням зауважень викладача."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**3. Верифікація:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "100% проходження тест-сьютів API (`npm run test:api`, 9/9 сьютів, 53 тести).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Успішна типізація та збірка `apps/student` (`npm run build:student`, Next.js Turbopack) та `apps/teacher` (`npm run build:teacher`).",
+              "subitems": []
+            }
+          ]
+        },
+        {
           "title": "0.1.7.56 Реалізація Незмінної Схеми `StudentActivityLog`, Сервісу `AuditLogService` та Ендпоінтів Анулювання та Експорту (`SBC-353`, `EP-TC`)",
           "level": 3,
           "paragraphs": [],

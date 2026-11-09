@@ -242,6 +242,17 @@ export default function TeacherDashboardPage() {
       socket.on('student_telemetry_updated', () => {
         fetchStudentAnalytics();
       });
+
+      socket.on('activity_log', (data: any) => {
+        console.log('⚡ [TeacherPortal] Real-time activity log detected:', data);
+        fetchStudentAnalytics();
+      });
+
+      socket.on('submission_annulled', (data: any) => {
+        console.log('⚠️ [TeacherPortal] Submission annulled event:', data);
+        fetchStudentAnalytics();
+        fetchReviewQueue();
+      });
     }
 
     return () => {
@@ -270,6 +281,38 @@ export default function TeacherDashboardPage() {
       }
     } catch (err) {
       console.error('Error submitting review decision:', err);
+    } finally {
+      setIsReviewSubmitting(false);
+    }
+  };
+
+  const handleAnnulDecision = async (
+    submissionId: string,
+    reason: string,
+    comment: string,
+    penaltyMultiplier: number = 1.25,
+  ) => {
+    setIsReviewSubmitting(true);
+    try {
+      const res = await fetch(`${API_URL}/api/v1/bkt/submissions/${submissionId}/annul`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          teacherId: 'teacher-current',
+          reason,
+          comment,
+          penaltyMultiplier,
+        }),
+      });
+
+      if (res.ok) {
+        setReviewComment('');
+        setReviewScoreOverride('');
+        await fetchReviewQueue();
+        await fetchStudentAnalytics();
+      }
+    } catch (err) {
+      console.error('Error annulling submission:', err);
     } finally {
       setIsReviewSubmitting(false);
     }
@@ -1862,6 +1905,7 @@ export default function TeacherDashboardPage() {
                   handleReviewDecision(current.submissionId, decision);
                 }
               }}
+              onAnnul={handleAnnulDecision}
             />
           )}
 
