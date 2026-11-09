@@ -20,6 +20,7 @@ export interface JustInTimeTheoryDrawerProps {
   capsule: TheoryCapsuleDto | null;
   detectedMisconception?: MisconceptionDto | null;
   fullLessonUrl?: string | null;
+  onRequestFullLesson?: (url: string) => void;
 }
 
 /**
@@ -33,6 +34,7 @@ export function JustInTimeTheoryDrawer({
   capsule,
   detectedMisconception,
   fullLessonUrl,
+  onRequestFullLesson,
 }: JustInTimeTheoryDrawerProps) {
   if (!isOpen || !capsule) return null;
 
@@ -190,16 +192,22 @@ export function JustInTimeTheoryDrawer({
           </button>
 
           {fullLessonUrl && (
-            <a
-              href={fullLessonUrl}
-              target="_blank"
-              rel="noopener noreferrer"
+            <button
+              type="button"
+              data-testid="jit-theory-open-full-lesson-btn"
+              onClick={() => {
+                if (onRequestFullLesson) {
+                  onRequestFullLesson(fullLessonUrl);
+                } else {
+                  window.open(fullLessonUrl, '_blank');
+                }
+              }}
               className="px-3 py-2 rounded-lg bg-slate-800/70 hover:bg-slate-800 text-slate-300 hover:text-white text-xs font-medium flex items-center gap-1.5 transition-colors cursor-pointer"
               title="Відкрити повний інтерактивний урок у Zen-режимі (порт 3006)"
             >
               <span>Повний урок</span>
               <ExternalLink className="w-3.5 h-3.5 text-blue-400" />
-            </a>
+            </button>
           )}
         </div>
       </aside>

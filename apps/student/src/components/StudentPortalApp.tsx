@@ -9,6 +9,7 @@ import { EssayTaskEditor } from '../features/essay-editor/ui/EssayTaskEditor';
 import { SkillDagMap } from '../features/skill-graph/ui/SkillDagMap';
 import { StudentProgressPill } from './StudentProgressPill';
 import { StudentProfileDrawer } from './StudentProfileDrawer';
+import { AbandonTaskModal } from './AbandonTaskModal';
 import { JustInTimeTheoryDrawer } from '../features/theory-capsule/ui/JustInTimeTheoryDrawer';
 import { resolveTheoryCapsule } from '../features/theory-capsule/model/theory-capsules';
 import { GameSkillTreeWidget, SkillGraphNode, DrawerSection, AppShellLayout, Breadcrumbs } from '@sbc/ui';
@@ -128,6 +129,8 @@ export function StudentPortalContent({
   };
   const [isProfileDrawerOpen, setIsProfileDrawerOpen] = useState<boolean>(false);
   const [isTheoryDrawerOpen, setIsTheoryDrawerOpen] = useState<boolean>(false);
+  const [fullLessonConfirmUrl, setFullLessonConfirmUrl] = useState<string | null>(null);
+  const [isAbandoning, setIsAbandoning] = useState<boolean>(false);
   const [recommendation, setRecommendation] = useState<TaskSequencerResultDto | null>(null);
   const [hasRemediationTask, setHasRemediationTask] = useState<boolean>(true);
   const [code, setCode] = useState<string>('');
@@ -380,6 +383,37 @@ export function StudentPortalContent({
       console.error('Error evaluating task submission:', err);
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handleRequestFullLesson = (url: string) => {
+    setFullLessonConfirmUrl(url);
+  };
+
+  const handleConfirmAbandonAndStudy = async () => {
+    if (!fullLessonConfirmUrl || !task) return;
+    setIsAbandoning(true);
+    try {
+      // ⚠️ Режим строгої відмови: надсилаємо запит на фіксацію незданої спроби в BKT (Ot = 0)
+      await handleEvaluate({
+        code: code || '',
+        essayAnswer: essayAnswer || '',
+        isAbandoned: true,
+      });
+
+      // Скидаємо робочу чернетку та підказки Сократа
+      setCode('');
+      setEssayAnswer('');
+      setRevealedHintLevel(0);
+
+      // Відкриваємо повний Zen-урок підручника
+      window.open(fullLessonConfirmUrl, '_blank');
+    } catch (err) {
+      console.error('Error during task abandonment:', err);
+    } finally {
+      setIsAbandoning(false);
+      setFullLessonConfirmUrl(null);
+      setIsTheoryDrawerOpen(false);
     }
   };
 
@@ -777,15 +811,15 @@ export function StudentPortalContent({
                           {task.studyUnitUrl && (
                             <div className="pt-2 border-t border-slate-800/50 flex items-center justify-between gap-2 text-[11px]">
                               <span className="text-slate-400">Повний інтерактивний підручник</span>
-                              <a
-                                href={resolveStudyUrl(task.studyUnitUrl)}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="text-blue-400 hover:text-blue-300 font-mono flex items-center gap-1 transition-colors"
+                              <button
+                                type="button"
+                                data-testid="sidebar-open-full-lesson-btn"
+                                onClick={() => handleRequestFullLesson(resolveStudyUrl(task.studyUnitUrl!))}
+                                className="text-blue-400 hover:text-blue-300 font-mono flex items-center gap-1 transition-colors cursor-pointer"
                               >
                                 <span>Zen-урок</span>
                                 <ArrowRight className="w-3 h-3" />
-                              </a>
+                              </button>
                             </div>
                           )}
                         </div>
@@ -1729,6 +1763,16 @@ export function StudentPortalContent({
             ? resolveStudyUrl(task.studyUnitUrl)
             : null
         }
+        onRequestFullLesson={handleRequestFullLesson}
+      />
+
+      {/* ⚠️ Модальне вікно підтвердження відмови від спроби заради повного підручника */}
+      <AbandonTaskModal
+        isOpen={Boolean(fullLessonConfirmUrl)}
+        onClose={() => setFullLessonConfirmUrl(null)}
+        onConfirm={handleConfirmAbandonAndStudy}
+        targetLessonUrl={fullLessonConfirmUrl}
+        isSubmitting={isAbandoning}
       />
 
       {/* 👤 Права бічна панель (Right Profile & Courses Drawer) */}

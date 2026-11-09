@@ -61,8 +61,12 @@ export class BktController {
     let teacherReviewStatus: TeacherReviewStatus = TeacherReviewStatus.NONE;
 
     // Polyglot Evaluation Strategies based on TaskType
-    switch (task.taskType) {
-      case TaskType.SINGLE_CHOICE: {
+    if (dto.isAbandoned) {
+      isPassed = false;
+      feedback = 'Спроба перервана учнем: зафіксовано відмову та перехід до повного підручника для ремедіації.';
+    } else {
+      switch (task.taskType) {
+        case TaskType.SINGLE_CHOICE: {
         const options = (task.options as Array<{ id: string; text: string; isCorrect: boolean }>) || [];
         const correctOption = options.find((o) => o.isCorrect);
         const selectedOption = options.find((o) => o.id === dto.selectedOptionId);
@@ -217,6 +221,7 @@ export class BktController {
         break;
       }
     }
+  }
 
     // Deduplication & Superseding for Teacher Review Queue:
     // When a student submits an open text/essay task, any previous submissions for the same
@@ -260,7 +265,7 @@ export class BktController {
       data: {
         userId: user.id,
         taskId: task.id,
-        code: dto.code || dto.essayAnswer || dto.selectedOptionId || (dto.selectedOptionIds ? dto.selectedOptionIds.join(',') : ''),
+        code: dto.code || dto.essayAnswer || dto.selectedOptionId || (dto.selectedOptionIds ? dto.selectedOptionIds.join(',') : '') || (dto.isAbandoned ? '[ABANDONED_TO_THEORY]' : ''),
         status: isPassed ? SubmissionStatus.ACCEPTED : SubmissionStatus.REJECTED,
         teacherReviewStatus,
         attemptNumber,
@@ -325,6 +330,10 @@ export class BktController {
         conceptCoverageRatio,
       },
     );
+
+    if (dto.isAbandoned) {
+      adjusted.reasons.push('task_abandoned_to_full_theory');
+    }
 
     // Безкомпромісна перевірка на аномалії поведінки для есе / відкритого тексту:
     // Якщо зафіксовано 3+ операцій вставки (paste) або висока ймовірність вгадування/спаму (pGuess >= 0.85),

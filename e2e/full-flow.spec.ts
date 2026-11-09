@@ -125,6 +125,19 @@ test.describe('Smart-BKT-Chain Multi-Discipline E2E Suite', () => {
 
     await expect(theoryDrawer).toBeVisible();
     await expect(theoryDrawer).toContainText('Розбір вашої помилки');
+
+    // 8. Verify strict abandonment confirmation modal before opening full lesson
+    const openFullLessonBtn = page.getByTestId('jit-theory-open-full-lesson-btn');
+    if (await openFullLessonBtn.isVisible()) {
+      await openFullLessonBtn.click();
+      const abandonModal = page.getByTestId('abandon-task-modal');
+      await expect(abandonModal).toBeVisible();
+      await expect(abandonModal).toContainText('Перехід до повного підручника');
+      await expect(abandonModal).toContainText('Фіксація в BKT');
+      await page.getByTestId('cancel-abandon-btn').click();
+      await expect(abandonModal).toBeHidden();
+    }
+
     await page.getByTestId('close-jit-theory-btn').click();
     await expect(theoryDrawer).toBeHidden();
   });

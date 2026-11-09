@@ -3119,6 +3119,25 @@ eferenceAnswer, критерії options.keywords (microtask|мікротаск|
   6. *Педагогічне значення для дисертації:* спеціальності 122 та 014.
   7. *Реєстрація у каталозі:* додано запис #15 до [`docs/brainstorm/README.md`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/docs/brainstorm/README.md).
 
+---
+
+### 11.60. Механізм Строгої Відмови від Завдання та Захисне Модальне Вікно `AbandonTaskModal` (SBC-350, EP-ST)
+- **Контекст та інженерна задача:**
+  Прямий перехід учня до повного підручника `apps/study` посеред активного проходження завдання створював загрозу відкриття паралельної вкладки-шпаргалки без жодних наслідків для BKT. Усунено небезпеку спотворення діагностики шляхом впровадження модального діалогу підтвердження відмови.
+- **Архітектурні зміни та компоненти:**
+  1. **Компонент модального вікна [`AbandonTaskModal.tsx`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/student/src/components/AbandonTaskModal.tsx):**
+     - Реалізовано за стандартом Opera Shell v2.0 (backdrop blur, темна тема, іконки попередження).
+     - Детальний опис наслідків для учня: фіксація невдачі в BKT ($O_t = 0$), очищення чернетки введеного коду, відкриття Zen-уроку для ремедіації та чистий старт після повернення.
+  2. **Інтеграція в інтерфейс [`StudentPortalApp.tsx`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/student/src/components/StudentPortalApp.tsx):**
+     - Заміна прямих посилань `<a>` на контрольований виклик `handleRequestFullLesson`.
+     - Функція `handleConfirmAbandonAndStudy`: надсилання `POST /api/v1/bkt/evaluate` з прапорцем `isAbandoned: true`, очищення станів `code`, `essayAnswer`, `revealedHintLevel` та відкриття цільового уроку.
+  3. **Бекенд-контракти та BKT-ядро (`apps/api`):**
+     - Додано `isAbandoned?: boolean` у `SubmitTaskPayloadDto` (`@sbc/types`) та `SubmitTaskDto`.
+     - У `bkt.controller.ts` при `isAbandoned === true` завдання безумовно маркується як `isPassed = false`, статус збереження стає `REJECTED`, $P(L_t)$ оновлюється за формулою нездачі, а в журнал додається причина `task_abandoned_to_full_theory`.
+  4. **Тестування та E2E валідація:**
+     - Оновлено Playwright E2E-тест у `e2e/full-flow.spec.ts` для перевірки появи модального вікна при кліку на «Повний урок», перевірки тексту та скасування.
+
+
 
 
 

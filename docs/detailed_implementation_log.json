@@ -11220,6 +11220,62 @@
               "type": "text",
               "raw_text": "*Реєстрація у каталозі:* додано запис #15 до [`docs/brainstorm/README.md`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/docs/brainstorm/README.md).",
               "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "---",
+              "subitems": []
+            }
+          ]
+        },
+        {
+          "title": "11.60. Механізм Строгої Відмови від Завдання та Захисне Модальне Вікно `AbandonTaskModal` (SBC-350, EP-ST)",
+          "level": 3,
+          "paragraphs": [
+            "Прямий перехід учня до повного підручника `apps/study` посеред активного проходження завдання створював загрозу відкриття паралельної вкладки-шпаргалки без жодних наслідків для BKT. Усунено небезпеку спотворення діагностики шляхом впровадження модального діалогу підтвердження відмови."
+          ],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "**Контекст та інженерна задача:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Архітектурні зміни та компоненти:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Компонент модального вікна [`AbandonTaskModal.tsx`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/student/src/components/AbandonTaskModal.tsx):**",
+              "subitems": [
+                "Реалізовано за стандартом Opera Shell v2.0 (backdrop blur, темна тема, іконки попередження).",
+                "Детальний опис наслідків для учня: фіксація невдачі в BKT ($O_t = 0$), очищення чернетки введеного коду, відкриття Zen-уроку для ремедіації та чистий старт після повернення."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Інтеграція в інтерфейс [`StudentPortalApp.tsx`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/student/src/components/StudentPortalApp.tsx):**",
+              "subitems": [
+                "Заміна прямих посилань `<a>` на контрольований виклик `handleRequestFullLesson`.",
+                "Функція `handleConfirmAbandonAndStudy`: надсилання `POST /api/v1/bkt/evaluate` з прапорцем `isAbandoned: true`, очищення станів `code`, `essayAnswer`, `revealedHintLevel` та відкриття цільового уроку."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Бекенд-контракти та BKT-ядро (`apps/api`):**",
+              "subitems": [
+                "Додано `isAbandoned?: boolean` у `SubmitTaskPayloadDto` (`@sbc/types`) та `SubmitTaskDto`.",
+                "У `bkt.controller.ts` при `isAbandoned === true` завдання безумовно маркується як `isPassed = false`, статус збереження стає `REJECTED`, $P(L_t)$ оновлюється за формулою нездачі, а в журнал додається причина `task_abandoned_to_full_theory`."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Тестування та E2E валідація:**",
+              "subitems": [
+                "Оновлено Playwright E2E-тест у `e2e/full-flow.spec.ts` для перевірки появи модального вікна при кліку на «Повний урок», перевірки тексту та скасування."
+              ]
             }
           ]
         }

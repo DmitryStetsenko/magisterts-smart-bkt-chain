@@ -158,6 +158,7 @@ export interface SubmitTaskPayloadDto {
   typingWpm?: number;
   revealedHintLevel?: number;
   appliedPenaltyPct?: number;
+  isAbandoned?: boolean;
 }
 
 /**

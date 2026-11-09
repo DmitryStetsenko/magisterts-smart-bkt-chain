@@ -40,4 +40,7 @@ export class SubmitTaskDto implements SubmitTaskPayloadDto {
 
   @ApiProperty({ description: 'Cumulative mastery/score penalty percentage from revealed Socratic hints (0..100)', required: false })
   appliedPenaltyPct?: number;
+
+  @ApiProperty({ description: 'Whether the student gave up/abandoned the task to study theory (registers BKT failure and resets attempt)', required: false })
+  isAbandoned?: boolean;
 }
