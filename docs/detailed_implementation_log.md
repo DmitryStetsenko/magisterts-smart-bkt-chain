@@ -30,6 +30,22 @@
   5. *Build Next.js Documentation Site* (`npm run build:docs`) — збірка статичного експорту (`output: "export"`, `trailingSlash: true`, `basePath: "/magisterts-smart-bkt-chain"`).
   6. *Upload Artifact & Deploy Pages* (`actions/upload-pages-artifact@v3` + `actions/deploy-pages@v4`).
 
+### 0.1.7.62 Усунення Гідраційної Помилки Вкладених Кнопок у DrawerSection (`SBC-359`, `EP-ST`)
+- **Інженерна проблема:**
+  - У консолі браузера з'являлася критична помилка SSR-гідрації: `In HTML, <button> cannot be a descendant of <button>. This will cause a hydration error.`
+  - Помилка спричинялася архітектурою компонента `DrawerSection` (`packages/ui/src/drawer/DrawerSection.tsx`): шапка секції огорталася в єдиний тег `<button onClick={handleToggle}>`, а опціональний слот `{action}` (наприклад, кнопка «Оновити» список спроб у Секції «Хронологія спроб та перевірок» у `StudentPortalApp.tsx`) рендерився всередині цього кореневого `<button>`, що прямо порушує специфікацію HTML5 щодо заборони інтерактивних нащадків всередині кнопок.
+- **Виконані зміни:**
+  - **Рефакторинг `DrawerSection` ([`packages/ui/src/drawer/DrawerSection.tsx`](file:///packages/ui/src/drawer/DrawerSection.tsx)):**
+    - Шапку секції переведено на семантичний `div className="w-full flex items-center justify-between px-0.5 py-1 text-slate-400"`.
+    - Ліва частина (іконка, заголовок, бейдж) виділена в доступну кнопку `button className="flex-1 ... select-none"` з обробником `handleToggle`.
+    - Права частина виділена в незалежний контейнер `div className="flex items-center gap-1.5 shrink-0 ml-1.5"`, де слот `{action}` розташований поруч із кнопкою індикатора `Plus`/`Minus`. Тепер будь-яка кнопка чи посилання всередині `action` ніколи не є нащадком іншого `<button>`.
+  - **Доопрацювання кнопки дій ([`apps/student/src/components/StudentPortalApp.tsx`](file:///apps/student/src/components/StudentPortalApp.tsx)):**
+    - Додано явний атрибут `type="button"` до кнопки «Оновити» у Секції «Хронологія спроб та перевірок».
+- **Верифікація:**
+  - Перевірка через Playwright MCP у живому Headless браузері: `document.querySelectorAll('button button')` на всіх порталах екосистеми (`student:3002`, `teacher:3003`, `admin:3004`, `study:3006`) повернув 0.
+  - Повне зникнення помилки гідрації в консолі.
+  - 100% успішне проходження повного E2E-сьюту Playwright (`npm run test:e2e`, 3/3 тестів, 18.3s).
+
 ### 0.1.7.61 Відновлення Строгого Дидактичного Порогу Розблокування Експрес-Теорії за Підказками Сократа (`SBC-358`, `EP-ST`)
 - **Інженерна та педагогічна постановка:**
   - 1. *Усунення передчасного відкриття теорії:* У `apps/student` кнопка «Експрес-теорія» помилково розблоковувалася відразу після першої невдалої спроби (`hasFailedAttemptOnCurrentTask`), оминаючи Сократівські підказки. Відновлено строге правило прогресивного скаффолдингу: теорія спочатку заблокована (`🔒`) і відкривається виключно після відкриття щонайменше 2 рівнів підказок Сократа (`revealedHintLevel >= 2`).

@@ -922,6 +922,7 @@ export function StudentPortalContent({
                         defaultOpen={true}
                         action={
                           <button
+                            type="button"
                             onClick={() => task && fetchTaskSubmissions(task.id)}
                             className="text-[11px] text-purple-400 hover:text-purple-300 flex items-center gap-1 cursor-pointer font-mono"
                             title="Оновити список спроб"

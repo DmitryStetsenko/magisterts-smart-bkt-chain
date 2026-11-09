@@ -55,28 +55,35 @@ export function DrawerSection({
 
   return (
     <div id={id} className={`flex flex-col gap-1.5 ${className}`}>
-      <button
-        type="button"
-        onClick={handleToggle}
-        className="w-full flex items-center justify-between text-left px-0.5 py-1 text-slate-400 hover:text-white transition-colors cursor-pointer group"
-      >
-        <span className={`text-[11px] font-semibold uppercase tracking-wider flex items-center gap-1.5 transition-colors ${titleColor}`}>
-          {Icon && <Icon className={`w-3.5 h-3.5 ${iconColor}`} />}
-          <span>{title}</span>
-          {badge !== undefined && (
-            <span className="text-[10px] font-mono text-slate-500 font-normal">
-              ({badge})
-            </span>
-          )}
-        </span>
-
-        <div className="flex items-center gap-1.5">
-          {action && <div onClick={(e) => e.stopPropagation()}>{action}</div>}
-          <span className="p-0.5 rounded text-slate-500 group-hover:text-white transition-colors flex items-center justify-center">
-            {open ? <Minus className="w-3.5 h-3.5 stroke-[2]" /> : <Plus className="w-3.5 h-3.5 stroke-[2]" />}
+      <div className="w-full flex items-center justify-between px-0.5 py-1 text-slate-400">
+        <button
+          type="button"
+          onClick={handleToggle}
+          className="flex-1 flex items-center text-left hover:text-white transition-colors cursor-pointer group select-none min-w-0"
+        >
+          <span className={`text-[11px] font-semibold uppercase tracking-wider flex items-center gap-1.5 transition-colors truncate ${titleColor}`}>
+            {Icon && <Icon className={`w-3.5 h-3.5 shrink-0 ${iconColor}`} />}
+            <span className="truncate">{title}</span>
+            {badge !== undefined && (
+              <span className="text-[10px] font-mono text-slate-500 font-normal shrink-0">
+                ({badge})
+              </span>
+            )}
           </span>
+        </button>
+
+        <div className="flex items-center gap-1.5 shrink-0 ml-1.5">
+          {action && <div className="flex items-center">{action}</div>}
+          <button
+            type="button"
+            onClick={handleToggle}
+            className="p-0.5 rounded text-slate-500 hover:text-white transition-colors flex items-center justify-center cursor-pointer"
+            title={open ? "Згорнути секцію" : "Розгорнути секцію"}
+          >
+            {open ? <Minus className="w-3.5 h-3.5 stroke-[2]" /> : <Plus className="w-3.5 h-3.5 stroke-[2]" />}
+          </button>
         </div>
-      </button>
+      </div>
 
       {open && (
         <div className={`animate-fadeIn flex flex-col gap-1.5 ${contentClassName}`}>

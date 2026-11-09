@@ -131,6 +131,18 @@
      - 100% проходження unit-тестів API (`npm run test:api`, 55/55 тестів у 9 сьютах).
      - Успішна виробнича збірка `npm run build:student` та `npm run build:admin`.
 
+10. **Усунення гідраційної помилки вкладених кнопок у DrawerSection (`SBC-359`, `EP-ST`):**
+    - **Виявлена проблема (Console Error):** `In HTML, <button> cannot be a descendant of <button>. This will cause a hydration error.` помилка виникала у `DrawerSection` через те, що вся шапка акордеона огорталася в `<button>`, а опціональний слот дій `action` містив інтерактивну кнопку (наприклад, кнопку «Оновити» список спроб у Секції «Хронологія спроб та перевірок» у `StudentPortalApp.tsx`). В результаті формувався невалідний HTML `button > div > button`, що ламало SSR-гідрацію React.
+    - **Виправлення архітектури `DrawerSection` (`packages/ui/src/drawer/DrawerSection.tsx`):**
+      - Зовнішній контейнер шапки переведено на семантичний тег `div className="w-full flex items-center justify-between px-0.5 py-1 text-slate-400"`.
+      - Заголовок та іконку виділено в окрему доступну кнопку `button className="flex-1 ... select-none"`, яка керує станом розгортання `handleToggle`.
+      - Правий блок дій винесено в окремий контейнер: слот `{action}` тепер є незалежним сусідом (sibling), а не нащадком кнопки акордеона. Індикатор `Plus`/`Minus` отримав окрему доступну кнопку перемикання.
+      - У `StudentPortalApp.tsx` явно додано атрибут `type="button"` до кнопки «Оновити» у слоті `action`.
+    - **Верифікація:**
+      - Перевірка через Playwright MCP у живому Headless браузері: запит `document.querySelectorAll('button button')` на всіх порталах (`student:3002`, `teacher:3003`, `admin:3004`, `study:3006`) повернув рівно `0` вкладених кнопок.
+      - Консоль браузера: 0 помилок гідрації (Hydration error повністю усунуто).
+      - 100% успішне проходження повного E2E-сьюту Playwright (`npm run test:e2e`, 3/3 тестів, 18.3s).
+
 
 ## 📅 7 листопада 2026 року
 
