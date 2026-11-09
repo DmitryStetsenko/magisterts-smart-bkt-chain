@@ -176,6 +176,7 @@ export default function AdminCMSDashboard() {
 
     return {
       isOpen: isDrawerOpen,
+      widthClass: 'w-72 sm:w-80 shrink-0',
       title,
       icon,
       iconColor,

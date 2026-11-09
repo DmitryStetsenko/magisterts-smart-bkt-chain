@@ -120,6 +120,115 @@
           ]
         },
         {
+          "title": "0.1.7.60 Реалізація Безпечного Очищення Бази Аудит-Логу та Остаточна Фіксація Стилів Адмін-Панелі (`SBC-357`, `EP-AD`)",
+          "level": 3,
+          "paragraphs": [],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "**Інженерна постановка:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "*Усунення першопричини стильової деформації адмінки:* З'ясовано, що у Tailwind CSS v4 файлі `apps/admin/src/app/globals.css` була відсутня директива `@source \"../../../../packages/ui/src\"`, через що рушій Next.js Turbopack не генерував класи ширини та акордеонів пакета `@sbc/ui` (`sm:w-80`, `DrawerSection` стилі). У поєднанні з мобільним фолбеком `w-full` у `packages/ui/src/shell/AppShellLayout.tsx` це призводило до розтягування бічної панелі на 100% ширини в'юпорту та витіснення контенту.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "*Впровадження безпечного очищення аудит-логу з захистом від випадкового видалення:* Для тестування, калібрування BKT та скидання демо-сесій розроблено наскрізний механізм очищення таблиці `StudentActivityLog` із захисним модальним вікном, яке вимагає введення слова `ОЧИСТИТИ`.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**1. Виправлення стилів та ізоляції лейауту ([`apps/admin/src/app/globals.css`](file:///apps/admin/src/app/globals.css), [`packages/ui/src/shell/AppShellLayout.tsx`](file:///packages/ui/src/shell/AppShellLayout.tsx)):**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Додано `@source \"../../../../packages/ui/src\"` для повного сканування та генерації класів спільних компонентів.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Спрощено та закріплено fallback ширини `<aside>` у `AppShellLayout.tsx` на `w-72 sm:w-80 shrink-0`.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Перезапущено Turbopack dev-сервер (порт 3004); через Playwright MCP підтверджено коректне side-by-side відображення: рейка `w-12` (48px), сайдбар `w-80` (320px) та головна робоча область `flex-1` (1113px).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**2. Бекенд архітектура очищення логів ([`apps/api/src/domain/audit/audit-log.service.ts`](file:///apps/api/src/domain/audit/audit-log.service.ts), [`apps/api/src/adapters/inbound/http/bkt.controller.ts`](file:///apps/api/src/adapters/inbound/http/bkt.controller.ts)):**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Метод `AuditLogService.clearAllLogs(actorId, actorRole)`:**",
+              "subitems": [
+                "Виконує транзакційне очищення: `this.prisma.studentActivityLog.deleteMany({})`.",
+                "Транслює системну подію `SYSTEM_LOGS_PURGED` через `TelemetryGateway.broadcastSystemEvent` для миттєвої реакції підключених клієнтів (оновлення віджетів викладача та адміна)."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**REST Ендпоінт `DELETE /api/v1/bkt/activity-logs`:**",
+              "subitems": [
+                "Приймає query-параметри `actorId` та `actorRole` (обов'язкова валідація ролі `ADMIN`).",
+                "Покритий юніт-тестами у `audit-log.service.spec.ts` та `bkt.controller.spec.ts`."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**3. Інтерфейс та захисне модальне вікно ([`apps/admin/src/features/dataset-export/ui/DatasetExportCenter.tsx`](file:///apps/admin/src/features/dataset-export/ui/DatasetExportCenter.tsx)):**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Додано кнопку дій `[ 🗑️ Очистити логи ]` у шапку центру експорту датасетів.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Створено модальне вікно `ClearLogsModal` з червоним попередженням, відображенням кількості активних записів у базі та захисним полем вводу слова `ОЧИСТИТИ`.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Кнопка «Підтвердити очищення» залишається деактивованою (`disabled`) до введення точного слова підтвердження.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Після видалення викликається `fetchRecentLogs()`, який миттєво обнуляє всі KPI-лічильники та виводить охайний порожній стан таблиці.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**4. Верифікація та результати тестування:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "`npm run test:api`: 55/55 тестів успішно пройдено (9/9 тест-сьютів).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "`npm run build:admin`: успішна компіляція Next.js 16.3.8 Turbopack.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Наскрізна перевірка через Playwright MCP: діалогове вікно безпеки, валідація вводу `ОЧИСТИТИ`, успішний виклик DELETE та обнулення метрик у реальному часі.",
+              "subitems": []
+            }
+          ]
+        },
+        {
           "title": "0.1.7.59 Комплексний Редизайн та Уніфікація Візуалу Адмін-Панелі за Канонічним Стандартом AppShellLayout & Minimalist Borderless (`SBC-356`, `EP-AD`)",
           "level": 3,
           "paragraphs": [],

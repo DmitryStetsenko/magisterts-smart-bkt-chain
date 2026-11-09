@@ -336,4 +336,28 @@ export class AuditLogService {
       createdAt: l.createdAt.toISOString(),
     })).join('\n');
   }
+
+  /**
+   * 🗑️ Повне очищення незмінного аудит-логу дій студентів
+   * (Доступно адміністраторам CMS для тестових перезапусків)
+   */
+  async clearAllLogs(actorId = 'admin', actorRole = 'ADMIN'): Promise<{ count: number; message: string }> {
+    const count = await this.prisma.studentActivityLog.count();
+    await this.prisma.studentActivityLog.deleteMany({});
+
+    this.logger.warn(`⚠️ [AuditLogService] All activity logs purged by ${actorId} (${actorRole}). Total deleted: ${count}`);
+
+    this.telemetryGateway.notifyActivityLog({
+      eventType: 'SYSTEM_LOGS_PURGED',
+      actorId,
+      actorRole,
+      payload: { deletedCount: count },
+      createdAt: new Date().toISOString(),
+    });
+
+    return {
+      count,
+      message: `Успішно видалено ${count} записів незмінного аудит-логу.`,
+    };
+  }
 }

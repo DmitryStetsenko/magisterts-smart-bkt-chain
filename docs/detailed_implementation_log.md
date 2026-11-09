@@ -30,6 +30,31 @@
   5. *Build Next.js Documentation Site* (`npm run build:docs`) — збірка статичного експорту (`output: "export"`, `trailingSlash: true`, `basePath: "/magisterts-smart-bkt-chain"`).
   6. *Upload Artifact & Deploy Pages* (`actions/upload-pages-artifact@v3` + `actions/deploy-pages@v4`).
 
+### 0.1.7.60 Реалізація Безпечного Очищення Бази Аудит-Логу та Остаточна Фіксація Стилів Адмін-Панелі (`SBC-357`, `EP-AD`)
+- **Інженерна постановка:**
+  - 1. *Усунення першопричини стильової деформації адмінки:* З'ясовано, що у Tailwind CSS v4 файлі `apps/admin/src/app/globals.css` була відсутня директива `@source "../../../../packages/ui/src"`, через що рушій Next.js Turbopack не генерував класи ширини та акордеонів пакета `@sbc/ui` (`sm:w-80`, `DrawerSection` стилі). У поєднанні з мобільним фолбеком `w-full` у `packages/ui/src/shell/AppShellLayout.tsx` це призводило до розтягування бічної панелі на 100% ширини в'юпорту та витіснення контенту.
+  - 2. *Впровадження безпечного очищення аудит-логу з захистом від випадкового видалення:* Для тестування, калібрування BKT та скидання демо-сесій розроблено наскрізний механізм очищення таблиці `StudentActivityLog` із захисним модальним вікном, яке вимагає введення слова `ОЧИСТИТИ`.
+- **1. Виправлення стилів та ізоляції лейауту ([`apps/admin/src/app/globals.css`](file:///apps/admin/src/app/globals.css), [`packages/ui/src/shell/AppShellLayout.tsx`](file:///packages/ui/src/shell/AppShellLayout.tsx)):**
+  - Додано `@source "../../../../packages/ui/src"` для повного сканування та генерації класів спільних компонентів.
+  - Спрощено та закріплено fallback ширини `<aside>` у `AppShellLayout.tsx` на `w-72 sm:w-80 shrink-0`.
+  - Перезапущено Turbopack dev-сервер (порт 3004); через Playwright MCP підтверджено коректне side-by-side відображення: рейка `w-12` (48px), сайдбар `w-80` (320px) та головна робоча область `flex-1` (1113px).
+- **2. Бекенд архітектура очищення логів ([`apps/api/src/domain/audit/audit-log.service.ts`](file:///apps/api/src/domain/audit/audit-log.service.ts), [`apps/api/src/adapters/inbound/http/bkt.controller.ts`](file:///apps/api/src/adapters/inbound/http/bkt.controller.ts)):**
+  - **Метод `AuditLogService.clearAllLogs(actorId, actorRole)`:**
+    - Виконує транзакційне очищення: `this.prisma.studentActivityLog.deleteMany({})`.
+    - Транслює системну подію `SYSTEM_LOGS_PURGED` через `TelemetryGateway.broadcastSystemEvent` для миттєвої реакції підключених клієнтів (оновлення віджетів викладача та адміна).
+  - **REST Ендпоінт `DELETE /api/v1/bkt/activity-logs`:**
+    - Приймає query-параметри `actorId` та `actorRole` (обов'язкова валідація ролі `ADMIN`).
+    - Покритий юніт-тестами у `audit-log.service.spec.ts` та `bkt.controller.spec.ts`.
+- **3. Інтерфейс та захисне модальне вікно ([`apps/admin/src/features/dataset-export/ui/DatasetExportCenter.tsx`](file:///apps/admin/src/features/dataset-export/ui/DatasetExportCenter.tsx)):**
+  - Додано кнопку дій `[ 🗑️ Очистити логи ]` у шапку центру експорту датасетів.
+  - Створено модальне вікно `ClearLogsModal` з червоним попередженням, відображенням кількості активних записів у базі та захисним полем вводу слова `ОЧИСТИТИ`.
+  - Кнопка «Підтвердити очищення» залишається деактивованою (`disabled`) до введення точного слова підтвердження.
+  - Після видалення викликається `fetchRecentLogs()`, який миттєво обнуляє всі KPI-лічильники та виводить охайний порожній стан таблиці.
+- **4. Верифікація та результати тестування:**
+  - `npm run test:api`: 55/55 тестів успішно пройдено (9/9 тест-сьютів).
+  - `npm run build:admin`: успішна компіляція Next.js 16.3.8 Turbopack.
+  - Наскрізна перевірка через Playwright MCP: діалогове вікно безпеки, валідація вводу `ОЧИСТИТИ`, успішний виклик DELETE та обнулення метрик у реальному часі.
+
 ### 0.1.7.59 Комплексний Редизайн та Уніфікація Візуалу Адмін-Панелі за Канонічним Стандартом AppShellLayout & Minimalist Borderless (`SBC-356`, `EP-AD`)
 - **Інженерна постановка:**
   - Усунуто візуальні та архітектурні диспропорції у веб-застосунку адміністратора `apps/admin` (порт 3004): відсутність бічного сайдбара (Sidebar Drawer), надмірну горизонтальну розтягнутість контенту на 1920px екранах, масивні суцільні неонові плашки кнопок, вкладені рамкові коробки-«матрьошки» та нерозпарсені сирі UUID / JSON-рядки в таблиці аудиту.

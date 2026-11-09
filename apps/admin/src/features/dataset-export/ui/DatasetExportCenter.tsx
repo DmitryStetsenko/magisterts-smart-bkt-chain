@@ -23,7 +23,8 @@ import {
   Check,
   ChevronRight,
   ExternalLink,
-  User
+  User,
+  Trash2
 } from 'lucide-react';
 import { StudentActivityLogDto } from '@sbc/types';
 
@@ -59,6 +60,37 @@ export const DatasetExportCenter: React.FC<DatasetExportCenterProps> = ({
   const [internalUserFilter, setInternalUserFilter] = useState<string>('');
   const [inspectingLog, setInspectingLog] = useState<StudentActivityLogDto | null>(null);
   const [isCopied, setIsCopied] = useState<boolean>(false);
+
+  // 🗑️ State for Safe Log Deletion Modal
+  const [isClearModalOpen, setIsClearModalOpen] = useState<boolean>(false);
+  const [clearConfirmInput, setClearConfirmInput] = useState<string>('');
+  const [isClearing, setIsClearing] = useState<boolean>(false);
+  const [clearError, setClearError] = useState<string | null>(null);
+
+  const handleClearAllLogs = async () => {
+    if (clearConfirmInput.trim() !== 'ОЧИСТИТИ') {
+      return;
+    }
+    setIsClearing(true);
+    setClearError(null);
+    try {
+      const res = await fetch(`${apiUrl}/api/v1/bkt/activity-logs?actorId=admin&actorRole=ADMIN`, {
+        method: 'DELETE',
+      });
+      if (res.ok) {
+        setIsClearModalOpen(false);
+        setClearConfirmInput('');
+        await fetchRecentLogs();
+      } else {
+        const errData = await res.json().catch(() => ({}));
+        setClearError(errData.message || 'Помилка при очищенні логів');
+      }
+    } catch (e: any) {
+      setClearError(e?.message || 'Мережева помилка при видаленні логів');
+    } finally {
+      setIsClearing(false);
+    }
+  };
 
   const activeFilter = controlledFilter !== undefined ? controlledFilter : internalFilter;
   const userFilter = controlledUserFilter !== undefined ? controlledUserFilter : internalUserFilter;
@@ -301,6 +333,20 @@ export const DatasetExportCenter: React.FC<DatasetExportCenterProps> = ({
             <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin text-emerald-400' : ''}`} />
             <span>Оновити</span>
           </button>
+
+          <button
+            type="button"
+            onClick={() => {
+              setClearConfirmInput('');
+              setClearError(null);
+              setIsClearModalOpen(true);
+            }}
+            className="px-3 py-1.5 rounded-lg bg-rose-500/15 hover:bg-rose-500/25 text-rose-300 border border-rose-500/30 text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer"
+            title="Очистити всі записи аудит-логу з бази даних"
+          >
+            <Trash2 className="w-3.5 h-3.5" />
+            <span>Очистити логи</span>
+          </button>
         </div>
       </div>
 
@@ -525,6 +571,84 @@ export const DatasetExportCenter: React.FC<DatasetExportCenterProps> = ({
                 className="px-4 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-medium transition-colors cursor-pointer"
               >
                 Закрити
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 🗑️ Clear Logs Safety Confirmation Modal */}
+      {isClearModalOpen && (
+        <div className="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-md flex items-center justify-center p-4 animate-fadeIn">
+          <div className="bg-slate-900 border border-rose-500/40 rounded-2xl max-w-md w-full p-6 shadow-2xl flex flex-col gap-4 relative">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-800/80">
+              <div className="flex items-center gap-2 text-rose-400">
+                <div className="p-2 bg-rose-500/10 border border-rose-500/20 rounded-xl">
+                  <Trash2 className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-bold text-white">Очищення бази аудит-логу</h3>
+                  <span className="text-[11px] text-rose-400 font-mono">НЕЗВОРОТНА ОПЕРАЦІЯ</span>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsClearModalOpen(false)}
+                className="p-1 text-slate-400 hover:text-white rounded-lg transition-colors cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="text-xs text-slate-300 flex flex-col gap-2 leading-relaxed">
+              <p>
+                Ви збираєтеся видалити всі <strong className="text-white font-mono">{logs.length}</strong> збережених подій аудит-логу (спроби розв&apos;язання, підказки Сократа, анулювання, час вивчення теорії).
+              </p>
+              <div className="p-3 bg-rose-950/30 border border-rose-500/20 rounded-lg text-rose-300 text-[11px]">
+                ⚠️ Це призведе до повного обнулення датасету для навчання ШІ-моделей та хроніки викладача.
+              </div>
+              <p className="mt-1 text-slate-400">
+                Для підтвердження введіть слово <strong className="text-white font-mono selection:bg-rose-500">ОЧИСТИТИ</strong> у поле нижче:
+              </p>
+            </div>
+
+            <input
+              type="text"
+              placeholder="Введіть ОЧИСТИТИ..."
+              value={clearConfirmInput}
+              onChange={(e) => setClearConfirmInput(e.target.value)}
+              className="w-full px-3 py-2 bg-slate-950 border border-slate-800 focus:border-rose-500 rounded-lg text-xs text-white font-mono placeholder:text-slate-600 focus:outline-none"
+              autoFocus
+            />
+
+            {clearError && (
+              <div className="text-xs text-rose-400 font-medium">
+                {clearError}
+              </div>
+            )}
+
+            <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-800/80">
+              <button
+                type="button"
+                onClick={() => setIsClearModalOpen(false)}
+                disabled={isClearing}
+                className="px-3.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium transition-colors cursor-pointer"
+              >
+                Скасувати
+              </button>
+
+              <button
+                type="button"
+                onClick={handleClearAllLogs}
+                disabled={clearConfirmInput.trim() !== 'ОЧИСТИТИ' || isClearing}
+                className={`px-4 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all ${
+                  clearConfirmInput.trim() === 'ОЧИСТИТИ' && !isClearing
+                    ? 'bg-rose-600 hover:bg-rose-500 text-white cursor-pointer shadow-lg shadow-rose-900/30'
+                    : 'bg-slate-800 text-slate-500 cursor-not-allowed border border-slate-700/50'
+                }`}
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+                <span>{isClearing ? 'Очищення...' : 'Підтвердити очищення'}</span>
               </button>
             </div>
           </div>

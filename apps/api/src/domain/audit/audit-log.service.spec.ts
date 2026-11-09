@@ -22,6 +22,8 @@ describe('AuditLogService', () => {
         findUnique: jest.fn().mockResolvedValue(mockUser),
       },
       studentActivityLog: {
+        count: jest.fn().mockResolvedValue(5),
+        deleteMany: jest.fn().mockResolvedValue({ count: 5 }),
         create: jest.fn().mockImplementation(({ data }) =>
           Promise.resolve({
             id: 'log-1',
@@ -195,6 +197,21 @@ describe('AuditLogService', () => {
       const csv = await service.exportDataset({ format: 'csv' });
       expect(csv).toContain('id,userId,actorId,actorRole');
       expect(csv).toContain('HINT_REQUESTED');
+    });
+  });
+
+  describe('clearAllLogs', () => {
+    it('should delete all activity logs and broadcast SYSTEM_LOGS_PURGED', async () => {
+      const result = await service.clearAllLogs('admin-user', 'ADMIN');
+      expect(result.count).toBe(5);
+      expect(prisma.studentActivityLog.deleteMany).toHaveBeenCalled();
+      expect(telemetryGateway.notifyActivityLog).toHaveBeenCalledWith(
+        expect.objectContaining({
+          eventType: 'SYSTEM_LOGS_PURGED',
+          actorId: 'admin-user',
+          actorRole: 'ADMIN',
+        }),
+      );
     });
   });
 });

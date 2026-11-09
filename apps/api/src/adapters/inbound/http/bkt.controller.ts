@@ -1,4 +1,4 @@
-import { Controller, Post, Get, Body, Param, Query, NotFoundException, Res } from '@nestjs/common';
+import { Controller, Post, Get, Delete, Body, Param, Query, NotFoundException, Res } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiQuery } from '@nestjs/swagger';
 import type { Response } from 'express';
 import * as vm from 'vm';
@@ -1214,5 +1214,14 @@ export class BktController {
     res.setHeader('Content-Type', contentType);
     res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
     return res.send(result);
+  }
+
+  @Delete('activity-logs')
+  @ApiOperation({ summary: 'Clear all student activity audit logs (Admin only)' })
+  async clearActivityLogs(
+    @Query('actorId') actorId?: string,
+    @Query('actorRole') actorRole?: string,
+  ) {
+    return this.auditLogService.clearAllLogs(actorId || 'admin', actorRole || 'ADMIN');
   }
 }

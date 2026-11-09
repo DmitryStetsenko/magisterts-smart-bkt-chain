@@ -50,6 +50,7 @@ describe('BktController (Analytics & Telemetry reset integration)', () => {
     getRecentLogs: jest.fn().mockResolvedValue([]),
     annulSubmission: jest.fn().mockResolvedValue({ success: true, submissionId: 'sub-1' }),
     exportDataset: jest.fn().mockResolvedValue('{"id":"log-1"}'),
+    clearAllLogs: jest.fn().mockResolvedValue({ count: 5, message: 'All logs deleted' }),
   };
 
   beforeEach(async () => {
@@ -249,6 +250,12 @@ describe('BktController (Analytics & Telemetry reset integration)', () => {
         format: 'jsonl',
       });
       expect(mockRes.setHeader).toHaveBeenCalledWith('Content-Type', 'application/x-ndjson');
+    });
+
+    it('should call clearAllLogs with actor metadata', async () => {
+      const res = await controller.clearActivityLogs('admin-1', 'ADMIN');
+      expect(mockAuditLogService.clearAllLogs).toHaveBeenCalledWith('admin-1', 'ADMIN');
+      expect(res.count).toBe(5);
     });
   });
 });

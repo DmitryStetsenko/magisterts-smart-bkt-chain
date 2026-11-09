@@ -261,7 +261,7 @@ export function AppShellLayout({
 
         {/* 📂 2.2 ВИСУВНИЙ САЙДБАР (Clean Side Drawer Shell) */}
         {drawer && drawer.isOpen && (
-          <aside className={`${drawer.widthClass || 'w-full sm:w-[300px] lg:w-[320px]'} bg-slate-900 border-r border-slate-800/80 flex flex-col shrink-0 animate-fadeIn z-10 overflow-hidden`}>
+          <aside className={`${drawer.widthClass || 'w-72 sm:w-80'} bg-slate-900 border-r border-slate-800/80 flex flex-col shrink-0 animate-fadeIn z-10 overflow-hidden`}>
             {/* Шапка сайдбара */}
             <div className="px-3.5 py-2.5 border-b border-slate-800/80 flex items-center justify-between shrink-0">
               <h2 className="text-[11px] font-semibold text-slate-300 uppercase tracking-wider flex items-center gap-2">
