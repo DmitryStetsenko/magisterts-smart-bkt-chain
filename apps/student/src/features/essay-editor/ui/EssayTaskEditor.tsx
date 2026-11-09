@@ -84,21 +84,6 @@ export function EssayTaskEditor({
         </div>
       </div>
 
-      {/* Question Prompt */}
-      {description && (
-        <div className="py-2 text-sm sm:text-base font-medium text-slate-100 leading-relaxed">
-          {description.split(/(`[^`]+`)/g).map((part, i) =>
-            part.startsWith('`') && part.endsWith('`') ? (
-              <code key={i} className="px-1.5 py-0.5 mx-0.5 rounded bg-slate-800 text-purple-300 font-mono text-xs sm:text-[13px] border border-slate-700/60">
-                {part.slice(1, -1)}
-              </code>
-            ) : (
-              part
-            )
-          )}
-        </div>
-      )}
-
       {/* Textarea Input */}
       <div className="flex flex-col gap-2">
         <textarea

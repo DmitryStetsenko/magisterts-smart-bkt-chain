@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { io } from 'socket.io-client';
-import { Brain, Sparkles, CheckCircle, AlertCircle, RefreshCw, User, Code2, BookOpen, Scale, ChevronDown, ArrowRight, AlertTriangle, X, Settings, Network, Compass, Flame, History, MessageSquareQuote, CheckCircle2, Trophy, Target, MessageSquare, Info, HelpCircle, GraduationCap, Lock, Unlock } from 'lucide-react';
+import { Brain, Sparkles, CheckCircle, AlertCircle, RefreshCw, User, Code2, BookOpen, Scale, ChevronDown, ArrowRight, AlertTriangle, X, Settings, Network, Compass, Flame, History, MessageSquareQuote, CheckCircle2, Trophy, Target, MessageSquare, Info, HelpCircle, GraduationCap, Lock, Unlock, SlidersHorizontal } from 'lucide-react';
 import { MonacoCodeEditor } from '../features/code-editor/ui/MonacoCodeEditor';
 import { QuizTaskEditor } from '../features/quiz-editor/ui/QuizTaskEditor';
 import { EssayTaskEditor } from '../features/essay-editor/ui/EssayTaskEditor';
@@ -683,18 +683,74 @@ export function StudentPortalContent({
                         </div>
                       </DrawerSection>
 
-                      {/* Section 2: Умова поточного завдання */}
+                      {/* Section 2: Параметри тестування та метадані */}
                       <DrawerSection
-                        title="Умова завдання"
-                        icon={BookOpen}
+                        title="Параметри тестування"
+                        icon={SlidersHorizontal}
                         iconColor="text-cyan-400"
                         titleColor="text-cyan-400 group-hover:text-cyan-300"
-                        defaultOpen={false}
+                        defaultOpen={true}
                         className="border-t border-slate-800/80 pt-2.5"
                       >
-                        <div className="flex flex-col gap-1.5 py-1">
-                          <h3 className="text-xs font-bold text-white">{task.title}</h3>
-                          <p className="text-xs text-slate-300 leading-relaxed">{task.description}</p>
+                        <div className="flex flex-col gap-2 py-1 text-xs">
+                          {/* Формат тестування */}
+                          <div className="flex items-center justify-between text-slate-400">
+                            <span>Формат тесту:</span>
+                            <span className="font-mono font-medium text-slate-200">
+                              {task.taskType === 'SINGLE_CHOICE'
+                                ? 'Тест · 1 варіант'
+                                : task.taskType === 'MULTIPLE_CHOICE'
+                                ? 'Тест · Мульти-вибір'
+                                : task.taskType === 'TEXT_ESSAY'
+                                ? 'Розгорнуте есе'
+                                : 'Кодинг · Sandbox'}
+                            </span>
+                          </div>
+
+                          {/* Рівень складності */}
+                          <div className="flex items-center justify-between text-slate-400">
+                            <span>Складність:</span>
+                            <span className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase ${
+                              task.difficulty === 'HARD'
+                                ? 'bg-rose-950/60 text-rose-300 border border-rose-800/50'
+                                : task.difficulty === 'MEDIUM'
+                                ? 'bg-amber-950/60 text-amber-300 border border-amber-800/50'
+                                : 'bg-emerald-950/60 text-emerald-300 border border-emerald-800/50'
+                            }`}>
+                              {task.difficulty || 'EASY'}
+                            </span>
+                          </div>
+
+                          {/* Оцінювання & Максимальний бал */}
+                          <div className="flex items-center justify-between text-slate-400">
+                            <span>Макс. бал:</span>
+                            <span className="font-mono font-medium text-indigo-300">
+                              {recommendation?.isDifficultyDegraded
+                                ? `${recommendation?.maxScoreCap ?? 70}% (Адаптивний)`
+                                : '100%'}
+                            </span>
+                          </div>
+
+                          {/* Телеметрія */}
+                          <div className="flex items-center justify-between text-slate-400">
+                            <span>Телеметрія:</span>
+                            <span className="font-mono text-[11px] text-emerald-400 flex items-center gap-1.5">
+                              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                              {task.taskType === 'CODE' || task.taskType === 'TEXT_ESSAY'
+                                ? 'WPM + Паузи + Paste'
+                                : 'Латентність реакції'}
+                            </span>
+                          </div>
+
+                          {/* Тематичний топік */}
+                          {task.topic && (
+                            <div className="flex items-center justify-between text-slate-400 pt-1.5 border-t border-slate-800/60">
+                              <span>Топік:</span>
+                              <span className="font-mono text-[11px] text-slate-300 truncate max-w-[140px]" title={task.topic}>
+                                {task.topic}
+                              </span>
+                            </div>
+                          )}
                         </div>
                       </DrawerSection>
 
@@ -1614,6 +1670,43 @@ export function StudentPortalContent({
                 </div>
               )}
 
+              {/* 📋 Централізована Стилізована Умова Завдання (Task Condition Callout) */}
+              {task.description && (
+                <div
+                  data-testid="task-condition-card"
+                  className="rounded-xl bg-slate-900/60 border border-slate-800/90 p-4 sm:p-5 relative overflow-hidden group hover:border-slate-700/80 transition-all shadow-sm"
+                >
+                  <div className="absolute top-0 left-0 bottom-0 w-1 bg-gradient-to-b from-indigo-500 via-indigo-400 to-purple-500 rounded-l" />
+                  <div className="flex items-center justify-between gap-3 mb-2.5">
+                    <div className="flex items-center gap-2 text-xs font-semibold text-indigo-400 uppercase tracking-wider">
+                      <HelpCircle className="w-3.5 h-3.5 text-indigo-400" />
+                      <span>Умова завдання</span>
+                    </div>
+                    <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-slate-800/80 text-slate-400 border border-slate-700/50">
+                      {task.taskType === 'CODE'
+                        ? 'Практичний кодинг'
+                        : task.taskType === 'TEXT_ESSAY'
+                        ? 'Аналітичне есе'
+                        : 'Тестове опитування'}
+                    </span>
+                  </div>
+                  <div className="text-sm sm:text-[15px] font-medium text-slate-100 leading-relaxed pl-0.5 font-sans">
+                    {task.description.split(/(`[^`]+`)/g).map((part, i) =>
+                      part.startsWith('`') && part.endsWith('`') ? (
+                        <code
+                          key={i}
+                          className="px-1.5 py-0.5 mx-0.5 rounded bg-indigo-950/70 border border-indigo-700/50 text-indigo-200 font-mono text-xs sm:text-[13px] font-medium"
+                        >
+                          {part.slice(1, -1)}
+                        </code>
+                      ) : (
+                        part
+                      )
+                    )}
+                  </div>
+                </div>
+              )}
+
               {task.taskType === 'SINGLE_CHOICE' || task.taskType === 'MULTIPLE_CHOICE' ? (
                 <QuizTaskEditor
                   taskId={task.id}
@@ -1640,37 +1733,16 @@ export function StudentPortalContent({
                   isPendingReview={evalResult?.teacherReviewStatus === 'PENDING_REVIEW'}
                 />
               ) : (
-                <div className="flex flex-col gap-3">
-                  {task.description && (
-                    <div className="py-2 pb-3 border-b border-slate-800/60 text-xs sm:text-sm text-slate-200 leading-relaxed font-sans">
-                      <div className="flex items-center gap-1.5 text-xs font-semibold text-indigo-400 uppercase tracking-wider mb-1.5">
-                        <Code2 className="w-3.5 h-3.5" />
-                        <span>Умова практичного завдання</span>
-                      </div>
-                      <p className="text-slate-300 leading-relaxed">
-                        {task.description.split(/(`[^`]+`)/g).map((part, i) =>
-                          part.startsWith('`') && part.endsWith('`') ? (
-                            <code key={i} className="px-1.5 py-0.5 mx-0.5 rounded bg-slate-800 text-indigo-300 font-mono text-xs border border-slate-700/60">
-                              {part.slice(1, -1)}
-                            </code>
-                          ) : (
-                            part
-                          )
-                        )}
-                      </p>
-                    </div>
-                  )}
-                  <MonacoCodeEditor
-                    userId="demo-student"
-                    taskId={task.id}
-                    initialCode={code}
-                    onChange={setCode}
-                    onSubmit={() => handleEvaluate({ code })}
-                    isSubmitting={isSubmitting}
-                    onNextTask={() => fetchRecommendedTask(activeCourseSlug)}
-                    isPassed={Boolean(evalResult?.isPassed)}
-                  />
-                </div>
+                <MonacoCodeEditor
+                  userId="demo-student"
+                  taskId={task.id}
+                  initialCode={code}
+                  onChange={setCode}
+                  onSubmit={() => handleEvaluate({ code })}
+                  isSubmitting={isSubmitting}
+                  onNextTask={() => fetchRecommendedTask(activeCourseSlug)}
+                  isPassed={Boolean(evalResult?.isPassed)}
+                />
               )}
 
               {/* Evaluation Result Panel */}

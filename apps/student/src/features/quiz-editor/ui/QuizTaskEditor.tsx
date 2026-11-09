@@ -89,7 +89,7 @@ export function QuizTaskEditor({
         <div className="flex items-center gap-2 text-indigo-400">
           <HelpCircle className="w-4 h-4" />
           <h3 className="font-semibold text-slate-200 text-xs uppercase tracking-wider">
-            {taskType === 'SINGLE_CHOICE' ? 'Тестове завдання · Один варіант' : 'Тестове завдання · Кілька варіантів'}
+            {taskType === 'SINGLE_CHOICE' ? 'Оберіть один варіант відповіді:' : 'Оберіть усі правильні варіанти:'}
           </h3>
         </div>
 
@@ -98,20 +98,6 @@ export function QuizTaskEditor({
           <span>Телеметрія активна</span>
         </div>
       </div>
-
-      {description && (
-        <div className="py-2 text-sm sm:text-base font-medium text-slate-100 leading-relaxed">
-          {description.split(/(`[^`]+`)/g).map((part, i) =>
-            part.startsWith('`') && part.endsWith('`') ? (
-              <code key={i} className="px-1.5 py-0.5 mx-0.5 rounded bg-slate-800 text-indigo-300 font-mono text-xs sm:text-[13px] border border-slate-700/60">
-                {part.slice(1, -1)}
-              </code>
-            ) : (
-              part
-            )
-          )}
-        </div>
-      )}
 
       <div className="flex flex-col divide-y divide-slate-800/60 border-b border-slate-800/80">
         {shuffledOptions.map((opt, idx) => {

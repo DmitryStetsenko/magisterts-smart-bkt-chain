@@ -12,12 +12,12 @@
 | **`SBC-EP-BKT`** | Bayesian Knowledge Tracing & Behavioral Telemetry | 29 |
 | **`SBC-EP-LLM`** | Automated Code Assessment & Open-Text Evaluation | 10 |
 | **`SBC-EP-W3`** | Web3 Infrastructure & Smart Contracts | 0 |
-| **`SBC-EP-ST`** | Student Portal & Skill Tree Map | 34 |
+| **`SBC-EP-ST`** | Student Portal & Skill Tree Map | 35 |
 | **`SBC-EP-TC`** | Teacher Portal & Analytics CRM | 27 |
 | **`SBC-EP-AD`** | Admin Portal & Knowledge DAG Builder | 10 |
 | **`SBC-EP-LD`** | Landing Web Page | 9 |
 | **`SBC-EP-MS`** | Master's Thesis Engineering & Academic Text Generation | 9 |
-| **ВСЬОГО** | - | **263** |
+| **ВСЬОГО** | - | **264** |
 
 ---
 
@@ -317,6 +317,7 @@
 | **SBC-358** | `Story` | `ST` | enforce strict socratic hint level 2 prerequisite for express theory unlocking and auto-unfold hints accordion | 2026-11-09 | `2c1d8ce` |
 | **SBC-359** | `Fix` | `ST` | resolve nested button hydration error in DrawerSection by decoupling action slot from toggle header | 2026-11-09 | `b8dd325` |
 | **SBC-360** | `Fix` | `ST` | render task condition and question prompt centrally in main workspace across quiz, essay and code editors | 2026-11-09 | `63e00ff` |
+| **SBC-361** | `Refactor` | `ST` | replace redundant task description drawer section with test metadata and render styled condition callout under theory | 2026-11-09 | `pending` |
 
 ---
 
