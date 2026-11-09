@@ -318,7 +318,7 @@
 | **SBC-359** | `Fix` | `ST` | resolve nested button hydration error in DrawerSection by decoupling action slot from toggle header | 2026-11-09 | `b8dd325` |
 | **SBC-360** | `Fix` | `ST` | render task condition and question prompt centrally in main workspace across quiz, essay and code editors | 2026-11-09 | `63e00ff` |
 | **SBC-361** | `Refactor` | `ST` | replace redundant task description drawer section with test metadata and render styled condition callout under theory | 2026-11-09 | `aaaad9a` |
-| **SBC-362** | `Style` | `ST` | constrain task condition, options and content column to optimal typographic line length | 2026-11-09 | `pending` |
+| **SBC-362** | `Style` | `ST` | constrain task condition, options and content column to optimal typographic line length | 2026-11-09 | `d6de49c` |
 
 ---
 
