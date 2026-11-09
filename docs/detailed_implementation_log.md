@@ -30,6 +30,29 @@
   5. *Build Next.js Documentation Site* (`npm run build:docs`) — збірка статичного експорту (`output: "export"`, `trailingSlash: true`, `basePath: "/magisterts-smart-bkt-chain"`).
   6. *Upload Artifact & Deploy Pages* (`actions/upload-pages-artifact@v3` + `actions/deploy-pages@v4`).
 
+### 0.1.7.63 Централізоване Відображення Умови та Запитання Завдання в Основній Робочій Області (`SBC-360`, `EP-ST`)
+- **Інженерна та педагогічна проблема:**
+  - У Кабінеті Студента (`apps/student`) текст запитання та умова поточного завдання (`task.description`) рендерилися виключно всередині вузької бічної панелі (320px) у Секції 2 сайдбара.
+  - На центральному полотні робочої області (канвасі) студент бачив лише метадані курсу, заголовок навички (`task.title`) та інтерактивні елементи введення (радіокнопки варіантів тесту або порожній редактор коду/есе).
+  - Це призводило до когнітивного розриву уваги (split-attention effect): учень мав читати формулювання запитання на периферії зліва, а потім переводити погляд праворуч на варіанти відповідей. При згортанні сайдбара або переході до вкладки «Історія спроб» текст запитання ставав повністю невидимим.
+- **Виконані інженерні зміни:**
+  - **Тестові завдання ([`apps/student/src/features/quiz-editor/ui/QuizTaskEditor.tsx`](file:///apps/student/src/features/quiz-editor/ui/QuizTaskEditor.tsx)):**
+    - Впроваджено центральний блок умови `description` безпосередньо над списком варіантів відповідей.
+    - Реалізовано форматування inline коду через регулярний вираз `/(`[^`]+`)/g`, що огортає токени у стилізовані бейджі `<code className="px-1.5 py-0.5 mx-0.5 rounded bg-slate-800 text-indigo-300 font-mono text-xs sm:text-[13px] border border-slate-700/60">`.
+  - **Аналітичні есе ([`apps/student/src/features/essay-editor/ui/EssayTaskEditor.tsx`](file:///apps/student/src/features/essay-editor/ui/EssayTaskEditor.tsx)):**
+    - Додано параметри `title?: string` та `description?: string` в інтерфейс `EssayTaskEditorProps`.
+    - Додано блок умови завдання між телеметричною смугою та областю введення тексту `textarea`.
+  - **Практичні завдання з кодуванням ([`apps/student/src/components/StudentPortalApp.tsx`](file:///apps/student/src/components/StudentPortalApp.tsx)):**
+    - Перед `<MonacoCodeEditor>` додано блок `Умова практичного завдання` з векторною іконкою `Code2` та стилізованим описом задачі.
+  - **Оптимізація та семантика сайдбара ([`apps/student/src/components/StudentPortalApp.tsx`](file:///apps/student/src/components/StudentPortalApp.tsx)):**
+    - Заголовок бічної панелі оновлено на `Контекст та Підказки Завдання`.
+    - Секцію 2 сайдбара («Умова завдання») переведено в згорнутий за замовчуванням стан (`defaultOpen={false}`), усунувши дублювання тексту перед очима студента.
+- **Верифікація:**
+  - 100% успішне проходження E2E тестів Playwright (`npm run test:e2e`, 3/3 тестів, 21.6s).
+  - 100% проходження unit-тестів API (`npm run test:api`, 55/55 тестів у 9 сьютах).
+  - Успішна виробнича збірка `npm run build:student` (Next.js 16.2.9 Turbopack).
+  - Візуальна перевірка скріншота через Playwright MCP у живому браузері: запитання відображається по центру робочої області безпосередньо перед варіантами відповідей.
+
 ### 0.1.7.62 Усунення Гідраційної Помилки Вкладених Кнопок у DrawerSection (`SBC-359`, `EP-ST`)
 - **Інженерна проблема:**
   - У консолі браузера з'являлася критична помилка SSR-гідрації: `In HTML, <button> cannot be a descendant of <button>. This will cause a hydration error.`

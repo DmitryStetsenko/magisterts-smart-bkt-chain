@@ -544,7 +544,7 @@ export function StudentPortalContent({
     let iconColor = 'text-indigo-400';
 
     if (activeTab === 'task') {
-      title = 'Умова та Контекст Завдання';
+      title = 'Контекст та Підказки Завдання';
       icon = BookOpen;
       iconColor = 'text-indigo-400';
     } else if (activeTab === 'bkt') {
@@ -689,7 +689,7 @@ export function StudentPortalContent({
                         icon={BookOpen}
                         iconColor="text-cyan-400"
                         titleColor="text-cyan-400 group-hover:text-cyan-300"
-                        defaultOpen={true}
+                        defaultOpen={false}
                         className="border-t border-slate-800/80 pt-2.5"
                       >
                         <div className="flex flex-col gap-1.5 py-1">
@@ -1630,6 +1630,8 @@ export function StudentPortalContent({
                 <EssayTaskEditor
                   userId="demo-student"
                   taskId={task.id}
+                  title={task.title}
+                  description={task.description}
                   onChange={setEssayAnswer}
                   onSubmit={(telemetry) => handleEvaluate({ essayAnswer, ...(telemetry || {}) })}
                   isSubmitting={isSubmitting}
@@ -1638,16 +1640,37 @@ export function StudentPortalContent({
                   isPendingReview={evalResult?.teacherReviewStatus === 'PENDING_REVIEW'}
                 />
               ) : (
-                <MonacoCodeEditor
-                  userId="demo-student"
-                  taskId={task.id}
-                  initialCode={code}
-                  onChange={setCode}
-                  onSubmit={() => handleEvaluate({ code })}
-                  isSubmitting={isSubmitting}
-                  onNextTask={() => fetchRecommendedTask(activeCourseSlug)}
-                  isPassed={Boolean(evalResult?.isPassed)}
-                />
+                <div className="flex flex-col gap-3">
+                  {task.description && (
+                    <div className="py-2 pb-3 border-b border-slate-800/60 text-xs sm:text-sm text-slate-200 leading-relaxed font-sans">
+                      <div className="flex items-center gap-1.5 text-xs font-semibold text-indigo-400 uppercase tracking-wider mb-1.5">
+                        <Code2 className="w-3.5 h-3.5" />
+                        <span>Умова практичного завдання</span>
+                      </div>
+                      <p className="text-slate-300 leading-relaxed">
+                        {task.description.split(/(`[^`]+`)/g).map((part, i) =>
+                          part.startsWith('`') && part.endsWith('`') ? (
+                            <code key={i} className="px-1.5 py-0.5 mx-0.5 rounded bg-slate-800 text-indigo-300 font-mono text-xs border border-slate-700/60">
+                              {part.slice(1, -1)}
+                            </code>
+                          ) : (
+                            part
+                          )
+                        )}
+                      </p>
+                    </div>
+                  )}
+                  <MonacoCodeEditor
+                    userId="demo-student"
+                    taskId={task.id}
+                    initialCode={code}
+                    onChange={setCode}
+                    onSubmit={() => handleEvaluate({ code })}
+                    isSubmitting={isSubmitting}
+                    onNextTask={() => fetchRecommendedTask(activeCourseSlug)}
+                    isPassed={Boolean(evalResult?.isPassed)}
+                  />
+                </div>
               )}
 
               {/* Evaluation Result Panel */}
