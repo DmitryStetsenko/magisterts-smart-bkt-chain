@@ -13,11 +13,11 @@
 | **`SBC-EP-LLM`** | Automated Code Assessment & Open-Text Evaluation | 10 |
 | **`SBC-EP-W3`** | Web3 Infrastructure & Smart Contracts | 0 |
 | **`SBC-EP-ST`** | Student Portal & Skill Tree Map | 31 |
-| **`SBC-EP-TC`** | Teacher Portal & Analytics CRM | 26 |
+| **`SBC-EP-TC`** | Teacher Portal & Analytics CRM | 27 |
 | **`SBC-EP-AD`** | Admin Portal & Knowledge DAG Builder | 8 |
 | **`SBC-EP-LD`** | Landing Web Page | 9 |
 | **`SBC-EP-MS`** | Master's Thesis Engineering & Academic Text Generation | 9 |
-| **ВСЬОГО** | - | **257** |
+| **ВСЬОГО** | - | **258** |
 
 ---
 
@@ -379,6 +379,7 @@
 | **SBC-352** | `Docs` | `TC` | document end-to-end student and teacher event stream and ai dataset architecture in brainstorm hub | 2026-11-09 | `e766a5e` |
 | **SBC-353** | `Story` | `TC` | implement StudentActivityLog append-only database schema, migrations and AuditLogService in api backend | 2026-11-09 | `e31c090` |
 | **SBC-354** | `Story` | `TC` | integrate end-to-end event logging and annulment actions across student and teacher portals | 2026-11-09 | `bd36456` |
+| **SBC-355** | `Story` | `TC` | add teacher live student activity chronicle widget and admin ai dataset export center | 2026-11-09 | `038f42e` |
 
 
 

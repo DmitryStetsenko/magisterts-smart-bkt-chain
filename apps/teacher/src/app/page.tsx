@@ -2,13 +2,14 @@
 
 import React, { useState, useEffect } from 'react';
 import { io } from 'socket.io-client';
-import { ShieldCheck, Network, Users, BarChart3, Code2, BookOpen, Scale, ChevronDown, ChevronUp, X, Search, RotateCcw, AlertTriangle, CheckCircle2, Lock, HelpCircle, Code, FileText, CheckSquare, Sparkles, Keyboard, Copy, Activity, Info, GitBranch, Layers, ClipboardCheck, Tag, FlaskConical, Compass, User, Globe, Plus, Minus, GraduationCap } from 'lucide-react';
+import { ShieldCheck, Network, Users, BarChart3, Code2, BookOpen, Scale, ChevronDown, ChevronUp, X, Search, RotateCcw, AlertTriangle, CheckCircle2, Lock, HelpCircle, Code, FileText, CheckSquare, Sparkles, Keyboard, Copy, Activity, Info, GitBranch, Layers, ClipboardCheck, Tag, FlaskConical, Compass, User, Globe, Plus, Minus, GraduationCap, Clock } from 'lucide-react';
 import { StudentAnalyticsItem } from '../features/analytics/model/analytics.types';
 import { AnomalyTreeWidget, GameSkillTreeWidget, SkillGraphNode, AppShellLayout, Breadcrumbs, UserProfileDrawer } from '@sbc/ui';
 import { CourseDto, TaskDto } from '@sbc/types';
 import { ReviewQueueInspector } from '../features/reviews/ui/ReviewQueueInspector';
 import { CourseGraphViewer } from '../features/course-map/ui/CourseGraphViewer';
 import { MetricsAuditInspector } from '../features/metrics-audit/ui/MetricsAuditInspector';
+import { StudentActivityTimelineWidget } from '../features/analytics/ui/StudentActivityTimelineWidget';
 
 export type CourseItem = Omit<Partial<CourseDto>, 'icon'> & {
   slug: string;
@@ -181,7 +182,8 @@ export default function TeacherDashboardPage() {
   const [isAdaptiveParamsOpen, setIsAdaptiveParamsOpen] = useState<boolean>(true);
   // By default, student selection is in the top bar, so canvas has 100% space
   const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
-  const [activeStudentView, setActiveStudentView] = useState<'metrics' | 'tree'>('metrics');
+  const [activeStudentView, setActiveStudentView] = useState<'metrics' | 'tree' | 'timeline'>('metrics');
+  const [liveActivityLogs, setLiveActivityLogs] = useState<any[]>([]);
 
   // Teacher Review Queue State & Filter Tab ('pending' | 'reviewed')
   const [reviewFilterTab, setReviewFilterTab] = useState<'pending' | 'reviewed'>('pending');
@@ -245,6 +247,7 @@ export default function TeacherDashboardPage() {
 
       socket.on('activity_log', (data: any) => {
         console.log('⚡ [TeacherPortal] Real-time activity log detected:', data);
+        setLiveActivityLogs((prev) => [data, ...prev.slice(0, 50)]);
         fetchStudentAnalytics();
       });
 
@@ -1642,7 +1645,7 @@ export default function TeacherDashboardPage() {
                 </div>
 
                 <div className="flex items-center gap-2.5">
-                  {/* View Mode Toggle: Metrics Heatmap vs RPG Skill Tree */}
+                  {/* View Mode Toggle: Metrics Heatmap vs RPG Skill Tree vs Activity Timeline */}
                   <div className="bg-slate-900/90 p-1 rounded-lg border border-slate-800/80 flex items-center gap-1">
                     <button
                       onClick={() => setActiveStudentView('metrics')}
@@ -1666,6 +1669,17 @@ export default function TeacherDashboardPage() {
                       <GitBranch className="w-3.5 h-3.5" />
                       <span>Дерево Знань</span>
                     </button>
+                    <button
+                      onClick={() => setActiveStudentView('timeline')}
+                      className={`px-2.5 py-1 rounded-md text-xs font-medium flex items-center gap-1.5 transition-all cursor-pointer ${
+                        activeStudentView === 'timeline'
+                          ? 'bg-purple-600 text-white'
+                          : 'text-slate-400 hover:text-white'
+                      }`}
+                    >
+                      <Clock className="w-3.5 h-3.5" />
+                      <span>Хроніка дій</span>
+                    </button>
                   </div>
 
                   <button
@@ -1679,7 +1693,7 @@ export default function TeacherDashboardPage() {
                 </div>
               </div>
 
-              {/* 🌟 Dynamic View Mode: RPG Game Skill Tree vs Traditional Metrics */}
+              {/* 🌟 Dynamic View Mode: RPG Game Skill Tree vs Activity Timeline vs Traditional Metrics */}
               {activeStudentView === 'tree' ? (
                 <div className="w-full h-[680px] rounded-xl overflow-hidden border border-slate-800/80">
                   <GameSkillTreeWidget
@@ -1697,6 +1711,13 @@ export default function TeacherDashboardPage() {
                     }}
                   />
                 </div>
+              ) : activeStudentView === 'timeline' ? (
+                <StudentActivityTimelineWidget
+                  studentId={selectedStudent.id || 'demo-student'}
+                  studentName={selectedStudent.name}
+                  apiUrl={API_URL}
+                  incomingLogs={liveActivityLogs}
+                />
               ) : (
                 <>
                   {/* Clean Student Metrics Grid */}

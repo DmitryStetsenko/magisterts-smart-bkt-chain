@@ -120,6 +120,93 @@
           ]
         },
         {
+          "title": "0.1.7.58 Віджет Хроніки Дій Студента у Кабінеті Викладача та Центр Експорту Датасетів для ШІ в Адмін-Панелі (`SBC-355`, `EP-TC`)",
+          "level": 3,
+          "paragraphs": [],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "**Інженерна постановка:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Для завершення наскрізного циклу аудиту та надання викладачу й дослідникам зручних інструментів аналізу та генерації вибірок для навчання нейромереж розроблено:",
+              "subitems": [
+                "1. Інтерактивний віджет хроніки подій учня в реальному часі у кабінеті викладача (`apps/teacher`);",
+                "2. Повнофункціональний центр експорту датасетів для ШІ (JSONL / CSV) та живий аудит-потік у панелі адміністратора (`apps/admin`)."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**1. Кабінет викладача (`apps/teacher`):**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Компонент `StudentActivityTimelineWidget` ([`apps/teacher/src/features/analytics/ui/StudentActivityTimelineWidget.tsx`](file:///apps/teacher/src/features/analytics/ui/StudentActivityTimelineWidget.tsx)):**",
+              "subitems": [
+                "Реалізує вертикальну часову вісь (Timeline) із фільтрами: `Всі події`, `Підказки Сократа`, `Експрес-теорія`, `Спроби завдань`, `Анулювання`, `Скидання`.",
+                "Відображає бейджі подій із тематичними іконками та колірним кодуванням:",
+                "`Анульовано викладачем` (червоний, `AlertTriangle`) — причина, штрафний BKT-відкат, зауваження вчителя;",
+                "`Підказка Сократа` (жовтий, `HelpCircle`) — рівень 1/2 та штрафний відсоток;",
+                "`Вивчення теорії` (блакитний, `BookOpen`) — точний хронометраж `dwellTimeSeconds`;",
+                "`Спроба розв'язку` (зелений, `Code2`) — вердикт успішності, приріст $\\Delta P(L)$, омани;",
+                "`Скидання / Ремедіація` (фіолетовий, `RotateCcw`) — добровільна відмова заради підручника або анулювання модуля.",
+                "Підтримує динамічне злиття нових подій з `incomingLogs` (WebSockets) без перезавантаження.",
+                "Кнопка 1-клік завантаження індивідуального часового ряду студента у форматі JSONL."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Інтеграція в тулбар аналітики студента ([`apps/teacher/src/app/page.tsx`](file:///apps/teacher/src/app/page.tsx)):**",
+              "subitems": [
+                "Додано режим `activeStudentView === 'timeline'` («Хроніка дій»).",
+                "Підключено стан `liveActivityLogs`, що реактивно наповнюється через сокет-подію `activity_log`."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**2. Панель адміністратора (`apps/admin`):**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Центр експорту датасетів для ШІ ([`apps/admin/src/features/dataset-export/ui/DatasetExportCenter.tsx`](file:///apps/admin/src/features/dataset-export/ui/DatasetExportCenter.tsx)):**",
+              "subitems": [
+                "**1-Click ML Export Cards:**",
+                "**JSONL:** для моделей DKT (Deep Knowledge Tracing), SAKT, AKT та потокового навчання у PyTorch / TensorFlow (`/api/v1/bkt/activity-logs/export?format=jsonl`);",
+                "**CSV:** для Pandas, R, Google Sheets, PowerBI з екрануванням JSON (`/api/v1/bkt/activity-logs/export?format=csv`).",
+                "**KPI Summary Grid:** швидкий огляд ключових показників (всього подій, спроб коду, анулювань як Hard Negatives, підказок, сесій теорії, скидань).",
+                "**Таблиця аудиту (Live Audit Stream):** перегляд останніх 100 подій системи з фільтрами за категоріями та `userId`."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Навігаційна рейка ([`apps/admin/src/app/page.tsx`](file:///apps/admin/src/app/page.tsx)):**",
+              "subitems": [
+                "Додано вкладку `datasets` («Експорт Датасетів для ШІ & Аудит-Логи») з іконкою `Database` та оновленням Breadcrumbs."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**3. Верифікація:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "100% проходження юніт-тестів API (`npm run test:api`, 53 тести, 9 сьютів).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Успішна збірка `npm run build:teacher` та `npm run build:admin`.",
+              "subitems": []
+            }
+          ]
+        },
+        {
           "title": "0.1.7.57 Інтеграція Наскрізного Логування та Механізму Анулювання Спроб у Клієнтських Порталах Учня та Викладача (`SBC-354`, `EP-TC`)",
           "level": 3,
           "paragraphs": [],

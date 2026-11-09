@@ -15,6 +15,7 @@ import { getAppBaseUrl } from '@sbc/routes';
 import { SkillDagEditor } from '../features/skill-editor/ui/SkillDagEditor';
 import { AdminSkillNode } from '../features/skill-editor/model/skill-editor.types';
 import { CourseManager } from '../features/course-manager/ui/CourseManager';
+import { DatasetExportCenter } from '../features/dataset-export/ui/DatasetExportCenter';
 
 export default function AdminCMSDashboard() {
   const [nodes, setNodes] = useState<AdminSkillNode[]>([
@@ -99,7 +100,7 @@ export default function AdminCMSDashboard() {
     setNodes((prev) => prev.filter((n) => n.id !== nodeId));
   };
 
-  type AdminTab = 'dag' | 'courses' | 'system';
+  type AdminTab = 'dag' | 'courses' | 'datasets' | 'system';
   const [activeTab, setActiveTab] = useState<AdminTab>('dag');
   const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(true);
   const [isProfileDrawerOpen, setIsProfileDrawerOpen] = useState<boolean>(false);
@@ -144,8 +145,10 @@ export default function AdminCMSDashboard() {
                   ? 'Граф навичок'
                   : activeTab === 'courses'
                   ? 'Курси'
+                  : activeTab === 'datasets'
+                  ? 'Датасети для ШІ'
                   : 'Система',
-                badge: `${nodes.length} навичок`,
+                badge: activeTab === 'dag' ? `${nodes.length} навичок` : undefined,
                 isCurrent: true,
               },
             ]}
@@ -201,6 +204,12 @@ export default function AdminCMSDashboard() {
             title: 'Керування Курсами & Завданнями',
             activeColor: 'bg-emerald-600',
           },
+          {
+            id: 'datasets',
+            icon: Database,
+            title: 'Експорт Датасетів для ШІ & Аудит-Логи',
+            activeColor: 'bg-emerald-600',
+          },
         ],
         activeTab: activeTab,
         isDrawerOpen: isDrawerOpen,
@@ -235,6 +244,8 @@ export default function AdminCMSDashboard() {
         )}
 
         {activeTab === 'courses' && <CourseManager />}
+
+        {activeTab === 'datasets' && <DatasetExportCenter />}
 
         {activeTab === 'system' && (
           <div className="flex flex-col gap-4">
