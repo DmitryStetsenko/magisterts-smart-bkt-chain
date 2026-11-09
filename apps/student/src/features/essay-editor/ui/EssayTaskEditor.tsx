@@ -85,14 +85,14 @@ export function EssayTaskEditor({
       </div>
 
       {/* Textarea Input */}
-      <div className="flex flex-col gap-2 max-w-3xl">
+      <div className="flex flex-col gap-2 w-full">
         <textarea
           value={essayText}
           onChange={handleChange}
           onKeyDown={handleTextareaKeyDown}
           onPaste={handleTextareaPaste}
           placeholder="Введіть вашу розгорнуту відповідь або аналіз..."
-          className="w-full min-h-[220px] p-3.5 bg-slate-900/60 border border-slate-800/80 rounded-lg text-slate-100 text-sm focus:outline-none focus:border-indigo-500/60 font-sans leading-relaxed resize-y max-w-3xl"
+          className="w-full min-h-[220px] p-3.5 bg-slate-900/60 border border-slate-800/80 rounded-lg text-slate-100 text-sm focus:outline-none focus:border-indigo-500/60 font-sans leading-relaxed resize-y"
         />
 
         <div className="flex items-center justify-between text-[11px] text-slate-500 font-mono">

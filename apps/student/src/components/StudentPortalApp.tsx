@@ -1485,12 +1485,12 @@ export function StudentPortalContent({
             </div>
           ) : task ? (
             <div className="flex-1 p-4 lg:p-6 overflow-y-auto flex flex-col gap-4">
-              <div className={`w-full flex flex-col gap-4 ${task.taskType === 'CODE' ? 'max-w-5xl' : 'max-w-3xl'}`}>
+              <div className="w-full flex flex-col gap-4">
               {/* Хлібні крихти перенесені в головний AppShellLayout хедер для уникнення дублювання */}
 
               {/* 🎓 Міжпортальна плашка повернення до Підручника Теорії (Cross-App Protocol) */}
               {source === 'study' && (
-                <div className="w-full max-w-3xl bg-gradient-to-r from-blue-950/80 via-indigo-950/60 to-slate-900 border border-blue-500/40 rounded-2xl p-4 shadow-xl flex items-center justify-between gap-4 animate-fadeIn">
+                <div className="w-full bg-gradient-to-r from-blue-950/80 via-indigo-950/60 to-slate-900 border border-blue-500/40 rounded-2xl p-4 shadow-xl flex items-center justify-between gap-4 animate-fadeIn">
                   <div className="flex items-center gap-3">
                     <div className="p-2 rounded-xl bg-blue-500/20 border border-blue-500/30 text-blue-400 shrink-0">
                       <GraduationCap className="w-5 h-5 animate-pulse" />
@@ -1520,7 +1520,7 @@ export function StudentPortalContent({
 
               {/* ⚠️ Top Adaptive Degradation Notice Banner */}
               {recommendation?.isDifficultyDegraded && (
-                <div className="w-full max-w-3xl bg-gradient-to-r from-amber-950/70 via-amber-900/40 to-slate-900 border border-amber-500/40 rounded-2xl p-4 shadow-xl flex items-start sm:items-center justify-between gap-4 animate-fadeIn">
+                <div className="w-full bg-gradient-to-r from-amber-950/70 via-amber-900/40 to-slate-900 border border-amber-500/40 rounded-2xl p-4 shadow-xl flex items-start sm:items-center justify-between gap-4 animate-fadeIn">
                   <div className="flex items-start sm:items-center gap-3">
                     <div className="p-2 rounded-xl bg-amber-500/20 border border-amber-500/30 text-amber-400 shrink-0 mt-0.5 sm:mt-0">
                       <AlertTriangle className="w-5 h-5 animate-pulse" />
@@ -1532,7 +1532,7 @@ export function StudentPortalContent({
                           Максимальний бал: {recommendation?.maxScoreCap ?? 70}%
                         </span>
                       </div>
-                      <p className="text-xs text-amber-200/90 mt-0.5 leading-relaxed max-w-2xl">
+                      <p className="text-xs text-amber-200/90 mt-0.5 leading-relaxed max-w-3xl">
                         Система помітила труднощі в попередніх завданнях і тимчасово надала допоміжні питання для закріплення базових концепцій. Ви зможете повернутися до 100% балу після успішного освоєння теми.
                       </p>
                     </div>
@@ -1546,7 +1546,7 @@ export function StudentPortalContent({
               )}
 
               {/* 📊 Active Task Compact Toolbar */}
-              <div className="w-full max-w-3xl pb-3 border-b border-slate-800/80 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div className="w-full pb-3 border-b border-slate-800/80 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div className="flex flex-col gap-0.5">
                   <div className="flex items-center gap-2 flex-wrap text-xs">
                     <span className="font-mono font-semibold text-indigo-400">
@@ -1675,15 +1675,15 @@ export function StudentPortalContent({
               {task.description && (
                 <div
                   data-testid="task-condition-card"
-                  className="rounded-xl bg-slate-900/60 border border-slate-800/90 p-4 sm:p-5 relative overflow-hidden group hover:border-slate-700/80 transition-all shadow-sm max-w-3xl"
+                  className="w-full rounded-2xl bg-gradient-to-r from-slate-900/80 via-indigo-950/20 to-slate-900/60 border border-slate-800/90 p-5 sm:p-6 relative overflow-hidden group hover:border-slate-700/80 transition-all shadow-sm"
                 >
-                  <div className="absolute top-0 left-0 bottom-0 w-1 bg-gradient-to-b from-indigo-500 via-indigo-400 to-purple-500 rounded-l" />
+                  <div className="absolute top-0 left-0 bottom-0 w-1.5 bg-gradient-to-b from-indigo-500 via-indigo-400 to-purple-500 rounded-l" />
                   <div className="flex items-center justify-between gap-3 mb-2.5">
                     <div className="flex items-center gap-2 text-xs font-semibold text-indigo-400 uppercase tracking-wider">
                       <HelpCircle className="w-3.5 h-3.5 text-indigo-400" />
                       <span>Умова завдання</span>
                     </div>
-                    <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-slate-800/80 text-slate-400 border border-slate-700/50">
+                    <span className="text-[11px] font-mono px-2.5 py-0.5 rounded-full bg-slate-800/80 text-slate-300 border border-slate-700/60">
                       {task.taskType === 'CODE'
                         ? 'Практичний кодинг'
                         : task.taskType === 'TEXT_ESSAY'
@@ -1691,12 +1691,12 @@ export function StudentPortalContent({
                         : 'Тестове опитування'}
                     </span>
                   </div>
-                  <div className="text-sm sm:text-[15px] font-medium text-slate-100 leading-relaxed pl-0.5 font-sans max-w-2xl">
+                  <div className="text-sm sm:text-base font-medium text-slate-100 leading-relaxed pl-0.5 font-sans max-w-4xl">
                     {task.description.split(/(`[^`]+`)/g).map((part, i) =>
                       part.startsWith('`') && part.endsWith('`') ? (
                         <code
                           key={i}
-                          className="px-1.5 py-0.5 mx-0.5 rounded bg-indigo-950/70 border border-indigo-700/50 text-indigo-200 font-mono text-xs sm:text-[13px] font-medium"
+                          className="px-2 py-0.5 mx-1 rounded-md bg-indigo-950/90 border border-indigo-700/60 text-indigo-200 font-mono text-xs sm:text-sm font-semibold"
                         >
                           {part.slice(1, -1)}
                         </code>

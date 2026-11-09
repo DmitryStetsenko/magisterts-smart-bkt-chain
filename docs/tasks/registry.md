@@ -12,12 +12,12 @@
 | **`SBC-EP-BKT`** | Bayesian Knowledge Tracing & Behavioral Telemetry | 29 |
 | **`SBC-EP-LLM`** | Automated Code Assessment & Open-Text Evaluation | 10 |
 | **`SBC-EP-W3`** | Web3 Infrastructure & Smart Contracts | 0 |
-| **`SBC-EP-ST`** | Student Portal & Skill Tree Map | 36 |
+| **`SBC-EP-ST`** | Student Portal & Skill Tree Map | 37 |
 | **`SBC-EP-TC`** | Teacher Portal & Analytics CRM | 27 |
 | **`SBC-EP-AD`** | Admin Portal & Knowledge DAG Builder | 10 |
 | **`SBC-EP-LD`** | Landing Web Page | 9 |
 | **`SBC-EP-MS`** | Master's Thesis Engineering & Academic Text Generation | 9 |
-| **ВСЬОГО** | - | **265** |
+| **ВСЬОГО** | - | **266** |
 
 ---
 
@@ -319,6 +319,7 @@
 | **SBC-360** | `Fix` | `ST` | render task condition and question prompt centrally in main workspace across quiz, essay and code editors | 2026-11-09 | `63e00ff` |
 | **SBC-361** | `Refactor` | `ST` | replace redundant task description drawer section with test metadata and render styled condition callout under theory | 2026-11-09 | `aaaad9a` |
 | **SBC-362** | `Style` | `ST` | constrain task condition, options and content column to optimal typographic line length | 2026-11-09 | `d6de49c` |
+| **SBC-363** | `Refactor` | `ST` | remove asymmetric layout capping and implement 2x2 responsive quiz options grid with full-width condition banner | 2026-11-09 | `pending` |
 
 ---
 

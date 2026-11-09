@@ -99,7 +99,7 @@ export function QuizTaskEditor({
         </div>
       </div>
 
-      <div className="flex flex-col divide-y divide-slate-800/60 border-b border-slate-800/80 max-w-3xl">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 w-full">
         {shuffledOptions.map((opt, idx) => {
           const active = isSelected(opt.id);
           const letter = String.fromCharCode(65 + idx); // A, B, C, D
@@ -112,33 +112,33 @@ export function QuizTaskEditor({
                   ? setSelectedSingleId(opt.id)
                   : handleToggleMultiple(opt.id);
               }}
-              className={`py-3.5 px-3 transition-colors flex items-center justify-between gap-4 ${
+              className={`p-3.5 sm:p-4 rounded-xl border transition-all flex items-start justify-between gap-3 cursor-pointer ${
                 isPassed
                   ? active
-                    ? 'bg-emerald-500/10 border-l-2 border-l-emerald-400 text-white cursor-default'
-                    : 'text-slate-500 cursor-not-allowed'
+                    ? 'bg-emerald-500/10 border-emerald-500/50 text-white cursor-default shadow-sm shadow-emerald-950/40'
+                    : 'bg-slate-900/30 border-slate-800/50 text-slate-500 cursor-not-allowed opacity-60'
                   : active
-                  ? 'bg-indigo-500/10 border-l-2 border-l-indigo-400 text-white cursor-pointer'
-                  : 'hover:bg-slate-900/60 text-slate-300 cursor-pointer'
+                  ? 'bg-indigo-600/15 border-indigo-500/70 text-white shadow-md shadow-indigo-950/50 ring-1 ring-indigo-500/40'
+                  : 'bg-slate-900/50 border-slate-800/80 hover:border-slate-700 hover:bg-slate-800/50 text-slate-200'
               }`}
             >
-              <div className="flex items-center gap-3 flex-1 min-w-0">
+              <div className="flex items-start gap-3 flex-1 min-w-0">
                 <div
-                  className={`w-5 h-5 rounded-${
+                  className={`w-6 h-6 rounded-${
                     taskType === 'SINGLE_CHOICE' ? 'full' : 'md'
-                  } flex items-center justify-center font-mono font-bold text-[11px] transition-colors shrink-0 ${
+                  } flex items-center justify-center font-mono font-bold text-xs transition-colors shrink-0 mt-0.5 ${
                     isPassed
                       ? active
                         ? 'bg-emerald-500 text-slate-950'
-                        : 'bg-slate-800/70 text-slate-500'
+                        : 'bg-slate-800 text-slate-500'
                       : active
                       ? 'bg-indigo-600 text-white'
-                      : 'bg-slate-800/80 text-slate-400'
+                      : 'bg-slate-800/90 border border-slate-700/60 text-slate-300'
                   }`}
                 >
                   {active ? <CheckCircle2 className="w-3.5 h-3.5 stroke-[2.5]" /> : letter}
                 </div>
-                <span className={`text-sm leading-relaxed max-w-2xl ${active ? 'font-semibold text-white' : 'font-normal text-slate-300'}`}>
+                <span className={`text-sm leading-relaxed ${active ? 'font-semibold text-white' : 'font-normal text-slate-300'}`}>
                   {opt.text}
                 </span>
               </div>
