@@ -3,6 +3,7 @@ import { BktController } from './bkt.controller';
 import { PrismaService } from '../../outbound/persistence/prisma.service';
 import { TelemetryGateway } from '../websocket/telemetry.gateway';
 import { OpenAnswerEvaluatorService } from '../../../domain/evaluation/open-answer-evaluator.service';
+import { AuditLogService } from '../../../domain/audit/audit-log.service';
 
 describe('BktController (Analytics & Telemetry reset integration)', () => {
   let controller: BktController;
@@ -39,6 +40,16 @@ describe('BktController (Analytics & Telemetry reset integration)', () => {
     notifyBktReset: jest.fn(),
     notifyStudentSubmission: jest.fn(),
     notifyTeacherReviewDecision: jest.fn(),
+    notifyActivityLog: jest.fn(),
+    notifySubmissionAnnulled: jest.fn(),
+  };
+
+  const mockAuditLogService = {
+    logEvent: jest.fn().mockResolvedValue({ id: 'log-1', eventType: 'TASK_SUBMITTED' }),
+    getStudentLogs: jest.fn().mockResolvedValue([]),
+    getRecentLogs: jest.fn().mockResolvedValue([]),
+    annulSubmission: jest.fn().mockResolvedValue({ success: true, submissionId: 'sub-1' }),
+    exportDataset: jest.fn().mockResolvedValue('{"id":"log-1"}'),
   };
 
   beforeEach(async () => {
@@ -65,6 +76,10 @@ describe('BktController (Analytics & Telemetry reset integration)', () => {
               needsTeacherReview: false,
             }),
           },
+        },
+        {
+          provide: AuditLogService,
+          useValue: mockAuditLogService,
         },
       ],
     }).compile();
@@ -191,5 +206,49 @@ describe('BktController (Analytics & Telemetry reset integration)', () => {
         data: expect.objectContaining({ teacherReviewStatus: 'APPROVED' }),
       }),
     );
+  });
+
+  describe('Activity Logging & Annulment Endpoints', () => {
+    it('should forward logActivityEvent to AuditLogService', async () => {
+      const dto = {
+        userId: 'student-1',
+        eventType: 'HINT_REQUESTED',
+        payload: { level: 1 },
+      };
+      const res = await controller.logActivityEvent(dto);
+      expect(mockAuditLogService.logEvent).toHaveBeenCalledWith(dto);
+      expect(res).toEqual({ id: 'log-1', eventType: 'TASK_SUBMITTED' });
+    });
+
+    it('should forward annulSubmission to AuditLogService', async () => {
+      const res = await controller.annulSubmission('sub-1', {
+        teacherId: 'teacher-1',
+        reason: 'PLAGIARISM',
+        comment: 'Списано',
+        penaltyMultiplier: 1.25,
+      });
+      expect(mockAuditLogService.annulSubmission).toHaveBeenCalledWith({
+        submissionId: 'sub-1',
+        teacherId: 'teacher-1',
+        reason: 'PLAGIARISM',
+        comment: 'Списано',
+        penaltyMultiplier: 1.25,
+      });
+      expect(res.success).toBe(true);
+    });
+
+    it('should export dataset with proper headers', async () => {
+      const mockRes: any = {
+        setHeader: jest.fn(),
+        send: jest.fn().mockImplementation((val) => val),
+      };
+      await controller.exportActivityLogs(mockRes, 'js-dev', 'student-1', 'jsonl');
+      expect(mockAuditLogService.exportDataset).toHaveBeenCalledWith({
+        courseSlug: 'js-dev',
+        userId: 'student-1',
+        format: 'jsonl',
+      });
+      expect(mockRes.setHeader).toHaveBeenCalledWith('Content-Type', 'application/x-ndjson');
+    });
   });
 });

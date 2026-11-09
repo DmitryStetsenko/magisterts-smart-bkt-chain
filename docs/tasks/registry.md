@@ -377,6 +377,8 @@
 | **SBC-332** | `Fix` | `TC` | remove duplicate breadcrumbs inside main canvas of teacher and admin portals | 2026-11-05 | `306d0de` |
 | **SBC-333** | `Style` | `TC` | declutter teacher portal workspace into clean borderless canvas | 2026-11-05 | `7e94eb6` |
 | **SBC-352** | `Docs` | `TC` | document end-to-end student and teacher event stream and ai dataset architecture in brainstorm hub | 2026-11-09 | `e766a5e` |
+| **SBC-353** | `Story` | `TC` | implement StudentActivityLog append-only database schema, migrations and AuditLogService in api backend | 2026-11-09 | pending |
+
 
 
 

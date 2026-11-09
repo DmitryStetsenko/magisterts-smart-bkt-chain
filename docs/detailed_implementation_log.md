@@ -30,6 +30,42 @@
   5. *Build Next.js Documentation Site* (`npm run build:docs`) — збірка статичного експорту (`output: "export"`, `trailingSlash: true`, `basePath: "/magisterts-smart-bkt-chain"`).
   6. *Upload Artifact & Deploy Pages* (`actions/upload-pages-artifact@v3` + `actions/deploy-pages@v4`).
 
+### 0.1.7.56 Реалізація Незмінної Схеми `StudentActivityLog`, Сервісу `AuditLogService` та Ендпоінтів Анулювання та Експорту (`SBC-353`, `EP-TC`)
+- **Інженерна постановка:**
+  - На основі схваленого Брейншторму #16 реалізовано перший практичний етап наскрізної системи логування: незмінну таблицю в базі даних PostgreSQL, типізовані контракти, бекенд-сервіс із реактивною WebSocket-шиною та REST API ендпоінти для запису, отримання, анулювання та експорту даних для ШІ.
+- **1. Незмінна модель `StudentActivityLog` ([`packages/database/prisma/schema.prisma`](file:///packages/database/prisma/schema.prisma)):**
+  - Створено таблицю `student_activity_logs` із полями:
+    - `id` (`uuid`), `userId` (FK на `User`), `actorId` (ID ініціатора: студент, викладач, адмін або система), `actorRole` (`UserRole`), `courseId`, `skillId`, `taskId`, `submissionId`, `eventType` (`String`), `payload` (`Json`), `createdAt` (`DateTime`, `@default(now())`).
+  - Налаштовано складені індекси для високопродуктивних запитів: `@@index([userId, createdAt])`, `@@index([eventType])`, `@@index([taskId])`, `@@index([skillId])`.
+  - Розширено переліки статусів `SubmissionStatus` та `TeacherReviewStatus` значенням `ANNULLED`.
+  - Успішно виконано команду `npx prisma db push --skip-generate` та згенеровано оновлений клієнт Prisma (`node_modules/@prisma/client`).
+- **2. Доменні та мережеві контракти ([`packages/types/src/telemetry.types.ts`](file:///packages/types/src/telemetry.types.ts)):**
+  - Додано строго типізований перелік подій `ActivityEventType` (19 типів подій по 5 доменах).
+  - Створено інтерфейси `StudentActivityLogDto`, `CreateActivityLogDto` та `AnnulSubmissionPayloadDto`.
+  - Виконано компіляцію типів через `npm run build:types`.
+- **3. Доменний сервіс `AuditLogService` ([`apps/api/src/domain/audit/audit-log.service.ts`](file:///apps/api/src/domain/audit/audit-log.service.ts)):**
+  - `logEvent(dto: CreateActivityLogDto)`: створює запис у `student_activity_logs` та ініціює push-повідомлення через `TelemetryGateway` (`activity_log` та `user_activity_{userId}`).
+  - `getStudentLogs(userId, limit)`: повертає хронологічний зріз дій студента (до 200 записів).
+  - `getRecentLogs(limit)`: повертає глобальний потік подій для кабінету викладача / адміна (до 500 записів).
+  - `annulSubmission(dto)`: виконує педагогічний протокол анулювання:
+    - Оновлює статус спроби на `ANNULLED` (і `teacherReviewStatus: 'ANNULLED'`);
+    - Виконує штрафний відкат BKT з коефіцієнтом $\gamma_{\text{penalty}} = 1.25$ до гарантованої нижньої асимптоти $P_{\min} = 0.05$;
+    - Фіксує корегувальний крок у `BktHistory` із міткою `teacher_annulled_<reason>`;
+    - Додає подію `TEACHER_SUBMISSION_ANNULLED` у незмінний аудит-лог;
+    - Емітує WebSocket подію `submission_annulled` для миттєвої реакції клієнтського інтерфейсу.
+  - `exportDataset(options)`: серіалізує потік подій у формат **JSONL** (кожен запис окремим рядком) або **CSV** (з екрануванням JSON-пейлоаду) для навчання моделей DKT, SAKT або класифікаторів недоброчесності.
+- **4. Розширення `BktController` ([`apps/api/src/adapters/inbound/http/bkt.controller.ts`](file:///apps/api/src/adapters/inbound/http/bkt.controller.ts)):**
+  - Додано автоматичне логування подій у наявні процеси: `TASK_SUBMITTED`, `TASK_ABANDON_CONFIRMED`, `STUDENT_SKILL_RESET`, `TEACHER_MODULE_REVOKED`, `TEACHER_REVIEW_APPROVED`, `TEACHER_REVIEW_REJECTED`.
+  - Додано нові ендпоінти:
+    - `POST /api/v1/bkt/activity-logs`
+    - `GET /api/v1/bkt/activity-logs/student/:userId`
+    - `GET /api/v1/bkt/activity-logs/recent`
+    - `POST /api/v1/bkt/submissions/:submissionId/annul`
+    - `GET /api/v1/bkt/activity-logs/export`
+- **5. Верифікація:**
+  - 100% успішне проходження 53 unit-тестів у [`audit-log.service.spec.ts`](file:///apps/api/src/domain/audit/audit-log.service.spec.ts) та [`bkt.controller.spec.ts`](file:///apps/api/src/adapters/inbound/http/bkt.controller.spec.ts) (`npm run test:api`).
+  - Успішна компіляція бекенду `npm run build:api` та клієнтів `npm run build:student`, `npm run build:teacher`.
+
 ### 0.1.7.55 Концептуалізація Наскрізної Архітектури Event Stream: Таксономія Подій Екосистеми, Педагогічні Інтервенції Викладача (Анулювання / Скидання) та Датасети для ШІ (`SBC-352`, `EP-TC`)
 - **Архітектурний та науковий контекст:**
   - У мультимодальному комплексі Smart-BKT-Chain виникла потреба зв'язати всі 5 веб-застосунків (`apps/study`, `apps/student`, `apps/teacher`, `apps/admin`, `apps/api`) у єдину наскрізну шину подій (End-to-End Learning Event Stream).

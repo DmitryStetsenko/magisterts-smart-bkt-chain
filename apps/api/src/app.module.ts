@@ -10,6 +10,7 @@ import { CourseController } from './adapters/inbound/http/course.controller';
 import { TelemetryGateway } from './adapters/inbound/websocket/telemetry.gateway';
 
 import { OpenAnswerEvaluatorService } from './domain/evaluation/open-answer-evaluator.service';
+import { AuditLogService } from './domain/audit/audit-log.service';
 
 @Module({
   imports: [
@@ -21,6 +22,6 @@ import { OpenAnswerEvaluatorService } from './domain/evaluation/open-answer-eval
     EvaluationQueueModule,
   ],
   controllers: [HealthController, TaskController, BktController, CourseController],
-  providers: [TelemetryGateway, EvaluationProcessor, OpenAnswerEvaluatorService],
+  providers: [TelemetryGateway, EvaluationProcessor, OpenAnswerEvaluatorService, AuditLogService],
 })
 export class AppModule {}

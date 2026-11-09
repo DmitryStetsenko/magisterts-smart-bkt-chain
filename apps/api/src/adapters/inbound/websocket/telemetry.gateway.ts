@@ -177,4 +177,26 @@ export class TelemetryGateway implements OnGatewayConnection, OnGatewayDisconnec
     );
     this.server.emit('teacher_review_decision', payload);
   }
+
+  notifyActivityLog(log: any) {
+    this.logger.log(`Emitting activity_log event: ${log.eventType} for user ${log.userId}`);
+    this.server.emit('activity_log', log);
+    this.server.emit(`user_activity_${log.userId}`, log);
+  }
+
+  notifySubmissionAnnulled(payload: {
+    submissionId: string;
+    userId: string;
+    taskId?: string;
+    skillId?: string;
+    reason: string;
+    comment?: string | null;
+    pMasteryUpdated?: number;
+  }) {
+    this.logger.log(
+      `Emitting submission_annulled event for submission ${payload.submissionId}, user ${payload.userId}`,
+    );
+    this.server.emit('submission_annulled', payload);
+    this.server.emit(`user_annulled_${payload.userId}`, payload);
+  }
 }

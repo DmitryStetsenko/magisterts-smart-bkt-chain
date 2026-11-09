@@ -32,6 +32,24 @@
      - **Педагогічний протокол анулювання викладачем (`Teacher Annulment Protocol`):** розроблено механіку анулювання зарахованої спроби (`TEACHER_SUBMISSION_ANNULLED`) або примусового скидання модуля (`TEACHER_MODULE_REVOKED`) за плагіат/генерацію стороннім ШІ з миттєвим штрафним відкатом BKT та push-сповіщенням у браузер учня.
      - **Супервізорний контур для навчання ШІ (Human-in-the-Loop Ground Truth):** обґрунтовано, що вердикти вчителя є еталонними мітками («Hard Ground Truth») для навчання нейромереж Deep Knowledge Tracing (DKT / SAKT) та класифікаторів доброчесності, а також стандартизовано формати експорту датасетів у JSONL та CSV.
 
+4. **Реалізація незмінної схеми `StudentActivityLog` та бекенд-сервісу `AuditLogService` (`SBC-353`, `EP-TC`):**
+   - **База даних (`packages/database`):**
+     - Додано модель `StudentActivityLog` у `schema.prisma` з індексами `[userId, createdAt]`, `[eventType]`, `[taskId]`, `[skillId]`.
+     - Розширено переліки `SubmissionStatus` та `TeacherReviewStatus` значенням `ANNULLED`.
+     - Успішно виконано синхронізацію схеми з БД PostgreSQL (`npx prisma db push`) та згенеровано оновлений Prisma Client.
+   - **Контракти даних (`packages/types`):**
+     - Створено DTO `StudentActivityLogDto`, `CreateActivityLogDto`, `AnnulSubmissionPayloadDto` та перелік `ActivityEventType`.
+     - Скомпільовано пакети типів `npm run build:types`.
+   - **Бекенд (`apps/api`):**
+     - Створено `AuditLogService` (`apps/api/src/domain/audit/audit-log.service.ts`): методи `logEvent`, `getStudentLogs`, `getRecentLogs`, `annulSubmission`, `exportDataset`.
+     - Розширено `TelemetryGateway` методами `notifyActivityLog` та `notifySubmissionAnnulled` для миттєвої трансляції подій через WebSockets у всі клієнтські застосунки.
+     - Інтегровано виклики логування в `BktController`: авто-фіксація `TASK_SUBMITTED`, `TASK_ABANDON_CONFIRMED`, `STUDENT_SKILL_RESET`, `TEACHER_MODULE_REVOKED`, `TEACHER_REVIEW_APPROVED`, `TEACHER_REVIEW_REJECTED`.
+     - Додано нові REST ендпоінти: `POST /api/v1/bkt/activity-logs`, `GET /api/v1/bkt/activity-logs/student/:userId`, `GET /api/v1/bkt/activity-logs/recent`, `POST /api/v1/bkt/submissions/:submissionId/annul`, `GET /api/v1/bkt/activity-logs/export`.
+   - **Верифікація:**
+     - 100% успішне проходження 53/53 юніт-тестів (9 тест-сьютів) `npm run test:api`.
+     - Успішна збірка бекенду `npm run build:api` та клієнтських застосунків `npm run build:student` і `npm run build:teacher`.
+
+
 
 ## 📅 7 листопада 2026 року
 

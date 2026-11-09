@@ -25,6 +25,7 @@ enum SubmissionStatus {
   PENDING
   ACCEPTED
   REJECTED
+  ANNULLED
   ERROR
 }
 
@@ -41,6 +42,7 @@ enum TeacherReviewStatus {
   PENDING_REVIEW
   APPROVED
   REJECTED
+  ANNULLED
   SUPERSEDED
 }
 
@@ -77,6 +79,7 @@ model User {
   behavioralProfiles BehavioralProfile[]
   submissions        Submission[]
   credentials        Credential[]
+  activityLogs       StudentActivityLog[]
 
   @@map("users")
 }
@@ -299,3 +302,25 @@ model Credential {
 
   @@map("credentials")
 }
+
+model StudentActivityLog {
+  id           String    @id @default(uuid())
+  userId       String
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  actorId      String    // ID of the user who initiated this action (student, teacher, admin or 'system')
+  actorRole    UserRole  @default(STUDENT) // Role at time of action
+  courseId     String?
+  skillId      String?
+  taskId       String?
+  submissionId String?
+  eventType    String    // E.g., 'HINT_REQUESTED', 'THEORY_DRAWER_OPENED', 'TEACHER_SUBMISSION_ANNULLED'
+  payload      Json      // Flexible context & parameters
+  createdAt    DateTime  @default(now())
+
+  @@index([userId, createdAt])
+  @@index([eventType])
+  @@index([taskId])
+  @@index([skillId])
+  @@map("student_activity_logs")
+}
+

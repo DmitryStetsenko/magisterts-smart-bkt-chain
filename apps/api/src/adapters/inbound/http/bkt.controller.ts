@@ -1,5 +1,6 @@
-import { Controller, Post, Get, Body, Param, Query, NotFoundException } from '@nestjs/common';
+import { Controller, Post, Get, Body, Param, Query, NotFoundException, Res } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiQuery } from '@nestjs/swagger';
+import type { Response } from 'express';
 import * as vm from 'vm';
 import { PrismaService } from '../../outbound/persistence/prisma.service';
 import { TelemetryGateway } from '../websocket/telemetry.gateway';
@@ -8,6 +9,7 @@ import { BehavioralAdjuster } from '../../../domain/bkt/behavioral-adjuster';
 import { OpenTextHeuristicEvaluator } from '../../../domain/evaluation/open-text-heuristic-evaluator';
 import { OpenAnswerEvaluatorService } from '../../../domain/evaluation/open-answer-evaluator.service';
 import { MisconceptionMatcher } from '../../../domain/evaluation/misconception-matcher';
+import { AuditLogService } from '../../../domain/audit/audit-log.service';
 import { SubmitTaskDto } from './dto/submit-task.dto';
 import { SubmissionStatus, TaskType, TeacherReviewStatus } from '@sbc/database';
 import type {
@@ -15,6 +17,7 @@ import type {
   ReviewQueueItemDto,
   StudentAnalyticsItemDto,
   TaskEvaluationResponseDto,
+  CreateActivityLogDto,
 } from '@sbc/types';
 
 @ApiTags('BKT')
@@ -24,6 +27,7 @@ export class BktController {
     private readonly prisma: PrismaService,
     private readonly telemetryGateway: TelemetryGateway,
     private readonly openAnswerEvaluator: OpenAnswerEvaluatorService,
+    private readonly auditLogService: AuditLogService,
   ) {}
 
   @Post('evaluate')
@@ -466,6 +470,37 @@ export class BktController {
       submissionId: submission.id,
     });
 
+    // Наскрізне логування у незмінний StudentActivityLog (Brainstorm #16)
+    try {
+      await this.auditLogService.logEvent({
+        userId: user.id,
+        actorId: user.id,
+        actorRole: 'STUDENT',
+        courseId: task.skill.courseId || undefined,
+        skillId: task.skillId,
+        taskId: task.id,
+        submissionId: submission.id,
+        eventType: dto.isAbandoned ? 'TASK_ABANDON_CONFIRMED' : 'TASK_SUBMITTED',
+        payload: {
+          isPassed,
+          pMasteryPrior: bktState.pMastery,
+          pMasteryPosterior: calcResult.pMasteryPosterior,
+          deltaL: Number((calcResult.pMasteryPosterior - bktState.pMastery).toFixed(4)),
+          adjustReasons: adjusted.reasons,
+          pSlip: adjusted.pSlip,
+          pGuess: adjusted.pGuess,
+          feedbackText: feedback,
+          attemptNumber,
+          isAbandoned: dto.isAbandoned || false,
+          revealedHintLevel: dto.revealedHintLevel,
+          appliedHintPenaltyPct,
+          detectedMisconception: detectedMisconception?.title || null,
+        },
+      });
+    } catch (auditErr) {
+      // Non-blocking catch to ensure submission completes even if logging fails
+    }
+
     const recommendedTheoryUrl =
       detectedMisconception?.recommendedReviewUrl || task.studyUnitUrl || null;
     const offerJustInTimeTheory =
@@ -754,6 +789,19 @@ export class BktController {
 
     this.telemetryGateway.notifyBktReset(targetUserId, dto.skillId);
 
+    try {
+      await this.auditLogService.logEvent({
+        userId: targetUserId,
+        actorId: targetUserId,
+        actorRole: 'STUDENT',
+        skillId: dto.skillId,
+        eventType: 'STUDENT_SKILL_RESET',
+        payload: {
+          reason: 'SELF_REMEDIATION_TO_THEORY',
+        },
+      });
+    } catch (e) {}
+
     return { message: `Progress for skill ${dto.skillId} has been reset` };
   }
 
@@ -827,6 +875,21 @@ export class BktController {
 
       this.telemetryGateway.notifyBktReset(targetUserId);
 
+      try {
+        await this.auditLogService.logEvent({
+          userId: targetUserId,
+          actorId: 'TEACHER',
+          actorRole: 'TEACHER',
+          courseId: courseSlug,
+          eventType: 'TEACHER_MODULE_REVOKED',
+          payload: {
+            scope: 'COURSE_SCOPED',
+            courseSlug,
+            skillsCount: skillIds.length,
+          },
+        });
+      } catch (e) {}
+
       return {
         message: `Student state for ${targetUserId} scoped to course ${courseSlug} has been reset`,
         courseSlug,
@@ -840,6 +903,18 @@ export class BktController {
     await this.prisma.telemetrySession.deleteMany({ where: { userId: targetUserId } });
 
     this.telemetryGateway.notifyBktReset(targetUserId);
+
+    try {
+      await this.auditLogService.logEvent({
+        userId: targetUserId,
+        actorId: 'TEACHER',
+        actorRole: 'TEACHER',
+        eventType: 'TEACHER_MODULE_REVOKED',
+        payload: {
+          scope: 'GLOBAL',
+        },
+      });
+    } catch (e) {}
 
     return { message: `Student state for ${targetUserId} has been reset globally` };
   }
@@ -1062,11 +1137,82 @@ export class BktController {
       scoreOverride: dto.scoreOverride !== undefined ? dto.scoreOverride : null,
     });
 
+    try {
+      await this.auditLogService.logEvent({
+        userId: submission.userId,
+        actorId: 'TEACHER',
+        actorRole: 'TEACHER',
+        courseId: submission.task.skill.courseId || undefined,
+        skillId: submission.task.skillId,
+        taskId: submission.taskId,
+        submissionId: updatedSub.id,
+        eventType: dto.decision === 'APPROVE' ? 'TEACHER_REVIEW_APPROVED' : 'TEACHER_REVIEW_REJECTED',
+        payload: {
+          decision: dto.decision,
+          comment: dto.comment,
+          scoreOverride: dto.scoreOverride,
+          pMasteryUpdated: bktState?.pMastery,
+        },
+      });
+    } catch (e) {}
+
     return {
       success: true,
       submissionId: updatedSub.id,
       teacherReviewStatus: updatedSub.teacherReviewStatus,
       pMasteryUpdated: bktState?.pMastery,
     };
+  }
+
+  @Post('activity-logs')
+  @ApiOperation({ summary: 'Log student/teacher learning activity event' })
+  async logActivityEvent(@Body() dto: CreateActivityLogDto) {
+    return this.auditLogService.logEvent(dto);
+  }
+
+  @Get('activity-logs/student/:userId')
+  @ApiOperation({ summary: 'Get recent activity logs for a student' })
+  async getStudentActivityLogs(
+    @Param('userId') userId: string,
+    @Query('limit') limit?: number,
+  ) {
+    return this.auditLogService.getStudentLogs(userId, limit ? Number(limit) : 50);
+  }
+
+  @Get('activity-logs/recent')
+  @ApiOperation({ summary: 'Get recent live activity logs feed across all students' })
+  async getRecentActivityLogs(@Query('limit') limit?: number) {
+    return this.auditLogService.getRecentLogs(limit ? Number(limit) : 100);
+  }
+
+  @Post('submissions/:submissionId/annul')
+  @ApiOperation({ summary: 'Annul submission by teacher with penalty rollback in BKT' })
+  async annulSubmission(
+    @Param('submissionId') submissionId: string,
+    @Body() dto: { teacherId?: string; reason: any; comment: string; penaltyMultiplier?: number },
+  ) {
+    return this.auditLogService.annulSubmission({
+      submissionId,
+      teacherId: dto.teacherId,
+      reason: dto.reason,
+      comment: dto.comment,
+      penaltyMultiplier: dto.penaltyMultiplier,
+    });
+  }
+
+  @Get('activity-logs/export')
+  @ApiOperation({ summary: 'Export activity logs dataset as JSONL or CSV for AI/ML training' })
+  async exportActivityLogs(
+    @Res() res: Response,
+    @Query('courseSlug') courseSlug?: string,
+    @Query('userId') userId?: string,
+    @Query('format') format?: 'jsonl' | 'csv',
+  ) {
+    const result = await this.auditLogService.exportDataset({ courseSlug, userId, format });
+    const contentType = format === 'csv' ? 'text/csv' : 'application/x-ndjson';
+    const filename = `activity_logs_${Date.now()}.${format === 'csv' ? 'csv' : 'jsonl'}`;
+    res.setHeader('Content-Type', contentType);
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+    return res.send(result);
   }
 }
