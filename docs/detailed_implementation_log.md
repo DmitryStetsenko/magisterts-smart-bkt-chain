@@ -3979,3 +3979,25 @@ eferenceAnswer, критерії options.keywords (microtask|мікротаск|
      - У `apps/api/src/adapters/inbound/http/course.controller.spec.ts` створено 11 unit-тестів.
 - **Верифікація:**
   - 100% успішне проходження 74/74 unit-тестів API у 12 сьютах (`npm run test:api`, 28.5s).
+
+
+---
+
+### 11.68. Модульний Конструктор Курсів та Редактор Порогів BKT в Admin Portal (SBC-386, EP-AD)
+- **Контекст та інженерна задача:**
+  Для надання адміністраторам та методистам повноцінного інструментарію управління навчальними планами створено модульний CMS-конструктор у `apps/admin`.
+- **Архітектурні зміни та компоненти:**
+  1. **Компонент `CourseEditModal` ([`apps/admin/src/features/course-manager/ui/CourseEditModal.tsx`](file:///apps/admin/src/features/course-manager/ui/CourseEditModal.tsx)):**
+     - Редагування назви, слага, опису, цільової аудиторії, статусу активності та базового порогу майстерності BKT ($P(L_n) \ge 0.85$).
+     - Валідація полів та інтеграція з ендпоінтом `PATCH /api/v1/courses/:id`.
+  2. **Компонент `ModuleManagerModal` ([`apps/admin/src/features/course-manager/ui/ModuleManagerModal.tsx`](file:///apps/admin/src/features/course-manager/ui/ModuleManagerModal.tsx)):**
+     - Інтерфейс управління списком модулів обраного курсу (`GET /api/v1/courses/:slug`).
+     - Створення модуля з впорядкуванням `orderIndex` та посиланням на підручник `theoryUrl` (`POST /api/v1/courses/:courseId/modules`).
+     - Редагування та видалення модулів (`PATCH` / `DELETE`).
+     - Модальне вікно призначення навичок курсу до модуля (`POST /api/v1/courses/:courseId/modules/:moduleId/skills`).
+     - Дотримання стандарту Rule 7: індикатори `+` / `−` з бібліотеки `lucide-react`, безрамкові списки із розділювачами `divide-y divide-slate-800/50`.
+  3. **Оновлення `CourseManager.tsx` ([`apps/admin/src/features/course-manager/ui/CourseManager.tsx`](file:///apps/admin/src/features/course-manager/ui/CourseManager.tsx)):**
+     - Пошук курсів, плашки аудиторії та BKT порогу, лічильники модулів та навичок, виклик редактора та модульного конструктора.
+- **Верифікація:**
+  - 100% успішна виробнича збірка `npm run build:admin` (Next.js 16.3.8 Turbopack).
+  - Візуальна перевірка у браузері Playwright (артефакти `admin_course_cms.png`, `admin_module_manager_modal.png`).

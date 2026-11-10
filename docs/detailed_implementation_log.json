@@ -13953,6 +13953,72 @@
               "type": "text",
               "raw_text": "100% успішне проходження 74/74 unit-тестів API у 12 сьютах (`npm run test:api`, 28.5s).",
               "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "---",
+              "subitems": []
+            }
+          ]
+        },
+        {
+          "title": "11.68. Модульний Конструктор Курсів та Редактор Порогів BKT в Admin Portal (SBC-386, EP-AD)",
+          "level": 3,
+          "paragraphs": [
+            "Для надання адміністраторам та методистам повноцінного інструментарію управління навчальними планами створено модульний CMS-конструктор у `apps/admin`."
+          ],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "**Контекст та інженерна задача:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Архітектурні зміни та компоненти:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Компонент `CourseEditModal` ([`apps/admin/src/features/course-manager/ui/CourseEditModal.tsx`](file:///apps/admin/src/features/course-manager/ui/CourseEditModal.tsx)):**",
+              "subitems": [
+                "Редагування назви, слага, опису, цільової аудиторії, статусу активності та базового порогу майстерності BKT ($P(L_n) \\ge 0.85$).",
+                "Валідація полів та інтеграція з ендпоінтом `PATCH /api/v1/courses/:id`."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Компонент `ModuleManagerModal` ([`apps/admin/src/features/course-manager/ui/ModuleManagerModal.tsx`](file:///apps/admin/src/features/course-manager/ui/ModuleManagerModal.tsx)):**",
+              "subitems": [
+                "Інтерфейс управління списком модулів обраного курсу (`GET /api/v1/courses/:slug`).",
+                "Створення модуля з впорядкуванням `orderIndex` та посиланням на підручник `theoryUrl` (`POST /api/v1/courses/:courseId/modules`).",
+                "Редагування та видалення модулів (`PATCH` / `DELETE`).",
+                "Модальне вікно призначення навичок курсу до модуля (`POST /api/v1/courses/:courseId/modules/:moduleId/skills`).",
+                "Дотримання стандарту Rule 7: індикатори `+` / `−` з бібліотеки `lucide-react`, безрамкові списки із розділювачами `divide-y divide-slate-800/50`."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Оновлення `CourseManager.tsx` ([`apps/admin/src/features/course-manager/ui/CourseManager.tsx`](file:///apps/admin/src/features/course-manager/ui/CourseManager.tsx)):**",
+              "subitems": [
+                "Пошук курсів, плашки аудиторії та BKT порогу, лічильники модулів та навичок, виклик редактора та модульного конструктора."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Верифікація:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "100% успішна виробнича збірка `npm run build:admin` (Next.js 16.3.8 Turbopack).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Візуальна перевірка у браузері Playwright (артефакти `admin_course_cms.png`, `admin_module_manager_modal.png`).",
+              "subitems": []
             }
           ]
         }

@@ -192,7 +192,7 @@
 | **SBC-171** | `Story` | `BK` | add BehavioralAdjuster for dynamic Slip/Guess (Phase 2 step 1) | 2026-10-13 | `bd7526c` |
 | **SBC-377** | `Story` | `BK` | implement google oauth token exchange, jwt sessions and test mode mock-login | 2026-11-10 | `214dde4` |
 | **SBC-378** | `Story` | `BK` | implement classroom invite codes, student join route and course enrollment management api | 2026-11-10 | `3344523` |
-| **SBC-385** | `Story` | `BK` | implement backend courses and modules crud api with skill attachment and classroom filtering | 2026-11-10 | pending |
+| **SBC-385** | `Story` | `BK` | implement backend courses and modules crud api with skill attachment and classroom filtering | 2026-11-10 | `e000fc7` |
 
 ---
 
