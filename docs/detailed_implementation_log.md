@@ -3914,3 +3914,43 @@ eferenceAnswer, критерії options.keywords (microtask|мікротаск|
 - **Створена документація:**
   - Створено офіційний документ [`docs/brainstorm/19_course_architecture_modular_curriculum_and_dynamic_cms.md`](file:///docs/brainstorm/19_course_architecture_modular_curriculum_and_dynamic_cms.md).
   - Оновлено реєстр завдань [`docs/tasks/registry.md`](file:///docs/tasks/registry.md) на 7 мікро-кроків (`SBC-383` - `SBC-389`).
+
+
+---
+
+### 11.66. Моделювання Схеми Даних CourseModule та Спільні Контракти @sbc/types (SBC-384, EP-SH)
+- **Контекст та інженерна задача:**
+  Для реалізації дидактичної моделі модульних курсів та BKT-гейтингу проведено розширення схеми даних у PostgreSQL та оголошено строгі типізовані контракти DTO у спільному монорепозиторному пакеті `@sbc/types`.
+- **Архітектурні зміни та компоненти:**
+  1. **Prisma ORM модель `CourseModule` ([`packages/database/prisma/schema.prisma`](file:///packages/database/prisma/schema.prisma)):**
+     ```prisma
+     model CourseModule {
+       id                  String      @id @default(uuid())
+       courseId            String
+       course              Course      @relation(fields: [courseId], references: [id], onDelete: Cascade)
+       slug                String
+       title               String
+       description         String?
+       orderIndex          Int         @default(0)
+       theoryUrl           String?
+       minMasteryThreshold Float       @default(0.85)
+       createdAt           DateTime    @default(now())
+       updatedAt           DateTime    @updatedAt
+       skills              SkillNode[]
+
+       @@unique([courseId, slug])
+       @@index([courseId, orderIndex])
+       @@map("course_modules")
+     }
+     ```
+  2. **Реляційні оновлення `Course` та `SkillNode`:**
+     - `Course`: додано реляцію `modules CourseModule[]`, поля `targetAudience String?`, `isPublished Boolean @default(true)`, `defaultMasteryThreshold Float @default(0.85)`.
+     - `SkillNode`: додано поля `moduleId String?`, `module CourseModule? @relation(fields: [moduleId], references: [id], onDelete: SetNull)`, `orderIndex Int @default(0)`.
+  3. **Спільні DTO контракти ([`packages/types/src/course.types.ts`](file:///packages/types/src/course.types.ts)):**
+     - Інтерфейси: `CourseModuleDto`, `CreateCourseModuleDto`, `UpdateCourseModuleDto`, `CreateCourseDto`, `UpdateCourseDto`.
+     - Оновлено `CourseDto` та `SkillNodeDto` у [`packages/types/src/sequencing.types.ts`](file:///packages/types/src/sequencing.types.ts).
+  4. **Синхронізація БД та кодогенерація:**
+     - Запущено `prisma db push` та згенеровано `@prisma/client`.
+- **Верифікація:**
+  - 100% успішна збірка пакету `@sbc/types`.
+  - 100% успішне виконання 63/63 тестів `npm run test:api`.

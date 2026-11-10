@@ -124,7 +124,7 @@
 | **SBC-374** | `Docs` | `INF` | document bkt audit verifier center in guides and admin portal specification | 2026-11-10 | `91066fa` |
 | **SBC-375** | `Docs` | `INF` | document brainstorm 18 on google auth, classroom invite codes, enrollment modes and user management | 2026-11-10 | `1a8f657` |
 | **SBC-382** | `Story` | `INF` | verify end-to-end user onboarding flow, invite redemption and auth test mode with playwright tests | 2026-11-10 | `70737ec` |
-| **SBC-383** | `Docs` | `INF` | document brainstorm 19 on course architecture, modular curriculum, bkt mastery gating and dynamic cms | 2026-11-10 | pending |
+| **SBC-383** | `Docs` | `INF` | document brainstorm 19 on course architecture, modular curriculum, bkt mastery gating and dynamic cms | 2026-11-10 | `27d725b` |
 | **SBC-389** | `Story` | `INF` | verify end-to-end course and module management flow with playwright tests and documentation update | 2026-11-10 | pending |
 
 ---

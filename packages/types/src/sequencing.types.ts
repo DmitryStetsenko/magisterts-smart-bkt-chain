@@ -1,4 +1,5 @@
 import { TaskDifficulty, TaskDto, TaskType } from './tasks.types';
+import type { CourseModuleDto } from './course.types';
 
 /**
  * Тип адаптивного кроку, який рекомендує секвенсор
@@ -94,6 +95,8 @@ export interface SequencingRecommendationDto {
 export interface SkillNodeDto {
   id: string;
   courseId?: string | null;
+  moduleId?: string | null;
+  orderIndex?: number;
   slug: string;
   title: string;
   description?: string;
@@ -120,6 +123,11 @@ export interface CourseDto {
   description?: string;
   category?: string;
   icon?: string | null;
+  targetAudience?: string | null;
+  isPublished?: boolean;
+  defaultMasteryThreshold?: number;
+  modules?: CourseModuleDto[];
   skills?: SkillNodeDto[];
   createdAt?: string | Date;
+  updatedAt?: string | Date;
 }

@@ -327,6 +327,23 @@ pm run build:student (Next.js 16.2.9 Turbopack, 0 помилок TypeScript).
       - Опубліковано детальний документ брейншторму [`docs/brainstorm/19_course_architecture_modular_curriculum_and_dynamic_cms.md`](file:///docs/brainstorm/19_course_architecture_modular_curriculum_and_dynamic_cms.md).
       - Оновлено каталог брейнштормів [`docs/brainstorm/README.md`](file:///docs/brainstorm/README.md) та реєстр задач [`docs/tasks/registry.md`](file:///docs/tasks/registry.md) на 7 мікро-кроків (`SBC-383` - `SBC-389`).
 
+21. **Розширення Моделі Даних Prisma, Таблиця `CourseModule` та Спільні Контракти `@sbc/types` (`SBC-384`, `EP-SH`):**
+    - **Виконані інженерні зміни:**
+      - **Розширення схеми Prisma ORM ([`packages/database/prisma/schema.prisma`](file:///packages/database/prisma/schema.prisma)):**
+        - Створено модель `CourseModule`: поля `id`, `courseId`, `slug`, `title`, `description`, `orderIndex`, `theoryUrl` (посилання на `apps/study`), `minMasteryThreshold` (дефолтний поріг $0.85$), `createdAt`, `updatedAt`, а також індекси та реляції до `Course` і `SkillNode[]`.
+        - Розширено модель `Course`: додано зв'язок `modules CourseModule[]`, поля `targetAudience` (цільова аудиторія), `isPublished` (видимість курсу), `defaultMasteryThreshold` (поріг BKT).
+        - Оновлено модель `SkillNode`: додано зовнішній ключ `moduleId` та реляцію `module CourseModule?`, а також порядковий номер `orderIndex`.
+      - **Спільні TypeScript DTO контракти ([`packages/types/src/course.types.ts`](file:///packages/types/src/course.types.ts)):**
+        - Визначено `CourseModuleDto`, `CreateCourseModuleDto`, `UpdateCourseModuleDto`, `CreateCourseDto`, `UpdateCourseDto`.
+        - Оновлено `CourseDto` та `SkillNodeDto` у [`packages/types/src/sequencing.types.ts`](file:///packages/types/src/sequencing.types.ts).
+        - Експортовано нові контракти через головний вхідний файл [`packages/types/src/index.ts`](file:///packages/types/src/index.ts).
+      - **Міграція та генерація клієнта Prisma:**
+        - Виконано безпечну синхронізацію структури БД PostgreSQL `prisma db push` без порушення існуючих записів.
+        - Згенеровано оновлений клієнт `@prisma/client` v6.19.3.
+    - **Верифікація:**
+      - 100% успішна компіляція пакету `@sbc/types` (`tsc`).
+      - 100% успішне проходження повного сьюту unit-тестів бекенду `npm run test:api` (63/63 тестів у 11 сьютах, 45.3s).
+
 ## 📅 9 листопада 2026 року
 
 ### ✅ Що зроблено за день:
