@@ -308,6 +308,267 @@
           "type": "text",
           "raw_text": "Блокування та розблокування акаунтів в 1 клік.",
           "subitems": []
+        },
+        {
+          "type": "text",
+          "raw_text": "---",
+          "subitems": []
+        }
+      ],
+      "subsections": []
+    },
+    {
+      "title": "📚 6. Динамічний Конструктор Курсів, Модульний CMS та Пороги BKT (`CourseManager`)",
+      "level": 2,
+      "paragraphs": [
+        "Вкладка **«Керування Курсами & Завданнями»** (`courses`) забезпечує повний життєвий цикл дисциплін та їх модульної структури відповідно до 4-рівневої дидактичної моделі:",
+        "$$\\text{Курс} \\longrightarrow \\text{Модулі} \\longrightarrow \\text{Компетенції (Skill DAG)} \\longrightarrow \\text{Завдання & Теорія}$$"
+      ],
+      "code_blocks": [],
+      "items": [],
+      "subsections": [
+        {
+          "title": "6.1 Головний Реєстр Дисциплін (`CourseManager.tsx`)",
+          "level": 3,
+          "paragraphs": [],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "**Інформаційне табло та пошук:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Живий рядок пошуку курсів за назвою або слагом (`js-dev`, `web-foundations`, `english-b2`, `ukraine-law`).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Кнопка швидкого створення нової дисципліни `+ Створити Новий Курс`.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Картки курсів за стандартом Minimalist Borderless UI:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Відображення ідентифікатора слага, назви, опису та цільової аудиторії (`targetAudience`: *10–11 класи / Студенти ВНЗ*).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Бейдж порогу BKT Target:** `BKT P(L): 0.85` — цільова ймовірність знання, необхідна для зарахування модуля та переходу далі.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Бейдж статусу видимості:** `Опубліковано` (зелений індикатор) або `Чернетка` (сірий індикатор).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Аналітичні лічильники:** кількість створених модулів `[Модулі (N)]`, прив'язаних компетенцій графу, навчальних груп та зареєстрованих учнів.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Швидкі дії над курсом:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "`[Модулі (N)]` — відкриття модульного конструктора `ModuleManagerModal`.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "`[Редагувати]` — виклик модального вікна налаштувань `CourseEditModal`.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "`[Видалити]` — безпечне видалення дисципліни з підтвердженням.",
+              "subitems": []
+            }
+          ]
+        },
+        {
+          "title": "6.2 Редактор Параметрів Курсу (`CourseEditModal.tsx`)",
+          "level": 3,
+          "paragraphs": [
+            "Дозволяє налаштовувати глобальні дидактичні параметри дисципліни:"
+          ],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "**Назва курсу (`title`) та Слаг (`slug`):** унікальний ідентифікатор для URL (наприклад, `/practice/js-dev` або `/lesson/js-dev`).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Опис дисципліни (`description`):** анотація для студентського порталу та кабінету вчителя.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Цільова аудиторія (`targetAudience`):** категорія здобувачів освіти.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Нормативний поріг майстерності BKT (`defaultMasteryThreshold`):** десятковий дріб від $0.50$ до $0.99$ (за замовчуванням $0.85$). Цей поріг наслідується всіма створюваними модулями курсу.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Тумблер публікації (`isPublished`):** перемикач видимості в каталозі курсів для студентів та викладачів.",
+              "subitems": []
+            }
+          ]
+        },
+        {
+          "title": "6.3 Модульний Конструктор Курсу (`ModuleManagerModal.tsx`)",
+          "level": 3,
+          "paragraphs": [
+            "Забезпечує декомпозицію курсу на тематичні розділи (модулі):"
+          ],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "**Ієрархія та впорядкування:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Кожен модуль має порядковий індекс `orderIndex` (1, 2, 3...), що визначає строгу хронологію вивчення.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Назва розділу (наприклад, *«Модуль 1: Змінні, Типи та Оператори»*).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Прив'язка теоретичного конспекту (`theoryUrl`):**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Прямий лінк на лекційний матеріал у підручнику `apps/study` (наприклад, `/lesson/syntax-and-variables`).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Індивідуальний поріг BKT (`minMasteryThreshold`):**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Можливість перевизначення порогу для складних модулів (наприклад, підвищити до $0.90$ для теми «Асинхронність JS»).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Масове призначення компетенцій графу навичок:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Кнопка `[Прив'язати навички]` відкриває модальний селектор усіх наявних у курсі вузлів Skill DAG.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Методист відмічає чекбоксами навички, що належать до цього модуля (наприклад, `variables-declaration`, `primitives-vs-objects`), і вони записуються через `POST /api/v1/courses/:courseId/modules/:moduleId/skills`.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "---",
+              "subitems": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "🔄 7. Наскрізний Потік Даних між Застосунками Екосистеми (Ecosystem Data Flow)",
+      "level": 2,
+      "paragraphs": [
+        "Впроваджений механізм курсів та модулів зв'язує всі 5 застосунків платформи в єдиний дидактичний контур:"
+      ],
+      "code_blocks": [
+        {
+          "lang": "mermaid",
+          "content": "sequenceDiagram\n    autonumber\n    actor Admin as Адміністратор / Методист (apps/admin)\n    participant DB as PostgreSQL (Prisma ORM)\n    actor Teacher as Викладач (apps/teacher)\n    actor Student as Студент (apps/student)\n    participant Study as Підручник (apps/study)\n\n    Note over Admin,DB: 1. Конфігурація Курсу в CMS\n    Admin->>DB: POST /api/v1/courses (Створення курсу, P_target = 0.85)\n    Admin->>DB: POST /api/v1/courses/:id/modules (Створення Модулів 1..5)\n    Admin->>DB: POST /api/v1/courses/:id/modules/:modId/skills (Прив'язка навичок до модулів)\n\n    Note over Teacher,DB: 2. Створення Класу з Селективним Доступом\n    Teacher->>DB: GET /api/v1/courses/:slug (Отримання списку модулів)\n    Teacher->>DB: POST /api/v1/classrooms (Код KOD-KN21, allowedModules = [Mod1, Mod2])\n\n    Note over Student,DB: 3. Зарахування та BKT-Гейтинг\n    Student->>DB: POST /api/v1/classrooms/join/KOD-KN21\n    DB-->>Student: Зарахування з режимом FULL_CYCLE та allowedModules\n    Student->>Student: Рендеринг Карти Навичок: Модуль 1 \"В процесі\" (50%), Модуль 2 \"Заблоковано (P(L) < 85%)\"\n    \n    Note over Student,Study: 4. Навчання та Ремедіація\n    Student->>Study: Перехід за theoryUrl до підручника для вивчення теми\n    Student->>DB: Здача завдань Модуля 1 -> P(L) зростає до >= 85%\n    DB-->>Student: Автоматичне розблокування Модуля 2!"
+        }
+      ],
+      "items": [
+        {
+          "type": "text",
+          "raw_text": "**Адміністратор (`apps/admin`, порт 3004):**",
+          "subitems": []
+        },
+        {
+          "type": "text",
+          "raw_text": "Створює курс `js-dev`, задає поріг $P_{\\text{target}} = 0.85$.",
+          "subitems": []
+        },
+        {
+          "type": "text",
+          "raw_text": "Створює модулі 1..5, пов'язує їх із посиланнями на лекції в `apps/study` (`theoryUrl`) та прив'язує відповідні вузли Skill DAG.",
+          "subitems": []
+        },
+        {
+          "type": "text",
+          "raw_text": "**Викладач (`apps/teacher`, порт 3003):**",
+          "subitems": []
+        },
+        {
+          "type": "text",
+          "raw_text": "Створює навчальну групу (наприклад, «11-А») із промокодом `KOD-KN21`.",
+          "subitems": []
+        },
+        {
+          "type": "text",
+          "raw_text": "Обирає дидактичний режим (`FULL_CYCLE`, `TESTING_ONLY`, `MODULAR`) та, за потреби, обмежує перелік дозволених модулів (`allowedModules: [mod1, mod2]`).",
+          "subitems": []
+        },
+        {
+          "type": "text",
+          "raw_text": "**Студент (`apps/student`, порт 3002):**",
+          "subitems": []
+        },
+        {
+          "type": "text",
+          "raw_text": "Вводить код або переходить за посиланням `/join/KOD-KN21`.",
+          "subitems": []
+        },
+        {
+          "type": "text",
+          "raw_text": "Бачить Карту Навичок із чітким модульним розбиттям: Модуль 1 відкритий, а Модулі 2–5 заблоковані із замком `Lock` та зрозумілим педагогічним правилом: *«Опануйте попередній модуль з P(L) ≥ 85%»*.",
+          "subitems": []
+        },
+        {
+          "type": "text",
+          "raw_text": "Після досягнення $\\overline{P}(L_{\\text{module } 1}) \\ge 0.85$ система без затримок автоматично відкриває Модуль 2.",
+          "subitems": []
+        },
+        {
+          "type": "text",
+          "raw_text": "**Підручник (`apps/study`, порт 3006):**",
+          "subitems": []
+        },
+        {
+          "type": "text",
+          "raw_text": "Надає повнотекстовий теоретичний лонгрід у режимі фокусування Zen Focus Reading Engine за адресою `theoryUrl` для первинного опанування чи усунення прогалин (Remediation).",
+          "subitems": []
         }
       ],
       "subsections": []
