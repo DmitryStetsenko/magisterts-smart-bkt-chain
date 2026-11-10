@@ -13687,17 +13687,63 @@
             },
             {
               "type": "text",
+              "raw_text": "---",
+              "subitems": []
+            }
+          ]
+        },
+        {
+          "title": "11.64. Скрізна Інтеграційна Верифікація Playwright E2E та Реліз Авторизації й Класів (SBC-382, EP-INF)",
+          "level": 3,
+          "paragraphs": [
+            "Для гарантії стабільності мультипортального комплексу Smart-BKT-Chain згідно з Правилом 4 монорепозиторію (Mandatory End-to-End Testing) реалізовано автоматизований набір наскрізних тестів, що верифікують роботу бекенду, бази даних, та чотирьох клієнтських веб-порталів у реальному браузері Chromium."
+          ],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "**Контекст та інженерна задача:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Архітектурні зміни та компоненти:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Набір E2E тестів [`e2e/onboarding-and-classrooms.spec.ts`](file:///e2e/onboarding-and-classrooms.spec.ts):**",
+              "subitems": [
+                "Покриває повний життєвий цикл користувача: від первинного входу Google OAuth 2.0 та конфігурації `SYSTEM_AUTH_TEST_MODE` до створення класів викладачем, переходу за інвайт-кодом `/join/:code` та зарахування на курс.",
+                "Перевірка REST контрактів DTO: `AuthUserDto`, `ClassroomDto`, `CourseEnrollmentDto`.",
+                "Перевірка навігаційної рейки та модальних вікон у кабінетах Викладача, Студента та Адміністратора."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Оновлення майстер-керівництва [`docs/guide/master_guide.md`](file:///docs/guide/master_guide.md):**",
+              "subitems": [
+                "Додано Розділ 9 з архітектурним описом системи авторизації, інвайт-кодів навчальних груп, дидактичних режимів та RBAC CMS."
+              ]
+            },
+            {
+              "type": "text",
               "raw_text": "**Верифікація:**",
               "subitems": []
             },
             {
               "type": "text",
-              "raw_text": "Успішна виробнича збірка `npm run build:student` та `npm run build:study` (Next.js 16.2.9 Turbopack).",
+              "raw_text": "100% успішне проходження всіх 7/7 E2E тестів у Playwright (`npm run test:e2e`, 27.0s).",
               "subitems": []
             },
             {
               "type": "text",
-              "raw_text": "Повне автоматизоване тестування у headless-браузері Playwright: перехід за кодом `KOD-KN21`, авторизація під тестовим та Google акаунтом, активація курсу та перехід до практичних завдань.",
+              "raw_text": "100% успішне проходження 63/63 юніт-тестів API у 11 сьютах (`npm run test:api`, 35.8s).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Успішна збірка всіх проектів монорепозиторію.",
               "subitems": []
             }
           ]
