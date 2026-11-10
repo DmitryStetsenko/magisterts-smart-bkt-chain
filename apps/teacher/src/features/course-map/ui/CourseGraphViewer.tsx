@@ -50,6 +50,48 @@ export function CourseGraphViewer({
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [difficultyFilter, setDifficultyFilter] = useState<'ALL' | 'EASY' | 'MEDIUM' | 'HARD'>('ALL');
   const [selectedTopic, setSelectedTopic] = useState<string | null>(null);
+  const [selectedSubConcepts, setSelectedSubConcepts] = useState<string[]>([]);
+
+  const toggleSubConcept = (sc: string) => {
+    setSelectedSubConcepts((prev) =>
+      prev.includes(sc) ? prev.filter((item) => item !== sc) : [...prev, sc]
+    );
+  };
+
+  const selectAllTopicSubConcepts = (scs: string[]) => {
+    setSelectedSubConcepts((prev) => Array.from(new Set([...prev, ...scs])));
+  };
+
+  const clearTopicSubConcepts = (scs: string[]) => {
+    setSelectedSubConcepts((prev) => prev.filter((item) => !scs.includes(item)));
+  };
+
+  const clearAllSubConcepts = () => {
+    setSelectedSubConcepts([]);
+  };
+
+  const matchesSearchQuery = (task?: TaskItem) => {
+    if (!task) return false;
+    if (!searchQuery) return true;
+    const q = searchQuery.toLowerCase();
+    return (
+      task.title.toLowerCase().includes(q) ||
+      task.description.toLowerCase().includes(q) ||
+      (task.subConcept || '').toLowerCase().includes(q) ||
+      (task.topic || '').toLowerCase().includes(q)
+    );
+  };
+
+  const matchesSubConceptFilter = (task?: TaskItem) => {
+    if (!task) return false;
+    if (selectedSubConcepts.length === 0) return true;
+    return Boolean(task.subConcept && selectedSubConcepts.includes(task.subConcept));
+  };
+
+  const matchesAllFilters = (task?: TaskItem) => {
+    if (!task) return false;
+    return matchesSearchQuery(task) && matchesSubConceptFilter(task);
+  };
 
   const toggleSkillExpand = (slug: string) => {
     setExpandedSkillSlugs((prev) =>
@@ -232,23 +274,35 @@ export function CourseGraphViewer({
     hard?: TaskItem;
     all: TaskItem[];
   }) => {
-    const matchesSearch = (task?: TaskItem) => {
-      if (!task) return false;
-      if (!searchQuery) return true;
-      const q = searchQuery.toLowerCase();
-      return (
-        task.title.toLowerCase().includes(q) ||
-        task.description.toLowerCase().includes(q) ||
-        (task.subConcept || '').toLowerCase().includes(q) ||
-        (task.topic || '').toLowerCase().includes(q)
-      );
-    };
+    // If filters are active, check if ANY task in tg.all matches
+    const hasAnyMatchingTask = tg.all.some(matchesAllFilters);
+    if ((searchQuery || selectedSubConcepts.length > 0) && !hasAnyMatchingTask) {
+      return null;
+    }
 
-    const isEasyVisible = tg.easy && (difficultyFilter === 'ALL' || difficultyFilter === 'EASY') && matchesSearch(tg.easy);
-    const isMediumVisible = tg.medium && (difficultyFilter === 'ALL' || difficultyFilter === 'MEDIUM') && matchesSearch(tg.medium);
-    const isHardVisible = tg.hard && (difficultyFilter === 'ALL' || difficultyFilter === 'HARD') && matchesSearch(tg.hard);
+    // Find best matching task for each difficulty from tg.all
+    const easyTasks = tg.all.filter((t) => t.difficulty === 'EASY');
+    const mediumTasks = tg.all.filter((t) => t.difficulty === 'MEDIUM');
+    const hardTasks = tg.all.filter((t) => t.difficulty === 'HARD');
 
-    if (!isEasyVisible && !isMediumVisible && !isHardVisible) return null;
+    const hasFilters = Boolean(searchQuery || selectedSubConcepts.length > 0);
+    const activeEasy = hasFilters
+      ? easyTasks.find(matchesAllFilters)
+      : easyTasks[0];
+    const activeMedium = hasFilters
+      ? mediumTasks.find(matchesAllFilters)
+      : mediumTasks[0];
+    const activeHard = hasFilters
+      ? hardTasks.find(matchesAllFilters)
+      : hardTasks[0];
+
+    const isEasyVisible = activeEasy && (difficultyFilter === 'ALL' || difficultyFilter === 'EASY');
+    const isMediumVisible = activeMedium && (difficultyFilter === 'ALL' || difficultyFilter === 'MEDIUM');
+    const isHardVisible = activeHard && (difficultyFilter === 'ALL' || difficultyFilter === 'HARD');
+
+    if (difficultyFilter !== 'ALL' && !isEasyVisible && !isMediumVisible && !isHardVisible) {
+      return null;
+    }
 
     return (
       <div
@@ -269,8 +323,10 @@ export function CourseGraphViewer({
 
             <SubConceptsPopover
               subConcepts={tg.subConcepts}
-              activeSubConcept={searchQuery}
-              onSelectSubConcept={(sc) => setSearchQuery(sc)}
+              selectedSubConcepts={selectedSubConcepts}
+              onToggleSubConcept={toggleSubConcept}
+              onSelectAllTopic={selectAllTopicSubConcepts}
+              onClearTopic={clearTopicSubConcepts}
               className="mt-1"
             />
           </div>
@@ -279,11 +335,11 @@ export function CourseGraphViewer({
         {/* Right: Question Cards (Easy, Medium, Hard) */}
         <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-2.5">
           {/* 🟢 Easy */}
-          {isEasyVisible ? (
+          {isEasyVisible && activeEasy ? (
             <div
-              onClick={() => tg.easy && onSelectTask(tg.easy.id)}
+              onClick={() => onSelectTask(activeEasy.id)}
               className={`p-3 rounded-lg border flex flex-col justify-between gap-2 transition-all cursor-pointer ${
-                selectedTaskId === tg.easy?.id
+                selectedTaskId === activeEasy.id
                   ? 'bg-emerald-950/40 border-emerald-500/60 ring-1 ring-emerald-500/40'
                   : 'bg-slate-900/40 border-slate-800/80 hover:border-emerald-500/40 hover:bg-slate-900/80'
               }`}
@@ -293,14 +349,14 @@ export function CourseGraphViewer({
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
                   <span>EASY · 70%</span>
                 </span>
-                {tg.easy && renderTypeBadge(tg.easy.taskType)}
+                {renderTypeBadge(activeEasy.taskType)}
               </div>
               <div className="text-xs font-medium text-slate-200 line-clamp-2">
-                {tg.easy?.title}
+                {activeEasy.title}
               </div>
-              {tg.easy?.subConcept && (
+              {activeEasy.subConcept && (
                 <div className="text-[10px] font-mono text-slate-500 truncate">
-                  {tg.easy.subConcept}
+                  {activeEasy.subConcept}
                 </div>
               )}
             </div>
@@ -311,11 +367,11 @@ export function CourseGraphViewer({
           )}
 
           {/* 🟡 Medium */}
-          {isMediumVisible ? (
+          {isMediumVisible && activeMedium ? (
             <div
-              onClick={() => tg.medium && onSelectTask(tg.medium.id)}
+              onClick={() => onSelectTask(activeMedium.id)}
               className={`p-3 rounded-lg border flex flex-col justify-between gap-2 transition-all cursor-pointer ${
-                selectedTaskId === tg.medium?.id
+                selectedTaskId === activeMedium.id
                   ? 'bg-amber-950/40 border-amber-500/60 ring-1 ring-amber-500/40'
                   : 'bg-slate-900/40 border-slate-800/80 hover:border-amber-500/40 hover:bg-slate-900/80'
               }`}
@@ -325,14 +381,14 @@ export function CourseGraphViewer({
                   <span className="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
                   <span>MEDIUM · 100%</span>
                 </span>
-                {tg.medium && renderTypeBadge(tg.medium.taskType)}
+                {renderTypeBadge(activeMedium.taskType)}
               </div>
               <div className="text-xs font-medium text-slate-200 line-clamp-2">
-                {tg.medium?.title}
+                {activeMedium.title}
               </div>
-              {tg.medium?.subConcept && (
+              {activeMedium.subConcept && (
                 <div className="text-[10px] font-mono text-slate-500 truncate">
-                  {tg.medium.subConcept}
+                  {activeMedium.subConcept}
                 </div>
               )}
             </div>
@@ -343,11 +399,11 @@ export function CourseGraphViewer({
           )}
 
           {/* 🔴 Hard */}
-          {isHardVisible ? (
+          {isHardVisible && activeHard ? (
             <div
-              onClick={() => tg.hard && onSelectTask(tg.hard.id)}
+              onClick={() => onSelectTask(activeHard.id)}
               className={`p-3 rounded-lg border flex flex-col justify-between gap-2 transition-all cursor-pointer ${
-                selectedTaskId === tg.hard?.id
+                selectedTaskId === activeHard.id
                   ? 'bg-rose-950/40 border-rose-500/60 ring-1 ring-rose-500/40'
                   : 'bg-slate-900/40 border-slate-800/80 hover:border-rose-500/40 hover:bg-slate-900/80'
               }`}
@@ -357,14 +413,14 @@ export function CourseGraphViewer({
                   <span className="w-1.5 h-1.5 rounded-full bg-rose-400"></span>
                   <span>HARD · 100%</span>
                 </span>
-                {tg.hard && renderTypeBadge(tg.hard.taskType)}
+                {renderTypeBadge(activeHard.taskType)}
               </div>
               <div className="text-xs font-medium text-slate-200 line-clamp-2">
-                {tg.hard?.title}
+                {activeHard.title}
               </div>
-              {tg.hard?.subConcept && (
+              {activeHard.subConcept && (
                 <div className="text-[10px] font-mono text-slate-500 truncate">
-                  {tg.hard.subConcept}
+                  {activeHard.subConcept}
                 </div>
               )}
             </div>
@@ -474,6 +530,39 @@ export function CourseGraphViewer({
           </div>
         </div>
 
+        {/* Active Subconcept Multi-Filter Badges */}
+        {selectedSubConcepts.length > 0 && (
+          <div className="flex flex-wrap items-center gap-1.5 pt-1.5 pb-0.5 border-t border-slate-800/60 animate-fadeIn">
+            <span className="text-[11px] font-mono text-purple-400 flex items-center gap-1">
+              <Tag className="w-3 h-3" />
+              <span>Фільтр підконцептів ({selectedSubConcepts.length}):</span>
+            </span>
+            {selectedSubConcepts.map((sc) => (
+              <span
+                key={sc}
+                className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[10px] font-mono bg-purple-950/60 border border-purple-500/40 text-purple-200"
+              >
+                <span>{sc}</span>
+                <button
+                  type="button"
+                  onClick={() => toggleSubConcept(sc)}
+                  className="text-purple-400 hover:text-white cursor-pointer"
+                  title={`Видалити ${sc} з фільтра`}
+                >
+                  <X className="w-2.5 h-2.5" />
+                </button>
+              </span>
+            ))}
+            <button
+              type="button"
+              onClick={clearAllSubConcepts}
+              className="text-[10px] font-mono text-slate-400 hover:text-rose-300 hover:underline cursor-pointer ml-1"
+            >
+              Скинути всі
+            </button>
+          </div>
+        )}
+
         {/* Module Stepper Bar (Clean Horizontal Pills) */}
         <div className="flex items-center gap-1.5 overflow-x-auto pb-0.5 scrollbar-thin scrollbar-thumb-slate-800">
           {skills.map((skill, idx) => {
@@ -558,26 +647,13 @@ export function CourseGraphViewer({
             const isExpanded = expandedSkillSlugs.includes(item.skill.slug);
 
             const matchingTopics = item.topics.filter((tg) => {
-              const matchesSearch = (task?: TaskItem) => {
-                if (!task) return false;
-                if (!searchQuery) return true;
-                const q = searchQuery.toLowerCase();
-                return (
-                  task.title.toLowerCase().includes(q) ||
-                  task.description.toLowerCase().includes(q) ||
-                  (task.subConcept || '').toLowerCase().includes(q) ||
-                  (task.topic || '').toLowerCase().includes(q)
-                );
-              };
-
-              const isEasy = tg.easy && (difficultyFilter === 'ALL' || difficultyFilter === 'EASY') && matchesSearch(tg.easy);
-              const isMedium = tg.medium && (difficultyFilter === 'ALL' || difficultyFilter === 'MEDIUM') && matchesSearch(tg.medium);
-              const isHard = tg.hard && (difficultyFilter === 'ALL' || difficultyFilter === 'HARD') && matchesSearch(tg.hard);
-
-              return isEasy || isMedium || isHard;
+              if (selectedSubConcepts.length === 0 && !searchQuery && difficultyFilter === 'ALL') {
+                return true;
+              }
+              return tg.all.some(matchesAllFilters);
             });
 
-            if (searchQuery && matchingTopics.length === 0) return null;
+            if ((searchQuery || selectedSubConcepts.length > 0) && matchingTopics.length === 0) return null;
 
             return (
               <div key={item.skill.id} className="py-3 first:pt-0">
@@ -666,100 +742,110 @@ export function CourseGraphViewer({
               {Object.values(topicTriads)
                 .filter((tg) => selectedTopic === null || tg.topic === selectedTopic)
                 .filter((tg) => {
-                  const matchesSearch = (task?: TaskItem) => {
-                    if (!task) return false;
-                    if (!searchQuery) return true;
-                    const q = searchQuery.toLowerCase();
-                    return (
-                      task.title.toLowerCase().includes(q) ||
-                      task.description.toLowerCase().includes(q) ||
-                      (task.subConcept || '').toLowerCase().includes(q) ||
-                      (task.topic || '').toLowerCase().includes(q)
-                    );
-                  };
-
-                  const isEasyVisible = tg.easy && (difficultyFilter === 'ALL' || difficultyFilter === 'EASY') && matchesSearch(tg.easy);
-                  const isMediumVisible = tg.medium && (difficultyFilter === 'ALL' || difficultyFilter === 'MEDIUM') && matchesSearch(tg.medium);
-                  const isHardVisible = tg.hard && (difficultyFilter === 'ALL' || difficultyFilter === 'HARD') && matchesSearch(tg.hard);
-
-                  return isEasyVisible || isMediumVisible || isHardVisible;
+                  if (selectedSubConcepts.length === 0 && !searchQuery && difficultyFilter === 'ALL') {
+                    return true;
+                  }
+                  return tg.all.some(matchesAllFilters);
                 })
-                .map((tg) => (
-                  <tr key={tg.topic} className="hover:bg-slate-900/30 transition-colors">
-                    <td className="py-3 pr-4 align-top w-60">
-                      <div className="font-mono text-slate-200 font-bold">{tg.topic}</div>
-                      <SubConceptsPopover
-              subConcepts={tg.subConcepts}
-              activeSubConcept={searchQuery}
-              onSelectSubConcept={(sc) => setSearchQuery(sc)}
-              className="mt-1"
-            />
-                    </td>
+                .map((tg) => {
+                  const easyTasks = tg.all.filter((t) => t.difficulty === 'EASY');
+                  const mediumTasks = tg.all.filter((t) => t.difficulty === 'MEDIUM');
+                  const hardTasks = tg.all.filter((t) => t.difficulty === 'HARD');
 
-                    <td className="py-3 px-3 align-top">
-                      {tg.easy && (difficultyFilter === 'ALL' || difficultyFilter === 'EASY') ? (
-                        <div
-                          onClick={() => tg.easy && onSelectTask(tg.easy.id)}
-                          className={`p-2.5 rounded-lg border transition-all cursor-pointer ${
-                            selectedTaskId === tg.easy.id
-                              ? 'bg-emerald-950/40 border-emerald-500/60'
-                              : 'bg-slate-900/40 border-slate-800/80 hover:border-emerald-500/40'
-                          }`}
-                        >
-                          <div className="font-medium text-slate-200">{tg.easy.title}</div>
-                          <div className="flex items-center justify-between gap-1.5 mt-1.5">
-                            {renderTypeBadge(tg.easy.taskType)}
-                            <span className="text-[10px] text-slate-500 font-mono">{tg.easy.subConcept}</span>
-                          </div>
-                        </div>
-                      ) : (
-                        <span className="text-slate-600 text-[11px]">—</span>
-                      )}
-                    </td>
+                  const hasFilters = Boolean(searchQuery || selectedSubConcepts.length > 0);
+                  const activeEasy = hasFilters
+                    ? easyTasks.find(matchesAllFilters)
+                    : easyTasks[0];
+                  const activeMedium = hasFilters
+                    ? mediumTasks.find(matchesAllFilters)
+                    : mediumTasks[0];
+                  const activeHard = hasFilters
+                    ? hardTasks.find(matchesAllFilters)
+                    : hardTasks[0];
 
-                    <td className="py-3 px-3 align-top">
-                      {tg.medium && (difficultyFilter === 'ALL' || difficultyFilter === 'MEDIUM') ? (
-                        <div
-                          onClick={() => tg.medium && onSelectTask(tg.medium.id)}
-                          className={`p-2.5 rounded-lg border transition-all cursor-pointer ${
-                            selectedTaskId === tg.medium.id
-                              ? 'bg-amber-950/40 border-amber-500/60'
-                              : 'bg-slate-900/40 border-slate-800/80 hover:border-amber-500/40'
-                          }`}
-                        >
-                          <div className="font-medium text-slate-200">{tg.medium.title}</div>
-                          <div className="flex items-center justify-between gap-1.5 mt-1.5">
-                            {renderTypeBadge(tg.medium.taskType)}
-                            <span className="text-[10px] text-slate-500 font-mono">{tg.medium.subConcept}</span>
-                          </div>
-                        </div>
-                      ) : (
-                        <span className="text-slate-600 text-[11px]">—</span>
-                      )}
-                    </td>
+                  const isEasyVisible = activeEasy && (difficultyFilter === 'ALL' || difficultyFilter === 'EASY');
+                  const isMediumVisible = activeMedium && (difficultyFilter === 'ALL' || difficultyFilter === 'MEDIUM');
+                  const isHardVisible = activeHard && (difficultyFilter === 'ALL' || difficultyFilter === 'HARD');
 
-                    <td className="py-3 pl-3 align-top">
-                      {tg.hard && (difficultyFilter === 'ALL' || difficultyFilter === 'HARD') ? (
-                        <div
-                          onClick={() => tg.hard && onSelectTask(tg.hard.id)}
-                          className={`p-2.5 rounded-lg border transition-all cursor-pointer ${
-                            selectedTaskId === tg.hard.id
-                              ? 'bg-rose-950/40 border-rose-500/60'
-                              : 'bg-slate-900/40 border-slate-800/80 hover:border-rose-500/40'
-                          }`}
-                        >
-                          <div className="font-medium text-slate-200">{tg.hard.title}</div>
-                          <div className="flex items-center justify-between gap-1.5 mt-1.5">
-                            {renderTypeBadge(tg.hard.taskType)}
-                            <span className="text-[10px] text-slate-500 font-mono">{tg.hard.subConcept}</span>
+                  return (
+                    <tr key={tg.topic} className="hover:bg-slate-900/30 transition-colors">
+                      <td className="py-3 pr-4 align-top w-60">
+                        <div className="font-mono text-slate-200 font-bold">{tg.topic}</div>
+                        <SubConceptsPopover
+                          subConcepts={tg.subConcepts}
+                          selectedSubConcepts={selectedSubConcepts}
+                          onToggleSubConcept={toggleSubConcept}
+                          onSelectAllTopic={selectAllTopicSubConcepts}
+                          onClearTopic={clearTopicSubConcepts}
+                          className="mt-1"
+                        />
+                      </td>
+
+                      <td className="py-3 px-3 align-top">
+                        {isEasyVisible && activeEasy ? (
+                          <div
+                            onClick={() => onSelectTask(activeEasy.id)}
+                            className={`p-2.5 rounded-lg border transition-all cursor-pointer ${
+                              selectedTaskId === activeEasy.id
+                                ? 'bg-emerald-950/40 border-emerald-500/60'
+                                : 'bg-slate-900/40 border-slate-800/80 hover:border-emerald-500/40'
+                            }`}
+                          >
+                            <div className="font-medium text-slate-200">{activeEasy.title}</div>
+                            <div className="flex items-center justify-between gap-1.5 mt-1.5">
+                              {renderTypeBadge(activeEasy.taskType)}
+                              <span className="text-[10px] text-slate-500 font-mono">{activeEasy.subConcept}</span>
+                            </div>
                           </div>
-                        </div>
-                      ) : (
-                        <span className="text-slate-600 text-[11px]">—</span>
-                      )}
-                    </td>
-                  </tr>
-                ))}
+                        ) : (
+                          <span className="text-slate-600 text-[11px]">—</span>
+                        )}
+                      </td>
+
+                      <td className="py-3 px-3 align-top">
+                        {isMediumVisible && activeMedium ? (
+                          <div
+                            onClick={() => onSelectTask(activeMedium.id)}
+                            className={`p-2.5 rounded-lg border transition-all cursor-pointer ${
+                              selectedTaskId === activeMedium.id
+                                ? 'bg-amber-950/40 border-amber-500/60'
+                                : 'bg-slate-900/40 border-slate-800/80 hover:border-amber-500/40'
+                            }`}
+                          >
+                            <div className="font-medium text-slate-200">{activeMedium.title}</div>
+                            <div className="flex items-center justify-between gap-1.5 mt-1.5">
+                              {renderTypeBadge(activeMedium.taskType)}
+                              <span className="text-[10px] text-slate-500 font-mono">{activeMedium.subConcept}</span>
+                            </div>
+                          </div>
+                        ) : (
+                          <span className="text-slate-600 text-[11px]">—</span>
+                        )}
+                      </td>
+
+                      <td className="py-3 pl-3 align-top">
+                        {isHardVisible && activeHard ? (
+                          <div
+                            onClick={() => onSelectTask(activeHard.id)}
+                            className={`p-2.5 rounded-lg border transition-all cursor-pointer ${
+                              selectedTaskId === activeHard.id
+                                ? 'bg-rose-950/40 border-rose-500/60'
+                                : 'bg-slate-900/40 border-slate-800/80 hover:border-rose-500/40'
+                            }`}
+                          >
+                            <div className="font-medium text-slate-200">{activeHard.title}</div>
+                            <div className="flex items-center justify-between gap-1.5 mt-1.5">
+                              {renderTypeBadge(activeHard.taskType)}
+                              <span className="text-[10px] text-slate-500 font-mono">{activeHard.subConcept}</span>
+                            </div>
+                          </div>
+                        ) : (
+                          <span className="text-slate-600 text-[11px]">—</span>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })}
             </tbody>
           </table>
         </div>
