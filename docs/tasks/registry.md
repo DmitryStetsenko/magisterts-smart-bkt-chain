@@ -402,7 +402,7 @@
 | **SBC-367** | `Feat` | `TC` | make subconcepts interactive filters in CourseGraphViewer and polish borderless popover list | 2026-11-10 | `19c061f` |
 | **SBC-368** | `Fix` | `TC` | implement checkbox multi-selection for subconcepts and fix triad slot filtering | 2026-11-10 | `368a0ea` |
 | **SBC-369** | `Style` | `TC` | eliminate nested containers and declutter MetricsAuditInspector into minimalist borderless layout | 2026-11-10 | `9b5f1f9` |
-| **SBC-380** | `Story` | `TC` | implement classroom management drawer section, invite code generator and enrollment mode selector | 2026-11-10 | pending |
+| **SBC-380** | `Story` | `TC` | implement classroom management drawer section, invite code generator and enrollment mode selector | 2026-11-10 | `137f38a` |
 
 
 
