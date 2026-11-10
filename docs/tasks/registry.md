@@ -330,7 +330,7 @@
 | **SBC-363** | `Refactor` | `ST` | remove asymmetric layout capping and implement 2x2 responsive quiz options grid with full-width condition banner | 2026-11-09 | `3d79a82` |
 | **SBC-364** | `Style` | `ST` | eliminate nested containers and declutter Skill DAG drawer into minimalist borderless sequence | 2026-11-10 | `e72e143` |
 | **SBC-370** | `Fix` | `ST` | constrain MonacoCodeEditor height and flex layout to eliminate infinite vertical expansion loop | 2026-11-10 | `6096911` |
-| **SBC-381** | `Story` | `ST` | implement google sign-in button, /join invite code redemption and enrollment mode gating | 2026-11-10 | pending |
+| **SBC-381** | `Story` | `ST` | implement google sign-in button, /join invite code redemption and enrollment mode gating | 2026-11-10 | `51e412f` |
 
 ---
 
