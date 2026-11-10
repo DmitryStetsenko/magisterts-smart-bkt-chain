@@ -348,12 +348,63 @@ export function StudentPortalContent({
 
       if (courseRes.ok) {
         const courseData = await courseRes.json();
-        const mappedNodes: SkillGraphNode[] = courseData.skills.map((skill: any) => {
+        const modules = courseData.modules || [];
+        const skills = courseData.skills || [];
+
+        // 1. Обрахунок середньої майстерності BKT для кожного модуля
+        const moduleMasteryMap: Record<string, number> = {};
+        modules.forEach((mod: any) => {
+          const modSkills = skills.filter((s: any) => s.moduleId === mod.id);
+          if (modSkills.length === 0) {
+            moduleMasteryMap[mod.id] = 1.0;
+          } else {
+            const sum = modSkills.reduce((acc: number, s: any) => acc + (bktMap[s.id] ?? 0.0), 0);
+            moduleMasteryMap[mod.id] = sum / modSkills.length;
+          }
+        });
+
+        // 2. Визначення статусу розблокування модулів (Mastery Gating)
+        const isTestingOnly = enrollmentMode === 'TESTING_ONLY';
+        const moduleUnlockMap: Record<string, boolean> = {};
+        const sortedModules = [...modules].sort((a: any, b: any) => (a.orderIndex || 0) - (b.orderIndex || 0));
+
+        sortedModules.forEach((mod: any, index: number) => {
+          const isAllowed =
+            !allowedModules ||
+            allowedModules.length === 0 ||
+            allowedModules.includes(mod.id) ||
+            allowedModules.includes(mod.slug);
+
+          if (!isAllowed) {
+            moduleUnlockMap[mod.id] = false;
+            return;
+          }
+
+          if (isTestingOnly || index === 0) {
+            moduleUnlockMap[mod.id] = true;
+          } else {
+            const prevMod = sortedModules[index - 1];
+            const prevMastery = moduleMasteryMap[prevMod.id] ?? 0.0;
+            const prevThreshold = prevMod.minMasteryThreshold ?? courseData.defaultMasteryThreshold ?? 0.85;
+            moduleUnlockMap[mod.id] = prevMastery >= prevThreshold;
+          }
+        });
+
+        const mappedNodes: SkillGraphNode[] = skills.map((skill: any) => {
           const p = bktMap[skill.id] ?? 0.0;
           const isMastered = p >= 0.90; // Gold Mastery threshold
           const parentIds = skill.parentDependencies?.map((d: any) => d.parentSkillId) || [];
           const parentMastered =
-            parentIds.length === 0 || parentIds.every((pid: string) => (bktMap[pid] ?? 0) >= 0.75); // Bloom Proficient threshold unlocks next
+            parentIds.length === 0 || parentIds.every((pid: string) => (bktMap[pid] ?? 0) >= 0.75);
+
+          const isModUnlocked = skill.moduleId ? (moduleUnlockMap[skill.moduleId] ?? true) : true;
+          const isAllowedSkill =
+            !allowedModules ||
+            allowedModules.length === 0 ||
+            !skill.moduleId ||
+            allowedModules.includes(skill.moduleId);
+
+          const isLockedByModule = !isModUnlocked || !isAllowedSkill;
 
           const skillAdjustments = adjustments.filter(
             (a) => a.skillSlug === skill.slug || a.skillTitle === skill.title
@@ -361,14 +412,30 @@ export function StudentPortalContent({
           const hasGuess = skillAdjustments.some((a) => Boolean(a.pGuessUsed && a.pGuessUsed > 0.3));
           const hasSlip = skillAdjustments.some((a) => Boolean(a.pSlipUsed && a.pSlipUsed > 0.2));
 
+          const status: 'MASTERED' | 'IN_PROGRESS' | 'LOCKED' = isMastered
+            ? 'MASTERED'
+            : isTestingOnly || (parentMastered && !isLockedByModule)
+            ? 'IN_PROGRESS'
+            : 'LOCKED';
+
           return {
             id: skill.id,
             slug: skill.slug,
             title: skill.title,
             description: skill.description,
             pMastery: p,
-            status: isMastered ? 'MASTERED' : parentMastered ? 'IN_PROGRESS' : 'LOCKED',
+            status,
             parentSkillIds: parentIds,
+            moduleId: skill.moduleId,
+            moduleTitle: skill.module?.title,
+            moduleOrder: skill.module?.orderIndex,
+            moduleSlug: skill.module?.slug,
+            isModuleLocked: isLockedByModule,
+            lockReason: !isAllowedSkill
+              ? 'Тема не включена до програми цієї групи'
+              : !isModUnlocked
+              ? 'Опануйте попередній модуль з P(L) ≥ 85%'
+              : undefined,
             tasks: skill.tasks || [],
             tasksCount: skill.tasks?.length || 0,
             telemetry: telemetryBySkill[skill.slug] || undefined,

@@ -1,5 +1,7 @@
+'use client';
+
 import React from 'react';
-import { CheckCircle2, Lock } from 'lucide-react';
+import { CheckCircle2, Lock, AlertCircle, Layers } from 'lucide-react';
 import { SkillGraphNode } from '../model/skill-graph.types';
 
 interface SkillDagMapProps {
@@ -18,20 +20,22 @@ export function SkillDagMap({ nodes, activeSkillSlug, onSelectSkill }: SkillDagM
     <div className="flex flex-col gap-2.5">
       {/* 1. Sub-header Info Bar (Borderless clean typography) */}
       <div className="flex items-center justify-between pb-1 text-[11px] select-none text-slate-400">
-        <span className="font-medium text-slate-400">
-          Оцінювання майстерності BKT
+        <span className="font-medium text-slate-400 flex items-center gap-1">
+          <Layers className="w-3.5 h-3.5 text-indigo-400" />
+          <span>Модульний BKT-Гейтинг</span>
         </span>
         <span className="font-mono text-[10px] text-emerald-400 font-semibold">
-          Поріг: P(L) ≥ 0.95
+          Поріг: P(L) ≥ 0.85
         </span>
       </div>
 
       {/* 2. Vertical Competence Sequence (Clean borderless list with subtle dividers) */}
       <div className="flex flex-col divide-y divide-slate-800/50 max-h-[calc(100vh-320px)] overflow-y-auto pr-1 custom-scrollbar">
         {nodes.map((node, idx) => {
-          const isMastered = node.pMastery >= 0.95;
+          const isMastered = node.pMastery >= 0.85;
           const isLocked = node.status === 'LOCKED';
           const isActive = node.slug === activeSkillSlug;
+          const moduleNumber = node.moduleOrder ?? (idx + 1);
 
           return (
             <div
@@ -39,16 +43,17 @@ export function SkillDagMap({ nodes, activeSkillSlug, onSelectSkill }: SkillDagM
               onClick={() => !isLocked && onSelectSkill?.(node.slug)}
               className={`group py-2.5 px-2 rounded-lg transition-colors flex flex-col gap-1.5 select-none ${
                 isLocked
-                  ? 'opacity-40 cursor-not-allowed'
+                  ? 'opacity-40 cursor-not-allowed hover:bg-slate-900/40'
                   : isActive
                   ? 'bg-slate-800/60 ring-1 ring-indigo-500/30 cursor-pointer'
                   : 'hover:bg-slate-800/40 cursor-pointer'
               }`}
+              title={node.lockReason || node.description}
             >
               {/* Header: Module Label & Status Badge */}
               <div className="flex items-center justify-between text-[10px] font-mono">
                 <span className={`uppercase tracking-wider ${isActive ? 'text-indigo-400 font-semibold' : 'text-slate-400'}`}>
-                  Модуль {idx + 1}
+                  Модуль {moduleNumber}
                 </span>
 
                 {isMastered ? (
@@ -86,6 +91,14 @@ export function SkillDagMap({ nodes, activeSkillSlug, onSelectSkill }: SkillDagM
                   {(node.pMastery * 100).toFixed(1)}%
                 </span>
               </div>
+
+              {/* Lock Reason hint if locked */}
+              {isLocked && node.lockReason && (
+                <div className="text-[10px] text-amber-400/80 font-mono truncate flex items-center gap-1">
+                  <AlertCircle className="w-2.5 h-2.5 shrink-0" />
+                  <span>{node.lockReason}</span>
+                </div>
+              )}
 
               {/* Minimalist Slim Progress Bar */}
               <div className="w-full h-1 bg-slate-800 rounded-full overflow-hidden mt-0.5">

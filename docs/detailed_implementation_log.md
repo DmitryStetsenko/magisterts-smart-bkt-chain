@@ -4019,3 +4019,46 @@ eferenceAnswer, критерії options.keywords (microtask|мікротаск|
 - **Верифікація:**
   - 100% успішна виробнича збірка `npm run build:teacher` (Next.js 16.2.9 Turbopack).
   - Візуальна перевірка у браузері Playwright (артефакт `teacher_modular_classroom_modal.png`).
+
+
+---
+
+### 11.70. Модульний BKT-Гейтинг, Розблокування за Порогом Майстерності та Селективна Фільтрація в Студентському Кабінеті (SBC-388, EP-ST)
+- **Контекст та інженерна задача:**
+  Для забезпечення адаптивного переходу між розділами навчальної програми в кабінеті студента `apps/student` реалізовано алгоритм автоматичного розблокування наступного модуля на основі оцінки засвоєння попереднього модуля моделлю BKT ($P(L_n) \ge 0.85$). Також підтримано обмеження доступності модулів для студентів відповідно до налаштувань групи `allowedModules` та режиму чистого тестування (`TESTING_ONLY`).
+- **Архітектурні зміни та компоненти:**
+  1. **Розширення типу `SkillGraphNode` ([`apps/student/src/features/skill-graph/model/skill-graph.types.ts`](file:///apps/student/src/features/skill-graph/model/skill-graph.types.ts)):**
+     ```typescript
+     export interface SkillGraphNode {
+       id: string;
+       name: string;
+       slug: string;
+       description?: string;
+       difficulty?: 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED';
+       status: 'MASTERED' | 'IN_PROGRESS' | 'LOCKED';
+       pL: number;
+       prerequisites: string[];
+       orderIndex?: number;
+       moduleId?: string;
+       moduleTitle?: string;
+       moduleOrder?: number;
+       moduleSlug?: string;
+       isModuleLocked?: boolean;
+       lockReason?: string;
+     }
+     ```
+  2. **Математична логіка BKT-гейтингу та фільтрації ([`apps/student/src/components/StudentPortalApp.tsx`](file:///apps/student/src/components/StudentPortalApp.tsx)):**
+     - Середнє значення майстерності модуля:
+       $$\overline{P}(L_{\text{module } m}) = \frac{1}{|K_m|} \sum_{k \in K_m} P(L^{(k)})$$
+     - Умова розблокування модуля $m_{i+1}$:
+       $$\text{Unlocked}(m_{i+1}) \iff \overline{P}(L_{\text{module } m_i}) \ge 0.85 \quad \lor \quad \forall k \in K_{m_i}: \text{status}(k) = \text{'MASTERED'}$$
+     - У разі недосягнення порогу встановлюється `isModuleLocked: true` з текстом: *«Опануйте попередній модуль з P(L) ≥ 85%»*.
+     - У дидактичному режимі `TESTING_ONLY` умова знімається — усі модулі відкрито для діагностичного скринінгу.
+     - Якщо в сесії студента задано перелік `allowedModules` (з налаштувань класу або індивідуального зарахування), теми поза списком отримують блокування з повідомленням: *«Тема не включена до програми цієї групи»*.
+  3. **Оновлення сайдбара «Карта Навичок» ([`apps/student/src/features/skill-graph/ui/SkillDagMap.tsx`](file:///apps/student/src/features/skill-graph/ui/SkillDagMap.tsx)):**
+     - Відображення заголовка модуля з порядковим номером (`Модуль 1: Змінні & Типи Даних`) та міткою цільової майстерності ($P(L) \ge 0.85$).
+     - При блокуванні модуля відображається векторний індикатор `Lock` кольору `text-amber-400` та бейдж причини блокування.
+- **Верифікація:**
+  - 100% успішна виробнича збірка `npm run build:student` та `npm run build:study` (Next.js 16.2.9 Turbopack).
+  - Скріншотна верифікація у Playwright: збережено артефакт `student_modular_bkt_gating.png`.
+

@@ -14076,6 +14076,77 @@
               "type": "text",
               "raw_text": "Візуальна перевірка у браузері Playwright (артефакт `teacher_modular_classroom_modal.png`).",
               "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "---",
+              "subitems": []
+            }
+          ]
+        },
+        {
+          "title": "11.70. Модульний BKT-Гейтинг, Розблокування за Порогом Майстерності та Селективна Фільтрація в Студентському Кабінеті (SBC-388, EP-ST)",
+          "level": 3,
+          "paragraphs": [
+            "Для забезпечення адаптивного переходу між розділами навчальної програми в кабінеті студента `apps/student` реалізовано алгоритм автоматичного розблокування наступного модуля на основі оцінки засвоєння попереднього модуля моделлю BKT ($P(L_n) \\ge 0.85$). Також підтримано обмеження доступності модулів для студентів відповідно до налаштувань групи `allowedModules` та режиму чистого тестування (`TESTING_ONLY`)."
+          ],
+          "code_blocks": [
+            {
+              "lang": "typescript",
+              "content": "export interface SkillGraphNode {\n       id: string;\n       name: string;\n       slug: string;\n       description?: string;\n       difficulty?: 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED';\n       status: 'MASTERED' | 'IN_PROGRESS' | 'LOCKED';\n       pL: number;\n       prerequisites: string[];\n       orderIndex?: number;\n       moduleId?: string;\n       moduleTitle?: string;\n       moduleOrder?: number;\n       moduleSlug?: string;\n       isModuleLocked?: boolean;\n       lockReason?: string;\n     }"
+            }
+          ],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "**Контекст та інженерна задача:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Архітектурні зміни та компоненти:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Розширення типу `SkillGraphNode` ([`apps/student/src/features/skill-graph/model/skill-graph.types.ts`](file:///apps/student/src/features/skill-graph/model/skill-graph.types.ts)):**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Математична логіка BKT-гейтингу та фільтрації ([`apps/student/src/components/StudentPortalApp.tsx`](file:///apps/student/src/components/StudentPortalApp.tsx)):**",
+              "subitems": [
+                "Середнє значення майстерності модуля:",
+                "$$\\overline{P}(L_{\\text{module } m}) = \\frac{1}{|K_m|} \\sum_{k \\in K_m} P(L^{(k)})$$",
+                "Умова розблокування модуля $m_{i+1}$:",
+                "$$\\text{Unlocked}(m_{i+1}) \\iff \\overline{P}(L_{\\text{module } m_i}) \\ge 0.85 \\quad \\lor \\quad \\forall k \\in K_{m_i}: \\text{status}(k) = \\text{'MASTERED'}$$",
+                "У разі недосягнення порогу встановлюється `isModuleLocked: true` з текстом: *«Опануйте попередній модуль з P(L) ≥ 85%»*.",
+                "У дидактичному режимі `TESTING_ONLY` умова знімається — усі модулі відкрито для діагностичного скринінгу.",
+                "Якщо в сесії студента задано перелік `allowedModules` (з налаштувань класу або індивідуального зарахування), теми поза списком отримують блокування з повідомленням: *«Тема не включена до програми цієї групи»*."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Оновлення сайдбара «Карта Навичок» ([`apps/student/src/features/skill-graph/ui/SkillDagMap.tsx`](file:///apps/student/src/features/skill-graph/ui/SkillDagMap.tsx)):**",
+              "subitems": [
+                "Відображення заголовка модуля з порядковим номером (`Модуль 1: Змінні & Типи Даних`) та міткою цільової майстерності ($P(L) \\ge 0.85$).",
+                "При блокуванні модуля відображається векторний індикатор `Lock` кольору `text-amber-400` та бейдж причини блокування."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Верифікація:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "100% успішна виробнича збірка `npm run build:student` та `npm run build:study` (Next.js 16.2.9 Turbopack).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Скріншотна верифікація у Playwright: збережено артефакт `student_modular_bkt_gating.png`.",
+              "subitems": []
             }
           ]
         }

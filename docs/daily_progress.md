@@ -392,6 +392,22 @@ pm run build:student (Next.js 16.2.9 Turbopack, 0 помилок TypeScript).
       - 100% успішна збірка `npm run build:teacher` (Next.js 16.2.9 Turbopack).
       - Візуальне підтвердження у Playwright: збережено скріншот `teacher_modular_classroom_modal.png`.
 
+25. **Модульне Розбиття Карти Компетенцій, BKT-Гейтинг Розблокування Модулів та Фільтрація за Програмою Групи в Кабінеті Студента (`SBC-388`, `EP-ST`):**
+    - **Виконана інженерна робота:**
+      - **Розширення моделі вузлів компетенцій ([`apps/student/src/features/skill-graph/model/skill-graph.types.ts`](file:///apps/student/src/features/skill-graph/model/skill-graph.types.ts)):**
+        - Додано поля зв'язку з модулем: `moduleId`, `moduleTitle`, `moduleOrder`, `moduleSlug`, `isModuleLocked` (булевий статус блокування теми) та `lockReason` (педагогічне пояснення блокування).
+      - **Динамічний BKT-гейтинг та фільтрація ([`apps/student/src/components/StudentPortalApp.tsx`](file:///apps/student/src/components/StudentPortalApp.tsx)):**
+        - Обчислення середньої майстерності для кожного модуля: $\overline{P}(L_{\text{module}}) = \frac{1}{|K|}\sum_{k \in K} P(L_n^{(k)})$.
+        - Правило розблокування: у стандартному режимі (`STANDARD` / `FULL_CYCLE`) перший модуль відкритий завжди. Модуль $i+1$ відкривається лише за умови, що попередній модуль $i$ опановано з $\overline{P}(L) \ge 0.85$ (або всі навички у статусі `MASTERED`). Якщо поріг не досягнуто, модуль блокується з повідомленням: *«Опануйте попередній модуль з P(L) ≥ 85%»*.
+        - У режимі тестування (`TESTING_ONLY`): гейтинг знімається, всі навички доступні одразу для вхідного зрізу знань.
+        - Селективна фільтрація `allowedModules`: якщо для навчальної групи викладач обмежив доступні теми, не включені модулі позначаються статусом `isModuleLocked: true` з причиною: *«Тема не включена до програми цієї групи»*.
+      - **Оновлення сайдбара «Карта Навичок» ([`apps/student/src/features/skill-graph/ui/SkillDagMap.tsx`](file:///apps/student/src/features/skill-graph/ui/SkillDagMap.tsx)):**
+        - Відображення заголовка модуля, порядкового номера, бейджа цільового порогу BKT ($P(L_n) \ge 0.85$).
+        - При блокуванні модуля виводиться компактний індикатор-замок `Lock` та зрозумілий текст причини блокування.
+    - **Верифікація:**
+      - 100% успішна збірка `npm run build:student` (Next.js 16.2.9 Turbopack) та `npm run build:study` (Next.js 16.2.9 Turbopack).
+      - Наскрізна візуальна перевірка у браузері Playwright: збережено артефакт `student_modular_bkt_gating.png`.
+
 ## 📅 9 листопада 2026 року
 
 ### ✅ Що зроблено за день:

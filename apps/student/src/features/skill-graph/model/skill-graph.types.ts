@@ -28,6 +28,12 @@ export interface SkillGraphNode {
   pMastery: number;
   status: SkillStatus;
   parentSkillIds: string[];
+  moduleId?: string | null;
+  moduleTitle?: string | null;
+  moduleOrder?: number;
+  moduleSlug?: string | null;
+  isModuleLocked?: boolean;
+  lockReason?: string;
   tasksCount?: number;
   telemetry?: SkillTelemetryStats;
   recentAdjustments?: SkillAdjustmentSummary[];
