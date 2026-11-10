@@ -389,7 +389,7 @@
 | **SBC-355** | `Story` | `TC` | add teacher live student activity chronicle widget and admin ai dataset export center | 2026-11-09 | `038f42e` |
 | **SBC-365** | `Style` | `TC` | eliminate nested containers and declutter AnomalyTreeWidget into minimalist borderless layout | 2026-11-10 | `bdfaec9` |
 | **SBC-366** | `Style` | `TC` | replace inline subconcept tags with compact absolute popover in CourseGraphViewer | 2026-11-10 | `294b4ef` |
-| **SBC-367** | `Feat` | `TC` | make subconcepts interactive filters in CourseGraphViewer and polish borderless popover list | 2026-11-10 | pending |
+| **SBC-367** | `Feat` | `TC` | make subconcepts interactive filters in CourseGraphViewer and polish borderless popover list | 2026-11-10 | `19c061f` |
 
 
 
