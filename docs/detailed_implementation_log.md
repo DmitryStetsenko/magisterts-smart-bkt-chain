@@ -4114,4 +4114,25 @@ eferenceAnswer, критерії options.keywords (microtask|мікротаск|
   - Успішна компіляція JSON для порталу документації `apps/docs/src/data/apps_admin_portal.json` через `python scripts/compile_docs.py`.
 
 
+---
+
+### 11.73. Ліквідація Ефекту «Матрьошки» та Рефакторинг Реєстру Курсів за Стандартом Rule 7 (SBC-391, EP-AD)
+- **Контекст та інженерна задача:**
+  У межах виконання Правила 7 (Minimalist Borderless UI) та за результатами візуального аналізу користувача усунено багаторівневі рамкові контейнери, сітку плаваючих карток та неонові контролери в компоненті `CourseManager.tsx` (`apps/admin`).
+- **Виконані інженерні зміни ([`apps/admin/src/features/course-manager/ui/CourseManager.tsx`](file:///apps/admin/src/features/course-manager/ui/CourseManager.tsx)):**
+  1. **Ліквідація зовнішнього контейнера шапки:**
+     - Видалено блок `border border-slate-800 rounded-2xl bg-slate-900 p-6 shadow-xl`.
+     - Верхню панель переведено на чистий тулбар `border-b border-slate-800/80 pb-4` із заголовком, компактним полем пошуку та доступною кнопкою створення курсу `bg-emerald-600 hover:bg-emerald-500`.
+  2. **Інтеграція 4 зведених метричних плиток:**
+     - Створено плоскі інформаційні плитки `px-3.5 py-2.5 rounded-xl border border-slate-800/60 bg-slate-900/40`: Всього курсів, Опубліковано, Всього модулів, Навичок у програмі.
+  3. **Перехід на канонічний безрамковий список `divide-y divide-slate-800/50`:**
+     - Замінено 3-колонкову сітку карток `grid-cols-3` на суцільну послідовність рядків із семантичними лініями розділення `border-t border-b border-slate-800/80`.
+     - Кожен рядок містить повну інформацію про курс, моноширинні бейджі слага, статус активності, норматив BKT $P(L) \ge 0.85$, лічильники модулів/навичок та компактні кнопки дій.
+- **Верифікація:**
+  - Успішна виробнича збірка `npm run build:admin` (Next.js 16.3.8 Turbopack, 0 помилок).
+  - 100% проходження Playwright E2E сьюту `e2e/course-and-modules.spec.ts` (4/4 passed).
+  - Візуальна перевірка у браузері Playwright: зафіксовано артефакт `admin_course_cms_borderless.png`.
+
+
+
 
