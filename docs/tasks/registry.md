@@ -13,11 +13,11 @@
 | **`SBC-EP-LLM`** | Automated Code Assessment & Open-Text Evaluation | 10 |
 | **`SBC-EP-W3`** | Web3 Infrastructure & Smart Contracts | 0 |
 | **`SBC-EP-ST`** | Student Portal & Skill Tree Map | 37 |
-| **`SBC-EP-TC`** | Teacher Portal & Analytics CRM | 27 |
+| **`SBC-EP-TC`** | Teacher Portal & Analytics CRM | 28 |
 | **`SBC-EP-AD`** | Admin Portal & Knowledge DAG Builder | 10 |
 | **`SBC-EP-LD`** | Landing Web Page | 9 |
 | **`SBC-EP-MS`** | Master's Thesis Engineering & Academic Text Generation | 9 |
-| **ВСЬОГО** | - | **266** |
+| **ВСЬОГО** | - | **267** |
 
 ---
 
@@ -388,6 +388,7 @@
 | **SBC-354** | `Story` | `TC` | integrate end-to-end event logging and annulment actions across student and teacher portals | 2026-11-09 | `bd36456` |
 | **SBC-355** | `Story` | `TC` | add teacher live student activity chronicle widget and admin ai dataset export center | 2026-11-09 | `038f42e` |
 | **SBC-365** | `Style` | `TC` | eliminate nested containers and declutter AnomalyTreeWidget into minimalist borderless layout | 2026-11-10 | `bdfaec9` |
+| **SBC-366** | `Style` | `TC` | replace inline subconcept tags with compact absolute popover in CourseGraphViewer | 2026-11-10 | pending |
 
 
 

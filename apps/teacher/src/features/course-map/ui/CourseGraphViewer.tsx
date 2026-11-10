@@ -18,6 +18,7 @@ import {
   X,
   GitBranch
 } from 'lucide-react';
+import { SubConceptsPopover } from './SubConceptsPopover';
 
 export type TaskItem = TaskDto;
 export type SkillNodeItem = Pick<SkillNodeDto, 'id' | 'slug' | 'title' | 'description' | 'category' | 'difficulty'>;
@@ -266,18 +267,7 @@ export function CourseGraphViewer({
               </span>
             </div>
 
-            {tg.subConcepts.length > 0 && (
-              <div className="flex flex-wrap gap-1 mt-1.5">
-                {tg.subConcepts.map((sc) => (
-                  <span
-                    key={sc}
-                    className="px-1.5 py-0.5 rounded text-[9px] font-mono bg-slate-900 text-slate-400 border border-slate-800/80"
-                  >
-                    {sc}
-                  </span>
-                ))}
-              </div>
-            )}
+            <SubConceptsPopover subConcepts={tg.subConcepts} className="mt-1" />
           </div>
         </div>
 
@@ -683,13 +673,7 @@ export function CourseGraphViewer({
                   <tr key={tg.topic} className="hover:bg-slate-900/30 transition-colors">
                     <td className="py-3 pr-4 align-top w-60">
                       <div className="font-mono text-slate-200 font-bold">{tg.topic}</div>
-                      <div className="text-[10px] text-slate-500 font-mono mt-1 flex flex-wrap gap-1">
-                        {tg.subConcepts.map((sc) => (
-                          <span key={sc} className="px-1.5 py-0.5 rounded bg-slate-900 border border-slate-800/80 text-slate-400">
-                            {sc}
-                          </span>
-                        ))}
-                      </div>
+                      <SubConceptsPopover subConcepts={tg.subConcepts} className="mt-1" />
                     </td>
 
                     <td className="py-3 px-3 align-top">
