@@ -433,7 +433,7 @@
 | **SBC-379** | `Story` | `AD` | create user management center with rbac, create/edit modals, course assignment and test mode toggle | 2026-11-10 | `afbe3e2` |
 | **SBC-386** | `Story` | `AD` | implement dynamic course and module cms with bkt mastery threshold controls in admin portal | 2026-11-10 | `834be0a` |
 | **SBC-390** | `Docs` | `AD` | expand admin portal specification with dynamic course cms, modular builder and ecosystem data flow | 2026-11-10 | `ef0e6fb` |
-| **SBC-391** | `Style` | `AD` | eliminate nested containers and declutter CourseManager into canonical Rule 7 borderless list | 2026-11-10 | pending |
+| **SBC-391** | `Style` | `AD` | eliminate nested containers and declutter CourseManager into canonical Rule 7 borderless list | 2026-11-10 | `7d217f9` |
 
 ---
 
