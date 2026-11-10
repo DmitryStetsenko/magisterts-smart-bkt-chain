@@ -388,7 +388,7 @@
 | **SBC-354** | `Story` | `TC` | integrate end-to-end event logging and annulment actions across student and teacher portals | 2026-11-09 | `bd36456` |
 | **SBC-355** | `Story` | `TC` | add teacher live student activity chronicle widget and admin ai dataset export center | 2026-11-09 | `038f42e` |
 | **SBC-365** | `Style` | `TC` | eliminate nested containers and declutter AnomalyTreeWidget into minimalist borderless layout | 2026-11-10 | `bdfaec9` |
-| **SBC-366** | `Style` | `TC` | replace inline subconcept tags with compact absolute popover in CourseGraphViewer | 2026-11-10 | pending |
+| **SBC-366** | `Style` | `TC` | replace inline subconcept tags with compact absolute popover in CourseGraphViewer | 2026-11-10 | `294b4ef` |
 
 
 
