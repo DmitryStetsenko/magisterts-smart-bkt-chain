@@ -387,6 +387,7 @@
 | **SBC-353** | `Story` | `TC` | implement StudentActivityLog append-only database schema, migrations and AuditLogService in api backend | 2026-11-09 | `e31c090` |
 | **SBC-354** | `Story` | `TC` | integrate end-to-end event logging and annulment actions across student and teacher portals | 2026-11-09 | `bd36456` |
 | **SBC-355** | `Story` | `TC` | add teacher live student activity chronicle widget and admin ai dataset export center | 2026-11-09 | `038f42e` |
+| **SBC-365** | `Style` | `TC` | eliminate nested containers and declutter AnomalyTreeWidget into minimalist borderless layout | 2026-11-10 | `working-tree` |
 
 
 

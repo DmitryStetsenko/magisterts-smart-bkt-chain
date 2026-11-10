@@ -30,6 +30,32 @@
   5. *Build Next.js Documentation Site* (`npm run build:docs`) — збірка статичного експорту (`output: "export"`, `trailingSlash: true`, `basePath: "/magisterts-smart-bkt-chain"`).
   6. *Upload Artifact & Deploy Pages* (`actions/upload-pages-artifact@v3` + `actions/deploy-pages@v4`).
 
+### 0.1.7.68 Рефакторинг Віджета Аномалій `AnomalyTreeWidget` та Робочого Простору Викладача (`SBC-365`, `EP-TC`)
+- **Контекст проблеми та виявлені невідповідності:**
+  - У центрі робочого полотна викладача (`apps/teacher`, порт 3003) ключовий аналітичний компонент `AnomalyTreeWidget` містив надмірне чотирирівневе нашарування вкладених рамкових контейнерів:
+    1. Зовнішній блок `w-full bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-2xl`.
+    2. Рамкові картки категорій `bg-slate-950/80 border ${cat.borderColor} rounded-xl overflow-hidden shadow-lg`.
+    3. Внутрішні рамкові картки для кожного інциденту `p-3.5 rounded-xl bg-slate-900/90 hover:bg-slate-850 border border-slate-800 shadow-md`.
+    4. Рамочні теги та бейджі з параметрами $G$ та $S$ всередині карток.
+  - Панель швидких фільтрів аномалій та перемикач аналітичних режимів учня мали агресивну неонову заливку `bg-purple-600` з тінню `shadow-purple-600/30`.
+  - Верхні 4 картки метрик учня (`P(L)`, `WPM`, `Copy-Paste`, `Fatigue Index`) мали важкі рамки та затінення.
+- **Виконані інженерні покращення:**
+  - **Рефакторинг [`packages/ui/src/analytics/AnomalyTreeWidget.tsx`](file:///packages/ui/src/analytics/AnomalyTreeWidget.tsx):**
+    - Ліквідовано зовнішній рамковий контейнер; віджет інтегровано безпосередньо в канвас із чистим заголовком на тонкій роздільній лінії `pb-3 border-b border-slate-800/80`.
+    - Швидкі фільтри категорій переведено на спокійний сегментований перемикач дизайн-системи (`bg-slate-950/60 p-0.5 rounded-lg border border-slate-800/60` із активним станом `bg-slate-800 text-white shadow-sm`).
+    - Спрощено поле пошуку інцидентів без важких затінень.
+    - Категорії аномалій перетворено на акуратні напівпрозорі панелі з тонким кантом `border border-slate-800/60 rounded-xl`.
+    - Список інцидентів всередині категорії перетворено на чистий безрамковий перелік із семантичними лініями `divide-y divide-slate-800/50`; видалено вкладені картки `p-3.5 rounded-xl bg-slate-900/90 border border-slate-800`.
+    - Теги та параметри $G/S$ переведено на чисту моноширинну типографіку без рамок.
+  - **Поліпшення в [`apps/teacher/src/app/page.tsx`](file:///apps/teacher/src/app/page.tsx):**
+    - Перемикач режимів `Аналітика / Дерево Знань / Хроніка дій` переведено на мінімалістичний стиль `bg-slate-800 text-white shadow-sm`.
+    - Кнопку «Скинути прогрес» узгоджено зі стриманим стилем `bg-slate-800/60 hover:bg-rose-950/40 text-rose-300 border border-slate-700/60 hover:border-rose-500/40`.
+    - 4 картки метрик учня переведено на витончений напівпрозорий вигляд `bg-slate-900/40 border border-slate-800/60 rounded-xl`.
+    - У сайдбарі когорт оптимізовано сітку кнопок 2x2 та маркер виділення активного студента.
+- **Верифікація:**
+  - Збірка клієнтського застосунку: `npm run build:teacher` завершилася успішно (0 помилок).
+  - Наскрізна E2E-перевірка у Playwright Headless Browser: знято скріншот робочого простору, підтверджено повне усунення матрьошок та строгу відповідність Rule 7.
+
 ### 0.1.7.67 Ліквідація Ефекту «Матрьошки» та Приведення Сайдбара Skill DAG до Стандарту Rule 7 (`SBC-364`, `EP-ST`)
 - **Контекст проблеми та виявлені невідповідності:**
   - У висувному сайдбарі «Карта Навичок (Skill DAG)» (`apps/student`) вміст секції «Граф зв'язків компетенцій» було огорнуто у важкий рамковий контейнер `border border-slate-800 rounded-2xl bg-slate-900/90 p-4 shadow-xl`. Це створювало багаторівневий ефект «матрьошки», суворо заборонений правилом 7 (Minimalist Borderless Design Standard).
