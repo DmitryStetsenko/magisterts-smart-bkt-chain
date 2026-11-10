@@ -6,18 +6,18 @@
 ## 📊 Зведена статистика
 | Епік | Назва | Кількість завдань |
 | :--- | :--- | :---: |
-| **`SBC-EP-INF`** | Monorepo & CI/CD Setup | 94 |
-| **`SBC-EP-SH`** | Database Modeling & Shared Packages | 24 |
-| **`SBC-EP-BK`** | Authentication & Core API | 14 |
+| **`SBC-EP-INF`** | Monorepo & CI/CD Setup | 95 |
+| **`SBC-EP-SH`** | Database Modeling & Shared Packages | 25 |
+| **`SBC-EP-BK`** | Authentication & Core API | 16 |
 | **`SBC-EP-BKT`** | Bayesian Knowledge Tracing & Behavioral Telemetry | 30 |
 | **`SBC-EP-LLM`** | Automated Code Assessment & Open-Text Evaluation | 10 |
 | **`SBC-EP-W3`** | Web3 Infrastructure & Smart Contracts | 0 |
-| **`SBC-EP-ST`** | Student Portal & Skill Tree Map | 38 |
-| **`SBC-EP-TC`** | Teacher Portal & Analytics CRM | 31 |
-| **`SBC-EP-AD`** | Admin Portal & Knowledge DAG Builder | 11 |
+| **`SBC-EP-ST`** | Student Portal & Skill Tree Map | 39 |
+| **`SBC-EP-TC`** | Teacher Portal & Analytics CRM | 32 |
+| **`SBC-EP-AD`** | Admin Portal & Knowledge DAG Builder | 12 |
 | **`SBC-EP-LD`** | Landing Web Page | 9 |
 | **`SBC-EP-MS`** | Master's Thesis Engineering & Academic Text Generation | 9 |
-| **ВСЬОГО** | - | **274** |
+| **ВСЬОГО** | - | **281** |
 
 ---
 
@@ -122,7 +122,8 @@
 | **SBC-291** | `Story` | `INF` | create interactive Google Support style help center and user guide | 2026-10-28 | pending |
 | **SBC-371** | `Docs` | `INF` | document brainstorm 17 on production launch readiness, cloud topology and security architecture | 2026-11-10 | `a843dc9` |
 | **SBC-374** | `Docs` | `INF` | document bkt audit verifier center in guides and admin portal specification | 2026-11-10 | `91066fa` |
-| **SBC-375** | `Docs` | `INF` | document brainstorm 18 on google auth, classroom invite codes, enrollment modes and user management | 2026-11-10 | `pending` |
+| **SBC-375** | `Docs` | `INF` | document brainstorm 18 on google auth, classroom invite codes, enrollment modes and user management | 2026-11-10 | `1a8f657` |
+| **SBC-382** | `Story` | `INF` | verify end-to-end user onboarding flow, invite redemption and auth test mode with playwright tests | 2026-11-10 | pending |
 
 ---
 
@@ -164,6 +165,7 @@
 | **SBC-337** | `Docs` | `SH` | synchronize app domain specifications and tech stack docs with approved Minimalist Borderless UI standard | 2026-11-06 | `794532f` |
 | **SBC-338** | `Style` | `ST` | redesign QuizTaskEditor, EssayTaskEditor, MonacoCodeEditor and evaluation feedback in student portal to minimalist borderless UI | 2026-11-06 | `2edb113` |
 | **SBC-346** | `Story` | `SH` | complete end-to-end @sbc/types DTO contract integration across api, admin, student and teacher apps (BACKLOG-6) | 2026-11-07 | `ef22e4e` |
+| **SBC-376** | `Story` | `SH` | extend prisma schema with classroom, course enrollment, auth provider and system config | 2026-11-10 | pending |
 
 ---
 
@@ -185,6 +187,8 @@
 | **SBC-115** | `Bug` | `BK` | fallback to global tasks in TaskSequencer when all active skill tasks are completed | 2026-10-05 | `5c969e0` |
 | **SBC-125** | `Bug` | `BK` | support const and let function declarations in VM runner | 2026-10-06 | `d5ac059` |
 | **SBC-171** | `Story` | `BK` | add BehavioralAdjuster for dynamic Slip/Guess (Phase 2 step 1) | 2026-10-13 | `bd7526c` |
+| **SBC-377** | `Story` | `BK` | implement google oauth token exchange, jwt sessions and test mode mock-login | 2026-11-10 | pending |
+| **SBC-378** | `Story` | `BK` | implement classroom invite codes, student join route and course enrollment management api | 2026-11-10 | pending |
 
 ---
 
@@ -326,6 +330,7 @@
 | **SBC-363** | `Refactor` | `ST` | remove asymmetric layout capping and implement 2x2 responsive quiz options grid with full-width condition banner | 2026-11-09 | `3d79a82` |
 | **SBC-364** | `Style` | `ST` | eliminate nested containers and declutter Skill DAG drawer into minimalist borderless sequence | 2026-11-10 | `e72e143` |
 | **SBC-370** | `Fix` | `ST` | constrain MonacoCodeEditor height and flex layout to eliminate infinite vertical expansion loop | 2026-11-10 | `6096911` |
+| **SBC-381** | `Story` | `ST` | implement google sign-in button, /join invite code redemption and enrollment mode gating | 2026-11-10 | pending |
 
 ---
 
@@ -397,6 +402,7 @@
 | **SBC-367** | `Feat` | `TC` | make subconcepts interactive filters in CourseGraphViewer and polish borderless popover list | 2026-11-10 | `19c061f` |
 | **SBC-368** | `Fix` | `TC` | implement checkbox multi-selection for subconcepts and fix triad slot filtering | 2026-11-10 | `368a0ea` |
 | **SBC-369** | `Style` | `TC` | eliminate nested containers and declutter MetricsAuditInspector into minimalist borderless layout | 2026-11-10 | `9b5f1f9` |
+| **SBC-380** | `Story` | `TC` | implement classroom management drawer section, invite code generator and enrollment mode selector | 2026-11-10 | pending |
 
 
 
@@ -418,6 +424,7 @@
 | **SBC-356** | `Story` | `AD` | align admin portal layout with canonical AppShellLayout drawer sections and minimalist borderless standard | 2026-11-09 | `3bde2b5` |
 | **SBC-357** | `Story` | `AD` | implement clear activity logs endpoint and admin confirmation modal with safety guard | 2026-11-09 | `4023517` |
 | **SBC-373** | `Story` | `AD` | integrate bkt math verifier and interactive sandbox into admin portal | 2026-11-10 | `ed773be` |
+| **SBC-379** | `Story` | `AD` | create user management center with rbac, create/edit modals, course assignment and test mode toggle | 2026-11-10 | pending |
 
 ---
 
