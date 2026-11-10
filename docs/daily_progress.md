@@ -344,6 +344,27 @@ pm run build:student (Next.js 16.2.9 Turbopack, 0 помилок TypeScript).
       - 100% успішна компіляція пакету `@sbc/types` (`tsc`).
       - 100% успішне проходження повного сьюту unit-тестів бекенду `npm run test:api` (63/63 тестів у 11 сьютах, 45.3s).
 
+22. **Реалізація Backend API для Динамічного Управління Курсами та Модулями (`SBC-385`, `EP-BK`):**
+    - **Виконана інженерна робота:**
+      - **Розширення контролера `CourseController` ([`apps/api/src/adapters/inbound/http/course.controller.ts`](file:///apps/api/src/adapters/inbound/http/course.controller.ts)):**
+        - `GET /api/v1/courses`: повертає каталог усіх академічних курсів із вкладеними модулями (`orderIndex: 'asc'`), навичками та лічильниками навчальних груп/студентів.
+        - `GET /api/v1/courses/:slug`: детальне дерево курсу з модулями, навичками DAG, залежностями та завданнями.
+        - `POST /api/v1/courses`: створення курсу з валідацією обов'язкової назви, автогенерацією слага, цільовою аудиторією та порогом BKT ($P(L_n) \ge 0.85$).
+        - `PATCH /api/v1/courses/:id`: модифікація метаданих, порогів майстерності та статусу публікації (`isPublished`).
+        - `DELETE /api/v1/courses/:id`: безпечне видалення курсу.
+        - `GET /api/v1/courses/:courseId/modules`: отримання списку модулів курсу.
+        - `POST /api/v1/courses/:courseId/modules`: створення нового модуля курсу з автообчисленням `orderIndex` та посиланням на підручник `theoryUrl`.
+        - `PATCH /api/v1/courses/:courseId/modules/:moduleId`: редагування модуля, порогів майстерності або порядку.
+        - `DELETE /api/v1/courses/:courseId/modules/:moduleId`: видалення модуля з відв'язуванням навичок (`moduleId = null`).
+        - `POST /api/v1/courses/:courseId/modules/:moduleId/skills`: масове призначення навичок (SkillNodes) до модуля.
+      - **Наповнення бази даних модулямі ([`packages/database/prisma/seed.ts`](file:///packages/database/prisma/seed.ts)):**
+        - У сід-скрипт додано ініціалізацію 5 модулів для курсу `js-dev` («Змінні & Типи», «Умови & Функції», «Масиви & Об'єкти», «Асинхронність», «ООП») із прив'язкою до існуючих навичок та посиланнями на підручник `theoryUrl`.
+      - **Unit-тестування ([`apps/api/src/adapters/inbound/http/course.controller.spec.ts`](file:///apps/api/src/adapters/inbound/http/course.controller.spec.ts)):**
+        - Написано 11 ізольованих unit-тестів із мокуванням PrismaService для всіх методів курсів та модулів.
+    - **Верифікація:**
+      - 100% успішне проходження 74/74 unit-тестів API у 12 сьютах (`npm run test:api`, 28.5s).
+      - Успішне тестування живого API через `Invoke-RestMethod` на `http://localhost:3000/api/v1/courses/js-dev`.
+
 ## 📅 9 листопада 2026 року
 
 ### ✅ Що зроблено за день:

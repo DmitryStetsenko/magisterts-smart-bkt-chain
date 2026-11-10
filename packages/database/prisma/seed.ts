@@ -115,6 +115,7 @@ async function main() {
   await prisma.task.deleteMany({});
   await prisma.skillDependency.deleteMany({});
   await prisma.skillNode.deleteMany({});
+  await prisma.courseModule.deleteMany({});
   await prisma.course.deleteMany({});
 
   // ==================== COURSE 1: JAVASCRIPT PROGRAMMING ====================
@@ -150,9 +151,71 @@ async function main() {
     },
   });
 
+  const mod1 = await prisma.courseModule.create({
+    data: {
+      courseId: courseJs.id,
+      slug: 'syntax-and-variables',
+      title: 'Модуль 1: Змінні, Типи та Оператори',
+      description: 'Оголошення let/const, примітивні типи, приведення типів та базові оператори',
+      orderIndex: 1,
+      theoryUrl: '/learn/js-dev/module-1',
+      minMasteryThreshold: 0.85,
+    },
+  });
+
+  const mod2 = await prisma.courseModule.create({
+    data: {
+      courseId: courseJs.id,
+      slug: 'functions-and-control-flow',
+      title: 'Модуль 2: Умовні конструкції та Функції',
+      description: 'Порівняння, if/else, функції, параметри та замикання',
+      orderIndex: 2,
+      theoryUrl: '/learn/js-dev/module-2',
+      minMasteryThreshold: 0.85,
+    },
+  });
+
+  const mod3 = await prisma.courseModule.create({
+    data: {
+      courseId: courseJs.id,
+      slug: 'arrays-and-objects',
+      title: 'Модуль 3: Масиви & Обʼєкти',
+      description: 'Функціональні методи map, filter, reduce та обхід обʼєктів',
+      orderIndex: 3,
+      theoryUrl: '/learn/js-dev/module-3',
+      minMasteryThreshold: 0.85,
+    },
+  });
+
+  const mod4 = await prisma.courseModule.create({
+    data: {
+      courseId: courseJs.id,
+      slug: 'async-programming',
+      title: 'Модуль 4: Асинхронність JS',
+      description: 'Event Loop, Promises, async/await та try/catch',
+      orderIndex: 4,
+      theoryUrl: '/learn/js-dev/module-4',
+      minMasteryThreshold: 0.85,
+    },
+  });
+
+  const mod5 = await prisma.courseModule.create({
+    data: {
+      courseId: courseJs.id,
+      slug: 'oop-and-prototypes',
+      title: 'Модуль 5: ООП & Прототипи',
+      description: 'Класи ES6, extends, прототипи та інкапсуляція',
+      orderIndex: 5,
+      theoryUrl: '/learn/js-dev/module-5',
+      minMasteryThreshold: 0.85,
+    },
+  });
+
   const jsBasics = await prisma.skillNode.create({
     data: {
       courseId: courseJs.id,
+      moduleId: mod1.id,
+      orderIndex: 1,
       slug: 'js-basics',
       title: 'Модуль 1: Змінні, Типи та Оператори',
       description: 'Оголошення let/const, примітивні типи, приведення типів та базові оператори',
@@ -164,6 +227,8 @@ async function main() {
   const jsFunctions = await prisma.skillNode.create({
     data: {
       courseId: courseJs.id,
+      moduleId: mod2.id,
+      orderIndex: 2,
       slug: 'js-functions',
       title: 'Модуль 2: Умовні конструкції та Функції',
       description: 'Порівняння, if/else, тернарний оператор, функції, параметри та замикання',
@@ -175,6 +240,8 @@ async function main() {
   const jsCollections = await prisma.skillNode.create({
     data: {
       courseId: courseJs.id,
+      moduleId: mod3.id,
+      orderIndex: 3,
       slug: 'js-collections',
       title: 'Модуль 3: Масиви & Обʼєкти',
       description: 'Функціональні методи map, filter, reduce та обхід обʼєктів',
@@ -186,6 +253,8 @@ async function main() {
   const jsAsync = await prisma.skillNode.create({
     data: {
       courseId: courseJs.id,
+      moduleId: mod4.id,
+      orderIndex: 4,
       slug: 'js-async',
       title: 'Модуль 4: Асинхронність JS',
       description: 'Event Loop, Promises, async/await та try/catch',
@@ -197,6 +266,8 @@ async function main() {
   const jsOop = await prisma.skillNode.create({
     data: {
       courseId: courseJs.id,
+      moduleId: mod5.id,
+      orderIndex: 5,
       slug: 'js-oop',
       title: 'Модуль 5: ООП & Прототипи',
       description: 'Класи ES6, extends, прототипи та інкапсуляція',

@@ -3954,3 +3954,28 @@ eferenceAnswer, критерії options.keywords (microtask|мікротаск|
 - **Верифікація:**
   - 100% успішна збірка пакету `@sbc/types`.
   - 100% успішне виконання 63/63 тестів `npm run test:api`.
+
+
+---
+
+### 11.67. Розробка REST API Конструктора Курсів та Модулів у Бекенді (SBC-385, EP-BK)
+- **Контекст та інженерна задача:**
+  Для забезпечення дидактичної гнучкості та підтримки селективного призначення тем викладачем реалізовано повний набір REST ендпоінтів у NestJS контролері `CourseController`.
+- **Архітектурні зміни та ендпоінти ([`apps/api/src/adapters/inbound/http/course.controller.ts`](file:///apps/api/src/adapters/inbound/http/course.controller.ts)):**
+  1. **Курсовий рівень:**
+     - `GET /api/v1/courses`: вибірка курсів із жадібним завантаженням модулів, навичок та лічильників.
+     - `GET /api/v1/courses/:slug`: повна ієрархія курсу для студентських та викладацьких застосунків.
+     - `POST /api/v1/courses`: створення нового курсу з валідацією слага.
+     - `PATCH /api/v1/courses/:id`: оновлення назви, опису, цільової аудиторії, статусу `isPublished` та порогу майстерності BKT.
+     - `DELETE /api/v1/courses/:id`: безпечне видалення.
+  2. **Модульний рівень:**
+     - `GET /api/v1/courses/:courseId/modules`: отримання списку модулів із відсортованими навичками (`orderIndex: 'asc'`).
+     - `POST /api/v1/courses/:courseId/modules`: створення модуля з автовизначенням `orderIndex` та прив'язкою `theoryUrl`.
+     - `PATCH /api/v1/courses/:courseId/modules/:moduleId`: редагування параметрів модуля.
+     - `DELETE /api/v1/courses/:courseId/modules/:moduleId`: видалення модуля з безпечним зняттям прив'язки навичок.
+     - `POST /api/v1/courses/:courseId/modules/:moduleId/skills`: масове призначення списку компетенцій до модуля.
+  3. **Сід-дані та Unit-тести:**
+     - В `packages/database/prisma/seed.ts` додано 5 модулів для `js-dev`.
+     - У `apps/api/src/adapters/inbound/http/course.controller.spec.ts` створено 11 unit-тестів.
+- **Верифікація:**
+  - 100% успішне проходження 74/74 unit-тестів API у 12 сьютах (`npm run test:api`, 28.5s).

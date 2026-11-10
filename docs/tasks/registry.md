@@ -168,7 +168,7 @@
 | **SBC-338** | `Style` | `ST` | redesign QuizTaskEditor, EssayTaskEditor, MonacoCodeEditor and evaluation feedback in student portal to minimalist borderless UI | 2026-11-06 | `2edb113` |
 | **SBC-346** | `Story` | `SH` | complete end-to-end @sbc/types DTO contract integration across api, admin, student and teacher apps (BACKLOG-6) | 2026-11-07 | `ef22e4e` |
 | **SBC-376** | `Story` | `SH` | extend prisma schema with classroom, course enrollment, auth provider and system config | 2026-11-10 | `988cf65` |
-| **SBC-384** | `Story` | `SH` | extend prisma schema with CourseModule model, allowedModuleIds fields and typescript dto contracts | 2026-11-10 | pending |
+| **SBC-384** | `Story` | `SH` | extend prisma schema with CourseModule model, allowedModuleIds fields and typescript dto contracts | 2026-11-10 | `682f7d3` |
 
 ---
 
