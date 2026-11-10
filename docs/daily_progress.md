@@ -237,6 +237,26 @@ pm run build:student (Next.js 16.2.9 Turbopack, 0 помилок TypeScript).
       - Успішна збірка бекенду `npm run build:api`.
       - Live HTTP тестування запущеного сервера: успішні виклики `GET /api/v1/classrooms`, передперегляд за кодом `GET /api/v1/classrooms/join/KOD-KN21`, перевірка активних зарахувань `GET /api/v1/classrooms/student/:userId`.
 
+16. **Створення Центру Керування Користувачами та Ролями в Адмін-Панелі (Admin Users & RBAC CMS) (`SBC-379`, `EP-AD`):**
+    - **Виконана інженерна робота:**
+      - **Бекенд-шар (`apps/api`):**
+        - Розроблено [`UserService.ts`](file:///apps/api/src/domain/user/user.service.ts) з методами вибірки користувачів з фільтрами (`getUsers`), створення користувача (`createUser`), оновлення ролі/статусу/профілю (`updateUser`) та видалення (`deleteUser`).
+        - Розроблено [`UserController.ts`](file:///apps/api/src/adapters/inbound/http/user.controller.ts) з ендпоінтами `GET /api/v1/users`, `POST /api/v1/users`, `PATCH /api/v1/users/:id`, `DELETE /api/v1/users/:id`.
+      - **Фронтенд-компоненти Адмін-панелі (`apps/admin`):**
+        - Додано нову вкладку `users` на навігаційну рейку з іконкою `Users` та оновлено бічну панель на базі `<DrawerSection>` (довідка Google OAuth, привілеї ролей та опис 3 дидактичних режимів).
+        - Розроблено головний компонент [`UserManagementCenter.tsx`](file:///apps/admin/src/features/users/ui/UserManagementCenter.tsx) відповідно до стандарту Rule 7 (Minimalist Borderless UI, Opera Shell v2.0):
+          - Верхня плашка статистики: Всього акаунтів, Студенти, Викладачі, Google OAuth реєстрації.
+          - Інтерактивний тумблер `SYSTEM_AUTH_TEST_MODE` із динамічним відображенням статусу (`Тестовий режим: УВІМКНЕНО` / `ВИМКНЕНО`) та миттєвим збереженням у базі даних через API.
+          - Пошук за ім'ям/email та фільтри за ролями (`Всі`, `Студенти`, `Викладачі`, `Адміни`).
+          - Безрамковий список користувачів із бейджами ролі (`ADMIN`, `TEACHER`, `STUDENT`), типу провайдера (`Google` / `Local`), статусу блокування (`ACTIVE` / `SUSPENDED`).
+        - Створено модальне вікно створення/редагування [`UserModal.tsx`](file:///apps/admin/src/features/users/ui/UserModal.tsx) з валідацією полів.
+        - Створено модальне вікно індивідуального підключення курсів [`EnrollCourseModal.tsx`](file:///apps/admin/src/features/users/ui/EnrollCourseModal.tsx) з вибором курсу та трьох дидактичних режимів (`FULL_CYCLE`, `TESTING_ONLY`, `MODULAR`).
+        - Діалог підтвердження незворотного видалення акаунту.
+    - **Верифікація:**
+      - Успішна збірка бекенду `npm run build:api`.
+      - Успішна збірка адмін-порталу `npm run build:admin` (Next.js 16.3.8 Turbopack).
+      - Автоматизоване тестування у реальному headless-браузері Playwright: перевірено відкриття вкладки користувачів, рендеринг списку, відкриття модального вікна підключення курсу з вибором 4 курсів та трьох режимів, інтерактивне перемикання тумблера тестового режиму в реальному часі.
+
 ## 📅 9 листопада 2026 року
 
 ### ✅ Що зроблено за день:

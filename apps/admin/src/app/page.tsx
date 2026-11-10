@@ -18,7 +18,8 @@ import {
   FileSpreadsheet,
   CheckCircle2,
   Clock,
-  Activity
+  Activity,
+  Users
 } from 'lucide-react';
 import { AppShellLayout, Breadcrumbs, UserProfileDrawer, DrawerSection } from '@sbc/ui';
 import { getAppBaseUrl } from '@sbc/routes';
@@ -27,6 +28,7 @@ import { AdminSkillNode } from '../features/skill-editor/model/skill-editor.type
 import { CourseManager } from '../features/course-manager/ui/CourseManager';
 import { DatasetExportCenter, DatasetStats } from '../features/dataset-export/ui/DatasetExportCenter';
 import { BktAuditVerifierCenter } from '../features/verifier/ui/BktAuditVerifierCenter';
+import { UserManagementCenter } from '../features/users/ui/UserManagementCenter';
 
 export default function AdminCMSDashboard() {
   const [nodes, setNodes] = useState<AdminSkillNode[]>([
@@ -111,7 +113,7 @@ export default function AdminCMSDashboard() {
     setNodes((prev) => prev.filter((n) => n.id !== nodeId));
   };
 
-  type AdminTab = 'dag' | 'courses' | 'datasets' | 'verifier' | 'system';
+  type AdminTab = 'dag' | 'courses' | 'users' | 'datasets' | 'verifier' | 'system';
   const [activeTab, setActiveTab] = useState<AdminTab>('dag');
   const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(true);
   const [isProfileDrawerOpen, setIsProfileDrawerOpen] = useState<boolean>(false);
@@ -164,6 +166,10 @@ export default function AdminCMSDashboard() {
     } else if (activeTab === 'courses') {
       title = 'Каталог Курсів & Завдань';
       icon = BookOpen;
+      iconColor = 'text-emerald-400';
+    } else if (activeTab === 'users') {
+      title = 'Керування Користувачами';
+      icon = Users;
       iconColor = 'text-emerald-400';
     } else if (activeTab === 'datasets') {
       title = 'Аудит & ШІ Датасети';
@@ -305,6 +311,53 @@ export default function AdminCMSDashboard() {
                   <div className="flex items-center justify-between py-1">
                     <span>Практичні вправи з кодом</span>
                     <span className="font-mono text-white font-bold">12</span>
+                  </div>
+                </div>
+              </DrawerSection>
+            </>
+          )}
+
+          {/* Drawer: Users & RBAC */}
+          {activeTab === 'users' && (
+            <>
+              <DrawerSection
+                title="Google OAuth & Доступ"
+                icon={ShieldCheck}
+                defaultOpen={true}
+              >
+                <div className="flex flex-col gap-2 pt-1 text-xs text-slate-300">
+                  <div className="p-2.5 rounded-lg bg-slate-950/60 border border-slate-800 flex flex-col gap-1">
+                    <span className="font-semibold text-emerald-400">Вхід в 1 клік (Google)</span>
+                    <p className="text-[11px] text-slate-400 leading-relaxed">
+                      Учні авторизуються через Google акаунт. При першому вході система створює профіль учня автоматично.
+                    </p>
+                  </div>
+                  <div className="p-2.5 rounded-lg bg-slate-950/60 border border-slate-800 flex flex-col gap-1">
+                    <span className="font-semibold text-purple-400">Привілеї Викладача</span>
+                    <p className="text-[11px] text-slate-400 leading-relaxed">
+                      Роль TEACHER відкриває когортну аналітику, інспекцію аномалій та створення інвайт-кодів груп.
+                    </p>
+                  </div>
+                </div>
+              </DrawerSection>
+
+              <DrawerSection
+                title="Дидактичні Режими"
+                icon={BookOpen}
+                defaultOpen={true}
+              >
+                <div className="flex flex-col gap-1.5 text-[11px] text-slate-400 pt-1">
+                  <div className="flex flex-col gap-0.5 py-1 border-b border-slate-800/60">
+                    <span className="text-indigo-300 font-semibold">FULL_CYCLE</span>
+                    <span>Повний цикл: конспект у підручнику + тренажер з BKT.</span>
+                  </div>
+                  <div className="flex flex-col gap-0.5 py-1 border-b border-slate-800/60">
+                    <span className="text-amber-300 font-semibold">TESTING_ONLY</span>
+                    <span>Експрес-діагностика без обов'язкової теорії.</span>
+                  </div>
+                  <div className="flex flex-col gap-0.5 py-1">
+                    <span className="text-purple-300 font-semibold">MODULAR</span>
+                    <span>Вибірковий доступ до обраних модулів.</span>
                   </div>
                 </div>
               </DrawerSection>
@@ -542,6 +595,8 @@ export default function AdminCMSDashboard() {
                     ? 'Граф навичок'
                     : activeTab === 'courses'
                     ? 'Курси'
+                    : activeTab === 'users'
+                    ? 'Користувачі & Доступ'
                     : activeTab === 'datasets'
                     ? 'Датасети для ШІ'
                     : activeTab === 'verifier'
@@ -604,6 +659,12 @@ export default function AdminCMSDashboard() {
               activeColor: 'bg-emerald-600',
             },
             {
+              id: 'users',
+              icon: Users,
+              title: 'Керування Користувачами & Доступом',
+              activeColor: 'bg-emerald-600',
+            },
+            {
               id: 'datasets',
               icon: Database,
               title: 'Експорт Датасетів для ШІ & Аудит-Логи',
@@ -649,6 +710,8 @@ export default function AdminCMSDashboard() {
           )}
 
           {activeTab === 'courses' && <CourseManager />}
+
+          {activeTab === 'users' && <UserManagementCenter apiUrl={API_URL} />}
 
           {activeTab === 'datasets' && (
             <DatasetExportCenter

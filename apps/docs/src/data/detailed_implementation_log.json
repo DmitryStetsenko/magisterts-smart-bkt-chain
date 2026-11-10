@@ -120,6 +120,86 @@
           ]
         },
         {
+          "title": "0.1.7.81 Панель Керування Користувачами, Ролями та Зарахуванням в CMS Адміністратора (SBC-379, EP-AD)",
+          "level": 3,
+          "paragraphs": [],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "**Контекст та інженерне завдання:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Реалізація Кроку 4 дорожньої карти Брейншторму 18: створення повноцінної підсистеми управління користувачами (User Management CMS) у додатку `apps/admin` (порт 3004) з підтримкою перемикання тестового режиму авторизації, моніторингу Google OAuth акаунтів, призначення курсів у трьох дидактичних режимах (`FULL_CYCLE`, `TESTING_ONLY`, `MODULAR`) та м'якого блокування акаунтів відповідно до канонічного архітектурного стандарту Rule 7 (Minimalist Borderless UI, Opera Shell v2.0).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Виконані інженерні зміни:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Бекенд API Користувачів (`apps/api`):**",
+              "subitems": [
+                "Створено [`UserService.ts`](file:///apps/api/src/domain/user/user.service.ts) з методами `getUsers()`, `getUserById()`, `createUser()`, `updateUser()`, `deleteUser()`.",
+                "Створено [`UserController.ts`](file:///apps/api/src/adapters/inbound/http/user.controller.ts) з маршрутами під префіксом `/api/v1/users`.",
+                "Зареєстровано контролер та сервіс у `app.module.ts`."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Інтеграція в Навігаційну Рейку (`apps/admin/src/app/page.tsx`):**",
+              "subitems": [
+                "Додано нову вкладку `users` на вертикальну рейку (іконка `Users`, підказка «Керування Користувачами & Доступом»).",
+                "Додано спеціалізовану бічну панель на базі `<DrawerSection>`: «Google OAuth & Доступ» та «Дидактичні Режими» з інтерактивними індикаторами `+` / `−`.",
+                "Оновлено хлібні крихти хедера: `CMS Адміністрування / Користувачі & Доступ`."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Головний UI Компонент ([`UserManagementCenter.tsx`](file:///apps/admin/src/features/users/ui/UserManagementCenter.tsx)):**",
+              "subitems": [
+                "Верхня смужка швидкої статистики (Всього акаунтів, Студенти, Викладачі, Google OAuth).",
+                "Кнопка керування тестовим режимом із тумблером: миттєвий запит `POST /api/v1/auth/test-mode` та візуальна індикація `Тестовий режим: УВІМКНЕНО` / `ВИМКНЕНО`.",
+                "Живий пошук за ім'ям/email та фільтри ролей (`Всі`, `Студенти`, `Викладачі`, `Адміни`).",
+                "Чистий безрамковий список (`divide-y divide-slate-800/50`) із розпізнаванням Google аватарок, бейджами ролі (`ADMIN`, `TEACHER`, `STUDENT`), типу автентифікації та статусу блокування."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Модальні Вікна Керування:**",
+              "subitems": [
+                "[`UserModal.tsx`](file:///apps/admin/src/features/users/ui/UserModal.tsx): створення нового користувача або редагування профілю/ролі/статусу.",
+                "[`EnrollCourseModal.tsx`](file:///apps/admin/src/features/users/ui/EnrollCourseModal.tsx): пряме підключення учню будь-якого з 4 курсів системи з вибором дидактичного режиму (`FULL_CYCLE` — теорія + BKT тренажер, `TESTING_ONLY` — чистий зріз знань, `MODULAR` — окремі модулі).",
+                "Діалогове вікно підтвердження видалення користувача."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Верифікація:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "`npm --workspace=@sbc/api run build`: успішна компіляція бекенду.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "`npm run build:admin`: успішна збірка Next.js 16.3.8 Turbopack.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Live тестування у реальному headless-браузері Playwright: перевірено відкриття вкладки користувачів, рендеринг списку з БД PostgreSQL, роботу модального вікна підключення курсу та live-перемикання тумблера тестового режиму в базі даних.",
+              "subitems": []
+            }
+          ]
+        },
+        {
           "title": "0.1.7.80 Бекенд-Модуль Навчальних Класів (Classroom), Інвайт-Кодів та Зарахування на Курси (SBC-378, EP-BK)",
           "level": 3,
           "paragraphs": [],
