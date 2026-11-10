@@ -424,7 +424,7 @@
 | **SBC-356** | `Story` | `AD` | align admin portal layout with canonical AppShellLayout drawer sections and minimalist borderless standard | 2026-11-09 | `3bde2b5` |
 | **SBC-357** | `Story` | `AD` | implement clear activity logs endpoint and admin confirmation modal with safety guard | 2026-11-09 | `4023517` |
 | **SBC-373** | `Story` | `AD` | integrate bkt math verifier and interactive sandbox into admin portal | 2026-11-10 | `ed773be` |
-| **SBC-379** | `Story` | `AD` | create user management center with rbac, create/edit modals, course assignment and test mode toggle | 2026-11-10 | pending |
+| **SBC-379** | `Story` | `AD` | create user management center with rbac, create/edit modals, course assignment and test mode toggle | 2026-11-10 | `afbe3e2` |
 
 ---
 
