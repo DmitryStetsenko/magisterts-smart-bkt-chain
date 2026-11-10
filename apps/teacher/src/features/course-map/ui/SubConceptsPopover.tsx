@@ -1,10 +1,12 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Tag, ChevronDown, X } from 'lucide-react';
+import { Tag, ChevronDown, X, Search, Check } from 'lucide-react';
 
 export interface SubConceptsPopoverProps {
   subConcepts: string[];
+  activeSubConcept?: string;
+  onSelectSubConcept?: (subConcept: string) => void;
   className?: string;
 }
 
@@ -27,15 +29,27 @@ function getPluralSubconcepts(count: number): string {
 }
 
 /**
- * SubConceptsPopover: Minimalist compact trigger badge and absolute dropdown
- * to inspect BKT micro-concepts without stretching vertical list height.
+ * SubConceptsPopover: Minimalist compact trigger badge and interactive dropdown
+ * to filter tasks by BKT micro-concepts without stretching vertical list height.
  */
-export function SubConceptsPopover({ subConcepts, className = '' }: SubConceptsPopoverProps) {
+export function SubConceptsPopover({
+  subConcepts,
+  activeSubConcept = '',
+  onSelectSubConcept,
+  className = '',
+}: SubConceptsPopoverProps) {
   const [isOpen, setIsOpen] = useState(false);
 
   if (!subConcepts || subConcepts.length === 0) {
     return null;
   }
+
+  const hasActiveFilter = Boolean(
+    activeSubConcept &&
+      subConcepts.some(
+        (sc) => sc.toLowerCase() === activeSubConcept.toLowerCase()
+      )
+  );
 
   return (
     <div className={`relative inline-block ${className}`}>
@@ -47,14 +61,17 @@ export function SubConceptsPopover({ subConcepts, className = '' }: SubConceptsP
           setIsOpen((prev) => !prev);
         }}
         className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[10px] font-mono transition-colors cursor-pointer select-none border ${
-          isOpen
+          isOpen || hasActiveFilter
             ? 'bg-purple-950/60 border-purple-500/60 text-purple-200 shadow-sm'
             : 'bg-slate-900/80 border-slate-800/80 text-slate-400 hover:text-slate-200 hover:border-slate-700'
         }`}
-        title="Показати повний список підконцептів BKT"
+        title="Переглянути та відфільтрувати завдання за підконцептами BKT"
       >
-        <Tag className="w-2.5 h-2.5 text-purple-400 shrink-0" />
+        <Tag className={`w-2.5 h-2.5 shrink-0 ${hasActiveFilter ? 'text-purple-300' : 'text-purple-400'}`} />
         <span>{getPluralSubconcepts(subConcepts.length)}</span>
+        {hasActiveFilter && (
+          <span className="w-1.5 h-1.5 rounded-full bg-purple-400 shrink-0" />
+        )}
         <ChevronDown
           className={`w-2.5 h-2.5 text-slate-500 transition-transform duration-150 ${
             isOpen ? 'rotate-180 text-purple-400' : ''
@@ -100,16 +117,79 @@ export function SubConceptsPopover({ subConcepts, className = '' }: SubConceptsP
               </button>
             </div>
 
-            {/* Subconcepts List */}
-            <div className="max-h-52 overflow-y-auto space-y-1 pr-1 scrollbar-thin scrollbar-thumb-slate-800">
-              {subConcepts.map((sc) => (
-                <div
-                  key={sc}
-                  className="px-2 py-1 rounded bg-slate-950/70 border border-slate-800/80 text-[10px] font-mono text-slate-300 hover:border-slate-700/80 transition-colors break-all select-all"
+            {/* Subconcepts Clean Borderless List */}
+            <div className="max-h-52 overflow-y-auto space-y-0.5 pr-0.5 divide-y divide-slate-800/40 scrollbar-thin scrollbar-thumb-slate-800">
+              {subConcepts.map((sc) => {
+                const isSelected =
+                  activeSubConcept?.toLowerCase() === sc.toLowerCase();
+
+                return (
+                  <button
+                    key={sc}
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (onSelectSubConcept) {
+                        onSelectSubConcept(isSelected ? '' : sc);
+                      }
+                      setIsOpen(false);
+                    }}
+                    className={`w-full text-left py-1.5 px-2 rounded transition-colors flex items-center justify-between group cursor-pointer text-[11px] font-mono ${
+                      isSelected
+                        ? 'bg-purple-950/60 text-purple-200 font-semibold'
+                        : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
+                    }`}
+                    title={
+                      isSelected
+                        ? 'Скинути фільтр за цим підконцептом'
+                        : `Фільтрувати завдання за ${sc}`
+                    }
+                  >
+                    <div className="flex items-center gap-1.5 truncate">
+                      <span
+                        className={`w-1.5 h-1.5 rounded-full shrink-0 ${
+                          isSelected
+                            ? 'bg-purple-400'
+                            : 'bg-slate-600 group-hover:bg-purple-400'
+                        }`}
+                      />
+                      <span className="truncate">{sc}</span>
+                    </div>
+
+                    <div className="flex items-center gap-1 text-[10px] shrink-0 font-sans">
+                      {isSelected ? (
+                        <span className="text-purple-400 flex items-center gap-0.5">
+                          <Check className="w-3 h-3" />
+                          <span>Фільтр</span>
+                        </span>
+                      ) : (
+                        <span className="text-slate-500 group-hover:text-purple-300 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1">
+                          <span>Фільтр</span>
+                          <Search className="w-2.5 h-2.5" />
+                        </span>
+                      )}
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Footer with Hint & Quick Reset */}
+            <div className="pt-2 mt-1.5 border-t border-slate-800/80 flex items-center justify-between text-[10px] font-mono text-slate-500">
+              <span>Клікніть для фільтрації завдань</span>
+              {hasActiveFilter && onSelectSubConcept && (
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onSelectSubConcept('');
+                    setIsOpen(false);
+                  }}
+                  className="text-purple-400 hover:text-purple-300 underline cursor-pointer"
                 >
-                  {sc}
-                </div>
-              ))}
+                  Скинути
+                </button>
+              )}
             </div>
           </div>
         </>

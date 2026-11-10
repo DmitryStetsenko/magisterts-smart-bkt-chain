@@ -267,7 +267,12 @@ export function CourseGraphViewer({
               </span>
             </div>
 
-            <SubConceptsPopover subConcepts={tg.subConcepts} className="mt-1" />
+            <SubConceptsPopover
+              subConcepts={tg.subConcepts}
+              activeSubConcept={searchQuery}
+              onSelectSubConcept={(sc) => setSearchQuery(sc)}
+              className="mt-1"
+            />
           </div>
         </div>
 
@@ -418,15 +423,25 @@ export function CourseGraphViewer({
 
           {/* Search & Difficulty Controls */}
           <div className="flex flex-wrap items-center gap-2">
-            <div className="relative min-w-[220px]">
+            <div className="relative min-w-[240px]">
               <Search className="w-3.5 h-3.5 absolute left-2.5 top-2 text-slate-500" />
               <input
                 type="text"
                 placeholder="Пошук завдання, підконцепту..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full bg-slate-900/80 border border-slate-800 rounded-lg pl-8 pr-3 py-1 text-xs text-slate-200 focus:outline-none focus:border-purple-500"
+                className="w-full bg-slate-900/80 border border-slate-800 rounded-lg pl-8 pr-7 py-1 text-xs text-slate-200 focus:outline-none focus:border-purple-500"
               />
+              {searchQuery && (
+                <button
+                  type="button"
+                  onClick={() => setSearchQuery('')}
+                  className="absolute right-2 top-2 text-slate-500 hover:text-slate-300 p-0.5 rounded cursor-pointer transition-colors"
+                  title="Очистити фільтр"
+                >
+                  <X className="w-3 h-3" />
+                </button>
+              )}
             </div>
 
             <select
@@ -673,7 +688,12 @@ export function CourseGraphViewer({
                   <tr key={tg.topic} className="hover:bg-slate-900/30 transition-colors">
                     <td className="py-3 pr-4 align-top w-60">
                       <div className="font-mono text-slate-200 font-bold">{tg.topic}</div>
-                      <SubConceptsPopover subConcepts={tg.subConcepts} className="mt-1" />
+                      <SubConceptsPopover
+              subConcepts={tg.subConcepts}
+              activeSubConcept={searchQuery}
+              onSelectSubConcept={(sc) => setSearchQuery(sc)}
+              className="mt-1"
+            />
                     </td>
 
                     <td className="py-3 px-3 align-top">
