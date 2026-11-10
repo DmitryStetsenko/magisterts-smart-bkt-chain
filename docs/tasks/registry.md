@@ -12,7 +12,7 @@
 | **`SBC-EP-BKT`** | Bayesian Knowledge Tracing & Behavioral Telemetry | 29 |
 | **`SBC-EP-LLM`** | Automated Code Assessment & Open-Text Evaluation | 10 |
 | **`SBC-EP-W3`** | Web3 Infrastructure & Smart Contracts | 0 |
-| **`SBC-EP-ST`** | Student Portal & Skill Tree Map | 37 |
+| **`SBC-EP-ST`** | Student Portal & Skill Tree Map | 38 |
 | **`SBC-EP-TC`** | Teacher Portal & Analytics CRM | 31 |
 | **`SBC-EP-AD`** | Admin Portal & Knowledge DAG Builder | 10 |
 | **`SBC-EP-LD`** | Landing Web Page | 9 |
@@ -321,6 +321,7 @@
 | **SBC-362** | `Style` | `ST` | constrain task condition, options and content column to optimal typographic line length | 2026-11-09 | `d6de49c` |
 | **SBC-363** | `Refactor` | `ST` | remove asymmetric layout capping and implement 2x2 responsive quiz options grid with full-width condition banner | 2026-11-09 | `3d79a82` |
 | **SBC-364** | `Style` | `ST` | eliminate nested containers and declutter Skill DAG drawer into minimalist borderless sequence | 2026-11-10 | `e72e143` |
+| **SBC-370** | `Fix` | `ST` | constrain MonacoCodeEditor height and flex layout to eliminate infinite vertical expansion loop | 2026-11-10 | `6096911` |
 
 ---
 

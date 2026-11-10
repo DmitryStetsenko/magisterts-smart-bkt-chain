@@ -14,6 +14,7 @@ interface MonacoCodeEditorProps {
   isSubmitting?: boolean;
   onNextTask?: () => void;
   isPassed?: boolean;
+  height?: string | number;
 }
 
 export function MonacoCodeEditor({
@@ -25,6 +26,7 @@ export function MonacoCodeEditor({
   isSubmitting = false,
   onNextTask,
   isPassed = false,
+  height,
 }: MonacoCodeEditorProps) {
   const { metrics, handleKeyDown, handleDelete, handlePaste } = useTelemetry(userId, taskId);
   const editorRef = useRef<any>(null);
@@ -66,7 +68,7 @@ export function MonacoCodeEditor({
   };
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col w-full">
       {/* 📊 Live Telemetry Bar */}
       <div className="flex flex-wrap items-center justify-between pb-2.5 mb-2.5 border-b border-slate-800/80 text-xs font-mono text-slate-400 gap-4">
         <div className="flex items-center gap-4 text-[11px]">
@@ -120,8 +122,12 @@ export function MonacoCodeEditor({
         </div>
       </div>
 
-      {/* 💻 Monaco Code Editor */}
-      <div className="flex-1 min-h-[360px] rounded-lg overflow-hidden border border-slate-800/80">
+      {/* 💻 Monaco Code Editor — Bounded & ergonomically constrained */}
+      <div 
+        ref={containerRef}
+        style={height ? { height } : undefined}
+        className={`w-full ${height ? '' : 'h-[360px] sm:h-[400px]'} rounded-lg overflow-hidden border border-slate-800/80 shrink-0 relative bg-slate-950`}
+      >
         <Editor
           height="100%"
           defaultLanguage="javascript"
@@ -137,6 +143,13 @@ export function MonacoCodeEditor({
             tabSize: 2,
             lineNumbersMinChars: 3,
             padding: { top: 12, bottom: 12 },
+            scrollbar: {
+              vertical: 'visible',
+              horizontal: 'auto',
+              verticalScrollbarSize: 10,
+              horizontalScrollbarSize: 10,
+            },
+            wordWrap: 'on',
           }}
         />
       </div>
