@@ -30,6 +30,44 @@
   5. *Build Next.js Documentation Site* (`npm run build:docs`) — збірка статичного експорту (`output: "export"`, `trailingSlash: true`, `basePath: "/magisterts-smart-bkt-chain"`).
   6. *Upload Artifact & Deploy Pages* (`actions/upload-pages-artifact@v3` + `actions/deploy-pages@v4`).
 
+### 0.1.7.79 Бекенд-Модуль Авторизації Google OAuth 2.0, JWT-Сесії та Тестовий Режим Входу (SBC-377, EP-BK)
+- **Контекст та інженерне завдання:**
+  - Реалізація Кроку 2 дорожньої карти Брейншторму 18: створення захищеного модулю авторизації на базі NestJS (`apps/api`), що підтримує два паралельні сценарії входу:
+    1. Промисловий Google OAuth 2.0 з миттєвою реєстрацією нових студентів за один клік (Zero Onboarding Friction).
+    2. Тестовий режим (Test Mode Bypass) для офлайн-демонстрацій у навчальних закладах та локальної розробки, керований прапорцем `SYSTEM_AUTH_TEST_MODE`.
+- **Виконані інженерні зміни:**
+  1. **Інтеграція бібліотек:**
+     - Встановлено офіційні пакети `google-auth-library` для криптографічної перевірки ID-токенів Google та `jsonwebtoken` (з `@types/jsonwebtoken`) для формування сесійних JWT-токенів.
+  2. **Сервіс Системних Конфігурацій ([`SystemConfigService.ts`](file:///apps/api/src/domain/config/system-config.service.ts)):**
+     - Зчитування та оновлення динамічних налаштувань платформи у таблиці `system_configs`.
+     - Метод `isTestAuthModeEnabled()` повертає `boolean` статус активності тестового режиму входу (за замовчуванням `true` для dev-середовища).
+     - Метод `set(key, value, description)` оновлює значення з логуванням події.
+  3. **Сервіс Авторизації ([`AuthService.ts`](file:///apps/api/src/domain/auth/auth.service.ts)):**
+     - Метод `validateGoogleToken(credential)`:
+       - Виконує верифікацію `idToken` через Google API `OAuth2Client.verifyIdToken({ idToken, audience: clientId })`.
+       - Витягує `email`, `sub` (Google ID), ім'я, прізвище та `picture` (аватар).
+       - Виконує пошук користувача в PostgreSQL; якщо користувач не існує — автоматично реєструє запис у таблиці `users` з роллю `STUDENT`, `authProvider: GOOGLE`, `googleId` та створює пов'язаний профіль `user_profiles`.
+       - Підтримує детерміновані тестові токени `mock-google-token-*` для модульних тестів та автоматизованих перевірок.
+       - Випускає 7-денний підписаний JWT-токен.
+     - Метод `mockLogin(userIdOrEmail, forcedRole)`:
+       - Перевіряє системний прапорець `isTestAuthModeEnabled()`. При вимкненому режимі генерує `ForbiddenException(403)` з поясненням українською мовою.
+       - Підтримує швидкі аліаси: `demo-student` (`student@example.com`), `teacher-olena` (`teacher@example.com`), `admin-cms` (`admin@example.com`).
+     - Метод `verifyJwt(token)`: декодує та верифікує підпис токена за секретним ключем `JWT_SECRET`.
+     - Метод `getMe(userId)`: повертає актуальні дані користувача з профилем та активними курсами.
+  4. **Контролер Авторизації ([`AuthController.ts`](file:///apps/api/src/adapters/inbound/http/auth.controller.ts)):**
+     - Зареєстровано під глобальним префіксом `/api/v1/auth`:
+       - `POST /api/v1/auth/google` — обмін Google ID токена на сесійний JWT.
+       - `POST /api/v1/auth/mock-login` — миттєвий тестовий вхід.
+       - `GET /api/v1/auth/me` — верифікація сесії через заголовок `Authorization: Bearer <token>`.
+       - `GET /api/v1/auth/config` — публічний ендпоінт перевірки активності тестового режиму та отримання Google Client ID для фронтенду.
+       - `POST /api/v1/auth/test-mode` — увімкнення/вимкнення прапорця `SYSTEM_AUTH_TEST_MODE`.
+  5. **Unit-тестування ([`auth.service.spec.ts`](file:///apps/api/src/domain/auth/auth.service.spec.ts)):**
+     - 5 модульних тестів, що покривають генерацію/валідацію JWT, обробку збійних токенів, вхід у тестовому режимі, відхилення 403 при вимкненому режимі, та обробку мок-токенів Google.
+- **Верифікація:**
+  - `npm --workspace=@sbc/api test auth.service.spec.ts`: 5/5 PASSED (100%).
+  - `npm --workspace=@sbc/api run build`: успішна компіляція NestJS.
+  - Live HTTP перевірка ендпоінтів на порту 3000: підтверджено успішний мок-вхід, випуск токена, авторизацію через заголовок `Bearer`, перемикання прапорця та блокування неавторизованих викликів.
+
 ### 0.1.7.78 Розширення Схеми Бази Даних Prisma ORM, Моделей Класів, Зарахувань та Контрактів Типів (SBC-376, EP-SH)
 - **Контекст та інженерне завдання:**
   - Реалізація Кроку 1 дорожньої карти Брейншторму 18: створення фундаменту бази даних PostgreSQL для підтримки автентифікації користувачів через Google OAuth 2.0 або локальні акаунти, організації студентів у навчальні класи (`Classroom`) за унікальними промокодами (`code`), зарахування на курси (`CourseEnrollment`) з трьома дидактичними режимами (`FULL_CYCLE`, `TESTING_ONLY`, `MODULAR`), та динамічного збереження системних прапорців платформи (`SystemConfig`).

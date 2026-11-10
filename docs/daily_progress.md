@@ -193,6 +193,31 @@ pm run build:student (Next.js 16.2.9 Turbopack, 0 помилок TypeScript).
       - Успішний сидинг бази даних `npm run db:seed` (створено користувачів, конфігурацію, клас та 4 курси).
       - Успішна збірка `@sbc/types` та `@sbc/database`.
 
+14. **Реалізація Модуля Авторизації Google OAuth 2.0, JWT Сесій та Тестового Режиму (Test Mode Bypass) (`SBC-377`, `EP-BK`):**
+    - **Виконана інженерна робота:**
+      - **Встановлення залежностей:** інтегровано офіційні бібліотеки `google-auth-library` та `jsonwebtoken` (з `@types/jsonwebtoken`) у `apps/api`.
+      - **Сервіс системних конфігурацій ([`SystemConfigService.ts`](file:///apps/api/src/domain/config/system-config.service.ts)):**
+        - Читання системних прапорців із таблиці `system_configs` БД PostgreSQL.
+        - Метод `isTestAuthModeEnabled()` для перевірки доступності тестового входу.
+        - Методи `get()`, `set()`, `getAll()` для динамічного керування конфігурацією платформи.
+      - **Сервіс авторизації ([`AuthService.ts`](file:///apps/api/src/domain/auth/auth.service.ts)):**
+        - `validateGoogleToken(credential)`: валідація Google ID Token через `OAuth2Client.verifyIdToken()`, отримання профілю (email, sub, ім'я, прізвище, аватар), автоматична реєстрація нового студента з роллю `STUDENT` та провайдером `GOOGLE`, генерація 7-денного JWT-токену; підтримка симуляційних токенів `mock-google-token-*` для dev-середовища.
+        - `mockLogin(userIdOrEmail, forcedRole)`: швидкий вхід для демонстрацій/тестування (`demo-student` -> `student@example.com`, `teacher-olena` -> `teacher@example.com`, `admin-cms` -> `admin@example.com`) із суворим захистом `ForbiddenException` при вимкненому тумблері `SYSTEM_AUTH_TEST_MODE`.
+        - `generateJwt()`, `verifyJwt()`: підпис та верифікація сесійних JWT токенів з корисною інформацією (`sub`, `email`, `role`).
+        - `getMe(userId)`: отримання безпечного профілю користувача без паролів.
+      - **HTTP Контролер ([`AuthController.ts`](file:///apps/api/src/adapters/inbound/http/auth.controller.ts)):**
+        - `POST /api/v1/auth/google`: обмін Google ID токена на сесію.
+        - `POST /api/v1/auth/mock-login`: тестовий вхід в 1 клік.
+        - `GET /api/v1/auth/me`: перевірка сесії через `Authorization: Bearer <token>`.
+        - `GET /api/v1/auth/config`: публічний статус тестового режиму та Google Client ID.
+        - `POST /api/v1/auth/test-mode`: перемикання прапорця `SYSTEM_AUTH_TEST_MODE` адміністратором.
+      - **Unit-тестування ([`auth.service.spec.ts`](file:///apps/api/src/domain/auth/auth.service.spec.ts)):**
+        - 5/5 успішних тестів: генерація/валідація JWT, обробка недійсного токена, вхід у тестовому режимі, блокування при вимкненому тестовому режимі, валідація Google токена.
+    - **Верифікація:**
+      - Проходження 100% юніт-тестів `jest auth.service.spec.ts` (5 passed).
+      - Успішна збірка бекенду `npm run build:api`.
+      - Live HTTP тестування запущеного сервера: успішні виклики `GET /api/v1/auth/config`, `POST /api/v1/auth/mock-login`, `GET /api/v1/auth/me`, перемикання `test-mode` та підтвердження блокування 403 Forbidden.
+
 ## 📅 9 листопада 2026 року
 
 ### ✅ Що зроблено за день:
