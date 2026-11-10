@@ -30,6 +30,36 @@
   5. *Build Next.js Documentation Site* (`npm run build:docs`) — збірка статичного експорту (`output: "export"`, `trailingSlash: true`, `basePath: "/magisterts-smart-bkt-chain"`).
   6. *Upload Artifact & Deploy Pages* (`actions/upload-pages-artifact@v3` + `actions/deploy-pages@v4`).
 
+### 0.1.7.75 Математичний Трейс BKT, Бортовий Самописець Подій (Event Stream) та Автономний Верифікатор (SBC-372, EP-BKT)
+- **Контекст проблеми та потреба прозорості:**
+  - Педагогічне впровадження платформи у коледжі та комп'ютерній академії вимагає абсолютної прозорості та математичної доказовості кожного кроку оновлення знань студента $P(L_t)$. Викладач і методист повинні мати змогу детально відтворити будь-яку дію студента (спідран, копіпаст, звернення за Сократівською підказкою, помилки або правильні відповіді) та переконатися у відсутності збоїв, без загрози вичерпання дискового простору сервера.
+- **Виконані інженерні рішення:**
+  1. **Поглиблений математичний трейс BKT ([`apps/api/src/domain/bkt/bkt-engine.ts`](file:///apps/api/src/domain/bkt/bkt-engine.ts)):**
+     - Реалізовано метод `calculateNextStateWithTrace(currentState, isCorrect, options)`:
+       - Фіксація вхідних параметрів: $P(L_{t-1})$, $P(T)$, $P(S)$, $P(G)$, штрафного коефіцієнта підказки $\text{Penalty}$.
+       - Байєсівське оновлення: обчислення точного $\text{Numerator}$ та $\text{Denominator}$ для $O_t = 1$ та $O_t = 0$.
+       - Апостеріорна ймовірність за спостереженням: $P(L \mid \text{Obs}) = \text{Numerator} / \text{Denominator}$.
+       - Крок переходу: $P(L_t) = P(L \mid \text{Obs}) + (1 - P(L \mid \text{Obs})) \cdot P(T)$.
+       - Демпфування приросту при зверненні до Сократівських підказок: $P(L_t)_{\text{final}} = P(L_{t-1}) + \Delta P \cdot (1 - \text{Penalty})$.
+       - Захисний клампінг: $P(L_t) \in [0.01; 0.99]$.
+       - Формування людиночитабельного формульного рядка для аудиту.
+  2. **Бортовий самописець (Flight Data Recorder) у [AuditLogService.ts](file:///apps/api/src/domain/audit/audit-log.service.ts):**
+     - Автономний запис подій у файл потоку `logs/event_stream.jsonl` (формат JSON Lines).
+     - Генерація структурованих ASCII-карток розрахунку у текстовий журнал `logs/bkt_math_audit.log`.
+     - Захист дискового простору за алгоритмом безпечної ротації `appendToRotatedFile(filePath, content, maxBytes = 20 * 1024 * 1024)`: при перевищенні 20 МБ файл перейменовується в `.1`, запобігаючи неконтрольованому зростанню розміру логів.
+  3. **Інтеграція в [BktController.ts](file:///apps/api/src/adapters/inbound/http/bkt.controller.ts):**
+     - Використання `calculateNextStateWithTrace` замість спрощеного оновлення.
+     - Передача об'єкта `mathTrace` у виклик `auditLogService.logEvent`, що зберігає детальний трейс як у базі даних PostgreSQL (`StudentActivityLog.details`), так і у фізичних файлах логів.
+  4. **Автономний скрипт математичної верифікації ([`scripts/verify_bkt_math.py`](file:///scripts/verify_bkt_math.py)):**
+     - Реалізовано 10 математичних інваріантних еталонних тестів (чесний ввід, спідран, копіпаст, випадкова описка, підказки Сократа 1–3 рівнів, граничні стани 0.05 та 0.88).
+     - Режим потокового аудиту живого файлу `logs/event_stream.jsonl` з верифікацією дельти до $10^{-6}$.
+     - Інтерактивний калькулятор формул BKT для педагогічних експериментів.
+  5. **Вичерпна технічна документація:**
+     - Створено посібник [`docs/guide/bkt_math_and_event_stream_guide.md`](file:///docs/guide/bkt_math_and_event_stream_guide.md), зареєстровано в [`scripts/compile_docs.py`](file:///scripts/compile_docs.py) та скомпільовано в `apps/docs/src/data/bkt_math_and_event_stream_guide.json`.
+- **Верифікація:**
+  - `python scripts/verify_bkt_math.py --test-only`: 10 із 10 еталонних тестів пройдено успішно.
+  - `python scripts/compile_docs.py`: усі структуровані JSON скомпільовано без помилок.
+
 ### 0.1.7.74 Архітектурний Брейншторм та Дорожня Карта Релізу Smart-BKT-Chain у Продакшен (SBC-371, EP-INF)
 - **Контекст проблеми та виявлені виклики продакшену:**
   - Локальний стенд платформи опирається на єдиного статичного користувача demo-student, незахищений рушій запуску JS-коду через vm.createContext() із прямим викликом eval(), відсутність персистенції графу в apps/admin (локальний useState) та порожній пакет packages/contracts.

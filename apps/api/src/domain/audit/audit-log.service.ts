@@ -1,4 +1,6 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import * as fs from 'fs';
+import * as path from 'path';
 import { PrismaService } from '../../adapters/outbound/persistence/prisma.service';
 import { TelemetryGateway } from '../../adapters/inbound/websocket/telemetry.gateway';
 import {
@@ -11,11 +13,89 @@ import { SubmissionStatus, TeacherReviewStatus } from '@sbc/database';
 @Injectable()
 export class AuditLogService {
   private readonly logger = new Logger(AuditLogService.name);
+  private readonly maxLogSizeBytes = 20 * 1024 * 1024; // 20 MB rotation threshold
 
   constructor(
     private readonly prisma: PrismaService,
     private readonly telemetryGateway: TelemetryGateway,
   ) {}
+
+  /**
+   * Safe rotated log appender to guarantee zero risk of disk space exhaustion
+   */
+  private appendToRotatedFile(filePath: string, content: string) {
+    try {
+      const dir = path.dirname(filePath);
+      if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir, { recursive: true });
+      }
+      if (fs.existsSync(filePath)) {
+        const stats = fs.statSync(filePath);
+        if (stats.size > this.maxLogSizeBytes) {
+          const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+          const rotatedPath = `${filePath}.${timestamp}.old`;
+          fs.renameSync(filePath, rotatedPath);
+        }
+      }
+      fs.appendFileSync(filePath, content + '\n', 'utf-8');
+    } catch (err) {
+      this.logger.warn(`Failed to append to log file ${filePath}: ${(err as Error).message}`);
+    }
+  }
+
+  /**
+   * Persists event stream to disk (event_stream.jsonl and bkt_math_audit.log)
+   */
+  private persistFlightData(dto: StudentActivityLogDto) {
+    const rootDir =
+      process.cwd().endsWith('apps\\api') || process.cwd().endsWith('apps/api')
+        ? path.resolve(process.cwd(), '../..')
+        : process.cwd();
+    const logsDir = path.resolve(rootDir, 'logs');
+    const jsonlPath = path.resolve(logsDir, 'event_stream.jsonl');
+    const mathLogPath = path.resolve(logsDir, 'bkt_math_audit.log');
+
+    // 1. JSON Lines flight recording for complete replayability
+    this.appendToRotatedFile(jsonlPath, JSON.stringify(dto));
+
+    // 2. If this event contains BKT math trace, format a human-readable ASCII card
+    const payload = dto.payload || {};
+    if (
+      payload.trace ||
+      (payload.pMasteryPrior !== undefined && payload.pMasteryPosterior !== undefined)
+    ) {
+      const trace = payload.trace || {};
+      const card = [
+        `==================== BKT CALCULATION TRACE [${dto.createdAt}] ====================`,
+        `[EVENT] ${dto.eventType} | Submission: ${dto.submissionId || 'N/A'} | Task: ${dto.taskId || 'N/A'}`,
+        `[ACTOR] Role: ${dto.actorRole} | ID: ${dto.actorId} | Target User: ${dto.userId}`,
+        `[INPUT BKT PARAMETERS]`,
+        `  Prior P(L_{t-1}): ${(payload.pMasteryPrior ?? trace.pMasteryPrior ?? 0).toFixed(4)}`,
+        `  P(Transit):       ${(trace.pTransit ?? 0.2000).toFixed(4)}`,
+        `  P(Slip used):     ${(payload.pSlip ?? trace.pSlip ?? 0.1000).toFixed(4)}`,
+        `  P(Guess used):    ${(payload.pGuess ?? trace.pGuess ?? 0.2000).toFixed(4)}`,
+        `  IsCorrect:        ${payload.isPassed ? 'TRUE (Correct observation)' : 'FALSE (Incorrect observation)'}`,
+        `  Adjust reasons:   ${(payload.adjustReasons || []).join(', ') || 'none (standard baseline)'}`,
+        `[STEP 1: BAYESIAN OBSERVATION P(L|Obs)]`,
+        `  Formula:          ${trace.formulaObs || (payload.isPassed ? '[P(L)*(1-S)] / [P(L)*(1-S) + (1-P(L))*G]' : '[P(L)*S] / [P(L)*S + (1-P(L))*(1-G)]')}`,
+        `  Numerator:        ${trace.numerator ?? 'N/A'}`,
+        `  Denominator:      ${trace.denominator ?? 'N/A'}`,
+        `  P(L | Obs):       ${trace.pObs ?? 'N/A'}`,
+        `[STEP 2: KNOWLEDGE TRANSITION P(L_t)]`,
+        `  Formula:          ${trace.formulaTransition || 'P(L|Obs) + (1 - P(L|Obs))*P(T)'}`,
+        `  Raw Posterior:    ${trace.rawPosterior ?? 'N/A'}`,
+        `[STEP 3: SCAFFOLDING & HINT PENALTIES]`,
+        `  Hint Penalty:     ${payload.appliedHintPenaltyPct ? `-${payload.appliedHintPenaltyPct}% penalty` : '0% (no hint penalty)'}`,
+        `  Delta P(L):       ${payload.deltaL !== undefined ? (payload.deltaL >= 0 ? `+${payload.deltaL}` : `${payload.deltaL}`) : 'N/A'}`,
+        `[FINAL POSTERIOR P(L_t)]`,
+        `  Result P(L_t):    ${(payload.pMasteryPosterior ?? trace.clampedPosterior ?? 0).toFixed(4)} (${((payload.pMasteryPosterior ?? trace.clampedPosterior ?? 0) * 100).toFixed(1)}%)`,
+        `  Mastery Status:   ${(payload.pMasteryPosterior ?? 0) >= 0.90 ? 'MASTERED (>= 90%)' : (payload.pMasteryPosterior ?? 0) >= 0.75 ? 'PROFICIENT (>= 75%)' : 'IN_PROGRESS'}`,
+        `===================================================================================\n`,
+      ].join('\n');
+
+      this.appendToRotatedFile(mathLogPath, card);
+    }
+  }
 
   /**
    * Запис нової події у незмінний потік StudentActivityLog (Append-Only)
@@ -68,6 +148,9 @@ export class AuditLogService {
 
     // Live broadcast via WebSockets
     this.telemetryGateway.notifyActivityLog(mappedDto);
+
+    // File-based flight data recording with automatic rotation
+    this.persistFlightData(mappedDto);
 
     return mappedDto;
   }

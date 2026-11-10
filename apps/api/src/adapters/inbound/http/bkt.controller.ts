@@ -371,6 +371,7 @@ export class BktController {
     // If the student already successfully passed this task previously (isAlreadyPassedBefore && isPassed),
     // we do NOT re-apply BKT knowledge gain for the same task over and over again to prevent spamming mastery up to 100%.
     let calcResult: any;
+    let mathTrace: any = null;
     // Match structured cognitive misconceptions on failed submissions
     const detectedMisconception = MisconceptionMatcher.matchSubmission(task.misconceptions, {
       taskType: task.taskType,
@@ -406,7 +407,7 @@ export class BktController {
       };
       updatedState = bktState;
     } else {
-      calcResult = BktEngine.calculateNextState(
+      const traceResult = BktEngine.calculateNextStateWithTrace(
         {
           pMastery: bktState.pMastery,
           pTransit: bktState.pTransit,
@@ -415,6 +416,8 @@ export class BktController {
         },
         isPassed,
       );
+      calcResult = traceResult;
+      mathTrace = traceResult.trace;
 
       // Apply Socratic hint penalty to positive mastery gain on first-time passed tasks
       if (isPassed && appliedHintPenaltyPct > 0 && calcResult.pMasteryPosterior > bktState.pMastery) {
@@ -495,6 +498,7 @@ export class BktController {
           revealedHintLevel: dto.revealedHintLevel,
           appliedHintPenaltyPct,
           detectedMisconception: detectedMisconception?.title || null,
+          trace: mathTrace,
         },
       });
     } catch (auditErr) {

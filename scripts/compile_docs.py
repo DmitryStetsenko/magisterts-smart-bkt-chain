@@ -192,6 +192,7 @@ def main():
     compile_file("docs/apps/api_backend.md", "docs/apps/api_backend.json", "apps/docs/src/data/apps_api_backend.json")
     compile_file("docs/guide/master_guide.md", "docs/guide/master_guide.json", "apps/docs/src/data/master_guide.json")
     compile_file("docs/guide/google_support_guide.md", "docs/guide/google_support_guide.json", "apps/docs/src/data/google_support_guide.json")
+    compile_file("docs/guide/bkt_math_and_event_stream_guide.md", "docs/guide/bkt_math_and_event_stream_guide.json", "apps/docs/src/data/bkt_math_and_event_stream_guide.json")
 
 if __name__ == "__main__":
     main()

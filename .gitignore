@@ -34,3 +34,8 @@ playwright-report/
 *.tsbuildinfo
 __pycache__/
 *.pyc
+
+# Logs & Flight Data
+logs/*.log*
+logs/*.jsonl*
+!logs/.gitkeep

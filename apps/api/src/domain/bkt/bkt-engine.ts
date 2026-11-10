@@ -66,6 +66,62 @@ export class BktEngine {
   }
 
   /**
+   * Calculates next BKT state and returns a complete, step-by-step mathematical trace
+   * for rigorous flight-data recording, thesis verification, and transparent auditing.
+   */
+  public static calculateNextStateWithTrace(
+    currentParams: Partial<BktParameters> & { pMastery: number },
+    isCorrect: boolean,
+  ) {
+    const pL = Math.max(0.0001, Math.min(0.9999, currentParams.pMastery));
+    const pT = currentParams.pTransit ?? this.DEFAULT_PARAMS.pTransit;
+    const pS = currentParams.pSlip ?? this.DEFAULT_PARAMS.pSlip;
+    const pG = currentParams.pGuess ?? this.DEFAULT_PARAMS.pGuess;
+
+    let numerator: number;
+    let denominator: number;
+    let pObs: number;
+    let formulaObs: string;
+
+    if (isCorrect) {
+      numerator = pL * (1 - pS);
+      denominator = pL * (1 - pS) + (1 - pL) * pG;
+      pObs = denominator > 0 ? numerator / denominator : pL;
+      formulaObs = `[P(L)*(1-S)] / [P(L)*(1-S) + (1-P(L))*G] = [${pL.toFixed(4)}*(1-${pS.toFixed(4)})] / [${pL.toFixed(4)}*(1-${pS.toFixed(4)}) + (1-${pL.toFixed(4)})*${pG.toFixed(4)}]`;
+    } else {
+      numerator = pL * pS;
+      denominator = pL * pS + (1 - pL) * (1 - pG);
+      pObs = denominator > 0 ? numerator / denominator : pL;
+      formulaObs = `[P(L)*S] / [P(L)*S + (1-P(L))*(1-G)] = [${pL.toFixed(4)}*${pS.toFixed(4)}] / [${pL.toFixed(4)}*${pS.toFixed(4)} + (1-${pL.toFixed(4)})*(1-${pG.toFixed(4)})]`;
+    }
+
+    const pMasteryPosterior = pObs + (1 - pObs) * pT;
+    const formulaTransition = `P(L|Obs) + (1 - P(L|Obs))*P(T) = ${pObs.toFixed(6)} + (1 - ${pObs.toFixed(6)})*${pT.toFixed(4)}`;
+    const clampedPosterior = Math.max(0.0001, Math.min(0.9999, pMasteryPosterior));
+
+    return {
+      pMasteryPrior: pL,
+      pMasteryPosterior: Number(clampedPosterior.toFixed(4)),
+      isCorrect,
+      timestamp: new Date(),
+      trace: {
+        pMasteryPrior: Number(pL.toFixed(6)),
+        pTransit: Number(pT.toFixed(4)),
+        pSlip: Number(pS.toFixed(4)),
+        pGuess: Number(pG.toFixed(4)),
+        isCorrect,
+        numerator: Number(numerator.toFixed(6)),
+        denominator: Number(denominator.toFixed(6)),
+        pObs: Number(pObs.toFixed(6)),
+        rawPosterior: Number(pMasteryPosterior.toFixed(6)),
+        clampedPosterior: Number(clampedPosterior.toFixed(4)),
+        formulaObs,
+        formulaTransition,
+      },
+    };
+  }
+
+  /**
    * Helper to check if a mastery probability meets or exceeds threshold (0.90)
    */
   public static isMastered(pMastery: number): boolean {

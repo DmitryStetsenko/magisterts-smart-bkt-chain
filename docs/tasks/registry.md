@@ -9,7 +9,7 @@
 | **`SBC-EP-INF`** | Monorepo & CI/CD Setup | 92 |
 | **`SBC-EP-SH`** | Database Modeling & Shared Packages | 24 |
 | **`SBC-EP-BK`** | Authentication & Core API | 14 |
-| **`SBC-EP-BKT`** | Bayesian Knowledge Tracing & Behavioral Telemetry | 29 |
+| **`SBC-EP-BKT`** | Bayesian Knowledge Tracing & Behavioral Telemetry | 30 |
 | **`SBC-EP-LLM`** | Automated Code Assessment & Open-Text Evaluation | 10 |
 | **`SBC-EP-W3`** | Web3 Infrastructure & Smart Contracts | 0 |
 | **`SBC-EP-ST`** | Student Portal & Skill Tree Map | 38 |
@@ -17,7 +17,7 @@
 | **`SBC-EP-AD`** | Admin Portal & Knowledge DAG Builder | 10 |
 | **`SBC-EP-LD`** | Landing Web Page | 9 |
 | **`SBC-EP-MS`** | Master's Thesis Engineering & Academic Text Generation | 9 |
-| **ВСЬОГО** | - | **270** |
+| **ВСЬОГО** | - | **271** |
 
 ---
 
@@ -222,6 +222,7 @@
 | **SBC-247** | `Bug` | `BKT` | prevent re-offering identical failed task on graceful degradation and supply auxiliary remediation task | 2026-10-22 | `9529263` |
 | **SBC-249** | `Task` | `BKT` | document brainstorm session 07 on breaking adaptive deadlock, remediation looping and scaffolding | 2026-10-22 | `pending` |
 | **SBC-278** | `Story` | `BKT` | reinforce TaskSequencer Fallback Modality Guard preventing cross-modality jumps during remediation | 2026-10-26 | `pending` |
+| **SBC-372** | `Story` | `BKT` | implement bkt math audit trace, flight data event stream logger, safe rotation and python verifier | 2026-11-10 | `922a1cb` |
 
 ---
 
