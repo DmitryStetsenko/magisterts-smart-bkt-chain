@@ -19,7 +19,8 @@ import {
   CheckCircle2,
   Clock,
   Activity,
-  Users
+  Users,
+  Edit2
 } from 'lucide-react';
 import { AppShellLayout, Breadcrumbs, UserProfileDrawer, DrawerSection } from '@sbc/ui';
 import { getAppBaseUrl } from '@sbc/routes';
@@ -139,6 +140,7 @@ export default function AdminCMSDashboard() {
   // Dynamic courses state for Courses Sidebar & filtering
   const [dynamicCourses, setDynamicCourses] = useState<CourseDto[]>([]);
   const [selectedCourseSlug, setSelectedCourseSlug] = useState<string | null>(null);
+  const [courseToEdit, setCourseToEdit] = useState<CourseDto | null>(null);
 
   useEffect(() => {
     const loadCourses = async () => {
@@ -323,29 +325,45 @@ export default function AdminCMSDashboard() {
                   ).map((c: any) => {
                     const isSelected = selectedCourseSlug === c.slug;
                     return (
-                      <button
+                      <div
                         key={c.slug}
-                        type="button"
-                        onClick={() => setSelectedCourseSlug(isSelected ? null : c.slug)}
-                        className={`w-full py-2 pr-2 text-left text-xs transition-colors cursor-pointer flex items-center justify-between group rounded-r ${
+                        className={`w-full py-1.5 pr-2 text-left text-xs transition-colors flex items-center justify-between group rounded-r ${
                           isSelected
                             ? 'bg-emerald-500/10 text-emerald-300 font-semibold border-l-2 border-emerald-400 pl-2'
                             : 'text-slate-400 hover:text-white hover:bg-slate-900/40 pl-2.5'
                         }`}
-                        title={c.title}
                       >
-                        <div className="flex flex-col min-w-0 pr-1">
+                        <button
+                          type="button"
+                          onClick={() => setSelectedCourseSlug(isSelected ? null : c.slug)}
+                          onDoubleClick={() => setCourseToEdit(c)}
+                          className="flex flex-col min-w-0 pr-1 flex-1 text-left cursor-pointer"
+                          title={`${c.title} (Клік — фільтрувати, Подвійний клік — редагувати)`}
+                        >
                           <span className={`truncate ${isSelected ? 'font-semibold text-emerald-300' : 'font-medium group-hover:text-slate-200'}`}>
                             {c.title}
                           </span>
                           <span className="text-[10px] font-mono text-slate-500 truncate">
                             {c.slug}
                           </span>
+                        </button>
+                        <div className="flex items-center gap-1 shrink-0">
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setCourseToEdit(c);
+                            }}
+                            className="p-1 rounded hover:bg-slate-800 text-slate-500 hover:text-white opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+                            title="Редагувати параметри курсу"
+                          >
+                            <Edit2 className="w-3 h-3" />
+                          </button>
+                          <span className="text-[10px] font-mono opacity-80 shrink-0 text-slate-500">
+                            {c.modules?.length ?? 0} мод.
+                          </span>
                         </div>
-                        <span className="text-[10px] font-mono opacity-80 shrink-0 text-slate-500">
-                          {c.modules?.length ?? 0} мод.
-                        </span>
-                      </button>
+                      </div>
                     );
                   })}
                 </div>
@@ -771,6 +789,8 @@ export default function AdminCMSDashboard() {
               selectedCourseFilter={selectedCourseSlug}
               onSelectCourseFilter={setSelectedCourseSlug}
               onCoursesLoaded={setDynamicCourses}
+              externalEditingCourse={courseToEdit}
+              onCloseExternalEditingCourse={() => setCourseToEdit(null)}
             />
           )}
 

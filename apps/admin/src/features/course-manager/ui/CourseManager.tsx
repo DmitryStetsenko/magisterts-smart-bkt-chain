@@ -23,12 +23,16 @@ export interface CourseManagerProps {
   selectedCourseFilter?: string | null;
   onSelectCourseFilter?: (slug: string | null) => void;
   onCoursesLoaded?: (courses: CourseDto[]) => void;
+  externalEditingCourse?: CourseDto | null;
+  onCloseExternalEditingCourse?: () => void;
 }
 
 export const CourseManager: React.FC<CourseManagerProps> = ({
   selectedCourseFilter,
   onSelectCourseFilter,
   onCoursesLoaded,
+  externalEditingCourse,
+  onCloseExternalEditingCourse,
 }) => {
   const [courses, setCourses] = useState<CourseDto[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -77,6 +81,12 @@ export const CourseManager: React.FC<CourseManagerProps> = ({
   useEffect(() => {
     fetchCourses();
   }, []);
+
+  useEffect(() => {
+    if (externalEditingCourse) {
+      setEditingCourse(externalEditingCourse);
+    }
+  }, [externalEditingCourse]);
 
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value;
@@ -292,14 +302,17 @@ export const CourseManager: React.FC<CourseManagerProps> = ({
             return (
               <div
                 key={course.id || course.slug}
-                className="py-3.5 px-1 flex flex-col md:flex-row md:items-center justify-between gap-3 hover:bg-slate-900/40 transition-colors group"
+                onClick={() => setEditingCourse(course)}
+                className="py-3.5 px-2 -mx-2 rounded-lg flex flex-col md:flex-row md:items-center justify-between gap-3 hover:bg-slate-900/60 transition-colors group cursor-pointer"
+                title="Натисніть для редагування параметрів курсу"
               >
                 {/* Left: Course details */}
-                <div className="flex flex-col gap-1 min-w-0">
+                <div className="flex flex-col gap-1 min-w-0 flex-1">
                   <div className="flex flex-wrap items-center gap-2">
                     <BookOpen className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
-                    <h3 className="text-sm font-bold text-white group-hover:text-indigo-300 transition-colors">
-                      {course.title}
+                    <h3 className="text-sm font-bold text-white group-hover:text-indigo-300 transition-colors flex items-center gap-1.5">
+                      <span>{course.title}</span>
+                      <Edit2 className="w-3 h-3 text-slate-500 opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
                     </h3>
                     <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-medium text-slate-400 bg-slate-800/60">
                       {course.slug}
@@ -334,7 +347,10 @@ export const CourseManager: React.FC<CourseManagerProps> = ({
                 </div>
 
                 {/* Right: Metrics and actions */}
-                <div className="flex items-center gap-4 shrink-0 justify-between md:justify-end pt-2 md:pt-0 border-t md:border-t-0 border-slate-800/40">
+                <div 
+                  className="flex items-center gap-4 shrink-0 justify-between md:justify-end pt-2 md:pt-0 border-t md:border-t-0 border-slate-800/40"
+                  onClick={(e) => e.stopPropagation()}
+                >
                   <div className="hidden sm:flex items-center gap-3 text-xs text-slate-400 font-mono">
                     <span className="flex items-center gap-1">
                       <Layers className="w-3.5 h-3.5 text-indigo-400" />
@@ -490,9 +506,14 @@ export const CourseManager: React.FC<CourseManagerProps> = ({
         <CourseEditModal
           course={editingCourse}
           isOpen={true}
-          onClose={() => setEditingCourse(null)}
+          onClose={() => {
+            setEditingCourse(null);
+            onCloseExternalEditingCourse?.();
+          }}
           onSaved={() => {
             setMessage('Параметри курсу успішно оновлено!');
+            setEditingCourse(null);
+            onCloseExternalEditingCourse?.();
             fetchCourses();
           }}
         />
