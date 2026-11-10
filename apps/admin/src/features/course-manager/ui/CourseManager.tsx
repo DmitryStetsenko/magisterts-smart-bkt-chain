@@ -19,7 +19,17 @@ import type { CourseDto, CreateCourseDto } from '@sbc/types';
 import { CourseEditModal } from './CourseEditModal';
 import { ModuleManagerModal } from './ModuleManagerModal';
 
-export const CourseManager: React.FC = () => {
+export interface CourseManagerProps {
+  selectedCourseFilter?: string | null;
+  onSelectCourseFilter?: (slug: string | null) => void;
+  onCoursesLoaded?: (courses: CourseDto[]) => void;
+}
+
+export const CourseManager: React.FC<CourseManagerProps> = ({
+  selectedCourseFilter,
+  onSelectCourseFilter,
+  onCoursesLoaded,
+}) => {
   const [courses, setCourses] = useState<CourseDto[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -51,8 +61,10 @@ export const CourseManager: React.FC = () => {
       const data = await res.json();
       if (Array.isArray(data)) {
         setCourses(data);
+        onCoursesLoaded?.(data);
       } else if (data.courses) {
         setCourses(data.courses);
+        onCoursesLoaded?.(data.courses);
       }
     } catch (err) {
       console.error('Failed to fetch courses:', err);
@@ -141,8 +153,11 @@ export const CourseManager: React.FC = () => {
     }
   };
 
-  // Filter courses by search query
+  // Filter courses by search query and optional selectedCourseFilter from sidebar
   const filteredCourses = courses.filter((c) => {
+    if (selectedCourseFilter && c.slug !== selectedCourseFilter) {
+      return false;
+    }
     if (!searchQuery.trim()) return true;
     const q = searchQuery.toLowerCase();
     return (
@@ -174,7 +189,24 @@ export const CourseManager: React.FC = () => {
           </div>
         </div>
 
-        <div className="flex items-center gap-2.5">
+        <div className="flex flex-wrap items-center gap-2.5">
+          {selectedCourseFilter && (
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-xs font-mono">
+              <span className="text-[10px] text-slate-400">Фільтр:</span>
+              <span className="font-semibold text-emerald-300 truncate max-w-[140px]">
+                {courses.find((c) => c.slug === selectedCourseFilter)?.title || selectedCourseFilter}
+              </span>
+              <button
+                type="button"
+                onClick={() => onSelectCourseFilter?.(null)}
+                className="hover:text-white text-slate-400 cursor-pointer ml-1 text-[11px]"
+                title="Скинути фільтр курсу"
+              >
+                ✕
+              </button>
+            </div>
+          )}
+
           <div className="relative">
             <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
             <input

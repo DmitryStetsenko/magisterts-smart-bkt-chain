@@ -4133,6 +4133,29 @@ eferenceAnswer, критерії options.keywords (microtask|мікротаск|
   - 100% проходження Playwright E2E сьюту `e2e/course-and-modules.spec.ts` (4/4 passed).
   - Візуальна перевірка у браузері Playwright: зафіксовано артефакт `admin_course_cms_borderless.png`.
 
+---
+
+### 11.74. Динамічна Синхронізація Сайдбара Курсів Адмін-Панелі з БД та Інтерактивна Фільтрація за Кліком (SBC-392, EP-AD)
+- **Контекст та інженерна задача:**
+  Усунено розбіжність між бічною панеллю (`Доступні курси (3)`) та основною областю CMS (`Всього курсів: 4`). Реалізовано динамічну синхронізацію переліку курсів з БД PostgreSQL та двосторонню інтерактивну фільтрацію основної робочої області за кліком на курс у сайдбарі відповідно до стандарту Rule 7 Minimalist Borderless.
+- **Архітектурні та інженерні рішення:**
+  1. **Динамічний стан курсів в оркестраторі сторінки ([`apps/admin/src/app/page.tsx`](file:///apps/admin/src/app/page.tsx)):**
+     - Введено стани `dynamicCourses: CourseDto[]` та `selectedCourseSlug: string | null`.
+     - Забезпечено асинхронне передзавантаження через `GET /api/v1/courses` із динамічним зв'язуванням бейджа секції сайдбара: `badge={String(dynamicCourses.length || 4)}`.
+  2. **Рефакторинг бічної секції `<DrawerSection>` (Rule 7 Minimalist Borderless):**
+     - Усунуто статичні картки-«коробочки» з важкими рамками; впроваджено семантичний список `divide-y divide-slate-800/50`.
+     - Додано елемент скидання фільтра `Всі курси платформи` із лічильником загальної кількості.
+     - Кожен курс оформлено інтерактивною кнопкою з оптимізованим ховером та лівим активним індикатором `border-l-2 border-emerald-400 bg-emerald-500/10 text-emerald-300` при виборі.
+  3. **Двостороння реактивна інтеграція з `CourseManager` ([`CourseManager.tsx`](file:///apps/admin/src/features/course-manager/ui/CourseManager.tsx)):**
+     - Оголошено інтерфейс `CourseManagerProps`: `selectedCourseFilter`, `onSelectCourseFilter`, `onCoursesLoaded`.
+     - Додано фільтрацію реєстру курсів: вибір курсу в сайдбарі відокремлює обраний курс у робочій області.
+     - Додано чіп активного фільтра `Фільтр: <Назва курсу>` із кнопкою `✕` поруч із полем пошуку для миттєвого повернення до повного переліку.
+- **Верифікація:**
+  - Успішна виробнича збірка `npm run build:admin` (Next.js 16.3.8 Turbopack, 0 помилок).
+  - 100% проходження Playwright E2E сьюту `e2e/course-and-modules.spec.ts` (4/4 passed).
+  - 100% проходження повного E2E сьюту платформи `npm run test:e2e` (11/11 passed, 35.5s).
+  - Візуальна перевірка Playwright MCP: збережено скріншот `admin_sidebar_dynamic_course_sync.png`.
+
 
 
 

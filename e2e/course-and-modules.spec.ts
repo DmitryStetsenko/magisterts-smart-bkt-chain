@@ -85,8 +85,11 @@ test.describe('Course Architecture, Modular Curriculum & BKT Mastery Gating E2E 
 
     // Verify Course Manager Center
     await expect(page.getByText('Управління Навчальними Курсами')).toBeVisible({ timeout: 15000 });
-    await expect(page.getByText('JavaScript & Web Engineering')).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'JavaScript & Web Engineering' })).toBeVisible();
     await expect(page.getByText('BKT P(L): 0.85').first()).toBeVisible();
+
+    // Verify dynamic sidebar has 4 courses
+    await expect(page.getByRole('button', { name: /Доступні курси \(4\)/i })).toBeVisible();
 
     // Find and click the Module Manager button for JavaScript course
     const moduleManagerBtn = page.locator('button:has-text("Модулі (5)")').first();

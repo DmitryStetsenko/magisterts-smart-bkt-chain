@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { 
   ShieldCheck, 
   Network, 
@@ -23,6 +23,7 @@ import {
 } from 'lucide-react';
 import { AppShellLayout, Breadcrumbs, UserProfileDrawer, DrawerSection } from '@sbc/ui';
 import { getAppBaseUrl } from '@sbc/routes';
+import type { CourseDto } from '@sbc/types';
 import { SkillDagEditor } from '../features/skill-editor/ui/SkillDagEditor';
 import { AdminSkillNode } from '../features/skill-editor/model/skill-editor.types';
 import { CourseManager } from '../features/course-manager/ui/CourseManager';
@@ -134,6 +135,26 @@ export default function AdminCMSDashboard() {
   });
 
   const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+
+  // Dynamic courses state for Courses Sidebar & filtering
+  const [dynamicCourses, setDynamicCourses] = useState<CourseDto[]>([]);
+  const [selectedCourseSlug, setSelectedCourseSlug] = useState<string | null>(null);
+
+  useEffect(() => {
+    const loadCourses = async () => {
+      try {
+        const res = await fetch(`${API_URL}/api/v1/courses`);
+        if (res.ok) {
+          const data = await res.json();
+          if (Array.isArray(data)) setDynamicCourses(data);
+          else if (data.courses) setDynamicCourses(data.courses);
+        }
+      } catch (e) {
+        console.error('Failed to load courses for Admin sidebar:', e);
+      }
+    };
+    loadCourses();
+  }, [API_URL]);
 
   const filteredDagNodes = useMemo(() => {
     if (!dagSearch.trim()) return nodes;
@@ -272,25 +293,61 @@ export default function AdminCMSDashboard() {
               <DrawerSection
                 title="Доступні курси"
                 icon={BookOpen}
-                badge="3"
+                badge={String(dynamicCourses.length || 4)}
                 defaultOpen={true}
               >
-                <div className="flex flex-col gap-1.5 pt-1">
-                  {[
-                    { title: 'JavaScript & Web Dev', slug: 'js-dev', modules: 5, active: true },
-                    { title: 'Business English (B2)', slug: 'english-b2', modules: 3, active: false },
-                    { title: 'Правознавство України', slug: 'ukraine-law', modules: 3, active: false },
-                  ].map((c) => (
-                    <div
-                      key={c.slug}
-                      className={`p-2 rounded-lg transition-colors flex items-center justify-between text-xs ${
-                        c.active ? 'bg-emerald-500/10 text-emerald-300 border border-emerald-500/25' : 'bg-slate-950/40 text-slate-400 border border-slate-800/80'
-                      }`}
-                    >
-                      <span className="font-medium truncate">{c.title}</span>
-                      <span className="text-[10px] font-mono opacity-80 shrink-0">{c.modules} мод.</span>
-                    </div>
-                  ))}
+                <div className="flex flex-col divide-y divide-slate-800/50 pt-1">
+                  <button
+                    type="button"
+                    onClick={() => setSelectedCourseSlug(null)}
+                    className={`w-full py-1.5 pr-2 text-left text-xs transition-colors cursor-pointer flex items-center justify-between rounded-r ${
+                      selectedCourseSlug === null
+                        ? 'bg-emerald-500/10 text-emerald-300 font-semibold border-l-2 border-emerald-400 pl-2'
+                        : 'text-slate-400 hover:text-white hover:bg-slate-900/40 pl-2.5'
+                    }`}
+                  >
+                    <span className="truncate">Всі курси платформи</span>
+                    <span className="text-[10px] font-mono opacity-70 shrink-0">
+                      {dynamicCourses.length || 4}
+                    </span>
+                  </button>
+
+                  {(dynamicCourses.length > 0
+                    ? dynamicCourses
+                    : [
+                        { id: '1', slug: 'js-dev', title: 'JavaScript & Web Engineering', modules: [] },
+                        { id: '2', slug: 'english-b2', title: 'Business & Tech English (B2)', modules: [] },
+                        { id: '3', slug: 'ukraine-law', title: 'Правознавство & Конституційне Право України', modules: [] },
+                        { id: '4', slug: 'web-algorithms-school', title: 'Вебтехнології та алгоритмізація (10–11 класи)', modules: [] },
+                      ]
+                  ).map((c: any) => {
+                    const isSelected = selectedCourseSlug === c.slug;
+                    return (
+                      <button
+                        key={c.slug}
+                        type="button"
+                        onClick={() => setSelectedCourseSlug(isSelected ? null : c.slug)}
+                        className={`w-full py-2 pr-2 text-left text-xs transition-colors cursor-pointer flex items-center justify-between group rounded-r ${
+                          isSelected
+                            ? 'bg-emerald-500/10 text-emerald-300 font-semibold border-l-2 border-emerald-400 pl-2'
+                            : 'text-slate-400 hover:text-white hover:bg-slate-900/40 pl-2.5'
+                        }`}
+                        title={c.title}
+                      >
+                        <div className="flex flex-col min-w-0 pr-1">
+                          <span className={`truncate ${isSelected ? 'font-semibold text-emerald-300' : 'font-medium group-hover:text-slate-200'}`}>
+                            {c.title}
+                          </span>
+                          <span className="text-[10px] font-mono text-slate-500 truncate">
+                            {c.slug}
+                          </span>
+                        </div>
+                        <span className="text-[10px] font-mono opacity-80 shrink-0 text-slate-500">
+                          {c.modules?.length ?? 0} мод.
+                        </span>
+                      </button>
+                    );
+                  })}
                 </div>
               </DrawerSection>
 
@@ -709,7 +766,13 @@ export default function AdminCMSDashboard() {
             </div>
           )}
 
-          {activeTab === 'courses' && <CourseManager />}
+          {activeTab === 'courses' && (
+            <CourseManager
+              selectedCourseFilter={selectedCourseSlug}
+              onSelectCourseFilter={setSelectedCourseSlug}
+              onCoursesLoaded={setDynamicCourses}
+            />
+          )}
 
           {activeTab === 'users' && <UserManagementCenter apiUrl={API_URL} />}
 
