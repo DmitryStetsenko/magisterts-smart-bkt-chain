@@ -12,7 +12,7 @@ import { StudentProfileDrawer } from './StudentProfileDrawer';
 import { AbandonTaskModal } from './AbandonTaskModal';
 import { JustInTimeTheoryDrawer } from '../features/theory-capsule/ui/JustInTimeTheoryDrawer';
 import { resolveTheoryCapsule } from '../features/theory-capsule/model/theory-capsules';
-import { GameSkillTreeWidget, SkillGraphNode, DrawerSection, AppShellLayout, Breadcrumbs } from '@sbc/ui';
+import { GameSkillTreeWidget, SkillGraphNode, DrawerSection, AppShellLayout, Breadcrumbs, AuthModal } from '@sbc/ui';
 import {
   TaskDto,
   CourseDto,
@@ -54,6 +54,140 @@ export function StudentPortalContent({
   const [activeCourseSlug, setActiveCourseSlug] = useState<string>(initialCourseSlug || 'js-dev');
   const [task, setTask] = useState<TaskDetail | null>(null);
   const [exhaustedModalData, setExhaustedModalData] = useState<{ skillId: string; skillTitle: string } | null>(null);
+
+  // 🔐 Авторизація, Тестовий режим та Режим зарахування (Enrollment Mode Gating)
+  const [currentUser, setCurrentUser] = useState<any | null>(null);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [testModeEnabled, setTestModeEnabled] = useState(true);
+  const [googleClientId, setGoogleClientId] = useState<string | undefined>(undefined);
+  const [enrollmentMode, setEnrollmentMode] = useState<'FULL_CYCLE' | 'TESTING_ONLY' | 'MODULAR'>('FULL_CYCLE');
+  const [allowedModules, setAllowedModules] = useState<string[]>([]);
+
+  const currentUserId = currentUser?.id || 'demo-student';
+  const currentUserName = currentUser?.profile?.firstName
+    ? `${currentUser.profile.firstName} ${currentUser.profile.lastName || ''}`.trim()
+    : currentUser?.email || 'Дмитро Стеценко';
+  const currentUserRole = currentUser?.role || 'УЧЕНЬ';
+  const currentUserInitials = currentUserName
+    .split(' ')
+    .filter(Boolean)
+    .map((s: string) => s[0])
+    .join('')
+    .slice(0, 2)
+    .toUpperCase() || 'ДС';
+
+  // Синхронізація сесії користувача та завантаження системної конфігурації
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const savedUser = localStorage.getItem('sbc_auth_user');
+      if (savedUser) {
+        try {
+          setCurrentUser(JSON.parse(savedUser));
+        } catch (e) {
+          console.error('Failed to parse stored user:', e);
+        }
+      }
+    }
+
+    const fetchAuthConfig = async () => {
+      try {
+        const res = await fetch(`${API_URL}/api/v1/auth/config`);
+        if (res.ok) {
+          const data = await res.json();
+          setTestModeEnabled(!!data.testModeEnabled);
+          setGoogleClientId(data.googleClientId);
+        }
+      } catch (err) {
+        console.warn('Failed to load auth config:', err);
+      }
+    };
+    fetchAuthConfig();
+  }, []);
+
+  // Динамічне завантаження статусу зарахування на курс (Enrollment Mode)
+  useEffect(() => {
+    const fetchEnrollment = async () => {
+      const activeId = currentUser?.id;
+      if (!activeId) {
+        setEnrollmentMode('FULL_CYCLE');
+        return;
+      }
+      try {
+        const res = await fetch(`${API_URL}/api/v1/classrooms/student/${activeId}`);
+        if (res.ok) {
+          const enrollments = await res.json();
+          if (Array.isArray(enrollments)) {
+            const currentEnrollment = enrollments.find(
+              (e: any) => e.course?.slug === activeCourseSlug || e.courseId === activeCourseSlug
+            );
+            if (currentEnrollment) {
+              setEnrollmentMode(currentEnrollment.mode || 'FULL_CYCLE');
+              setAllowedModules(currentEnrollment.allowedModules || []);
+            } else {
+              setEnrollmentMode('FULL_CYCLE');
+              setAllowedModules([]);
+            }
+          }
+        }
+      } catch (err) {
+        console.error('Error fetching student enrollment:', err);
+      }
+    };
+    fetchEnrollment();
+  }, [currentUser, activeCourseSlug]);
+
+  const handleGoogleLogin = async (credential: string) => {
+    try {
+      const res = await fetch(`${API_URL}/api/v1/auth/google`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ credential }),
+      });
+      const data = await res.json();
+      if (res.ok && data.user) {
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('sbc_auth_token', data.token);
+          localStorage.setItem('sbc_auth_user', JSON.stringify(data.user));
+        }
+        setCurrentUser(data.user);
+        fetchRecommendedTask(activeCourseSlug, undefined, undefined, data.user.id);
+      }
+    } catch (err) {
+      console.error('Google login failed:', err);
+    }
+  };
+
+  const handleMockLogin = async (roleKey: string) => {
+    try {
+      const res = await fetch(`${API_URL}/api/v1/auth/mock-login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userIdOrEmail: roleKey }),
+      });
+      const data = await res.json();
+      if (res.ok && data.user) {
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('sbc_auth_token', data.token);
+          localStorage.setItem('sbc_auth_user', JSON.stringify(data.user));
+        }
+        setCurrentUser(data.user);
+        fetchRecommendedTask(activeCourseSlug, undefined, undefined, data.user.id);
+      }
+    } catch (err) {
+      console.error('Mock login failed:', err);
+    }
+  };
+
+  const handleLogout = () => {
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('sbc_auth_token');
+      localStorage.removeItem('sbc_auth_user');
+    }
+    setCurrentUser(null);
+    setEnrollmentMode('FULL_CYCLE');
+    setAllowedModules([]);
+    fetchRecommendedTask(activeCourseSlug, undefined, undefined, 'demo-student');
+  };
 
   // Синхронізація збереженого в localStorage курсу виключно після монтування компонента на клієнті
   useEffect(() => {
@@ -176,7 +310,7 @@ export function StudentPortalContent({
 
   const fetchTaskSubmissions = async (taskId: string) => {
     try {
-      const res = await fetch(`${API_URL}/api/v1/tasks/${taskId}/submissions?userId=demo-student`);
+      const res = await fetch(`${API_URL}/api/v1/tasks/${taskId}/submissions?userId=${currentUserId}`);
       if (res.ok) {
         const data = await res.json();
         setTaskSubmissions(data);
@@ -189,7 +323,7 @@ export function StudentPortalContent({
   const fetchCourseStructureAndState = async (courseSlug: string) => {
     try {
       const courseRes = await fetch(`${API_URL}/api/v1/courses/${courseSlug}`);
-      const bktRes = await fetch(`${API_URL}/api/v1/bkt/state/demo-student`);
+      const bktRes = await fetch(`${API_URL}/api/v1/bkt/state/${currentUserId}`);
       const analyticsRes = await fetch(`${API_URL}/api/v1/bkt/analytics/students?courseSlug=${courseSlug}`);
 
       let bktMap: Record<string, number> = {};
@@ -204,7 +338,7 @@ export function StudentPortalContent({
       let telemetryBySkill: Record<string, any> = {};
       if (analyticsRes.ok) {
         const studentsList: StudentAnalyticsItemDto[] = await analyticsRes.json();
-        const demoStudent = studentsList.find((s) => s.id === 'demo-student' || s.email?.includes('demo') || s.name?.includes('Demo')) || studentsList[0];
+        const demoStudent = studentsList.find((s) => s.id === currentUserId || s.email === currentUser?.email || s.id === 'demo-student') || studentsList[0];
         if (demoStudent) {
           adjustments = demoStudent.recentAdjustments || [];
           telemetryBySkill = demoStudent.telemetryBySkill || {};
@@ -251,13 +385,19 @@ export function StudentPortalContent({
     }
   };
 
-  const fetchRecommendedTask = async (courseSlug: string, excludeTaskId?: string, targetSkillSlug?: string) => {
+  const fetchRecommendedTask = async (
+    courseSlug: string, 
+    excludeTaskId?: string, 
+    targetSkillSlug?: string,
+    overrideUserId?: string
+  ) => {
     setIsLoading(true);
     setEvalResult(null);
     try {
       await fetchCourseStructureAndState(courseSlug);
+      const activeUid = overrideUserId || currentUserId;
       const skillFilter = targetSkillSlug || initialSkillSlug;
-      const url = `${API_URL}/api/v1/tasks/recommended?courseSlug=${courseSlug}&userId=demo-student${
+      const url = `${API_URL}/api/v1/tasks/recommended?courseSlug=${courseSlug}&userId=${activeUid}${
         excludeTaskId ? `&excludeTaskId=${excludeTaskId}` : ''
       }${skillFilter ? `&skillSlug=${skillFilter}` : ''}`;
       const res = await fetch(url);
@@ -534,9 +674,10 @@ export function StudentPortalContent({
   );
 
   // 📘 Progressive Scaffolding Escalation for Just-in-Time Theory:
-  // Theory capsule is locked initially to encourage independent problem solving.
-  // It unlocks ONLY when student revealed Socratic hints to Level 2 or higher (revealedHintLevel >= 2).
-  const isTheoryUnlocked = revealedHintLevel >= 2;
+  // In TESTING_ONLY mode, theory is accessible directly without scaffolding locks.
+  // In FULL_CYCLE mode, it unlocks when student revealed Socratic hints to Level 2+ (revealedHintLevel >= 2).
+  const isTestingOnlyMode = enrollmentMode === 'TESTING_ONLY';
+  const isTheoryUnlocked = isTestingOnlyMode || revealedHintLevel >= 2;
 
   const getDrawerConfig = () => {
     let title: React.ReactNode = 'Панель';
@@ -1321,17 +1462,17 @@ export function StudentPortalContent({
               type="button"
               onClick={() => setIsProfileDrawerOpen(true)}
               className="flex items-center gap-2 hover:bg-slate-800/60 px-2 py-1 rounded-lg transition-colors cursor-pointer select-none text-left group"
-              title="Натисніть для відкриття профілю та вибору курсів"
+              title="Натисніть для відкриття профілю, входу або вибору курсів"
             >
               <div className="w-6 h-6 rounded-full bg-gradient-to-tr from-indigo-600 to-purple-500 flex items-center justify-center text-[10px] font-bold text-white shrink-0">
-                ДС
+                {currentUserInitials}
               </div>
               <div className="hidden lg:flex flex-col leading-none">
-                <span className="text-xs font-medium text-slate-200 group-hover:text-white transition-colors">
-                  Дмитро Стеценко
+                <span className="text-xs font-medium text-slate-200 group-hover:text-white transition-colors truncate max-w-[120px]">
+                  {currentUserName}
                 </span>
                 <span className="text-[9px] font-mono text-indigo-400 mt-0.5">
-                  УЧЕНЬ
+                  {currentUserRole}
                 </span>
               </div>
             </button>
@@ -1573,6 +1714,16 @@ export function StudentPortalContent({
 
                 {/* Quick Navigation to Theory & Skill Tree */}
                 <div className="flex items-center gap-2 shrink-0">
+                  {isTestingOnlyMode && (
+                    <div 
+                      className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs font-medium" 
+                      title="Викладач призначив режим тестування без обов'язкової теорії"
+                    >
+                      <SlidersHorizontal className="w-3.5 h-3.5 text-amber-400" />
+                      <span className="hidden sm:inline">Лише тестування</span>
+                    </div>
+                  )}
+
                   <div className="relative group">
                     <button
                       type="button"
@@ -2077,9 +2228,36 @@ export function StudentPortalContent({
         courseCompletionPct={courseCompletionPct}
         masteredSkillsCount={masteredSkillsCount}
         totalSkillsCount={totalSkillsCount}
+        currentUser={currentUser}
+        onOpenAuthModal={() => {
+          setIsProfileDrawerOpen(false);
+          setIsAuthModalOpen(true);
+        }}
+        onLogout={handleLogout}
         onResetBktState={() => {
           fetchRecommendedTask(activeCourseSlug);
           setIsProfileDrawerOpen(false);
+        }}
+      />
+
+      {/* 🔐 Модальне вікно авторизації, Google Sign-In та Тестового входу */}
+      <AuthModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
+        currentUser={currentUser ? {
+          id: currentUser.id,
+          email: currentUser.email,
+          name: currentUserName,
+          role: currentUser.role,
+          authProvider: currentUser.authProvider,
+        } : null}
+        testModeEnabled={testModeEnabled}
+        googleClientId={googleClientId}
+        onGoogleLogin={handleGoogleLogin}
+        onMockLogin={handleMockLogin}
+        onLogout={handleLogout}
+        onJoinCode={(joinCode) => {
+          window.location.href = `/join/${joinCode}`;
         }}
       />
     </>

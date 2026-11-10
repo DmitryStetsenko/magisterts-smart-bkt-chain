@@ -6,3 +6,5 @@ export * from './drawer/DrawerSection';
 export * from './drawer/UserProfileDrawer';
 export * from './shell/AppShellLayout';
 export * from './breadcrumbs/Breadcrumbs';
+export * from './auth/GoogleSignInButton';
+export * from './auth/AuthModal';

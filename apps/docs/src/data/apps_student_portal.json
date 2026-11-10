@@ -31,7 +31,12 @@
         },
         {
           "type": "text",
-          "raw_text": "**Діагностики когнітивних оман (`Misconception Engine`) та експрес-теорії (`Just-in-Time Theory`):** виявлення конкретної помилкової ментальної моделі учня (`detectedMisconception`) у тестах, коді або есе та миттєве відкриття вбудованої теоретичної капсули `JustInTimeTheoryDrawer` без втрати введеного коду.",
+          "raw_text": "**Шкільний та Студентський Onboarding (Google OAuth 2.0 & Інвайт-Коди):** безперешкодний вхід через Google акаунт (`GoogleSignInButton`), активація курсів за інвайт-кодом класу (`/join/:code`) та підтримка трьох дидактичних режимів (`FULL_CYCLE`, `TESTING_ONLY`, `MODULAR`).",
+          "subitems": []
+        },
+        {
+          "type": "text",
+          "raw_text": "**Тестовий режим розробника (Auth Test Mode Bypass):** швидкий тестовий вхід в один клік (`demo-student`, `teacher-olena`, `admin-cms`) через `AuthModal` при активованому адміністративному налаштуванні `SYSTEM_AUTH_TEST_MODE`.",
           "subitems": []
         },
         {

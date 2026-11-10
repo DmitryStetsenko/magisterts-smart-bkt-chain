@@ -7,9 +7,11 @@ import {
   CheckCircle2, 
   ChevronRight, 
   RotateCcw, 
-  GraduationCap,
-  ExternalLink,
-  LucideIcon
+  GraduationCap, 
+  ExternalLink, 
+  LucideIcon,
+  LogIn,
+  LogOut
 } from 'lucide-react';
 import { DrawerSection } from '../drawer/DrawerSection';
 
@@ -56,6 +58,8 @@ export interface UserProfileDrawerProps {
   }>;
   children?: React.ReactNode;
   versionBadge?: string;
+  onOpenAuthModal?: () => void;
+  onLogout?: () => void;
 }
 
 /**
@@ -77,6 +81,8 @@ export function UserProfileDrawer({
   quickLinks,
   children,
   versionBadge = 'Smart-BKT-Chain v2.0',
+  onOpenAuthModal,
+  onLogout,
 }: UserProfileDrawerProps) {
   if (!isOpen) return null;
 
@@ -210,14 +216,27 @@ export function UserProfileDrawer({
 
           {children}
 
-          {/* СЕКЦІЯ 3: Швидкі переходи та скидання */}
-          {(onResetDemoState || (quickLinks && quickLinks.length > 0)) && (
+          {/* СЕКЦІЯ 3: Швидкі переходи та керування сесією */}
+          {(onResetDemoState || onOpenAuthModal || onLogout || (quickLinks && quickLinks.length > 0)) && (
             <div className="pt-3">
               <DrawerSection
                 title="Керування Сесією"
-                defaultOpen={false}
+                defaultOpen={true}
               >
                 <div className="divide-y divide-slate-800/50">
+                  {onOpenAuthModal && (
+                    <button
+                      onClick={onOpenAuthModal}
+                      className="w-full flex items-center justify-between py-2 px-1.5 hover:bg-slate-800/40 text-slate-300 hover:text-white text-xs transition-colors cursor-pointer rounded"
+                    >
+                      <span className="flex items-center gap-2">
+                        <LogIn className="w-3.5 h-3.5 text-indigo-400" />
+                        Авторизація / Зміна акаунта
+                      </span>
+                      <ChevronRight className="w-3 h-3 text-slate-600" />
+                    </button>
+                  )}
+
                   {onResetDemoState && (
                     <button
                       onClick={onResetDemoState}
@@ -228,6 +247,18 @@ export function UserProfileDrawer({
                         {resetDemoLabel}
                       </span>
                       <span className="text-[10px] font-mono text-slate-500">P(L)→0</span>
+                    </button>
+                  )}
+
+                  {onLogout && (
+                    <button
+                      onClick={onLogout}
+                      className="w-full flex items-center justify-between py-2 px-1.5 hover:bg-rose-950/20 text-rose-400 hover:text-rose-300 text-xs transition-colors cursor-pointer rounded"
+                    >
+                      <span className="flex items-center gap-2">
+                        <LogOut className="w-3.5 h-3.5 text-rose-400" />
+                        Вийти з акаунта
+                      </span>
                     </button>
                   )}
 

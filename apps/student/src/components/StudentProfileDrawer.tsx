@@ -15,6 +15,19 @@ export interface StudentProfileDrawerProps {
   masteredSkillsCount: number;
   totalSkillsCount: number;
   onResetBktState?: () => void;
+  currentUser?: {
+    id: string;
+    email: string;
+    role: string;
+    authProvider?: string;
+    profile?: {
+      firstName?: string | null;
+      lastName?: string | null;
+      avatarUrl?: string | null;
+    } | null;
+  } | null;
+  onOpenAuthModal?: () => void;
+  onLogout?: () => void;
 }
 
 export const StudentProfileDrawer: React.FC<StudentProfileDrawerProps> = ({
@@ -27,6 +40,9 @@ export const StudentProfileDrawer: React.FC<StudentProfileDrawerProps> = ({
   masteredSkillsCount,
   totalSkillsCount,
   onResetBktState,
+  currentUser,
+  onOpenAuthModal,
+  onLogout,
 }) => {
   const drawerCourses: UserProfileDrawerCourse[] = courses.map((c) => ({
     slug: c.slug,
@@ -37,16 +53,28 @@ export const StudentProfileDrawer: React.FC<StudentProfileDrawerProps> = ({
     completionPct: c.slug === activeCourseSlug ? courseCompletionPct : undefined,
   }));
 
+  const displayName = currentUser?.profile?.firstName
+    ? `${currentUser.profile.firstName} ${currentUser.profile.lastName || ''}`.trim()
+    : currentUser?.email || 'Дмитро Стеценко';
+
+  const initials = displayName
+    .split(' ')
+    .filter(Boolean)
+    .map((s) => s[0])
+    .join('')
+    .slice(0, 2)
+    .toUpperCase() || 'ДС';
+
   return (
     <UserProfileDrawer
       isOpen={isOpen}
       onClose={onClose}
       user={{
-        name: 'Дмитро Стеценко',
-        roleName: 'Учень',
-        roleBadge: 'УЧЕНЬ',
-        subtitle: '11-А клас · ID: demo-student',
-        initials: 'ДС',
+        name: displayName,
+        roleName: currentUser?.role === 'TEACHER' ? 'Викладач' : currentUser?.role === 'ADMIN' ? 'Адміністратор' : 'Учень',
+        roleBadge: currentUser?.role || 'УЧЕНЬ',
+        subtitle: currentUser ? `${currentUser.email} · ${currentUser.authProvider || 'LOCAL'}` : '11-А клас · ID: demo-student',
+        initials,
         avatarGradient: 'bg-gradient-to-tr from-indigo-600 via-purple-600 to-pink-500',
       }}
       courses={drawerCourses}
@@ -70,6 +98,8 @@ export const StudentProfileDrawer: React.FC<StudentProfileDrawerProps> = ({
       ]}
       onResetDemoState={onResetBktState}
       resetDemoLabel="Скинути BKT стан для демо"
+      onOpenAuthModal={onOpenAuthModal}
+      onLogout={onLogout}
       quickLinks={[
         {
           label: 'Відкрити Підручник Теорії',

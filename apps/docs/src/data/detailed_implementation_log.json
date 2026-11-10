@@ -13625,17 +13625,79 @@
             },
             {
               "type": "text",
+              "raw_text": "---",
+              "subitems": []
+            }
+          ]
+        },
+        {
+          "title": "11.63. Google Sign-In, Маршрут Зарахування `/join/:code` та Гейтинг Дидактичних Режимів (SBC-381, EP-ST)",
+          "level": 3,
+          "paragraphs": [
+            "Для забезпечення безшовного входу учнів (Zero-Friction Onboarding), збереження результатів BKT-оцінювання та підтримки призначених викладачем дидактичних режимів розроблено наскрізний шар клієнтської авторизації, сторінки активації інвайт-кодів та механізми адаптивного гейтингу."
+          ],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "**Контекст та інженерна задача:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Архітектурні зміни та компоненти:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Спільні компоненти авторизації (`packages/ui/src/auth/`):**",
+              "subitems": [
+                "[`GoogleSignInButton.tsx`](file:///packages/ui/src/auth/GoogleSignInButton.tsx): офіційний фірмовий стиль кнопки Google із вбудованим механізмом симуляції токенів для локальної розробки та делікатною інтеграцією Google Identity Services у хмарі.",
+                "[`AuthModal.tsx`](file:///packages/ui/src/auth/AuthModal.tsx): уніфікований діалог для всіх порталів екосистеми з підтримкою Google OAuth 2.0, 1-клік тестового входу (Test Mode Bypass) для швидких демонстрацій, введення інвайт-кодів та керування акаунтом.",
+                "[`UserProfileDrawer.tsx`](file:///packages/ui/src/drawer/UserProfileDrawer.tsx): розширено кнопками виклику модального вікна авторизації та безпечного завершення сеансу (`onLogout`)."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Маршрути онбордингу `/join` та `/join/[code]` (`apps/student` та `apps/study`):**",
+              "subitems": [
+                "Компонент [`JoinClassroomView.tsx`](file:///apps/student/src/features/classrooms/ui/JoinClassroomView.tsx): завантажує публічні метадані класу через `GET /api/v1/classrooms/join/:code`, виводить картку предмета, викладача та обраного дидактичного режиму.",
+                "Якщо учень авторизований: пряма кнопка підтвердження зарахування в 1 клік.",
+                "Якщо учень не авторизований: пропозиція входу через Google або тестовий режим із автоматичним зарахуванням після успішного логіну."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Гейтинг дидактичних режимів (Didactic Mode Gating) у тренажері (`apps/student`):**",
+              "subitems": [
+                "Динамічний запит активних курсів учня `GET /api/v1/classrooms/student/:userId`.",
+                "При значенні `EnrollmentMode.TESTING_ONLY`:",
+                "Автоматичне розблокування експрес-теорії без обов'язкового відкриття Сократівських евристик (`isTheoryUnlocked = isTestingOnlyMode || revealedHintLevel >= 2`).",
+                "Індикація активного статусу прямого тестування у верхньому тулбарі над редактором.",
+                "При значенні `EnrollmentMode.MODULAR`:",
+                "Фільтрація доступних компетенцій виключно за списком дозволених модулів (`allowedModules`)."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Маршрут `/practice/[courseSlug]`:**",
+              "subitems": [
+                "Створено сторінку `apps/student/src/app/practice/[courseSlug]/page.tsx` для безшовних переходів після зарахування."
+              ]
+            },
+            {
+              "type": "text",
               "raw_text": "**Верифікація:**",
               "subitems": []
             },
             {
               "type": "text",
-              "raw_text": "Успішна виробнича збірка `npm run build:teacher`.",
+              "raw_text": "Успішна виробнича збірка `npm run build:student` та `npm run build:study` (Next.js 16.2.9 Turbopack).",
               "subitems": []
             },
             {
               "type": "text",
-              "raw_text": "Автоматизована перевірка у Playwright Headless Browser: створення класу, копіювання інвайт-коду, перевірка переліку курсів та режимів навчання.",
+              "raw_text": "Повне автоматизоване тестування у headless-браузері Playwright: перехід за кодом `KOD-KN21`, авторизація під тестовим та Google акаунтом, активація курсу та перехід до практичних завдань.",
               "subitems": []
             }
           ]

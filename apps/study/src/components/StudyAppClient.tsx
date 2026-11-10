@@ -27,7 +27,7 @@ import {
   Lock,
   Unlock
 } from 'lucide-react';
-import { DrawerSection, AppShellLayout, Breadcrumbs, UserProfileDrawer } from '@sbc/ui';
+import { DrawerSection, AppShellLayout, Breadcrumbs, UserProfileDrawer, AuthModal } from '@sbc/ui';
 import { ROUTES, buildStudyToPracticeUrl } from '@sbc/routes';
 import { SCHOOL_WEB_CURRICULUM, LessonUnit, LessonSection, CurriculumModule } from '../data/school-web-curriculum';
 import { CodePlayground } from './CodePlayground';
@@ -90,6 +90,99 @@ export function StudyAppClient({
   const [activeTab, setActiveTab] = useState<StudyTab>('curriculum');
   const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(true);
   const [isProfileDrawerOpen, setIsProfileDrawerOpen] = useState<boolean>(false);
+
+  // 🔐 Авторизація користувача та системний тестовий режим
+  const [currentUser, setCurrentUser] = useState<any | null>(null);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState<boolean>(false);
+  const [testModeEnabled, setTestModeEnabled] = useState<boolean>(true);
+  const [googleClientId, setGoogleClientId] = useState<string | undefined>(undefined);
+
+  const currentUserName = currentUser?.profile?.firstName
+    ? `${currentUser.profile.firstName} ${currentUser.profile.lastName || ''}`.trim()
+    : currentUser?.email || 'Дмитро Стеценко';
+  const currentUserRole = currentUser?.role || 'УЧЕНЬ';
+  const currentUserInitials = currentUserName
+    .split(' ')
+    .filter(Boolean)
+    .map((s: string) => s[0])
+    .join('')
+    .slice(0, 2)
+    .toUpperCase() || 'ДС';
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const savedUser = localStorage.getItem('sbc_auth_user');
+      if (savedUser) {
+        try {
+          setCurrentUser(JSON.parse(savedUser));
+        } catch (e) {
+          console.error('Failed to parse saved user in study app:', e);
+        }
+      }
+    }
+
+    const fetchAuthConfig = async () => {
+      try {
+        const res = await fetch(`http://localhost:3000/api/v1/auth/config`);
+        if (res.ok) {
+          const data = await res.json();
+          setTestModeEnabled(!!data.testModeEnabled);
+          setGoogleClientId(data.googleClientId);
+        }
+      } catch (err) {
+        console.warn('Failed to load auth config in study app:', err);
+      }
+    };
+    fetchAuthConfig();
+  }, []);
+
+  const handleGoogleLogin = async (credential: string) => {
+    try {
+      const res = await fetch(`http://localhost:3000/api/v1/auth/google`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ credential }),
+      });
+      const data = await res.json();
+      if (res.ok && data.user) {
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('sbc_auth_token', data.token);
+          localStorage.setItem('sbc_auth_user', JSON.stringify(data.user));
+        }
+        setCurrentUser(data.user);
+      }
+    } catch (err) {
+      console.error('Google login failed in study app:', err);
+    }
+  };
+
+  const handleMockLogin = async (roleKey: string) => {
+    try {
+      const res = await fetch(`http://localhost:3000/api/v1/auth/mock-login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userIdOrEmail: roleKey }),
+      });
+      const data = await res.json();
+      if (res.ok && data.user) {
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('sbc_auth_token', data.token);
+          localStorage.setItem('sbc_auth_user', JSON.stringify(data.user));
+        }
+        setCurrentUser(data.user);
+      }
+    } catch (err) {
+      console.error('Mock login failed in study app:', err);
+    }
+  };
+
+  const handleLogout = () => {
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('sbc_auth_token');
+      localStorage.removeItem('sbc_auth_user');
+    }
+    setCurrentUser(null);
+  };
 
   // 📖 Zen Reading Mode State: початково стандартні налаштування
   const [readerSettings, setReaderSettings] = useState<ReaderSettings>(DEFAULT_READER_SETTINGS);
@@ -266,17 +359,17 @@ export function StudyAppClient({
               type="button"
               onClick={() => setIsProfileDrawerOpen(true)}
               className="flex items-center gap-2 hover:bg-slate-800/60 px-2 py-1 rounded-lg transition-colors cursor-pointer select-none text-left group"
-              title="Натисніть для відкриття профілю та вибору курсів"
+              title="Натисніть для відкриття профілю, входу або вибору курсів"
             >
               <div className="w-6 h-6 rounded-full bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center text-[10px] font-bold text-white shrink-0">
-                ДС
+                {currentUserInitials}
               </div>
               <div className="hidden lg:flex flex-col leading-none">
-                <span className="text-xs font-medium text-slate-200 group-hover:text-white transition-colors">
-                  Дмитро Стеценко
+                <span className="text-xs font-medium text-slate-200 group-hover:text-white transition-colors truncate max-w-[120px]">
+                  {currentUserName}
                 </span>
                 <span className="text-[9px] font-mono text-blue-400 mt-0.5">
-                  УЧЕНЬ
+                  {currentUserRole}
                 </span>
               </div>
             </button>
@@ -650,11 +743,11 @@ console.log(greeting, "Номер спроби:", counter);`}
       isOpen={isProfileDrawerOpen}
       onClose={() => setIsProfileDrawerOpen(false)}
       user={{
-        name: 'Дмитро Стеценко',
-        roleName: 'Учень',
-        roleBadge: 'УЧЕНЬ',
-        subtitle: '10–11 класи · Профільний рівень',
-        initials: 'ДС',
+        name: currentUserName,
+        roleName: currentUserRole === 'TEACHER' ? 'Викладач' : currentUserRole === 'ADMIN' ? 'Адміністратор' : 'Учень',
+        roleBadge: currentUserRole,
+        subtitle: currentUser ? `${currentUser.email} · ${currentUser.authProvider || 'LOCAL'}` : '10–11 класи · Профільний рівень',
+        initials: currentUserInitials,
         avatarGradient: 'bg-gradient-to-tr from-blue-600 to-indigo-500',
       }}
       courses={[
@@ -690,6 +783,11 @@ console.log(greeting, "Номер спроби:", counter);`}
           valueColor: 'text-blue-400',
         },
       ]}
+      onOpenAuthModal={() => {
+        setIsProfileDrawerOpen(false);
+        setIsAuthModalOpen(true);
+      }}
+      onLogout={handleLogout}
       quickLinks={[
         {
           label: 'Перейти до Тренажера BKT',
@@ -698,6 +796,27 @@ console.log(greeting, "Номер спроби:", counter);`}
           iconColor: 'text-indigo-400',
         },
       ]}
+    />
+
+    {/* 🔐 Модальне вікно авторизації */}
+    <AuthModal
+      isOpen={isAuthModalOpen}
+      onClose={() => setIsAuthModalOpen(false)}
+      currentUser={currentUser ? {
+        id: currentUser.id,
+        email: currentUser.email,
+        name: currentUserName,
+        role: currentUserRole,
+        authProvider: currentUser.authProvider,
+      } : null}
+      testModeEnabled={testModeEnabled}
+      googleClientId={googleClientId}
+      onGoogleLogin={handleGoogleLogin}
+      onMockLogin={handleMockLogin}
+      onLogout={handleLogout}
+      onJoinCode={(joinCode) => {
+        window.location.href = `/join/${joinCode}`;
+      }}
     />
     </>
   );
