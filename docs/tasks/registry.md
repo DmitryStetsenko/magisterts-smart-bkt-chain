@@ -123,7 +123,7 @@
 | **SBC-371** | `Docs` | `INF` | document brainstorm 17 on production launch readiness, cloud topology and security architecture | 2026-11-10 | `a843dc9` |
 | **SBC-374** | `Docs` | `INF` | document bkt audit verifier center in guides and admin portal specification | 2026-11-10 | `91066fa` |
 | **SBC-375** | `Docs` | `INF` | document brainstorm 18 on google auth, classroom invite codes, enrollment modes and user management | 2026-11-10 | `1a8f657` |
-| **SBC-382** | `Story` | `INF` | verify end-to-end user onboarding flow, invite redemption and auth test mode with playwright tests | 2026-11-10 | pending |
+| **SBC-382** | `Story` | `INF` | verify end-to-end user onboarding flow, invite redemption and auth test mode with playwright tests | 2026-11-10 | `70737ec` |
 
 ---
 
