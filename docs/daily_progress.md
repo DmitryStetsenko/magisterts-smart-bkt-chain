@@ -380,6 +380,18 @@ pm run build:student (Next.js 16.2.9 Turbopack, 0 помилок TypeScript).
       - 100% успішна компіляція та збірка `npm run build:admin` (Next.js 16.3.8 Turbopack).
       - Візуальна верифікація у Playwright: збережено артефакти `admin_course_cms.png` та `admin_module_manager_modal.png`.
 
+24. **Модульний Селектор Курсів та Конфігурація Навчальних Груп у Кабінеті Викладача (`SBC-387`, `EP-TC`):**
+    - **Виконана інженерна робота:**
+      - **Розширення модального вікна створення класу ([`apps/teacher/src/features/classrooms/ui/CreateClassroomModal.tsx`](file:///apps/teacher/src/features/classrooms/ui/CreateClassroomModal.tsx)):**
+        - Додано динамічне завантаження модулів обраного курсу (`CourseModuleDto[]`).
+        - Впроваджено інтерактивний сегментований перемикач: `[Весь курс цілком]` vs `[Обрані модулі]`.
+        - При виборі селективного доступу розгортається перелік чекбоксів з назвами модулів, порядковими номерами та кількістю навичок, що формують масив `allowedModules`.
+      - **Оновлення списку навчальних груп ([`apps/teacher/src/features/classrooms/ui/ClassroomManager.tsx`](file:///apps/teacher/src/features/classrooms/ui/ClassroomManager.tsx)):**
+        - У картку групи додано бейджі доступності матеріалів: `[Всі модулі]` (зелений бейдж) або `[N модулів]` (фіолетовий бейдж з граматичним числівником).
+    - **Верифікація:**
+      - 100% успішна збірка `npm run build:teacher` (Next.js 16.2.9 Turbopack).
+      - Візуальне підтвердження у Playwright: збережено скріншот `teacher_modular_classroom_modal.png`.
+
 ## 📅 9 листопада 2026 року
 
 ### ✅ Що зроблено за день:

@@ -143,6 +143,15 @@ export const ClassroomManager: React.FC<ClassroomManagerProps> = ({
                         <span className="text-[10px] font-mono text-slate-400 bg-slate-900 px-1.5 py-0.5 rounded border border-slate-800">
                           {cls.defaultMode === 'FULL_CYCLE' ? 'Повний цикл BKT' : 'Тестування'}
                         </span>
+                        {cls.allowedModules && cls.allowedModules.length > 0 ? (
+                          <span className="text-[10px] font-mono text-purple-300 bg-purple-950/60 px-2 py-0.5 rounded border border-purple-800/40">
+                            {cls.allowedModules.length} {cls.allowedModules.length === 1 ? 'модуль' : cls.allowedModules.length < 5 ? 'модулі' : 'модулів'}
+                          </span>
+                        ) : (
+                          <span className="text-[10px] font-mono text-emerald-400 bg-emerald-950/40 px-1.5 py-0.5 rounded border border-emerald-800/40">
+                            Всі модулі
+                          </span>
+                        )}
                       </div>
 
                       <div className="flex items-center gap-3 text-[11px] text-slate-400 mt-1">

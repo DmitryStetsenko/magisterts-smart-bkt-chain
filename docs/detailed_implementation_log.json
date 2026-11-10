@@ -14019,6 +14019,63 @@
               "type": "text",
               "raw_text": "Візуальна перевірка у браузері Playwright (артефакти `admin_course_cms.png`, `admin_module_manager_modal.png`).",
               "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "---",
+              "subitems": []
+            }
+          ]
+        },
+        {
+          "title": "11.69. Модульний Селектор Курсів та Конфігурація Груп у Кабінеті Викладача (SBC-387, EP-TC)",
+          "level": 3,
+          "paragraphs": [
+            "Для надання викладачам можливості обмежувати видимість тем курсу для конкретної групи (наприклад, відкрити тільки поточний модуль семінару) реалізовано селектор дозволених модулів у кабінеті викладача `apps/teacher`."
+          ],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "**Контекст та інженерна задача:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Архітектурні зміни та компоненти:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Компонент `CreateClassroomModal` ([`apps/teacher/src/features/classrooms/ui/CreateClassroomModal.tsx`](file:///apps/teacher/src/features/classrooms/ui/CreateClassroomModal.tsx)):**",
+              "subitems": [
+                "При виборі курсу з випадаючого списку відображається кількість доступних модулів.",
+                "Сегментований перемикач доступу: `Весь курс цілком` (`allowedModules: []`) проти `Обрані модулі` (`allowedModules: string[]`).",
+                "Список чекбоксів для вибору конкретних модулів.",
+                "Валідація: заборона створення класу з обраним ручним режимом без виділення хоча б одного модуля."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Компонент `ClassroomManager` ([`apps/teacher/src/features/classrooms/ui/ClassroomManager.tsx`](file:///apps/teacher/src/features/classrooms/ui/ClassroomManager.tsx)):**",
+              "subitems": [
+                "Відображення бейджів `Всі модулі` або `N модулів` у кожній картці класу."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Верифікація:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "100% успішна виробнича збірка `npm run build:teacher` (Next.js 16.2.9 Turbopack).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Візуальна перевірка у браузері Playwright (артефакт `teacher_modular_classroom_modal.png`).",
+              "subitems": []
             }
           ]
         }

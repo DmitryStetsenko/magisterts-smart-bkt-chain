@@ -1,14 +1,15 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { X, Users, Check, AlertCircle, Key, BookOpen } from 'lucide-react';
-import { CreateClassroomDto, EnrollmentMode } from '@sbc/types';
+import { X, Users, Check, AlertCircle, Key, BookOpen, Layers } from 'lucide-react';
+import { CreateClassroomDto, EnrollmentMode, CourseModuleDto } from '@sbc/types';
 
 interface CourseOption {
   id: string;
   slug: string;
   title: string;
   description: string;
+  modules?: CourseModuleDto[];
 }
 
 interface CreateClassroomModalProps {
@@ -35,6 +36,10 @@ export const CreateClassroomModal: React.FC<CreateClassroomModalProps> = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Modular selection state
+  const [isAllModules, setIsAllModules] = useState<boolean>(true);
+  const [selectedModuleIds, setSelectedModuleIds] = useState<string[]>([]);
+
   useEffect(() => {
     if (!isOpen) return;
     const fetchCourses = async () => {
@@ -42,7 +47,7 @@ export const CreateClassroomModal: React.FC<CreateClassroomModalProps> = ({
         setIsLoadingCourses(true);
         const res = await fetch(`${apiUrl}/api/v1/courses`);
         const data = await res.json();
-        const list = Array.isArray(data) ? data : data.courses || [];
+        const list: CourseOption[] = Array.isArray(data) ? data : data.courses || [];
         setCourses(list);
         if (list.length > 0 && !selectedCourseId) {
           setSelectedCourseId(list[0].id);
@@ -55,6 +60,10 @@ export const CreateClassroomModal: React.FC<CreateClassroomModalProps> = ({
     };
     fetchCourses();
   }, [isOpen, apiUrl]);
+
+  // When selected course changes, update available modules
+  const currentCourse = courses.find((c) => c.id === selectedCourseId);
+  const availableModules = currentCourse?.modules || [];
 
   if (!isOpen) return null;
 
@@ -69,6 +78,11 @@ export const CreateClassroomModal: React.FC<CreateClassroomModalProps> = ({
       return;
     }
 
+    if (!isAllModules && selectedModuleIds.length === 0) {
+      setError('Оберіть щонайменше один модуль або перемкніться на режим «Весь курс»');
+      return;
+    }
+
     try {
       setIsSubmitting(true);
       setError(null);
@@ -77,6 +91,7 @@ export const CreateClassroomModal: React.FC<CreateClassroomModalProps> = ({
         courseId: selectedCourseId,
         code: customCode.trim() ? customCode.trim().toUpperCase() : undefined,
         defaultMode: mode,
+        allowedModules: isAllModules ? [] : selectedModuleIds,
         teacherId,
       };
 
@@ -102,9 +117,9 @@ export const CreateClassroomModal: React.FC<CreateClassroomModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm animate-fadeIn">
-      <div className="w-full max-w-md bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl overflow-hidden flex flex-col">
+      <div className="w-full max-w-lg bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
         {/* Header */}
-        <div className="px-5 py-4 border-b border-slate-800 flex items-center justify-between">
+        <div className="px-5 py-4 border-b border-slate-800 flex items-center justify-between shrink-0">
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-lg bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400">
               <Users className="w-4 h-4" />
@@ -112,7 +127,7 @@ export const CreateClassroomModal: React.FC<CreateClassroomModalProps> = ({
             <div>
               <h3 className="text-sm font-bold text-white">Створити навчальну групу (Клас)</h3>
               <p className="text-[11px] text-slate-400">
-                Генерація інвайт-коду та вибір дидактичного режиму
+                Генерація інвайт-коду, вибір курсу та модулів
               </p>
             </div>
           </div>
@@ -126,7 +141,7 @@ export const CreateClassroomModal: React.FC<CreateClassroomModalProps> = ({
         </div>
 
         {/* Body */}
-        <form onSubmit={handleSubmit} className="p-5 flex flex-col gap-4 text-xs">
+        <form onSubmit={handleSubmit} className="p-5 flex flex-col gap-4 text-xs overflow-y-auto custom-scrollbar">
           {error && (
             <div className="p-3 rounded-lg bg-rose-500/10 border border-rose-500/20 text-rose-300 flex items-center gap-2">
               <AlertCircle className="w-4 h-4 shrink-0 text-rose-400" />
@@ -159,15 +174,112 @@ export const CreateClassroomModal: React.FC<CreateClassroomModalProps> = ({
             ) : (
               <select
                 value={selectedCourseId}
-                onChange={(e) => setSelectedCourseId(e.target.value)}
+                onChange={(e) => {
+                  setSelectedCourseId(e.target.value);
+                  setIsAllModules(true);
+                  setSelectedModuleIds([]);
+                }}
                 className="px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-slate-200 focus:outline-none focus:border-purple-500 text-xs cursor-pointer"
               >
                 {courses.map((c) => (
                   <option key={c.id} value={c.id}>
-                    {c.title} ({c.slug})
+                    {c.title} ({c.slug}) — {c.modules?.length || 0} модулів
                   </option>
                 ))}
               </select>
+            )}
+          </div>
+
+          {/* Modular Enrollment Selection */}
+          <div className="flex flex-col gap-2 p-3 bg-slate-950/70 border border-slate-800 rounded-xl">
+            <div className="flex items-center justify-between">
+              <label className="text-[11px] font-semibold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
+                <Layers className="w-3.5 h-3.5 text-indigo-400" />
+                <span>Доступ до Модулів Курсу</span>
+              </label>
+              <span className="text-[10px] font-mono text-slate-500">
+                {availableModules.length} доступно
+              </span>
+            </div>
+
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  setIsAllModules(true);
+                  setSelectedModuleIds([]);
+                }}
+                className={`py-2 px-3 rounded-lg border text-left flex flex-col gap-0.5 transition-colors cursor-pointer ${
+                  isAllModules
+                    ? 'border-indigo-500 bg-indigo-500/10 text-white'
+                    : 'border-slate-800 hover:border-slate-700 bg-slate-900 text-slate-400'
+                }`}
+              >
+                <span className="font-bold text-xs">Весь курс цілком</span>
+                <span className="text-[10px] text-slate-500">Усі поточні та майбутні модулі</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setIsAllModules(false);
+                  if (selectedModuleIds.length === 0 && availableModules.length > 0) {
+                    setSelectedModuleIds(availableModules.slice(0, 2).map((m) => m.id));
+                  }
+                }}
+                className={`py-2 px-3 rounded-lg border text-left flex flex-col gap-0.5 transition-colors cursor-pointer ${
+                  !isAllModules
+                    ? 'border-indigo-500 bg-indigo-500/10 text-white'
+                    : 'border-slate-800 hover:border-slate-700 bg-slate-900 text-slate-400'
+                }`}
+              >
+                <span className="font-bold text-xs">Обрані модулі</span>
+                <span className="text-[10px] text-slate-500">Селективний доступ до тем</span>
+              </button>
+            </div>
+
+            {/* Checkbox list of modules when selective access chosen */}
+            {!isAllModules && (
+              <div className="mt-2 space-y-1.5 max-h-40 overflow-y-auto custom-scrollbar p-1.5 bg-slate-900/60 rounded-lg border border-slate-800/80">
+                {availableModules.length === 0 ? (
+                  <div className="text-center py-2 text-slate-500 text-[11px] font-mono">
+                    У цьому курсі немає попередньо створених модулів
+                  </div>
+                ) : (
+                  availableModules.map((m) => {
+                    const isChecked = selectedModuleIds.includes(m.id);
+                    return (
+                      <label
+                        key={m.id}
+                        className={`flex items-center justify-between p-2 rounded-md cursor-pointer transition-colors ${
+                          isChecked ? 'bg-indigo-950/40 border border-indigo-500/30' : 'hover:bg-slate-800/40'
+                        }`}
+                      >
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="checkbox"
+                            checked={isChecked}
+                            onChange={(e) => {
+                              if (e.target.checked) {
+                                setSelectedModuleIds((prev) => [...prev, m.id]);
+                              } else {
+                                setSelectedModuleIds((prev) => prev.filter((id) => id !== m.id));
+                              }
+                            }}
+                            className="w-3.5 h-3.5 rounded text-indigo-600 bg-slate-800 border-slate-700 focus:ring-0"
+                          />
+                          <span className="text-xs font-medium text-slate-200">
+                            {m.orderIndex}. {m.title}
+                          </span>
+                        </div>
+                        <span className="text-[10px] font-mono text-slate-500">
+                          {m.skills?.length || 0} навичок
+                        </span>
+                      </label>
+                    );
+                  })
+                )}
+              </div>
             )}
           </div>
 

@@ -4001,3 +4001,21 @@ eferenceAnswer, критерії options.keywords (microtask|мікротаск|
 - **Верифікація:**
   - 100% успішна виробнича збірка `npm run build:admin` (Next.js 16.3.8 Turbopack).
   - Візуальна перевірка у браузері Playwright (артефакти `admin_course_cms.png`, `admin_module_manager_modal.png`).
+
+
+---
+
+### 11.69. Модульний Селектор Курсів та Конфігурація Груп у Кабінеті Викладача (SBC-387, EP-TC)
+- **Контекст та інженерна задача:**
+  Для надання викладачам можливості обмежувати видимість тем курсу для конкретної групи (наприклад, відкрити тільки поточний модуль семінару) реалізовано селектор дозволених модулів у кабінеті викладача `apps/teacher`.
+- **Архітектурні зміни та компоненти:**
+  1. **Компонент `CreateClassroomModal` ([`apps/teacher/src/features/classrooms/ui/CreateClassroomModal.tsx`](file:///apps/teacher/src/features/classrooms/ui/CreateClassroomModal.tsx)):**
+     - При виборі курсу з випадаючого списку відображається кількість доступних модулів.
+     - Сегментований перемикач доступу: `Весь курс цілком` (`allowedModules: []`) проти `Обрані модулі` (`allowedModules: string[]`).
+     - Список чекбоксів для вибору конкретних модулів.
+     - Валідація: заборона створення класу з обраним ручним режимом без виділення хоча б одного модуля.
+  2. **Компонент `ClassroomManager` ([`apps/teacher/src/features/classrooms/ui/ClassroomManager.tsx`](file:///apps/teacher/src/features/classrooms/ui/ClassroomManager.tsx)):**
+     - Відображення бейджів `Всі модулі` або `N модулів` у кожній картці класу.
+- **Верифікація:**
+  - 100% успішна виробнича збірка `npm run build:teacher` (Next.js 16.2.9 Turbopack).
+  - Візуальна перевірка у браузері Playwright (артефакт `teacher_modular_classroom_modal.png`).
