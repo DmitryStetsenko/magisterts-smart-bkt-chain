@@ -82,6 +82,11 @@
         },
         {
           "type": "text",
+          "raw_text": "`classrooms` (GraduationCap): навчальні групи, генерація інвайт-кодів та дидактичні режими;",
+          "subitems": []
+        },
+        {
+          "type": "text",
           "raw_text": "`coursemap` (Network): граф навичок та завдання;",
           "subitems": []
         },
@@ -122,12 +127,22 @@
         },
         {
           "type": "text",
+          "raw_text": "*Секція 4: Інвайт-коди та дидактичні режими (при переході на вкладку груп)*",
+          "subitems": []
+        },
+        {
+          "type": "text",
           "raw_text": "**Центральне полотно (`<main className=\"flex-1 overflow-y-auto\">` — Clean Borderless Canvas):**",
           "subitems": []
         },
         {
           "type": "text",
           "raw_text": "Плоский однорядковий верхній тулбар (`border-b border-slate-800/80`) замість багатоповерхових карток та банерів.",
+          "subitems": []
+        },
+        {
+          "type": "text",
+          "raw_text": "`ClassroomManager`: керування класами викладача, генератор інвайт-кодів (`KOD-XXXX`), 1-клік копіювання посилання `/join/:code`, розкриття списку студентів та вибір одного з 3 дидактичних режимів (`FULL_CYCLE`, `TESTING_ONLY`, `MODULAR`).",
           "subitems": []
         },
         {

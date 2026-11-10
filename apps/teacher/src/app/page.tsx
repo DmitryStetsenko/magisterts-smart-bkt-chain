@@ -10,6 +10,7 @@ import { ReviewQueueInspector } from '../features/reviews/ui/ReviewQueueInspecto
 import { CourseGraphViewer } from '../features/course-map/ui/CourseGraphViewer';
 import { MetricsAuditInspector } from '../features/metrics-audit/ui/MetricsAuditInspector';
 import { StudentActivityTimelineWidget } from '../features/analytics/ui/StudentActivityTimelineWidget';
+import { ClassroomManager } from '../features/classrooms/ui/ClassroomManager';
 
 export type CourseItem = Omit<Partial<CourseDto>, 'icon'> & {
   slug: string;
@@ -166,7 +167,7 @@ export default function TeacherDashboardPage() {
   // Unified Navigation State:
   // activeTab defines which workspace / module is active.
   // isDrawerOpen controls whether its companion sidebar drawer is visible.
-  type TeacherTab = 'analytics' | 'reviews' | 'coursemap' | 'metrics-audit' | 'settings';
+  type TeacherTab = 'analytics' | 'coursemap' | 'reviews' | 'classrooms' | 'metrics-audit' | 'settings';
   const [activeTab, setActiveTab] = useState<TeacherTab>('analytics');
   const [auditSubTab, setAuditSubTab] = useState<'live-log' | 'what-if' | 'test-matrix' | 'mechanisms'>('live-log');
   // Collapsible sections state inside Metrics Audit drawer
@@ -482,6 +483,10 @@ export default function TeacherDashboardPage() {
       title = `Черга Перевірки (${reviewQueue.length})`;
       icon = ClipboardCheck;
       iconColor = 'text-amber-400';
+    } else if (activeTab === 'classrooms') {
+      title = 'Навчальні Групи & Інвайти';
+      icon = Users;
+      iconColor = 'text-purple-400';
     } else if (activeTab === 'metrics-audit') {
       title = 'Аудит Метрик & Студенти';
       icon = FlaskConical;
@@ -1015,6 +1020,29 @@ export default function TeacherDashboardPage() {
             </div>
           )}
 
+          {/* Drawer: Classrooms Info */}
+          {activeTab === 'classrooms' && (
+            <div className="flex flex-col gap-3 p-1">
+              <div className="p-3 rounded-xl bg-purple-500/10 border border-purple-500/20 text-xs text-purple-300 flex flex-col gap-1.5">
+                <span className="font-semibold flex items-center gap-1.5">
+                  <Users className="w-4 h-4 text-purple-400" />
+                  <span>Швидке Зарахування</span>
+                </span>
+                <p className="text-[11px] text-slate-400 leading-relaxed">
+                  Згенеруйте інвайт-код або надішліть учням посилання /join. Вони авторизуються в 1 клік через Google та автоматично підключаться до вашого курсу.
+                </p>
+              </div>
+
+              <div className="p-3 rounded-xl bg-slate-900/60 border border-slate-800 text-xs flex flex-col gap-1.5">
+                <span className="font-semibold text-slate-300">Дидактичні Режими</span>
+                <p className="text-[11px] text-slate-400 leading-relaxed">
+                  • <strong className="text-purple-300">FULL_CYCLE:</strong> обов'язкова теорія в підручнику + адаптивний тренажер BKT ($P(L_n) \ge 0.85$).<br/>
+                  • <strong className="text-amber-300">TESTING_ONLY:</strong> експрес-зріз або екзамен без блокування на конспекті.
+                </p>
+              </div>
+            </div>
+          )}
+
           {/* Drawer: Metrics Audit */}
           {activeTab === 'metrics-audit' && (
             <div className="flex flex-col divide-y divide-slate-800/70">
@@ -1198,6 +1226,8 @@ export default function TeacherDashboardPage() {
                   ? 'Граф навичок'
                   : activeTab === 'reviews'
                   ? 'Черга перевірки'
+                  : activeTab === 'classrooms'
+                  ? 'Навчальні групи'
                   : activeTab === 'metrics-audit'
                   ? 'Аудит BKT'
                   : 'Параметри',
@@ -1343,6 +1373,12 @@ export default function TeacherDashboardPage() {
             icon: ClipboardCheck,
             title: 'Черга Перевірки Відкритих Відповідей (Human-in-the-Loop)',
             badge: reviewQueue.length > 0 ? reviewQueue.length : undefined,
+            activeColor: 'bg-purple-600',
+          },
+          {
+            id: 'classrooms',
+            icon: Users,
+            title: 'Навчальні Групи & Інвайт-коди',
             activeColor: 'bg-purple-600',
           },
           {
@@ -1936,6 +1972,11 @@ export default function TeacherDashboardPage() {
               }}
               onAnnul={handleAnnulDecision}
             />
+          )}
+
+          {/* Main View: Classrooms & Invite Codes */}
+          {activeTab === 'classrooms' && (
+            <ClassroomManager apiUrl={API_URL} />
           )}
 
           {/* Main View: Metrics Audit & BKT Math Simulator */}
