@@ -218,6 +218,25 @@ pm run build:student (Next.js 16.2.9 Turbopack, 0 помилок TypeScript).
       - Успішна збірка бекенду `npm run build:api`.
       - Live HTTP тестування запущеного сервера: успішні виклики `GET /api/v1/auth/config`, `POST /api/v1/auth/mock-login`, `GET /api/v1/auth/me`, перемикання `test-mode` та підтвердження блокування 403 Forbidden.
 
+15. **Реалізація Сервісу та REST API Навчальних Груп (Classroom) та Зарахування на Курси (`SBC-378`, `EP-BK`):**
+    - **Виконана інженерна робота:**
+      - **Доменний сервіс ([`ClassroomService.ts`](file:///apps/api/src/domain/classroom/classroom.service.ts)):**
+        - `createClassroom(teacherId, dto)`: створення групи з автоматичною або ручною генерацією унікального інвайт-коду (наприклад `KOD-KN21`), перевіркою існування курсу, прив'язкою викладача, дидактичного режиму за замовчуванням (`FULL_CYCLE`, `TESTING_ONLY`, `MODULAR`) та переліку дозволених модулів.
+        - `getClassroomByCode(code)`: публічний пошук інформації про клас для передперегляду студентом перед зарахуванням.
+        - `joinClassroom(userId, code)`: підключення студента до класу (зв'язок `Classroom.students`) та автоматичне створення/оновлення `CourseEnrollment` із фіксацією події `CLASSROOM_JOINED` у журналі `StudentActivityLog`.
+        - `enrollStudent(dto)`: пряме індивідуальне призначення курсу користувачу з вибором дидактичного режиму та модулів адміністратором або викладачем.
+        - `getClassroomsByTeacher(teacherId)` та `getAllClassrooms()`: агреговані вибірки з підрахунком кількості студентів (`_count.students`).
+        - `getStudentEnrollments(userId)`: отримання списку курсів студента з інформацією про клас та дидактичний режим.
+        - `deleteClassroom(id)`: безпечне видалення класу.
+      - **HTTP Контролер ([`ClassroomController.ts`](file:///apps/api/src/adapters/inbound/http/classroom.controller.ts)):**
+        - Зареєстровано ендпоінти: `GET /api/v1/classrooms`, `POST /api/v1/classrooms`, `GET /api/v1/classrooms/join/:code`, `POST /api/v1/classrooms/join/:code`, `POST /api/v1/classrooms/enroll`, `GET /api/v1/classrooms/student/:userId`, `DELETE /api/v1/classrooms/:id`.
+      - **Unit-тестування ([`classroom.service.spec.ts`](file:///apps/api/src/domain/classroom/classroom.service.spec.ts)):**
+        - 3/3 успішних тестів: створення класу з унікальним кодом, перевірка 404 при неіснуючому курсі, підключення студента та upsert зарахування на курс.
+    - **Верифікація:**
+      - Проходження 100% юніт-тестів `jest classroom.service.spec.ts` (3 passed).
+      - Успішна збірка бекенду `npm run build:api`.
+      - Live HTTP тестування запущеного сервера: успішні виклики `GET /api/v1/classrooms`, передперегляд за кодом `GET /api/v1/classrooms/join/KOD-KN21`, перевірка активних зарахувань `GET /api/v1/classrooms/student/:userId`.
+
 ## 📅 9 листопада 2026 року
 
 ### ✅ Що зроблено за день:

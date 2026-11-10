@@ -8,12 +8,14 @@ import { TaskController } from './adapters/inbound/http/task.controller';
 import { BktController } from './adapters/inbound/http/bkt.controller';
 import { CourseController } from './adapters/inbound/http/course.controller';
 import { AuthController } from './adapters/inbound/http/auth.controller';
+import { ClassroomController } from './adapters/inbound/http/classroom.controller';
 import { TelemetryGateway } from './adapters/inbound/websocket/telemetry.gateway';
 
 import { OpenAnswerEvaluatorService } from './domain/evaluation/open-answer-evaluator.service';
 import { AuditLogService } from './domain/audit/audit-log.service';
 import { AuthService } from './domain/auth/auth.service';
 import { SystemConfigService } from './domain/config/system-config.service';
+import { ClassroomService } from './domain/classroom/classroom.service';
 
 @Module({
   imports: [
@@ -24,7 +26,14 @@ import { SystemConfigService } from './domain/config/system-config.service';
     DatabaseModule,
     EvaluationQueueModule,
   ],
-  controllers: [HealthController, TaskController, BktController, CourseController, AuthController],
+  controllers: [
+    HealthController,
+    TaskController,
+    BktController,
+    CourseController,
+    AuthController,
+    ClassroomController,
+  ],
   providers: [
     TelemetryGateway,
     EvaluationProcessor,
@@ -32,6 +41,7 @@ import { SystemConfigService } from './domain/config/system-config.service';
     AuditLogService,
     AuthService,
     SystemConfigService,
+    ClassroomService,
   ],
 })
 export class AppModule {}

@@ -30,6 +30,34 @@
   5. *Build Next.js Documentation Site* (`npm run build:docs`) — збірка статичного експорту (`output: "export"`, `trailingSlash: true`, `basePath: "/magisterts-smart-bkt-chain"`).
   6. *Upload Artifact & Deploy Pages* (`actions/upload-pages-artifact@v3` + `actions/deploy-pages@v4`).
 
+### 0.1.7.80 Бекенд-Модуль Навчальних Класів (Classroom), Інвайт-Кодів та Зарахування на Курси (SBC-378, EP-BK)
+- **Контекст та інженерне завдання:**
+  - Реалізація Кроку 3 дорожньої карти Брейншторму 18: розробка доменного сервісу та REST API контролера для організації студентів у навчальні групи за промокодами, забезпечення попереднього перегляду класу та безпечного зарахування на курси у відповідному дидактичному режимі (`FULL_CYCLE`, `TESTING_ONLY`, `MODULAR`).
+- **Виконані інженерні зміни:**
+  1. **Доменний сервіс ([`ClassroomService.ts`](file:///apps/api/src/domain/classroom/classroom.service.ts)):**
+     - `createClassroom(teacherId, dto)`: валідує курс, генерує або верифікує унікальний інвайт-код (наприклад `KOD-KN21`), створює запис `classrooms` з зв'язком з викладачем, курсом та дидактичними налаштуваннями.
+     - `getClassroomByCode(code)`: нормалізує код до верхнього регістру, завантажує метадані класу, викладача, курсу та кількість зарахованих студентів (`_count.students`).
+     - `joinClassroom(userId, code)`: підключає студента через Prisma relation (`students: { connect: [{ id: userId }] }`), створює або оновлює `CourseEnrollment` із встановленням `mode = classroom.defaultMode` та `allowedModules = classroom.allowedModules`, та записує подію `CLASSROOM_JOINED` у `student_activity_logs`.
+     - `enrollStudent(dto)`: виконує пряме індивідуальне призначення курсу учню з підтримкою ручного вибору режиму навчання.
+     - `getStudentEnrollments(userId)`: повертає всі активні курси учня з розкриттям інформації про клас та дидактичний режим.
+     - `getClassroomsByTeacher(teacherId)` та `getAllClassrooms()`: повертає список класів для викладача або адміністратора.
+     - `deleteClassroom(id)`: видаляє клас із бази даних.
+  2. **Контролер Класів ([`ClassroomController.ts`](file:///apps/api/src/adapters/inbound/http/classroom.controller.ts)):**
+     - Зареєстровано ендпоінти під префіксом `/api/v1/classrooms`:
+       - `GET /api/v1/classrooms` — список класів (з фільтром `?teacherId=...`).
+       - `POST /api/v1/classrooms` — створення класу викладачем.
+       - `GET /api/v1/classrooms/join/:code` — публічний передперегляд класу за інвайт-кодом.
+       - `POST /api/v1/classrooms/join/:code` — приєднання студента за кодом (з `Bearer` токеном або `userId` у тілі).
+       - `POST /api/v1/classrooms/enroll` — пряме призначення курсу.
+       - `GET /api/v1/classrooms/student/:userId` — активні зарахування учня.
+       - `DELETE /api/v1/classrooms/:id` — видалення класу.
+  3. **Unit-тестування ([`classroom.service.spec.ts`](file:///apps/api/src/domain/classroom/classroom.service.spec.ts)):**
+     - Покриття створення класу з унікальним кодом, перевірки помилки 404 при неіснуючому курсі, підключення учня за кодом та upsert запису в таблиці `course_enrollments`.
+- **Верифікація:**
+  - `npm --workspace=@sbc/api test classroom.service.spec.ts`: 3/3 PASSED (100%).
+  - `npm --workspace=@sbc/api run build`: успішна компіляція NestJS.
+  - Live HTTP перевірка ендпоінтів на порту 3000: успішне виконання `GET /api/v1/classrooms`, `GET /api/v1/classrooms/join/KOD-KN21`, `GET /api/v1/classrooms/student/:userId`.
+
 ### 0.1.7.79 Бекенд-Модуль Авторизації Google OAuth 2.0, JWT-Сесії та Тестовий Режим Входу (SBC-377, EP-BK)
 - **Контекст та інженерне завдання:**
   - Реалізація Кроку 2 дорожньої карти Брейншторму 18: створення захищеного модулю авторизації на базі NestJS (`apps/api`), що підтримує два паралельні сценарії входу:
