@@ -120,6 +120,98 @@
           ]
         },
         {
+          "title": "0.1.7.82 Наскрізна Категоризація Курсів, Динамічне Керування Галузями Знань та Фільтрація Сайдбара (SBC-394, EP-AD)",
+          "level": 3,
+          "paragraphs": [],
+          "code_blocks": [
+            {
+              "lang": "prisma",
+              "content": "model CourseCategory {\n         id          String   @id @default(uuid())\n         slug        String   @unique\n         title       String\n         description String?\n         icon        String   @default(\"Folder\")\n         orderIndex  Int      @default(0)\n         courses     Course[]\n         createdAt   DateTime @default(now())\n         updatedAt   DateTime @updatedAt\n\n         @@map(\"course_categories\")\n       }"
+            }
+          ],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "**Контекст та інженерне завдання:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Організувати курси екосистеми за наскрізними предметними галузями («Програмування & IT», «Іноземні Мови», «Право & Суспільствознавство», «Точні Науки & Математика»), дозволити адміністратору динамічно створювати й редагувати категорії в адмін-панелі, вибирати категорію при створенні/редагуванні курсу, та реорганізувати сайдбар адмін-панелі від надлишкового списку 4 окремих курсів до масштабованої секції «Предметні категорії» із лічильниками та миттєвою фільтрацією.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Виконані інженерні рішення:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Моделювання Бази Даних та Prisma ORM (`packages/database/prisma/schema.prisma`):**",
+              "subitems": [
+                "Додано модель `CourseCategory`:",
+                "У моделі `Course` додано `categoryId String?` та зв'язок `category CourseCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)` із захисним правилом `SetNull`, що унеможливлює видалення курсів або їх BKT-станів при видаленні категорії.",
+                "Застосовано схему до PostgreSQL через `npx prisma db push` та згенеровано клієнт Prisma."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Початкові Дані Списку Категорій (`packages/database/prisma/seed.ts`):**",
+              "subitems": [
+                "Створено 4 початкові предметні галузі: `prog-it` («Програмування & IT», іконка `Code`), `languages` («Іноземні Мови», `Languages`), `law-social` («Право & Суспільствознавство», `Scale`), `exact-sciences` («Точні Науки & Математика», `Binary`).",
+                "Зв'язано початкові курси з категоріями."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Спільні Інтерфейси DTO (`packages/types`):**",
+              "subitems": [
+                "Введено `CourseCategoryDto`, `CreateCourseCategoryDto`, `UpdateCourseCategoryDto`.",
+                "Розширено `CourseDto`, `CreateCourseDto` та `UpdateCourseDto` полем `categoryId?: string | null`."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**REST API Ендпоінти Категорій (`apps/api`):**",
+              "subitems": [
+                "Створено `CategoryController` (`GET /api/v1/categories` з агрегацією `_count.courses`, `POST /api/v1/categories`, `PATCH /api/v1/categories/:id`, `DELETE /api/v1/categories/:id`).",
+                "Розширено `CourseController`: підтримка фільтрації `GET /api/v1/courses?category=:slug`, збереження та оновлення `categoryId` у `POST /api/v1/courses` та `PATCH /api/v1/courses/:id`."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Інтерфейс Адміністратора CMS (`apps/admin`):**",
+              "subitems": [
+                "Створено `CategoryManagerModal.tsx`: форма створення з автогенерацією слага, вибір піктограми, список активних категорій із підрахунком курсів та безпечним видаленням, підтримка закриття по Escape.",
+                "Оновлено модальні вікна створення та редагування курсу `CourseEditModal.tsx` та `CourseManager.tsx`: додано випадаючий список вибору категорії курсу.",
+                "Додано бурштинові бейджі предметних галузей `[📁 Категорія]` для кожного курсу в таблиці `CourseManager`.",
+                "Сайдбар адмін-панелі переведено на секцію `<DrawerSection title=\"Предметні категорії\" icon={Folder} badge={4}>`: перелік напрямів із піктограмами та реальними лічильниками курсів, опція «Всі напрями» та смарагдовий індикатор активного вибору.",
+                "Додано чіп активного фільтра галузі `[Галузь: Назва ✕]` у тулбар курсів для миттєвого очищення."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Верифікація:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "100% проходження Playwright E2E тестів `e2e/course-and-modules.spec.ts` (4/4 passed).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "100% проходження повного сьюту `npm run test:e2e` (11/11 passed, 38.0s).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Збережено візуальні скріншоти: `admin_course_categories_cms.png` та `admin_category_manager_modal.png`.",
+              "subitems": []
+            }
+          ]
+        },
+        {
           "title": "0.1.7.81 Панель Керування Користувачами, Ролями та Зарахуванням в CMS Адміністратора (SBC-379, EP-AD)",
           "level": 3,
           "paragraphs": [],

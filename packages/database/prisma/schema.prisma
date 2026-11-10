@@ -67,6 +67,20 @@ enum CredentialType {
   DNFT_ERC721
 }
 
+model CourseCategory {
+  id          String   @id @default(uuid())
+  slug        String   @unique
+  title       String
+  description String?
+  icon        String?
+  orderIndex  Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  courses     Course[]
+
+  @@map("course_categories")
+}
+
 model Course {
   id                      String             @id @default(uuid())
   slug                    String             @unique
@@ -76,6 +90,8 @@ model Course {
   targetAudience          String?
   isPublished             Boolean            @default(true)
   defaultMasteryThreshold Float              @default(0.85)
+  categoryId              String?
+  category                CourseCategory?    @relation(fields: [categoryId], references: [id], onDelete: SetNull)
   createdAt               DateTime           @default(now())
   updatedAt               DateTime           @updatedAt
   modules                 CourseModule[]

@@ -1,14 +1,15 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Sparkles, X, Target, Users, BookOpen, Layers } from 'lucide-react';
-import type { CourseDto, UpdateCourseDto } from '@sbc/types';
+import { Sparkles, X, Target, Users, BookOpen, Layers, Folder } from 'lucide-react';
+import type { CourseDto, UpdateCourseDto, CourseCategoryDto } from '@sbc/types';
 
 interface CourseEditModalProps {
   course: CourseDto;
   isOpen: boolean;
   onClose: () => void;
   onSaved: () => void;
+  categories?: CourseCategoryDto[];
 }
 
 export const CourseEditModal: React.FC<CourseEditModalProps> = ({
@@ -16,10 +17,14 @@ export const CourseEditModal: React.FC<CourseEditModalProps> = ({
   isOpen,
   onClose,
   onSaved,
+  categories = [],
 }) => {
   const [title, setTitle] = useState(course.title);
   const [slug, setSlug] = useState(course.slug);
   const [description, setDescription] = useState(course.description || '');
+  const [categoryId, setCategoryId] = useState<string | null>(
+    course.categoryId || (typeof course.category === 'object' && course.category ? (course.category as any).id : null)
+  );
   const [targetAudience, setTargetAudience] = useState(course.targetAudience || '10-11 класи, Студенти коледжів');
   const [defaultMasteryThreshold, setDefaultMasteryThreshold] = useState<number>(
     course.defaultMasteryThreshold ?? 0.85
@@ -47,6 +52,7 @@ export const CourseEditModal: React.FC<CourseEditModalProps> = ({
         title: title.trim(),
         slug: slug.trim(),
         description: description.trim(),
+        categoryId: categoryId || null,
         targetAudience: targetAudience.trim() || undefined,
         defaultMasteryThreshold: Number(defaultMasteryThreshold),
         isPublished,
@@ -137,6 +143,25 @@ export const CourseEditModal: React.FC<CourseEditModalProps> = ({
               onChange={(e) => setDescription(e.target.value)}
               className="w-full px-3.5 py-2 rounded-xl bg-slate-950 border border-slate-800 text-sm text-white focus:outline-none focus:border-purple-500"
             />
+          </div>
+
+          <div>
+            <label className="block text-xs font-semibold text-slate-300 mb-1 flex items-center gap-1.5">
+              <Folder className="w-3.5 h-3.5 text-amber-400" />
+              <span>Предметна Категорія / Галузь</span>
+            </label>
+            <select
+              value={categoryId || ''}
+              onChange={(e) => setCategoryId(e.target.value || null)}
+              className="w-full px-3.5 py-2 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white focus:outline-none focus:border-purple-500 cursor-pointer"
+            >
+              <option value="">Без категорії (Загальний напрям)</option>
+              {categories.map((cat) => (
+                <option key={cat.id} value={cat.id}>
+                  {cat.title} ({cat.slug})
+                </option>
+              ))}
+            </select>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

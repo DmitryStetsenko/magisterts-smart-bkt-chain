@@ -7,6 +7,7 @@ import { HealthController } from './adapters/inbound/http/health.controller';
 import { TaskController } from './adapters/inbound/http/task.controller';
 import { BktController } from './adapters/inbound/http/bkt.controller';
 import { CourseController } from './adapters/inbound/http/course.controller';
+import { CategoryController } from './adapters/inbound/http/category.controller';
 import { AuthController } from './adapters/inbound/http/auth.controller';
 import { ClassroomController } from './adapters/inbound/http/classroom.controller';
 import { UserController } from './adapters/inbound/http/user.controller';
@@ -33,6 +34,7 @@ import { UserService } from './domain/user/user.service';
     TaskController,
     BktController,
     CourseController,
+    CategoryController,
     AuthController,
     ClassroomController,
     UserController,

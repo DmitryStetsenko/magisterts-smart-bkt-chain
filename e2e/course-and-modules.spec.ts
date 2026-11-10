@@ -78,6 +78,9 @@ test.describe('Course Architecture, Modular Curriculum & BKT Mastery Gating E2E 
     await page.goto('http://localhost:3004', { waitUntil: 'domcontentloaded', timeout: 30000 });
     await expect(page.locator('h1')).toContainText('Admin');
 
+    // Wait for hydration by ensuring default DAG tab content rendered
+    await expect(page.getByText('Вузли Графа Навичок')).toBeVisible({ timeout: 15000 });
+
     // Open Courses CMS tab
     const coursesTabBtn = page.locator('nav button[title*="Керування Курсами"]');
     await expect(coursesTabBtn).toBeVisible({ timeout: 15000 });
@@ -88,8 +91,31 @@ test.describe('Course Architecture, Modular Curriculum & BKT Mastery Gating E2E 
     await expect(page.getByRole('heading', { name: 'JavaScript & Web Engineering' })).toBeVisible();
     await expect(page.getByText('BKT P(L): 0.85').first()).toBeVisible();
 
-    // Verify dynamic sidebar has 4 courses
-    await expect(page.getByRole('button', { name: /Доступні курси \(4\)/i })).toBeVisible();
+    // Verify dynamic sidebar has 4 subject categories
+    await expect(page.getByRole('button', { name: /Предметні категорії \(4\)/i })).toBeVisible();
+
+    // Verify Category Manager Modal opens from toolbar
+    const categoryManagerBtn = page.getByRole('button', { name: 'Категорії (4)', exact: true });
+    await expect(categoryManagerBtn).toBeVisible();
+    await categoryManagerBtn.click();
+    await expect(page.getByText('Керування Предметними Категоріями')).toBeVisible({ timeout: 5000 });
+    await expect(page.getByText('Програмування & IT').first()).toBeVisible();
+    await page.keyboard.press('Escape');
+    await expect(page.getByText('Керування Предметними Категоріями')).not.toBeVisible();
+
+    // Filter courses by category via sidebar
+    const progCategorySidebarBtn = page.locator('aside button:has-text("Програмування & IT")').first();
+    await expect(progCategorySidebarBtn).toBeVisible();
+    await progCategorySidebarBtn.click();
+
+    // Verify active filter chip appears and table is filtered
+    await expect(page.getByText('Галузь:').first()).toBeVisible();
+
+    // Reset filter
+    const resetFilterBtn = page.getByTitle('Скинути фільтр галузі');
+    await expect(resetFilterBtn).toBeVisible();
+    await resetFilterBtn.click();
+    await expect(page.getByTitle('Скинути фільтр галузі')).not.toBeVisible();
 
     // Find and click the Module Manager button for JavaScript course
     const moduleManagerBtn = page.locator('button:has-text("Модулі (5)")').first();
@@ -108,6 +134,7 @@ test.describe('Course Architecture, Modular Curriculum & BKT Mastery Gating E2E 
   test('3. Teacher Portal Modular Course Selection & Allowed Modules UI Flow', async ({ page }) => {
     await page.goto('http://localhost:3003', { waitUntil: 'domcontentloaded', timeout: 30000 });
     await expect(page.locator('h1')).toContainText('Teacher');
+    await expect(page.getByText('Середня Майстерність P(L)')).toBeVisible({ timeout: 15000 });
 
     // Open Classrooms Tab on the rail
     const classroomsRailBtn = page.locator('nav button[title*="Навчальні Групи"]');

@@ -117,6 +117,48 @@ async function main() {
   await prisma.skillNode.deleteMany({});
   await prisma.courseModule.deleteMany({});
   await prisma.course.deleteMany({});
+  await prisma.courseCategory.deleteMany({});
+
+  // ==================== COURSE CATEGORIES ====================
+  const catProg = await prisma.courseCategory.create({
+    data: {
+      slug: 'prog-it',
+      title: 'Програмування & IT',
+      description: 'Розробка програмного забезпечення, вебтехнології та алгоритми',
+      icon: 'Code',
+      orderIndex: 1,
+    },
+  });
+
+  const catLang = await prisma.courseCategory.create({
+    data: {
+      slug: 'languages',
+      title: 'Іноземні Мови',
+      description: 'Ділова та технічна іноземна мова для професійного спілкування',
+      icon: 'Languages',
+      orderIndex: 2,
+    },
+  });
+
+  const catLaw = await prisma.courseCategory.create({
+    data: {
+      slug: 'law-social',
+      title: 'Право & Суспільствознавство',
+      description: 'Основи держави і права, конституційне та галузеве право',
+      icon: 'Scale',
+      orderIndex: 3,
+    },
+  });
+
+  const catMath = await prisma.courseCategory.create({
+    data: {
+      slug: 'exact-sciences',
+      title: 'Точні Науки & Математика',
+      description: 'Алгебра, геометрія, вища математика та комп’ютерна дискретна математика',
+      icon: 'Binary',
+      orderIndex: 4,
+    },
+  });
 
   // ==================== COURSE 1: JAVASCRIPT PROGRAMMING ====================
   const courseJs = await prisma.course.create({
@@ -125,6 +167,7 @@ async function main() {
       title: 'JavaScript & Web Engineering',
       description: 'Повний курс розробки на JS: від синтаксису до асинхронності та ООП',
       icon: 'code',
+      categoryId: catProg.id,
     },
   });
 
@@ -346,6 +389,7 @@ async function main() {
       title: 'Business & Tech English (B2)',
       description: 'Практична англійська для IT та бізнесу: граматика, лексика та ділове листування',
       icon: 'languages',
+      categoryId: catLang.id,
     },
   });
 
@@ -478,6 +522,7 @@ async function main() {
       title: 'Правознавство & Конституційне Право України',
       description: 'Основи держави і права, Конституція України та правовий аналіз реальних юридичних кейсів',
       icon: 'scale',
+      categoryId: catLaw.id,
     },
   });
 
@@ -593,6 +638,7 @@ async function main() {
       title: 'Вебтехнології та алгоритмізація (10–11 класи)',
       description: 'Практико-орієнтований курс алгоритмізації на базі сучасних вебтехнологій (DOM, форми, масиви, сортування)',
       icon: 'graduation-cap',
+      categoryId: catProg.id,
     },
   });
 

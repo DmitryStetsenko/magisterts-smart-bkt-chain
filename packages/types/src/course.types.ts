@@ -42,6 +42,44 @@ export interface UpdateCourseModuleDto {
 }
 
 /**
+ * Предметна категорія / галузь знань навчальних курсів
+ */
+export interface CourseCategoryDto {
+  id: string;
+  slug: string;
+  title: string;
+  description?: string | null;
+  icon?: string | null;
+  orderIndex: number;
+  coursesCount?: number;
+  courses?: any[];
+  createdAt?: string | Date;
+  updatedAt?: string | Date;
+}
+
+/**
+ * DTO створення нової категорії курсів
+ */
+export interface CreateCourseCategoryDto {
+  title: string;
+  slug?: string;
+  description?: string;
+  icon?: string;
+  orderIndex?: number;
+}
+
+/**
+ * DTO оновлення категорії курсів
+ */
+export interface UpdateCourseCategoryDto {
+  title?: string;
+  slug?: string;
+  description?: string;
+  icon?: string;
+  orderIndex?: number;
+}
+
+/**
  * DTO оновлення параметрів курсу
  */
 export interface UpdateCourseDto {
@@ -52,6 +90,7 @@ export interface UpdateCourseDto {
   targetAudience?: string;
   isPublished?: boolean;
   defaultMasteryThreshold?: number;
+  categoryId?: string | null;
 }
 
 /**
@@ -64,4 +103,5 @@ export interface CreateCourseDto {
   icon?: string;
   targetAudience?: string;
   defaultMasteryThreshold?: number;
+  categoryId?: string | null;
 }

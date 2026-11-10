@@ -6,6 +6,7 @@ import {
   Delete,
   Body,
   Param,
+  Query,
   NotFoundException,
   BadRequestException,
   Logger,
@@ -27,13 +28,20 @@ export class CourseController {
   constructor(private readonly prisma: PrismaService) {}
 
   /**
-   * Отримати перелік усіх доступних курсів із модулями та навичками
+   * Отримати перелік усіх доступних курсів із модулями, категоріями та навичками
    */
   @Get()
   @ApiOperation({ summary: 'Get all available academic courses' })
-  async getCourses() {
+  async getCourses(@Query('category') categorySlug?: string) {
+    const where: any = {};
+    if (categorySlug && categorySlug !== 'ALL') {
+      where.category = { slug: categorySlug };
+    }
+
     return this.prisma.course.findMany({
+      where,
       include: {
+        category: true,
         modules: {
           orderBy: { orderIndex: 'asc' },
           include: {
@@ -72,6 +80,7 @@ export class CourseController {
     const course = await this.prisma.course.findUnique({
       where: { slug },
       include: {
+        category: true,
         modules: {
           orderBy: { orderIndex: 'asc' },
           include: {
@@ -134,8 +143,10 @@ export class CourseController {
         targetAudience: body.targetAudience?.trim() || null,
         defaultMasteryThreshold: body.defaultMasteryThreshold ?? 0.85,
         isPublished: true,
+        categoryId: body.categoryId || null,
       },
       include: {
+        category: true,
         modules: true,
         skills: true,
       },
@@ -168,11 +179,15 @@ export class CourseController {
     if (body.defaultMasteryThreshold !== undefined) {
       updateData.defaultMasteryThreshold = Number(body.defaultMasteryThreshold);
     }
+    if (body.categoryId !== undefined) {
+      updateData.categoryId = body.categoryId || null;
+    }
 
     const updated = await this.prisma.course.update({
       where: { id },
       data: updateData,
       include: {
+        category: true,
         modules: { orderBy: { orderIndex: 'asc' } },
         skills: true,
       },

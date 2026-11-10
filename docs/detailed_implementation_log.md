@@ -30,6 +30,49 @@
   5. *Build Next.js Documentation Site* (`npm run build:docs`) — збірка статичного експорту (`output: "export"`, `trailingSlash: true`, `basePath: "/magisterts-smart-bkt-chain"`).
   6. *Upload Artifact & Deploy Pages* (`actions/upload-pages-artifact@v3` + `actions/deploy-pages@v4`).
 
+### 0.1.7.82 Наскрізна Категоризація Курсів, Динамічне Керування Галузями Знань та Фільтрація Сайдбара (SBC-394, EP-AD)
+- **Контекст та інженерне завдання:**
+  - Організувати курси екосистеми за наскрізними предметними галузями («Програмування & IT», «Іноземні Мови», «Право & Суспільствознавство», «Точні Науки & Математика»), дозволити адміністратору динамічно створювати й редагувати категорії в адмін-панелі, вибирати категорію при створенні/редагуванні курсу, та реорганізувати сайдбар адмін-панелі від надлишкового списку 4 окремих курсів до масштабованої секції «Предметні категорії» із лічильниками та миттєвою фільтрацією.
+- **Виконані інженерні рішення:**
+  1. **Моделювання Бази Даних та Prisma ORM (`packages/database/prisma/schema.prisma`):**
+     - Додано модель `CourseCategory`:
+       ```prisma
+       model CourseCategory {
+         id          String   @id @default(uuid())
+         slug        String   @unique
+         title       String
+         description String?
+         icon        String   @default("Folder")
+         orderIndex  Int      @default(0)
+         courses     Course[]
+         createdAt   DateTime @default(now())
+         updatedAt   DateTime @updatedAt
+
+         @@map("course_categories")
+       }
+       ```
+     - У моделі `Course` додано `categoryId String?` та зв'язок `category CourseCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)` із захисним правилом `SetNull`, що унеможливлює видалення курсів або їх BKT-станів при видаленні категорії.
+     - Застосовано схему до PostgreSQL через `npx prisma db push` та згенеровано клієнт Prisma.
+  2. **Початкові Дані Списку Категорій (`packages/database/prisma/seed.ts`):**
+     - Створено 4 початкові предметні галузі: `prog-it` («Програмування & IT», іконка `Code`), `languages` («Іноземні Мови», `Languages`), `law-social` («Право & Суспільствознавство», `Scale`), `exact-sciences` («Точні Науки & Математика», `Binary`).
+     - Зв'язано початкові курси з категоріями.
+  3. **Спільні Інтерфейси DTO (`packages/types`):**
+     - Введено `CourseCategoryDto`, `CreateCourseCategoryDto`, `UpdateCourseCategoryDto`.
+     - Розширено `CourseDto`, `CreateCourseDto` та `UpdateCourseDto` полем `categoryId?: string | null`.
+  4. **REST API Ендпоінти Категорій (`apps/api`):**
+     - Створено `CategoryController` (`GET /api/v1/categories` з агрегацією `_count.courses`, `POST /api/v1/categories`, `PATCH /api/v1/categories/:id`, `DELETE /api/v1/categories/:id`).
+     - Розширено `CourseController`: підтримка фільтрації `GET /api/v1/courses?category=:slug`, збереження та оновлення `categoryId` у `POST /api/v1/courses` та `PATCH /api/v1/courses/:id`.
+  5. **Інтерфейс Адміністратора CMS (`apps/admin`):**
+     - Створено `CategoryManagerModal.tsx`: форма створення з автогенерацією слага, вибір піктограми, список активних категорій із підрахунком курсів та безпечним видаленням, підтримка закриття по Escape.
+     - Оновлено модальні вікна створення та редагування курсу `CourseEditModal.tsx` та `CourseManager.tsx`: додано випадаючий список вибору категорії курсу.
+     - Додано бурштинові бейджі предметних галузей `[📁 Категорія]` для кожного курсу в таблиці `CourseManager`.
+     - Сайдбар адмін-панелі переведено на секцію `<DrawerSection title="Предметні категорії" icon={Folder} badge={4}>`: перелік напрямів із піктограмами та реальними лічильниками курсів, опція «Всі напрями» та смарагдовий індикатор активного вибору.
+     - Додано чіп активного фільтра галузі `[Галузь: Назва ✕]` у тулбар курсів для миттєвого очищення.
+- **Верифікація:**
+  - 100% проходження Playwright E2E тестів `e2e/course-and-modules.spec.ts` (4/4 passed).
+  - 100% проходження повного сьюту `npm run test:e2e` (11/11 passed, 38.0s).
+  - Збережено візуальні скріншоти: `admin_course_categories_cms.png` та `admin_category_manager_modal.png`.
+
 ### 0.1.7.81 Панель Керування Користувачами, Ролями та Зарахуванням в CMS Адміністратора (SBC-379, EP-AD)
 - **Контекст та інженерне завдання:**
   - Реалізація Кроку 4 дорожньої карти Брейншторму 18: створення повноцінної підсистеми управління користувачами (User Management CMS) у додатку `apps/admin` (порт 3004) з підтримкою перемикання тестового режиму авторизації, моніторингу Google OAuth акаунтів, призначення курсів у трьох дидактичних режимах (`FULL_CYCLE`, `TESTING_ONLY`, `MODULAR`) та м'якого блокування акаунтів відповідно до канонічного архітектурного стандарту Rule 7 (Minimalist Borderless UI, Opera Shell v2.0).

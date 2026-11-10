@@ -38,7 +38,8 @@
             "27. **Комплексна Актуалізація Специфікації Адмін-Порталу: Динамічний CMS Курсів, Модульний Конструктор та Наскрізний Потік Даних (`SBC-390`, `EP-AD`):**",
             "28. **Ліквідація Ефекту «Матрьошки» та Рефакторинг Реєстру Курсів `CourseManager` за Стандартом Rule 7 (`SBC-391`, `EP-AD`):**",
             "29. **Динамічна Синхронізація Сайдбара Курсів Адмін-Панелі з БД та Інтерактивна Фільтрація за Кліком (`SBC-392`, `EP-AD`):**",
-            "30. **Інтерактивне Відкриття Модального Редагування Курсу за Кліком на Рядок та Швидке Редагування з Сайдбара (`SBC-393`, `EP-AD`):**"
+            "30. **Інтерактивне Відкриття Модального Редагування Курсу за Кліком на Рядок та Швидке Редагування з Сайдбара (`SBC-393`, `EP-AD`):**",
+            "31. **Наскрізна Категоризація Курсів, Динамічне Керування Предметними Галузями та Фільтрація Сайдбара (`SBC-394`, `EP-AD`):**"
           ],
           "code_blocks": [],
           "items": [
@@ -625,7 +626,34 @@
                 "**Верифікація:**",
                 "Успішна виробнича збірка `npm run build:admin` (0 помилок).",
                 "Успішне проходження Playwright E2E сьюту `e2e/course-and-modules.spec.ts` (4/4 passed).",
-                "Візуальне підтвердження у headless браузері: збережено артефакт `admin_course_click_to_edit.png`."
+                "Візуальне підтвердження у headless браузері: збережено артефакт `admin_course_click_to_edit.png`.",
+                "**Педагогічна та архітектурна мета:**",
+                "Організувати курси екосистеми за наскрізними предметними галузями («Програмування & IT», «Іноземні Мови», «Право & Суспільствознавство», «Точні Науки & Математика»), дозволити адміністратору динамічно створювати й редагувати категорії в адмін-панелі, вибирати категорію при створенні/редагуванні курсу, та реорганізувати сайдбар адмін-панелі від надлишкового списку 4 окремих курсів до масштабованої секції «Предметні категорії» із лічильниками та миттєвою фільтрацією.",
+                "**Виконані інженерні роботи:**",
+                "**База даних та схема Prisma ([`schema.prisma`](file:///packages/database/prisma/schema.prisma)):**",
+                "Додано модель `CourseCategory` (`id`, `slug`, `title`, `description`, `icon`, `orderIndex`, `courses`).",
+                "Додано відношення `categoryId` та `category` до моделі `Course` із безпечним правилом `onDelete: SetNull`.",
+                "Проведено міграцію схеми через `npx prisma db push` та згенеровано оновлений клієнт Prisma.",
+                "**Початкові дані ([`seed.ts`](file:///packages/database/prisma/seed.ts)):**",
+                "Додано 4 наскрізні категорії зі спеціалізованими піктограмами: `prog-it` (Code), `languages` (Languages), `law-social` (Scale), `exact-sciences` (Binary).",
+                "Зв'язано початкові курси з категоріями: JavaScript та Шкільний курс вебтехнологій $\\to$ Програмування & IT; Англійська B2 $\\to$ Іноземні Мови; Основи правознавства $\\to$ Право & Суспільствознавство.",
+                "**Контракти DTO ([`packages/types`](file:///packages/types/src/course.types.ts)):**",
+                "Додано інтерфейси `CourseCategoryDto`, `CreateCourseCategoryDto`, `UpdateCourseCategoryDto`.",
+                "Додано поле `categoryId?: string | null` до `CreateCourseDto`, `UpdateCourseDto` та `CourseDto`.",
+                "**REST API бекенду ([`apps/api`](file:///apps/api/src/adapters/inbound/http/category.controller.ts)):**",
+                "Створено `CategoryController` (`GET /api/v1/categories` з підрахунком курсів `_count.courses`, `POST /api/v1/categories`, `PATCH /api/v1/categories/:id`, `DELETE /api/v1/categories/:id`).",
+                "Розширено `CourseController`: підтримка фільтрації `GET /api/v1/courses?category=:slug`, збереження та оновлення `categoryId` у `POST /api/v1/courses` та `PATCH /api/v1/courses/:id`.",
+                "**Інтерфейс адмін-порталу ([`apps/admin`](file:///apps/admin/src/app/page.tsx)):**",
+                "Створено модальне вікно керування категоріями [`CategoryManagerModal.tsx`](file:///apps/admin/src/features/course-manager/ui/CategoryManagerModal.tsx) (форма створення з автогенерацією слага, вибір піктограми, список активних категорій із підрахунком курсів та безпечним видаленням, підтримка закриття по Escape).",
+                "Оновлено модальні вікна створення та редагування курсу [`CourseEditModal.tsx`](file:///apps/admin/src/features/course-manager/ui/CourseEditModal.tsx) та [`CourseManager.tsx`](file:///apps/admin/src/features/course-manager/ui/CourseManager.tsx): додано випадаючий список вибору категорії курсу.",
+                "Додано бурштинові бейджі предметних галузей `[📁 Категорія]` для кожного курсу в таблиці `CourseManager`.",
+                "Сайдбар адмін-панелі переведено на секцію `<DrawerSection title=\"Предметні категорії\" icon={Folder} badge={4}>`: перелік напрямів із піктограмами та реальними лічильниками курсів, опція «Всі напрями» та смарагдовий індикатор активного вибору.",
+                "Додано чіп активного фільтра галузі `[Галузь: Назва ✕]` у тулбар курсів для миттєвого очищення.",
+                "**Верифікація:**",
+                "Успішна компіляція та збірка `@sbc/types`, `@sbc/database`, `apps/api` та `apps/admin`.",
+                "100% проходження Playwright E2E сьюту `e2e/course-and-modules.spec.ts` (4/4 passed).",
+                "100% проходження повного сьюту регресії E2E `npm run test:e2e` (11/11 passed, 38.0s).",
+                "Збережено візуальні скріншоти: `admin_course_categories_cms.png` та `admin_category_manager_modal.png`."
               ]
             }
           ]

@@ -14,14 +14,20 @@ import {
   CheckCircle2,
   AlertCircle,
   Shield,
+  Folder,
 } from 'lucide-react';
-import type { CourseDto, CreateCourseDto } from '@sbc/types';
+import type { CourseDto, CreateCourseDto, CourseCategoryDto } from '@sbc/types';
 import { CourseEditModal } from './CourseEditModal';
 import { ModuleManagerModal } from './ModuleManagerModal';
+import { CategoryManagerModal } from './CategoryManagerModal';
 
 export interface CourseManagerProps {
   selectedCourseFilter?: string | null;
   onSelectCourseFilter?: (slug: string | null) => void;
+  selectedCategoryFilter?: string | null;
+  onSelectCategoryFilter?: (slug: string | null) => void;
+  categories?: CourseCategoryDto[];
+  onCategoriesChanged?: () => void;
   onCoursesLoaded?: (courses: CourseDto[]) => void;
   externalEditingCourse?: CourseDto | null;
   onCloseExternalEditingCourse?: () => void;
@@ -30,6 +36,10 @@ export interface CourseManagerProps {
 export const CourseManager: React.FC<CourseManagerProps> = ({
   selectedCourseFilter,
   onSelectCourseFilter,
+  selectedCategoryFilter,
+  onSelectCategoryFilter,
+  categories = [],
+  onCategoriesChanged,
   onCoursesLoaded,
   externalEditingCourse,
   onCloseExternalEditingCourse,
@@ -48,10 +58,14 @@ export const CourseManager: React.FC<CourseManagerProps> = ({
   // Module manager modal state
   const [selectedCourseForModules, setSelectedCourseForModules] = useState<CourseDto | null>(null);
 
+  // Category manager modal state
+  const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
+
   // Form State for creating new course
   const [title, setTitle] = useState('');
   const [slug, setSlug] = useState('');
   const [description, setDescription] = useState('');
+  const [categoryId, setCategoryId] = useState('');
   const [targetAudience, setTargetAudience] = useState('10-11 класи, ВНЗ');
   const [defaultMasteryThreshold, setDefaultMasteryThreshold] = useState<number>(0.85);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -115,6 +129,7 @@ export const CourseManager: React.FC<CourseManagerProps> = ({
         description: description.trim(),
         targetAudience: targetAudience.trim() || undefined,
         defaultMasteryThreshold: Number(defaultMasteryThreshold),
+        categoryId: categoryId || undefined,
       };
 
       const res = await fetch(`${API_URL}/api/v1/courses`, {
@@ -129,8 +144,10 @@ export const CourseManager: React.FC<CourseManagerProps> = ({
         setTitle('');
         setSlug('');
         setDescription('');
+        setCategoryId('');
         setTargetAudience('10-11 класи, ВНЗ');
         fetchCourses();
+        onCategoriesChanged?.();
       } else {
         const errData = await res.json();
         setMessage(`Помилка: ${errData.message || 'Не вдалося створити курс'}`);
@@ -163,17 +180,24 @@ export const CourseManager: React.FC<CourseManagerProps> = ({
     }
   };
 
-  // Filter courses by search query and optional selectedCourseFilter from sidebar
+  // Filter courses by search query, selectedCourseFilter, and selectedCategoryFilter
   const filteredCourses = courses.filter((c) => {
     if (selectedCourseFilter && c.slug !== selectedCourseFilter) {
       return false;
+    }
+    if (selectedCategoryFilter && selectedCategoryFilter !== 'ALL') {
+      const catSlug = (c.category as any)?.slug;
+      if (catSlug !== selectedCategoryFilter && c.categoryId !== selectedCategoryFilter) {
+        return false;
+      }
     }
     if (!searchQuery.trim()) return true;
     const q = searchQuery.toLowerCase();
     return (
       c.title.toLowerCase().includes(q) ||
       c.slug.toLowerCase().includes(q) ||
-      (c.description && c.description.toLowerCase().includes(q))
+      (c.description && c.description.toLowerCase().includes(q)) ||
+      ((c.category as any)?.title && (c.category as any).title.toLowerCase().includes(q))
     );
   });
 
@@ -202,7 +226,7 @@ export const CourseManager: React.FC<CourseManagerProps> = ({
         <div className="flex flex-wrap items-center gap-2.5">
           {selectedCourseFilter && (
             <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-xs font-mono">
-              <span className="text-[10px] text-slate-400">Фільтр:</span>
+              <span className="text-[10px] text-slate-400">Курс:</span>
               <span className="font-semibold text-emerald-300 truncate max-w-[140px]">
                 {courses.find((c) => c.slug === selectedCourseFilter)?.title || selectedCourseFilter}
               </span>
@@ -211,6 +235,23 @@ export const CourseManager: React.FC<CourseManagerProps> = ({
                 onClick={() => onSelectCourseFilter?.(null)}
                 className="hover:text-white text-slate-400 cursor-pointer ml-1 text-[11px]"
                 title="Скинути фільтр курсу"
+              >
+                ✕
+              </button>
+            </div>
+          )}
+
+          {selectedCategoryFilter && selectedCategoryFilter !== 'ALL' && (
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs font-mono">
+              <span className="text-[10px] text-slate-400">Галузь:</span>
+              <span className="font-semibold text-amber-300 truncate max-w-[140px]">
+                {categories.find((cat) => cat.slug === selectedCategoryFilter)?.title || selectedCategoryFilter}
+              </span>
+              <button
+                type="button"
+                onClick={() => onSelectCategoryFilter?.(null)}
+                className="hover:text-white text-slate-400 cursor-pointer ml-1 text-[11px]"
+                title="Скинути фільтр галузі"
               >
                 ✕
               </button>
@@ -227,6 +268,16 @@ export const CourseManager: React.FC<CourseManagerProps> = ({
               className="pl-9 pr-3 py-1.5 bg-slate-950 border border-slate-800 rounded-lg text-slate-200 placeholder-slate-600 focus:outline-none focus:border-emerald-500 text-xs w-44 sm:w-56"
             />
           </div>
+
+          <button
+            type="button"
+            onClick={() => setIsCategoryModalOpen(true)}
+            className="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium flex items-center gap-1.5 transition-colors cursor-pointer text-xs"
+            title="Керування предметними категоріями"
+          >
+            <Folder className="w-3.5 h-3.5 text-amber-400" />
+            <span>Категорії ({categories.length})</span>
+          </button>
 
           <button
             onClick={() => setIsModalOpen(true)}
@@ -317,6 +368,12 @@ export const CourseManager: React.FC<CourseManagerProps> = ({
                     <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-medium text-slate-400 bg-slate-800/60">
                       {course.slug}
                     </span>
+                    {(course.category as any)?.title && (
+                      <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-medium text-amber-300 bg-amber-500/10 border border-amber-500/20 flex items-center gap-1">
+                        <Folder className="w-2.5 h-2.5 text-amber-400" />
+                        <span>{(course.category as any).title}</span>
+                      </span>
+                    )}
                     {course.isPublished !== false ? (
                       <span className="text-[10px] font-mono text-emerald-400 font-medium">
                         ✓ Active
@@ -451,6 +508,25 @@ export const CourseManager: React.FC<CourseManagerProps> = ({
                 />
               </div>
 
+              <div>
+                <label className="block text-xs font-semibold text-slate-300 mb-1 flex items-center gap-1.5">
+                  <Folder className="w-3.5 h-3.5 text-amber-400" />
+                  <span>Предметна Категорія / Галузь</span>
+                </label>
+                <select
+                  value={categoryId}
+                  onChange={(e) => setCategoryId(e.target.value)}
+                  className="w-full px-3 py-1.5 rounded-lg bg-slate-950 border border-slate-800 text-xs text-white focus:outline-none focus:border-emerald-500 cursor-pointer"
+                >
+                  <option value="">Без категорії (Загальний напрям)</option>
+                  {categories.map((cat) => (
+                    <option key={cat.id} value={cat.id}>
+                      {cat.title} ({cat.slug})
+                    </option>
+                  ))}
+                </select>
+              </div>
+
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-semibold text-slate-300 mb-1">
@@ -505,6 +581,7 @@ export const CourseManager: React.FC<CourseManagerProps> = ({
       {editingCourse && (
         <CourseEditModal
           course={editingCourse}
+          categories={categories}
           isOpen={true}
           onClose={() => {
             setEditingCourse(null);
@@ -515,6 +592,7 @@ export const CourseManager: React.FC<CourseManagerProps> = ({
             setEditingCourse(null);
             onCloseExternalEditingCourse?.();
             fetchCourses();
+            onCategoriesChanged?.();
           }}
         />
       )}
@@ -530,6 +608,17 @@ export const CourseManager: React.FC<CourseManagerProps> = ({
           }}
         />
       )}
+
+      {/* Category Manager Modal */}
+      <CategoryManagerModal
+        isOpen={isCategoryModalOpen}
+        onClose={() => setIsCategoryModalOpen(false)}
+        categories={categories}
+        onCategoriesChanged={() => {
+          onCategoriesChanged?.();
+          fetchCourses();
+        }}
+      />
     </div>
   );
 };

@@ -20,11 +20,16 @@ import {
   Clock,
   Activity,
   Users,
-  Edit2
+  Edit2,
+  Folder,
+  Code,
+  Languages,
+  Scale,
+  Binary
 } from 'lucide-react';
 import { AppShellLayout, Breadcrumbs, UserProfileDrawer, DrawerSection } from '@sbc/ui';
 import { getAppBaseUrl } from '@sbc/routes';
-import type { CourseDto } from '@sbc/types';
+import type { CourseDto, CourseCategoryDto } from '@sbc/types';
 import { SkillDagEditor } from '../features/skill-editor/ui/SkillDagEditor';
 import { AdminSkillNode } from '../features/skill-editor/model/skill-editor.types';
 import { CourseManager } from '../features/course-manager/ui/CourseManager';
@@ -137,25 +142,41 @@ export default function AdminCMSDashboard() {
 
   const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
 
-  // Dynamic courses state for Courses Sidebar & filtering
+  // Dynamic courses and categories state for Admin sidebar & filtering
   const [dynamicCourses, setDynamicCourses] = useState<CourseDto[]>([]);
+  const [categories, setCategories] = useState<CourseCategoryDto[]>([]);
   const [selectedCourseSlug, setSelectedCourseSlug] = useState<string | null>(null);
+  const [selectedCategorySlug, setSelectedCategorySlug] = useState<string | null>(null);
   const [courseToEdit, setCourseToEdit] = useState<CourseDto | null>(null);
 
-  useEffect(() => {
-    const loadCourses = async () => {
-      try {
-        const res = await fetch(`${API_URL}/api/v1/courses`);
-        if (res.ok) {
-          const data = await res.json();
-          if (Array.isArray(data)) setDynamicCourses(data);
-          else if (data.courses) setDynamicCourses(data.courses);
-        }
-      } catch (e) {
-        console.error('Failed to load courses for Admin sidebar:', e);
+  const loadCourses = async () => {
+    try {
+      const res = await fetch(`${API_URL}/api/v1/courses`);
+      if (res.ok) {
+        const data = await res.json();
+        if (Array.isArray(data)) setDynamicCourses(data);
+        else if (data.courses) setDynamicCourses(data.courses);
       }
-    };
+    } catch (e) {
+      console.error('Failed to load courses for Admin sidebar:', e);
+    }
+  };
+
+  const loadCategories = async () => {
+    try {
+      const res = await fetch(`${API_URL}/api/v1/categories`);
+      if (res.ok) {
+        const data = await res.json();
+        if (Array.isArray(data)) setCategories(data);
+      }
+    } catch (e) {
+      console.error('Failed to load categories for Admin sidebar:', e);
+    }
+  };
+
+  useEffect(() => {
     loadCourses();
+    loadCategories();
   }, [API_URL]);
 
   const filteredDagNodes = useMemo(() => {
@@ -293,77 +314,71 @@ export default function AdminCMSDashboard() {
           {activeTab === 'courses' && (
             <>
               <DrawerSection
-                title="Доступні курси"
-                icon={BookOpen}
-                badge={String(dynamicCourses.length || 4)}
+                title="Предметні категорії"
+                icon={Folder}
+                badge={String(categories.length || 4)}
                 defaultOpen={true}
               >
                 <div className="flex flex-col divide-y divide-slate-800/50 pt-1">
                   <button
                     type="button"
-                    onClick={() => setSelectedCourseSlug(null)}
+                    onClick={() => {
+                      setSelectedCategorySlug(null);
+                      setSelectedCourseSlug(null);
+                    }}
                     className={`w-full py-1.5 pr-2 text-left text-xs transition-colors cursor-pointer flex items-center justify-between rounded-r ${
-                      selectedCourseSlug === null
+                      selectedCategorySlug === null
                         ? 'bg-emerald-500/10 text-emerald-300 font-semibold border-l-2 border-emerald-400 pl-2'
                         : 'text-slate-400 hover:text-white hover:bg-slate-900/40 pl-2.5'
                     }`}
                   >
-                    <span className="truncate">Всі курси платформи</span>
+                    <span className="truncate">Всі напрями</span>
                     <span className="text-[10px] font-mono opacity-70 shrink-0">
-                      {dynamicCourses.length || 4}
+                      {dynamicCourses.length || 4} курсів
                     </span>
                   </button>
 
-                  {(dynamicCourses.length > 0
-                    ? dynamicCourses
+                  {(categories.length > 0
+                    ? categories
                     : [
-                        { id: '1', slug: 'js-dev', title: 'JavaScript & Web Engineering', modules: [] },
-                        { id: '2', slug: 'english-b2', title: 'Business & Tech English (B2)', modules: [] },
-                        { id: '3', slug: 'ukraine-law', title: 'Правознавство & Конституційне Право України', modules: [] },
-                        { id: '4', slug: 'web-algorithms-school', title: 'Вебтехнології та алгоритмізація (10–11 класи)', modules: [] },
+                        { id: '1', slug: 'prog-it', title: 'Програмування & IT', icon: 'Code', coursesCount: 2 },
+                        { id: '2', slug: 'languages', title: 'Іноземні Мови', icon: 'Languages', coursesCount: 1 },
+                        { id: '3', slug: 'law-social', title: 'Право & Суспільствознавство', icon: 'Scale', coursesCount: 1 },
+                        { id: '4', slug: 'exact-sciences', title: 'Точні Науки & Математика', icon: 'Binary', coursesCount: 0 },
                       ]
-                  ).map((c: any) => {
-                    const isSelected = selectedCourseSlug === c.slug;
+                  ).map((cat: any) => {
+                    const isSelected = selectedCategorySlug === cat.slug;
                     return (
-                      <div
-                        key={c.slug}
-                        className={`w-full py-1.5 pr-2 text-left text-xs transition-colors flex items-center justify-between group rounded-r ${
+                      <button
+                        key={cat.id || cat.slug}
+                        type="button"
+                        onClick={() => {
+                          setSelectedCategorySlug(isSelected ? null : cat.slug);
+                          setSelectedCourseSlug(null);
+                        }}
+                        className={`w-full py-2 pr-2 text-left text-xs transition-colors cursor-pointer flex items-center justify-between group rounded-r ${
                           isSelected
                             ? 'bg-emerald-500/10 text-emerald-300 font-semibold border-l-2 border-emerald-400 pl-2'
                             : 'text-slate-400 hover:text-white hover:bg-slate-900/40 pl-2.5'
                         }`}
+                        title={cat.title}
                       >
-                        <button
-                          type="button"
-                          onClick={() => setSelectedCourseSlug(isSelected ? null : c.slug)}
-                          onDoubleClick={() => setCourseToEdit(c)}
-                          className="flex flex-col min-w-0 pr-1 flex-1 text-left cursor-pointer"
-                          title={`${c.title} (Клік — фільтрувати, Подвійний клік — редагувати)`}
-                        >
+                        <div className="flex items-center gap-2 min-w-0 pr-1">
+                          <span className="shrink-0">
+                            {cat.icon === 'Code' ? <Code className="w-3.5 h-3.5 text-emerald-400" /> :
+                             cat.icon === 'Languages' ? <Languages className="w-3.5 h-3.5 text-indigo-400" /> :
+                             cat.icon === 'Scale' ? <Scale className="w-3.5 h-3.5 text-purple-400" /> :
+                             cat.icon === 'Binary' ? <Binary className="w-3.5 h-3.5 text-amber-400" /> :
+                             <Folder className="w-3.5 h-3.5 text-slate-400" />}
+                          </span>
                           <span className={`truncate ${isSelected ? 'font-semibold text-emerald-300' : 'font-medium group-hover:text-slate-200'}`}>
-                            {c.title}
-                          </span>
-                          <span className="text-[10px] font-mono text-slate-500 truncate">
-                            {c.slug}
-                          </span>
-                        </button>
-                        <div className="flex items-center gap-1 shrink-0">
-                          <button
-                            type="button"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setCourseToEdit(c);
-                            }}
-                            className="p-1 rounded hover:bg-slate-800 text-slate-500 hover:text-white opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
-                            title="Редагувати параметри курсу"
-                          >
-                            <Edit2 className="w-3 h-3" />
-                          </button>
-                          <span className="text-[10px] font-mono opacity-80 shrink-0 text-slate-500">
-                            {c.modules?.length ?? 0} мод.
+                            {cat.title}
                           </span>
                         </div>
-                      </div>
+                        <span className="text-[10px] font-mono opacity-80 shrink-0 text-slate-500">
+                          {cat.coursesCount ?? 0}
+                        </span>
+                      </button>
                     );
                   })}
                 </div>
@@ -788,6 +803,10 @@ export default function AdminCMSDashboard() {
             <CourseManager
               selectedCourseFilter={selectedCourseSlug}
               onSelectCourseFilter={setSelectedCourseSlug}
+              selectedCategoryFilter={selectedCategorySlug}
+              onSelectCategoryFilter={setSelectedCategorySlug}
+              categories={categories}
+              onCategoriesChanged={loadCategories}
               onCoursesLoaded={setDynamicCourses}
               externalEditingCourse={courseToEdit}
               onCloseExternalEditingCourse={() => setCourseToEdit(null)}

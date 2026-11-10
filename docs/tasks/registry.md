@@ -436,6 +436,7 @@
 | **SBC-391** | `Style` | `AD` | eliminate nested containers and declutter CourseManager into canonical Rule 7 borderless list | 2026-11-10 | `7d217f9` |
 | **SBC-392** | `Story` | `AD` | synchronize admin sidebar courses dynamically from db and implement interactive filtering on click | 2026-11-10 | `dcc1bed` |
 | **SBC-393** | `Story` | `AD` | enable row click to edit course modal and sidebar quick edit in admin portal | 2026-11-10 | `80fb44b` |
+| **SBC-394** | `Story` | `AD` | implement cross-cutting course categories management, sidebar filtering and course categorization | 2026-11-10 | pending |
 
 ---
 

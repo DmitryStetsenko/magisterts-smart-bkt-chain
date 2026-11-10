@@ -1,5 +1,5 @@
 import { TaskDifficulty, TaskDto, TaskType } from './tasks.types';
-import type { CourseModuleDto } from './course.types';
+import type { CourseModuleDto, CourseCategoryDto } from './course.types';
 
 /**
  * Тип адаптивного кроку, який рекомендує секвенсор
@@ -121,7 +121,8 @@ export interface CourseDto {
   slug: string;
   title: string;
   description?: string;
-  category?: string;
+  categoryId?: string | null;
+  category?: CourseCategoryDto | string | null;
   icon?: string | null;
   targetAudience?: string | null;
   isPublished?: boolean;
