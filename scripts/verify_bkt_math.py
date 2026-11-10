@@ -11,8 +11,9 @@ scripts/verify_bkt_math.py
 2. Для кожної події відповіді студента (TASK_SUBMITTED) перераховує апостеріорну
    ймовірність P(L_t) "з нуля" за чистими формулами Баєса з точністю до 6 знаку.
 3. Звіряє теоретичні математичні значення з фактично збереженими в системі.
-4. Якщо лог порожній — запускає серію з 10 еталонних математичних інваріантних тестів.
-5. Підтримує інтерактивний режим (--interactive) для перевірки довільних параметрів.
+4. Підтримує 10 еталонних математичних інваріантних тестів.
+5. Підтримує вивід у форматі JSON (--json) для веб-інтерфейсу Адмін-панелі.
+6. Підтримує інтерактивний режим (--interactive) для викладача.
 =============================================================================
 """
 
@@ -20,7 +21,8 @@ import sys
 import os
 import json
 import argparse
-from typing import Dict, Any, Tuple
+from datetime import datetime, timezone
+from typing import Dict, Any, List, Tuple
 
 DEFAULT_P_TRANSIT = 0.2000
 DEFAULT_P_SLIP = 0.1000
@@ -85,16 +87,8 @@ def calculate_bkt_step(
     }
 
 
-def run_invariant_tests():
-    """
-    10 фундаментальних математичних інваріантних перевірок поведінки BKT
-    """
-    print("\n" + "=" * 80)
-    print("🔬 ЗАПУСК 10 ЕТАЛОННИХ МАТЕМАТИЧНИХ ІНВАРІАНТНИХ ТЕСТІВ BKT")
-    print("=" * 80)
-
+def get_invariant_test_data() -> Tuple[List[Dict[str, Any]], Dict[str, Any]]:
     test_cases = [
-        # (Опис, Prior, Transit, Slip, Guess, Correct, HintPenalty, Очікуване зростання/падіння)
         ("1. Базова правильна відповідь (чесний ввід)", 0.3000, 0.2000, 0.1000, 0.2000, True, 0, "INCREASE"),
         ("2. Базова помилка (незнання)", 0.5000, 0.2000, 0.1000, 0.2000, False, 0, "DECREASE"),
         ("3. Спідран / Вгадування (Guess=0.85)", 0.3000, 0.2000, 0.1000, 0.8500, True, 0, "LOW_GAIN"),
@@ -107,9 +101,9 @@ def run_invariant_tests():
         ("10. Високе знання перед майстерністю (Prior=0.8800)", 0.8800, 0.2000, 0.1000, 0.2000, True, 0, "REACH_MASTERY"),
     ]
 
+    records = []
     all_passed = True
-    print(f"{'#':<3} | {'Опис тесту':<44} | {'Prior':<7} -> {'Posterior':<9} | {'Статус':<8}")
-    print("-" * 80)
+    passed_count = 0
 
     for idx, (desc, prior, t, s, g, correct, penalty, expected_behavior) in enumerate(test_cases, 1):
         res = calculate_bkt_step(prior, t, s, g, correct, penalty)
@@ -122,38 +116,83 @@ def run_invariant_tests():
             passed = False
         elif expected_behavior == "LOW_GAIN":
             standard_post = calculate_bkt_step(prior, t, s, DEFAULT_P_GUESS, correct, 0)["final_posterior"]
-            if post >= standard_post:  # спідран має давати строго менший приріст
+            if post >= standard_post:
                 passed = False
         elif expected_behavior == "REACH_MASTERY" and post < 0.90:
             passed = False
 
-        status_str = "✅ PASSED" if passed else "❌ FAILED"
-        if not passed:
+        if passed:
+            passed_count += 1
+        else:
             all_passed = False
 
-        print(f"{idx:<3} | {desc:<44} | {prior:<7.4f} -> {post:<9.4f} | {status_str}")
+        records.append({
+            "id": idx,
+            "name": desc,
+            "prior": prior,
+            "transit": t,
+            "slip": s,
+            "guess": g,
+            "is_correct": correct,
+            "hint_penalty_pct": penalty,
+            "posterior": post,
+            "passed": passed,
+            "status": "PASSED" if passed else "FAILED",
+            "formula_obs": res["formula_obs"],
+            "numerator": res["numerator"],
+            "denominator": res["denominator"]
+        })
 
-    print("=" * 80)
-    if all_passed:
-        print("🎉 ВСІ 10 МАТЕМАТИЧНИХ ІНВАРІАНТНИХ ТЕСТІВ BKT ПРОЙДЕНО УСПІШНО!")
-        print("   Математична логіка є строго монотонною, детерміністичною та стійкою.")
-    else:
-        print("⚠️ УВАГА: Виявлено відхилення у математичних тестах!")
-    print("=" * 80 + "\n")
-    return all_passed
+    summary = {
+        "total": len(test_cases),
+        "passed": passed_count,
+        "failed": len(test_cases) - passed_count,
+        "all_passed": all_passed
+    }
+    return records, summary
 
 
-def verify_live_event_log(log_path: str):
+def run_invariant_tests(silent: bool = False):
     """
-    Зчитує реальний журнал event_stream.jsonl та звіряє кожну записану подію
+    10 фундаментальних математичних інваріантних перевірок поведінки BKT
     """
+    records, summary = get_invariant_test_data()
+
+    if not silent:
+        print("\n" + "=" * 80)
+        print("🔬 ЗАПУСК 10 ЕТАЛОННИХ МАТЕМАТИЧНИХ ІНВАРІАНТНИХ ТЕСТІВ BKT")
+        print("=" * 80)
+        print(f"{'#':<3} | {'Опис тесту':<44} | {'Prior':<7} -> {'Posterior':<9} | {'Статус':<8}")
+        print("-" * 80)
+
+        for r in records:
+            status_str = "✅ PASSED" if r["passed"] else "❌ FAILED"
+            print(f"{r['id']:<3} | {r['name']:<44} | {r['prior']:<7.4f} -> {r['posterior']:<9.4f} | {status_str}")
+
+        print("=" * 80)
+        if summary["all_passed"]:
+            print("🎉 ВСІ 10 МАТЕМАТИЧНИХ ІНВАРІАНТНИХ ТЕСТІВ BKT ПРОЙДЕНО УСПІШНО!")
+            print("   Математична логіка є строго монотонною, детерміністичною та стійкою.")
+        else:
+            print("⚠️ УВАГА: Виявлено відхилення у математичних тестах!")
+        print("=" * 80 + "\n")
+
+    return summary["all_passed"]
+
+
+def get_live_audit_data(log_path: str) -> Dict[str, Any]:
     if not os.path.exists(log_path):
-        print(f"ℹ️ Файл журналу подій '{log_path}' поки що не створено (не було зафіксовано відповідей).")
-        print("   Запускаємо еталонні інваріантні тести...")
-        run_invariant_tests()
-        return
+        return {
+            "log_path": log_path,
+            "file_exists": False,
+            "total_events": 0,
+            "task_events": 0,
+            "verified_count": 0,
+            "mismatch_count": 0,
+            "all_matched": True,
+            "records": []
+        }
 
-    print(f"\n📂 Зчитування журналу подій: {log_path}")
     events = []
     with open(log_path, "r", encoding="utf-8") as f:
         for line in f:
@@ -161,23 +200,13 @@ def verify_live_event_log(log_path: str):
             if line:
                 try:
                     events.append(json.loads(line))
-                except Exception as e:
+                except Exception:
                     pass
 
-    print(f"📊 Загальна кількість подій у журналі: {len(events)}")
     task_events = [e for e in events if e.get("eventType") in ["TASK_SUBMITTED", "BKT_FORMULA_CALCULATED"]]
-    print(f"🎯 Подій оцінювання завдань з математичним слідом: {len(task_events)}")
-
-    if not task_events:
-        print("ℹ️ Подій TASK_SUBMITTED у файлі ще немає.")
-        return
-
     verified_count = 0
     mismatch_count = 0
-
-    print("\n" + "=" * 96)
-    print(f"{'Час':<19} | {'Студент':<12} | {'Завдання':<15} | {'Prior':<6} | {'S/G Used':<9} | {'В базі':<7} | {'Еталон':<7} | {'Статус':<8}")
-    print("=" * 96)
+    audit_records = []
 
     for e in task_events:
         payload = e.get("payload", {})
@@ -196,29 +225,82 @@ def verify_live_event_log(log_path: str):
 
         expected = calculate_bkt_step(prior, p_transit, p_slip, p_guess, is_passed, penalty)
         diff = abs(expected["final_posterior"] - actual_post)
-
-        time_str = e.get("createdAt", "")[:19].replace("T", " ")
-        user_str = str(e.get("userId", ""))[:12]
-        task_str = str(e.get("taskId", ""))[:15]
-        sg_str = f"{p_slip:.2f}/{p_guess:.2f}"
-
         is_match = diff <= 0.0002
+
         if is_match:
             verified_count += 1
-            status = "✅ OK"
+            status = "OK"
         else:
             mismatch_count += 1
-            status = f"❌ Δ={diff:.4f}"
+            status = f"MISMATCH (diff={diff:.4f})"
 
-        print(f"{time_str:<19} | {user_str:<12} | {task_str:<15} | {prior:<6.4f} | {sg_str:<9} | {actual_post:<7.4f} | {expected['final_posterior']:<7.4f} | {status}")
+        audit_records.append({
+            "timestamp": e.get("createdAt", ""),
+            "userId": str(e.get("userId", "")),
+            "taskId": str(e.get("taskId", "")),
+            "prior": prior,
+            "posterior_actual": actual_post,
+            "posterior_expected": expected["final_posterior"],
+            "p_slip": p_slip,
+            "p_guess": p_guess,
+            "diff": round(diff, 6),
+            "is_match": is_match,
+            "status": status,
+        })
+
+    return {
+        "log_path": log_path,
+        "file_exists": True,
+        "total_events": len(events),
+        "task_events": len(task_events),
+        "verified_count": verified_count,
+        "mismatch_count": mismatch_count,
+        "all_matched": mismatch_count == 0,
+        "records": audit_records,
+    }
+
+
+def verify_live_event_log(log_path: str, silent: bool = False):
+    """
+    Зчитує реальний журнал event_stream.jsonl та звіряє кожну записану подію
+    """
+    data = get_live_audit_data(log_path)
+    if silent:
+        return data["all_matched"]
+
+    if not data["file_exists"]:
+        print(f"ℹ️ Файл журналу подій '{log_path}' поки що не створено (не було зафіксовано відповідей).")
+        return False
+
+    print(f"\n📂 Зчитування журналу подій: {log_path}")
+    print(f"📊 Загальна кількість подій у журналі: {data['total_events']}")
+    print(f"🎯 Подій оцінювання завдань з математичним слідом: {data['task_events']}")
+
+    if data["task_events"] == 0:
+        print("ℹ️ Подій TASK_SUBMITTED у файлі ще немає.")
+        return True
+
+    print("\n" + "=" * 96)
+    print(f"{'Час':<19} | {'Студент':<12} | {'Завдання':<15} | {'Prior':<6} | {'S/G Used':<9} | {'В базі':<7} | {'Еталон':<7} | {'Статус':<8}")
+    print("=" * 96)
+
+    for r in data["records"]:
+        time_str = r["timestamp"][:19].replace("T", " ")
+        user_str = r["userId"][:12]
+        task_str = r["taskId"][:15]
+        sg_str = f"{r['p_slip']:.2f}/{r['p_guess']:.2f}"
+        status_str = "✅ OK" if r["is_match"] else f"❌ Δ={r['diff']:.4f}"
+
+        print(f"{time_str:<19} | {user_str:<12} | {task_str:<15} | {r['prior']:<6.4f} | {sg_str:<9} | {r['posterior_actual']:<7.4f} | {r['posterior_expected']:<7.4f} | {status_str}")
 
     print("=" * 96)
     print(f"🏆 Результат верифікації реальних даних:")
-    print(f"   Успішно перевірено розрахунків: {verified_count}")
-    print(f"   Невідповідностей формулі:       {mismatch_count}")
-    if mismatch_count == 0 and verified_count > 0:
+    print(f"   Успішно перевірено розрахунків: {data['verified_count']}")
+    print(f"   Невідповідностей формулі:       {data['mismatch_count']}")
+    if data["all_matched"] and data["verified_count"] > 0:
         print("   🌟 100% МАТЕМАТИЧНА ТОЧНІСТЬ УСІХ ЗБЕРЕЖЕНИХ РОЗРАХУНКІВ ПЛАТФОРМИ!")
     print("=" * 96 + "\n")
+    return data["all_matched"]
 
 
 def interactive_calculator():
@@ -272,16 +354,34 @@ def main():
     parser.add_argument("--interactive", "-i", action="store_true", help="Launch interactive step-by-step calculator")
     parser.add_argument("--test-only", "-t", action="store_true", help="Run 10 invariant mathematical unit checks")
     parser.add_argument("--log-path", "--file", dest="log_path", default="logs/event_stream.jsonl", help="Path to event_stream.jsonl")
+    parser.add_argument("--json", action="store_true", help="Output results in JSON format for web UI")
 
     args = parser.parse_args()
 
     if args.interactive:
         interactive_calculator()
-    elif args.test_only:
-        run_invariant_tests()
+        return
+
+    if args.json:
+        invariant_records, invariant_summary = get_invariant_test_data()
+        live_data = get_live_audit_data(args.log_path)
+        payload = {
+            "success": invariant_summary["all_passed"] and live_data["all_matched"],
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "invariant_tests": invariant_records,
+            "invariant_summary": invariant_summary,
+            "live_audit": live_data,
+        }
+        print(json.dumps(payload, indent=2, ensure_ascii=False))
+        return
+
+    if args.test_only:
+        success = run_invariant_tests()
+        sys.exit(0 if success else 1)
     else:
-        run_invariant_tests()
-        verify_live_event_log(args.log_path)
+        inv_ok = run_invariant_tests()
+        live_ok = verify_live_event_log(args.log_path)
+        sys.exit(0 if (inv_ok and live_ok) else 1)
 
 
 if __name__ == "__main__":

@@ -26,6 +26,7 @@ import { SkillDagEditor } from '../features/skill-editor/ui/SkillDagEditor';
 import { AdminSkillNode } from '../features/skill-editor/model/skill-editor.types';
 import { CourseManager } from '../features/course-manager/ui/CourseManager';
 import { DatasetExportCenter, DatasetStats } from '../features/dataset-export/ui/DatasetExportCenter';
+import { BktAuditVerifierCenter } from '../features/verifier/ui/BktAuditVerifierCenter';
 
 export default function AdminCMSDashboard() {
   const [nodes, setNodes] = useState<AdminSkillNode[]>([
@@ -110,7 +111,7 @@ export default function AdminCMSDashboard() {
     setNodes((prev) => prev.filter((n) => n.id !== nodeId));
   };
 
-  type AdminTab = 'dag' | 'courses' | 'datasets' | 'system';
+  type AdminTab = 'dag' | 'courses' | 'datasets' | 'verifier' | 'system';
   const [activeTab, setActiveTab] = useState<AdminTab>('dag');
   const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(true);
   const [isProfileDrawerOpen, setIsProfileDrawerOpen] = useState<boolean>(false);
@@ -167,6 +168,10 @@ export default function AdminCMSDashboard() {
     } else if (activeTab === 'datasets') {
       title = 'Аудит & ШІ Датасети';
       icon = Database;
+      iconColor = 'text-emerald-400';
+    } else if (activeTab === 'verifier') {
+      title = 'Математичний Аудит BKT';
+      icon = Activity;
       iconColor = 'text-emerald-400';
     } else if (activeTab === 'system') {
       title = 'Конфігурація Системи';
@@ -425,6 +430,60 @@ export default function AdminCMSDashboard() {
             </>
           )}
 
+          {/* Drawer: BKT Verifier Sidebar */}
+          {activeTab === 'verifier' && (
+            <>
+              <DrawerSection
+                title="Регламент перевірки"
+                icon={Activity}
+                defaultOpen={true}
+              >
+                <div className="flex flex-col gap-2 pt-1 text-xs text-slate-400">
+                  <p className="text-[11px] leading-relaxed text-slate-400">
+                    Автономна верифікація математичної коректності BKT: перевірка чисельників, знаменників та апостеріорних ймовірностей $P(L_t)$ за формулами Баєса з точністю до $10^{-6}$.
+                  </p>
+                  <div className="flex items-center justify-between py-1 border-t border-slate-800/60 text-[11px]">
+                    <span>Стандарт тесту:</span>
+                    <span className="font-mono text-emerald-400 font-bold">10 Інваріантів</span>
+                  </div>
+                  <div className="flex items-center justify-between py-1 border-t border-slate-800/60 text-[11px]">
+                    <span>Журнал подій:</span>
+                    <span className="font-mono text-indigo-400">event_stream.jsonl</span>
+                  </div>
+                  <div className="flex items-center justify-between py-1 border-t border-slate-800/60 text-[11px]">
+                    <span>Ротація логів:</span>
+                    <span className="font-mono text-emerald-400">20 МБ (Safe)</span>
+                  </div>
+                </div>
+              </DrawerSection>
+
+              <DrawerSection
+                title="Ключові формули BKT"
+                icon={Sparkles}
+                defaultOpen={true}
+              >
+                <div className="flex flex-col gap-2 pt-1 text-[11px] font-mono text-slate-300">
+                  <div className="p-2 rounded bg-slate-950/60 border border-slate-800/80">
+                    <span className="text-[10px] text-slate-500 font-sans block mb-0.5">Правильна відповідь:</span>
+                    <span className="text-emerald-400 font-semibold">[P(L)*(1-S)] / Den</span>
+                  </div>
+                  <div className="p-2 rounded bg-slate-950/60 border border-slate-800/80">
+                    <span className="text-[10px] text-slate-500 font-sans block mb-0.5">Помилка:</span>
+                    <span className="text-rose-400 font-semibold">[P(L)*S] / Den</span>
+                  </div>
+                  <div className="p-2 rounded bg-slate-950/60 border border-slate-800/80">
+                    <span className="text-[10px] text-slate-500 font-sans block mb-0.5">Транзит знань:</span>
+                    <span className="text-indigo-400 font-semibold">P(L|Obs) + (1-P(L|Obs))*P(T)</span>
+                  </div>
+                  <div className="p-2 rounded bg-slate-950/60 border border-slate-800/80">
+                    <span className="text-[10px] text-slate-500 font-sans block mb-0.5">Штраф Сократа:</span>
+                    <span className="text-amber-400 font-semibold">ΔP * (1 - Penalty)</span>
+                  </div>
+                </div>
+              </DrawerSection>
+            </>
+          )}
+
           {/* Drawer 4: System Sidebar */}
           {activeTab === 'system' && (
             <DrawerSection
@@ -485,6 +544,8 @@ export default function AdminCMSDashboard() {
                     ? 'Курси'
                     : activeTab === 'datasets'
                     ? 'Датасети для ШІ'
+                    : activeTab === 'verifier'
+                    ? 'Математичний аудит BKT'
                     : 'Система',
                   badge: activeTab === 'dag' ? `${nodes.length} навичок` : undefined,
                   isCurrent: true,
@@ -548,6 +609,12 @@ export default function AdminCMSDashboard() {
               title: 'Експорт Датасетів для ШІ & Аудит-Логи',
               activeColor: 'bg-emerald-600',
             },
+            {
+              id: 'verifier',
+              icon: Activity,
+              title: 'Математичний Аудит BKT & Верифікатор',
+              activeColor: 'bg-emerald-600',
+            },
           ],
           activeTab: activeTab,
           isDrawerOpen: isDrawerOpen,
@@ -593,6 +660,8 @@ export default function AdminCMSDashboard() {
               onStatsChange={setDatasetStats}
             />
           )}
+
+          {activeTab === 'verifier' && <BktAuditVerifierCenter apiUrl={API_URL} />}
 
           {activeTab === 'system' && (
             <div className="flex flex-col gap-4">

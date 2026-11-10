@@ -1228,4 +1228,16 @@ export class BktController {
   ) {
     return this.auditLogService.clearAllLogs(actorId || 'admin', actorRole || 'ADMIN');
   }
+
+  @Post('audit/verify')
+  @ApiOperation({ summary: 'Run BKT mathematical verification suite and event stream auditor via Python script' })
+  async runAuditVerifier(@Query('mode') mode?: 'test-only' | 'full') {
+    return this.auditLogService.runPythonVerifier(mode || 'full');
+  }
+
+  @Get('audit/verify')
+  @ApiOperation({ summary: 'Get current BKT mathematical verification status via Python script' })
+  async getAuditVerifierStatus(@Query('mode') mode?: 'test-only' | 'full') {
+    return this.auditLogService.runPythonVerifier(mode || 'full');
+  }
 }

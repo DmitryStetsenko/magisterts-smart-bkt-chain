@@ -1,6 +1,7 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import * as fs from 'fs';
 import * as path from 'path';
+import { spawn } from 'child_process';
 import { PrismaService } from '../../adapters/outbound/persistence/prisma.service';
 import { TelemetryGateway } from '../../adapters/inbound/websocket/telemetry.gateway';
 import {
@@ -442,5 +443,72 @@ export class AuditLogService {
       count,
       message: `Успішно видалено ${count} записів незмінного аудит-логу.`,
     };
+  }
+
+  /**
+   * 🔬 Автоматичний запуск скрипта верифікації BKT та аудиту логів
+   */
+  async runPythonVerifier(mode: 'test-only' | 'full' = 'full'): Promise<any> {
+    const rootDir =
+      process.cwd().endsWith('apps\\api') || process.cwd().endsWith('apps/api')
+        ? path.resolve(process.cwd(), '../..')
+        : process.cwd();
+    const scriptPath = path.resolve(rootDir, 'scripts', 'verify_bkt_math.py');
+    const logsPath = path.resolve(rootDir, 'logs', 'event_stream.jsonl');
+
+    const args = ['--json'];
+    if (mode === 'test-only') {
+      args.push('--test-only');
+    } else {
+      args.push('--file', logsPath);
+    }
+
+    return new Promise((resolve) => {
+      const startTime = Date.now();
+      const pythonCmd = process.platform === 'win32' ? 'python' : 'python3';
+      const child = spawn(pythonCmd, [scriptPath, ...args], { cwd: rootDir });
+
+      let stdout = '';
+      let stderr = '';
+
+      child.stdout.on('data', (data) => {
+        stdout += data.toString();
+      });
+
+      child.stderr.on('data', (data) => {
+        stderr += data.toString();
+      });
+
+      child.on('error', (err) => {
+        this.logger.error(`Error spawning python verifier: ${err.message}`);
+        resolve({
+          success: false,
+          error: `Не вдалося запустити Python: ${err.message}. Перевірте наявність Python 3 у системній PATH.`,
+          rawStdout: stdout,
+          rawStderr: stderr,
+          executionTimeMs: Date.now() - startTime,
+        });
+      });
+
+      child.on('close', (code) => {
+        const executionTimeMs = Date.now() - startTime;
+        try {
+          const parsed = JSON.parse(stdout);
+          resolve({
+            ...parsed,
+            exitCode: code,
+            executionTimeMs,
+            rawOutput: stdout,
+          });
+        } catch {
+          resolve({
+            success: code === 0,
+            exitCode: code,
+            rawOutput: stdout || stderr,
+            executionTimeMs,
+          });
+        }
+      });
+    });
   }
 }

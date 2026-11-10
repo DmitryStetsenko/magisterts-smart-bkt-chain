@@ -14,10 +14,10 @@
 | **`SBC-EP-W3`** | Web3 Infrastructure & Smart Contracts | 0 |
 | **`SBC-EP-ST`** | Student Portal & Skill Tree Map | 38 |
 | **`SBC-EP-TC`** | Teacher Portal & Analytics CRM | 31 |
-| **`SBC-EP-AD`** | Admin Portal & Knowledge DAG Builder | 10 |
+| **`SBC-EP-AD`** | Admin Portal & Knowledge DAG Builder | 11 |
 | **`SBC-EP-LD`** | Landing Web Page | 9 |
 | **`SBC-EP-MS`** | Master's Thesis Engineering & Academic Text Generation | 9 |
-| **ВСЬОГО** | - | **271** |
+| **ВСЬОГО** | - | **272** |
 
 ---
 
@@ -415,6 +415,7 @@
 | **SBC-122** | `Story` | `AD` | implement dynamic course manager CMS and API creation endpoint | 2026-10-06 | `bf10d19` |
 | **SBC-356** | `Story` | `AD` | align admin portal layout with canonical AppShellLayout drawer sections and minimalist borderless standard | 2026-11-09 | `3bde2b5` |
 | **SBC-357** | `Story` | `AD` | implement clear activity logs endpoint and admin confirmation modal with safety guard | 2026-11-09 | `4023517` |
+| **SBC-373** | `Story` | `AD` | integrate bkt math verifier and interactive sandbox into admin portal | 2026-11-10 | `ed773be` |
 
 ---
 
