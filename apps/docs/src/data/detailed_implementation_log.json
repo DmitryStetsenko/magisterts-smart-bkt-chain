@@ -120,6 +120,64 @@
           ]
         },
         {
+          "title": "0.1.7.74 Архітектурний Брейншторм та Дорожня Карта Релізу Smart-BKT-Chain у Продакшен (SBC-371, EP-INF)",
+          "level": 3,
+          "paragraphs": [],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "**Контекст проблеми та виявлені виклики продакшену:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Локальний стенд платформи опирається на єдиного статичного користувача demo-student, незахищений рушій запуску JS-коду через vm.createContext() із прямим викликом eval(), відсутність персистенції графу в apps/admin (локальний useState) та порожній пакет packages/contracts.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Запуск у реальне шкільне середовище вимагає дотримання законодавства щодо персональних даних неповнолітніх, захисту сервера від DDOS та колапсу через нескінченні цикли в учнівському коді, а також втілення заявленого Web3-шару підтвердження компетентності.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Розроблені архітектурні рішення (деталізовано в docs/brainstorm/17_production_launch_readiness_and_architecture.md):**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "*Мережева топологія:* маршрутизація піддоменів через Nginx / Cloudflare WAF (study., learn., teacher., admin., docs., api.smartbkt.edu.ua) та міжпортальний шлюз @sbc/routes.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "*Шкільна автентифікація:* сесійний вхід за кодом класу (Classroom Code) без примусового збору пошт учнів; OAuth 2.0 Google Workspace for Education для вчителів.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "*Ізоляція коду:* впровадження isolated-vm на сервері та клієнтського Web Worker у браузері учня.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "*Web3 SBT Relayer:* смартконтракт SkillMasterySBT.sol (ERC-5192) на L2 Base/Sepolia із серверним релеєром для оплати газу без потреби криптовалюти у школярів.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "*Tier 3 Gemini 2.5 Flash:* підключення офіційного SDK @google/genai для структурованого семантичного аналізу есе та виявлення прихованих оман.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "*Операційна стабільність:* docker-compose.prod.yml, щоденні дампи pg_dump, експорт відомостей в Excel/CSV.",
+              "subitems": []
+            }
+          ]
+        },
+        {
           "title": "0.1.7.73 Обмеження Розмірів Monaco Code Editor та Усунення Нескінченного Розтягування за Висотою (SBC-370, EP-ST)",
           "level": 3,
           "paragraphs": [

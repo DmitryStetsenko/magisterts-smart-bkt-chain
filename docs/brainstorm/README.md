@@ -71,4 +71,8 @@
     - *Дата:* 9 листопада 2026
     - *Ключові теми:* Концепція наскрізності (Cross-App Omnipresence) між 5 застосунками, незмінний журнал подій (Append-Only Event Store), 5-рівнева таксономія подій, механіка анулювання результату викладачем (`TEACHER_SUBMISSION_ANNULLED`) та відкату BKT, супервізорний контур Human-in-the-Loop, автоматичний експорт JSONL/CSV датасетів для моделей Deep Knowledge Tracing (DKT / SAKT) та класифікаторів доброчесності.
 
+17. [17. Архітектура, Виклики та План Запуску Комплексу Smart-BKT-Chain у Продакшен (Production Launch Readiness & Architecture)](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/docs/brainstorm/17_production_launch_readiness_and_architecture.md)
+    - *Дата:* 10 листопада 2026
+    - *Ключові теми:* Мережева топологія та мульти-піддоменний шлюз Nginx, шкільна модель авторизації за кодом класу (Classroom Auth) без порушення захисту персональних даних неповнолітніх, ізольоване виконання коду (`isolated-vm` / Web Workers), персистенція DAG в `apps/admin`, Gasless Web3 SBT сертифікація майстерності (ERC-5192 на L2 Base/Sepolia), підключення Gemini 2.5 Flash до Tier 3 аналітичних есе, 4-етапна дорожня карта розгортання в хмарі.
+
 
