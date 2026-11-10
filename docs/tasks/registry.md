@@ -335,7 +335,7 @@
 | **SBC-364** | `Style` | `ST` | eliminate nested containers and declutter Skill DAG drawer into minimalist borderless sequence | 2026-11-10 | `e72e143` |
 | **SBC-370** | `Fix` | `ST` | constrain MonacoCodeEditor height and flex layout to eliminate infinite vertical expansion loop | 2026-11-10 | `6096911` |
 | **SBC-381** | `Story` | `ST` | implement google sign-in button, /join invite code redemption and enrollment mode gating | 2026-11-10 | `51e412f` |
-| **SBC-388** | `Story` | `ST` | implement modular skill drawer sections, bkt mastery module unlocking and allowed modules filtering in student portal | 2026-11-10 | pending |
+| **SBC-388** | `Story` | `ST` | implement modular skill drawer sections, bkt mastery module unlocking and allowed modules filtering in student portal | 2026-11-10 | `198b330` |
 
 ---
 
@@ -408,7 +408,7 @@
 | **SBC-368** | `Fix` | `TC` | implement checkbox multi-selection for subconcepts and fix triad slot filtering | 2026-11-10 | `368a0ea` |
 | **SBC-369** | `Style` | `TC` | eliminate nested containers and declutter MetricsAuditInspector into minimalist borderless layout | 2026-11-10 | `9b5f1f9` |
 | **SBC-380** | `Story` | `TC` | implement classroom management drawer section, invite code generator and enrollment mode selector | 2026-11-10 | `137f38a` |
-| **SBC-387** | `Story` | `TC` | implement modular course selection and allowed modules filter in teacher classroom creator | 2026-11-10 | pending |
+| **SBC-387** | `Story` | `TC` | implement modular course selection and allowed modules filter in teacher classroom creator | 2026-11-10 | `42195a5` |
 
 
 
