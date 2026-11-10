@@ -13,11 +13,11 @@
 | **`SBC-EP-LLM`** | Automated Code Assessment & Open-Text Evaluation | 10 |
 | **`SBC-EP-W3`** | Web3 Infrastructure & Smart Contracts | 0 |
 | **`SBC-EP-ST`** | Student Portal & Skill Tree Map | 37 |
-| **`SBC-EP-TC`** | Teacher Portal & Analytics CRM | 30 |
+| **`SBC-EP-TC`** | Teacher Portal & Analytics CRM | 31 |
 | **`SBC-EP-AD`** | Admin Portal & Knowledge DAG Builder | 10 |
 | **`SBC-EP-LD`** | Landing Web Page | 9 |
 | **`SBC-EP-MS`** | Master's Thesis Engineering & Academic Text Generation | 9 |
-| **ВСЬОГО** | - | **269** |
+| **ВСЬОГО** | - | **270** |
 
 ---
 
@@ -391,6 +391,7 @@
 | **SBC-366** | `Style` | `TC` | replace inline subconcept tags with compact absolute popover in CourseGraphViewer | 2026-11-10 | `294b4ef` |
 | **SBC-367** | `Feat` | `TC` | make subconcepts interactive filters in CourseGraphViewer and polish borderless popover list | 2026-11-10 | `19c061f` |
 | **SBC-368** | `Fix` | `TC` | implement checkbox multi-selection for subconcepts and fix triad slot filtering | 2026-11-10 | `368a0ea` |
+| **SBC-369** | `Style` | `TC` | eliminate nested containers and declutter MetricsAuditInspector into minimalist borderless layout | 2026-11-10 | pending |
 
 
 

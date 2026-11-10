@@ -493,19 +493,19 @@ export function MetricsAuditInspector({
           <h1 className="text-sm font-bold text-white">Математичний Аудит та Симулятор BKT</h1>
         </div>
 
-        <div className="flex flex-wrap items-center gap-1.5 bg-slate-900/90 p-1 rounded-lg border border-slate-800/80">
+        <div className="flex flex-wrap items-center gap-1 bg-slate-950/60 p-0.5 rounded-lg border border-slate-800/60">
           <button
             onClick={() => setActiveSubTab('live-log')}
             className={`px-2.5 py-1 rounded-md text-xs font-medium flex items-center gap-1.5 transition-all cursor-pointer ${
               activeSubTab === 'live-log'
-                ? 'bg-purple-600 text-white'
+                ? 'bg-slate-800 text-white shadow-sm'
                 : 'text-slate-400 hover:text-white'
             }`}
           >
             <Calculator className="w-3.5 h-3.5" />
             <span>Формула Студента</span>
             {student && (
-              <span className="text-[10px] font-mono opacity-80">
+              <span className="text-[10px] font-mono text-purple-300">
                 ({student.name.split(' ')[0]})
               </span>
             )}
@@ -515,7 +515,7 @@ export function MetricsAuditInspector({
             onClick={() => setActiveSubTab('what-if')}
             className={`px-2.5 py-1 rounded-md text-xs font-medium flex items-center gap-1.5 transition-all cursor-pointer ${
               activeSubTab === 'what-if'
-                ? 'bg-purple-600 text-white'
+                ? 'bg-slate-800 text-white shadow-sm'
                 : 'text-slate-400 hover:text-white'
             }`}
           >
@@ -527,7 +527,7 @@ export function MetricsAuditInspector({
             onClick={() => setActiveSubTab('test-matrix')}
             className={`px-2.5 py-1 rounded-md text-xs font-medium flex items-center gap-1.5 transition-all cursor-pointer ${
               activeSubTab === 'test-matrix'
-                ? 'bg-purple-600 text-white'
+                ? 'bg-slate-800 text-white shadow-sm'
                 : 'text-slate-400 hover:text-white'
             }`}
           >
@@ -539,7 +539,7 @@ export function MetricsAuditInspector({
             onClick={() => setActiveSubTab('mechanisms')}
             className={`px-2.5 py-1 rounded-md text-xs font-medium flex items-center gap-1.5 transition-all cursor-pointer ${
               activeSubTab === 'mechanisms'
-                ? 'bg-purple-600 text-white'
+                ? 'bg-slate-800 text-white shadow-sm'
                 : 'text-slate-400 hover:text-white'
             }`}
           >
@@ -568,15 +568,17 @@ export function MetricsAuditInspector({
               </div>
             </div>
 
-            {/* Submissions & Bayes Calculations Grid */}
-            <div className="flex flex-col gap-4">
-              <h2 className="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
-                <Layers className="w-4 h-4 text-purple-400" />
-                <span>Останні Спроби та Покрокова Декомпозиція Баєса ({student?.recentAdjustments?.length || 0})</span>
-              </h2>
+            {/* Submissions & Bayes Calculations Feed */}
+            <div className="flex flex-col gap-2">
+              <div className="flex items-center justify-between pb-2 border-b border-slate-800/80">
+                <h2 className="text-xs font-bold text-slate-200 uppercase tracking-wider flex items-center gap-2">
+                  <Layers className="w-3.5 h-3.5 text-purple-400" />
+                  <span>Останні Спроби та Покрокова Декомпозиція Баєса ({student?.recentAdjustments?.length || 0})</span>
+                </h2>
+              </div>
 
               {(!student?.recentAdjustments || student.recentAdjustments.length === 0) ? (
-                <div className="bg-slate-900 border border-slate-800 rounded-2xl p-8 text-center flex flex-col items-center justify-center gap-3">
+                <div className="border border-dashed border-slate-800/80 rounded-xl p-8 text-center flex flex-col items-center justify-center gap-3">
                   <Calculator className="w-8 h-8 text-slate-600" />
                   <p className="text-sm text-slate-400 font-semibold">У обраного студента ще немає зареєстрованих спроб</p>
                   <p className="text-xs text-slate-500 max-w-md">
@@ -584,7 +586,7 @@ export function MetricsAuditInspector({
                   </p>
                 </div>
               ) : (
-                <div className="flex flex-col gap-4">
+                <div className="divide-y divide-slate-800/60">
                   {student.recentAdjustments.map((adj, index) => {
                     const stepCalc = computeBktMath({
                       priorL: student.bktBySkill?.[adj.skillSlug] ?? 0.5,
@@ -599,218 +601,229 @@ export function MetricsAuditInspector({
                     return (
                       <div
                         key={adj.id || index}
-                        className="bg-slate-900 border border-slate-800 hover:border-purple-500/50 rounded-2xl p-5 shadow-xl transition-all flex flex-col gap-4"
+                        className="py-4.5 first:pt-2 last:pb-2 flex flex-col gap-3.5"
                       >
-                        {/* Header of attempt */}
-                        <div className="flex flex-col md:flex-row md:items-center justify-between gap-2 border-b border-slate-800/80 pb-3">
-                          <div className="flex items-center gap-2.5">
-                            <span className={`w-3 h-3 rounded-full shrink-0 ${adj.isCorrect ? 'bg-emerald-400 shadow-sm shadow-emerald-400' : 'bg-rose-400 shadow-sm shadow-rose-400'}`} />
-                            <div>
-                              <div className="text-xs font-bold text-white flex items-center gap-2 flex-wrap">
-                                <span>{adj.taskTitle || 'Завдання'}</span>
-                                <button
-                                  onClick={() => setActiveExplanation(EXPLANATIONS.skillBadge)}
-                                  className="px-2 py-0.5 rounded text-[10px] font-mono bg-purple-500/10 text-purple-300 border border-purple-500/20 hover:bg-purple-500/20 hover:border-purple-500/40 transition-all cursor-pointer flex items-center gap-1 group/btn"
-                                  title="Натисніть для детального пояснення навички"
-                                >
-                                  <span>{adj.skillTitle || adj.skillSlug}</span>
-                                  <HelpCircle className="w-2.5 h-2.5 opacity-60 group-hover/btn:opacity-100" />
-                                </button>
-                                <button
-                                  onClick={() => setActiveExplanation(EXPLANATIONS.taskTypeBadge)}
-                                  className="px-2 py-0.5 rounded text-[10px] font-mono bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white transition-all cursor-pointer flex items-center gap-1 group/btn"
-                                  title="Натисніть для деталей про тип завдання"
-                                >
-                                  <span>{adj.taskType || 'TASK'}</span>
-                                  <HelpCircle className="w-2.5 h-2.5 opacity-60 group-hover/btn:opacity-100" />
-                                </button>
-                              </div>
-                              <span className="text-[10px] text-slate-400 font-mono">
+                        {/* Header of attempt: Clean typography without heavy borders */}
+                        <div className="flex flex-col md:flex-row md:items-center justify-between gap-2">
+                          <div className="flex items-center gap-2.5 min-w-0">
+                            <span className={`w-2 h-2 rounded-full shrink-0 ${adj.isCorrect ? 'bg-emerald-400' : 'bg-rose-400'}`} />
+                            <div className="flex items-center gap-2 flex-wrap min-w-0">
+                              <span className="text-xs font-bold text-white truncate max-w-md">
+                                {adj.taskTitle || 'Завдання'}
+                              </span>
+
+                              <button
+                                type="button"
+                                onClick={() => setActiveExplanation(EXPLANATIONS.skillBadge)}
+                                className="text-[10px] font-mono text-purple-400 hover:text-purple-300 transition-colors cursor-pointer flex items-center gap-0.5"
+                                title="Натисніть для детального пояснення навички"
+                              >
+                                <span>{adj.skillTitle || adj.skillSlug}</span>
+                                <HelpCircle className="w-2.5 h-2.5 opacity-60" />
+                              </button>
+
+                              <span className="text-slate-600 font-mono text-[10px]">·</span>
+
+                              <button
+                                type="button"
+                                onClick={() => setActiveExplanation(EXPLANATIONS.taskTypeBadge)}
+                                className="text-[10px] font-mono text-slate-500 hover:text-slate-300 transition-colors cursor-pointer flex items-center gap-0.5"
+                                title="Натисніть для деталей про тип завдання"
+                              >
+                                <span>{adj.taskType || 'TASK'}</span>
+                                <HelpCircle className="w-2.5 h-2.5 opacity-60" />
+                              </button>
+
+                              <span className="text-slate-600 font-mono text-[10px]">·</span>
+
+                              <span className="text-[10px] text-slate-500 font-mono">
                                 {new Date(adj.createdAt).toLocaleString('uk-UA')}
                               </span>
                             </div>
                           </div>
 
-                          <div className="flex items-center gap-2">
-                            <span className={`px-2.5 py-1 rounded-xl text-xs font-bold font-mono border ${
+                          <div className="flex items-center gap-3 shrink-0">
+                            <span className={`text-xs font-mono font-semibold ${
                               adj.isCorrect
-                                ? 'bg-emerald-500/10 text-emerald-300 border-emerald-500/30'
-                                : 'bg-rose-500/10 text-rose-300 border-rose-500/30'
+                                ? 'text-emerald-400'
+                                : 'text-rose-400'
                             }`}>
                               {adj.isCorrect ? '✓ ПРАВИЛЬНО' : '✗ ПОМИЛКА'}
                             </span>
+
                             <button
+                              type="button"
                               onClick={() => setActiveExplanation(EXPLANATIONS.deltaL)}
-                              className="px-2.5 py-1 rounded-xl text-xs font-mono font-bold bg-slate-950 text-purple-300 border border-slate-800 hover:border-purple-500/50 hover:bg-purple-950/30 transition-all cursor-pointer flex items-center gap-1.5"
+                              className="text-xs font-mono font-bold text-purple-300 hover:text-purple-200 transition-colors cursor-pointer flex items-center gap-1"
                               title="Натисніть для пояснення динаміки ΔP(L)"
                             >
                               <span>ΔP(L): {stepCalc.deltaL >= 0 ? `+${stepCalc.deltaL}` : stepCalc.deltaL}</span>
-                              <HelpCircle className="w-3 h-3 text-purple-400/70" />
+                              <HelpCircle className="w-3 h-3 opacity-60" />
                             </button>
                           </div>
                         </div>
 
                         {/* Behavioral Modifiers Applied */}
                         {adj.adjustReasons && adj.adjustReasons.length > 0 && (
-                          <div className="bg-amber-950/30 border border-amber-500/30 rounded-xl p-3 flex items-start gap-2.5">
-                            <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
-                            <div className="flex-1">
-                              <span className="text-[11px] font-bold text-amber-300 uppercase tracking-wide">
-                                Задіяно поведінкові коректори:
-                              </span>
-                              <div className="flex flex-wrap gap-2 mt-1">
-                                {adj.adjustReasons.map((r, ri) => (
-                                  <button
-                                    key={ri}
-                                    onClick={() => {
-                                      if (r.includes('G↑') || r.includes('вгадування')) {
-                                        setActiveExplanation(EXPLANATIONS.guess);
-                                      } else if (r.includes('S↑') || r.includes('описка')) {
-                                        setActiveExplanation(EXPLANATIONS.slip);
-                                      } else {
-                                        setActiveExplanation(EXPLANATIONS.slipGuess);
-                                      }
-                                    }}
-                                    className="px-2 py-0.5 rounded text-[11px] font-mono bg-amber-500/10 text-amber-200 border border-amber-500/20 hover:bg-amber-500/20 hover:border-amber-500/40 transition-all cursor-pointer flex items-center gap-1 text-left"
-                                    title="Натисніть для пояснення поведінкового тригера"
-                                  >
-                                    <span>{r}</span>
-                                    <HelpCircle className="w-3 h-3 text-amber-400/80 shrink-0" />
-                                  </button>
-                                ))}
-                              </div>
-                            </div>
+                          <div className="flex flex-wrap items-center gap-2 text-[11px] font-mono text-amber-300/90 pt-0.5">
+                            <AlertTriangle className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                            <span className="text-[10px] text-amber-400/90 font-semibold uppercase tracking-wider">
+                              Коректори:
+                            </span>
+                            {adj.adjustReasons.map((r, ri) => (
+                              <button
+                                key={ri}
+                                type="button"
+                                onClick={() => {
+                                  if (r.includes('G↑') || r.includes('вгадування')) {
+                                    setActiveExplanation(EXPLANATIONS.guess);
+                                  } else if (r.includes('S↑') || r.includes('описка')) {
+                                    setActiveExplanation(EXPLANATIONS.slip);
+                                  } else {
+                                    setActiveExplanation(EXPLANATIONS.slipGuess);
+                                  }
+                                }}
+                                className="px-1.5 py-0.5 rounded text-[10px] font-mono bg-amber-950/40 text-amber-300 border border-amber-500/30 hover:border-amber-500/60 transition-colors cursor-pointer flex items-center gap-1"
+                                title="Натисніть для пояснення поведінкового тригера"
+                              >
+                                <span>{r}</span>
+                                <HelpCircle className="w-2.5 h-2.5 opacity-60" />
+                              </button>
+                            ))}
                           </div>
                         )}
 
-                        {/* Step-by-Step Bayes Mathematical Proof */}
-                        <div className="bg-slate-950 rounded-xl p-4 border border-slate-800/80 flex flex-col gap-3 font-mono text-xs">
-                          <div className="flex items-center justify-between text-slate-400 border-b border-slate-800/60 pb-2">
-                            <span className="font-bold text-purple-300 flex items-center gap-1.5">
+                        {/* Step-by-Step Bayes Mathematical Proof (Clean flat layout without nested box) */}
+                        <div className="flex flex-col gap-2.5 font-mono text-xs">
+                          <div className="flex items-center justify-between text-slate-400 text-[11px]">
+                            <span className="font-semibold text-purple-300 flex items-center gap-1.5">
                               <Calculator className="w-3.5 h-3.5 text-purple-400" />
-                              <span>Математична викладка оновлення Баєса:</span>
+                              <span>Математична викладка оновлення Баєса</span>
                             </span>
-                            <span className="text-[11px] text-slate-500">P(L_t) = P(L_{`t-1`}|Obs) + (1 - P(L_{`t-1`}|Obs)) · P(T)</span>
+                            <span className="text-[10px] text-slate-500">
+                              P(L_t) = P(L_{`t-1`}|Obs) + (1 - P(L_{`t-1`}|Obs)) · P(T)
+                            </span>
                           </div>
 
-                          <div className="grid grid-cols-1 md:grid-cols-4 gap-3 text-slate-300">
+                          {/* 4-Column Flat Metric Cards */}
+                          <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-slate-300">
                             {/* Card 1: Prior */}
                             <div
                               onClick={() => setActiveExplanation(EXPLANATIONS.priorL)}
-                              className="bg-slate-900/60 p-2.5 rounded-lg border border-slate-800 hover:border-purple-500/60 hover:bg-purple-950/20 transition-all cursor-pointer group flex flex-col justify-between"
+                              className="bg-slate-900/40 p-2.5 rounded-lg border border-slate-800/80 hover:border-purple-500/50 hover:bg-slate-850/60 transition-colors cursor-pointer group flex flex-col justify-between"
                               title="Натисніть, щоб дізнатися що таке Апріорна ймовірність"
                             >
                               <div>
                                 <div className="flex items-center justify-between">
-                                  <span className="text-[10px] text-slate-500 block group-hover:text-purple-300">1. Апріорна ймовірність P(L_{`t-1`}):</span>
+                                  <span className="text-[10px] text-slate-500 group-hover:text-purple-300 transition-colors">1. Апріорна P(L_{`t-1`}):</span>
                                   <HelpCircle className="w-3 h-3 text-slate-600 group-hover:text-purple-400 transition-colors" />
                                 </div>
-                                <span className="text-sm font-bold text-white group-hover:text-purple-200">{stepCalc.priorL}</span>
+                                <span className="text-sm font-bold text-white group-hover:text-purple-200 transition-colors">{stepCalc.priorL}</span>
                               </div>
-                              <span className="text-[9px] text-slate-500 group-hover:text-purple-400/80 mt-1 flex items-center gap-0.5">Клік для роз'яснення ➔</span>
+                              <span className="text-[9px] text-slate-500 group-hover:text-purple-400 mt-1">Клік для роз'яснення ➔</span>
                             </div>
 
                             {/* Card 2: Slip / Guess */}
                             <div
                               onClick={() => setActiveExplanation(EXPLANATIONS.slipGuess)}
-                              className="bg-slate-900/60 p-2.5 rounded-lg border border-slate-800 hover:border-amber-500/60 hover:bg-amber-950/20 transition-all cursor-pointer group flex flex-col justify-between"
+                              className="bg-slate-900/40 p-2.5 rounded-lg border border-slate-800/80 hover:border-amber-500/50 hover:bg-slate-850/60 transition-colors cursor-pointer group flex flex-col justify-between"
                               title="Натисніть, щоб дізнатися як працюють Slip та Guess"
                             >
                               <div>
                                 <div className="flex items-center justify-between">
-                                  <span className="text-[10px] text-slate-500 block group-hover:text-amber-300">2. Ефективні Slip / Guess:</span>
+                                  <span className="text-[10px] text-slate-500 group-hover:text-amber-300 transition-colors">2. Slip / Guess:</span>
                                   <HelpCircle className="w-3 h-3 text-slate-600 group-hover:text-amber-400 transition-colors" />
                                 </div>
                                 <span className="text-sm font-bold text-amber-300">
                                   S={stepCalc.pSlipEffective} | G={stepCalc.pGuessEffective}
                                 </span>
                               </div>
-                              <span className="text-[9px] text-slate-500 group-hover:text-amber-400/80 mt-1 flex items-center gap-0.5">Клік для роз'яснення ➔</span>
+                              <span className="text-[9px] text-slate-500 group-hover:text-amber-400 mt-1">Клік для роз'яснення ➔</span>
                             </div>
 
                             {/* Card 3: P(L|Obs) */}
                             <div
                               onClick={() => setActiveExplanation(EXPLANATIONS.pObs)}
-                              className="bg-slate-900/60 p-2.5 rounded-lg border border-slate-800 hover:border-indigo-500/60 hover:bg-indigo-950/20 transition-all cursor-pointer group flex flex-col justify-between"
+                              className="bg-slate-900/40 p-2.5 rounded-lg border border-slate-800/80 hover:border-indigo-500/50 hover:bg-slate-850/60 transition-colors cursor-pointer group flex flex-col justify-between"
                               title="Натисніть, щоб дізнатися що таке Правдоподібність P(L|Obs)"
                             >
                               <div>
                                 <div className="flex items-center justify-between">
-                                  <span className="text-[10px] text-slate-500 block group-hover:text-indigo-300">3. Правдоподібність P(L|Obs):</span>
+                                  <span className="text-[10px] text-slate-500 group-hover:text-indigo-300 transition-colors">3. Правдоподібність P(L|Obs):</span>
                                   <HelpCircle className="w-3 h-3 text-slate-600 group-hover:text-indigo-400 transition-colors" />
                                 </div>
                                 <span className="text-sm font-bold text-indigo-300">
                                   {stepCalc.pObs.toFixed(4)}
                                 </span>
                               </div>
-                              <span className="text-[9px] text-slate-500 group-hover:text-indigo-400/80 mt-1 flex items-center gap-0.5">Клік для роз'яснення ➔</span>
+                              <span className="text-[9px] text-slate-500 group-hover:text-indigo-400 mt-1">Клік для роз'яснення ➔</span>
                             </div>
 
                             {/* Card 4: Posterior P(L_t) */}
                             <div
                               onClick={() => setActiveExplanation(EXPLANATIONS.posteriorL)}
-                              className="bg-slate-900/60 p-2.5 rounded-lg border border-slate-800 hover:border-emerald-500/60 hover:bg-emerald-950/20 transition-all cursor-pointer group flex flex-col justify-between"
+                              className="bg-slate-900/40 p-2.5 rounded-lg border border-slate-800/80 hover:border-emerald-500/50 hover:bg-slate-850/60 transition-colors cursor-pointer group flex flex-col justify-between"
                               title="Натисніть, щоб дізнатися що таке Апостеріорна P(L_t)"
                             >
                               <div>
                                 <div className="flex items-center justify-between">
-                                  <span className="text-[10px] text-slate-500 block group-hover:text-emerald-300">4. Апостеріорна P(L_t):</span>
+                                  <span className="text-[10px] text-slate-500 group-hover:text-emerald-300 transition-colors">4. Апостеріорна P(L_t):</span>
                                   <HelpCircle className="w-3 h-3 text-slate-600 group-hover:text-emerald-400 transition-colors" />
                                 </div>
                                 <span className="text-sm font-bold text-emerald-400">
                                   {stepCalc.posteriorL} ({(stepCalc.posteriorL * 100).toFixed(1)}%)
                                 </span>
                               </div>
-                              <span className="text-[9px] text-slate-500 group-hover:text-emerald-400/80 mt-1 flex items-center gap-0.5">Клік для роз'яснення ➔</span>
+                              <span className="text-[9px] text-slate-500 group-hover:text-emerald-400 mt-1">Клік для роз'яснення ➔</span>
                             </div>
                           </div>
 
                           {/* Mathematical formula breakdown with clickable parts */}
-                          <div className="p-3 bg-purple-950/20 border border-purple-500/20 rounded-lg text-slate-300 text-[11px] leading-relaxed flex flex-col gap-2">
+                          <div className="p-2.5 bg-slate-950/60 border border-slate-800/80 rounded-lg text-slate-300 text-[11px] leading-relaxed flex flex-col gap-1.5">
                             {adj.isCorrect ? (
                               <>
                                 <div
                                   onClick={() => setActiveExplanation(EXPLANATIONS.formulaCorrect)}
-                                  className="p-1.5 rounded hover:bg-purple-900/30 transition-all cursor-pointer flex items-center justify-between"
+                                  className="py-1 px-1.5 rounded hover:bg-slate-900/60 transition-colors cursor-pointer flex items-center justify-between"
                                   title="Натисніть для пояснення формули правдоподібності успіху"
                                 >
                                   <div>
-                                    <span className="text-purple-300 font-bold underline decoration-dotted">Розрахунок для успіху:</span> P(L|Correct) = [{stepCalc.priorL} · (1 - {stepCalc.pSlipEffective})] / [{stepCalc.priorL} · (1 - {stepCalc.pSlipEffective}) + (1 - {stepCalc.priorL}) · {stepCalc.pGuessEffective}] = <strong className="text-white">{stepCalc.pObs.toFixed(4)}</strong>
+                                    <span className="text-purple-400 font-semibold">Розрахунок для успіху:</span> P(L|Correct) = [{stepCalc.priorL} · (1 - {stepCalc.pSlipEffective})] / [{stepCalc.priorL} · (1 - {stepCalc.pSlipEffective}) + (1 - {stepCalc.priorL}) · {stepCalc.pGuessEffective}] = <strong className="text-white">{stepCalc.pObs.toFixed(4)}</strong>
                                   </div>
-                                  <HelpCircle className="w-3 h-3 text-purple-400 shrink-0 ml-2" />
+                                  <HelpCircle className="w-3 h-3 text-purple-400 shrink-0 ml-2 opacity-60" />
                                 </div>
                                 <div
                                   onClick={() => setActiveExplanation(EXPLANATIONS.transitStep)}
-                                  className="p-1.5 rounded hover:bg-emerald-950/30 transition-all cursor-pointer flex items-center justify-between"
+                                  className="py-1 px-1.5 rounded hover:bg-slate-900/60 transition-colors cursor-pointer flex items-center justify-between"
                                   title="Натисніть для пояснення кроку транзиту знань"
                                 >
                                   <div>
-                                    <span className="text-purple-300 font-bold underline decoration-dotted">Транзит знань:</span> {stepCalc.pObs.toFixed(4)} + (1 - {stepCalc.pObs.toFixed(4)}) · {stepCalc.pTransit} = <strong className="text-emerald-400">{stepCalc.posteriorL}</strong>
+                                    <span className="text-purple-400 font-semibold">Транзит знань:</span> {stepCalc.pObs.toFixed(4)} + (1 - {stepCalc.pObs.toFixed(4)}) · {stepCalc.pTransit} = <strong className="text-emerald-400">{stepCalc.posteriorL}</strong>
                                   </div>
-                                  <HelpCircle className="w-3 h-3 text-emerald-400 shrink-0 ml-2" />
+                                  <HelpCircle className="w-3 h-3 text-emerald-400 shrink-0 ml-2 opacity-60" />
                                 </div>
                               </>
                             ) : (
                               <>
                                 <div
                                   onClick={() => setActiveExplanation(EXPLANATIONS.formulaIncorrect)}
-                                  className="p-1.5 rounded hover:bg-purple-900/30 transition-all cursor-pointer flex items-center justify-between"
+                                  className="py-1 px-1.5 rounded hover:bg-slate-900/60 transition-colors cursor-pointer flex items-center justify-between"
                                   title="Натисніть для пояснення формули правдоподібності помилки"
                                 >
                                   <div>
-                                    <span className="text-purple-300 font-bold underline decoration-dotted">Розрахунок для помилки:</span> P(L|Incorrect) = [{stepCalc.priorL} · {stepCalc.pSlipEffective}] / [{stepCalc.priorL} · {stepCalc.pSlipEffective} + (1 - {stepCalc.priorL}) · (1 - {stepCalc.pGuessEffective})] = <strong className="text-white">{stepCalc.pObs.toFixed(4)}</strong>
+                                    <span className="text-purple-400 font-semibold">Розрахунок для помилки:</span> P(L|Incorrect) = [{stepCalc.priorL} · {stepCalc.pSlipEffective}] / [{stepCalc.priorL} · {stepCalc.pSlipEffective} + (1 - {stepCalc.priorL}) · (1 - {stepCalc.pGuessEffective})] = <strong className="text-white">{stepCalc.pObs.toFixed(4)}</strong>
                                   </div>
-                                  <HelpCircle className="w-3 h-3 text-purple-400 shrink-0 ml-2" />
+                                  <HelpCircle className="w-3 h-3 text-purple-400 shrink-0 ml-2 opacity-60" />
                                 </div>
                                 <div
                                   onClick={() => setActiveExplanation(EXPLANATIONS.transitStep)}
-                                  className="p-1.5 rounded hover:bg-rose-950/30 transition-all cursor-pointer flex items-center justify-between"
+                                  className="py-1 px-1.5 rounded hover:bg-slate-900/60 transition-colors cursor-pointer flex items-center justify-between"
                                   title="Натисніть для пояснення кроку транзиту знань"
                                 >
                                   <div>
-                                    <span className="text-purple-300 font-bold underline decoration-dotted">Транзит знань:</span> {stepCalc.pObs.toFixed(4)} + (1 - {stepCalc.pObs.toFixed(4)}) · {stepCalc.pTransit} = <strong className="text-rose-400">{stepCalc.posteriorL}</strong>
+                                    <span className="text-purple-400 font-semibold">Транзит знань:</span> {stepCalc.pObs.toFixed(4)} + (1 - {stepCalc.pObs.toFixed(4)}) · {stepCalc.pTransit} = <strong className="text-rose-400">{stepCalc.posteriorL}</strong>
                                   </div>
-                                  <HelpCircle className="w-3 h-3 text-rose-400 shrink-0 ml-2" />
+                                  <HelpCircle className="w-3 h-3 text-rose-400 shrink-0 ml-2 opacity-60" />
                                 </div>
                               </>
                             )}
