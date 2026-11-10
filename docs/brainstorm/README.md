@@ -79,4 +79,8 @@
     - *Дата:* 10 листопада 2026
     - *Ключові теми:* Google OAuth 2.0 та тумблер Test Mode Auth Bypass в адмінці, інвайт-коди класів (`/join/:code`) та індивідуальне призначення курсів учням, 3 дидактичні режими зарахування (`FULL_CYCLE`, `TESTING_ONLY`, `MODULAR`), вкладка `users` в `apps/admin` (таблиця користувачів, створення, редагування, блокування/видалення), розширення Prisma ORM (`Classroom`, `CourseEnrollment`, `SystemConfig`).
 
+19. [19. Архітектура Налаштування Курсів, Модульна Дидактика, Пороги Майстерності BKT та Динамічний CMS](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/docs/brainstorm/19_course_architecture_modular_curriculum_and_dynamic_cms.md)
+    - *Дата:* 10 листопада 2026
+    - *Ключові теми:* 3 рівні налаштування курсів (Admin CMS, Teacher Classroom Customization, Student/Study Portal), ієрархія Курс ➔ Модулі ➔ Skill DAG ➔ Завдання & Теорія, модель `CourseModule` у Prisma, пороговий BKT-гейтинг відкриття наступного модуля ($P(L_n) \ge 0.85$), селективне підключення модулів викладачем (`allowedModuleIds`), REST API CRUD для курсів і модулів.
+
 

@@ -124,6 +124,8 @@
 | **SBC-374** | `Docs` | `INF` | document bkt audit verifier center in guides and admin portal specification | 2026-11-10 | `91066fa` |
 | **SBC-375** | `Docs` | `INF` | document brainstorm 18 on google auth, classroom invite codes, enrollment modes and user management | 2026-11-10 | `1a8f657` |
 | **SBC-382** | `Story` | `INF` | verify end-to-end user onboarding flow, invite redemption and auth test mode with playwright tests | 2026-11-10 | `70737ec` |
+| **SBC-383** | `Docs` | `INF` | document brainstorm 19 on course architecture, modular curriculum, bkt mastery gating and dynamic cms | 2026-11-10 | pending |
+| **SBC-389** | `Story` | `INF` | verify end-to-end course and module management flow with playwright tests and documentation update | 2026-11-10 | pending |
 
 ---
 
@@ -166,6 +168,7 @@
 | **SBC-338** | `Style` | `ST` | redesign QuizTaskEditor, EssayTaskEditor, MonacoCodeEditor and evaluation feedback in student portal to minimalist borderless UI | 2026-11-06 | `2edb113` |
 | **SBC-346** | `Story` | `SH` | complete end-to-end @sbc/types DTO contract integration across api, admin, student and teacher apps (BACKLOG-6) | 2026-11-07 | `ef22e4e` |
 | **SBC-376** | `Story` | `SH` | extend prisma schema with classroom, course enrollment, auth provider and system config | 2026-11-10 | `988cf65` |
+| **SBC-384** | `Story` | `SH` | extend prisma schema with CourseModule model, allowedModuleIds fields and typescript dto contracts | 2026-11-10 | pending |
 
 ---
 
@@ -189,6 +192,7 @@
 | **SBC-171** | `Story` | `BK` | add BehavioralAdjuster for dynamic Slip/Guess (Phase 2 step 1) | 2026-10-13 | `bd7526c` |
 | **SBC-377** | `Story` | `BK` | implement google oauth token exchange, jwt sessions and test mode mock-login | 2026-11-10 | `214dde4` |
 | **SBC-378** | `Story` | `BK` | implement classroom invite codes, student join route and course enrollment management api | 2026-11-10 | `3344523` |
+| **SBC-385** | `Story` | `BK` | implement backend courses and modules crud api with skill attachment and classroom filtering | 2026-11-10 | pending |
 
 ---
 
@@ -331,6 +335,7 @@
 | **SBC-364** | `Style` | `ST` | eliminate nested containers and declutter Skill DAG drawer into minimalist borderless sequence | 2026-11-10 | `e72e143` |
 | **SBC-370** | `Fix` | `ST` | constrain MonacoCodeEditor height and flex layout to eliminate infinite vertical expansion loop | 2026-11-10 | `6096911` |
 | **SBC-381** | `Story` | `ST` | implement google sign-in button, /join invite code redemption and enrollment mode gating | 2026-11-10 | `51e412f` |
+| **SBC-388** | `Story` | `ST` | implement modular skill drawer sections, bkt mastery module unlocking and allowed modules filtering in student portal | 2026-11-10 | pending |
 
 ---
 
@@ -403,6 +408,7 @@
 | **SBC-368** | `Fix` | `TC` | implement checkbox multi-selection for subconcepts and fix triad slot filtering | 2026-11-10 | `368a0ea` |
 | **SBC-369** | `Style` | `TC` | eliminate nested containers and declutter MetricsAuditInspector into minimalist borderless layout | 2026-11-10 | `9b5f1f9` |
 | **SBC-380** | `Story` | `TC` | implement classroom management drawer section, invite code generator and enrollment mode selector | 2026-11-10 | `137f38a` |
+| **SBC-387** | `Story` | `TC` | implement modular course selection and allowed modules filter in teacher classroom creator | 2026-11-10 | pending |
 
 
 
@@ -425,6 +431,7 @@
 | **SBC-357** | `Story` | `AD` | implement clear activity logs endpoint and admin confirmation modal with safety guard | 2026-11-09 | `4023517` |
 | **SBC-373** | `Story` | `AD` | integrate bkt math verifier and interactive sandbox into admin portal | 2026-11-10 | `ed773be` |
 | **SBC-379** | `Story` | `AD` | create user management center with rbac, create/edit modals, course assignment and test mode toggle | 2026-11-10 | `afbe3e2` |
+| **SBC-386** | `Story` | `AD` | implement dynamic course and module cms with bkt mastery threshold controls in admin portal | 2026-11-10 | pending |
 
 ---
 
