@@ -574,24 +574,26 @@ export function StudentPortalContent({
               {activeTab === 'task' && task && (
                 <div className="flex flex-col gap-3 flex-1">
                   {/* Sub-tab navigation: Condition vs History */}
-                  <div className="bg-slate-800/60 p-0.5 rounded-lg flex items-center gap-0.5">
+                  <div className="bg-slate-950/60 p-0.5 rounded-lg flex items-center gap-0.5 border border-slate-800/60">
                     <button
+                      type="button"
                       onClick={() => setTaskDrawerSubTab('condition')}
-                      className={`flex-1 py-1.5 px-2.5 rounded-md text-xs font-medium flex items-center justify-center gap-1.5 transition-colors cursor-pointer ${
+                      className={`flex-1 py-1.5 px-2.5 rounded-md text-xs font-medium flex items-center justify-center gap-1.5 transition-colors cursor-pointer select-none ${
                         taskDrawerSubTab === 'condition'
-                          ? 'bg-indigo-600 text-white'
-                          : 'text-slate-400 hover:text-white'
+                          ? 'bg-slate-800 text-white shadow-sm'
+                          : 'text-slate-400 hover:text-slate-200'
                       }`}
                     >
                       <BookOpen className="w-3.5 h-3.5" />
                       <span>Умова</span>
                     </button>
                     <button
+                      type="button"
                       onClick={() => setTaskDrawerSubTab('history')}
-                      className={`flex-1 py-1.5 px-2.5 rounded-md text-xs font-medium flex items-center justify-center gap-1.5 transition-colors cursor-pointer relative ${
+                      className={`flex-1 py-1.5 px-2.5 rounded-md text-xs font-medium flex items-center justify-center gap-1.5 transition-colors cursor-pointer relative select-none ${
                         taskDrawerSubTab === 'history'
-                          ? 'bg-purple-600 text-white'
-                          : 'text-slate-400 hover:text-white'
+                          ? 'bg-slate-800 text-white shadow-sm'
+                          : 'text-slate-400 hover:text-slate-200'
                       }`}
                     >
                       <History className="w-3.5 h-3.5" />
@@ -600,7 +602,7 @@ export function StudentPortalContent({
                         <span className={`text-[10px] font-mono ${
                           taskSubmissions.some((s) => s.teacherComment)
                             ? 'text-amber-300 font-bold'
-                            : 'text-slate-300'
+                            : 'text-slate-400'
                         }`}>
                           ({taskSubmissions.length})
                         </span>
@@ -710,12 +712,12 @@ export function StudentPortalContent({
                           {/* Рівень складності */}
                           <div className="flex items-center justify-between text-slate-400">
                             <span>Складність:</span>
-                            <span className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase ${
+                            <span className={`text-[11px] font-mono font-semibold uppercase ${
                               task.difficulty === 'HARD'
-                                ? 'bg-rose-950/60 text-rose-300 border border-rose-800/50'
+                                ? 'text-rose-400'
                                 : task.difficulty === 'MEDIUM'
-                                ? 'bg-amber-950/60 text-amber-300 border border-amber-800/50'
-                                : 'bg-emerald-950/60 text-emerald-300 border border-emerald-800/50'
+                                ? 'text-amber-400'
+                                : 'text-emerald-400'
                             }`}>
                               {task.difficulty || 'EASY'}
                             </span>
@@ -1110,12 +1112,13 @@ export function StudentPortalContent({
                     <SkillDagMap nodes={graphNodes} activeSkillSlug={task?.skill?.slug} />
 
                     <button
+                      type="button"
                       onClick={() => {
                         handleTabClick('tree');
                       }}
-                      className="w-full py-2 px-3 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-xs flex items-center justify-center gap-2 transition-colors cursor-pointer mt-2"
+                      className="w-full py-2 px-3 rounded-lg bg-slate-800/60 hover:bg-slate-800 text-indigo-300 hover:text-white font-medium text-xs flex items-center justify-center gap-2 border border-slate-700/60 hover:border-indigo-500/40 transition-colors cursor-pointer mt-2 select-none"
                     >
-                      <Network className="w-3.5 h-3.5" />
+                      <Network className="w-3.5 h-3.5 text-indigo-400" />
                       <span>Відкрити Дерево Знань на Екрані</span>
                     </button>
                   </DrawerSection>
@@ -1207,6 +1210,7 @@ export function StudentPortalContent({
 
                       {/* Action Button */}
                       <button
+                        type="button"
                         disabled={inspectedSkill.status === 'LOCKED'}
                         onClick={() => {
                           setActiveTab('task');
@@ -1214,12 +1218,12 @@ export function StudentPortalContent({
                           setIsDrawerOpen(true);
                           fetchRecommendedTask(activeCourseSlug);
                         }}
-                        className={`w-full py-2 px-3 rounded-lg font-medium text-xs flex items-center justify-center gap-2 transition-colors cursor-pointer mt-2 ${
+                        className={`w-full py-2 px-3 rounded-lg font-medium text-xs flex items-center justify-center gap-2 transition-colors cursor-pointer mt-2 select-none ${
                           inspectedSkill.status === 'LOCKED'
-                            ? 'bg-slate-800 text-slate-500 cursor-not-allowed'
+                            ? 'bg-slate-800/40 text-slate-500 cursor-not-allowed border border-slate-800/60'
                             : inspectedSkill.pMastery >= 0.90
-                            ? 'bg-emerald-600 hover:bg-emerald-500 text-white'
-                            : 'bg-indigo-600 hover:bg-indigo-500 text-white'
+                            ? 'bg-slate-800/60 hover:bg-slate-800 text-emerald-300 hover:text-white border border-slate-700/60 hover:border-emerald-500/40'
+                            : 'bg-slate-800/60 hover:bg-slate-800 text-indigo-300 hover:text-white border border-slate-700/60 hover:border-indigo-500/40'
                         }`}
                       >
                         <span>{inspectedSkill.status === 'LOCKED' ? '🔒 Заблоковано' : inspectedSkill.pMastery >= 0.90 ? 'Повторити тему' : 'Розпочати вправу вузла →'}</span>
@@ -1244,12 +1248,13 @@ export function StudentPortalContent({
                     defaultOpen={true}
                   >
                     <div className="flex flex-col gap-3 text-xs text-slate-300 py-1">
-                      <p>Параметри середовища розробки та актуалізації моделі знань.</p>
+                      <p className="text-slate-400 text-xs leading-relaxed">Параметри середовища розробки та актуалізації моделі знань.</p>
                       <button
+                        type="button"
                         onClick={() => fetchRecommendedTask(activeCourseSlug)}
-                        className="w-full py-2 bg-indigo-600 text-white rounded-lg font-medium cursor-pointer hover:bg-indigo-500 transition-colors flex items-center justify-center gap-2"
+                        className="w-full py-2 px-3 bg-slate-800/60 hover:bg-slate-800 text-slate-300 hover:text-white border border-slate-700/60 hover:border-indigo-500/40 rounded-lg text-xs font-medium cursor-pointer transition-colors flex items-center justify-center gap-2 select-none"
                       >
-                        <RefreshCw className="w-3.5 h-3.5" />
+                        <RefreshCw className="w-3.5 h-3.5 text-indigo-400" />
                         <span>Перезавантажити стан BKT</span>
                       </button>
                     </div>
@@ -1479,9 +1484,9 @@ export function StudentPortalContent({
               />
             </div>
           ) : isLoading ? (
-            <div className="p-12 bg-slate-900/50 border border-slate-800 rounded-2xl flex flex-col items-center justify-center gap-4 text-slate-400 my-auto mx-auto">
-              <RefreshCw className="w-8 h-8 animate-spin text-indigo-500" />
-              <p className="text-sm font-medium">Завантаження адаптивного завдання з BKT графа...</p>
+            <div className="py-16 flex flex-col items-center justify-center gap-3 text-slate-400 my-auto mx-auto select-none">
+              <RefreshCw className="w-7 h-7 animate-spin text-indigo-400" />
+              <p className="text-xs font-mono text-slate-400">Завантаження адаптивного завдання з BKT графа...</p>
             </div>
           ) : task ? (
             <div className="flex-1 p-4 lg:p-6 overflow-y-auto flex flex-col gap-4">
@@ -1490,55 +1495,55 @@ export function StudentPortalContent({
 
               {/* 🎓 Міжпортальна плашка повернення до Підручника Теорії (Cross-App Protocol) */}
               {source === 'study' && (
-                <div className="w-full bg-gradient-to-r from-blue-950/80 via-indigo-950/60 to-slate-900 border border-blue-500/40 rounded-2xl p-4 shadow-xl flex items-center justify-between gap-4 animate-fadeIn">
+                <div className="w-full bg-blue-950/30 border border-blue-500/30 rounded-xl p-3.5 flex items-center justify-between gap-4 animate-fadeIn">
                   <div className="flex items-center gap-3">
-                    <div className="p-2 rounded-xl bg-blue-500/20 border border-blue-500/30 text-blue-400 shrink-0">
-                      <GraduationCap className="w-5 h-5 animate-pulse" />
+                    <div className="p-1.5 rounded-lg bg-blue-500/10 text-blue-400 shrink-0">
+                      <GraduationCap className="w-4 h-4" />
                     </div>
                     <div>
                       <div className="flex items-center gap-2">
-                        <span className="text-xs font-bold text-white uppercase tracking-wider">
+                        <span className="text-xs font-semibold text-white uppercase tracking-wider">
                           Шлюз перевірки компетенції з Підручника
                         </span>
-                        <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-blue-500/20 text-blue-300 border border-blue-500/30">
+                        <span className="text-[10px] font-mono text-blue-300">
                           {unitSlug || 'Теоретичний блок'}
                         </span>
                       </div>
-                      <p className="text-xs text-blue-200/90 mt-0.5">
+                      <p className="text-xs text-blue-200/80 mt-0.5">
                         Ви перейшли для підтвердження знань. Після успішного проходження вправи BKT-секвенсор опрацює результат і розблокує подальші теми.
                       </p>
                     </div>
                   </div>
                   <a
                     href={getAppBaseUrl('study')}
-                    className="px-4 py-2 rounded-xl bg-blue-600/30 hover:bg-blue-600 text-blue-200 hover:text-white font-bold text-xs border border-blue-400/40 transition-all flex items-center gap-1.5 shrink-0 shadow-md cursor-pointer"
+                    className="px-3 py-1.5 rounded-lg bg-slate-800/80 hover:bg-slate-800 text-blue-300 hover:text-white font-medium text-xs border border-blue-500/30 hover:border-blue-400 transition-colors flex items-center gap-1.5 shrink-0 cursor-pointer"
                   >
-                    <span>← Повернутися до підручника</span>
+                    <span>← До підручника</span>
                   </a>
                 </div>
               )}
 
               {/* ⚠️ Top Adaptive Degradation Notice Banner */}
               {recommendation?.isDifficultyDegraded && (
-                <div className="w-full bg-gradient-to-r from-amber-950/70 via-amber-900/40 to-slate-900 border border-amber-500/40 rounded-2xl p-4 shadow-xl flex items-start sm:items-center justify-between gap-4 animate-fadeIn">
+                <div className="w-full bg-amber-950/25 border border-amber-500/30 rounded-xl p-3.5 flex items-start sm:items-center justify-between gap-4 animate-fadeIn">
                   <div className="flex items-start sm:items-center gap-3">
-                    <div className="p-2 rounded-xl bg-amber-500/20 border border-amber-500/30 text-amber-400 shrink-0 mt-0.5 sm:mt-0">
-                      <AlertTriangle className="w-5 h-5 animate-pulse" />
+                    <div className="p-1.5 rounded-lg bg-amber-500/10 text-amber-400 shrink-0 mt-0.5 sm:mt-0">
+                      <AlertTriangle className="w-4 h-4" />
                     </div>
                     <div>
                       <div className="flex items-center gap-2 flex-wrap">
-                        <span className="text-sm font-bold text-white">Рівень складності адаптовано</span>
-                        <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">
-                          Максимальний бал: {recommendation?.maxScoreCap ?? 70}%
+                        <span className="text-xs font-semibold text-white">Рівень складності адаптовано</span>
+                        <span className="text-[10px] font-mono font-medium text-amber-400">
+                          (Макс. бал: {recommendation?.maxScoreCap ?? 70}%)
                         </span>
                       </div>
-                      <p className="text-xs text-amber-200/90 mt-0.5 leading-relaxed max-w-3xl">
+                      <p className="text-xs text-amber-200/80 mt-0.5 leading-relaxed max-w-3xl">
                         Система помітила труднощі в попередніх завданнях і тимчасово надала допоміжні питання для закріплення базових концепцій. Ви зможете повернутися до 100% балу після успішного освоєння теми.
                       </p>
                     </div>
                   </div>
                   <div className="hidden md:flex items-center gap-2 shrink-0">
-                    <span className="text-[11px] font-mono text-amber-400/80 bg-slate-950/60 px-3 py-1.5 rounded-xl border border-amber-500/20">
+                    <span className="text-[10px] font-mono text-amber-400/80">
                       Тема: {task.topic || task.skill?.title || 'Навичка'}
                     </span>
                   </div>
@@ -1675,15 +1680,15 @@ export function StudentPortalContent({
               {task.description && (
                 <div
                   data-testid="task-condition-card"
-                  className="w-full rounded-2xl bg-gradient-to-r from-slate-900/80 via-indigo-950/20 to-slate-900/60 border border-slate-800/90 p-5 sm:p-6 relative overflow-hidden group hover:border-slate-700/80 transition-all shadow-sm"
+                  className="w-full rounded-xl bg-slate-900/50 border border-slate-800/80 p-4 sm:p-5 relative overflow-hidden transition-all"
                 >
-                  <div className="absolute top-0 left-0 bottom-0 w-1.5 bg-gradient-to-b from-indigo-500 via-indigo-400 to-purple-500 rounded-l" />
+                  <div className="absolute top-0 left-0 bottom-0 w-1 bg-indigo-500 rounded-l" />
                   <div className="flex items-center justify-between gap-3 mb-2.5">
                     <div className="flex items-center gap-2 text-xs font-semibold text-indigo-400 uppercase tracking-wider">
                       <HelpCircle className="w-3.5 h-3.5 text-indigo-400" />
                       <span>Умова завдання</span>
                     </div>
-                    <span className="text-[11px] font-mono px-2.5 py-0.5 rounded-full bg-slate-800/80 text-slate-300 border border-slate-700/60">
+                    <span className="text-[11px] font-mono text-slate-400 font-medium">
                       {task.taskType === 'CODE'
                         ? 'Практичний кодинг'
                         : task.taskType === 'TEXT_ESSAY'

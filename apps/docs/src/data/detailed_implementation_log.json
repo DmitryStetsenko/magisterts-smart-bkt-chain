@@ -120,6 +120,87 @@
           ]
         },
         {
+          "title": "0.1.7.67 Ліквідація Ефекту «Матрьошки» та Приведення Сайдбара Skill DAG до Стандарту Rule 7 (`SBC-364`, `EP-ST`)",
+          "level": 3,
+          "paragraphs": [],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "**Контекст проблеми та виявлені невідповідності:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "У висувному сайдбарі «Карта Навичок (Skill DAG)» (`apps/student`) вміст секції «Граф зв'язків компетенцій» було огорнуто у важкий рамковий контейнер `border border-slate-800 rounded-2xl bg-slate-900/90 p-4 shadow-xl`. Це створювало багаторівневий ефект «матрьошки», суворо заборонений правилом 7 (Minimalist Borderless Design Standard).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Кожен вузол графа компетенцій являв собою окрему важку картку з рамкою `p-3 rounded-xl border`, тінню та неоновою підсвіткою (`ring-1.5 ring-indigo-500/50`).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Між картками відображалися громіздкі круглі кнопки-стрілки з рамками (`w-6 h-6 rounded-full bg-slate-900 border border-slate-700 shadow-md`), що засмічували вертикальний простір.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Внизу сайдбара знаходилася кричуща суцільна фіолетова кнопка `bg-indigo-600 hover:bg-indigo-500`, яка порушувала стриману кольорову гаму темного інтерфейсу.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Вкладені бейджі складності та перемикач вкладок мали важкі обведення та яскраві кольорові заливки.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Виконані інженерні покращення:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Повний рефакторинг компонента [`SkillDagMap.tsx`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/student/src/features/skill-graph/ui/SkillDagMap.tsx):**",
+              "subitems": [
+                "Видалено зовнішній рамковий контейнер `border border-slate-800 rounded-2xl bg-slate-900/90 p-4 shadow-xl`.",
+                "Список компетенцій організовано як чистий безрамковий перелік із семантичними тонкими лініями розділення `divide-y divide-slate-800/50` та динамічним обмеженням висоти скролу `max-h-[calc(100vh-320px)] custom-scrollbar`.",
+                "Індикатори статусу модулів переведено на чисту моноширинну типографіку без рамок (`font-mono text-[10px] text-emerald-400 / text-amber-400 / text-slate-500`).",
+                "Видалено зайві круглі кнопки зі стрілками між рядками.",
+                "Прогрес-бари оптимізовано до тонких безрамкових смужок висотою 1px (`h-1 bg-slate-800 rounded-full`).",
+                "Активний модуль візуально акцентується м'якою підкладкою `bg-slate-800/60 ring-1 ring-indigo-500/30` без неонових тіней."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Поліпшення в [`StudentPortalApp.tsx`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/student/src/components/StudentPortalApp.tsx):**",
+              "subitems": [
+                "Кнопку «Відкрити Дерево Знань на Екрані» переведено на витончений темний стиль `bg-slate-800/60 hover:bg-slate-800 text-indigo-300 border border-slate-700/60 hover:border-indigo-500/40`.",
+                "Аналогічно оновлено кнопки дій у шторках «Деталізація вузла дерева» та «Налаштування Студента».",
+                "Сегментований перемикач «Умова / Історія» переведено на спокійні нейтральні стани `bg-slate-800 text-white shadow-sm` замість `bg-indigo-600` та `bg-purple-600`.",
+                "Бейджі складності у параметрах тестування переведено на безрамковий типографічний стиль.",
+                "Полегшено банери адаптивної складності та шлюзу повернення до підручника з усуненням важких тіней `shadow-xl`."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Верифікація:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Успішна компіляція та збірка: `npm run build:student` (0 помилок, чистий білд Next.js Turbopack).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Скріншотна верифікація у Playwright Headless Browser: повна відповідність вимогам Rule 7.",
+              "subitems": []
+            }
+          ]
+        },
+        {
           "title": "0.1.7.66 Усунення Асиметричного Звуження та Адаптивна Сітка Варіантів 2x2 (`SBC-363`, `EP-ST`)",
           "level": 3,
           "paragraphs": [],
