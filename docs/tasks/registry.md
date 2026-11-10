@@ -187,7 +187,7 @@
 | **SBC-115** | `Bug` | `BK` | fallback to global tasks in TaskSequencer when all active skill tasks are completed | 2026-10-05 | `5c969e0` |
 | **SBC-125** | `Bug` | `BK` | support const and let function declarations in VM runner | 2026-10-06 | `d5ac059` |
 | **SBC-171** | `Story` | `BK` | add BehavioralAdjuster for dynamic Slip/Guess (Phase 2 step 1) | 2026-10-13 | `bd7526c` |
-| **SBC-377** | `Story` | `BK` | implement google oauth token exchange, jwt sessions and test mode mock-login | 2026-11-10 | pending |
+| **SBC-377** | `Story` | `BK` | implement google oauth token exchange, jwt sessions and test mode mock-login | 2026-11-10 | `214dde4` |
 | **SBC-378** | `Story` | `BK` | implement classroom invite codes, student join route and course enrollment management api | 2026-11-10 | pending |
 
 ---
