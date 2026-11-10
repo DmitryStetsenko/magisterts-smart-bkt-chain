@@ -75,4 +75,8 @@
     - *Дата:* 10 листопада 2026
     - *Ключові теми:* Мережева топологія та мульти-піддоменний шлюз Nginx, шкільна модель авторизації за кодом класу (Classroom Auth) без порушення захисту персональних даних неповнолітніх, ізольоване виконання коду (`isolated-vm` / Web Workers), персистенція DAG в `apps/admin`, Gasless Web3 SBT сертифікація майстерності (ERC-5192 на L2 Base/Sepolia), підключення Gemini 2.5 Flash до Tier 3 аналітичних есе, 4-етапна дорожня карта розгортання в хмарі.
 
+18. [18. Повноцінна Авторизація через Google, Інвайт-Коди Класів, Гнучкий Енролмент Курсів та Адмін-Керування Користувачами](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/docs/brainstorm/18_user_onboarding_google_auth_course_enrollment_and_admin_rbac.md)
+    - *Дата:* 10 листопада 2026
+    - *Ключові теми:* Google OAuth 2.0 та тумблер Test Mode Auth Bypass в адмінці, інвайт-коди класів (`/join/:code`) та індивідуальне призначення курсів учням, 3 дидактичні режими зарахування (`FULL_CYCLE`, `TESTING_ONLY`, `MODULAR`), вкладка `users` в `apps/admin` (таблиця користувачів, створення, редагування, блокування/видалення), розширення Prisma ORM (`Classroom`, `CourseEnrollment`, `SystemConfig`).
+
 

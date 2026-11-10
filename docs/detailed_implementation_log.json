@@ -120,6 +120,107 @@
           ]
         },
         {
+          "title": "0.1.7.77 Архітектурний Брейншторм 18: Реєстрація через Google, Інвайт-коди Курсів, Режими Доступу та CMS Користувачів (SBC-375, EP-INF)",
+          "level": 3,
+          "paragraphs": [],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "**Контекст та дидактична мета:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Підготовка платформи Smart-BKT-Chain до пілотного впровадження в коледжах та комп'ютерній академії.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Усунення бар'єрів першого входу для студентів (Google OAuth 2.0 в 1 клік), забезпечення гнучких сценаріїв роботи викладачів (генерація інвайт-кодів для навчальних груп на кшталт Google Classroom + індивідуальне призначення курсів), підтримка трьох дидактичних режимів (`FULL_CYCLE` — повний цикл теорія + практика з BKT-гейтингом, `TESTING_ONLY` — експрес-діагностика без обов'язкової теорії, `MODULAR` — вибірковий доступ до модулів), а також централізоване керування викладачами та студентами в Адмін-панелі CMS з підтримкою перемикача тестового режиму авторизації (`SYSTEM_AUTH_TEST_MODE`).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Зафіксовані архітектурні концепції та рішення (відповідно до Правила 5 AGENTS.md):**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Google OAuth 2.0 Pipeline та Автономний Тестовий Режим:**",
+              "subitems": [
+                "Інтеграція `@react-oauth/google` на фронтенді та `google-auth-library` на NestJS бекенді (`POST /api/v1/auth/google`).",
+                "Сесійні HTTP-only JWT куки (`sbc_auth_token`), що діють на рівні кореневого домену та поширюються на всі субдомени (`study.*`, `student.*`, `teacher.*`, `admin.*`).",
+                "Для запобігання блокуванню локального тестування або офлайн-демонстрацій (за відсутності ключів Google API) у конфігурації платформи впроваджено системний прапорець `SYSTEM_AUTH_TEST_MODE` у таблиці `SystemConfig`. Коли прапорець активний, на сторінках входу з'являються кнопки швидкого мок-входу (Студент, Викладач, Адміністратор) без Google SDK."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Інвайт-коди Класів (Classroom Invite Codes) та Індивідуальне Підключення:**",
+              "subitems": [
+                "Модель `Classroom`: унікальний короткий промокод (наприклад `KOD-KN21`), назва групи, закріплений викладач (`teacherId`), курс (`courseId`) та дидактичний режим за замовчуванням.",
+                "Студент вводить код на сторінці `/join` або переходить за прямим посиланням `/join/:code` і автоматично зараховується на курс зі створенням запису `CourseEnrollment`.",
+                "Викладач має можливість як згенерувати інвайт-код для всього потоку, так і підключити конкретного зареєстрованого студента персонально за його email або ідентифікатором."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Три Дидактичні Режими Зарахування (`EnrollmentMode`):**",
+              "subitems": [
+                "`FULL_CYCLE`: стандартна логіка платформи — обов'язкове вивчення теорії уроку в `apps/study`, складання тренажера в `apps/student`, відкриття наступного рівня лише після досягнення майстерності $P(L_t) \\ge 0.85$.",
+                "`TESTING_ONLY`: діагностичний режим (зріз знань, вступні чи семестрові іспити), де практичний тренажер відкривається негайно, без блокування на читанні теоретичних уроків.",
+                "`MODULAR`: викладач обирає конкретні модулі курсу (`allowedModules: string[]`), доступні для проходження."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Центр Керування Користувачами (Admin Users & Roles CMS):**",
+              "subitems": [
+                "Нова вкладка `users` на навігаційній рейці `apps/admin`.",
+                "Таблиця користувачів з фільтрами за ролями (`STUDENT`, `TEACHER`, `ADMIN`), класами та статусом.",
+                "Модальне вікно створення та редагування користувача (ім'я, email, роль, пароль/Google, призначення курсів).",
+                "М'яке блокування / деактивація акаунтів, журнал активності та швидкий перемикач `SYSTEM_AUTH_TEST_MODE`."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Схема Бази Даних (Prisma ORM):**",
+              "subitems": [
+                "Розширення `User`: додано поля `authProvider` (`GOOGLE` / `LOCAL`), `googleId`, `avatarUrl`, `status` (`ACTIVE`, `SUSPENDED`).",
+                "Нові сутності: `Classroom`, `CourseEnrollment`, `SystemConfig`, перерахування `EnrollmentMode`, `AuthProvider`."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Дорожня карта впровадження на 7 мікро-кроків:**",
+              "subitems": [
+                "Крок 1 (`SBC-376`, `EP-SH`): Prisma Schema & Migrations (`Classroom`, `CourseEnrollment`, `SystemConfig`).",
+                "Крок 2 (`SBC-377`, `EP-BK`): Backend Auth & Mock-Auth (`/api/v1/auth/google`, `/api/v1/auth/mock-login`, `/api/v1/system-config`).",
+                "Крок 3 (`SBC-378`, `EP-BK`): Backend Classroom & Enrollment API (`/api/v1/classrooms`, `/api/v1/classrooms/join/:code`, `/api/v1/enrollments`).",
+                "Крок 4 (`SBC-379`, `EP-AD`): Admin Users CMS (`UserManagementCenter.tsx`, фільтри, модалка створення/редагування, тест-моде тогл).",
+                "Крок 5 (`SBC-380`, `EP-TC`): Teacher Classrooms & Invite Codes (генерація кодів, список студентів класу, вибір дидактичного режиму).",
+                "Крок 6 (`SBC-381`, `EP-ST`): Student / Study Onboarding & Join Route (вхід через Google, модалка введення інвайт-коду `/join`, адаптація BKT під дидактичний режим).",
+                "Крок 7 (`SBC-382`, `EP-INF`): Скрізне E2E тестування (Playwright), регенерація документації та фіксація релізу."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Документація:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Детальний опис брейншторму збережено у [`docs/brainstorm/18_user_onboarding_google_auth_course_enrollment_and_admin_rbac.md`](file:///docs/brainstorm/18_user_onboarding_google_auth_course_enrollment_and_admin_rbac.md).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Зареєстровано в [`docs/brainstorm/README.md`](file:///docs/brainstorm/README.md).",
+              "subitems": []
+            }
+          ]
+        },
+        {
           "title": "0.1.7.76 Інтеграція Математичного Аудитора та Python-Верифікатора BKT в Адміністративну Панель CMS (SBC-373, EP-AD)",
           "level": 3,
           "paragraphs": [],
