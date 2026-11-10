@@ -30,6 +30,44 @@
   5. *Build Next.js Documentation Site* (`npm run build:docs`) — збірка статичного експорту (`output: "export"`, `trailingSlash: true`, `basePath: "/magisterts-smart-bkt-chain"`).
   6. *Upload Artifact & Deploy Pages* (`actions/upload-pages-artifact@v3` + `actions/deploy-pages@v4`).
 
+### 0.1.7.78 Розширення Схеми Бази Даних Prisma ORM, Моделей Класів, Зарахувань та Контрактів Типів (SBC-376, EP-SH)
+- **Контекст та інженерне завдання:**
+  - Реалізація Кроку 1 дорожньої карти Брейншторму 18: створення фундаменту бази даних PostgreSQL для підтримки автентифікації користувачів через Google OAuth 2.0 або локальні акаунти, організації студентів у навчальні класи (`Classroom`) за унікальними промокодами (`code`), зарахування на курси (`CourseEnrollment`) з трьома дидактичними режимами (`FULL_CYCLE`, `TESTING_ONLY`, `MODULAR`), та динамічного збереження системних прапорців платформи (`SystemConfig`).
+- **Виконані інженерні зміни:**
+  1. **Prisma ORM Схема (`packages/database/prisma/schema.prisma`):**
+     - Створено перерахування `AuthProvider` (`LOCAL`, `GOOGLE`).
+     - Створено перерахування `UserStatus` (`ACTIVE`, `SUSPENDED`).
+     - Створено перерахування `EnrollmentMode` (`FULL_CYCLE`, `TESTING_ONLY`, `MODULAR`).
+     - Розширено модель `User`:
+       - `authProvider AuthProvider @default(LOCAL)`
+       - `googleId String?` з індексом `@@index([googleId])` для швидкого O(1) пошуку при обміні Google ID токенів.
+       - `status UserStatus @default(ACTIVE)`
+       - Реляційні зв'язки: `taughtClassrooms Classroom[] @relation("TeacherClassrooms")`, `classrooms Classroom[] @relation("ClassroomStudents")`, `courseEnrollments CourseEnrollment[]`.
+     - Розширено модель `Course`:
+       - Реляційні зв'язки: `classrooms Classroom[]`, `enrollments CourseEnrollment[]`.
+     - Створено модель `Classroom`:
+       - `id`, `name`, `code` (унікальний інвайт-код, наприклад `KOD-KN21`), `teacherId`, `courseId`, `defaultMode`, `allowedModules String[]`, `createdAt`, `updatedAt`, зв'язки `teacher`, `course`, `students`, `enrollments`.
+     - Створено модель `CourseEnrollment`:
+       - `id`, `userId`, `courseId`, `classroomId?`, `mode`, `allowedModules String[]`, `isActive Boolean`, `enrolledAt`, `updatedAt`.
+       - Унікальне складене обмеження `@@unique([userId, courseId])`, індекси `@@index([userId])`, `@@index([courseId])`, `@@index([classroomId])`.
+     - Створено модель `SystemConfig`:
+       - `key String @id`, `value String`, `description String?`, `updatedAt DateTime @updatedAt`.
+  2. **Синхронізація БД та Генерація Клієнта:**
+     - Застосовано `npx prisma db push --schema=packages/database/prisma/schema.prisma` до PostgreSQL бази даних `smart_bkt_chain` без втрати існуючих даних.
+     - Успішно згенеровано актуалізований Prisma Client `v6.19.3` у пакеті `@sbc/database`.
+  3. **Скрипт Сидингу (`packages/database/prisma/seed.ts`):**
+     - Додано створення системного адміністратора `admin@example.com` (`UserRole.ADMIN`).
+     - Ініціалізовано системне налаштування `SYSTEM_AUTH_TEST_MODE = 'true'` у таблиці `system_configs`.
+     - Додано каскадне очищення `course_enrollments` та `classrooms` перед заповненням курсів.
+     - Створено демонстраційний навчальний клас `KOD-KN21` («Група КН-21 (Інформатика)») під керівництвом `teacher@example.com` та зараховано учня `student@example.com` у режимі `FULL_CYCLE`.
+  4. **Спільні Пакети Типів (`@sbc/types`):**
+     - Створено [`packages/types/src/auth.types.ts`](file:///packages/types/src/auth.types.ts): DTO-інтерфейси `AuthUserDto`, `AuthUserProfileDto`, `GoogleAuthPayloadDto`, `MockAuthPayloadDto`, `SystemConfigDto`, `CreateUserDto`, `UpdateUserDto`.
+     - Створено [`packages/types/src/classroom.types.ts`](file:///packages/types/src/classroom.types.ts): DTO-інтерфейси `ClassroomDto`, `CourseEnrollmentDto`, `CreateClassroomDto`, `JoinClassroomDto`, `EnrollStudentDto`, тип `EnrollmentMode`.
+     - Експортовано з `packages/types/src/index.ts` та успішно скомпільовано через TypeScript Compiler (`tsc`).
+- **Верифікація:**
+  - Успішний прогін повного сидингу `npm run db:seed` (створено користувачів, конфіг, навчальний клас, зарахування та 4 курси).
+  - Успішна збірка пакетів `@sbc/types` та `@sbc/database` (`tsc`).
+
 ### 0.1.7.77 Архітектурний Брейншторм 18: Реєстрація через Google, Інвайт-коди Курсів, Режими Доступу та CMS Користувачів (SBC-375, EP-INF)
 - **Контекст та дидактична мета:**
   - Підготовка платформи Smart-BKT-Chain до пілотного впровадження в коледжах та комп'ютерній академії.

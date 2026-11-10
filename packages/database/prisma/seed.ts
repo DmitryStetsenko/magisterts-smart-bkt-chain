@@ -3,7 +3,7 @@ import dotenv from 'dotenv';
 dotenv.config({ path: path.resolve(__dirname, '../../../.env') });
 dotenv.config();
 
-import { PrismaClient, UserRole, TaskDifficulty, TaskType } from '@prisma/client';
+import { PrismaClient, UserRole, TaskDifficulty, TaskType, EnrollmentMode } from '@prisma/client';
 import {
   jsBasicsTasks,
   jsFunctionsTasks,
@@ -76,12 +76,42 @@ async function main() {
     },
   });
 
-  console.log(`👤 Users seeded: Student (${student.email}), Teacher (${teacher.email})`);
+  const admin = await prisma.user.upsert({
+    where: { email: 'admin@example.com' },
+    update: {},
+    create: {
+      email: 'admin@example.com',
+      passwordHash: '$2b$10$Epq9L4.8/aB8xQk/6Qj1yeFw3aEaU5vN1/2v3b4c5d6e7f8g9h0i',
+      role: UserRole.ADMIN,
+      profile: {
+        create: {
+          firstName: 'Олександр',
+          lastName: 'Адміністратор',
+          bio: 'Головний методист та адміністратор платформи',
+        },
+      },
+    },
+  });
+
+  console.log(`👤 Users seeded: Student (${student.email}), Teacher (${teacher.email}), Admin (${admin.email})`);
+
+  // Seed System Configuration
+  await prisma.systemConfig.upsert({
+    where: { key: 'SYSTEM_AUTH_TEST_MODE' },
+    update: { value: 'true' },
+    create: {
+      key: 'SYSTEM_AUTH_TEST_MODE',
+      value: 'true',
+      description: 'Дозволяє швидкий тестовий вхід (студент, викладач, адмін) без обов\'язкового Google OAuth 2.0',
+    },
+  });
 
   // Clean old data for fresh multi-course initialization
   await prisma.submission.deleteMany({});
   await prisma.bktHistory.deleteMany({});
   await prisma.bktState.deleteMany({});
+  await prisma.courseEnrollment.deleteMany({});
+  await prisma.classroom.deleteMany({});
   await prisma.task.deleteMany({});
   await prisma.skillDependency.deleteMany({});
   await prisma.skillNode.deleteMany({});
@@ -94,6 +124,29 @@ async function main() {
       title: 'JavaScript & Web Engineering',
       description: 'Повний курс розробки на JS: від синтаксису до асинхронності та ООП',
       icon: 'code',
+    },
+  });
+
+  // Seed sample classroom and course enrollment
+  const sampleClassroom = await prisma.classroom.create({
+    data: {
+      name: 'Група КН-21 (Інформатика)',
+      code: 'KOD-KN21',
+      teacherId: teacher.id,
+      courseId: courseJs.id,
+      defaultMode: EnrollmentMode.FULL_CYCLE,
+      students: {
+        connect: [{ id: student.id }],
+      },
+    },
+  });
+
+  await prisma.courseEnrollment.create({
+    data: {
+      userId: student.id,
+      courseId: courseJs.id,
+      classroomId: sampleClassroom.id,
+      mode: EnrollmentMode.FULL_CYCLE,
     },
   });
 

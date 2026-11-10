@@ -20,7 +20,8 @@
             "pm run build:student (Next.js 16.2.9 Turbopack, 0 помилок TypeScript).",
             "10. **Інтеграція Математичного Аудитора та Python-Верифікатора BKT в Адміністративну Панель CMS (`SBC-373`, `EP-AD`):**",
             "11. **Синхронізація Посібника з Логування та Специфікації Адмін-Панелі (`SBC-374`, `EP-INF`):**",
-            "12. **Брейншторм 18: Архітектура Google Авторизації, Інвайт-Кодів Класів, Гнучких Режимів Енролменту та Адмін-Керування Користувачами (`SBC-375`, `EP-INF`):**"
+            "12. **Брейншторм 18: Архітектура Google Авторизації, Інвайт-Кодів Класів, Гнучких Режимів Енролменту та Адмін-Керування Користувачами (`SBC-375`, `EP-INF`):**",
+            "13. **Розширення Схеми Бази Даних Prisma ORM та Пакетів Типів для Системи Авторизації, Класів та Режимів Навчання (`SBC-376`, `EP-SH`):**"
           ],
           "code_blocks": [],
           "items": [
@@ -328,7 +329,28 @@
                 "Описано нову вкладку `users` на навігаційній рейці `apps/admin` (таблиця користувачів, створення, редагування ролі/групи, блокування/видалення).",
                 "Складено розширення Prisma ORM (`Classroom`, `CourseEnrollment`, `EnrollmentMode`, `SystemConfig`) та 7-етапну дорожню карту мікро-кроків.",
                 "**Верифікація:**",
-                "Успішна реєстрація в `docs/brainstorm/README.md` та компіляція `python scripts/compile_docs.py`."
+                "Успішна реєстрація в `docs/brainstorm/README.md` та компіляція `python scripts/compile_docs.py`.",
+                "**Виконана інженерна робота:**",
+                "**Prisma Schema (`packages/database/prisma/schema.prisma`):**",
+                "Додано нові перерахування: `AuthProvider` (`LOCAL`, `GOOGLE`), `UserStatus` (`ACTIVE`, `SUSPENDED`), `EnrollmentMode` (`FULL_CYCLE`, `TESTING_ONLY`, `MODULAR`).",
+                "Розширено модель `User`: додано `authProvider`, `googleId` з індексом `@@index([googleId])`, `status`, а також зв'язки з навчальними групами (`taughtClassrooms`, `classrooms`) та зарахуваннями на курси (`courseEnrollments`).",
+                "Створено модель `Classroom`: унікальний інвайт-код (`code`, `@@index([code])`), назва групи, зв'язок з викладачем (`teacher`), курсом (`course`), списком студентів (`students`), дидактичним режимом за замовчуванням (`defaultMode`) та переліком відкритих модулів (`allowedModules`).",
+                "Створено модель `CourseEnrollment`: зв'язок користувача з курсом і класом, дидактичний режим проходження, перелік дозволених модулів, стан активності (`isActive`).",
+                "Створено модель `SystemConfig`: збереження системних прапорців платформи, включаючи `SYSTEM_AUTH_TEST_MODE`.",
+                "**Оновлення БД та генерація клієнта:**",
+                "Виконано `npx prisma db push` для безпечної синхронізації PostgreSQL без ризику втрати даних; згенеровано оновлений Prisma Client `v6.19.3`.",
+                "**Оновлення скрипта сидингу (`packages/database/prisma/seed.ts`):**",
+                "Додано адміністратора `admin@example.com` (`UserRole.ADMIN`).",
+                "Додано системний конфіг `SYSTEM_AUTH_TEST_MODE = 'true'`.",
+                "Додано очищення таблиць `course_enrollments` та `classrooms`.",
+                "Створено тестову навчальну групу `KOD-KN21` («Група КН-21 (Інформатика)») та зв'язано студента `student@example.com` з курсом `js-dev` через `CourseEnrollment` у режимі `FULL_CYCLE`.",
+                "**Розширення спільних контрактів `@sbc/types`:**",
+                "Створено `packages/types/src/auth.types.ts` (`AuthUserDto`, `GoogleAuthPayloadDto`, `MockAuthPayloadDto`, `SystemConfigDto`, `CreateUserDto`, `UpdateUserDto`).",
+                "Створено `packages/types/src/classroom.types.ts` (`ClassroomDto`, `CourseEnrollmentDto`, `CreateClassroomDto`, `JoinClassroomDto`, `EnrollStudentDto`, `EnrollmentMode`).",
+                "Експортовано з кореневого `packages/types/src/index.ts` та успішно скомпільовано через `tsc`.",
+                "**Верифікація:**",
+                "Успішний сидинг бази даних `npm run db:seed` (створено користувачів, конфігурацію, клас та 4 курси).",
+                "Успішна збірка `@sbc/types` та `@sbc/database`."
               ]
             }
           ]

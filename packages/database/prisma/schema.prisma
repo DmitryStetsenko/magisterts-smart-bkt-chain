@@ -14,6 +14,22 @@ enum UserRole {
   ADMIN
 }
 
+enum AuthProvider {
+  LOCAL
+  GOOGLE
+}
+
+enum UserStatus {
+  ACTIVE
+  SUSPENDED
+}
+
+enum EnrollmentMode {
+  FULL_CYCLE
+  TESTING_ONLY
+  MODULAR
+}
+
 enum TaskDifficulty {
   EASY
   MEDIUM
@@ -52,14 +68,16 @@ enum CredentialType {
 }
 
 model Course {
-  id          String      @id @default(uuid())
-  slug        String      @unique
+  id          String             @id @default(uuid())
+  slug        String             @unique
   title       String
   description String
   icon        String?
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
   skills      SkillNode[]
+  classrooms  Classroom[]
+  enrollments CourseEnrollment[]
 
   @@map("courses")
 }
@@ -70,6 +88,9 @@ model User {
   passwordHash       String?
   walletAddress      String?             @unique
   role               UserRole            @default(STUDENT)
+  authProvider       AuthProvider        @default(LOCAL)
+  googleId           String?
+  status             UserStatus          @default(ACTIVE)
   createdAt          DateTime            @default(now())
   updatedAt          DateTime            @updatedAt
   profile            UserProfile?
@@ -80,7 +101,11 @@ model User {
   submissions        Submission[]
   credentials        Credential[]
   activityLogs       StudentActivityLog[]
+  taughtClassrooms   Classroom[]         @relation("TeacherClassrooms")
+  classrooms         Classroom[]         @relation("ClassroomStudents")
+  courseEnrollments  CourseEnrollment[]
 
+  @@index([googleId])
   @@map("users")
 }
 
@@ -323,4 +348,55 @@ model StudentActivityLog {
   @@index([skillId])
   @@map("student_activity_logs")
 }
+
+model Classroom {
+  id             String             @id @default(uuid())
+  name           String
+  code           String             @unique
+  teacherId      String
+  teacher        User               @relation("TeacherClassrooms", fields: [teacherId], references: [id], onDelete: Cascade)
+  courseId       String
+  course         Course             @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  defaultMode    EnrollmentMode     @default(FULL_CYCLE)
+  allowedModules String[]           @default([])
+  createdAt      DateTime           @default(now())
+  updatedAt      DateTime           @updatedAt
+  students       User[]             @relation("ClassroomStudents")
+  enrollments    CourseEnrollment[]
+
+  @@index([teacherId])
+  @@index([code])
+  @@map("classrooms")
+}
+
+model CourseEnrollment {
+  id             String         @id @default(uuid())
+  userId         String
+  user           User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  courseId       String
+  course         Course         @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  classroomId    String?
+  classroom      Classroom?     @relation(fields: [classroomId], references: [id], onDelete: SetNull)
+  mode           EnrollmentMode @default(FULL_CYCLE)
+  allowedModules String[]       @default([])
+  isActive       Boolean        @default(true)
+  enrolledAt     DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  @@unique([userId, courseId])
+  @@index([userId])
+  @@index([courseId])
+  @@index([classroomId])
+  @@map("course_enrollments")
+}
+
+model SystemConfig {
+  key         String   @id
+  value       String
+  description String?
+  updatedAt   DateTime @updatedAt
+
+  @@map("system_configs")
+}
+
 
