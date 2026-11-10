@@ -151,6 +151,13 @@ pm run build:student (Next.js 16.2.9 Turbopack, 0 помилок TypeScript).
       - Успішна збірка бекенду `npm run build:api` та адмін-панелі `npm run build:admin`.
       - Скріншотна перевірка у Playwright Headless Browser: успішний клік по вкладці `verifier`, прогін 10 тестів, робота live-симулятора та термінального логу.
 
+11. **Синхронізація Посібника з Логування та Специфікації Адмін-Панелі (`SBC-374`, `EP-INF`):**
+    - **Виконана робота:**
+      - Оновлено головний посібник [`docs/guide/bkt_math_and_event_stream_guide.md`](file:///docs/guide/bkt_math_and_event_stream_guide.md): переведено розділ на 5 практичних способів роботи з логами, де Спосіб 1 деталізує використання веб-інтерфейсу Адмін-панелі; додано Розділ 7 із детальним описом інтерфейсу `BktAuditVerifierCenter`, 4 інтерактивних підрозділів, кнопок запуску та REST-ендпоінтів бекенду.
+      - Оновлено специфікацію [`docs/apps/admin_portal.md`](file:///docs/apps/admin_portal.md): зафіксовано роль вкладки `verifier` на навігаційній рейці, додано розділ 4 з описом BktAuditVerifierCenter.
+    - **Верифікація:**
+      - Успішна компіляція `python scripts/compile_docs.py` без помилок.
+
 ## 📅 9 листопада 2026 року
 
 ### ✅ Що зроблено за день:

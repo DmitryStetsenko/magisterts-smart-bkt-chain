@@ -6,7 +6,7 @@
 ## 📊 Зведена статистика
 | Епік | Назва | Кількість завдань |
 | :--- | :--- | :---: |
-| **`SBC-EP-INF`** | Monorepo & CI/CD Setup | 92 |
+| **`SBC-EP-INF`** | Monorepo & CI/CD Setup | 93 |
 | **`SBC-EP-SH`** | Database Modeling & Shared Packages | 24 |
 | **`SBC-EP-BK`** | Authentication & Core API | 14 |
 | **`SBC-EP-BKT`** | Bayesian Knowledge Tracing & Behavioral Telemetry | 30 |
@@ -17,7 +17,7 @@
 | **`SBC-EP-AD`** | Admin Portal & Knowledge DAG Builder | 11 |
 | **`SBC-EP-LD`** | Landing Web Page | 9 |
 | **`SBC-EP-MS`** | Master's Thesis Engineering & Academic Text Generation | 9 |
-| **ВСЬОГО** | - | **272** |
+| **ВСЬОГО** | - | **273** |
 
 ---
 
@@ -121,6 +121,7 @@
 | **SBC-290** | `Story` | `INF` | implement master guide and ecosystem apps handbook on documentation portal | 2026-10-28 | `8470a6a` |
 | **SBC-291** | `Story` | `INF` | create interactive Google Support style help center and user guide | 2026-10-28 | pending |
 | **SBC-371** | `Docs` | `INF` | document brainstorm 17 on production launch readiness, cloud topology and security architecture | 2026-11-10 | `a843dc9` |
+| **SBC-374** | `Docs` | `INF` | document bkt audit verifier center in guides and admin portal specification | 2026-11-10 | `91066fa` |
 
 ---
 
