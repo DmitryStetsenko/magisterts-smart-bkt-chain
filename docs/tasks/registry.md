@@ -14,10 +14,10 @@
 | **`SBC-EP-W3`** | Web3 Infrastructure & Smart Contracts | 0 |
 | **`SBC-EP-ST`** | Student Portal & Skill Tree Map | 39 |
 | **`SBC-EP-TC`** | Teacher Portal & Analytics CRM | 32 |
-| **`SBC-EP-AD`** | Admin Portal & Knowledge DAG Builder | 14 |
+| **`SBC-EP-AD`** | Admin Portal & Knowledge DAG Builder | 15 |
 | **`SBC-EP-LD`** | Landing Web Page | 9 |
 | **`SBC-EP-MS`** | Master's Thesis Engineering & Academic Text Generation | 9 |
-| **ВСЬОГО** | - | **283** |
+| **ВСЬОГО** | - | **284** |
 
 ---
 
@@ -442,6 +442,7 @@
 | **SBC-397** | `Story` | `AD` | transform course creation and studio into full pages with breadcrumb navigation and remove standalone dag tab | 2026-11-11 | `38263cc` |
 | **SBC-398** | `Story` | `AD` | redesign admin sidebar navigation, eliminate duplicate module cards, and add instant course switcher with studio sections | 2026-11-11 | `e578c0d` |
 | **SBC-399** | `Fix` | `AD` | eliminate duplicate module titles in skill cards and clean up competency naming across studio and db seed | 2026-11-11 | `ab9086f` |
+| **SBC-400** | `Fix` | `AD` | eliminate duplicate studio section tabs between sidebar drawer and studio canvas | 2026-11-11 | `pending` |
 
 ---
 

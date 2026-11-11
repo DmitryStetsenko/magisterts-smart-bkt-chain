@@ -136,10 +136,10 @@ test.describe('Course Architecture, Modular Curriculum & BKT Mastery Gating E2E 
     await expect(page.getByText(/Модуль 1: Змінні, Типи та Оператори/i).first()).toBeVisible();
     await expect(page.getByText(/Модуль 2: Умовні конструкції та Функції/i).first()).toBeVisible();
 
-    // Verify Sidebar Drawer clean navigation (no duplicate modules)
-    await expect(page.getByRole('button', { name: /Розділи Студії/i })).toBeVisible();
-    await expect(page.getByRole('button', { name: /Навчальний план & DAG/i })).toBeVisible();
+    // Verify Sidebar Drawer clean navigation (no duplicate tabs or modules)
+    await expect(page.getByRole('button', { name: /До каталогу курсів/i })).toBeVisible();
     await expect(page.getByRole('button', { name: /Курси платформи/i })).toBeVisible();
+    await expect(page.getByRole('button', { name: /Живий перегляд/i })).toBeVisible();
 
     // Click "Курси" in Breadcrumb to return to Course List
     await studioBreadcrumbCoursesBtn.click();

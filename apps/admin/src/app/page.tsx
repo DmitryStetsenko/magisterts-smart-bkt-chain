@@ -172,62 +172,18 @@ export default function AdminCMSDashboard() {
           {/* Drawer: Course Studio Mode (Non-redundant, high-productivity navigation) */}
           {activeTab === 'courses' && courseViewMode === 'STUDIO' && selectedStudioCourse && (
             <>
-              {/* Studio Workspace Sections */}
-              <DrawerSection
-                title="Розділи Студії"
-                icon={Layers}
-                defaultOpen={true}
-              >
-                <div className="flex flex-col gap-1 pt-1 text-xs">
-                  <button
-                    type="button"
-                    onClick={() => setStudioSubTab('CURRICULUM')}
-                    className={`w-full py-2 px-2.5 rounded-lg text-left transition-colors cursor-pointer flex items-center justify-between group ${
-                      studioSubTab === 'CURRICULUM'
-                        ? 'bg-emerald-500/10 text-emerald-300 font-semibold border-l-2 border-emerald-400'
-                        : 'text-slate-400 hover:text-white hover:bg-slate-900/40'
-                    }`}
-                  >
-                    <div className="flex items-center gap-2">
-                      <Layers className={`w-3.5 h-3.5 ${studioSubTab === 'CURRICULUM' ? 'text-emerald-400' : 'text-slate-400'}`} />
-                      <span>Навчальний план & DAG</span>
-                    </div>
-                    <span className="text-[10px] font-mono text-slate-500">
-                      {selectedStudioCourse.modules?.length || 0} тем
-                    </span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => setStudioSubTab('SETTINGS')}
-                    className={`w-full py-2 px-2.5 rounded-lg text-left transition-colors cursor-pointer flex items-center justify-between group ${
-                      studioSubTab === 'SETTINGS'
-                        ? 'bg-emerald-500/10 text-emerald-300 font-semibold border-l-2 border-emerald-400'
-                        : 'text-slate-400 hover:text-white hover:bg-slate-900/40'
-                    }`}
-                  >
-                    <div className="flex items-center gap-2">
-                      <Settings className={`w-3.5 h-3.5 ${studioSubTab === 'SETTINGS' ? 'text-emerald-400' : 'text-slate-400'}`} />
-                      <span>Параметри курсу & BKT</span>
-                    </div>
-                    <span className="text-[10px] font-mono text-emerald-400">
-                      P(L) ≥ {selectedStudioCourse.defaultMasteryThreshold ?? 0.85}
-                    </span>
-                  </button>
-
-                  <div className="pt-1.5 mt-1 border-t border-slate-800/60">
-                    <button
-                      type="button"
-                      onClick={handleBackToCoursesList}
-                      className="w-full py-1.5 px-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-900/60 transition-colors flex items-center gap-2 text-xs cursor-pointer border border-slate-800/60"
-                      title="Повернутися до табличного каталогу курсів"
-                    >
-                      <ArrowLeft className="w-3.5 h-3.5 text-slate-400" />
-                      <span>До списку курсів (Каталог)</span>
-                    </button>
-                  </div>
-                </div>
-              </DrawerSection>
+              {/* Back to Catalog Button */}
+              <div className="p-2 border-b border-slate-800/60">
+                <button
+                  type="button"
+                  onClick={handleBackToCoursesList}
+                  className="w-full py-2 px-2.5 rounded-lg text-slate-300 hover:text-white hover:bg-slate-900/60 transition-colors flex items-center gap-2 text-xs cursor-pointer border border-slate-800/60"
+                  title="Повернутися до табличного каталогу курсів"
+                >
+                  <ArrowLeft className="w-3.5 h-3.5 text-slate-400" />
+                  <span>← До каталогу курсів</span>
+                </button>
+              </div>
 
               {/* Course Switcher: Instant 1-click jump to another course */}
               <DrawerSection
