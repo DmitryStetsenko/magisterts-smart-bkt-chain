@@ -189,8 +189,8 @@ test.describe('Course Architecture, Modular Curriculum & BKT Mastery Gating E2E 
     // Check Header and student presence
     await expect(page.locator('header h1')).toContainText('Student');
 
-    // Ensure page has hydrated by waiting for the active task to render
-    await expect(page.getByText('Модуль 1: Змінні, Типи та Оператори').first()).toBeVisible({ timeout: 20000 });
+    // Ensure page has hydrated by waiting for the active task and skill node to render
+    await expect(page.getByText('Синтаксис, змінні let/const та базові типи').first()).toBeVisible({ timeout: 20000 });
 
     // Switch to Skill DAG / BKT tab on the rail
     const bktRailBtn = page.getByRole('button', { name: /Карта Навичок BKT/i });
@@ -202,11 +202,13 @@ test.describe('Course Architecture, Modular Curriculum & BKT Mastery Gating E2E 
     await expect(page.getByText('Модульний BKT-Гейтинг')).toBeVisible();
     await expect(page.getByText('Поріг: P(L) ≥ 0.85')).toBeVisible();
 
-    // Verify Module 1 is active ("В процесі") and displayed
-    await expect(page.getByRole('heading', { name: /Модуль 1: Змінні, Типи та Оператори/i })).toBeVisible({ timeout: 10000 });
+    // Verify Module 1 is active ("В процесі") and displayed with clean competency title
+    await expect(page.getByText('Модуль 1').first()).toBeVisible({ timeout: 10000 });
+    await expect(page.getByRole('heading', { name: /Синтаксис, змінні let\/const та базові типи/i })).toBeVisible();
 
     // Verify Module 2 is locked with BKT threshold gating reason
-    await expect(page.getByRole('heading', { name: /Модуль 2: Умовні конструкції та Функції/i })).toBeVisible();
+    await expect(page.getByText('Модуль 2').first()).toBeVisible();
+    await expect(page.getByRole('heading', { name: /Функції, область видимості та замикання/i })).toBeVisible();
     await expect(page.getByText('Опануйте попередній модуль з P(L) ≥ 85%').first()).toBeVisible();
     await expect(page.getByText('Заблоковано').first()).toBeVisible();
   });

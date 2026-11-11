@@ -24,6 +24,35 @@ import {
 } from 'lucide-react';
 import type { CourseDto, CourseModuleDto, SkillNodeDto, CourseCategoryDto, UpdateCourseDto } from '@sbc/types';
 
+/**
+ * Очищує назву навички від дублюючого префікса «Модуль N:» та запобігає повторенню назви батьківського модуля
+ */
+export const formatCleanSkillTitle = (skillTitle?: string | null, moduleTitle?: string | null): string => {
+  if (!skillTitle) return 'Компетенція BKT';
+  let clean = skillTitle.replace(/^(?:Модуль|Module)\s*\d+:\s*/i, '').trim();
+  const cleanMod = (moduleTitle || '').replace(/^(?:Модуль|Module)\s*\d+:\s*/i, '').trim();
+  if (!clean || (cleanMod && clean.toLowerCase() === cleanMod.toLowerCase())) {
+    return clean || 'Базова навичка модуля';
+  }
+  return clean;
+};
+
+/**
+ * Запобігає дублюванню однакового тексту опису модуля і навички
+ */
+export const getCleanSkillDescription = (skillDesc?: string | null, modDesc?: string | null, taskCount: number = 0): string | null => {
+  if (!skillDesc || !skillDesc.trim()) {
+    return taskCount > 0 ? `Атомарна BKT компетенція • ${taskCount} завд. у банку` : null;
+  }
+  const isDuplicate = modDesc && modDesc.trim().toLowerCase() === skillDesc.trim().toLowerCase();
+  if (isDuplicate) {
+    return taskCount > 0
+      ? `Атомарна BKT компетенція • ${taskCount} завд. у банку`
+      : 'Атомарна BKT компетенція модуля';
+  }
+  return skillDesc.trim();
+};
+
 interface CourseStudioViewProps {
   course: CourseDto;
   categories?: CourseCategoryDto[];
@@ -713,7 +742,7 @@ export const CourseStudioView: React.FC<CourseStudioViewProps> = ({
                                     }}
                                     className="rounded border-slate-700 text-indigo-600 focus:ring-0"
                                   />
-                                  <span className="truncate">{skill.title}</span>
+                                  <span className="truncate">{formatCleanSkillTitle(skill.title, mod.title)}</span>
                                 </div>
                                 <span className="text-[9px] font-mono uppercase opacity-70">
                                   {skill.difficulty}
@@ -751,48 +780,63 @@ export const CourseStudioView: React.FC<CourseStudioViewProps> = ({
                           </div>
                         ) : (
                           <div className="flex flex-col gap-2">
-                            {modSkills.map((skill) => (
-                              <div
-                                key={skill.id}
-                                className="p-2.5 rounded-lg bg-slate-900/60 border border-slate-800 flex items-center justify-between gap-3 text-xs"
-                              >
-                                <div className="flex items-center gap-2.5 min-w-0">
-                                  <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0" />
-                                  <div className="min-w-0">
-                                    <div className="flex items-center gap-1.5 flex-wrap">
-                                      <span className="px-1.5 py-0.5 rounded text-[9px] font-mono font-bold uppercase bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 shrink-0">
-                                        BKT Компетенція
-                                      </span>
-                                      <span className="font-semibold text-slate-200 truncate">{skill.title}</span>
-                                      <span className="text-[10px] font-mono text-slate-500">/{skill.slug}</span>
-                                      <span className="px-1.5 py-0.2 rounded text-[9px] font-mono uppercase bg-slate-800 text-slate-400">
-                                        {skill.difficulty}
-                                      </span>
+                            {modSkills.map((skill) => {
+                              const cleanTitle = formatCleanSkillTitle(skill.title, mod.title);
+                              const cleanDesc = getCleanSkillDescription(skill.description, mod.description, skill.tasks?.length || 0);
+                              const diff = (skill.difficulty || 'EASY').toUpperCase();
+                              const diffBadgeColor = 
+                                diff === 'HARD' ? 'bg-rose-950/60 text-rose-400 border-rose-800/40' :
+                                diff === 'MEDIUM' ? 'bg-amber-950/60 text-amber-400 border-amber-800/40' :
+                                'bg-emerald-950/60 text-emerald-400 border-emerald-800/40';
+
+                              return (
+                                <div
+                                  key={skill.id}
+                                  className="p-2.5 rounded-lg bg-slate-900/60 border border-slate-800 flex items-center justify-between gap-3 text-xs"
+                                >
+                                  <div className="flex items-center gap-2.5 min-w-0">
+                                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0" />
+                                    <div className="min-w-0">
+                                      <div className="flex items-center gap-1.5 flex-wrap">
+                                        <span className="px-1.5 py-0.5 rounded text-[9px] font-mono font-bold uppercase bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 shrink-0">
+                                          BKT Компетенція
+                                        </span>
+                                        <span className="font-semibold text-slate-200 truncate">{cleanTitle}</span>
+                                        <span className="text-[10px] font-mono text-slate-500">/{skill.slug}</span>
+                                        <span className={`px-1.5 py-0.5 rounded text-[9px] font-mono uppercase border ${diffBadgeColor}`}>
+                                          {diff}
+                                        </span>
+                                        {skill.tasks && skill.tasks.length > 0 && (
+                                          <span className="px-1.5 py-0.5 rounded text-[9px] font-mono bg-slate-800 text-slate-400">
+                                            {skill.tasks.length} {skill.tasks.length === 1 ? 'завдання' : skill.tasks.length < 5 ? 'завдання' : 'завдань'}
+                                          </span>
+                                        )}
+                                      </div>
+                                      {cleanDesc && (
+                                        <p className="text-[11px] text-slate-400 truncate mt-0.5">
+                                          {cleanDesc}
+                                        </p>
+                                      )}
                                     </div>
-                                    {skill.description && (
-                                      <p className="text-[11px] text-slate-400 truncate mt-0.5">
-                                        {skill.description}
-                                      </p>
-                                    )}
+                                  </div>
+
+                                  <div className="grid grid-cols-4 gap-1.5 text-[10px] font-mono shrink-0">
+                                    <span className="px-1.5 py-0.5 rounded bg-slate-950 border border-slate-800 text-slate-400" title="Початковий рівень знань P(L₀)">
+                                      P(L₀): <span className="text-emerald-400 font-bold">{skill.pInit ?? '0.50'}</span>
+                                    </span>
+                                    <span className="px-1.5 py-0.5 rounded bg-slate-950 border border-slate-800 text-slate-400" title="Ймовірність навчання P(T)">
+                                      P(T): <span className="text-emerald-400 font-bold">{skill.pTransit ?? '0.10'}</span>
+                                    </span>
+                                    <span className="px-1.5 py-0.5 rounded bg-slate-950 border border-slate-800 text-slate-400" title="Ймовірність помилки P(S)">
+                                      P(S): <span className="text-rose-400 font-bold">{skill.pSlip ?? '0.10'}</span>
+                                    </span>
+                                    <span className="px-1.5 py-0.5 rounded bg-slate-950 border border-slate-800 text-slate-400" title="Ймовірність вгадування P(G)">
+                                      P(G): <span className="text-indigo-400 font-bold">{skill.pGuess ?? '0.20'}</span>
+                                    </span>
                                   </div>
                                 </div>
-
-                                <div className="grid grid-cols-4 gap-1.5 text-[10px] font-mono shrink-0">
-                                  <span className="px-1.5 py-0.5 rounded bg-slate-950 border border-slate-800 text-slate-400">
-                                    P(L₀): <span className="text-emerald-400 font-bold">0.5</span>
-                                  </span>
-                                  <span className="px-1.5 py-0.5 rounded bg-slate-950 border border-slate-800 text-slate-400">
-                                    P(T): <span className="text-emerald-400 font-bold">0.1</span>
-                                  </span>
-                                  <span className="px-1.5 py-0.5 rounded bg-slate-950 border border-slate-800 text-slate-400">
-                                    P(S): <span className="text-rose-400 font-bold">0.1</span>
-                                  </span>
-                                  <span className="px-1.5 py-0.5 rounded bg-slate-950 border border-slate-800 text-slate-400">
-                                    P(G): <span className="text-indigo-400 font-bold">0.2</span>
-                                  </span>
-                                </div>
-                              </div>
-                            ))}
+                              );
+                            })}
                           </div>
                         )}
                       </div>
