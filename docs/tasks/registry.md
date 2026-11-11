@@ -439,6 +439,8 @@
 | **SBC-394** | `Story` | `AD` | implement cross-cutting course categories management, sidebar filtering and course categorization | 2026-11-10 | `0240b9b` |
 | **SBC-395** | `Story` | `AD` | implement user-based filtering, identity resolution and user picker in audit log dataset center | 2026-11-11 | `1f70ed5` |
 | **SBC-396** | `Story` | `AD` | synchronize skill dag editor with sidebar selection and canvas auto-scroll | 2026-11-11 | `7f0c733` |
+| **SBC-397** | `Story` | `AD` | transform course creation and studio into full pages with breadcrumb navigation and remove standalone dag tab | 2026-11-11 | `38263cc` |
+| **SBC-398** | `Story` | `AD` | redesign admin sidebar navigation, eliminate duplicate module cards, and add instant course switcher with studio sections | 2026-11-11 | `38263cc` |
 
 ---
 

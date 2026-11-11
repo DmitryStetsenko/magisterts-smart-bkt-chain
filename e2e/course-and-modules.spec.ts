@@ -74,47 +74,45 @@ test.describe('Course Architecture, Modular Curriculum & BKT Mastery Gating E2E 
     expect(delRes.ok()).toBeTruthy();
   });
 
-  test('2. Admin Portal Course CMS & Module Manager Modal UI Flow', async ({ page }) => {
+  test('2. Admin Portal Course CMS, Studio & Breadcrumb Navigation UI Flow', async ({ page }) => {
     await page.goto('http://localhost:3004', { waitUntil: 'domcontentloaded', timeout: 30000 });
     await expect(page.locator('h1')).toContainText('Admin');
 
-    // Wait for hydration by ensuring default DAG tab content rendered
-    await expect(page.getByText('Вузли Графа Навичок')).toBeVisible({ timeout: 15000 });
-
-    // Verify Skill DAG Editor sidebar and main window synchronization
-    const mod2SidebarBtn = page.getByRole('button', { name: /Модуль 2: Функції & Closures/i }).first();
-    await expect(mod2SidebarBtn).toBeVisible({ timeout: 10000 });
-    await mod2SidebarBtn.click();
-    await expect(page.getByRole('heading', { name: /Редагування: Модуль 2: Функції & Closures/i })).toBeVisible({ timeout: 5000 });
-
-    // Open Courses CMS tab
-    const coursesTabBtn = page.locator('nav button[title*="Керування Курсами"]');
-    await expect(coursesTabBtn).toBeVisible({ timeout: 15000 });
-    await coursesTabBtn.click();
-
-    // Verify Course Manager Center
+    // 2.1 Default primary view is Course CMS
     await expect(page.getByText('Управління Навчальними Курсами')).toBeVisible({ timeout: 15000 });
     await expect(page.getByRole('heading', { name: 'JavaScript & Web Engineering' })).toBeVisible();
     await expect(page.getByText('BKT P(L): 0.85').first()).toBeVisible();
 
-    // Verify dynamic sidebar has 4 subject categories
-    await expect(page.getByRole('button', { name: /Предметні категорії \(4\)/i })).toBeVisible();
+    // Verify initial Breadcrumb: CMS Адміністрування / Курси
+    await expect(page.getByRole('button', { name: 'CMS Адміністрування' })).toBeVisible();
+    await expect(page.getByText(/Курси/)).toBeVisible();
 
-    // Verify Category Manager Modal opens from toolbar
-    const categoryManagerBtn = page.getByRole('button', { name: 'Категорії (4)', exact: true });
-    await expect(categoryManagerBtn).toBeVisible();
-    await categoryManagerBtn.click();
-    await expect(page.getByText('Керування Предметними Категоріями')).toBeVisible({ timeout: 5000 });
-    await expect(page.getByText('Програмування & IT').first()).toBeVisible();
-    await page.keyboard.press('Escape');
-    await expect(page.getByText('Керування Предметними Категоріями')).not.toBeVisible();
+    // 2.2 Full-page Course Creation View with Breadcrumb drill-down
+    const createCourseBtn = page.getByRole('button', { name: 'Створити Новий Курс' });
+    await expect(createCourseBtn).toBeVisible();
+    await createCourseBtn.click();
 
-    // Filter courses by category via sidebar
+    // Verify Breadcrumbs updated to: CMS Адміністрування / Курси / Створення нового курсу
+    const breadcrumbCoursesBtn = page.locator('nav[aria-label="Breadcrumb"] button:has-text("Курси")');
+    await expect(breadcrumbCoursesBtn).toBeVisible({ timeout: 5000 });
+    await expect(page.getByText('Створення нового курсу')).toBeVisible();
+
+    // Verify Full-Page CourseCreateView elements (no modal popup)
+    await expect(page.getByRole('heading', { name: 'Створення Нового Навчального Курсу' })).toBeVisible();
+    await expect(page.getByPlaceholder(/наприклад, Основи кібербезпеки/i)).toBeVisible();
+    await expect(page.getByText('Опублікувати курс у каталозі')).toBeVisible();
+
+    // Click "Курси" in Breadcrumbs to return back to Course List
+    await breadcrumbCoursesBtn.click();
+    await expect(page.getByText('Управління Навчальними Курсами')).toBeVisible({ timeout: 10000 });
+
+    // 2.3 Verify Category Filter in sidebar
+    await expect(page.getByRole('button', { name: /Предметні категорії/i })).toBeVisible();
     const progCategorySidebarBtn = page.locator('aside button:has-text("Програмування & IT")').first();
     await expect(progCategorySidebarBtn).toBeVisible();
     await progCategorySidebarBtn.click();
 
-    // Verify active filter chip appears and table is filtered
+    // Verify active filter chip appears
     await expect(page.getByText('Галузь:').first()).toBeVisible();
 
     // Reset filter
@@ -123,18 +121,29 @@ test.describe('Course Architecture, Modular Curriculum & BKT Mastery Gating E2E 
     await resetFilterBtn.click();
     await expect(page.getByTitle('Скинути фільтр галузі')).not.toBeVisible();
 
-    // Find and click the Module Manager button for JavaScript course
-    const moduleManagerBtn = page.locator('button:has-text("Модулі (5)")').first();
-    await expect(moduleManagerBtn).toBeVisible();
-    await moduleManagerBtn.click();
+    // 2.4 Full-page Course Studio View with Breadcrumbs & Modules
+    const moduleStudioBtn = page.locator('button:has-text("Модулі (5)")').first();
+    await expect(moduleStudioBtn).toBeVisible();
+    await moduleStudioBtn.click();
 
-    // Verify Module Manager Modal opened
-    await expect(page.getByText('Модульний Конструктор Курсу')).toBeVisible({ timeout: 10000 });
-    await expect(page.getByRole('heading', { name: /Модуль 1/i })).toBeVisible();
-    await expect(page.getByRole('heading', { name: /Модуль 2/i })).toBeVisible();
+    // Verify Breadcrumbs updated to: CMS Адміністрування / Курси / JavaScript & Web Engineering
+    const studioBreadcrumbCoursesBtn = page.locator('nav[aria-label="Breadcrumb"] button:has-text("Курси")');
+    await expect(studioBreadcrumbCoursesBtn).toBeVisible({ timeout: 5000 });
+    await expect(page.locator('nav[aria-label="Breadcrumb"]').getByText(/JavaScript & Web Engineering/i)).toBeVisible();
 
-    // Close Modal via Escape
-    await page.keyboard.press('Escape');
+    // Verify Full-Page CourseStudioView elements
+    await expect(page.getByText('Тематичні Розділи & Компетенції BKT')).toBeVisible({ timeout: 10000 });
+    await expect(page.getByText(/Модуль 1: Змінні, Типи та Оператори/i).first()).toBeVisible();
+    await expect(page.getByText(/Модуль 2: Умовні конструкції та Функції/i).first()).toBeVisible();
+
+    // Verify Sidebar Drawer clean navigation (no duplicate modules)
+    await expect(page.getByRole('button', { name: /Розділи Студії/i })).toBeVisible();
+    await expect(page.getByRole('button', { name: /Навчальний план & DAG/i })).toBeVisible();
+    await expect(page.getByRole('button', { name: /Курси платформи/i })).toBeVisible();
+
+    // Click "Курси" in Breadcrumb to return to Course List
+    await studioBreadcrumbCoursesBtn.click();
+    await expect(page.getByText('Управління Навчальними Курсами')).toBeVisible({ timeout: 10000 });
   });
 
   test('3. Teacher Portal Modular Course Selection & Allowed Modules UI Flow', async ({ page }) => {

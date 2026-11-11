@@ -31,6 +31,8 @@ export interface CourseManagerProps {
   onCoursesLoaded?: (courses: CourseDto[]) => void;
   externalEditingCourse?: CourseDto | null;
   onCloseExternalEditingCourse?: () => void;
+  onCreateCourseClick?: () => void;
+  onOpenCourseStudio?: (course: CourseDto) => void;
 }
 
 export const CourseManager: React.FC<CourseManagerProps> = ({
@@ -43,6 +45,8 @@ export const CourseManager: React.FC<CourseManagerProps> = ({
   onCoursesLoaded,
   externalEditingCourse,
   onCloseExternalEditingCourse,
+  onCreateCourseClick,
+  onOpenCourseStudio,
 }) => {
   const [courses, setCourses] = useState<CourseDto[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -280,7 +284,13 @@ export const CourseManager: React.FC<CourseManagerProps> = ({
           </button>
 
           <button
-            onClick={() => setIsModalOpen(true)}
+            onClick={() => {
+              if (onCreateCourseClick) {
+                onCreateCourseClick();
+              } else {
+                setIsModalOpen(true);
+              }
+            }}
             className="px-3.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-medium flex items-center gap-1.5 transition-colors cursor-pointer text-xs shadow-sm"
           >
             <Plus className="w-3.5 h-3.5" />
@@ -353,9 +363,15 @@ export const CourseManager: React.FC<CourseManagerProps> = ({
             return (
               <div
                 key={course.id || course.slug}
-                onClick={() => setEditingCourse(course)}
+                onClick={() => {
+                  if (onOpenCourseStudio) {
+                    onOpenCourseStudio(course);
+                  } else {
+                    setEditingCourse(course);
+                  }
+                }}
                 className="py-3.5 px-2 -mx-2 rounded-lg flex flex-col md:flex-row md:items-center justify-between gap-3 hover:bg-slate-900/60 transition-colors group cursor-pointer"
-                title="Натисніть для редагування параметрів курсу"
+                title="Натисніть для переходу до Студії курсу"
               >
                 {/* Left: Course details */}
                 <div className="flex flex-col gap-1 min-w-0 flex-1">
@@ -421,16 +437,28 @@ export const CourseManager: React.FC<CourseManagerProps> = ({
 
                   <div className="flex items-center gap-2">
                     <button
-                      onClick={() => setSelectedCourseForModules(course)}
+                      onClick={() => {
+                        if (onOpenCourseStudio) {
+                          onOpenCourseStudio(course);
+                        } else {
+                          setSelectedCourseForModules(course);
+                        }
+                      }}
                       className="px-2.5 py-1.5 rounded-lg bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 text-xs font-medium flex items-center gap-1.5 transition-colors cursor-pointer select-none"
                     >
                       <Layers className="w-3.5 h-3.5" />
                       <span>Модулі ({modulesCount})</span>
                     </button>
                     <button
-                      onClick={() => setEditingCourse(course)}
+                      onClick={() => {
+                        if (onOpenCourseStudio) {
+                          onOpenCourseStudio(course);
+                        } else {
+                          setEditingCourse(course);
+                        }
+                      }}
                       className="p-1.5 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white transition-colors cursor-pointer"
-                      title="Редагувати параметри курсу"
+                      title="Редагувати параметри курсу в Студії"
                     >
                       <Edit2 className="w-3.5 h-3.5" />
                     </button>

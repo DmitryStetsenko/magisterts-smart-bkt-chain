@@ -102,6 +102,7 @@ export interface CreateCourseDto {
   description?: string;
   icon?: string;
   targetAudience?: string;
+  isPublished?: boolean;
   defaultMasteryThreshold?: number;
   categoryId?: string | null;
 }

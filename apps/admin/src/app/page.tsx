@@ -8,16 +8,13 @@ import {
   Settings, 
   ArrowRight,
   Database,
-  Cpu,
   Download,
   Filter,
   Sparkles,
   Plus,
   Search,
   Layers,
-  FileSpreadsheet,
   CheckCircle2,
-  Clock,
   Activity,
   Users,
   Edit2,
@@ -25,113 +22,34 @@ import {
   Code,
   Languages,
   Scale,
-  Binary
+  Binary,
+  ArrowLeft,
+  Target,
+  ExternalLink
 } from 'lucide-react';
 import { AppShellLayout, Breadcrumbs, UserProfileDrawer, DrawerSection } from '@sbc/ui';
 import { getAppBaseUrl } from '@sbc/routes';
 import type { CourseDto, CourseCategoryDto } from '@sbc/types';
-import { SkillDagEditor } from '../features/skill-editor/ui/SkillDagEditor';
-import { AdminSkillNode } from '../features/skill-editor/model/skill-editor.types';
 import { CourseManager } from '../features/course-manager/ui/CourseManager';
+import { CourseCreateView } from '../features/course-manager/ui/CourseCreateView';
+import { CourseStudioView } from '../features/course-manager/ui/CourseStudioView';
 import { DatasetExportCenter, DatasetStats } from '../features/dataset-export/ui/DatasetExportCenter';
 import { BktAuditVerifierCenter } from '../features/verifier/ui/BktAuditVerifierCenter';
 import { UserManagementCenter } from '../features/users/ui/UserManagementCenter';
 
 export default function AdminCMSDashboard() {
-  const [nodes, setNodes] = useState<AdminSkillNode[]>([
-    {
-      id: '1',
-      slug: 'js-basics',
-      title: 'Модуль 1: Синтаксис & База',
-      description: 'Базові типи даних, змінні let/const та цикли',
-      category: 'Core Fundamentals',
-      difficulty: 'EASY',
-      parentSkillIds: [],
-      pInit: 0.5,
-      pTransit: 0.2,
-      pSlip: 0.1,
-      pGuess: 0.2,
-    },
-    {
-      id: '2',
-      slug: 'js-functions',
-      title: 'Модуль 2: Функції & Closures',
-      description: 'Arrow functions, замикання та rest/spread',
-      category: 'Core Fundamentals',
-      difficulty: 'EASY',
-      parentSkillIds: ['js-basics'],
-      pInit: 0.4,
-      pTransit: 0.2,
-      pSlip: 0.1,
-      pGuess: 0.2,
-    },
-    {
-      id: '3',
-      slug: 'js-collections',
-      title: 'Модуль 3: Масиви & Обʼєкти',
-      description: 'Методи map, filter, reduce та обхід обʼєктів',
-      category: 'Data Structures',
-      difficulty: 'MEDIUM',
-      parentSkillIds: ['js-functions'],
-      pInit: 0.3,
-      pTransit: 0.2,
-      pSlip: 0.1,
-      pGuess: 0.2,
-    },
-    {
-      id: '4',
-      slug: 'js-async',
-      title: 'Модуль 4: Асинхронність',
-      description: 'Promises, async/await та обробка помилок',
-      category: 'Advanced JS',
-      difficulty: 'HARD',
-      parentSkillIds: ['js-collections'],
-      pInit: 0.2,
-      pTransit: 0.2,
-      pSlip: 0.1,
-      pGuess: 0.2,
-    },
-    {
-      id: '5',
-      slug: 'js-oop',
-      title: 'Модуль 5: ООП & Прототипи',
-      description: 'Класи ES6, extends та прототипи',
-      category: 'Object Oriented',
-      difficulty: 'HARD',
-      parentSkillIds: ['js-async'],
-      pInit: 0.1,
-      pTransit: 0.2,
-      pSlip: 0.1,
-      pGuess: 0.2,
-    },
-  ]);
+  type AdminTab = 'courses' | 'users' | 'datasets' | 'verifier' | 'system';
+  type CourseViewMode = 'LIST' | 'CREATE' | 'STUDIO';
 
-  const handleSaveNode = (updatedNode: AdminSkillNode) => {
-    setNodes((prev) => {
-      const exists = prev.some((n) => n.id === updatedNode.id);
-      if (exists) {
-        return prev.map((n) => (n.id === updatedNode.id ? updatedNode : n));
-      }
-      return [...prev, updatedNode];
-    });
-  };
+  const [activeTab, setActiveTab] = useState<AdminTab>('courses');
+  const [courseViewMode, setCourseViewMode] = useState<CourseViewMode>('LIST');
+  const [selectedStudioCourse, setSelectedStudioCourse] = useState<CourseDto | null>(null);
+  const [studioSubTab, setStudioSubTab] = useState<'CURRICULUM' | 'SETTINGS'>('CURRICULUM');
 
-  const handleDeleteNode = (nodeId: string) => {
-    setNodes((prev) => prev.filter((n) => n.id !== nodeId));
-    if (selectedNodeId === nodeId) {
-      setSelectedNodeId(null);
-    }
-  };
-
-  type AdminTab = 'dag' | 'courses' | 'users' | 'datasets' | 'verifier' | 'system';
-  const [activeTab, setActiveTab] = useState<AdminTab>('dag');
   const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(true);
   const [isProfileDrawerOpen, setIsProfileDrawerOpen] = useState<boolean>(false);
 
   // Search & Filter state for Drawer Sections
-  const [dagSearch, setDagSearch] = useState<string>('');
-  const [selectedNodeId, setSelectedNodeId] = useState<string | null>('1');
-
   const [datasetFilter, setDatasetFilter] = useState<'ALL' | 'SUBMISSIONS' | 'HINTS' | 'THEORY' | 'ANNULMENTS' | 'RESETS'>('ALL');
   const [datasetUserFilter, setDatasetUserFilter] = useState<string>('');
   const [datasetActiveUsers, setDatasetActiveUsers] = useState<{ userId: string; name: string; email?: string; count: number; role?: string }[]>([]);
@@ -151,7 +69,6 @@ export default function AdminCMSDashboard() {
   const [categories, setCategories] = useState<CourseCategoryDto[]>([]);
   const [selectedCourseSlug, setSelectedCourseSlug] = useState<string | null>(null);
   const [selectedCategorySlug, setSelectedCategorySlug] = useState<string | null>(null);
-  const [courseToEdit, setCourseToEdit] = useState<CourseDto | null>(null);
 
   const loadCourses = async () => {
     try {
@@ -183,15 +100,6 @@ export default function AdminCMSDashboard() {
     loadCategories();
   }, [API_URL]);
 
-  const filteredDagNodes = useMemo(() => {
-    if (!dagSearch.trim()) return nodes;
-    return nodes.filter(
-      (n) =>
-        n.title.toLowerCase().includes(dagSearch.toLowerCase()) ||
-        n.slug.toLowerCase().includes(dagSearch.toLowerCase())
-    );
-  }, [nodes, dagSearch]);
-
   const handleTabClick = (tabId: string) => {
     const tab = tabId as AdminTab;
     if (activeTab === tab) {
@@ -202,19 +110,38 @@ export default function AdminCMSDashboard() {
     }
   };
 
+  const handleOpenStudio = (course: CourseDto, initialTab: 'CURRICULUM' | 'SETTINGS' = 'CURRICULUM') => {
+    setSelectedStudioCourse(course);
+    setStudioSubTab(initialTab);
+    setCourseViewMode('STUDIO');
+  };
+
+  const handleBackToCoursesList = () => {
+    setCourseViewMode('LIST');
+    setSelectedStudioCourse(null);
+    setStudioSubTab('CURRICULUM');
+    loadCourses();
+  };
+
   const getDrawerConfig = () => {
     let title: React.ReactNode = 'Навігація';
-    let icon = Network;
+    let icon = BookOpen;
     let iconColor = 'text-emerald-400';
 
-    if (activeTab === 'dag') {
-      title = 'Вузли Графа Навичок';
-      icon = Network;
-      iconColor = 'text-emerald-400';
-    } else if (activeTab === 'courses') {
-      title = 'Каталог Курсів & Завдань';
-      icon = BookOpen;
-      iconColor = 'text-emerald-400';
+    if (activeTab === 'courses') {
+      if (courseViewMode === 'STUDIO' && selectedStudioCourse) {
+        title = 'Керування курсом';
+        icon = BookOpen;
+        iconColor = 'text-indigo-400';
+      } else if (courseViewMode === 'CREATE') {
+        title = 'Створення Курсу';
+        icon = Plus;
+        iconColor = 'text-emerald-400';
+      } else {
+        title = 'Каталог Курсів & Завдань';
+        icon = BookOpen;
+        iconColor = 'text-emerald-400';
+      }
     } else if (activeTab === 'users') {
       title = 'Керування Користувачами';
       icon = Users;
@@ -242,95 +169,153 @@ export default function AdminCMSDashboard() {
       onClose: () => setIsDrawerOpen(false),
       children: (
         <div className="flex flex-col divide-y divide-slate-800/70">
-          {/* Drawer 1: DAG Editor Sidebar */}
-          {activeTab === 'dag' && (
+          {/* Drawer: Course Studio Mode (Non-redundant, high-productivity navigation) */}
+          {activeTab === 'courses' && courseViewMode === 'STUDIO' && selectedStudioCourse && (
             <>
+              {/* Studio Workspace Sections */}
               <DrawerSection
-                title="Навички курсу"
-                icon={Network}
-                badge={filteredDagNodes.length}
+                title="Розділи Студії"
+                icon={Layers}
                 defaultOpen={true}
               >
-                <div className="flex flex-col gap-2 pt-1">
-                  <div className="relative">
-                    <Search className="w-3.5 h-3.5 absolute left-2.5 top-2 text-slate-500" />
-                    <input
-                      type="text"
-                      placeholder="Пошук навички за назвою..."
-                      value={dagSearch}
-                      onChange={(e) => setDagSearch(e.target.value)}
-                      className="w-full pl-8 pr-6 py-1 bg-slate-950/80 border border-slate-800 rounded-lg text-xs text-slate-200 placeholder-slate-600 focus:outline-none focus:border-emerald-500"
-                    />
-                    {dagSearch && (
-                      <button
-                        type="button"
-                        onClick={() => setDagSearch('')}
-                        className="absolute right-2 top-1 text-slate-500 hover:text-white text-xs cursor-pointer"
-                        title="Очистити пошук"
-                      >
-                        ✕
-                      </button>
-                    )}
-                  </div>
+                <div className="flex flex-col gap-1 pt-1 text-xs">
+                  <button
+                    type="button"
+                    onClick={() => setStudioSubTab('CURRICULUM')}
+                    className={`w-full py-2 px-2.5 rounded-lg text-left transition-colors cursor-pointer flex items-center justify-between group ${
+                      studioSubTab === 'CURRICULUM'
+                        ? 'bg-emerald-500/10 text-emerald-300 font-semibold border-l-2 border-emerald-400'
+                        : 'text-slate-400 hover:text-white hover:bg-slate-900/40'
+                    }`}
+                  >
+                    <div className="flex items-center gap-2">
+                      <Layers className={`w-3.5 h-3.5 ${studioSubTab === 'CURRICULUM' ? 'text-emerald-400' : 'text-slate-400'}`} />
+                      <span>Навчальний план & DAG</span>
+                    </div>
+                    <span className="text-[10px] font-mono text-slate-500">
+                      {selectedStudioCourse.modules?.length || 0} тем
+                    </span>
+                  </button>
 
-                  <div className="max-h-60 overflow-y-auto divide-y divide-slate-800/50 pr-0.5">
-                    {filteredDagNodes.map((node) => {
-                      const isSelected = selectedNodeId === node.id;
-                      return (
-                        <button
-                          key={node.id}
-                          type="button"
-                          onClick={() => setSelectedNodeId(node.id)}
-                          className={`w-full py-2 px-2 transition-colors cursor-pointer flex items-center justify-between gap-2 rounded text-left group ${
-                            isSelected
-                              ? 'bg-emerald-500/10 text-emerald-300 font-semibold border-l-2 border-emerald-400 pl-1.5'
-                              : 'text-slate-300 hover:text-white hover:bg-slate-800/50'
-                          }`}
-                          title={`Натисніть для вибору навички: ${node.title}`}
-                        >
-                          <div className="overflow-hidden min-w-0 pr-1">
-                            <div className="text-xs truncate">{node.title}</div>
-                            <div className="text-[10px] text-slate-500 font-mono">/{node.slug}</div>
-                          </div>
-                          <span className="text-[9px] font-mono font-bold px-1.5 py-0.5 rounded bg-slate-800 text-slate-400 border border-slate-700/60 uppercase shrink-0">
-                            {node.difficulty}
-                          </span>
-                        </button>
-                      );
-                    })}
+                  <button
+                    type="button"
+                    onClick={() => setStudioSubTab('SETTINGS')}
+                    className={`w-full py-2 px-2.5 rounded-lg text-left transition-colors cursor-pointer flex items-center justify-between group ${
+                      studioSubTab === 'SETTINGS'
+                        ? 'bg-emerald-500/10 text-emerald-300 font-semibold border-l-2 border-emerald-400'
+                        : 'text-slate-400 hover:text-white hover:bg-slate-900/40'
+                    }`}
+                  >
+                    <div className="flex items-center gap-2">
+                      <Settings className={`w-3.5 h-3.5 ${studioSubTab === 'SETTINGS' ? 'text-emerald-400' : 'text-slate-400'}`} />
+                      <span>Параметри курсу & BKT</span>
+                    </div>
+                    <span className="text-[10px] font-mono text-emerald-400">
+                      P(L) ≥ {selectedStudioCourse.defaultMasteryThreshold ?? 0.85}
+                    </span>
+                  </button>
+
+                  <div className="pt-1.5 mt-1 border-t border-slate-800/60">
+                    <button
+                      type="button"
+                      onClick={handleBackToCoursesList}
+                      className="w-full py-1.5 px-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-900/60 transition-colors flex items-center gap-2 text-xs cursor-pointer border border-slate-800/60"
+                      title="Повернутися до табличного каталогу курсів"
+                    >
+                      <ArrowLeft className="w-3.5 h-3.5 text-slate-400" />
+                      <span>До списку курсів (Каталог)</span>
+                    </button>
                   </div>
                 </div>
               </DrawerSection>
 
+              {/* Course Switcher: Instant 1-click jump to another course */}
               <DrawerSection
-                title="BKT Параметри за замовчуванням"
-                icon={Sparkles}
+                title="Курси платформи"
+                icon={BookOpen}
+                badge={dynamicCourses.length}
                 defaultOpen={true}
               >
-                <div className="grid grid-cols-2 gap-2 text-xs font-mono pt-1">
-                  <div className="p-2 bg-slate-950/60 rounded border border-slate-800/80 flex flex-col">
-                    <span className="text-[10px] text-slate-500 font-sans">Початкове P(L₀)</span>
-                    <span className="text-emerald-400 font-bold mt-0.5">0.50</span>
-                  </div>
-                  <div className="p-2 bg-slate-950/60 rounded border border-slate-800/80 flex flex-col">
-                    <span className="text-[10px] text-slate-500 font-sans">Перехід P(T)</span>
-                    <span className="text-emerald-400 font-bold mt-0.5">0.10</span>
-                  </div>
-                  <div className="p-2 bg-slate-950/60 rounded border border-slate-800/80 flex flex-col">
-                    <span className="text-[10px] text-slate-500 font-sans">Помилка P(S)</span>
-                    <span className="text-rose-400 font-bold mt-0.5">0.10</span>
-                  </div>
-                  <div className="p-2 bg-slate-950/60 rounded border border-slate-800/80 flex flex-col">
-                    <span className="text-[10px] text-slate-500 font-sans">Вгадування P(G)</span>
-                    <span className="text-indigo-400 font-bold mt-0.5">0.20</span>
-                  </div>
+                <div className="flex flex-col divide-y divide-slate-800/50 pt-1">
+                  {dynamicCourses.map((c) => {
+                    const isCurrent = selectedStudioCourse.slug === c.slug || selectedStudioCourse.id === c.id;
+                    const modsCount = c.modules?.length || 0;
+                    return (
+                      <button
+                        key={c.id || c.slug}
+                        type="button"
+                        onClick={() => {
+                          if (!isCurrent) {
+                            handleOpenStudio(c, studioSubTab);
+                          }
+                        }}
+                        className={`w-full py-2 pr-2 text-left text-xs transition-colors cursor-pointer flex items-center justify-between group rounded-r ${
+                          isCurrent
+                            ? 'bg-indigo-500/15 text-indigo-300 font-semibold border-l-2 border-indigo-400 pl-2'
+                            : 'text-slate-400 hover:text-white hover:bg-slate-900/40 pl-2.5'
+                        }`}
+                        title={isCurrent ? `Поточний курс: ${c.title}` : `Перемкнути Студію на курс: ${c.title}`}
+                      >
+                        <div className="flex items-center gap-2 min-w-0 pr-1">
+                          <BookOpen className={`w-3.5 h-3.5 shrink-0 ${isCurrent ? 'text-indigo-400' : 'text-slate-500'}`} />
+                          <span className="truncate">{c.title}</span>
+                        </div>
+                        <span className={`text-[10px] font-mono shrink-0 ${isCurrent ? 'text-indigo-300 font-bold' : 'text-slate-500'}`}>
+                          {isCurrent ? 'Активний' : `${modsCount} мод.`}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </DrawerSection>
+
+              {/* Live Preview Links */}
+              <DrawerSection
+                title="Живий перегляд"
+                icon={ExternalLink}
+                defaultOpen={true}
+              >
+                <div className="flex flex-col gap-1.5 pt-1 text-xs">
+                  <a
+                    href={`${getAppBaseUrl('study')}/learn/${selectedStudioCourse.slug}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="p-2 rounded-lg bg-slate-950/60 hover:bg-slate-900 border border-slate-800/80 text-slate-300 hover:text-white transition-colors flex items-center justify-between group cursor-pointer"
+                    title="Відкрити конспекти уроків у Підручнику"
+                  >
+                    <div className="flex items-center gap-2 min-w-0 pr-1">
+                      <BookOpen className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                      <div className="flex flex-col min-w-0">
+                        <span className="font-semibold truncate">Підручник (Теорія)</span>
+                        <span className="text-[10px] font-mono text-slate-500 truncate">/learn/{selectedStudioCourse.slug}</span>
+                      </div>
+                    </div>
+                    <ExternalLink className="w-3 h-3 text-slate-500 group-hover:text-emerald-400 shrink-0" />
+                  </a>
+
+                  <a
+                    href={`${getAppBaseUrl('student')}/practice/${selectedStudioCourse.slug}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="p-2 rounded-lg bg-slate-950/60 hover:bg-slate-900 border border-slate-800/80 text-slate-300 hover:text-white transition-colors flex items-center justify-between group cursor-pointer"
+                    title="Спробувати інтерактивні завдання у Тренажері"
+                  >
+                    <div className="flex items-center gap-2 min-w-0 pr-1">
+                      <Code className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
+                      <div className="flex flex-col min-w-0">
+                        <span className="font-semibold truncate">Тренажер (BKT)</span>
+                        <span className="text-[10px] font-mono text-slate-500 truncate">/practice/{selectedStudioCourse.slug}</span>
+                      </div>
+                    </div>
+                    <ExternalLink className="w-3 h-3 text-slate-500 group-hover:text-indigo-400 shrink-0" />
+                  </a>
                 </div>
               </DrawerSection>
             </>
           )}
 
-          {/* Drawer 2: Courses Sidebar */}
-          {activeTab === 'courses' && (
+          {/* Drawer: Courses List Mode */}
+          {activeTab === 'courses' && courseViewMode !== 'STUDIO' && (
             <>
               <DrawerSection
                 title="Предметні категорії"
@@ -396,6 +381,40 @@ export default function AdminCMSDashboard() {
                         </div>
                         <span className="text-[10px] font-mono opacity-80 shrink-0 text-slate-500">
                           {cat.coursesCount ?? 0}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </DrawerSection>
+
+              <DrawerSection
+                title="Доступні курси"
+                icon={BookOpen}
+                badge={dynamicCourses.length}
+                defaultOpen={true}
+              >
+                <div className="flex flex-col divide-y divide-slate-800/50 pt-1">
+                  {dynamicCourses.map((c) => {
+                    const isSelected = selectedCourseSlug === c.slug;
+                    const modsCount = c.modules?.length || 0;
+                    return (
+                      <button
+                        key={c.id || c.slug}
+                        type="button"
+                        onClick={() => {
+                          setSelectedCourseSlug(isSelected ? null : c.slug);
+                        }}
+                        className={`w-full py-2 pr-2 text-left text-xs transition-colors cursor-pointer flex items-center justify-between group rounded-r ${
+                          isSelected
+                            ? 'bg-emerald-500/10 text-emerald-300 font-semibold border-l-2 border-emerald-400 pl-2'
+                            : 'text-slate-400 hover:text-white hover:bg-slate-900/40 pl-2.5'
+                        }`}
+                        title={`${c.title} (${modsCount} мод.)`}
+                      >
+                        <span className="truncate pr-1">{c.title}</span>
+                        <span className="text-[10px] font-mono opacity-80 shrink-0 text-slate-500">
+                          {modsCount} мод.
                         </span>
                       </button>
                     );
@@ -473,7 +492,7 @@ export default function AdminCMSDashboard() {
             </>
           )}
 
-          {/* Drawer 3: Datasets & Audit Sidebar */}
+          {/* Drawer: Datasets & Audit Sidebar */}
           {activeTab === 'datasets' && (
             <>
               <DrawerSection
@@ -715,7 +734,7 @@ export default function AdminCMSDashboard() {
             </>
           )}
 
-          {/* Drawer 4: System Sidebar */}
+          {/* Drawer: System Sidebar */}
           {activeTab === 'system' && (
             <DrawerSection
               title="Web3 SBT Релейєр"
@@ -763,27 +782,71 @@ export default function AdminCMSDashboard() {
           breadcrumbs: (
             <Breadcrumbs
               className="text-[11px]"
-              items={[
-                {
-                  label: 'CMS Адміністрування',
-                  onClick: () => handleTabClick('dag'),
-                },
-                {
-                  label: activeTab === 'dag'
-                    ? 'Граф навичок'
-                    : activeTab === 'courses'
-                    ? 'Курси'
-                    : activeTab === 'users'
-                    ? 'Користувачі & Доступ'
-                    : activeTab === 'datasets'
-                    ? 'Датасети для ШІ'
-                    : activeTab === 'verifier'
-                    ? 'Математичний аудит BKT'
-                    : 'Система',
-                  badge: activeTab === 'dag' ? `${nodes.length} навичок` : undefined,
-                  isCurrent: true,
-                },
-              ]}
+              items={
+                activeTab === 'courses'
+                  ? courseViewMode === 'CREATE'
+                    ? [
+                        {
+                          label: 'CMS Адміністрування',
+                          onClick: handleBackToCoursesList,
+                        },
+                        {
+                          label: 'Курси',
+                          onClick: handleBackToCoursesList,
+                        },
+                        {
+                          label: 'Створення нового курсу',
+                          isCurrent: true,
+                        },
+                      ]
+                    : courseViewMode === 'STUDIO' && selectedStudioCourse
+                    ? [
+                        {
+                          label: 'CMS Адміністрування',
+                          onClick: handleBackToCoursesList,
+                        },
+                        {
+                          label: 'Курси',
+                          onClick: handleBackToCoursesList,
+                        },
+                        {
+                          label: selectedStudioCourse.title,
+                          badge: `${selectedStudioCourse.modules?.length || 0} мод.`,
+                          isCurrent: true,
+                        },
+                      ]
+                    : [
+                        {
+                          label: 'CMS Адміністрування',
+                          onClick: handleBackToCoursesList,
+                        },
+                        {
+                          label: 'Курси',
+                          badge: `${dynamicCourses.length} курсів`,
+                          isCurrent: true,
+                        },
+                      ]
+                  : [
+                      {
+                        label: 'CMS Адміністрування',
+                        onClick: () => {
+                          setActiveTab('courses');
+                          handleBackToCoursesList();
+                        },
+                      },
+                      {
+                        label:
+                          activeTab === 'users'
+                            ? 'Користувачі & Доступ'
+                            : activeTab === 'datasets'
+                            ? 'Датасети для ШІ'
+                            : activeTab === 'verifier'
+                            ? 'Математичний аудит BKT'
+                            : 'Система',
+                        isCurrent: true,
+                      },
+                    ]
+              }
             />
           ),
           rightSlot: (
@@ -825,15 +888,9 @@ export default function AdminCMSDashboard() {
         navigationRail={{
           tabs: [
             {
-              id: 'dag',
-              icon: Network,
-              title: 'Конструктор Графа Навичок (Skill DAG Editor)',
-              activeColor: 'bg-emerald-600',
-            },
-            {
               id: 'courses',
               icon: BookOpen,
-              title: 'Керування Курсами & Завданнями',
+              title: 'Керування Курсами, Модулями & Графами Навичок',
               activeColor: 'bg-emerald-600',
             },
             {
@@ -865,43 +922,52 @@ export default function AdminCMSDashboard() {
         mainClassName="p-4 lg:p-6 overflow-y-auto flex flex-col gap-5 bg-slate-950"
       >
         <div className="flex flex-col gap-5 min-h-[400px]">
-          {activeTab === 'dag' && (
-            <div className="flex flex-col gap-4">
-              <div className="pb-3 border-b border-slate-800/80 flex items-center justify-between">
-                <div>
-                  <h3 className="text-sm font-bold text-white flex items-center gap-2">
-                    <Network className="w-4 h-4 text-emerald-400" />
-                    <span>Конструктор Графа Навичок (Skill DAG Editor)</span>
-                  </h3>
-                  <p className="text-xs text-slate-400 mt-0.5">
-                    Налаштування початкових BKT-параметрів ($P(L_0), P(T), P(S), P(G)$) та управління вузлами графа
-                  </p>
-                </div>
-              </div>
-
-              <SkillDagEditor
-                nodes={nodes}
-                selectedNodeId={selectedNodeId}
-                onSelectNode={setSelectedNodeId}
-                searchQuery={dagSearch}
-                onSaveNode={handleSaveNode}
-                onDeleteNode={handleDeleteNode}
-              />
-            </div>
-          )}
-
           {activeTab === 'courses' && (
-            <CourseManager
-              selectedCourseFilter={selectedCourseSlug}
-              onSelectCourseFilter={setSelectedCourseSlug}
-              selectedCategoryFilter={selectedCategorySlug}
-              onSelectCategoryFilter={setSelectedCategorySlug}
-              categories={categories}
-              onCategoriesChanged={loadCategories}
-              onCoursesLoaded={setDynamicCourses}
-              externalEditingCourse={courseToEdit}
-              onCloseExternalEditingCourse={() => setCourseToEdit(null)}
-            />
+            <>
+              {courseViewMode === 'CREATE' && (
+                <CourseCreateView
+                  categories={categories}
+                  onCreated={(newCourse) => {
+                    loadCourses();
+                    handleOpenStudio(newCourse);
+                  }}
+                  onCancel={handleBackToCoursesList}
+                />
+              )}
+
+              {courseViewMode === 'STUDIO' && selectedStudioCourse && (
+                <CourseStudioView
+                  course={selectedStudioCourse}
+                  categories={categories}
+                  activeSubTab={studioSubTab}
+                  onSubTabChange={setStudioSubTab}
+                  onBack={handleBackToCoursesList}
+                  onCourseUpdated={(updated) => {
+                    setSelectedStudioCourse(updated);
+                    loadCourses();
+                  }}
+                  onCourseDeleted={() => {
+                    handleBackToCoursesList();
+                  }}
+                />
+              )}
+
+              {courseViewMode === 'LIST' && (
+                <CourseManager
+                  selectedCourseFilter={selectedCourseSlug}
+                  onSelectCourseFilter={setSelectedCourseSlug}
+                  selectedCategoryFilter={selectedCategorySlug}
+                  onSelectCategoryFilter={setSelectedCategorySlug}
+                  categories={categories}
+                  onCategoriesChanged={loadCategories}
+                  onCoursesLoaded={setDynamicCourses}
+                  onCreateCourseClick={() => {
+                    setCourseViewMode('CREATE');
+                  }}
+                  onOpenCourseStudio={handleOpenStudio}
+                />
+              )}
+            </>
           )}
 
           {activeTab === 'users' && <UserManagementCenter apiUrl={API_URL} />}
@@ -948,53 +1014,41 @@ export default function AdminCMSDashboard() {
           initials: 'АД',
           avatarGradient: 'bg-gradient-to-tr from-emerald-600 to-teal-500',
         }}
-        courses={[
-          {
-            slug: 'js-dev',
-            title: 'JavaScript & Web Dev',
-            category: 'Програмування',
-            skillsCount: nodes.length,
-            totalSkillsCount: nodes.length,
-            completionPct: 100,
-          },
-        ]}
+        activeCourseSlug={selectedCourseSlug || undefined}
+        courses={dynamicCourses.map((c) => ({
+          slug: c.slug,
+          title: c.title,
+          category: (c.category as any)?.title,
+          skillsCount: c.skills?.length || 0,
+          totalSkillsCount: c.skills?.length || 10,
+        }))}
+        onSelectCourse={(courseSlug) => {
+          setSelectedCourseSlug(courseSlug);
+        }}
         stats={[
           {
-            label: 'Активних навичок у DAG',
-            value: nodes.length,
-            icon: Network,
-            iconColor: 'text-emerald-400',
+            label: 'Всього курсів',
+            value: `${dynamicCourses.length}`,
             valueColor: 'text-emerald-400',
           },
           {
-            label: 'Конфігурація Релейєра',
-            value: 'ONLINE',
-            icon: ShieldCheck,
-            iconColor: 'text-teal-400',
-            valueColor: 'text-teal-400',
+            label: 'Всього модулів',
+            value: `${dynamicCourses.reduce((acc, c) => acc + (c.modules?.length || 0), 0)}`,
+            valueColor: 'text-indigo-400',
+          },
+          {
+            label: 'Статус Релейєра',
+            value: 'Online',
+            valueColor: 'text-emerald-400',
           },
         ]}
-        statsTitle="Статус Методичного Центру"
-        quickLinks={[
-          {
-            label: 'Кабінет Викладача',
-            href: getAppBaseUrl('teacher'),
-            icon: BookOpen,
-            iconColor: 'text-purple-400',
-          },
-          {
-            label: 'Підручник Теорії',
-            href: getAppBaseUrl('study'),
-            icon: BookOpen,
-            iconColor: 'text-blue-400',
-          },
-          {
-            label: 'Документація Системи',
-            href: getAppBaseUrl('docs'),
-            icon: Database,
-            iconColor: 'text-slate-400',
-          },
-        ]}
+        resetDemoLabel="Скинути всі фільтри"
+        onResetDemoState={() => {
+          setSelectedCourseSlug(null);
+          setSelectedCategorySlug(null);
+          setDatasetFilter('ALL');
+          setDatasetUserFilter('');
+        }}
       />
     </>
   );

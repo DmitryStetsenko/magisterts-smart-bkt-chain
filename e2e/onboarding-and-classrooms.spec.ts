@@ -71,6 +71,7 @@ test.describe('User Onboarding, Google Auth & Classroom Management E2E Suite', (
   test('2. Teacher Portal Classroom Management & Invite Codes UI Flow', async ({ page }) => {
     await page.goto('http://localhost:3003', { waitUntil: 'domcontentloaded', timeout: 30000 });
     await expect(page.locator('h1')).toContainText('Teacher');
+    await expect(page.getByText('Середня Майстерність P(L)')).toBeVisible({ timeout: 15000 });
 
     // Open Classrooms Tab on the rail
     const classroomsRailBtn = page.locator('nav button[title*="Навчальні Групи"]');
