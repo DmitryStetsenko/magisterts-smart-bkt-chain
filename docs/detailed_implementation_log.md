@@ -30,6 +30,27 @@
   5. *Build Next.js Documentation Site* (`npm run build:docs`) — збірка статичного експорту (`output: "export"`, `trailingSlash: true`, `basePath: "/magisterts-smart-bkt-chain"`).
   6. *Upload Artifact & Deploy Pages* (`actions/upload-pages-artifact@v3` + `actions/deploy-pages@v4`).
 
+### 0.1.7.84 Двостороння Синхронізація Конструктора Графа Навичок із Сайдбаром (SBC-396, EP-AD)
+- **Контекст та інженерне завдання:**
+  - У вкладці «Конструктор Графа Навичок (Skill DAG Editor)» (`apps/admin`, порт 3004) вибір навички або модуля у висувній бічній панелі («Навички курсу») не викликав реакції на центральному полотні чи у формі редагування параметрів BKT справа.
+  - Компонент `SkillDagEditor` мав ізольований внутрішній стан `selectedNode`, який не синхронізувався із зовнішнім `selectedNodeId` у `page.tsx`.
+- **Виконані інженерні рішення:**
+  1. **Інтерфейс Контракту `SkillDagEditorProps` ([`SkillDagEditor.tsx`](file:///apps/admin/src/features/skill-editor/ui/SkillDagEditor.tsx)):**
+     - Додано вхідні параметри `selectedNodeId?: string | null`, `onSelectNode?: (nodeId: string | null) => void`, `searchQuery?: string`.
+  2. **Двостороння Реактивна Синхронізація:**
+     - Впроваджено `useEffect`, який при отриманні `selectedNodeId` знаходить відповідний об'єкт `AdminSkillNode` (за `id` або `slug`), встановлює його в `selectedNode` та `formData`, перемикає `isEditing: true` і викликає плавний скрол `element.scrollIntoView({ behavior: 'smooth', block: 'nearest' })` до DOM-елемента `dag-node-${target.id}`.
+     - При виборі картки на полотні (`handleSelectNode`) або створенні (`handleCreateNew`) викликається зворотний виклик `onSelectNode?.(node.id)`, миттєво підсвічуючи відповідний пункт у сайдбарі.
+     - При видаленні вузла забезпечено коректне очищення вибору `onSelectNode?.(null)`.
+  3. **Стандартизація Сайдбара (Rule 7 Minimalist Borderless UI):**
+     - Елементи списку навичок у сайдбарі замінено на доступні інтерактивні кнопки `<button>` із семантичною підсвіткою активного вибору: `bg-emerald-500/10 text-emerald-300 font-semibold border-l-2 border-emerald-400 pl-1.5`.
+     - Додано кнопку скидання пошуку `✕` для поля `dagSearch`.
+  4. **Автоматизоване E2E Тестування:**
+     - Розширено `e2e/course-and-modules.spec.ts` перевіркою кліку по модулю в сайдбарі DAG Editor та валідацією форми `Редагування: Модуль 2: Функції & Closures`.
+- **Верифікація:**
+  - 100% успішна виробнича збірка `npm run build:admin`.
+  - 100% успішне проходження повного сьюту регресії Playwright E2E (`npm run test:e2e`, 12/12 passed, 55.8s).
+  - Збережено візуальний артефакт: `admin_dag_editor_sidebar_sync.png`.
+
 ### 0.1.7.83 Ідентифікація Користувачів, Фільтрація Аудит-Логів та Селектор у Центрі Датасетів ШІ (SBC-395, EP-AD)
 - **Контекст та інженерне завдання:**
   - У Центрі Експорту Датасетів для ШІ & Незмінного Аудит-Логу (`apps/admin`) в таблиці подій відображалися нечитабельні сирі UUID виду `Учень #53023c...ff19 [STUDENT]` через відсутність реляційного `include: { user: { select: { profile: ... } } }` у бекенді.

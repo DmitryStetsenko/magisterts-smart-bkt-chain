@@ -36,6 +36,28 @@
      - 100% успішне проходження повного скрізного E2E сьюту Playwright (`npm run test:e2e`, 12/12 passed, 55.1s).
      - Візуальна перевірка та збереження артефакту `admin_audit_logs_user_filter.png`.
 
+2. **Двостороння синхронізація Конструктора Графа Навичок (Skill DAG Editor) із сайдбаром та плавний автоскрол (`SBC-396`, `EP-AD`):**
+   - **Виявлені невідповідності (зауваження користувача):**
+     - У вкладці «Конструктор Графа Навичок (Skill DAG Editor)» (`apps/admin`, порт 3004) при виборі модуля/навички у лівому сайдбарі (секція «Навички курсу») основна робоча область та права панель редагування залишалися незмінними.
+     - Сайдбар та компонент `SkillDagEditor` мали повністю розірвані локальні стани: клік у сайдбарі оновлював ізольований `selectedNodeId` у `page.tsx`, який не передавався у `SkillDagEditor`, а клік по картці у центрі оновлював внутрішній `selectedNode` редактора без сповіщення батьківського компонента.
+   - **Виконані інженерні покращення:**
+     - **Розширення пропсів `SkillDagEditorProps` ([`SkillDagEditor.tsx`](file:///apps/admin/src/features/skill-editor/ui/SkillDagEditor.tsx)):**
+       - Додано `selectedNodeId?: string | null`, `onSelectNode?: (nodeId: string | null) => void`, `searchQuery?: string`.
+     - **Двосторонній ефект синхронізації:**
+       - Додано хук `useEffect`, який при зміні `selectedNodeId` знаходить відповідний вузол за `id` або `slug`, ініціалізує `selectedNode`, заповнює форму редагування `formData`, активує режим `isEditing: true` та здійснює плавний скролінг робочого полотна до обраної картки (`element.scrollIntoView({ behavior: 'smooth', block: 'nearest' })`).
+       - При виборі картки на полотні (`handleSelectNode`) викликається `onSelectNode?.(node.id)`, синхронізуючи стан із сайдбаром.
+       - При створенні нового вузла (`handleCreateNew`) та видаленні (`onDeleteNode`) забезпечено скидання або оновлення вибору в обох зонах.
+     - **Покращення сайдбара навичок ([`apps/admin/src/app/page.tsx`](file:///apps/admin/src/app/page.tsx)):**
+       - Елементи списку перетворено на доступні кнопки `<button>` із фірмовим смарагдовим лівим індикатором: `bg-emerald-500/10 text-emerald-300 font-semibold border-l-2 border-emerald-400 pl-1.5`.
+       - Додано кнопку очищення пошуку `✕` для поля `dagSearch`.
+       - Синхронізовано `searchQuery` між сайдбаром та списком карток на полотні.
+     - **Скрізне Playwright тестування ([`e2e/course-and-modules.spec.ts`](file:///e2e/course-and-modules.spec.ts)):**
+       - Додано перевірку кліку по модулю в сайдбарі DAG Editor та валідацію миттєвого завантаження даних у форму редагування.
+   - **Верифікація:**
+     - 100% успішна виробнича збірка `npm run build:admin` (Next.js 16.3.8 Turbopack, 0 помилок).
+     - 100% успішне проходження повного сьюту регресії E2E `npm run test:e2e` (12/12 passed, 55.8s).
+     - Збережено візуальний артефакт підтвердження: `admin_dag_editor_sidebar_sync.png`.
+
 ## 📅 10 листопада 2026 року
 
 ### ✅ Що зроблено за день:

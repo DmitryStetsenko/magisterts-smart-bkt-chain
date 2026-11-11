@@ -14,10 +14,10 @@
 | **`SBC-EP-W3`** | Web3 Infrastructure & Smart Contracts | 0 |
 | **`SBC-EP-ST`** | Student Portal & Skill Tree Map | 39 |
 | **`SBC-EP-TC`** | Teacher Portal & Analytics CRM | 32 |
-| **`SBC-EP-AD`** | Admin Portal & Knowledge DAG Builder | 13 |
+| **`SBC-EP-AD`** | Admin Portal & Knowledge DAG Builder | 14 |
 | **`SBC-EP-LD`** | Landing Web Page | 9 |
 | **`SBC-EP-MS`** | Master's Thesis Engineering & Academic Text Generation | 9 |
-| **ВСЬОГО** | - | **282** |
+| **ВСЬОГО** | - | **283** |
 
 ---
 
@@ -438,6 +438,7 @@
 | **SBC-393** | `Story` | `AD` | enable row click to edit course modal and sidebar quick edit in admin portal | 2026-11-10 | `80fb44b` |
 | **SBC-394** | `Story` | `AD` | implement cross-cutting course categories management, sidebar filtering and course categorization | 2026-11-10 | `0240b9b` |
 | **SBC-395** | `Story` | `AD` | implement user-based filtering, identity resolution and user picker in audit log dataset center | 2026-11-11 | `1f70ed5` |
+| **SBC-396** | `Story` | `AD` | synchronize skill dag editor with sidebar selection and canvas auto-scroll | 2026-11-11 | pending |
 
 ---
 

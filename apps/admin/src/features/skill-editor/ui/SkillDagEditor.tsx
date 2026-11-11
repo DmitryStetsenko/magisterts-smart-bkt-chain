@@ -1,18 +1,24 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Network, Plus, Trash2, Edit3, ArrowRight, Save, Layers } from 'lucide-react';
 import type { TaskDifficulty } from '@sbc/types';
 import { AdminSkillNode } from '../model/skill-editor.types';
 
 interface SkillDagEditorProps {
   nodes: AdminSkillNode[];
+  selectedNodeId?: string | null;
+  onSelectNode?: (nodeId: string | null) => void;
+  searchQuery?: string;
   onSaveNode: (node: AdminSkillNode) => void;
   onDeleteNode: (nodeId: string) => void;
 }
 
 export const SkillDagEditor: React.FC<SkillDagEditorProps> = ({
   nodes,
+  selectedNodeId,
+  onSelectNode,
+  searchQuery,
   onSaveNode,
   onDeleteNode,
 }) => {
@@ -33,6 +39,39 @@ export const SkillDagEditor: React.FC<SkillDagEditorProps> = ({
     pGuess: 0.2,
   });
 
+  // Synchronize with external selectedNodeId (from left sidebar)
+  useEffect(() => {
+    if (selectedNodeId) {
+      const target = nodes.find((n) => n.id === selectedNodeId || n.slug === selectedNodeId);
+      if (target) {
+        setSelectedNode(target);
+        setFormData(target);
+        setIsEditing(true);
+
+        // Smooth scroll center canvas to the selected card
+        const el = document.getElementById(`dag-node-${target.id}`);
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+      }
+    } else if (selectedNodeId === null && selectedNode) {
+      setSelectedNode(null);
+      setIsEditing(false);
+    }
+  }, [selectedNodeId, nodes]);
+
+  // Filter nodes if search query is provided
+  const displayedNodes = useMemo(() => {
+    if (!searchQuery || !searchQuery.trim()) return nodes;
+    const q = searchQuery.toLowerCase().trim();
+    return nodes.filter(
+      (n) =>
+        n.title.toLowerCase().includes(q) ||
+        n.slug.toLowerCase().includes(q) ||
+        n.description.toLowerCase().includes(q)
+    );
+  }, [nodes, searchQuery]);
+
   const handleCreateNew = () => {
     const newNode: AdminSkillNode = {
       id: `skill-${Date.now()}`,
@@ -50,18 +89,21 @@ export const SkillDagEditor: React.FC<SkillDagEditorProps> = ({
     setSelectedNode(newNode);
     setFormData(newNode);
     setIsEditing(true);
+    onSelectNode?.(newNode.id);
   };
 
   const handleSelectNode = (node: AdminSkillNode) => {
     setSelectedNode(node);
     setFormData(node);
     setIsEditing(true);
+    onSelectNode?.(node.id);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onSaveNode(formData);
-    setIsEditing(false);
+    setSelectedNode(formData);
+    setIsEditing(true);
   };
 
   return (
@@ -84,62 +126,71 @@ export const SkillDagEditor: React.FC<SkillDagEditorProps> = ({
 
         {/* Nodes Canvas Grid */}
         <div className="flex flex-col gap-3 max-h-[calc(100vh-260px)] overflow-y-auto pr-1">
-          {nodes.map((node) => {
-            const isSelected = selectedNode?.id === node.id;
-            return (
-              <div
-                key={node.id}
-                onClick={() => handleSelectNode(node)}
-                className={`p-3.5 rounded-lg border transition-all cursor-pointer flex flex-col gap-2.5 ${
-                  isSelected
-                    ? 'bg-emerald-950/30 border-emerald-500/80 shadow-md shadow-emerald-950/40'
-                    : 'bg-slate-950/60 border-slate-800/80 hover:border-slate-700'
-                }`}
-              >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold uppercase bg-slate-800 text-slate-300">
-                      /{node.slug}
+          {displayedNodes.length === 0 ? (
+            <div className="p-6 text-center text-slate-500 text-xs border border-dashed border-slate-800 rounded-lg">
+              Навичок за запитом не знайдено
+            </div>
+          ) : (
+            displayedNodes.map((node) => {
+              const isSelected = selectedNode?.id === node.id || selectedNodeId === node.id;
+              return (
+                <div
+                  id={`dag-node-${node.id}`}
+                  key={node.id}
+                  onClick={() => handleSelectNode(node)}
+                  className={`p-3.5 rounded-lg border transition-all cursor-pointer flex flex-col gap-2.5 ${
+                    isSelected
+                      ? 'bg-emerald-950/30 border-emerald-500/80 shadow-md shadow-emerald-950/40 ring-1 ring-emerald-500/50'
+                      : 'bg-slate-950/60 border-slate-800/80 hover:border-slate-700'
+                  }`}
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold uppercase bg-slate-800 text-slate-300">
+                        /{node.slug}
+                      </span>
+                      <h4 className={`font-semibold text-xs ${isSelected ? 'text-emerald-300' : 'text-slate-100'}`}>
+                        {node.title}
+                      </h4>
+                    </div>
+                    <span className="px-2 py-0.5 rounded text-[9px] font-mono font-bold bg-purple-500/10 text-purple-400 border border-purple-500/20 uppercase">
+                      {node.difficulty}
                     </span>
-                    <h4 className="font-semibold text-slate-100 text-xs">{node.title}</h4>
                   </div>
-                  <span className="px-2 py-0.5 rounded text-[9px] font-mono font-bold bg-purple-500/10 text-purple-400 border border-purple-500/20 uppercase">
-                    {node.difficulty}
-                  </span>
+
+                  <p className="text-xs text-slate-400 leading-relaxed">{node.description}</p>
+
+                  {/* BKT Parameters Badge Grid */}
+                  <div className="grid grid-cols-4 gap-2 pt-1.5 border-t border-slate-800/80 text-[10px] font-mono">
+                    <div className="p-1.5 bg-slate-900 rounded border border-slate-800/80 flex flex-col items-center">
+                      <span className="text-slate-500">P(L₀)</span>
+                      <span className="text-emerald-400 font-bold">{node.pInit}</span>
+                    </div>
+                    <div className="p-1.5 bg-slate-900 rounded border border-slate-800/80 flex flex-col items-center">
+                      <span className="text-slate-500">P(T)</span>
+                      <span className="text-emerald-400 font-bold">{node.pTransit}</span>
+                    </div>
+                    <div className="p-1.5 bg-slate-900 rounded border border-slate-800/80 flex flex-col items-center">
+                      <span className="text-slate-500">P(S)</span>
+                      <span className="text-rose-400 font-bold">{node.pSlip}</span>
+                    </div>
+                    <div className="p-1.5 bg-slate-900 rounded border border-slate-800/80 flex flex-col items-center">
+                      <span className="text-slate-500">P(G)</span>
+                      <span className="text-indigo-400 font-bold">{node.pGuess}</span>
+                    </div>
+                  </div>
+
+                  {/* Parents indication */}
+                  {node.parentSkillIds.length > 0 && (
+                    <div className="flex items-center gap-1.5 text-[10px] text-slate-500">
+                      <ArrowRight className="w-3 h-3 text-emerald-400" />
+                      <span>Базові навички: {node.parentSkillIds.join(', ')}</span>
+                    </div>
+                  )}
                 </div>
-
-                <p className="text-xs text-slate-400 leading-relaxed">{node.description}</p>
-
-                {/* BKT Parameters Badge Grid */}
-                <div className="grid grid-cols-4 gap-2 pt-1.5 border-t border-slate-800/80 text-[10px] font-mono">
-                  <div className="p-1.5 bg-slate-900 rounded border border-slate-800/80 flex flex-col items-center">
-                    <span className="text-slate-500">P(L₀)</span>
-                    <span className="text-emerald-400 font-bold">{node.pInit}</span>
-                  </div>
-                  <div className="p-1.5 bg-slate-900 rounded border border-slate-800/80 flex flex-col items-center">
-                    <span className="text-slate-500">P(T)</span>
-                    <span className="text-emerald-400 font-bold">{node.pTransit}</span>
-                  </div>
-                  <div className="p-1.5 bg-slate-900 rounded border border-slate-800/80 flex flex-col items-center">
-                    <span className="text-slate-500">P(S)</span>
-                    <span className="text-rose-400 font-bold">{node.pSlip}</span>
-                  </div>
-                  <div className="p-1.5 bg-slate-900 rounded border border-slate-800/80 flex flex-col items-center">
-                    <span className="text-slate-500">P(G)</span>
-                    <span className="text-indigo-400 font-bold">{node.pGuess}</span>
-                  </div>
-                </div>
-
-                {/* Parents indication */}
-                {node.parentSkillIds.length > 0 && (
-                  <div className="flex items-center gap-1.5 text-[10px] text-slate-500">
-                    <ArrowRight className="w-3 h-3 text-emerald-400" />
-                    <span>Базові навички: {node.parentSkillIds.join(', ')}</span>
-                  </div>
-                )}
-              </div>
-            );
-          })}
+              );
+            })
+          )}
         </div>
       </div>
 
@@ -148,7 +199,7 @@ export const SkillDagEditor: React.FC<SkillDagEditorProps> = ({
         <div className="flex items-center gap-2 text-emerald-400 pb-2 border-b border-slate-800/80">
           <Edit3 className="w-4 h-4" />
           <h3 className="font-bold text-white text-sm">
-            {isEditing ? 'Редагування Навички & BKT' : 'Оберіть навичку для редагування'}
+            {isEditing && selectedNode ? `Редагування: ${formData.title}` : 'Оберіть навичку для редагування'}
           </h3>
         </div>
 
@@ -270,7 +321,12 @@ export const SkillDagEditor: React.FC<SkillDagEditorProps> = ({
             <div className="flex items-center justify-between gap-3 pt-2">
               <button
                 type="button"
-                onClick={() => onDeleteNode(formData.id)}
+                onClick={() => {
+                  onDeleteNode(formData.id);
+                  setIsEditing(false);
+                  setSelectedNode(null);
+                  onSelectNode?.(null);
+                }}
                 className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 text-xs font-semibold border border-rose-500/20 transition-all cursor-pointer"
               >
                 <Trash2 className="w-3.5 h-3.5" />

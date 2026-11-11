@@ -81,6 +81,12 @@ test.describe('Course Architecture, Modular Curriculum & BKT Mastery Gating E2E 
     // Wait for hydration by ensuring default DAG tab content rendered
     await expect(page.getByText('Вузли Графа Навичок')).toBeVisible({ timeout: 15000 });
 
+    // Verify Skill DAG Editor sidebar and main window synchronization
+    const mod2SidebarBtn = page.getByRole('button', { name: /Модуль 2: Функції & Closures/i }).first();
+    await expect(mod2SidebarBtn).toBeVisible({ timeout: 10000 });
+    await mod2SidebarBtn.click();
+    await expect(page.getByRole('heading', { name: /Редагування: Модуль 2: Функції & Closures/i })).toBeVisible({ timeout: 5000 });
+
     // Open Courses CMS tab
     const coursesTabBtn = page.locator('nav button[title*="Керування Курсами"]');
     await expect(coursesTabBtn).toBeVisible({ timeout: 15000 });

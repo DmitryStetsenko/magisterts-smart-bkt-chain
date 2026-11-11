@@ -118,6 +118,9 @@ export default function AdminCMSDashboard() {
 
   const handleDeleteNode = (nodeId: string) => {
     setNodes((prev) => prev.filter((n) => n.id !== nodeId));
+    if (selectedNodeId === nodeId) {
+      setSelectedNodeId(null);
+    }
   };
 
   type AdminTab = 'dag' | 'courses' | 'users' | 'datasets' | 'verifier' | 'system';
@@ -127,7 +130,7 @@ export default function AdminCMSDashboard() {
 
   // Search & Filter state for Drawer Sections
   const [dagSearch, setDagSearch] = useState<string>('');
-  const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
+  const [selectedNodeId, setSelectedNodeId] = useState<string | null>('1');
 
   const [datasetFilter, setDatasetFilter] = useState<'ALL' | 'SUBMISSIONS' | 'HINTS' | 'THEORY' | 'ANNULMENTS' | 'RESETS'>('ALL');
   const [datasetUserFilter, setDatasetUserFilter] = useState<string>('');
@@ -256,30 +259,45 @@ export default function AdminCMSDashboard() {
                       placeholder="Пошук навички за назвою..."
                       value={dagSearch}
                       onChange={(e) => setDagSearch(e.target.value)}
-                      className="w-full pl-8 pr-2.5 py-1 bg-slate-950/80 border border-slate-800 rounded-lg text-xs text-slate-200 placeholder-slate-600 focus:outline-none focus:border-emerald-500"
+                      className="w-full pl-8 pr-6 py-1 bg-slate-950/80 border border-slate-800 rounded-lg text-xs text-slate-200 placeholder-slate-600 focus:outline-none focus:border-emerald-500"
                     />
+                    {dagSearch && (
+                      <button
+                        type="button"
+                        onClick={() => setDagSearch('')}
+                        className="absolute right-2 top-1 text-slate-500 hover:text-white text-xs cursor-pointer"
+                        title="Очистити пошук"
+                      >
+                        ✕
+                      </button>
+                    )}
                   </div>
 
                   <div className="max-h-60 overflow-y-auto divide-y divide-slate-800/50 pr-0.5">
-                    {filteredDagNodes.map((node) => (
-                      <div
-                        key={node.id}
-                        onClick={() => setSelectedNodeId(node.id)}
-                        className={`py-2 px-1.5 transition-colors cursor-pointer flex items-center justify-between gap-2 rounded-lg ${
-                          selectedNodeId === node.id
-                            ? 'bg-emerald-500/10 text-emerald-300'
-                            : 'hover:bg-slate-800/50 text-slate-300'
-                        }`}
-                      >
-                        <div className="overflow-hidden">
-                          <div className="text-xs font-medium truncate">{node.title}</div>
-                          <div className="text-[10px] text-slate-500 font-mono">/{node.slug}</div>
-                        </div>
-                        <span className="text-[9px] font-mono font-bold px-1.5 py-0.5 rounded bg-slate-800 text-slate-400 border border-slate-700/60 uppercase shrink-0">
-                          {node.difficulty}
-                        </span>
-                      </div>
-                    ))}
+                    {filteredDagNodes.map((node) => {
+                      const isSelected = selectedNodeId === node.id;
+                      return (
+                        <button
+                          key={node.id}
+                          type="button"
+                          onClick={() => setSelectedNodeId(node.id)}
+                          className={`w-full py-2 px-2 transition-colors cursor-pointer flex items-center justify-between gap-2 rounded text-left group ${
+                            isSelected
+                              ? 'bg-emerald-500/10 text-emerald-300 font-semibold border-l-2 border-emerald-400 pl-1.5'
+                              : 'text-slate-300 hover:text-white hover:bg-slate-800/50'
+                          }`}
+                          title={`Натисніть для вибору навички: ${node.title}`}
+                        >
+                          <div className="overflow-hidden min-w-0 pr-1">
+                            <div className="text-xs truncate">{node.title}</div>
+                            <div className="text-[10px] text-slate-500 font-mono">/{node.slug}</div>
+                          </div>
+                          <span className="text-[9px] font-mono font-bold px-1.5 py-0.5 rounded bg-slate-800 text-slate-400 border border-slate-700/60 uppercase shrink-0">
+                            {node.difficulty}
+                          </span>
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
               </DrawerSection>
@@ -863,6 +881,9 @@ export default function AdminCMSDashboard() {
 
               <SkillDagEditor
                 nodes={nodes}
+                selectedNodeId={selectedNodeId}
+                onSelectNode={setSelectedNodeId}
+                searchQuery={dagSearch}
                 onSaveNode={handleSaveNode}
                 onDeleteNode={handleDeleteNode}
               />

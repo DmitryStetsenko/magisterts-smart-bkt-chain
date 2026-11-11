@@ -120,6 +120,85 @@
           ]
         },
         {
+          "title": "0.1.7.84 Двостороння Синхронізація Конструктора Графа Навичок із Сайдбаром (SBC-396, EP-AD)",
+          "level": 3,
+          "paragraphs": [],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "**Контекст та інженерне завдання:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "У вкладці «Конструктор Графа Навичок (Skill DAG Editor)» (`apps/admin`, порт 3004) вибір навички або модуля у висувній бічній панелі («Навички курсу») не викликав реакції на центральному полотні чи у формі редагування параметрів BKT справа.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Компонент `SkillDagEditor` мав ізольований внутрішній стан `selectedNode`, який не синхронізувався із зовнішнім `selectedNodeId` у `page.tsx`.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Виконані інженерні рішення:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Інтерфейс Контракту `SkillDagEditorProps` ([`SkillDagEditor.tsx`](file:///apps/admin/src/features/skill-editor/ui/SkillDagEditor.tsx)):**",
+              "subitems": [
+                "Додано вхідні параметри `selectedNodeId?: string | null`, `onSelectNode?: (nodeId: string | null) => void`, `searchQuery?: string`."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Двостороння Реактивна Синхронізація:**",
+              "subitems": [
+                "Впроваджено `useEffect`, який при отриманні `selectedNodeId` знаходить відповідний об'єкт `AdminSkillNode` (за `id` або `slug`), встановлює його в `selectedNode` та `formData`, перемикає `isEditing: true` і викликає плавний скрол `element.scrollIntoView({ behavior: 'smooth', block: 'nearest' })` до DOM-елемента `dag-node-${target.id}`.",
+                "При виборі картки на полотні (`handleSelectNode`) або створенні (`handleCreateNew`) викликається зворотний виклик `onSelectNode?.(node.id)`, миттєво підсвічуючи відповідний пункт у сайдбарі.",
+                "При видаленні вузла забезпечено коректне очищення вибору `onSelectNode?.(null)`."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Стандартизація Сайдбара (Rule 7 Minimalist Borderless UI):**",
+              "subitems": [
+                "Елементи списку навичок у сайдбарі замінено на доступні інтерактивні кнопки `<button>` із семантичною підсвіткою активного вибору: `bg-emerald-500/10 text-emerald-300 font-semibold border-l-2 border-emerald-400 pl-1.5`.",
+                "Додано кнопку скидання пошуку `✕` для поля `dagSearch`."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Автоматизоване E2E Тестування:**",
+              "subitems": [
+                "Розширено `e2e/course-and-modules.spec.ts` перевіркою кліку по модулю в сайдбарі DAG Editor та валідацією форми `Редагування: Модуль 2: Функції & Closures`."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Верифікація:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "100% успішна виробнича збірка `npm run build:admin`.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "100% успішне проходження повного сьюту регресії Playwright E2E (`npm run test:e2e`, 12/12 passed, 55.8s).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Збережено візуальний артефакт: `admin_dag_editor_sidebar_sync.png`.",
+              "subitems": []
+            }
+          ]
+        },
+        {
           "title": "0.1.7.83 Ідентифікація Користувачів, Фільтрація Аудит-Логів та Селектор у Центрі Датасетів ШІ (SBC-395, EP-AD)",
           "level": 3,
           "paragraphs": [],
