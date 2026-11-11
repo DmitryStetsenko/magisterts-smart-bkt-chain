@@ -437,7 +437,7 @@
 | **SBC-392** | `Story` | `AD` | synchronize admin sidebar courses dynamically from db and implement interactive filtering on click | 2026-11-10 | `dcc1bed` |
 | **SBC-393** | `Story` | `AD` | enable row click to edit course modal and sidebar quick edit in admin portal | 2026-11-10 | `80fb44b` |
 | **SBC-394** | `Story` | `AD` | implement cross-cutting course categories management, sidebar filtering and course categorization | 2026-11-10 | `0240b9b` |
-| **SBC-395** | `Story` | `AD` | implement user-based filtering, identity resolution and user picker in audit log dataset center | 2026-11-11 | pending |
+| **SBC-395** | `Story` | `AD` | implement user-based filtering, identity resolution and user picker in audit log dataset center | 2026-11-11 | `1f70ed5` |
 
 ---
 
