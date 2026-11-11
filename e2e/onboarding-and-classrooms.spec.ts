@@ -137,6 +137,7 @@ test.describe('User Onboarding, Google Auth & Classroom Management E2E Suite', (
   test('4. Admin Portal Users CMS & RBAC Management Flow', async ({ page }) => {
     await page.goto('http://localhost:3004', { waitUntil: 'domcontentloaded', timeout: 30000 });
     await expect(page.locator('h1')).toContainText('Admin');
+    await expect(page.getByText('Управління Навчальними Курсами')).toBeVisible({ timeout: 15000 });
 
     // Click Users Tab
     const usersTabBtn = page.locator('nav button[title*="Керування Користувачами"]');
@@ -155,6 +156,7 @@ test.describe('User Onboarding, Google Auth & Classroom Management E2E Suite', (
   test('5. Admin Portal Audit Log & AI Datasets with User Filtering Flow', async ({ page }) => {
     await page.goto('http://localhost:3004', { waitUntil: 'domcontentloaded', timeout: 30000 });
     await expect(page.locator('h1')).toContainText('Admin');
+    await expect(page.getByText('Управління Навчальними Курсами')).toBeVisible({ timeout: 15000 });
 
     // Click Datasets & Audit Tab
     const datasetsTabBtn = page.locator('nav button[title*="Експорт Датасетів для ШІ & Аудит-Логи"]');

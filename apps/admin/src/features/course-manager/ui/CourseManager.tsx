@@ -26,6 +26,8 @@ export interface CourseManagerProps {
   onSelectCourseFilter?: (slug: string | null) => void;
   selectedCategoryFilter?: string | null;
   onSelectCategoryFilter?: (slug: string | null) => void;
+  selectedStatusFilter?: 'ALL' | 'PUBLISHED' | 'DRAFT';
+  onSelectStatusFilter?: (status: 'ALL' | 'PUBLISHED' | 'DRAFT') => void;
   categories?: CourseCategoryDto[];
   onCategoriesChanged?: () => void;
   onCoursesLoaded?: (courses: CourseDto[]) => void;
@@ -40,6 +42,8 @@ export const CourseManager: React.FC<CourseManagerProps> = ({
   onSelectCourseFilter,
   selectedCategoryFilter,
   onSelectCategoryFilter,
+  selectedStatusFilter = 'ALL',
+  onSelectStatusFilter,
   categories = [],
   onCategoriesChanged,
   onCoursesLoaded,
@@ -184,7 +188,7 @@ export const CourseManager: React.FC<CourseManagerProps> = ({
     }
   };
 
-  // Filter courses by search query, selectedCourseFilter, and selectedCategoryFilter
+  // Filter courses by search query, selectedCourseFilter, selectedCategoryFilter, and selectedStatusFilter
   const filteredCourses = courses.filter((c) => {
     if (selectedCourseFilter && c.slug !== selectedCourseFilter) {
       return false;
@@ -194,6 +198,12 @@ export const CourseManager: React.FC<CourseManagerProps> = ({
       if (catSlug !== selectedCategoryFilter && c.categoryId !== selectedCategoryFilter) {
         return false;
       }
+    }
+    if (selectedStatusFilter === 'PUBLISHED' && c.isPublished === false) {
+      return false;
+    }
+    if (selectedStatusFilter === 'DRAFT' && c.isPublished !== false) {
+      return false;
     }
     if (!searchQuery.trim()) return true;
     const q = searchQuery.toLowerCase();
@@ -256,6 +266,23 @@ export const CourseManager: React.FC<CourseManagerProps> = ({
                 onClick={() => onSelectCategoryFilter?.(null)}
                 className="hover:text-white text-slate-400 cursor-pointer ml-1 text-[11px]"
                 title="Скинути фільтр галузі"
+              >
+                ✕
+              </button>
+            </div>
+          )}
+
+          {selectedStatusFilter && selectedStatusFilter !== 'ALL' && (
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-xs font-mono">
+              <span className="text-[10px] text-slate-400">Статус:</span>
+              <span className="font-semibold text-emerald-300">
+                {selectedStatusFilter === 'PUBLISHED' ? 'Опубліковані' : 'Чернетки'}
+              </span>
+              <button
+                type="button"
+                onClick={() => onSelectStatusFilter?.('ALL')}
+                className="hover:text-white text-slate-400 cursor-pointer ml-1 text-[11px]"
+                title="Скинути фільтр статусу"
               >
                 ✕
               </button>

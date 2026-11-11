@@ -69,6 +69,7 @@ export default function AdminCMSDashboard() {
   const [categories, setCategories] = useState<CourseCategoryDto[]>([]);
   const [selectedCourseSlug, setSelectedCourseSlug] = useState<string | null>(null);
   const [selectedCategorySlug, setSelectedCategorySlug] = useState<string | null>(null);
+  const [courseStatusFilter, setCourseStatusFilter] = useState<'ALL' | 'PUBLISHED' | 'DRAFT'>('ALL');
 
   const loadCourses = async () => {
     try {
@@ -130,9 +131,9 @@ export default function AdminCMSDashboard() {
 
     if (activeTab === 'courses') {
       if (courseViewMode === 'STUDIO' && selectedStudioCourse) {
-        title = 'Керування курсом';
-        icon = BookOpen;
-        iconColor = 'text-indigo-400';
+        title = 'Навігатор курсу';
+        icon = Layers;
+        iconColor = 'text-emerald-400';
       } else if (courseViewMode === 'CREATE') {
         title = 'Створення Курсу';
         icon = Plus;
@@ -169,7 +170,7 @@ export default function AdminCMSDashboard() {
       onClose: () => setIsDrawerOpen(false),
       children: (
         <div className="flex flex-col divide-y divide-slate-800/70">
-          {/* Drawer: Course Studio Mode (Non-redundant, high-productivity navigation) */}
+          {/* Drawer: Course Studio Mode (Focused outline & course tools, zero platform duplication) */}
           {activeTab === 'courses' && courseViewMode === 'STUDIO' && selectedStudioCourse && (
             <>
               {/* Back to Catalog Button */}
@@ -185,43 +186,109 @@ export default function AdminCMSDashboard() {
                 </button>
               </div>
 
-              {/* Course Switcher: Instant 1-click jump to another course */}
+              {/* Course Outline Navigator: Quick jump to any module */}
               <DrawerSection
-                title="Курси платформи"
-                icon={BookOpen}
-                badge={dynamicCourses.length}
+                title="Структура курсу"
+                icon={Layers}
+                badge={selectedStudioCourse.modules?.length || 0}
                 defaultOpen={true}
               >
                 <div className="flex flex-col divide-y divide-slate-800/50 pt-1">
-                  {dynamicCourses.map((c) => {
-                    const isCurrent = selectedStudioCourse.slug === c.slug || selectedStudioCourse.id === c.id;
-                    const modsCount = c.modules?.length || 0;
-                    return (
-                      <button
-                        key={c.id || c.slug}
-                        type="button"
-                        onClick={() => {
-                          if (!isCurrent) {
-                            handleOpenStudio(c, studioSubTab);
-                          }
-                        }}
-                        className={`w-full py-2 pr-2 text-left text-xs transition-colors cursor-pointer flex items-center justify-between group rounded-r ${
-                          isCurrent
-                            ? 'bg-indigo-500/15 text-indigo-300 font-semibold border-l-2 border-indigo-400 pl-2'
-                            : 'text-slate-400 hover:text-white hover:bg-slate-900/40 pl-2.5'
-                        }`}
-                        title={isCurrent ? `Поточний курс: ${c.title}` : `Перемкнути Студію на курс: ${c.title}`}
-                      >
-                        <div className="flex items-center gap-2 min-w-0 pr-1">
-                          <BookOpen className={`w-3.5 h-3.5 shrink-0 ${isCurrent ? 'text-indigo-400' : 'text-slate-500'}`} />
-                          <span className="truncate">{c.title}</span>
-                        </div>
-                        <span className={`text-[10px] font-mono shrink-0 ${isCurrent ? 'text-indigo-300 font-bold' : 'text-slate-500'}`}>
-                          {isCurrent ? 'Активний' : `${modsCount} мод.`}
-                        </span>
-                      </button>
-                    );
-                  })}
+                  {(!selectedStudioCourse.modules || selectedStudioCourse.modules.length === 0) ? (
+                    <div className="p-3 text-[11px] text-slate-500 italic text-center">
+                      У цьому курсі ще немає модулів.
+                    </div>
+                  ) : (
+                    selectedStudioCourse.modules.map((m, idx) => {
+                      const skillsCount = m.skills?.length || 1;
+                      return (
+                        <button
+                          key={m.id || m.slug}
+                          type="button"
+                          onClick={() => {
+                            setStudioSubTab('CURRICULUM');
+                            setTimeout(() => {
+                              const el = document.getElementById(`module-card-${m.id}`);
+                              if (el) {
+                                el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                                el.classList.add('ring-2', 'ring-emerald-400', 'transition-all');
+                                setTimeout(() => el.classList.remove('ring-2', 'ring-emerald-400'), 1500);
+                              }
+                            }, 50);
+                          }}
+                          className="w-full py-2 pr-2 text-left text-xs transition-colors cursor-pointer flex items-center justify-between group rounded-r text-slate-400 hover:text-white hover:bg-slate-900/40 pl-2.5"
+                          title={`Перейти до модуля: ${m.title}`}
+                        >
+                          <div className="flex items-center gap-2 min-w-0 pr-1">
+                            <span className="w-4 h-4 rounded bg-slate-800 flex items-center justify-center text-[10px] font-mono text-emerald-400 shrink-0">
+                              {idx + 1}
+                            </span>
+                            <span className="truncate">{m.title}</span>
+                          </div>
+                          <span className="text-[10px] font-mono text-slate-500 shrink-0">
+                            {skillsCount} нав.
+                          </span>
+                        </button>
+                      );
+                    })
+                  )}
+                </div>
+              </DrawerSection>
+
+              {/* Course Actions & Settings */}
+              <DrawerSection
+                title="Дії та інструменти"
+                icon={Settings}
+                defaultOpen={true}
+              >
+                <div className="flex flex-col gap-1.5 pt-1 text-xs">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setStudioSubTab('CURRICULUM');
+                      window.dispatchEvent(new CustomEvent('admin-studio-open-create-module'));
+                    }}
+                    className="w-full py-2 px-2.5 rounded-lg bg-emerald-600/10 hover:bg-emerald-600/20 text-emerald-300 border border-emerald-500/30 transition-colors flex items-center gap-2 font-medium cursor-pointer"
+                  >
+                    <Plus className="w-3.5 h-3.5 text-emerald-400" />
+                    <span>+ Додати модуль</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setStudioSubTab('CURRICULUM')}
+                    className={`w-full py-1.5 px-2.5 rounded-lg text-left transition-colors flex items-center justify-between cursor-pointer ${
+                      studioSubTab === 'CURRICULUM'
+                        ? 'bg-slate-800 text-white font-medium'
+                        : 'text-slate-400 hover:text-white hover:bg-slate-900/40'
+                    }`}
+                  >
+                    <div className="flex items-center gap-2">
+                      <Layers className="w-3.5 h-3.5 text-emerald-400" />
+                      <span>План & DAG</span>
+                    </div>
+                    <span className="text-[10px] font-mono text-slate-500">
+                      {selectedStudioCourse.modules?.length || 0} тем
+                    </span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setStudioSubTab('SETTINGS')}
+                    className={`w-full py-1.5 px-2.5 rounded-lg text-left transition-colors flex items-center justify-between cursor-pointer ${
+                      studioSubTab === 'SETTINGS'
+                        ? 'bg-slate-800 text-white font-medium'
+                        : 'text-slate-400 hover:text-white hover:bg-slate-900/40'
+                    }`}
+                  >
+                    <div className="flex items-center gap-2">
+                      <Settings className="w-3.5 h-3.5 text-indigo-400" />
+                      <span>Параметри & BKT</span>
+                    </div>
+                    <span className="text-[10px] font-mono text-emerald-400">
+                      P(L) ≥ {selectedStudioCourse.defaultMasteryThreshold ?? 0.85}
+                    </span>
+                  </button>
                 </div>
               </DrawerSection>
 
@@ -270,7 +337,7 @@ export default function AdminCMSDashboard() {
             </>
           )}
 
-          {/* Drawer: Courses List Mode */}
+          {/* Drawer: Courses List Mode (Clean filter & bank stats, zero duplicate course list) */}
           {activeTab === 'courses' && courseViewMode !== 'STUDIO' && (
             <>
               <DrawerSection
@@ -345,36 +412,57 @@ export default function AdminCMSDashboard() {
               </DrawerSection>
 
               <DrawerSection
-                title="Доступні курси"
-                icon={BookOpen}
-                badge={dynamicCourses.length}
+                title="Статус публікації"
+                icon={ShieldCheck}
                 defaultOpen={true}
               >
-                <div className="flex flex-col divide-y divide-slate-800/50 pt-1">
-                  {dynamicCourses.map((c) => {
-                    const isSelected = selectedCourseSlug === c.slug;
-                    const modsCount = c.modules?.length || 0;
-                    return (
-                      <button
-                        key={c.id || c.slug}
-                        type="button"
-                        onClick={() => {
-                          setSelectedCourseSlug(isSelected ? null : c.slug);
-                        }}
-                        className={`w-full py-2 pr-2 text-left text-xs transition-colors cursor-pointer flex items-center justify-between group rounded-r ${
-                          isSelected
-                            ? 'bg-emerald-500/10 text-emerald-300 font-semibold border-l-2 border-emerald-400 pl-2'
-                            : 'text-slate-400 hover:text-white hover:bg-slate-900/40 pl-2.5'
-                        }`}
-                        title={`${c.title} (${modsCount} мод.)`}
-                      >
-                        <span className="truncate pr-1">{c.title}</span>
-                        <span className="text-[10px] font-mono opacity-80 shrink-0 text-slate-500">
-                          {modsCount} мод.
-                        </span>
-                      </button>
-                    );
-                  })}
+                <div className="flex flex-col gap-1 pt-1 text-xs">
+                  <button
+                    type="button"
+                    onClick={() => setCourseStatusFilter('ALL')}
+                    className={`w-full py-1.5 px-2.5 rounded-lg text-left transition-colors cursor-pointer flex items-center justify-between ${
+                      courseStatusFilter === 'ALL'
+                        ? 'bg-emerald-500/10 text-emerald-300 font-semibold border-l-2 border-emerald-400'
+                        : 'text-slate-400 hover:text-white hover:bg-slate-900/40'
+                    }`}
+                  >
+                    <span>Всі курси</span>
+                    <span className="text-[10px] font-mono text-slate-500">{dynamicCourses.length}</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setCourseStatusFilter('PUBLISHED')}
+                    className={`w-full py-1.5 px-2.5 rounded-lg text-left transition-colors cursor-pointer flex items-center justify-between ${
+                      courseStatusFilter === 'PUBLISHED'
+                        ? 'bg-emerald-500/10 text-emerald-300 font-semibold border-l-2 border-emerald-400'
+                        : 'text-slate-400 hover:text-white hover:bg-slate-900/40'
+                    }`}
+                  >
+                    <div className="flex items-center gap-1.5">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                      <span>Опубліковані</span>
+                    </div>
+                    <span className="text-[10px] font-mono text-emerald-400">
+                      {dynamicCourses.filter(c => c.isPublished !== false).length}
+                    </span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setCourseStatusFilter('DRAFT')}
+                    className={`w-full py-1.5 px-2.5 rounded-lg text-left transition-colors cursor-pointer flex items-center justify-between ${
+                      courseStatusFilter === 'DRAFT'
+                        ? 'bg-emerald-500/10 text-emerald-300 font-semibold border-l-2 border-emerald-400'
+                        : 'text-slate-400 hover:text-white hover:bg-slate-900/40'
+                    }`}
+                  >
+                    <div className="flex items-center gap-1.5">
+                      <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
+                      <span>Чернетки</span>
+                    </div>
+                    <span className="text-[10px] font-mono text-amber-400">
+                      {dynamicCourses.filter(c => c.isPublished === false).length}
+                    </span>
+                  </button>
                 </div>
               </DrawerSection>
 
@@ -898,6 +986,9 @@ export default function AdminCMSDashboard() {
                   activeSubTab={studioSubTab}
                   onSubTabChange={setStudioSubTab}
                   onBack={handleBackToCoursesList}
+                  onCourseLoaded={(fullCourse) => {
+                    setSelectedStudioCourse(fullCourse);
+                  }}
                   onCourseUpdated={(updated) => {
                     setSelectedStudioCourse(updated);
                     loadCourses();
@@ -914,6 +1005,8 @@ export default function AdminCMSDashboard() {
                   onSelectCourseFilter={setSelectedCourseSlug}
                   selectedCategoryFilter={selectedCategorySlug}
                   onSelectCategoryFilter={setSelectedCategorySlug}
+                  selectedStatusFilter={courseStatusFilter}
+                  onSelectStatusFilter={setCourseStatusFilter}
                   categories={categories}
                   onCategoriesChanged={loadCategories}
                   onCoursesLoaded={setDynamicCourses}

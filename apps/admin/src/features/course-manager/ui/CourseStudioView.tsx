@@ -59,6 +59,7 @@ interface CourseStudioViewProps {
   activeSubTab?: 'CURRICULUM' | 'SETTINGS';
   onSubTabChange?: (tab: 'CURRICULUM' | 'SETTINGS') => void;
   onBack: () => void;
+  onCourseLoaded?: (course: CourseDto) => void;
   onCourseUpdated: (updatedCourse: CourseDto) => void;
   onCourseDeleted: (deletedCourseId: string) => void;
 }
@@ -69,6 +70,7 @@ export const CourseStudioView: React.FC<CourseStudioViewProps> = ({
   activeSubTab: externalSubTab,
   onSubTabChange,
   onBack,
+  onCourseLoaded,
   onCourseUpdated,
   onCourseDeleted,
 }) => {
@@ -87,6 +89,18 @@ export const CourseStudioView: React.FC<CourseStudioViewProps> = ({
 
   // Expanded modules
   const [expandedModuleIds, setExpandedModuleIds] = useState<Record<string, boolean>>({});
+
+  // Expanded theory sections per module
+  const [expandedTheoryModuleIds, setExpandedTheoryModuleIds] = useState<Record<string, boolean>>({});
+
+  // Expanded skill tasks per skill
+  const [expandedSkillTaskIds, setExpandedSkillTaskIds] = useState<Record<string, boolean>>({});
+
+  // Inline Task creation state per skill
+  const [addingTaskSkillId, setAddingTaskSkillId] = useState<string | null>(null);
+  const [newTaskTitle, setNewTaskTitle] = useState('');
+  const [newTaskType, setNewTaskType] = useState<'CODE' | 'MULTIPLE_CHOICE' | 'ESSAY'>('CODE');
+  const [newTaskDifficulty, setNewTaskDifficulty] = useState<'EASY' | 'MEDIUM' | 'HARD'>('EASY');
 
   // Module creation / editing state (inline, no popups)
   const [isCreatingModule, setIsCreatingModule] = useState(false);
@@ -135,6 +149,7 @@ export const CourseStudioView: React.FC<CourseStudioViewProps> = ({
       if (res.ok) {
         const data = await res.json();
         setCourse(data);
+        onCourseLoaded?.(data);
         setModules(data.modules || []);
         setAllCourseSkills(data.skills || []);
 
@@ -152,6 +167,15 @@ export const CourseStudioView: React.FC<CourseStudioViewProps> = ({
       setIsLoading(false);
     }
   };
+
+  useEffect(() => {
+    const handleOpenCreate = () => {
+      setIsCreatingModule(true);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+    window.addEventListener('admin-studio-open-create-module', handleOpenCreate);
+    return () => window.removeEventListener('admin-studio-open-create-module', handleOpenCreate);
+  }, []);
 
   useEffect(() => {
     setCourse(initialCourse);
@@ -582,7 +606,7 @@ export const CourseStudioView: React.FC<CourseStudioViewProps> = ({
                 const modSkills = mod.skills || [];
 
                 return (
-                  <div key={mod.id} className="flex flex-col transition-colors">
+                  <div key={mod.id} id={`module-card-${mod.id}`} className="flex flex-col transition-all scroll-mt-6">
                     {/* Module Header Row */}
                     <div className="p-3.5 flex items-center justify-between gap-3 hover:bg-slate-900/60">
                       <div className="flex items-center gap-3 min-w-0">
@@ -625,6 +649,20 @@ export const CourseStudioView: React.FC<CourseStudioViewProps> = ({
 
                         <button
                           type="button"
+                          onClick={() => setExpandedTheoryModuleIds(prev => ({ ...prev, [mod.id]: !prev[mod.id] }))}
+                          className={`px-2.5 py-1 rounded text-xs font-medium border transition-colors cursor-pointer flex items-center gap-1.5 ${
+                            expandedTheoryModuleIds[mod.id]
+                              ? 'bg-emerald-500/15 border-emerald-500/40 text-emerald-300'
+                              : 'bg-slate-800/80 hover:bg-slate-800 border-slate-700/60 text-slate-300'
+                          }`}
+                          title="Переглянути та налаштувати теоретичний конспект модуля"
+                        >
+                          <BookOpen className="w-3.5 h-3.5 text-emerald-400" />
+                          <span>Теорія</span>
+                        </button>
+
+                        <button
+                          type="button"
                           onClick={() => handleOpenAssignSkills(mod)}
                           className="px-2.5 py-1 rounded bg-slate-800/80 hover:bg-slate-800 text-indigo-300 text-xs font-medium border border-indigo-500/20 transition-colors cursor-pointer"
                           title="Прив'язати навички (SkillNodes)"
@@ -660,6 +698,38 @@ export const CourseStudioView: React.FC<CourseStudioViewProps> = ({
                         </button>
                       </div>
                     </div>
+
+                    {/* Inline Theory Content Unit for this module */}
+                    {expandedTheoryModuleIds[mod.id] && (
+                      <div className="p-3.5 bg-slate-950/90 border-t border-b border-emerald-500/30 flex flex-col gap-2.5 animate-fadeIn">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <BookOpen className="w-4 h-4 text-emerald-400" />
+                            <span className="text-xs font-bold text-white uppercase tracking-wider">
+                              Теоретичний Конспект Модуля
+                            </span>
+                          </div>
+                          {mod.theoryUrl && (
+                            <a
+                              href={mod.theoryUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-xs text-emerald-400 hover:text-emerald-300 font-mono inline-flex items-center gap-1 underline"
+                            >
+                              <span>Відкрити в Zen Focus Підручника</span>
+                              <ExternalLink className="w-3 h-3" />
+                            </a>
+                          )}
+                        </div>
+                        <div className="p-2.5 rounded-lg bg-slate-900 border border-slate-800 text-xs text-slate-300 leading-relaxed">
+                          {mod.description || 'Теоретичний конспект для цього модуля доступний у Підручнику теорії (apps/study). Учні вивчають концепції, інтерактивний код та типові омани перед переходом до адаптивного розвʼязання завдань.'}
+                        </div>
+                        <div className="flex items-center justify-between text-[11px] text-slate-500">
+                          <span>Маршрут підручника: <code className="text-emerald-400 font-mono">{mod.theoryUrl || `/learn/${course.slug}/${mod.slug}`}</code></span>
+                          <span className="text-slate-400 font-mono text-[10px]">Zen Focus Reading Engine v2.0</span>
+                        </div>
+                      </div>
+                    )}
 
                     {/* Inline Edit Form for this module */}
                     {isEditing && (
@@ -790,50 +860,96 @@ export const CourseStudioView: React.FC<CourseStudioViewProps> = ({
                                 'bg-emerald-950/60 text-emerald-400 border-emerald-800/40';
 
                               return (
-                                <div
-                                  key={skill.id}
-                                  className="p-2.5 rounded-lg bg-slate-900/60 border border-slate-800 flex items-center justify-between gap-3 text-xs"
-                                >
-                                  <div className="flex items-center gap-2.5 min-w-0">
-                                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0" />
-                                    <div className="min-w-0">
-                                      <div className="flex items-center gap-1.5 flex-wrap">
-                                        <span className="px-1.5 py-0.5 rounded text-[9px] font-mono font-bold uppercase bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 shrink-0">
-                                          BKT Компетенція
-                                        </span>
-                                        <span className="font-semibold text-slate-200 truncate">{cleanTitle}</span>
-                                        <span className="text-[10px] font-mono text-slate-500">/{skill.slug}</span>
-                                        <span className={`px-1.5 py-0.5 rounded text-[9px] font-mono uppercase border ${diffBadgeColor}`}>
-                                          {diff}
-                                        </span>
-                                        {skill.tasks && skill.tasks.length > 0 && (
-                                          <span className="px-1.5 py-0.5 rounded text-[9px] font-mono bg-slate-800 text-slate-400">
-                                            {skill.tasks.length} {skill.tasks.length === 1 ? 'завдання' : skill.tasks.length < 5 ? 'завдання' : 'завдань'}
+                                <div key={skill.id} className="flex flex-col gap-1">
+                                  <div className="p-2.5 rounded-lg bg-slate-900/60 border border-slate-800 flex items-center justify-between gap-3 text-xs">
+                                    <div className="flex items-center gap-2.5 min-w-0">
+                                      <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0" />
+                                      <div className="min-w-0">
+                                        <div className="flex items-center gap-1.5 flex-wrap">
+                                          <span className="px-1.5 py-0.5 rounded text-[9px] font-mono font-bold uppercase bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 shrink-0">
+                                            BKT Компетенція
                                           </span>
+                                          <span className="font-semibold text-slate-200 truncate">{cleanTitle}</span>
+                                          <span className="text-[10px] font-mono text-slate-500">/{skill.slug}</span>
+                                          <span className={`px-1.5 py-0.5 rounded text-[9px] font-mono uppercase border ${diffBadgeColor}`}>
+                                            {diff}
+                                          </span>
+                                          {skill.tasks && skill.tasks.length > 0 && (
+                                            <button
+                                              type="button"
+                                              onClick={() => setExpandedSkillTaskIds(prev => ({ ...prev, [skill.id]: !prev[skill.id] }))}
+                                              className="px-1.5 py-0.5 rounded text-[9px] font-mono bg-slate-800 hover:bg-slate-700 text-emerald-300 transition-colors cursor-pointer flex items-center gap-1"
+                                              title="Переглянути завдання цієї компетенції"
+                                            >
+                                              <span>{skill.tasks.length} {skill.tasks.length === 1 ? 'завдання' : skill.tasks.length < 5 ? 'завдання' : 'завдань'}</span>
+                                              <span className="text-[8px]">{expandedSkillTaskIds[skill.id] ? '▲' : '▼'}</span>
+                                            </button>
+                                          )}
+                                        </div>
+                                        {cleanDesc && (
+                                          <p className="text-[11px] text-slate-400 truncate mt-0.5">
+                                            {cleanDesc}
+                                          </p>
                                         )}
                                       </div>
-                                      {cleanDesc && (
-                                        <p className="text-[11px] text-slate-400 truncate mt-0.5">
-                                          {cleanDesc}
-                                        </p>
-                                      )}
+                                    </div>
+
+                                    <div className="grid grid-cols-4 gap-1.5 text-[10px] font-mono shrink-0">
+                                      <span className="px-1.5 py-0.5 rounded bg-slate-950 border border-slate-800 text-slate-400" title="Початковий рівень знань P(L₀)">
+                                        P(L₀): <span className="text-emerald-400 font-bold">{skill.pInit ?? '0.50'}</span>
+                                      </span>
+                                      <span className="px-1.5 py-0.5 rounded bg-slate-950 border border-slate-800 text-slate-400" title="Ймовірність навчання P(T)">
+                                        P(T): <span className="text-emerald-400 font-bold">{skill.pTransit ?? '0.10'}</span>
+                                      </span>
+                                      <span className="px-1.5 py-0.5 rounded bg-slate-950 border border-slate-800 text-slate-400" title="Ймовірність помилки P(S)">
+                                        P(S): <span className="text-rose-400 font-bold">{skill.pSlip ?? '0.10'}</span>
+                                      </span>
+                                      <span className="px-1.5 py-0.5 rounded bg-slate-950 border border-slate-800 text-slate-400" title="Ймовірність вгадування P(G)">
+                                        P(G): <span className="text-indigo-400 font-bold">{skill.pGuess ?? '0.20'}</span>
+                                      </span>
                                     </div>
                                   </div>
 
-                                  <div className="grid grid-cols-4 gap-1.5 text-[10px] font-mono shrink-0">
-                                    <span className="px-1.5 py-0.5 rounded bg-slate-950 border border-slate-800 text-slate-400" title="Початковий рівень знань P(L₀)">
-                                      P(L₀): <span className="text-emerald-400 font-bold">{skill.pInit ?? '0.50'}</span>
-                                    </span>
-                                    <span className="px-1.5 py-0.5 rounded bg-slate-950 border border-slate-800 text-slate-400" title="Ймовірність навчання P(T)">
-                                      P(T): <span className="text-emerald-400 font-bold">{skill.pTransit ?? '0.10'}</span>
-                                    </span>
-                                    <span className="px-1.5 py-0.5 rounded bg-slate-950 border border-slate-800 text-slate-400" title="Ймовірність помилки P(S)">
-                                      P(S): <span className="text-rose-400 font-bold">{skill.pSlip ?? '0.10'}</span>
-                                    </span>
-                                    <span className="px-1.5 py-0.5 rounded bg-slate-950 border border-slate-800 text-slate-400" title="Ймовірність вгадування P(G)">
-                                      P(G): <span className="text-indigo-400 font-bold">{skill.pGuess ?? '0.20'}</span>
-                                    </span>
-                                  </div>
+                                  {/* Expanded Skill Tasks Inspector */}
+                                  {expandedSkillTaskIds[skill.id] && (
+                                    <div className="p-3 bg-slate-950/80 rounded-lg border border-slate-800 flex flex-col gap-2 animate-fadeIn">
+                                      <div className="flex items-center justify-between border-b border-slate-800/80 pb-1.5">
+                                        <div className="flex items-center gap-2">
+                                          <Sparkles className="w-3.5 h-3.5 text-indigo-400" />
+                                          <span className="text-[11px] font-bold text-slate-200">
+                                            Банк завдань компетенції: {cleanTitle}
+                                          </span>
+                                        </div>
+                                        <span className="text-[10px] font-mono text-slate-400">
+                                          Всього: {skill.tasks?.length || 0} завдань
+                                        </span>
+                                      </div>
+
+                                      <div className="flex flex-col divide-y divide-slate-800/50 max-h-48 overflow-y-auto pr-1">
+                                        {(skill.tasks || []).map((t: any, tIdx: number) => {
+                                          const typeBadge =
+                                            t.taskType === 'CODE' ? 'bg-indigo-950 text-indigo-300 border-indigo-800/40' :
+                                            t.taskType === 'ESSAY' ? 'bg-purple-950 text-purple-300 border-purple-800/40' :
+                                            'bg-emerald-950 text-emerald-300 border-emerald-800/40';
+                                          return (
+                                            <div key={t.id || tIdx} className="py-1.5 flex items-center justify-between text-xs hover:bg-slate-900/40 px-1 rounded">
+                                              <div className="flex items-center gap-2 min-w-0 pr-2">
+                                                <span className={`text-[9px] font-mono px-1.5 py-0.5 rounded border uppercase shrink-0 ${typeBadge}`}>
+                                                  {t.taskType || 'CODE'}
+                                                </span>
+                                                <span className="truncate text-slate-300 font-medium">{t.title}</span>
+                                              </div>
+                                              <div className="flex items-center gap-2 shrink-0">
+                                                <span className="text-[9px] font-mono uppercase text-slate-400">
+                                                  {t.difficulty || 'EASY'}
+                                                </span>
+                                              </div>
+                                            </div>
+                                          );
+                                        })}
+                                      </div>
+                                    </div>
+                                  )}
                                 </div>
                               );
                             })}
