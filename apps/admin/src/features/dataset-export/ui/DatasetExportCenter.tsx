@@ -44,6 +44,7 @@ interface DatasetExportCenterProps {
   userFilter?: string;
   onUserFilterChange?: (user: string) => void;
   onStatsChange?: (stats: DatasetStats) => void;
+  onUsersLoaded?: (users: { userId: string; name: string; email?: string; count: number; role?: string }[]) => void;
 }
 
 export const DatasetExportCenter: React.FC<DatasetExportCenterProps> = ({
@@ -53,6 +54,7 @@ export const DatasetExportCenter: React.FC<DatasetExportCenterProps> = ({
   userFilter: controlledUserFilter,
   onUserFilterChange,
   onStatsChange,
+  onUsersLoaded,
 }) => {
   const [logs, setLogs] = useState<StudentActivityLogDto[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -130,6 +132,75 @@ export const DatasetExportCenter: React.FC<DatasetExportCenterProps> = ({
     fetchRecentLogs();
   }, []);
 
+  const getUserDisplay = (log: StudentActivityLogDto) => {
+    if (log.userName && log.userName.trim()) {
+      return {
+        primary: log.userName,
+        secondary: log.userEmail || (log.userId.length > 20 ? `#${log.userId.slice(0, 6)}...${log.userId.slice(-4)}` : log.userId),
+        isIdentified: true,
+      };
+    }
+    if (log.user?.email) {
+      return {
+        primary: log.user.name || log.user.email.split('@')[0],
+        secondary: log.user.email,
+        isIdentified: true,
+      };
+    }
+    if (log.userId === 'demo-student') {
+      return {
+        primary: 'Дмитро Стеценко',
+        secondary: 'demo-student',
+        isIdentified: true,
+      };
+    }
+    if (log.userId.length > 20) {
+      return {
+        primary: `Учень #${log.userId.slice(0, 6)}...${log.userId.slice(-4)}`,
+        secondary: log.userId,
+        isIdentified: false,
+      };
+    }
+    return {
+      primary: log.userId,
+      secondary: log.userId,
+      isIdentified: false,
+    };
+  };
+
+  // Active Users calculation with counts for quick-filter selector
+  const activeUsers = useMemo(() => {
+    const userMap = new Map<string, { userId: string; name: string; email?: string; count: number; role?: string }>();
+    logs.forEach((log) => {
+      const uInfo = getUserDisplay(log);
+      if (!userMap.has(log.userId)) {
+        userMap.set(log.userId, {
+          userId: log.userId,
+          name: uInfo.primary,
+          email: log.userEmail || log.user?.email || undefined,
+          role: log.actorRole,
+          count: 1,
+        });
+      } else {
+        const existing = userMap.get(log.userId)!;
+        existing.count += 1;
+        if (existing.name.startsWith('Учень #') && !uInfo.primary.startsWith('Учень #')) {
+          existing.name = uInfo.primary;
+        }
+        if (!existing.email && (log.userEmail || log.user?.email)) {
+          existing.email = log.userEmail || log.user?.email || undefined;
+        }
+      }
+    });
+    return Array.from(userMap.values()).sort((a, b) => b.count - a.count);
+  }, [logs]);
+
+  useEffect(() => {
+    if (onUsersLoaded) {
+      onUsersLoaded(activeUsers);
+    }
+  }, [activeUsers, onUsersLoaded]);
+
   // Stats calculation
   const stats: DatasetStats = useMemo(() => {
     return {
@@ -150,9 +221,24 @@ export const DatasetExportCenter: React.FC<DatasetExportCenterProps> = ({
 
   const filteredLogs = useMemo(() => {
     return logs.filter((log) => {
-      if (userFilter.trim() && !log.userId.toLowerCase().includes(userFilter.toLowerCase())) {
-        return false;
+      // 1. User Filter matching (ID, Name, Email or Substring)
+      if (userFilter.trim() && userFilter !== 'ALL') {
+        const q = userFilter.toLowerCase().trim();
+        const uInfo = getUserDisplay(log);
+        const matchId = log.userId.toLowerCase().includes(q);
+        const matchPrimary = uInfo.primary.toLowerCase().includes(q);
+        const matchSecondary = uInfo.secondary ? uInfo.secondary.toLowerCase().includes(q) : false;
+        const matchName = log.userName ? log.userName.toLowerCase().includes(q) : false;
+        const matchEmail = log.userEmail ? log.userEmail.toLowerCase().includes(q) : false;
+        const matchUserObjName = log.user?.name ? log.user.name.toLowerCase().includes(q) : false;
+        const matchUserObjEmail = log.user?.email ? log.user.email.toLowerCase().includes(q) : false;
+
+        if (!matchId && !matchPrimary && !matchSecondary && !matchName && !matchEmail && !matchUserObjName && !matchUserObjEmail) {
+          return false;
+        }
       }
+
+      // 2. Event Type Filter matching
       if (activeFilter === 'ALL') return true;
       if (activeFilter === 'SUBMISSIONS') return log.eventType.includes('SUBMIT') || log.eventType.includes('EVALUAT');
       if (activeFilter === 'HINTS') return log.eventType.includes('HINT');
@@ -283,6 +369,9 @@ export const DatasetExportCenter: React.FC<DatasetExportCenterProps> = ({
     setTimeout(() => setIsCopied(false), 2000);
   };
 
+  const exportJsonlUrl = `${apiUrl}/api/v1/bkt/activity-logs/export?format=jsonl${userFilter.trim() && userFilter !== 'ALL' ? `&userId=${encodeURIComponent(userFilter.trim())}` : ''}`;
+  const exportCsvUrl = `${apiUrl}/api/v1/bkt/activity-logs/export?format=csv${userFilter.trim() && userFilter !== 'ALL' ? `&userId=${encodeURIComponent(userFilter.trim())}` : ''}`;
+
   return (
     <div className="flex flex-col gap-4">
       {/* 🚀 Sleek Minimalist Borderless Header & Action Bar */}
@@ -300,11 +389,11 @@ export const DatasetExportCenter: React.FC<DatasetExportCenterProps> = ({
         {/* 1-Click Sleek Export Actions */}
         <div className="flex items-center gap-2 flex-wrap">
           <a
-            href={`${apiUrl}/api/v1/bkt/activity-logs/export?format=jsonl`}
+            href={exportJsonlUrl}
             target="_blank"
             rel="noopener noreferrer"
             className="px-3 py-1.5 rounded-lg bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 border border-emerald-500/30 text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer"
-            title="Завантажити повний датасет у форматі JSONL для моделей DKT / PyTorch"
+            title={userFilter.trim() && userFilter !== 'ALL' ? `Завантажити JSONL для користувача ${userFilter}` : "Завантажити повний датасет у форматі JSONL для моделей DKT / PyTorch"}
           >
             <Download className="w-3.5 h-3.5" />
             <span>JSONL (DKT/ШІ)</span>
@@ -312,11 +401,11 @@ export const DatasetExportCenter: React.FC<DatasetExportCenterProps> = ({
           </a>
 
           <a
-            href={`${apiUrl}/api/v1/bkt/activity-logs/export?format=csv`}
+            href={exportCsvUrl}
             target="_blank"
             rel="noopener noreferrer"
             className="px-3 py-1.5 rounded-lg bg-blue-500/15 hover:bg-blue-500/25 text-blue-300 border border-blue-500/30 text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer"
-            title="Завантажити табличний датасет у форматі CSV для Pandas / Excel"
+            title={userFilter.trim() && userFilter !== 'ALL' ? `Завантажити CSV для користувача ${userFilter}` : "Завантажити табличний датасет у форматі CSV для Pandas / Excel"}
           >
             <FileSpreadsheet className="w-3.5 h-3.5" />
             <span>CSV (Pandas)</span>
@@ -408,16 +497,63 @@ export const DatasetExportCenter: React.FC<DatasetExportCenterProps> = ({
           ))}
         </div>
 
-        <div className="flex items-center gap-2 w-full sm:w-auto">
-          <div className="relative w-full sm:w-48">
+        <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+          {/* Active User Filter Pill with 1-Click Clear */}
+          {userFilter.trim() && userFilter !== 'ALL' && (
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-xs font-mono">
+              <User className="w-3.5 h-3.5 text-emerald-400" />
+              <span className="text-[10px] text-slate-400">Користувач:</span>
+              <span className="font-semibold text-emerald-300 truncate max-w-[130px]">
+                {activeUsers.find((u) => u.userId === userFilter)?.name || userFilter}
+              </span>
+              <button
+                type="button"
+                onClick={() => handleUserFilterChange('')}
+                className="hover:text-white text-slate-400 cursor-pointer ml-1 text-[11px]"
+                title="Скинути фільтр користувача"
+              >
+                ✕
+              </button>
+            </div>
+          )}
+
+          {/* Quick User Selector Dropdown */}
+          <div className="relative">
+            <select
+              value={userFilter}
+              onChange={(e) => handleUserFilterChange(e.target.value)}
+              className="px-2.5 py-1 bg-slate-900 border border-slate-800 rounded-lg text-xs text-slate-200 focus:outline-none focus:border-emerald-500 cursor-pointer max-w-[170px] truncate"
+              title="Швидкий вибір користувача зі списку подій"
+            >
+              <option value="">Всі користувачі ({logs.length})</option>
+              {activeUsers.map((u) => (
+                <option key={u.userId} value={u.userId}>
+                  {u.name} ({u.count})
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Search by Name, Email, or ID */}
+          <div className="relative w-full sm:w-56">
             <Search className="w-3.5 h-3.5 absolute left-2.5 top-2 text-slate-500" />
             <input
               type="text"
-              placeholder="Фільтр за userId..."
+              placeholder="Пошук за ім'ям, email або ID..."
               value={userFilter}
               onChange={(e) => handleUserFilterChange(e.target.value)}
-              className="w-full pl-8 pr-2.5 py-1 bg-slate-950 border border-slate-800 rounded-lg text-xs text-slate-200 placeholder-slate-600 focus:outline-none focus:border-emerald-500"
+              className="w-full pl-8 pr-7 py-1 bg-slate-950 border border-slate-800 rounded-lg text-xs text-slate-200 placeholder-slate-600 focus:outline-none focus:border-emerald-500"
             />
+            {userFilter && (
+              <button
+                type="button"
+                onClick={() => handleUserFilterChange('')}
+                className="absolute right-2 top-1.5 text-slate-500 hover:text-white text-xs cursor-pointer"
+                title="Очистити пошук"
+              >
+                ✕
+              </button>
+            )}
           </div>
           <span className="text-[11px] font-mono text-slate-500 shrink-0">
             Записів: {filteredLogs.length}
@@ -457,6 +593,8 @@ export const DatasetExportCenter: React.FC<DatasetExportCenterProps> = ({
                 filteredLogs.map((log) => {
                   const badge = getEventBadge(log.eventType);
                   const Icon = badge.icon;
+                  const uInfo = getUserDisplay(log);
+                  const isUserActive = Boolean(userFilter.trim() && (log.userId === userFilter || uInfo.primary.toLowerCase() === userFilter.toLowerCase()));
 
                   return (
                     <tr key={log.id} className="hover:bg-slate-900/40 transition-colors">
@@ -467,16 +605,50 @@ export const DatasetExportCenter: React.FC<DatasetExportCenterProps> = ({
 
                       {/* User & Role */}
                       <td className="py-2.5 px-3 whitespace-nowrap">
-                        <div className="flex items-center gap-1.5">
-                          <span className="text-slate-200 font-medium text-xs" title={log.userId}>
-                            {formatUserName(log.userId)}
-                          </span>
-                          {log.actorRole && (
-                            <span className="px-1.5 py-0.2 rounded text-[9px] font-mono font-bold bg-slate-800 text-slate-400 border border-slate-700/60">
-                              {log.actorRole}
-                            </span>
-                          )}
-                        </div>
+                        <button
+                          type="button"
+                          onClick={() => handleUserFilterChange(userFilter === log.userId ? '' : log.userId)}
+                          className="flex items-center gap-2 text-left group cursor-pointer hover:opacity-90 transition-opacity"
+                          title={`Натисніть для фільтрації подій користувача: ${uInfo.primary}`}
+                        >
+                          <div
+                            className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold text-white shrink-0 ${
+                              log.actorRole === 'ADMIN'
+                                ? 'bg-gradient-to-tr from-emerald-600 to-teal-500'
+                                : log.actorRole === 'TEACHER'
+                                ? 'bg-gradient-to-tr from-purple-600 to-indigo-500'
+                                : 'bg-gradient-to-tr from-indigo-600 to-blue-500'
+                            }`}
+                          >
+                            {uInfo.primary.charAt(0).toUpperCase()}
+                          </div>
+                          <div className="flex flex-col min-w-0">
+                            <div className="flex items-center gap-1.5">
+                              <span
+                                className={`text-xs font-medium truncate ${
+                                  isUserActive ? 'text-emerald-300 font-bold' : 'text-slate-200 group-hover:text-emerald-400'
+                                }`}
+                              >
+                                {uInfo.primary}
+                              </span>
+                              {log.actorRole && (
+                                <span className="px-1.5 py-0.2 rounded text-[9px] font-mono font-bold bg-slate-800 text-slate-400 border border-slate-700/60 shrink-0">
+                                  {log.actorRole}
+                                </span>
+                              )}
+                            </div>
+                            {uInfo.secondary && uInfo.secondary !== uInfo.primary && (
+                              <span className="text-[10px] text-slate-500 font-mono truncate max-w-[170px]">
+                                {uInfo.secondary}
+                              </span>
+                            )}
+                          </div>
+                          <Filter
+                            className={`w-3 h-3 ml-0.5 shrink-0 transition-opacity ${
+                              isUserActive ? 'text-emerald-400 opacity-100' : 'text-slate-600 opacity-0 group-hover:opacity-100'
+                            }`}
+                          />
+                        </button>
                       </td>
 
                       {/* Event Type Badge */}

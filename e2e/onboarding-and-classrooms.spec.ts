@@ -150,4 +150,36 @@ test.describe('User Onboarding, Google Auth & Classroom Management E2E Suite', (
     await expect(page.getByText('student@example.com')).toBeVisible();
     await expect(page.getByText('teacher@example.com')).toBeVisible();
   });
+
+  test('5. Admin Portal Audit Log & AI Datasets with User Filtering Flow', async ({ page }) => {
+    await page.goto('http://localhost:3004', { waitUntil: 'domcontentloaded', timeout: 30000 });
+    await expect(page.locator('h1')).toContainText('Admin');
+
+    // Click Datasets & Audit Tab
+    const datasetsTabBtn = page.locator('nav button[title*="Експорт Датасетів для ШІ & Аудит-Логи"]');
+    await expect(datasetsTabBtn).toBeVisible({ timeout: 15000 });
+    await datasetsTabBtn.click();
+
+    // Verify Dataset Export Center renders
+    await expect(page.getByText('Центр Експорту Датасетів для ШІ & Незмінний Аудит-Лог')).toBeVisible({ timeout: 15000 });
+
+    // Verify user display in audit table
+    const tableUserBtn = page.locator('table button[title*="Натисніть для фільтрації подій користувача"]').first();
+    await expect(tableUserBtn).toBeVisible({ timeout: 15000 });
+
+    // Verify Drawer section "Фільтрація Подій" contains user filters
+    await expect(page.getByRole('button', { name: /Всі користувачі/i })).toBeVisible();
+
+    // Filter by clicking on the first user in the table
+    await tableUserBtn.click();
+
+    // Verify user active chip or filter indicator appears
+    await expect(page.locator('text=Користувач:').first()).toBeVisible({ timeout: 10000 });
+
+    // Clear filter via active chip
+    const clearChipBtn = page.getByTitle('Скинути фільтр за користувачем');
+    if (await clearChipBtn.isVisible()) {
+      await clearChipBtn.click();
+    }
+  });
 });

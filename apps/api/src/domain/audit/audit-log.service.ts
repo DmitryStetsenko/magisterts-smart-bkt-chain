@@ -170,45 +170,119 @@ export class AuditLogService {
       where: { userId: targetUserId },
       orderBy: { createdAt: 'desc' },
       take: Math.min(200, Math.max(1, limit)),
+      include: {
+        user: {
+          select: {
+            id: true,
+            email: true,
+            role: true,
+            profile: {
+              select: {
+                firstName: true,
+                lastName: true,
+                avatarUrl: true,
+              },
+            },
+          },
+        },
+      },
     });
 
-    return logs.map((l) => ({
-      id: l.id,
-      userId: l.userId,
-      actorId: l.actorId,
-      actorRole: l.actorRole as any,
-      courseId: l.courseId,
-      skillId: l.skillId,
-      taskId: l.taskId,
-      submissionId: l.submissionId,
-      eventType: l.eventType,
-      payload: (l.payload as Record<string, any>) || {},
-      createdAt: l.createdAt.toISOString(),
-    }));
+    return logs.map((l: any) => {
+      const fullName = l.user?.profile
+        ? [l.user.profile.firstName, l.user.profile.lastName].filter(Boolean).join(' ')
+        : null;
+      const name = fullName || (l.user?.email ? l.user.email.split('@')[0] : null);
+
+      return {
+        id: l.id,
+        userId: l.userId,
+        user: l.user
+          ? {
+              id: l.user.id,
+              name,
+              email: l.user.email,
+              role: l.user.role,
+              avatarUrl: l.user.profile?.avatarUrl || null,
+            }
+          : null,
+        userName: name,
+        userEmail: l.user?.email || null,
+        actorId: l.actorId,
+        actorRole: l.actorRole as any,
+        courseId: l.courseId,
+        skillId: l.skillId,
+        taskId: l.taskId,
+        submissionId: l.submissionId,
+        eventType: l.eventType,
+        payload: (l.payload as Record<string, any>) || {},
+        createdAt: l.createdAt.toISOString(),
+      };
+    });
   }
 
   /**
    * Отримання глобального живого потоку подій для кабінету викладача або адміністратора
    */
-  async getRecentLogs(limit = 100): Promise<StudentActivityLogDto[]> {
+  async getRecentLogs(limit = 100, userId?: string): Promise<StudentActivityLogDto[]> {
+    const where: any = {};
+    if (userId && userId.trim() && userId !== 'ALL') {
+      where.userId = userId.trim();
+    }
+
     const logs = await this.prisma.studentActivityLog.findMany({
+      where,
       orderBy: { createdAt: 'desc' },
       take: Math.min(500, Math.max(1, limit)),
+      include: {
+        user: {
+          select: {
+            id: true,
+            email: true,
+            role: true,
+            profile: {
+              select: {
+                firstName: true,
+                lastName: true,
+                avatarUrl: true,
+              },
+            },
+          },
+        },
+      },
     });
 
-    return logs.map((l) => ({
-      id: l.id,
-      userId: l.userId,
-      actorId: l.actorId,
-      actorRole: l.actorRole as any,
-      courseId: l.courseId,
-      skillId: l.skillId,
-      taskId: l.taskId,
-      submissionId: l.submissionId,
-      eventType: l.eventType,
-      payload: (l.payload as Record<string, any>) || {},
-      createdAt: l.createdAt.toISOString(),
-    }));
+    return logs.map((l: any) => {
+      const fullName = l.user?.profile
+        ? [l.user.profile.firstName, l.user.profile.lastName].filter(Boolean).join(' ')
+        : null;
+      const name = fullName || (l.user?.email ? l.user.email.split('@')[0] : null);
+
+      return {
+        id: l.id,
+        userId: l.userId,
+        user: l.user
+          ? {
+              id: l.user.id,
+              name,
+              email: l.user.email,
+              role: l.user.role,
+              avatarUrl: l.user.profile?.avatarUrl || null,
+            }
+          : null,
+        userName: name,
+        userEmail: l.user?.email || null,
+        actorId: l.actorId,
+        actorRole: l.actorRole as any,
+        courseId: l.courseId,
+        skillId: l.skillId,
+        taskId: l.taskId,
+        submissionId: l.submissionId,
+        eventType: l.eventType,
+        payload: (l.payload as Record<string, any>) || {},
+        createdAt: l.createdAt.toISOString(),
+      };
+    });
   }
 
   /**
@@ -360,7 +434,7 @@ export class AuditLogService {
       const user = await this.prisma.user.findFirst({
         where: { OR: [{ id: options.userId }, { email: options.userId }] },
       });
-      if (user) where.userId = user.id;
+      where.userId = user ? user.id : options.userId;
     }
 
     if (options?.courseSlug) {

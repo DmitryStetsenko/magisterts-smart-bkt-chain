@@ -131,6 +131,7 @@ export default function AdminCMSDashboard() {
 
   const [datasetFilter, setDatasetFilter] = useState<'ALL' | 'SUBMISSIONS' | 'HINTS' | 'THEORY' | 'ANNULMENTS' | 'RESETS'>('ALL');
   const [datasetUserFilter, setDatasetUserFilter] = useState<string>('');
+  const [datasetActiveUsers, setDatasetActiveUsers] = useState<{ userId: string; name: string; email?: string; count: number; role?: string }[]>([]);
   const [datasetStats, setDatasetStats] = useState<DatasetStats>({
     total: 0,
     submissions: 0,
@@ -529,14 +530,83 @@ export default function AdminCMSDashboard() {
                   </div>
 
                   <div className="flex flex-col gap-1 pt-1">
-                    <span className="text-[10px] font-semibold text-slate-500 uppercase">Користувач</span>
-                    <input
-                      type="text"
-                      placeholder="Фільтр за userId..."
-                      value={datasetUserFilter}
-                      onChange={(e) => setDatasetUserFilter(e.target.value)}
-                      className="w-full px-2.5 py-1 bg-slate-950 border border-slate-800 rounded-lg text-xs text-slate-200 placeholder-slate-600 focus:outline-none focus:border-emerald-500"
-                    />
+                    <div className="flex items-center justify-between">
+                      <span className="text-[10px] font-semibold text-slate-500 uppercase">Користувач</span>
+                      {datasetUserFilter && (
+                        <button
+                          type="button"
+                          onClick={() => setDatasetUserFilter('')}
+                          className="text-[10px] text-emerald-400 hover:text-emerald-300 cursor-pointer"
+                        >
+                          Скинути
+                        </button>
+                      )}
+                    </div>
+                    <div className="relative">
+                      <input
+                        type="text"
+                        placeholder="Пошук за ім'ям чи email..."
+                        value={datasetUserFilter}
+                        onChange={(e) => setDatasetUserFilter(e.target.value)}
+                        className="w-full pl-2.5 pr-6 py-1 bg-slate-950 border border-slate-800 rounded-lg text-xs text-slate-200 placeholder-slate-600 focus:outline-none focus:border-emerald-500"
+                      />
+                      {datasetUserFilter && (
+                        <button
+                          type="button"
+                          onClick={() => setDatasetUserFilter('')}
+                          className="absolute right-2 top-1 text-slate-500 hover:text-white text-xs cursor-pointer"
+                          title="Очистити фільтр"
+                        >
+                          ✕
+                        </button>
+                      )}
+                    </div>
+
+                    {/* Quick User List in Drawer */}
+                    {datasetActiveUsers.length > 0 && (
+                      <div className="flex flex-col divide-y divide-slate-800/50 mt-1 max-h-48 overflow-y-auto">
+                        <button
+                          type="button"
+                          onClick={() => setDatasetUserFilter('')}
+                          className={`w-full py-1.5 px-2 text-left text-xs transition-colors cursor-pointer flex items-center justify-between rounded ${
+                            !datasetUserFilter
+                              ? 'bg-emerald-500/10 text-emerald-300 font-semibold border-l-2 border-emerald-400 pl-1.5'
+                              : 'text-slate-400 hover:text-white hover:bg-slate-900/40'
+                          }`}
+                        >
+                          <span className="truncate">Всі користувачі</span>
+                          <span className="text-[10px] font-mono opacity-70">
+                            {datasetStats.total}
+                          </span>
+                        </button>
+                        {datasetActiveUsers.slice(0, 8).map((u) => {
+                          const isSelected = datasetUserFilter === u.userId || datasetUserFilter === u.name;
+                          return (
+                            <button
+                              key={u.userId}
+                              type="button"
+                              onClick={() => setDatasetUserFilter(isSelected ? '' : u.userId)}
+                              className={`w-full py-1.5 px-2 text-left text-xs transition-colors cursor-pointer flex items-center justify-between group rounded ${
+                                isSelected
+                                  ? 'bg-emerald-500/10 text-emerald-300 font-semibold border-l-2 border-emerald-400 pl-1.5'
+                                  : 'text-slate-400 hover:text-white hover:bg-slate-900/40'
+                              }`}
+                              title={u.email || u.userId}
+                            >
+                              <div className="flex items-center gap-1.5 min-w-0 pr-1">
+                                <div className="w-4 h-4 rounded-full bg-slate-800 flex items-center justify-center text-[9px] font-bold text-slate-300 shrink-0">
+                                  {u.name.charAt(0).toUpperCase()}
+                                </div>
+                                <span className="truncate">{u.name}</span>
+                              </div>
+                              <span className="text-[10px] font-mono text-slate-500 shrink-0">
+                                {u.count}
+                              </span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    )}
                   </div>
                 </div>
               </DrawerSection>
@@ -823,6 +893,7 @@ export default function AdminCMSDashboard() {
               userFilter={datasetUserFilter}
               onUserFilterChange={setDatasetUserFilter}
               onStatsChange={setDatasetStats}
+              onUsersLoaded={setDatasetActiveUsers}
             />
           )}
 

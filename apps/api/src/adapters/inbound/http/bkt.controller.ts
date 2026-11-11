@@ -1185,8 +1185,11 @@ export class BktController {
 
   @Get('activity-logs/recent')
   @ApiOperation({ summary: 'Get recent live activity logs feed across all students' })
-  async getRecentActivityLogs(@Query('limit') limit?: number) {
-    return this.auditLogService.getRecentLogs(limit ? Number(limit) : 100);
+  async getRecentActivityLogs(
+    @Query('limit') limit?: number,
+    @Query('userId') userId?: string,
+  ) {
+    return this.auditLogService.getRecentLogs(limit ? Number(limit) : 100, userId);
   }
 
   @Post('submissions/:submissionId/annul')

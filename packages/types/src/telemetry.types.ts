@@ -101,6 +101,15 @@ export type ActivityEventType =
 export interface StudentActivityLogDto {
   id: string;
   userId: string;
+  user?: {
+    id: string;
+    name: string | null;
+    email: string;
+    role: string;
+    avatarUrl?: string | null;
+  } | null;
+  userName?: string | null;
+  userEmail?: string | null;
   actorId: string;
   actorRole: 'STUDENT' | 'TEACHER' | 'ADMIN' | 'RECRUITER';
   courseId?: string | null;
