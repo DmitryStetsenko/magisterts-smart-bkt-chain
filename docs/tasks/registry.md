@@ -14,10 +14,10 @@
 | **`SBC-EP-W3`** | Web3 Infrastructure & Smart Contracts | 0 |
 | **`SBC-EP-ST`** | Student Portal & Skill Tree Map | 39 |
 | **`SBC-EP-TC`** | Teacher Portal & Analytics CRM | 32 |
-| **`SBC-EP-AD`** | Admin Portal & Knowledge DAG Builder | 16 |
+| **`SBC-EP-AD`** | Admin Portal & Knowledge DAG Builder | 17 |
 | **`SBC-EP-LD`** | Landing Web Page | 9 |
 | **`SBC-EP-MS`** | Master's Thesis Engineering & Academic Text Generation | 9 |
-| **ВСЬОГО** | - | **284** |
+| **ВСЬОГО** | - | **285** |
 
 ---
 
@@ -444,6 +444,7 @@
 | **SBC-399** | `Fix` | `AD` | eliminate duplicate module titles in skill cards and clean up competency naming across studio and db seed | 2026-11-11 | `ab9086f` |
 | **SBC-400** | `Fix` | `AD` | eliminate duplicate studio section tabs between sidebar drawer and studio canvas | 2026-11-11 | `5055fc3` |
 | **SBC-401** | `Story` | `AD` | transform admin course studio into end-to-end course builder with outline navigator, theory content and task bank inspector | 2026-11-11 | `0c5c0ee` |
+| **SBC-402** | `Story` | `AD` | implement turnkey course authoring with author control panel, skill and task creation modals and module test sandbox | 2026-11-11 | pending |
 
 ---
 

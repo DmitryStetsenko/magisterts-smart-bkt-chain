@@ -136,9 +136,10 @@ test.describe('Course Architecture, Modular Curriculum & BKT Mastery Gating E2E 
     await expect(page.getByText(/Модуль 1: Змінні, Типи та Оператори/i).first()).toBeVisible();
     await expect(page.getByText(/Модуль 2: Умовні конструкції та Функції/i).first()).toBeVisible();
 
-    // Verify Sidebar Drawer clean navigation (course outline navigator, no platform duplicate courses)
+    // Verify Sidebar Drawer clean navigation (course readiness audit, module test sandbox, no duplicate courses)
     await expect(page.getByRole('button', { name: /До каталогу курсів/i })).toBeVisible();
-    await expect(page.getByRole('button', { name: /Структура курсу/i })).toBeVisible();
+    await expect(page.getByRole('button', { name: /Готовність курсу/i })).toBeVisible();
+    await expect(page.getByRole('button', { name: /Тестування модуля/i })).toBeVisible();
     await expect(page.getByRole('button', { name: /Дії та інструменти/i })).toBeVisible();
     await expect(page.getByRole('button', { name: /Живий перегляд/i })).toBeVisible();
 

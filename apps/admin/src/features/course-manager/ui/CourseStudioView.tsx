@@ -21,8 +21,12 @@ import {
   ArrowRight,
   Shield,
   FileCode,
+  FlaskConical,
 } from 'lucide-react';
 import type { CourseDto, CourseModuleDto, SkillNodeDto, CourseCategoryDto, UpdateCourseDto } from '@sbc/types';
+import { CreateSkillModal } from './CreateSkillModal';
+import { CreateTaskModal } from './CreateTaskModal';
+import { ModuleTestSandboxModal } from './ModuleTestSandboxModal';
 
 /**
  * Очищує назву навички від дублюючого префікса «Модуль N:» та запобігає повторенню назви батьківського модуля
@@ -95,6 +99,11 @@ export const CourseStudioView: React.FC<CourseStudioViewProps> = ({
 
   // Expanded skill tasks per skill
   const [expandedSkillTaskIds, setExpandedSkillTaskIds] = useState<Record<string, boolean>>({});
+
+  // Turnkey Authoring Modals State
+  const [skillCreationModule, setSkillCreationModule] = useState<{ id: string; title: string } | null>(null);
+  const [taskCreationSkill, setTaskCreationSkill] = useState<{ id: string; title: string } | null>(null);
+  const [testingSandboxModule, setTestingSandboxModule] = useState<CourseModuleDto | null>(null);
 
   // Inline Task creation state per skill
   const [addingTaskSkillId, setAddingTaskSkillId] = useState<string | null>(null);
@@ -173,9 +182,25 @@ export const CourseStudioView: React.FC<CourseStudioViewProps> = ({
       setIsCreatingModule(true);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     };
+    const handleOpenCreateSkill = () => {
+      if (modules.length > 0) {
+        setSkillCreationModule({ id: modules[0].id, title: modules[0].title });
+      }
+    };
+    const handleOpenTestModule = () => {
+      if (modules.length > 0) {
+        setTestingSandboxModule(modules[0]);
+      }
+    };
     window.addEventListener('admin-studio-open-create-module', handleOpenCreate);
-    return () => window.removeEventListener('admin-studio-open-create-module', handleOpenCreate);
-  }, []);
+    window.addEventListener('admin-studio-open-create-skill', handleOpenCreateSkill);
+    window.addEventListener('admin-studio-open-test-module', handleOpenTestModule);
+    return () => {
+      window.removeEventListener('admin-studio-open-create-module', handleOpenCreate);
+      window.removeEventListener('admin-studio-open-create-skill', handleOpenCreateSkill);
+      window.removeEventListener('admin-studio-open-test-module', handleOpenTestModule);
+    };
+  }, [modules]);
 
   useEffect(() => {
     setCourse(initialCourse);
@@ -649,6 +674,16 @@ export const CourseStudioView: React.FC<CourseStudioViewProps> = ({
 
                         <button
                           type="button"
+                          onClick={() => setTestingSandboxModule(mod)}
+                          className="px-2.5 py-1 rounded bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 text-xs font-semibold border border-emerald-500/30 transition-colors cursor-pointer flex items-center gap-1.5"
+                          title="Протестувати модуль у пісочниці автора"
+                        >
+                          <FlaskConical className="w-3.5 h-3.5 text-emerald-400" />
+                          <span>Тестувати</span>
+                        </button>
+
+                        <button
+                          type="button"
                           onClick={() => setExpandedTheoryModuleIds(prev => ({ ...prev, [mod.id]: !prev[mod.id] }))}
                           className={`px-2.5 py-1 rounded text-xs font-medium border transition-colors cursor-pointer flex items-center gap-1.5 ${
                             expandedTheoryModuleIds[mod.id]
@@ -659,6 +694,16 @@ export const CourseStudioView: React.FC<CourseStudioViewProps> = ({
                         >
                           <BookOpen className="w-3.5 h-3.5 text-emerald-400" />
                           <span>Теорія</span>
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => setSkillCreationModule({ id: mod.id, title: mod.title })}
+                          className="px-2.5 py-1 rounded bg-slate-800/80 hover:bg-slate-700 text-slate-200 text-xs font-medium border border-slate-700 transition-colors cursor-pointer flex items-center gap-1"
+                          title="Створити нову BKT-компетенцію в цьому модулі"
+                        >
+                          <Plus className="w-3 h-3 text-emerald-400" />
+                          <span>Компетенція</span>
                         </button>
 
                         <button
@@ -885,6 +930,15 @@ export const CourseStudioView: React.FC<CourseStudioViewProps> = ({
                                               <span className="text-[8px]">{expandedSkillTaskIds[skill.id] ? '▲' : '▼'}</span>
                                             </button>
                                           )}
+                                          <button
+                                            type="button"
+                                            onClick={() => setTaskCreationSkill({ id: skill.id, title: cleanTitle })}
+                                            className="px-1.5 py-0.5 rounded text-[9px] font-mono bg-indigo-500/15 hover:bg-indigo-500/25 text-indigo-300 border border-indigo-500/30 transition-colors cursor-pointer flex items-center gap-0.5"
+                                            title="Додати нове завдання до цієї компетенції"
+                                          >
+                                            <Plus className="w-2.5 h-2.5" />
+                                            <span>Завдання</span>
+                                          </button>
                                         </div>
                                         {cleanDesc && (
                                           <p className="text-[11px] text-slate-400 truncate mt-0.5">
@@ -920,9 +974,19 @@ export const CourseStudioView: React.FC<CourseStudioViewProps> = ({
                                             Банк завдань компетенції: {cleanTitle}
                                           </span>
                                         </div>
-                                        <span className="text-[10px] font-mono text-slate-400">
-                                          Всього: {skill.tasks?.length || 0} завдань
-                                        </span>
+                                        <div className="flex items-center gap-2">
+                                          <span className="text-[10px] font-mono text-slate-400">
+                                            Всього: {skill.tasks?.length || 0} завдань
+                                          </span>
+                                          <button
+                                            type="button"
+                                            onClick={() => setTaskCreationSkill({ id: skill.id, title: cleanTitle })}
+                                            className="px-2 py-0.5 rounded bg-indigo-500/15 hover:bg-indigo-500/25 text-indigo-300 text-[10px] font-semibold border border-indigo-500/30 flex items-center gap-1 transition-colors cursor-pointer"
+                                          >
+                                            <Plus className="w-3 h-3" />
+                                            <span>Додати</span>
+                                          </button>
+                                        </div>
                                       </div>
 
                                       <div className="flex flex-col divide-y divide-slate-800/50 max-h-48 overflow-y-auto pr-1">
@@ -1072,6 +1136,42 @@ export const CourseStudioView: React.FC<CourseStudioViewProps> = ({
             </button>
           </div>
         </form>
+      )}
+
+      {/* Turnkey Authoring Modals */}
+      {skillCreationModule && (
+        <CreateSkillModal
+          isOpen={Boolean(skillCreationModule)}
+          courseId={course.id || ''}
+          moduleId={skillCreationModule.id}
+          moduleTitle={skillCreationModule.title}
+          onClose={() => setSkillCreationModule(null)}
+          onSkillCreated={async () => {
+            await fetchFullCourseData();
+          }}
+        />
+      )}
+
+      {taskCreationSkill && (
+        <CreateTaskModal
+          isOpen={Boolean(taskCreationSkill)}
+          courseId={course.id || ''}
+          skillId={taskCreationSkill.id}
+          skillTitle={taskCreationSkill.title}
+          onClose={() => setTaskCreationSkill(null)}
+          onTaskCreated={async () => {
+            await fetchFullCourseData();
+          }}
+        />
+      )}
+
+      {testingSandboxModule && (
+        <ModuleTestSandboxModal
+          isOpen={Boolean(testingSandboxModule)}
+          module={testingSandboxModule}
+          courseSlug={course.slug}
+          onClose={() => setTestingSandboxModule(null)}
+        />
       )}
     </div>
   );

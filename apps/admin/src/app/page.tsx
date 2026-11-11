@@ -25,7 +25,8 @@ import {
   Binary,
   ArrowLeft,
   Target,
-  ExternalLink
+  ExternalLink,
+  FlaskConical,
 } from 'lucide-react';
 import { AppShellLayout, Breadcrumbs, UserProfileDrawer, DrawerSection } from '@sbc/ui';
 import { getAppBaseUrl } from '@sbc/routes';
@@ -182,58 +183,144 @@ export default function AdminCMSDashboard() {
                   title="Повернутися до табличного каталогу курсів"
                 >
                   <ArrowLeft className="w-3.5 h-3.5 text-slate-400" />
-                  <span>← До каталогу курсів</span>
+                  <span>До каталогу курсів</span>
                 </button>
               </div>
 
-              {/* Course Outline Navigator: Quick jump to any module */}
-              <DrawerSection
-                title="Структура курсу"
-                icon={Layers}
-                badge={selectedStudioCourse.modules?.length || 0}
-                defaultOpen={true}
-              >
-                <div className="flex flex-col divide-y divide-slate-800/50 pt-1">
-                  {(!selectedStudioCourse.modules || selectedStudioCourse.modules.length === 0) ? (
-                    <div className="p-3 text-[11px] text-slate-500 italic text-center">
-                      У цьому курсі ще немає модулів.
-                    </div>
-                  ) : (
-                    selectedStudioCourse.modules.map((m, idx) => {
-                      const skillsCount = m.skills?.length || 1;
-                      return (
+              {/* 1. Course Readiness & Quality Audit */}
+              {(() => {
+                const mods = selectedStudioCourse.modules || [];
+                const totalMods = mods.length;
+                const modsWithTheory = mods.filter((m) => Boolean(m.theoryUrl)).length;
+                let tSkills = 0;
+                let tTasks = 0;
+                let codeCount = 0;
+                let quizCount = 0;
+
+                mods.forEach((m) => {
+                  if (m.skills) {
+                    tSkills += m.skills.length;
+                    m.skills.forEach((s: any) => {
+                      if (s.tasks) {
+                        tTasks += s.tasks.length;
+                        s.tasks.forEach((t: any) => {
+                          if (t.taskType === 'CODE') codeCount++;
+                          else quizCount++;
+                        });
+                      }
+                    });
+                  }
+                });
+
+                if (tSkills === 0 && selectedStudioCourse.skills) {
+                  tSkills = selectedStudioCourse.skills.length;
+                  selectedStudioCourse.skills.forEach((s: any) => {
+                    if (s.tasks) {
+                      tTasks += s.tasks.length;
+                      s.tasks.forEach((t: any) => {
+                        if (t.taskType === 'CODE') codeCount++;
+                        else quizCount++;
+                      });
+                    }
+                  });
+                }
+
+                return (
+                  <>
+                    <DrawerSection
+                      title="Готовність курсу"
+                      icon={CheckCircle2}
+                      badge={selectedStudioCourse.isPublished ? 'PUBLISHED' : 'DRAFT'}
+                      defaultOpen={true}
+                    >
+                      <div className="flex flex-col gap-2 pt-1 text-xs">
+                        <div className="flex items-center justify-between p-2 rounded-lg bg-slate-950/80 border border-slate-800/80">
+                          <span className="text-[11px] text-slate-400">Статус курсу:</span>
+                          <button
+                            type="button"
+                            onClick={async () => {
+                              try {
+                                const nextStatus = !selectedStudioCourse.isPublished;
+                                const res = await fetch(`${API_URL}/api/v1/courses/${selectedStudioCourse.id}`, {
+                                  method: 'PATCH',
+                                  headers: { 'Content-Type': 'application/json' },
+                                  body: JSON.stringify({ isPublished: nextStatus }),
+                                });
+                                if (res.ok) {
+                                  const updated = await res.json();
+                                  setSelectedStudioCourse(updated);
+                                  loadCourses();
+                                }
+                              } catch {}
+                            }}
+                            className={`px-2 py-0.5 rounded text-[10px] font-mono font-semibold transition-colors cursor-pointer border ${
+                              selectedStudioCourse.isPublished
+                                ? 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30 hover:bg-emerald-500/25'
+                                : 'bg-amber-500/15 text-amber-300 border-amber-500/30 hover:bg-amber-500/25'
+                            }`}
+                          >
+                            {selectedStudioCourse.isPublished ? '✓ Опубліковано' : '● Чернетка'}
+                          </button>
+                        </div>
+
+                        <div className="flex flex-col divide-y divide-slate-800/50 text-[11px]">
+                          <div className="py-1.5 flex items-center justify-between">
+                            <span className="text-slate-400">📖 Конспекти теорії:</span>
+                            <span className={`font-mono ${modsWithTheory > 0 ? 'text-emerald-400' : 'text-amber-400'}`}>
+                              {modsWithTheory}/{totalMods} тем
+                            </span>
+                          </div>
+                          <div className="py-1.5 flex items-center justify-between">
+                            <span className="text-slate-400">🎯 BKT-компетенції:</span>
+                            <span className="font-mono text-slate-200">{tSkills} навичок</span>
+                          </div>
+                          <div className="py-1.5 flex items-center justify-between">
+                            <span className="text-slate-400">📝 Банк завдань:</span>
+                            <span className="font-mono text-indigo-400">
+                              {tTasks} вправ ({codeCount} код, {quizCount} тест)
+                            </span>
+                          </div>
+                          <div className="py-1.5 flex items-center justify-between">
+                            <span className="text-slate-400">⚖️ Поріг майстерності:</span>
+                            <span className="font-mono text-emerald-400">
+                              P(L) ≥ {selectedStudioCourse.defaultMasteryThreshold ?? 0.85}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </DrawerSection>
+
+                    {/* 2. Module Testing & Sandbox Runner */}
+                    <DrawerSection
+                      title="Тестування модуля"
+                      icon={FlaskConical}
+                      defaultOpen={true}
+                    >
+                      <div className="flex flex-col gap-2 pt-1 text-xs">
+                        <p className="text-[11px] text-slate-400 leading-tight">
+                          Симуляція адаптивного розв'язку учня та калібрування BKT:
+                        </p>
+
                         <button
-                          key={m.id || m.slug}
                           type="button"
                           onClick={() => {
                             setStudioSubTab('CURRICULUM');
-                            setTimeout(() => {
-                              const el = document.getElementById(`module-card-${m.id}`);
-                              if (el) {
-                                el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                                el.classList.add('ring-2', 'ring-emerald-400', 'transition-all');
-                                setTimeout(() => el.classList.remove('ring-2', 'ring-emerald-400'), 1500);
-                              }
-                            }, 50);
+                            window.dispatchEvent(new CustomEvent('admin-studio-open-test-module'));
                           }}
-                          className="w-full py-2 pr-2 text-left text-xs transition-colors cursor-pointer flex items-center justify-between group rounded-r text-slate-400 hover:text-white hover:bg-slate-900/40 pl-2.5"
-                          title={`Перейти до модуля: ${m.title}`}
+                          className="w-full py-2 px-2.5 rounded-lg bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 border border-emerald-500/30 transition-colors flex items-center justify-center gap-2 font-semibold cursor-pointer"
                         >
-                          <div className="flex items-center gap-2 min-w-0 pr-1">
-                            <span className="w-4 h-4 rounded bg-slate-800 flex items-center justify-center text-[10px] font-mono text-emerald-400 shrink-0">
-                              {idx + 1}
-                            </span>
-                            <span className="truncate">{m.title}</span>
-                          </div>
-                          <span className="text-[10px] font-mono text-slate-500 shrink-0">
-                            {skillsCount} нав.
-                          </span>
+                          <FlaskConical className="w-3.5 h-3.5 text-emerald-400" />
+                          <span>🧪 Тестова пісочниця автора</span>
                         </button>
-                      );
-                    })
-                  )}
-                </div>
-              </DrawerSection>
+
+                        <div className="p-2 rounded bg-slate-950/60 border border-slate-800 text-[10px] text-slate-400 font-mono">
+                          <span className="text-emerald-400 font-bold">BKT динаміка:</span> ~3–4 успішні відповіді підряд піднімуть P(L) до 0.85.
+                        </div>
+                      </div>
+                    </DrawerSection>
+                  </>
+                );
+              })()}
 
               {/* Course Actions & Settings */}
               <DrawerSection
@@ -248,10 +335,22 @@ export default function AdminCMSDashboard() {
                       setStudioSubTab('CURRICULUM');
                       window.dispatchEvent(new CustomEvent('admin-studio-open-create-module'));
                     }}
-                    className="w-full py-2 px-2.5 rounded-lg bg-emerald-600/10 hover:bg-emerald-600/20 text-emerald-300 border border-emerald-500/30 transition-colors flex items-center gap-2 font-medium cursor-pointer"
+                    className="w-full py-1.5 px-2.5 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-slate-200 border border-slate-700 transition-colors flex items-center gap-2 font-medium cursor-pointer"
                   >
                     <Plus className="w-3.5 h-3.5 text-emerald-400" />
                     <span>+ Додати модуль</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setStudioSubTab('CURRICULUM');
+                      window.dispatchEvent(new CustomEvent('admin-studio-open-create-skill'));
+                    }}
+                    className="w-full py-1.5 px-2.5 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-slate-200 border border-slate-700 transition-colors flex items-center gap-2 font-medium cursor-pointer"
+                  >
+                    <Target className="w-3.5 h-3.5 text-indigo-400" />
+                    <span>+ Додати компетенцію</span>
                   </button>
 
                   <button

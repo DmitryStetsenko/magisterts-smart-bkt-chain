@@ -81,6 +81,41 @@ export interface TaskDto {
 }
 
 /**
+ * DTO для створення нового навчального завдання в банку
+ */
+export interface CreateTaskDto {
+  skillId: string;
+  title: string;
+  description: string;
+  taskType: TaskType;
+  difficulty?: TaskDifficulty;
+  starterCode?: string;
+  options?: QuizOptionDto[];
+  referenceAnswer?: string;
+  socraticHints?: SocraticHintDto[];
+  studyUnitUrl?: string;
+  topic?: string;
+  subConcept?: string;
+  testCases?: TestCaseDto[];
+}
+
+/**
+ * DTO для створення нової BKT-компетенції (Skill Node)
+ */
+export interface CreateSkillNodeDto {
+  title: string;
+  slug?: string;
+  description?: string;
+  difficulty?: TaskDifficulty;
+  category?: string;
+  orderIndex?: number;
+  pL0?: number;
+  pT?: number;
+  pS?: number;
+  pG?: number;
+}
+
+/**
  * Результат виконання та подання завдання студентом
  */
 export interface SubmissionDto {

@@ -417,4 +417,119 @@ export class CourseController {
 
     return updatedModule;
   }
+
+  /**
+   * Створити нову BKT-компетенцію (SkillNode) безпосередньо у модулі курсу
+   */
+  @Post(':courseId/modules/:moduleId/skills/create')
+  @ApiOperation({ summary: 'Create a new skill node directly in a course module' })
+  async createSkillInModule(
+    @Param('courseId') courseId: string,
+    @Param('moduleId') moduleId: string,
+    @Body() body: any
+  ) {
+    const module = await this.prisma.courseModule.findFirst({
+      where: { id: moduleId, courseId },
+    });
+    if (!module) {
+      throw new NotFoundException(`Модуль із ID ${moduleId} не знайдено у курсі ${courseId}`);
+    }
+
+    if (!body.title || !body.title.trim()) {
+      throw new BadRequestException('Назва компетенції обовʼязкова');
+    }
+
+    const baseSlug = body.slug
+      ? body.slug.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
+      : body.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+
+    const existing = await this.prisma.skillNode.findUnique({ where: { slug: baseSlug } });
+    const slug = existing ? `${baseSlug}-${Date.now().toString().slice(-4)}` : baseSlug;
+
+    const highest = await this.prisma.skillNode.findFirst({
+      where: { moduleId },
+      orderBy: { orderIndex: 'desc' },
+      select: { orderIndex: true },
+    });
+    const orderIndex = body.orderIndex ?? (highest ? highest.orderIndex + 1 : 1);
+
+    const skill = await this.prisma.skillNode.create({
+      data: {
+        courseId,
+        moduleId,
+        slug,
+        title: body.title.trim(),
+        description: body.description?.trim() || body.title.trim(),
+        category: body.category || 'General',
+        difficulty: body.difficulty || 'EASY',
+        orderIndex,
+      },
+      include: {
+        tasks: true,
+      },
+    });
+
+    this.logger.log(`Created skill "${skill.title}" (${skill.slug}) in module ${moduleId}`);
+    return skill;
+  }
+
+  /**
+   * Створити нове навчальне завдання у компетенції (Банк завдань курсу)
+   */
+  @Post(':courseId/skills/:skillId/tasks/create')
+  @ApiOperation({ summary: 'Create a new assessment task in a skill node' })
+  async createTaskInSkill(
+    @Param('courseId') courseId: string,
+    @Param('skillId') skillId: string,
+    @Body() body: any
+  ) {
+    const skill = await this.prisma.skillNode.findUnique({
+      where: { id: skillId },
+      include: { module: true },
+    });
+    if (!skill) {
+      throw new NotFoundException(`Компетенцію з ID ${skillId} не знайдено`);
+    }
+
+    if (!body.title || !body.title.trim()) {
+      throw new BadRequestException('Назва завдання обовʼязкова');
+    }
+
+    const taskType = body.taskType || 'CODE';
+    const difficulty = body.difficulty || 'EASY';
+
+    const task = await this.prisma.task.create({
+      data: {
+        skillId,
+        title: body.title.trim(),
+        description: body.description?.trim() || body.title.trim(),
+        taskType,
+        difficulty,
+        starterCode: body.starterCode || (taskType === 'CODE' ? '// Напишіть ваш розвʼязок тут\n' : null),
+        options: body.options ? body.options : null,
+        referenceAnswer: body.referenceAnswer || null,
+        socraticHints: body.socraticHints ? body.socraticHints : null,
+        studyUnitUrl: body.studyUnitUrl || null,
+        topic: body.topic || skill.title,
+        subConcept: body.subConcept || null,
+        testCases: body.testCases && body.testCases.length > 0
+          ? {
+              create: body.testCases.map((tc: any, idx: number) => ({
+                input: String(tc.input ?? ''),
+                expectedOutput: String(tc.expectedOutput ?? ''),
+                isSecret: Boolean(tc.isSecret),
+                orderIndex: idx,
+              })),
+            }
+          : undefined,
+      },
+      include: {
+        skill: true,
+        testCases: true,
+      },
+    });
+
+    this.logger.log(`Created task "${task.title}" (${task.taskType}) for skill ${skill.title}`);
+    return task;
+  }
 }
