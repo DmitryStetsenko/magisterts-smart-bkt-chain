@@ -442,7 +442,7 @@
 | **SBC-397** | `Story` | `AD` | transform course creation and studio into full pages with breadcrumb navigation and remove standalone dag tab | 2026-11-11 | `38263cc` |
 | **SBC-398** | `Story` | `AD` | redesign admin sidebar navigation, eliminate duplicate module cards, and add instant course switcher with studio sections | 2026-11-11 | `e578c0d` |
 | **SBC-399** | `Fix` | `AD` | eliminate duplicate module titles in skill cards and clean up competency naming across studio and db seed | 2026-11-11 | `ab9086f` |
-| **SBC-400** | `Fix` | `AD` | eliminate duplicate studio section tabs between sidebar drawer and studio canvas | 2026-11-11 | `pending` |
+| **SBC-400** | `Fix` | `AD` | eliminate duplicate studio section tabs between sidebar drawer and studio canvas | 2026-11-11 | `5055fc3` |
 
 ---
 
