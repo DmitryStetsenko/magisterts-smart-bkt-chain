@@ -450,7 +450,7 @@
 | **SBC-405** | `Story` | `AD` | transform theory lesson builder into full-fledged page with breadcrumbs, dedicated sidebar drawer and URL routing | 2026-11-12 | `ee8f53b` |
 | **SBC-406** | `Refactor` | `AD` | enforce minimalist borderless design across theory builder, drawer sections and studio controls | 2026-11-12 | `5f6d520` |
 | **SBC-407** | `Story` | `AD` | restore platform courses overview and 1-click course switcher in admin sidebar drawer | 2026-11-12 | `40b00a5` |
-| **SBC-408** | `Story` | `AD` | decouple course catalog and course creation into separate dedicated navigation rail icons in admin portal | 2026-11-12 | pending |
+| **SBC-408** | `Story` | `AD` | decouple course catalog and course creation into separate dedicated navigation rail icons in admin portal | 2026-11-12 | `9d7010a` |
 
 ---
 
