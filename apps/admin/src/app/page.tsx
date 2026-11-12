@@ -272,7 +272,7 @@ export default function AdminCMSDashboard() {
                 <button
                   type="button"
                   onClick={handleBackToStudio}
-                  className="w-full py-2 px-2.5 rounded-lg text-slate-300 hover:text-white hover:bg-slate-900/60 transition-colors flex items-center gap-2 text-xs cursor-pointer border border-slate-800/60 group"
+                  className="w-full py-2 px-2.5 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800/70 transition-colors flex items-center gap-2 text-xs cursor-pointer group"
                   title="Повернутися до Студії курсу"
                 >
                   <ArrowLeft className="w-3.5 h-3.5 text-slate-400 group-hover:text-emerald-400 shrink-0" />
@@ -358,34 +358,38 @@ export default function AdminCMSDashboard() {
                 icon={Sparkles}
                 defaultOpen={true}
               >
-                <div className="flex flex-col gap-1.5 pt-1 text-xs">
+                <div className="flex flex-col gap-1 pt-1 text-xs">
                   <button
                     type="button"
                     onClick={() => window.dispatchEvent(new CustomEvent('admin-theory-apply-preset', { detail: { preset: 'html' } }))}
-                    className="w-full py-1.5 px-2.5 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-emerald-300 border border-emerald-500/20 text-left transition-colors font-medium cursor-pointer flex items-center gap-2"
+                    className="w-full py-1.5 px-2 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800/60 text-left transition-colors font-medium cursor-pointer flex items-center gap-2"
                   >
-                    <span>⚡ HTML (Базова розмітка)</span>
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0" />
+                    <span>HTML (Базова розмітка)</span>
                   </button>
                   <button
                     type="button"
                     onClick={() => window.dispatchEvent(new CustomEvent('admin-theory-apply-preset', { detail: { preset: 'js' } }))}
-                    className="w-full py-1.5 px-2.5 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-indigo-300 border border-indigo-500/20 text-left transition-colors font-medium cursor-pointer flex items-center gap-2"
+                    className="w-full py-1.5 px-2 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800/60 text-left transition-colors font-medium cursor-pointer flex items-center gap-2"
                   >
-                    <span>⚡ JavaScript (Змінні & Типи)</span>
+                    <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 shrink-0" />
+                    <span>JavaScript (Змінні & Типи)</span>
                   </button>
                   <button
                     type="button"
                     onClick={() => window.dispatchEvent(new CustomEvent('admin-theory-apply-preset', { detail: { preset: 'css' } }))}
-                    className="w-full py-1.5 px-2.5 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-teal-300 border border-teal-500/20 text-left transition-colors font-medium cursor-pointer flex items-center gap-2"
+                    className="w-full py-1.5 px-2 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800/60 text-left transition-colors font-medium cursor-pointer flex items-center gap-2"
                   >
-                    <span>⚡ CSS (Flexbox Розкладка)</span>
+                    <span className="w-1.5 h-1.5 rounded-full bg-teal-400 shrink-0" />
+                    <span>CSS (Flexbox Розкладка)</span>
                   </button>
                   <button
                     type="button"
                     onClick={() => window.dispatchEvent(new CustomEvent('admin-theory-apply-preset', { detail: { preset: 'python' } }))}
-                    className="w-full py-1.5 px-2.5 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-amber-300 border border-amber-500/20 text-left transition-colors font-medium cursor-pointer flex items-center gap-2"
+                    className="w-full py-1.5 px-2 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800/60 text-left transition-colors font-medium cursor-pointer flex items-center gap-2"
                   >
-                    <span>⚡ Python (Синтаксис & Типи)</span>
+                    <span className="w-1.5 h-1.5 rounded-full bg-amber-400 shrink-0" />
+                    <span>Python (Синтаксис & Типи)</span>
                   </button>
                 </div>
               </DrawerSection>
@@ -454,7 +458,7 @@ export default function AdminCMSDashboard() {
                 <button
                   type="button"
                   onClick={handleBackToCoursesList}
-                  className="w-full py-2 px-2.5 rounded-lg text-slate-300 hover:text-white hover:bg-slate-900/60 transition-colors flex items-center gap-2 text-xs cursor-pointer border border-slate-800/60"
+                  className="w-full py-2 px-2.5 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800/70 transition-colors flex items-center gap-2 text-xs cursor-pointer"
                   title="Повернутися до табличного каталогу курсів"
                 >
                   <ArrowLeft className="w-3.5 h-3.5 text-slate-400" />

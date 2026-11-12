@@ -690,14 +690,14 @@ export const CourseStudioView: React.FC<CourseStudioViewProps> = ({
                       </div>
 
                       <div className="flex items-center gap-2 shrink-0">
-                        <div className="px-2 py-0.5 rounded text-[10px] font-mono bg-slate-800 text-emerald-400 border border-slate-700/60">
+                        <div className="px-2 py-0.5 rounded text-[10px] font-mono text-emerald-400 bg-slate-900 select-none">
                           BKT ≥ {mod.minMasteryThreshold ?? 0.85}
                         </div>
 
                         <button
                           type="button"
                           onClick={() => setTestingSandboxModule(mod)}
-                          className="px-2.5 py-1 rounded bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 text-xs font-semibold border border-emerald-500/30 transition-colors cursor-pointer flex items-center gap-1.5"
+                          className="px-2.5 py-1 rounded-md bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 text-xs font-semibold transition-colors cursor-pointer flex items-center gap-1.5"
                           title="Протестувати модуль у пісочниці автора"
                         >
                           <FlaskConical className="w-3.5 h-3.5 text-emerald-400" />
@@ -707,10 +707,10 @@ export const CourseStudioView: React.FC<CourseStudioViewProps> = ({
                         <button
                           type="button"
                           onClick={() => setExpandedTheoryModuleIds(prev => ({ ...prev, [mod.id]: !prev[mod.id] }))}
-                          className={`px-2.5 py-1 rounded text-xs font-medium border transition-colors cursor-pointer flex items-center gap-1.5 ${
+                          className={`px-2.5 py-1 rounded-md text-xs font-medium transition-colors cursor-pointer flex items-center gap-1.5 ${
                             expandedTheoryModuleIds[mod.id]
-                              ? 'bg-emerald-500/15 border-emerald-500/40 text-emerald-300'
-                              : 'bg-slate-800/80 hover:bg-slate-800 border-slate-700/60 text-slate-300'
+                              ? 'bg-emerald-500/15 text-emerald-300'
+                              : 'bg-slate-800/60 hover:bg-slate-800 text-slate-300'
                           }`}
                           title="Переглянути та налаштувати теоретичний конспект модуля"
                         >
@@ -721,7 +721,7 @@ export const CourseStudioView: React.FC<CourseStudioViewProps> = ({
                         <button
                           type="button"
                           onClick={() => setSkillCreationModule({ id: mod.id, title: mod.title })}
-                          className="px-2.5 py-1 rounded bg-slate-800/80 hover:bg-slate-700 text-slate-200 text-xs font-medium border border-slate-700 transition-colors cursor-pointer flex items-center gap-1"
+                          className="px-2.5 py-1 rounded-md bg-slate-800/60 hover:bg-slate-800 text-slate-200 text-xs font-medium transition-colors cursor-pointer flex items-center gap-1"
                           title="Створити нову BKT-компетенцію в цьому модулі"
                         >
                           <Plus className="w-3 h-3 text-emerald-400" />
@@ -731,7 +731,7 @@ export const CourseStudioView: React.FC<CourseStudioViewProps> = ({
                         <button
                           type="button"
                           onClick={() => handleOpenAssignSkills(mod)}
-                          className="px-2.5 py-1 rounded bg-slate-800/80 hover:bg-slate-800 text-indigo-300 text-xs font-medium border border-indigo-500/20 transition-colors cursor-pointer"
+                          className="px-2.5 py-1 rounded-md bg-slate-800/60 hover:bg-slate-800 text-indigo-300 text-xs font-medium transition-colors cursor-pointer"
                           title="Прив'язати навички (SkillNodes)"
                         >
                           Навички ({modSkills.length})
@@ -768,7 +768,7 @@ export const CourseStudioView: React.FC<CourseStudioViewProps> = ({
 
                     {/* Inline Theory Content Unit for this module */}
                     {expandedTheoryModuleIds[mod.id] && (
-                      <div className="p-4 bg-slate-950/90 border-t border-b border-emerald-500/30 flex flex-col gap-3 animate-fadeIn">
+                      <div className="p-4 bg-slate-950/70 border-t border-slate-800/60 flex flex-col gap-3 animate-fadeIn">
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
                             <BookOpen className="w-4 h-4 text-emerald-400" />
@@ -776,7 +776,7 @@ export const CourseStudioView: React.FC<CourseStudioViewProps> = ({
                               Теоретичний Конспект Модуля
                             </span>
                             {mod.description && (
-                              <span className="px-1.5 py-0.5 rounded text-[9px] font-mono bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                              <span className="px-1.5 py-0.5 rounded text-[9px] font-mono text-emerald-400 bg-emerald-500/10">
                                 {mod.description.length} симв.
                               </span>
                             )}
@@ -788,7 +788,7 @@ export const CourseStudioView: React.FC<CourseStudioViewProps> = ({
                                 if (onOpenTheoryBuilder) onOpenTheoryBuilder(mod);
                                 else setTheoryBuilderModule(mod);
                               }}
-                              className="px-2.5 py-1 rounded text-[11px] font-bold bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white transition-all cursor-pointer flex items-center gap-1.5 shadow-sm shadow-emerald-950/40"
+                              className="px-2.5 py-1 rounded-md text-[11px] font-bold bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white transition-all cursor-pointer flex items-center gap-1.5 shadow-sm"
                               title="Відкрити повноцінний конструктор уроку з блоками коду та оманами"
                             >
                               <Sliders className="w-3 h-3" />
@@ -801,7 +801,7 @@ export const CourseStudioView: React.FC<CourseStudioViewProps> = ({
                                   setEditingTheoryModuleId(mod.id);
                                   setEditingTheoryContent(mod.description || '');
                                 }}
-                                className="px-2 py-1 rounded text-[10px] font-medium bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition-colors cursor-pointer flex items-center gap-1"
+                                className="px-2 py-1 rounded-md text-[10px] font-medium bg-slate-800/80 hover:bg-slate-700 text-slate-300 transition-colors cursor-pointer flex items-center gap-1"
                                 title="Швидке редагування сирого тексту"
                               >
                                 <Edit2 className="w-3 h-3 text-slate-400" />
@@ -872,13 +872,13 @@ export const CourseStudioView: React.FC<CourseStudioViewProps> = ({
                             </div>
                           </div>
                         ) : mod.description ? (
-                          <div className="p-3.5 rounded-lg bg-slate-900 border border-slate-800 text-xs text-slate-200 leading-relaxed font-sans whitespace-pre-wrap max-h-72 overflow-y-auto">
+                          <div className="p-3.5 rounded-xl bg-slate-900/60 border border-slate-800/50 text-xs text-slate-200 leading-relaxed font-sans whitespace-pre-wrap max-h-72 overflow-y-auto">
                             {mod.description}
                           </div>
                         ) : (
-                          <div className="p-6 rounded-xl bg-slate-900/60 border border-dashed border-slate-800 text-center flex flex-col items-center gap-3">
-                            <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center">
-                              <Sparkles className="w-5 h-5" />
+                          <div className="p-6 rounded-xl bg-slate-900/30 text-center flex flex-col items-center gap-3">
+                            <div className="w-9 h-9 rounded-lg bg-emerald-500/10 text-emerald-400 flex items-center justify-center">
+                              <Sparkles className="w-4 h-4" />
                             </div>
                             <div className="max-w-md">
                               <h4 className="text-xs font-bold text-white">Теоретичний конспект ще не заповнено</h4>

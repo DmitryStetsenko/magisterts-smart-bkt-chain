@@ -14,10 +14,10 @@
 | **`SBC-EP-W3`** | Web3 Infrastructure & Smart Contracts | 0 |
 | **`SBC-EP-ST`** | Student Portal & Skill Tree Map | 39 |
 | **`SBC-EP-TC`** | Teacher Portal & Analytics CRM | 32 |
-| **`SBC-EP-AD`** | Admin Portal & Knowledge DAG Builder | 20 |
+| **`SBC-EP-AD`** | Admin Portal & Knowledge DAG Builder | 21 |
 | **`SBC-EP-LD`** | Landing Web Page | 9 |
 | **`SBC-EP-MS`** | Master's Thesis Engineering & Academic Text Generation | 9 |
-| **ВСЬОГО** | - | **288** |
+| **ВСЬОГО** | - | **289** |
 
 ---
 
@@ -448,6 +448,7 @@
 | **SBC-403** | `Story` | `AD` | integrate inline markdown theory editor and course creation theory input in admin studio | 2026-11-12 | `5439bd7` |
 | **SBC-404** | `Story` | `AD` | implement visual block-based theory lesson builder with live student preview and pedagogical presets | 2026-11-12 | `6d095fd` |
 | **SBC-405** | `Story` | `AD` | transform theory lesson builder into full-fledged page with breadcrumbs, dedicated sidebar drawer and URL routing | 2026-11-12 | `ee8f53b` |
+| **SBC-406** | `Refactor` | `AD` | enforce minimalist borderless design across theory builder, drawer sections and studio controls | 2026-11-12 | pending |
 
 ---
 

@@ -351,8 +351,8 @@ export const TheoryLessonBuilderView: React.FC<TheoryLessonBuilderViewProps> = (
           const el = document.getElementById(cardId);
           if (el) {
             el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            el.classList.add('ring-2', 'ring-emerald-500/50');
-            setTimeout(() => el.classList.remove('ring-2', 'ring-emerald-500/50'), 1500);
+            el.classList.add('bg-slate-900/40');
+            setTimeout(() => el.classList.remove('bg-slate-900/40'), 1500);
           }
         }, 50);
       }
@@ -442,14 +442,14 @@ export const TheoryLessonBuilderView: React.FC<TheoryLessonBuilderViewProps> = (
   }, [blocks, rawMarkdown, activeTab]);
 
   return (
-    <div className="flex flex-col gap-5 w-full pb-16 animate-fadeIn select-text">
-      {/* 🧭 Top Navigation & Sticky Action Header */}
-      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 p-4 rounded-xl bg-slate-900/90 border border-slate-800/80 backdrop-blur-md sticky top-0 z-10 shadow-lg shadow-slate-950/50">
+    <div className="flex flex-col gap-6 w-full pb-16 animate-fadeIn select-text">
+      {/* 🧭 Minimalist Borderless Top Action Header */}
+      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 pb-4 border-b border-slate-800/80 bg-slate-950/90 backdrop-blur-md sticky top-0 z-10">
         <div className="flex items-center gap-3 min-w-0">
           <button
             type="button"
             onClick={onBack}
-            className="p-2 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white transition-colors cursor-pointer border border-slate-700 shrink-0"
+            className="p-2 rounded-lg hover:bg-slate-800/80 text-slate-400 hover:text-white transition-colors cursor-pointer shrink-0"
             title="Повернутися до Студії курсу"
           >
             <ArrowLeft className="w-4 h-4" />
@@ -457,12 +457,13 @@ export const TheoryLessonBuilderView: React.FC<TheoryLessonBuilderViewProps> = (
 
           <div className="flex flex-col min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
-              <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-bold uppercase tracking-wider">
+              <span className="text-[10px] font-mono text-emerald-400 font-bold uppercase tracking-wider">
                 Модуль {(course.modules || []).findIndex((m) => m.id === module.id) + 1 || 1}
               </span>
+              <span className="text-slate-600">•</span>
               <span className="text-xs font-mono text-slate-500 truncate">/{module.slug}</span>
               {saveSuccess && (
-                <span className="inline-flex items-center gap-1 text-[11px] font-mono text-emerald-400 font-semibold animate-fadeIn">
+                <span className="inline-flex items-center gap-1 text-[11px] font-mono text-emerald-400 font-semibold animate-fadeIn ml-2">
                   <CheckCheck className="w-3.5 h-3.5" />
                   <span>Збережено</span>
                 </span>
@@ -475,15 +476,15 @@ export const TheoryLessonBuilderView: React.FC<TheoryLessonBuilderViewProps> = (
         </div>
 
         {/* Center / Right controls */}
-        <div className="flex items-center gap-2.5 flex-wrap w-full md:w-auto justify-between md:justify-end">
-          {/* Subtabs switcher */}
-          <div className="flex items-center p-1 rounded-lg bg-slate-950 border border-slate-800 text-xs">
+        <div className="flex items-center gap-3 flex-wrap w-full md:w-auto justify-between md:justify-end">
+          {/* Borderless Subtabs switcher */}
+          <div className="flex items-center p-0.5 rounded-lg bg-slate-900/90 text-xs">
             <button
               type="button"
               onClick={() => handleSwitchTab('BUILDER')}
               className={`px-3 py-1.5 rounded-md font-semibold transition-colors flex items-center gap-1.5 cursor-pointer ${
                 activeTab === 'BUILDER'
-                  ? 'bg-emerald-600 text-white shadow-sm'
+                  ? 'bg-slate-800 text-white'
                   : 'text-slate-400 hover:text-slate-200'
               }`}
             >
@@ -495,7 +496,7 @@ export const TheoryLessonBuilderView: React.FC<TheoryLessonBuilderViewProps> = (
               onClick={() => handleSwitchTab('PREVIEW')}
               className={`px-3 py-1.5 rounded-md font-semibold transition-colors flex items-center gap-1.5 cursor-pointer ${
                 activeTab === 'PREVIEW'
-                  ? 'bg-emerald-600 text-white shadow-sm'
+                  ? 'bg-slate-800 text-white'
                   : 'text-slate-400 hover:text-slate-200'
               }`}
             >
@@ -507,7 +508,7 @@ export const TheoryLessonBuilderView: React.FC<TheoryLessonBuilderViewProps> = (
               onClick={() => handleSwitchTab('RAW_MARKDOWN')}
               className={`px-3 py-1.5 rounded-md font-semibold transition-colors flex items-center gap-1.5 cursor-pointer ${
                 activeTab === 'RAW_MARKDOWN'
-                  ? 'bg-emerald-600 text-white shadow-sm'
+                  ? 'bg-slate-800 text-white'
                   : 'text-slate-400 hover:text-slate-200'
               }`}
             >
@@ -516,11 +517,11 @@ export const TheoryLessonBuilderView: React.FC<TheoryLessonBuilderViewProps> = (
             </button>
           </div>
 
-          {/* Reading time metric badge */}
-          <div className="hidden xl:flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-slate-950/60 border border-slate-800 text-slate-400 text-xs font-mono">
+          {/* Reading time metric */}
+          <div className="hidden xl:flex items-center gap-2 text-slate-400 text-xs font-mono select-none">
             <Clock className="w-3.5 h-3.5 text-indigo-400" />
             <span>~{textMetrics.minutes} хв</span>
-            <span className="text-slate-600">•</span>
+            <span className="text-slate-700">•</span>
             <span>{textMetrics.words} слів</span>
           </div>
 
@@ -529,67 +530,67 @@ export const TheoryLessonBuilderView: React.FC<TheoryLessonBuilderViewProps> = (
             type="button"
             onClick={handleSave}
             disabled={isSaving}
-            className={`px-4 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-2 shadow-lg shadow-emerald-950/50 ${
+            className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
               isSaving
-                ? 'bg-slate-700 text-slate-400 cursor-not-allowed'
-                : 'bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white'
+                ? 'bg-slate-800 text-slate-500 cursor-not-allowed'
+                : 'bg-emerald-600 hover:bg-emerald-500 text-white'
             }`}
           >
             <Save className="w-3.5 h-3.5" />
-            <span>{isSaving ? 'Збереження...' : 'Зберегти конспект'}</span>
+            <span>{isSaving ? 'Збереження...' : 'Зберегти'}</span>
           </button>
         </div>
       </div>
 
       {error && (
-        <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs flex items-center gap-2">
+        <div className="p-3 rounded-xl bg-rose-500/10 border-l-2 border-rose-500 text-rose-300 text-xs flex items-center gap-2">
           <AlertTriangle className="w-4 h-4 shrink-0" />
           <span>{error}</span>
         </div>
       )}
 
-      {/* 🧩 TAB 1: VISUAL BLOCK BUILDER */}
+      {/* 🧩 TAB 1: MINIMALIST BORDERLESS BLOCK BUILDER */}
       {activeTab === 'BUILDER' && (
-        <div className="flex flex-col gap-6 w-full">
-          {/* Quick Presets Bar */}
-          <div className="p-3.5 rounded-xl bg-slate-900/60 border border-slate-800/80 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-            <div className="flex items-center gap-2 text-xs text-slate-300">
-              <Sparkles className="w-4 h-4 text-emerald-400" />
-              <span className="font-semibold">Швидкі дидактичні шаблони:</span>
+        <div className="flex flex-col divide-y divide-slate-800/60 w-full">
+          {/* Quick Presets Ribbon */}
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2.5 pb-5 text-xs">
+            <div className="flex items-center gap-2 text-slate-400">
+              <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
+              <span className="font-semibold text-[11px] uppercase tracking-wider text-slate-400">Дидактичні шаблони:</span>
             </div>
-            <div className="flex items-center gap-2 flex-wrap text-xs">
+            <div className="flex items-center gap-1.5 flex-wrap text-xs">
               <button
                 type="button"
                 onClick={() => applyPreset(HTML_PRESET)}
-                className="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-emerald-300 border border-emerald-500/20 transition-colors font-medium cursor-pointer flex items-center gap-1.5"
+                className="px-2.5 py-1 rounded-md bg-slate-900/80 hover:bg-slate-800 text-emerald-300 hover:text-white transition-colors font-medium cursor-pointer flex items-center gap-1.5"
               >
-                <span>⚡ HTML (Базова розмітка)</span>
+                <span>⚡ HTML</span>
               </button>
               <button
                 type="button"
                 onClick={() => applyPreset(JS_PRESET)}
-                className="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-indigo-300 border border-indigo-500/20 transition-colors font-medium cursor-pointer flex items-center gap-1.5"
+                className="px-2.5 py-1 rounded-md bg-slate-900/80 hover:bg-slate-800 text-indigo-300 hover:text-white transition-colors font-medium cursor-pointer flex items-center gap-1.5"
               >
-                <span>⚡ JS (Змінні & Типи)</span>
+                <span>⚡ JS</span>
               </button>
               <button
                 type="button"
                 onClick={() => applyPreset(CSS_PRESET)}
-                className="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-teal-300 border border-teal-500/20 transition-colors font-medium cursor-pointer flex items-center gap-1.5"
+                className="px-2.5 py-1 rounded-md bg-slate-900/80 hover:bg-slate-800 text-teal-300 hover:text-white transition-colors font-medium cursor-pointer flex items-center gap-1.5"
               >
-                <span>⚡ CSS (Flexbox)</span>
+                <span>⚡ CSS</span>
               </button>
               <button
                 type="button"
                 onClick={() => applyPreset(PYTHON_PRESET)}
-                className="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-amber-300 border border-amber-500/20 transition-colors font-medium cursor-pointer flex items-center gap-1.5"
+                className="px-2.5 py-1 rounded-md bg-slate-900/80 hover:bg-slate-800 text-amber-300 hover:text-white transition-colors font-medium cursor-pointer flex items-center gap-1.5"
               >
-                <span>⚡ Python (Синтаксис)</span>
+                <span>⚡ Python</span>
               </button>
               <button
                 type="button"
                 onClick={() => setBlocks({ ...DEFAULT_BLOCKS, takeaways: [''] })}
-                className="p-1.5 rounded-lg text-slate-400 hover:text-slate-200 transition-colors cursor-pointer"
+                className="p-1.5 rounded-md text-slate-500 hover:text-slate-300 transition-colors cursor-pointer"
                 title="Очистити всі поля"
               >
                 <RotateCcw className="w-3.5 h-3.5" />
@@ -597,16 +598,13 @@ export const TheoryLessonBuilderView: React.FC<TheoryLessonBuilderViewProps> = (
             </div>
           </div>
 
-          {/* CARD 1: Вступ & Мета теми */}
-          <div
-            id="theory-card-summary"
-            className="p-5 rounded-2xl bg-slate-900 border border-slate-800 hover:border-slate-700/80 transition-all shadow-sm flex flex-col gap-3"
-          >
-            <div className="flex items-center justify-between pb-2 border-b border-slate-800/80">
+          {/* SECTION 1: Вступ & Мета теми */}
+          <section id="theory-card-summary" className="py-6 flex flex-col gap-3 transition-colors rounded-xl px-1">
+            <div className="flex items-center justify-between">
               <div className="flex items-center gap-2.5">
-                <div className="w-7 h-7 rounded-lg bg-blue-500/10 border border-blue-500/20 text-blue-400 flex items-center justify-center font-bold text-xs">
+                <span className="w-6 h-6 rounded-md bg-blue-500/15 text-blue-400 flex items-center justify-center font-bold text-xs">
                   1
-                </div>
+                </span>
                 <div>
                   <h3 className="text-sm font-bold text-white flex items-center gap-2">
                     <span>📌 Вступ & Мета теми (Summary & Hook)</span>
@@ -624,20 +622,17 @@ export const TheoryLessonBuilderView: React.FC<TheoryLessonBuilderViewProps> = (
               value={blocks.summary}
               onChange={(e) => setBlocks({ ...blocks, summary: e.target.value })}
               placeholder="Наприклад: Опануйте фундаментальні правила роботи з розміткою HTML-документа, структуру тегів <head> і <body> та уникнення помилок відображення..."
-              className="w-full p-3 rounded-xl bg-slate-950 border border-slate-800 text-slate-200 placeholder-slate-500 text-xs focus:outline-none focus:border-blue-500/50 leading-relaxed font-sans"
+              className="w-full p-3.5 rounded-xl bg-slate-900/70 border border-slate-800/60 hover:border-slate-700 focus:border-blue-500/50 focus:bg-slate-950 text-slate-200 placeholder-slate-500 text-xs focus:outline-none leading-relaxed font-sans transition-colors"
             />
-          </div>
+          </section>
 
-          {/* CARD 2: Теоретичні поняття (Core Concepts) */}
-          <div
-            id="theory-card-concepts"
-            className="p-5 rounded-2xl bg-slate-900 border border-slate-800 hover:border-slate-700/80 transition-all shadow-sm flex flex-col gap-3"
-          >
-            <div className="flex items-center justify-between pb-2 border-b border-slate-800/80">
+          {/* SECTION 2: Теоретичні поняття (Core Concepts) */}
+          <section id="theory-card-concepts" className="py-6 flex flex-col gap-3 transition-colors rounded-xl px-1">
+            <div className="flex items-center justify-between">
               <div className="flex items-center gap-2.5">
-                <div className="w-7 h-7 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-xs">
+                <span className="w-6 h-6 rounded-md bg-emerald-500/15 text-emerald-400 flex items-center justify-center font-bold text-xs">
                   2
-                </div>
+                </span>
                 <div>
                   <h3 className="text-sm font-bold text-white flex items-center gap-2">
                     <span>📖 Теоретичні поняття (Core Concepts)</span>
@@ -655,20 +650,17 @@ export const TheoryLessonBuilderView: React.FC<TheoryLessonBuilderViewProps> = (
               value={blocks.conceptExplanation}
               onChange={(e) => setBlocks({ ...blocks, conceptExplanation: e.target.value })}
               placeholder="Детально опишіть теоретичний матеріал: термінологію, принципи роботи технології, правила синтаксису чи математичні закономірності..."
-              className="w-full p-3 rounded-xl bg-slate-950 border border-slate-800 text-slate-200 placeholder-slate-500 text-xs focus:outline-none focus:border-emerald-500/50 leading-relaxed font-sans"
+              className="w-full p-3.5 rounded-xl bg-slate-900/70 border border-slate-800/60 hover:border-slate-700 focus:border-emerald-500/50 focus:bg-slate-950 text-slate-200 placeholder-slate-500 text-xs focus:outline-none leading-relaxed font-sans transition-colors"
             />
-          </div>
+          </section>
 
-          {/* CARD 3: Інтерактивний приклад коду (Interactive Code Snippet) */}
-          <div
-            id="theory-card-code"
-            className="p-5 rounded-2xl bg-slate-900 border border-slate-800 hover:border-slate-700/80 transition-all shadow-sm flex flex-col gap-3.5"
-          >
-            <div className="flex items-center justify-between pb-2 border-b border-slate-800/80">
+          {/* SECTION 3: Інтерактивний приклад коду (Interactive Code Snippet) */}
+          <section id="theory-card-code" className="py-6 flex flex-col gap-3.5 transition-colors rounded-xl px-1">
+            <div className="flex items-center justify-between">
               <div className="flex items-center gap-2.5">
-                <div className="w-7 h-7 rounded-lg bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 flex items-center justify-center font-bold text-xs">
+                <span className="w-6 h-6 rounded-md bg-indigo-500/15 text-indigo-400 flex items-center justify-center font-bold text-xs">
                   3
-                </div>
+                </span>
                 <div>
                   <h3 className="text-sm font-bold text-white flex items-center gap-2">
                     <span>💻 Інтерактивний приклад коду (Code Snippet)</span>
@@ -685,7 +677,7 @@ export const TheoryLessonBuilderView: React.FC<TheoryLessonBuilderViewProps> = (
                 <select
                   value={blocks.codeLang}
                   onChange={(e) => setBlocks({ ...blocks, codeLang: e.target.value })}
-                  className="px-2.5 py-1 rounded-lg bg-slate-950 border border-slate-800 text-indigo-300 text-xs font-mono font-bold focus:outline-none focus:border-indigo-500/50 cursor-pointer"
+                  className="px-2.5 py-1 rounded-md bg-slate-900 hover:bg-slate-850 text-indigo-300 text-xs font-mono font-bold focus:outline-none focus:ring-1 focus:ring-indigo-500/50 cursor-pointer"
                 >
                   <option value="html">HTML</option>
                   <option value="javascript">JavaScript</option>
@@ -697,14 +689,14 @@ export const TheoryLessonBuilderView: React.FC<TheoryLessonBuilderViewProps> = (
               </div>
             </div>
 
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-1.5">
               <label className="text-xs font-semibold text-slate-300">Фрагмент коду:</label>
               <textarea
                 rows={8}
                 value={blocks.codeSnippet}
                 onChange={(e) => setBlocks({ ...blocks, codeSnippet: e.target.value })}
                 placeholder={`// Вставте чистий зразок коду для демонстрації учням...`}
-                className="w-full p-3 rounded-xl bg-slate-950 border border-slate-800 text-indigo-200 placeholder-slate-600 text-xs font-mono leading-relaxed focus:outline-none focus:border-indigo-500/50"
+                className="w-full p-3.5 rounded-xl bg-slate-950 border border-slate-800/80 hover:border-slate-700 focus:border-indigo-500/60 text-indigo-200 placeholder-slate-600 text-xs font-mono leading-relaxed focus:outline-none transition-colors"
               />
             </div>
 
@@ -717,21 +709,18 @@ export const TheoryLessonBuilderView: React.FC<TheoryLessonBuilderViewProps> = (
                 value={blocks.codeExplanation}
                 onChange={(e) => setBlocks({ ...blocks, codeExplanation: e.target.value })}
                 placeholder="Опишіть, що відбувається у ключових рядках коду і які стандарти тут проілюстровано..."
-                className="w-full p-2.5 rounded-xl bg-slate-950 border border-slate-800 text-slate-300 placeholder-slate-500 text-xs leading-relaxed focus:outline-none focus:border-indigo-500/50"
+                className="w-full p-3 rounded-xl bg-slate-900/70 border border-slate-800/60 hover:border-slate-700 focus:border-indigo-500/60 focus:bg-slate-950 text-slate-300 placeholder-slate-500 text-xs leading-relaxed focus:outline-none transition-colors"
               />
             </div>
-          </div>
+          </section>
 
-          {/* CARD 4: Картка типової омани учнів (Misconception Alert) */}
-          <div
-            id="theory-card-misconception"
-            className="p-5 rounded-2xl bg-slate-900 border border-amber-500/30 hover:border-amber-500/50 transition-all shadow-sm flex flex-col gap-3.5 bg-gradient-to-b from-amber-500/5 to-transparent"
-          >
-            <div className="flex items-center justify-between pb-2 border-b border-amber-500/20">
+          {/* SECTION 4: Картка типової омани учнів (Misconception Alert) */}
+          <section id="theory-card-misconception" className="py-6 flex flex-col gap-3.5 transition-colors rounded-xl px-1">
+            <div className="flex items-center justify-between">
               <div className="flex items-center gap-2.5">
-                <div className="w-7 h-7 rounded-lg bg-amber-500/20 border border-amber-500/30 text-amber-300 flex items-center justify-center font-bold text-xs">
+                <span className="w-6 h-6 rounded-md bg-amber-500/20 text-amber-300 flex items-center justify-center font-bold text-xs">
                   4
-                </div>
+                </span>
                 <div>
                   <h3 className="text-sm font-bold text-white flex items-center gap-2">
                     <span className="text-amber-300">⚠️ Картка типової омани учнів (Misconception Alert)</span>
@@ -743,59 +732,59 @@ export const TheoryLessonBuilderView: React.FC<TheoryLessonBuilderViewProps> = (
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="flex flex-col gap-1.5">
-                <label className="text-xs font-semibold text-rose-300 flex items-center gap-1.5">
-                  <span>❌ Хибне уявлення (помилка учнів):</span>
-                </label>
-                <textarea
-                  rows={3}
-                  value={blocks.wrongBelief}
-                  onChange={(e) => setBlocks({ ...blocks, wrongBelief: e.target.value })}
-                  placeholder="Що новачки часто помилково думають або роблять неправильно..."
-                  className="w-full p-2.5 rounded-xl bg-slate-950 border border-rose-500/30 text-rose-200 placeholder-slate-600 text-xs leading-relaxed focus:outline-none focus:border-rose-500"
-                />
-              </div>
-
-              <div className="flex flex-col gap-1.5">
-                <label className="text-xs font-semibold text-emerald-300 flex items-center gap-1.5">
-                  <span>✅ Як насправді (наукове роз'яснення):</span>
-                </label>
-                <textarea
-                  rows={3}
-                  value={blocks.realityExplanation}
-                  onChange={(e) => setBlocks({ ...blocks, realityExplanation: e.target.value })}
-                  placeholder="Чому це працює інакше з точки зору архітектури чи стандарту..."
-                  className="w-full p-2.5 rounded-xl bg-slate-950 border border-emerald-500/30 text-emerald-200 placeholder-slate-600 text-xs leading-relaxed focus:outline-none focus:border-emerald-500"
-                />
-              </div>
-            </div>
-
-            <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-semibold text-amber-300 flex items-center gap-1.5">
-                <Lightbulb className="w-3.5 h-3.5" />
-                <span>💡 Порада для самоперевірки (Tip / Rule of Thumb):</span>
-              </label>
-              <input
-                type="text"
-                value={blocks.fixTip}
-                onChange={(e) => setBlocks({ ...blocks, fixTip: e.target.value })}
-                placeholder="Коротке мнемонічне правило або лайфхак..."
-                className="w-full p-2.5 rounded-xl bg-slate-950 border border-amber-500/30 text-amber-200 placeholder-slate-600 text-xs focus:outline-none focus:border-amber-400"
-              />
-            </div>
-          </div>
-
-          {/* CARD 5: Ключові висновки (Key Takeaways) */}
-          <div
-            id="theory-card-takeaways"
-            className="p-5 rounded-2xl bg-slate-900 border border-slate-800 hover:border-slate-700/80 transition-all shadow-sm flex flex-col gap-3"
-          >
-            <div className="flex items-center justify-between pb-2 border-b border-slate-800/80">
-              <div className="flex items-center gap-2.5">
-                <div className="w-7 h-7 rounded-lg bg-purple-500/10 border border-purple-500/20 text-purple-400 flex items-center justify-center font-bold text-xs">
-                  5
+            {/* Clean borderless callout with a subtle left accent line */}
+            <div className="pl-4 border-l-2 border-amber-500/60 flex flex-col gap-4 py-1">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs font-semibold text-rose-300 flex items-center gap-1.5">
+                    <span>❌ Хибне уявлення (помилка учнів):</span>
+                  </label>
+                  <textarea
+                    rows={3}
+                    value={blocks.wrongBelief}
+                    onChange={(e) => setBlocks({ ...blocks, wrongBelief: e.target.value })}
+                    placeholder="Що новачки часто помилково думають або роблять неправильно..."
+                    className="w-full p-3 rounded-xl bg-slate-900/80 border border-rose-500/20 hover:border-rose-500/40 focus:border-rose-500/70 focus:bg-slate-950 text-rose-200 placeholder-slate-600 text-xs leading-relaxed focus:outline-none transition-colors"
+                  />
                 </div>
+
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs font-semibold text-emerald-300 flex items-center gap-1.5">
+                    <span>✅ Як насправді (наукове роз'яснення):</span>
+                  </label>
+                  <textarea
+                    rows={3}
+                    value={blocks.realityExplanation}
+                    onChange={(e) => setBlocks({ ...blocks, realityExplanation: e.target.value })}
+                    placeholder="Чому це працює інакше з точки зору архітектури чи стандарту..."
+                    className="w-full p-3 rounded-xl bg-slate-900/80 border border-emerald-500/20 hover:border-emerald-500/40 focus:border-emerald-500/70 focus:bg-slate-950 text-emerald-200 placeholder-slate-600 text-xs leading-relaxed focus:outline-none transition-colors"
+                  />
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-1.5">
+                <label className="text-xs font-semibold text-amber-300 flex items-center gap-1.5">
+                  <Lightbulb className="w-3.5 h-3.5" />
+                  <span>💡 Порада для самоперевірки (Tip / Rule of Thumb):</span>
+                </label>
+                <input
+                  type="text"
+                  value={blocks.fixTip}
+                  onChange={(e) => setBlocks({ ...blocks, fixTip: e.target.value })}
+                  placeholder="Коротке мнемонічне правило або лайфхак..."
+                  className="w-full p-2.5 rounded-xl bg-slate-900/80 border border-amber-500/20 hover:border-amber-500/40 focus:border-amber-400/70 focus:bg-slate-950 text-amber-200 placeholder-slate-600 text-xs focus:outline-none transition-colors"
+                />
+              </div>
+            </div>
+          </section>
+
+          {/* SECTION 5: Ключові висновки (Key Takeaways) */}
+          <section id="theory-card-takeaways" className="py-6 flex flex-col gap-3 transition-colors rounded-xl px-1">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2.5">
+                <span className="w-6 h-6 rounded-md bg-purple-500/15 text-purple-400 flex items-center justify-center font-bold text-xs">
+                  5
+                </span>
                 <div>
                   <h3 className="text-sm font-bold text-white flex items-center gap-2">
                     <span>🎯 Ключові висновки (Takeaways)</span>
@@ -809,7 +798,7 @@ export const TheoryLessonBuilderView: React.FC<TheoryLessonBuilderViewProps> = (
               <button
                 type="button"
                 onClick={handleAddTakeaway}
-                className="px-2.5 py-1 rounded-lg bg-purple-500/15 hover:bg-purple-500/25 text-purple-300 border border-purple-500/30 text-xs font-semibold transition-colors flex items-center gap-1 cursor-pointer"
+                className="px-2.5 py-1 rounded-md hover:bg-purple-500/10 text-purple-400 hover:text-purple-300 text-xs font-semibold transition-colors flex items-center gap-1 cursor-pointer"
               >
                 <Plus className="w-3.5 h-3.5" />
                 <span>Додати тезу</span>
@@ -827,7 +816,7 @@ export const TheoryLessonBuilderView: React.FC<TheoryLessonBuilderViewProps> = (
                     value={item}
                     onChange={(e) => handleUpdateTakeaway(idx, e.target.value)}
                     placeholder={`Підсумок ${idx + 1}...`}
-                    className="flex-1 p-2.5 rounded-xl bg-slate-950 border border-slate-800 text-slate-200 placeholder-slate-600 text-xs focus:outline-none focus:border-purple-500/50"
+                    className="flex-1 p-2.5 rounded-xl bg-slate-900/70 border border-slate-800/60 hover:border-slate-700 focus:border-purple-500/60 focus:bg-slate-950 text-slate-200 placeholder-slate-600 text-xs focus:outline-none transition-colors"
                   />
                   {blocks.takeaways.length > 1 && (
                     <button
@@ -842,13 +831,13 @@ export const TheoryLessonBuilderView: React.FC<TheoryLessonBuilderViewProps> = (
                 </div>
               ))}
             </div>
-          </div>
+          </section>
         </div>
       )}
 
-      {/* 👁️ TAB 2: STUDENT LIVE PREVIEW */}
+      {/* 👁️ TAB 2: MINIMALIST STUDENT LIVE PREVIEW */}
       {activeTab === 'PREVIEW' && (
-        <div className="p-6 sm:p-8 rounded-2xl bg-slate-900 border border-slate-800 shadow-xl flex flex-col gap-6 max-w-4xl mx-auto w-full animate-fadeIn">
+        <div className="py-4 flex flex-col gap-6 max-w-4xl mx-auto w-full animate-fadeIn">
           <div className="pb-4 border-b border-slate-800/80 flex items-center justify-between">
             <div>
               <span className="text-[11px] font-mono text-emerald-400 uppercase tracking-wider font-semibold">
@@ -856,14 +845,14 @@ export const TheoryLessonBuilderView: React.FC<TheoryLessonBuilderViewProps> = (
               </span>
               <h2 className="text-xl sm:text-2xl font-bold text-white mt-1">{module.title}</h2>
             </div>
-            <span className="text-xs font-mono px-2.5 py-1 rounded bg-slate-800 text-slate-300 border border-slate-700">
+            <span className="text-xs font-mono text-slate-400 select-none">
               ~{textMetrics.minutes} хв читання
             </span>
           </div>
 
           {/* Rendered Summary */}
           {blocks.summary && (
-            <div className="p-4 rounded-xl bg-blue-500/10 border-l-4 border-blue-500 text-slate-200 text-xs sm:text-sm leading-relaxed">
+            <div className="p-4 rounded-xl bg-blue-500/10 border-l-2 border-blue-500 text-slate-200 text-xs sm:text-sm leading-relaxed">
               <span className="font-bold text-blue-400 block mb-1">📌 Короткий огляд:</span>
               <p className="whitespace-pre-wrap">{blocks.summary}</p>
             </div>
@@ -875,7 +864,7 @@ export const TheoryLessonBuilderView: React.FC<TheoryLessonBuilderViewProps> = (
               <h3 className="text-base font-bold text-white flex items-center gap-2">
                 <span>📖 Теоретичні поняття</span>
               </h3>
-              <div className="text-xs sm:text-sm text-slate-300 leading-relaxed whitespace-pre-wrap font-sans p-4 rounded-xl bg-slate-950/60 border border-slate-800/80">
+              <div className="text-xs sm:text-sm text-slate-300 leading-relaxed whitespace-pre-wrap font-sans p-4 rounded-xl bg-slate-900/60 border border-slate-800/50">
                 {blocks.conceptExplanation}
               </div>
             </div>
@@ -891,7 +880,7 @@ export const TheoryLessonBuilderView: React.FC<TheoryLessonBuilderViewProps> = (
                 </h3>
                 <span className="text-[10px] font-mono text-slate-500">read-only syntax</span>
               </div>
-              <div className="p-4 rounded-xl bg-slate-950 border border-slate-800 font-mono text-xs text-indigo-200 overflow-x-auto whitespace-pre">
+              <div className="p-4 rounded-xl bg-slate-950 border border-slate-800/60 font-mono text-xs text-indigo-200 overflow-x-auto whitespace-pre">
                 {blocks.codeSnippet}
               </div>
               {blocks.codeExplanation && (
@@ -902,21 +891,21 @@ export const TheoryLessonBuilderView: React.FC<TheoryLessonBuilderViewProps> = (
 
           {/* Rendered Misconception Alert */}
           {blocks.hasMisconception && (blocks.wrongBelief || blocks.realityExplanation) && (
-            <div className="p-5 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex flex-col gap-3">
+            <div className="p-5 rounded-xl bg-amber-500/5 border-l-2 border-amber-500/60 flex flex-col gap-3">
               <h4 className="text-xs font-bold uppercase tracking-wider text-amber-300 flex items-center gap-1.5">
                 <AlertTriangle className="w-4 h-4" />
                 <span>Типова омана учнів (Misconception Alert)</span>
               </h4>
 
               {blocks.wrongBelief && (
-                <div className="p-3 rounded-lg bg-rose-500/10 border border-rose-500/20 text-xs text-rose-200 leading-relaxed">
+                <div className="p-3 rounded-lg bg-rose-500/10 text-xs text-rose-200 leading-relaxed border-l-2 border-rose-500/60">
                   <span className="font-bold text-rose-400 block mb-0.5">❌ Хибне уявлення:</span>
                   {blocks.wrongBelief}
                 </div>
               )}
 
               {blocks.realityExplanation && (
-                <div className="p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-xs text-emerald-200 leading-relaxed">
+                <div className="p-3 rounded-lg bg-emerald-500/10 text-xs text-emerald-200 leading-relaxed border-l-2 border-emerald-500/60">
                   <span className="font-bold text-emerald-400 block mb-0.5">✅ Як насправді:</span>
                   {blocks.realityExplanation}
                 </div>
@@ -944,7 +933,7 @@ export const TheoryLessonBuilderView: React.FC<TheoryLessonBuilderViewProps> = (
                   .map((point, i) => (
                     <li
                       key={i}
-                      className="text-xs sm:text-sm text-slate-300 flex items-start gap-2.5 p-2 rounded-lg bg-slate-950/40"
+                      className="text-xs sm:text-sm text-slate-300 flex items-start gap-2.5 p-2 rounded-lg bg-slate-900/40"
                     >
                       <span className="w-1.5 h-1.5 rounded-full bg-purple-400 mt-2 shrink-0" />
                       <span>{point}</span>
@@ -956,10 +945,10 @@ export const TheoryLessonBuilderView: React.FC<TheoryLessonBuilderViewProps> = (
         </div>
       )}
 
-      {/* 📝 TAB 3: RAW MARKDOWN SYNCHRONIZATION */}
+      {/* 📝 TAB 3: MINIMALIST RAW MARKDOWN */}
       {activeTab === 'RAW_MARKDOWN' && (
-        <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800 shadow-xl flex flex-col gap-3 animate-fadeIn">
-          <div className="flex items-center justify-between pb-2 border-b border-slate-800">
+        <div className="py-2 flex flex-col gap-3 animate-fadeIn">
+          <div className="flex items-center justify-between pb-2 border-b border-slate-800/80">
             <div>
               <h3 className="text-sm font-bold text-white flex items-center gap-2">
                 <FileText className="w-4 h-4 text-emerald-400" />
@@ -976,7 +965,7 @@ export const TheoryLessonBuilderView: React.FC<TheoryLessonBuilderViewProps> = (
             rows={18}
             value={rawMarkdown}
             onChange={(e) => setRawMarkdown(e.target.value)}
-            className="w-full p-4 rounded-xl bg-slate-950 border border-slate-800 text-slate-200 font-mono text-xs leading-relaxed focus:outline-none focus:border-emerald-500/50"
+            className="w-full p-4 rounded-xl bg-slate-950 border border-slate-800/80 focus:border-emerald-500/60 text-slate-200 font-mono text-xs leading-relaxed focus:outline-none transition-colors"
           />
         </div>
       )}
