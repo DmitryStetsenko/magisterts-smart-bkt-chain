@@ -30,21 +30,23 @@ import {
 } from 'lucide-react';
 import { AppShellLayout, Breadcrumbs, UserProfileDrawer, DrawerSection } from '@sbc/ui';
 import { getAppBaseUrl } from '@sbc/routes';
-import type { CourseDto, CourseCategoryDto } from '@sbc/types';
+import type { CourseDto, CourseCategoryDto, CourseModuleDto } from '@sbc/types';
 import { CourseManager } from '../features/course-manager/ui/CourseManager';
 import { CourseCreateView } from '../features/course-manager/ui/CourseCreateView';
 import { CourseStudioView } from '../features/course-manager/ui/CourseStudioView';
+import { TheoryLessonBuilderView } from '../features/course-manager/ui/TheoryLessonBuilderView';
 import { DatasetExportCenter, DatasetStats } from '../features/dataset-export/ui/DatasetExportCenter';
 import { BktAuditVerifierCenter } from '../features/verifier/ui/BktAuditVerifierCenter';
 import { UserManagementCenter } from '../features/users/ui/UserManagementCenter';
 
 export default function AdminCMSDashboard() {
   type AdminTab = 'courses' | 'users' | 'datasets' | 'verifier' | 'system';
-  type CourseViewMode = 'LIST' | 'CREATE' | 'STUDIO';
+  type CourseViewMode = 'LIST' | 'CREATE' | 'STUDIO' | 'THEORY';
 
   const [activeTab, setActiveTab] = useState<AdminTab>('courses');
   const [courseViewMode, setCourseViewMode] = useState<CourseViewMode>('LIST');
   const [selectedStudioCourse, setSelectedStudioCourse] = useState<CourseDto | null>(null);
+  const [selectedTheoryModule, setSelectedTheoryModule] = useState<CourseModuleDto | null>(null);
   const [studioSubTab, setStudioSubTab] = useState<'CURRICULUM' | 'SETTINGS'>('CURRICULUM');
 
   const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(true);
@@ -71,6 +73,32 @@ export default function AdminCMSDashboard() {
   const [selectedCourseSlug, setSelectedCourseSlug] = useState<string | null>(null);
   const [selectedCategorySlug, setSelectedCategorySlug] = useState<string | null>(null);
   const [courseStatusFilter, setCourseStatusFilter] = useState<'ALL' | 'PUBLISHED' | 'DRAFT'>('ALL');
+
+  const updateBrowserUrl = (params: { tab?: AdminTab; mode?: CourseViewMode; courseSlug?: string; moduleSlug?: string }) => {
+    if (typeof window === 'undefined') return;
+    const url = new URL(window.location.href);
+    if (params.tab) url.searchParams.set('tab', params.tab);
+    if (params.mode) {
+      if (params.mode === 'LIST') {
+        url.searchParams.delete('mode');
+        url.searchParams.delete('course');
+        url.searchParams.delete('module');
+      } else if (params.mode === 'CREATE') {
+        url.searchParams.set('mode', 'create');
+        url.searchParams.delete('course');
+        url.searchParams.delete('module');
+      } else if (params.mode === 'STUDIO') {
+        url.searchParams.set('mode', 'studio');
+        if (params.courseSlug) url.searchParams.set('course', params.courseSlug);
+        url.searchParams.delete('module');
+      } else if (params.mode === 'THEORY') {
+        url.searchParams.set('mode', 'theory');
+        if (params.courseSlug) url.searchParams.set('course', params.courseSlug);
+        if (params.moduleSlug) url.searchParams.set('module', params.moduleSlug);
+      }
+    }
+    window.history.pushState(null, '', url.pathname + url.search);
+  };
 
   const loadCourses = async () => {
     try {
@@ -102,6 +130,49 @@ export default function AdminCMSDashboard() {
     loadCategories();
   }, [API_URL]);
 
+  // Handle browser back/forward and initial URL parameters
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const handleUrlSync = () => {
+      const params = new URLSearchParams(window.location.search);
+      const tabParam = params.get('tab') as AdminTab;
+      const modeParam = params.get('mode');
+      const courseParam = params.get('course');
+      const moduleParam = params.get('module');
+
+      if (tabParam && ['courses', 'users', 'datasets', 'verifier', 'system'].includes(tabParam)) {
+        setActiveTab(tabParam);
+      }
+
+      if (modeParam === 'create') {
+        setCourseViewMode('CREATE');
+        setSelectedStudioCourse(null);
+        setSelectedTheoryModule(null);
+      } else if (modeParam === 'theory' && courseParam && moduleParam) {
+        const matchCourse = dynamicCourses.find((c) => c.slug === courseParam || c.id === courseParam);
+        if (matchCourse) {
+          setSelectedStudioCourse(matchCourse);
+          const matchMod = (matchCourse.modules || []).find((m) => m.slug === moduleParam || m.id === moduleParam);
+          if (matchMod) {
+            setSelectedTheoryModule(matchMod);
+            setCourseViewMode('THEORY');
+          }
+        }
+      } else if (modeParam === 'studio' && courseParam) {
+        const matchCourse = dynamicCourses.find((c) => c.slug === courseParam || c.id === courseParam);
+        if (matchCourse) {
+          setSelectedStudioCourse(matchCourse);
+          setSelectedTheoryModule(null);
+          setCourseViewMode('STUDIO');
+        }
+      }
+    };
+
+    handleUrlSync();
+    window.addEventListener('popstate', handleUrlSync);
+    return () => window.removeEventListener('popstate', handleUrlSync);
+  }, [dynamicCourses]);
+
   const handleTabClick = (tabId: string) => {
     const tab = tabId as AdminTab;
     if (activeTab === tab) {
@@ -109,19 +180,37 @@ export default function AdminCMSDashboard() {
     } else {
       setActiveTab(tab);
       setIsDrawerOpen(true);
+      updateBrowserUrl({ tab });
     }
   };
 
   const handleOpenStudio = (course: CourseDto, initialTab: 'CURRICULUM' | 'SETTINGS' = 'CURRICULUM') => {
     setSelectedStudioCourse(course);
+    setSelectedTheoryModule(null);
     setStudioSubTab(initialTab);
     setCourseViewMode('STUDIO');
+    updateBrowserUrl({ tab: 'courses', mode: 'STUDIO', courseSlug: course.slug });
+  };
+
+  const handleOpenTheory = (course: CourseDto, module: CourseModuleDto) => {
+    setSelectedStudioCourse(course);
+    setSelectedTheoryModule(module);
+    setCourseViewMode('THEORY');
+    updateBrowserUrl({ tab: 'courses', mode: 'THEORY', courseSlug: course.slug, moduleSlug: module.slug });
+  };
+
+  const handleBackToStudio = () => {
+    setCourseViewMode('STUDIO');
+    setSelectedTheoryModule(null);
+    updateBrowserUrl({ tab: 'courses', mode: 'STUDIO', courseSlug: selectedStudioCourse?.slug });
   };
 
   const handleBackToCoursesList = () => {
     setCourseViewMode('LIST');
     setSelectedStudioCourse(null);
+    setSelectedTheoryModule(null);
     setStudioSubTab('CURRICULUM');
+    updateBrowserUrl({ tab: 'courses', mode: 'LIST' });
     loadCourses();
   };
 
@@ -131,7 +220,11 @@ export default function AdminCMSDashboard() {
     let iconColor = 'text-emerald-400';
 
     if (activeTab === 'courses') {
-      if (courseViewMode === 'STUDIO' && selectedStudioCourse) {
+      if (courseViewMode === 'THEORY' && selectedStudioCourse && selectedTheoryModule) {
+        title = 'Конструктор Теорії';
+        icon = BookOpen;
+        iconColor = 'text-emerald-400';
+      } else if (courseViewMode === 'STUDIO' && selectedStudioCourse) {
         title = 'Навігатор курсу';
         icon = Layers;
         iconColor = 'text-emerald-400';
@@ -171,6 +264,188 @@ export default function AdminCMSDashboard() {
       onClose: () => setIsDrawerOpen(false),
       children: (
         <div className="flex flex-col divide-y divide-slate-800/70">
+          {/* Drawer: Course Theory Builder Mode */}
+          {activeTab === 'courses' && courseViewMode === 'THEORY' && selectedStudioCourse && selectedTheoryModule && (
+            <>
+              {/* Back to Studio Button */}
+              <div className="p-2 border-b border-slate-800/60">
+                <button
+                  type="button"
+                  onClick={handleBackToStudio}
+                  className="w-full py-2 px-2.5 rounded-lg text-slate-300 hover:text-white hover:bg-slate-900/60 transition-colors flex items-center gap-2 text-xs cursor-pointer border border-slate-800/60 group"
+                  title="Повернутися до Студії курсу"
+                >
+                  <ArrowLeft className="w-3.5 h-3.5 text-slate-400 group-hover:text-emerald-400 shrink-0" />
+                  <div className="flex flex-col text-left min-w-0">
+                    <span className="font-semibold text-slate-200">До Студії курсу</span>
+                    <span className="text-[10px] text-slate-500 font-mono truncate">{selectedStudioCourse.title}</span>
+                  </div>
+                </button>
+              </div>
+
+              {/* 1. Lesson Outline (5 Didactic Blocks) */}
+              <DrawerSection
+                title="Зміст уроку (5 блоків)"
+                icon={BookOpen}
+                defaultOpen={true}
+              >
+                <div className="flex flex-col gap-1 pt-1 text-xs">
+                  <button
+                    type="button"
+                    onClick={() => window.dispatchEvent(new CustomEvent('admin-theory-scroll-to-card', { detail: { cardId: 'theory-card-summary' } }))}
+                    className="w-full p-2 rounded-lg text-left text-slate-300 hover:text-white hover:bg-slate-800/60 transition-colors flex items-center justify-between cursor-pointer group"
+                  >
+                    <div className="flex items-center gap-2 min-w-0">
+                      <span className="text-blue-400 font-bold font-mono">1.</span>
+                      <span className="truncate">Вступ & Мета теми</span>
+                    </div>
+                    <span className="text-[10px] text-slate-500 font-mono">Summary</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => window.dispatchEvent(new CustomEvent('admin-theory-scroll-to-card', { detail: { cardId: 'theory-card-concepts' } }))}
+                    className="w-full p-2 rounded-lg text-left text-slate-300 hover:text-white hover:bg-slate-800/60 transition-colors flex items-center justify-between cursor-pointer group"
+                  >
+                    <div className="flex items-center gap-2 min-w-0">
+                      <span className="text-emerald-400 font-bold font-mono">2.</span>
+                      <span className="truncate">Теоретичні поняття</span>
+                    </div>
+                    <span className="text-[10px] text-slate-500 font-mono">Concepts</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => window.dispatchEvent(new CustomEvent('admin-theory-scroll-to-card', { detail: { cardId: 'theory-card-code' } }))}
+                    className="w-full p-2 rounded-lg text-left text-slate-300 hover:text-white hover:bg-slate-800/60 transition-colors flex items-center justify-between cursor-pointer group"
+                  >
+                    <div className="flex items-center gap-2 min-w-0">
+                      <span className="text-indigo-400 font-bold font-mono">3.</span>
+                      <span className="truncate">Приклад коду</span>
+                    </div>
+                    <span className="text-[10px] text-slate-500 font-mono">Snippet</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => window.dispatchEvent(new CustomEvent('admin-theory-scroll-to-card', { detail: { cardId: 'theory-card-misconception' } }))}
+                    className="w-full p-2 rounded-lg text-left text-slate-300 hover:text-white hover:bg-slate-800/60 transition-colors flex items-center justify-between cursor-pointer group"
+                  >
+                    <div className="flex items-center gap-2 min-w-0">
+                      <span className="text-amber-400 font-bold font-mono">4.</span>
+                      <span className="truncate text-amber-300/90">Картка омани</span>
+                    </div>
+                    <span className="text-[10px] text-amber-500/80 font-mono">Alert</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => window.dispatchEvent(new CustomEvent('admin-theory-scroll-to-card', { detail: { cardId: 'theory-card-takeaways' } }))}
+                    className="w-full p-2 rounded-lg text-left text-slate-300 hover:text-white hover:bg-slate-800/60 transition-colors flex items-center justify-between cursor-pointer group"
+                  >
+                    <div className="flex items-center gap-2 min-w-0">
+                      <span className="text-purple-400 font-bold font-mono">5.</span>
+                      <span className="truncate">Ключові висновки</span>
+                    </div>
+                    <span className="text-[10px] text-slate-500 font-mono">Takeaways</span>
+                  </button>
+                </div>
+              </DrawerSection>
+
+              {/* 2. Didactic Presets */}
+              <DrawerSection
+                title="Дидактичні шаблони"
+                icon={Sparkles}
+                defaultOpen={true}
+              >
+                <div className="flex flex-col gap-1.5 pt-1 text-xs">
+                  <button
+                    type="button"
+                    onClick={() => window.dispatchEvent(new CustomEvent('admin-theory-apply-preset', { detail: { preset: 'html' } }))}
+                    className="w-full py-1.5 px-2.5 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-emerald-300 border border-emerald-500/20 text-left transition-colors font-medium cursor-pointer flex items-center gap-2"
+                  >
+                    <span>⚡ HTML (Базова розмітка)</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => window.dispatchEvent(new CustomEvent('admin-theory-apply-preset', { detail: { preset: 'js' } }))}
+                    className="w-full py-1.5 px-2.5 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-indigo-300 border border-indigo-500/20 text-left transition-colors font-medium cursor-pointer flex items-center gap-2"
+                  >
+                    <span>⚡ JavaScript (Змінні & Типи)</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => window.dispatchEvent(new CustomEvent('admin-theory-apply-preset', { detail: { preset: 'css' } }))}
+                    className="w-full py-1.5 px-2.5 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-teal-300 border border-teal-500/20 text-left transition-colors font-medium cursor-pointer flex items-center gap-2"
+                  >
+                    <span>⚡ CSS (Flexbox Розкладка)</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => window.dispatchEvent(new CustomEvent('admin-theory-apply-preset', { detail: { preset: 'python' } }))}
+                    className="w-full py-1.5 px-2.5 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-amber-300 border border-amber-500/20 text-left transition-colors font-medium cursor-pointer flex items-center gap-2"
+                  >
+                    <span>⚡ Python (Синтаксис & Типи)</span>
+                  </button>
+                </div>
+              </DrawerSection>
+
+              {/* 3. Course Modules Switcher */}
+              <DrawerSection
+                title="Теми цього курсу"
+                icon={Layers}
+                badge={`${selectedStudioCourse.modules?.length || 0} тем`}
+                defaultOpen={true}
+              >
+                <div className="flex flex-col divide-y divide-slate-800/50 pt-1 max-h-56 overflow-y-auto">
+                  {(selectedStudioCourse.modules || []).map((m, idx) => {
+                    const isCurrent = m.id === selectedTheoryModule.id;
+                    const hasTheory = Boolean(m.description && m.description.trim().length > 0);
+                    return (
+                      <button
+                        key={m.id}
+                        type="button"
+                        onClick={() => handleOpenTheory(selectedStudioCourse, m)}
+                        className={`w-full py-2 px-2 text-left text-xs transition-colors flex items-center justify-between cursor-pointer ${
+                          isCurrent
+                            ? 'bg-emerald-500/15 text-emerald-300 font-semibold border-l-2 border-emerald-400 pl-2'
+                            : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
+                        }`}
+                      >
+                        <div className="flex items-center gap-2 min-w-0 pr-1">
+                          <span className="font-mono text-[10px] text-slate-500 shrink-0">#{idx + 1}</span>
+                          <span className="truncate">{m.title}</span>
+                        </div>
+                        <span className={`text-[9px] font-mono shrink-0 ${hasTheory ? 'text-emerald-400' : 'text-slate-600'}`}>
+                          {hasTheory ? '✓ готова' : 'порожньо'}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </DrawerSection>
+
+              {/* 4. Live Preview links */}
+              <DrawerSection
+                title="Зовнішній перегляд"
+                icon={ExternalLink}
+                defaultOpen={false}
+              >
+                <div className="flex flex-col gap-1.5 pt-1 text-xs">
+                  <a
+                    href={`${getAppBaseUrl('study')}/learn/${selectedStudioCourse.slug}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="p-2 rounded-lg bg-slate-950/60 hover:bg-slate-900 border border-slate-800/80 text-slate-300 hover:text-white transition-colors flex items-center justify-between group cursor-pointer"
+                  >
+                    <span className="font-semibold truncate">Zen Focus у Підручнику</span>
+                    <ExternalLink className="w-3 h-3 text-slate-500 group-hover:text-emerald-400 shrink-0" />
+                  </a>
+                </div>
+              </DrawerSection>
+            </>
+          )}
+
           {/* Drawer: Course Studio Mode (Focused outline & course tools, zero platform duplication) */}
           {activeTab === 'courses' && courseViewMode === 'STUDIO' && selectedStudioCourse && (
             <>
@@ -942,6 +1217,29 @@ export default function AdminCMSDashboard() {
                           isCurrent: true,
                         },
                       ]
+                    : courseViewMode === 'THEORY' && selectedStudioCourse && selectedTheoryModule
+                    ? [
+                        {
+                          label: 'CMS Адміністрування',
+                          onClick: handleBackToCoursesList,
+                        },
+                        {
+                          label: 'Курси',
+                          onClick: handleBackToCoursesList,
+                        },
+                        {
+                          label: selectedStudioCourse.title,
+                          onClick: handleBackToStudio,
+                        },
+                        {
+                          label: selectedTheoryModule.title,
+                          badge: `Модуль ${(selectedStudioCourse.modules || []).findIndex((m) => m.id === selectedTheoryModule.id) + 1 || 1}`,
+                        },
+                        {
+                          label: 'Конструктор теорії',
+                          isCurrent: true,
+                        },
+                      ]
                     : courseViewMode === 'STUDIO' && selectedStudioCourse
                     ? [
                         {
@@ -1078,6 +1376,29 @@ export default function AdminCMSDashboard() {
                 />
               )}
 
+              {courseViewMode === 'THEORY' && selectedStudioCourse && selectedTheoryModule && (
+                <TheoryLessonBuilderView
+                  course={selectedStudioCourse}
+                  module={selectedTheoryModule}
+                  apiUrl={API_URL}
+                  onBack={handleBackToStudio}
+                  onModuleUpdated={(updatedMod) => {
+                    setSelectedTheoryModule(updatedMod);
+                    setSelectedStudioCourse((prev) => {
+                      if (!prev) return prev;
+                      const newMods = (prev.modules || []).map((m) =>
+                        m.id === updatedMod.id ? { ...m, ...updatedMod } : m
+                      );
+                      return { ...prev, modules: newMods };
+                    });
+                    loadCourses();
+                  }}
+                  onSelectOtherModule={(targetMod) => {
+                    handleOpenTheory(selectedStudioCourse, targetMod);
+                  }}
+                />
+              )}
+
               {courseViewMode === 'STUDIO' && selectedStudioCourse && (
                 <CourseStudioView
                   course={selectedStudioCourse}
@@ -1094,6 +1415,9 @@ export default function AdminCMSDashboard() {
                   }}
                   onCourseDeleted={() => {
                     handleBackToCoursesList();
+                  }}
+                  onOpenTheoryBuilder={(mod) => {
+                    handleOpenTheory(selectedStudioCourse, mod);
                   }}
                 />
               )}
