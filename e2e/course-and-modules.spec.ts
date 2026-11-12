@@ -93,9 +93,9 @@ test.describe('Course Architecture, Modular Curriculum & BKT Mastery Gating E2E 
     await expect(createCourseBtn).toBeVisible();
     await createCourseBtn.click();
 
-    // Verify Breadcrumbs updated to: CMS Адміністрування / Курси / Створення нового курсу
-    const breadcrumbCoursesBtn = page.locator('nav[aria-label="Breadcrumb"] button:has-text("Курси")');
-    await expect(breadcrumbCoursesBtn).toBeVisible({ timeout: 5000 });
+    // Verify Breadcrumbs updated to: CMS Адміністрування / Створення нового курсу
+    const breadcrumbAdminBtn = page.locator('nav[aria-label="Breadcrumb"] button:has-text("CMS Адміністрування")');
+    await expect(breadcrumbAdminBtn).toBeVisible({ timeout: 5000 });
     await expect(page.getByText('Створення нового курсу')).toBeVisible();
 
     // Verify Full-Page CourseCreateView elements (no modal popup)
@@ -133,8 +133,8 @@ test.describe('Course Architecture, Modular Curriculum & BKT Mastery Gating E2E 
     await expect(page.locator('aside').getByText('🔒 Заблоковано').first()).toBeVisible();
     await expect(page.getByText('Перейти до цього кроку у створених курсах:')).not.toBeVisible();
 
-    // Click "Курси" in Breadcrumbs to return back to Course List
-    await breadcrumbCoursesBtn.click();
+    // Click "CMS Адміністрування" in Breadcrumbs to return back to Course List
+    await breadcrumbAdminBtn.click();
     await expect(page.getByText('Управління Навчальними Курсами')).toBeVisible({ timeout: 10000 });
 
     // Verify dedicated navigation rail icon for Course Creation

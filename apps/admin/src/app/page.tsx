@@ -145,7 +145,7 @@ export default function AdminCMSDashboard() {
   const [categories, setCategories] = useState<CourseCategoryDto[]>([]);
   const [selectedCourseSlug, setSelectedCourseSlug] = useState<string | null>(null);
   const [selectedCategorySlug, setSelectedCategorySlug] = useState<string | null>(null);
-  const [courseStatusFilter, setCourseStatusFilter] = useState<'ALL' | 'PUBLISHED' | 'DRAFT'>('PUBLISHED');
+  const [courseStatusFilter, setCourseStatusFilter] = useState<'ALL' | 'PUBLISHED' | 'DRAFT'>('ALL');
 
   const updateBrowserUrl = (params: { tab?: AdminTab; mode?: CourseViewMode; courseSlug?: string; moduleSlug?: string }) => {
     if (typeof window === 'undefined') return;
@@ -217,11 +217,46 @@ export default function AdminCMSDashboard() {
         setActiveTab(tabParam);
       }
 
-      if (modeParam === 'create' || tabParam === 'create_course') {
+      if (tabParam === 'create_course' || modeParam === 'create') {
         setActiveTab('create_course');
-        setCourseViewMode('CREATE');
-        setSelectedStudioCourse(null);
-        setSelectedTheoryModule(null);
+        if (modeParam === 'theory' && courseParam && moduleParam) {
+          const matchCourse = dynamicCourses.find((c) => c.slug === courseParam || c.id === courseParam);
+          if (matchCourse) {
+            setSelectedStudioCourse(matchCourse);
+            const matchMod = (matchCourse.modules || []).find((m) => m.slug === moduleParam || m.id === moduleParam);
+            if (matchMod) {
+              setSelectedTheoryModule(matchMod);
+              setCourseViewMode('THEORY');
+            }
+          }
+        } else if (modeParam === 'studio' && courseParam) {
+          setCourseViewMode('STUDIO');
+          setSelectedStudioCourse((currentSelected) => {
+            if (currentSelected && (currentSelected.slug === courseParam || currentSelected.id === courseParam)) {
+              return currentSelected;
+            }
+            const matchCourse = dynamicCourses.find((c) => c.slug === courseParam || c.id === courseParam);
+            if (matchCourse) {
+              setSelectedTheoryModule(null);
+              return matchCourse;
+            }
+            fetch(`${API_URL}/api/v1/courses/${courseParam}`)
+              .then((res) => (res.ok ? res.json() : null))
+              .then((fetched) => {
+                if (fetched) {
+                  setSelectedStudioCourse(fetched);
+                  setSelectedTheoryModule(null);
+                  setCourseViewMode('STUDIO');
+                }
+              })
+              .catch(() => {});
+            return currentSelected;
+          });
+        } else {
+          setCourseViewMode('CREATE');
+          setSelectedStudioCourse(null);
+          setSelectedTheoryModule(null);
+        }
       } else if (modeParam === 'theory' && courseParam && moduleParam) {
         const matchCourse = dynamicCourses.find((c) => c.slug === courseParam || c.id === courseParam);
         if (matchCourse) {
@@ -265,7 +300,7 @@ export default function AdminCMSDashboard() {
 
   const handleTabClick = (tabId: string) => {
     if (tabId === 'create_course') {
-      if (courseViewMode === 'CREATE' && activeTab === 'create_course') {
+      if (activeTab === 'create_course') {
         setIsDrawerOpen((prev) => !prev);
       } else {
         setActiveTab('create_course');
@@ -309,7 +344,8 @@ export default function AdminCMSDashboard() {
   const handleOpenStudio = (
     course: CourseDto,
     initialTab: 'CURRICULUM' | 'SETTINGS' = 'CURRICULUM',
-    initialStep?: number
+    initialStep?: number,
+    targetTab?: 'courses' | 'create_course'
   ) => {
     setSelectedStudioCourse(course);
     setSelectedTheoryModule(null);
@@ -319,8 +355,9 @@ export default function AdminCMSDashboard() {
     setMaxUnlockedStep(initialMax);
     setAuthorStep(initialStep ?? (initialTab === 'SETTINGS' ? 1 : 2));
     setCourseViewMode('STUDIO');
-    setActiveTab('courses');
-    updateBrowserUrl({ tab: 'courses', mode: 'STUDIO', courseSlug: course.slug });
+    const destTab = targetTab || (activeTab === 'create_course' ? 'create_course' : 'courses');
+    setActiveTab(destTab);
+    updateBrowserUrl({ tab: destTab, mode: 'STUDIO', courseSlug: course.slug });
   };
 
   const handleStepClick = (stepNum: number) => {
@@ -349,19 +386,25 @@ export default function AdminCMSDashboard() {
     handleStepClick(nextStep);
   };
 
-  const handleOpenTheory = (course: CourseDto, module: CourseModuleDto) => {
+  const handleOpenTheory = (
+    course: CourseDto,
+    module: CourseModuleDto,
+    targetTab?: 'courses' | 'create_course'
+  ) => {
     setSelectedStudioCourse(course);
     setSelectedTheoryModule(module);
     setCourseViewMode('THEORY');
-    setActiveTab('courses');
-    updateBrowserUrl({ tab: 'courses', mode: 'THEORY', courseSlug: course.slug, moduleSlug: module.slug });
+    const destTab = targetTab || (activeTab === 'create_course' ? 'create_course' : 'courses');
+    setActiveTab(destTab);
+    updateBrowserUrl({ tab: destTab, mode: 'THEORY', courseSlug: course.slug, moduleSlug: module.slug });
   };
 
   const handleBackToStudio = () => {
     setCourseViewMode('STUDIO');
     setSelectedTheoryModule(null);
-    setActiveTab('courses');
-    updateBrowserUrl({ tab: 'courses', mode: 'STUDIO', courseSlug: selectedStudioCourse?.slug });
+    const destTab = activeTab === 'create_course' ? 'create_course' : 'courses';
+    setActiveTab(destTab);
+    updateBrowserUrl({ tab: destTab, mode: 'STUDIO', courseSlug: selectedStudioCourse?.slug });
   };
 
   const handleBackToCoursesList = () => {
@@ -381,7 +424,21 @@ export default function AdminCMSDashboard() {
     let icon = BookOpen;
     let iconColor = 'text-emerald-400';
 
-    if (activeTab === 'courses' || activeTab === 'create_course') {
+    if (activeTab === 'create_course') {
+      if (courseViewMode === 'THEORY' && selectedStudioCourse && selectedTheoryModule) {
+        title = 'Конструктор Теорії';
+        icon = BookOpen;
+        iconColor = 'text-emerald-400';
+      } else if (courseViewMode === 'STUDIO' && selectedStudioCourse) {
+        title = 'Майстер створення курсу';
+        icon = Layers;
+        iconColor = 'text-emerald-400';
+      } else {
+        title = 'Створення Курсу';
+        icon = PlusCircle;
+        iconColor = 'text-emerald-400';
+      }
+    } else if (activeTab === 'courses') {
       if (courseViewMode === 'THEORY' && selectedStudioCourse && selectedTheoryModule) {
         title = 'Конструктор Теорії';
         icon = BookOpen;
@@ -390,7 +447,7 @@ export default function AdminCMSDashboard() {
         title = 'Навігатор курсу';
         icon = Layers;
         iconColor = 'text-emerald-400';
-      } else if (courseViewMode === 'CREATE' || activeTab === 'create_course') {
+      } else if (courseViewMode === 'CREATE') {
         title = 'Створення Курсу';
         icon = PlusCircle;
         iconColor = 'text-emerald-400';
@@ -427,7 +484,7 @@ export default function AdminCMSDashboard() {
       children: (
         <div className="flex flex-col divide-y divide-slate-800/70">
           {/* Drawer: Course Theory Builder Mode */}
-          {activeTab === 'courses' && courseViewMode === 'THEORY' && selectedStudioCourse && selectedTheoryModule && (
+          {(activeTab === 'courses' || activeTab === 'create_course') && courseViewMode === 'THEORY' && selectedStudioCourse && selectedTheoryModule && (
             <>
               {/* Back to Studio Button */}
               <div className="p-2 border-b border-slate-800/60">
@@ -610,58 +667,11 @@ export default function AdminCMSDashboard() {
                 </div>
               </DrawerSection>
 
-              {/* 5. Platform Courses Switcher */}
-              <DrawerSection
-                title="Курси платформи"
-                icon={BookOpen}
-                badge={`${dynamicCourses.length}`}
-                defaultOpen={false}
-              >
-                <div className="flex flex-col divide-y divide-slate-800/50 pt-1">
-                  {dynamicCourses.map((c) => {
-                    const isCurrent = selectedStudioCourse.slug === c.slug || selectedStudioCourse.id === c.id;
-                    const modsCount = c.modules?.length || 0;
-                    return (
-                      <button
-                        key={c.id || c.slug}
-                        type="button"
-                        onClick={() => {
-                          if (!isCurrent) {
-                            handleOpenStudio(c);
-                          }
-                        }}
-                        className={`w-full py-2 px-2 text-left text-xs transition-colors cursor-pointer flex items-center justify-between group rounded-md ${
-                          isCurrent
-                            ? 'bg-emerald-500/15 text-emerald-300 font-semibold border-l-2 border-emerald-400 pl-2'
-                            : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
-                        }`}
-                        title={isCurrent ? `Поточний курс: ${c.title}` : `Перейти до Студії курсу: ${c.title}`}
-                      >
-                        <div className="flex items-center gap-2 min-w-0 pr-1">
-                          <BookOpen
-                            className={`w-3.5 h-3.5 shrink-0 ${
-                              isCurrent ? 'text-emerald-400' : 'text-slate-500 group-hover:text-slate-300'
-                            }`}
-                          />
-                          <span className="truncate">{c.title}</span>
-                        </div>
-                        <span
-                          className={`text-[10px] font-mono shrink-0 ${
-                            isCurrent ? 'text-emerald-300 font-bold' : 'text-slate-500'
-                          }`}
-                        >
-                          {isCurrent ? 'Активний' : `${modsCount} мод.`}
-                        </span>
-                      </button>
-                    );
-                  })}
-                </div>
-              </DrawerSection>
             </>
           )}
 
           {/* Drawer: Course Studio Mode (Focused outline & course tools, zero platform duplication) */}
-          {activeTab === 'courses' && courseViewMode === 'STUDIO' && selectedStudioCourse && (
+          {(activeTab === 'courses' || activeTab === 'create_course') && courseViewMode === 'STUDIO' && selectedStudioCourse && (
             <>
               {/* 1. Course Readiness & Quality Audit */}
               {(() => {
@@ -1014,7 +1024,8 @@ export default function AdminCMSDashboard() {
           )}
 
           {/* Drawer: Course Create Mode */}
-          {((activeTab === 'courses' && courseViewMode === 'CREATE') || activeTab === 'create_course') && (
+          {((activeTab === 'courses' && courseViewMode === 'CREATE') ||
+            (activeTab === 'create_course' && (!selectedStudioCourse || courseViewMode === 'CREATE'))) && (
             <>
               {/* 1. Quick Didactic Templates / Presets */}
               <DrawerSection
@@ -1686,23 +1697,62 @@ export default function AdminCMSDashboard() {
             <Breadcrumbs
               className="text-[11px]"
               items={
-                activeTab === 'courses' || activeTab === 'create_course'
-                  ? courseViewMode === 'CREATE' || activeTab === 'create_course'
+                activeTab === 'create_course'
+                  ? selectedStudioCourse && courseViewMode === 'STUDIO'
                     ? [
                         {
                           label: 'CMS Адміністрування',
                           onClick: handleBackToCoursesList,
                         },
                         {
-                          label: 'Курси',
-                          onClick: handleBackToCoursesList,
+                          label: 'Створення курсу',
+                          onClick: () => {
+                            setSelectedStudioCourse(null);
+                            setCourseViewMode('CREATE');
+                            setAuthorStep(1);
+                            setMaxUnlockedStep(1);
+                            updateBrowserUrl({ tab: 'create_course', mode: 'CREATE' });
+                          },
                         },
                         {
-                          label: 'Створення нового курсу',
+                          label: selectedStudioCourse.title,
+                          badge: `Крок ${authorStep} з 5`,
                           isCurrent: true,
                         },
                       ]
                     : courseViewMode === 'THEORY' && selectedStudioCourse && selectedTheoryModule
+                    ? [
+                        {
+                          label: 'CMS Адміністрування',
+                          onClick: handleBackToCoursesList,
+                        },
+                        {
+                          label: 'Створення курсу',
+                          onClick: handleBackToStudio,
+                        },
+                        {
+                          label: selectedStudioCourse.title,
+                          onClick: handleBackToStudio,
+                        },
+                        {
+                          label: selectedTheoryModule.title,
+                          badge: 'Конспект уроку',
+                          isCurrent: true,
+                        },
+                      ]
+                    : [
+                        {
+                          label: 'CMS Адміністрування',
+                          onClick: handleBackToCoursesList,
+                        },
+                        {
+                          label: 'Створення нового курсу',
+                          badge: 'Крок 1 з 5',
+                          isCurrent: true,
+                        },
+                      ]
+                  : activeTab === 'courses'
+                  ? courseViewMode === 'THEORY' && selectedStudioCourse && selectedTheoryModule
                     ? [
                         {
                           label: 'CMS Адміністрування',
@@ -1845,7 +1895,9 @@ export default function AdminCMSDashboard() {
             },
           ],
           activeTab:
-            courseViewMode === 'CREATE' || activeTab === 'create_course'
+            activeTab === 'create_course'
+              ? 'create_course'
+              : courseViewMode === 'CREATE'
               ? 'create_course'
               : activeTab,
           isDrawerOpen: isDrawerOpen,
@@ -1858,18 +1910,86 @@ export default function AdminCMSDashboard() {
       >
         <div className="flex flex-col gap-5 min-h-[400px]">
           {activeTab === 'create_course' && (
-            <CourseCreateView
-              categories={categories}
-              onCreated={(newCourse) => {
-                setDynamicCourses((prev) => {
-                  const exists = prev.some((c) => c.id === newCourse.id || c.slug === newCourse.slug);
-                  return exists ? prev.map((c) => (c.id === newCourse.id ? newCourse : c)) : [newCourse, ...prev];
-                });
-                handleOpenStudio(newCourse, 'CURRICULUM', 2);
-                loadCourses();
-              }}
-              onCancel={handleBackToCoursesList}
-            />
+            <>
+              {courseViewMode === 'CREATE' && (
+                <CourseCreateView
+                  categories={categories}
+                  onCreated={(newCourse) => {
+                    setDynamicCourses((prev) => {
+                      const exists = prev.some((c) => c.id === newCourse.id || c.slug === newCourse.slug);
+                      return exists ? prev.map((c) => (c.id === newCourse.id ? newCourse : c)) : [newCourse, ...prev];
+                    });
+                    handleOpenStudio(newCourse, 'CURRICULUM', 2, 'create_course');
+                    loadCourses();
+                  }}
+                  onCancel={handleBackToCoursesList}
+                />
+              )}
+
+              {courseViewMode === 'THEORY' && selectedStudioCourse && selectedTheoryModule && (
+                <TheoryLessonBuilderView
+                  course={selectedStudioCourse}
+                  module={selectedTheoryModule}
+                  apiUrl={API_URL}
+                  onBack={handleBackToStudio}
+                  onModuleUpdated={(updatedMod) => {
+                    setSelectedTheoryModule(updatedMod);
+                    setSelectedStudioCourse((prev) => {
+                      if (!prev) return prev;
+                      const newMods = (prev.modules || []).map((m) =>
+                        m.id === updatedMod.id ? { ...m, ...updatedMod } : m
+                      );
+                      return { ...prev, modules: newMods };
+                    });
+                    loadCourses();
+                  }}
+                  onSelectOtherModule={(targetMod) => {
+                    handleOpenTheory(selectedStudioCourse, targetMod, 'create_course');
+                  }}
+                />
+              )}
+
+              {courseViewMode === 'STUDIO' && selectedStudioCourse && (
+                <CourseStudioView
+                  course={selectedStudioCourse}
+                  categories={categories}
+                  activeSubTab={studioSubTab}
+                  onSubTabChange={setStudioSubTab}
+                  authorStep={authorStep}
+                  maxUnlockedStep={maxUnlockedStep}
+                  onStepChange={handleStepClick}
+                  onAdvanceStep={handleAdvanceStep}
+                  onBack={() => {
+                    if (authorStep > 1) {
+                      handleStepClick(authorStep - 1);
+                    } else {
+                      setSelectedStudioCourse(null);
+                      setCourseViewMode('CREATE');
+                      setAuthorStep(1);
+                      setMaxUnlockedStep(1);
+                      updateBrowserUrl({ tab: 'create_course', mode: 'CREATE' });
+                    }
+                  }}
+                  onCourseLoaded={(fullCourse) => {
+                    setSelectedStudioCourse(fullCourse);
+                  }}
+                  onCourseUpdated={(updated) => {
+                    setSelectedStudioCourse(updated);
+                    loadCourses();
+                    if (updated.isPublished) {
+                      setActiveTab('courses');
+                      updateBrowserUrl({ tab: 'courses', mode: 'STUDIO', courseSlug: updated.slug });
+                    }
+                  }}
+                  onCourseDeleted={() => {
+                    handleBackToCoursesList();
+                  }}
+                  onOpenTheoryBuilder={(mod) => {
+                    handleOpenTheory(selectedStudioCourse, mod, 'create_course');
+                  }}
+                />
+              )}
+            </>
           )}
 
           {activeTab === 'courses' && (

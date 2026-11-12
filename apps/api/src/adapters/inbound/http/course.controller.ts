@@ -45,11 +45,6 @@ export class CourseController {
       where.isPublished = true;
     } else if (status === 'DRAFT') {
       where.isPublished = false;
-    } else if (status === 'ALL') {
-      // Return both published and drafts (admin view)
-    } else {
-      // Default: Only published courses for students, teachers and public catalog
-      where.isPublished = true;
     }
 
     return this.prisma.course.findMany({

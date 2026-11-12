@@ -83,7 +83,7 @@ export const CourseManager: React.FC<CourseManagerProps> = ({
   const fetchCourses = async () => {
     try {
       setIsLoading(true);
-      const res = await fetch(`${API_URL}/api/v1/courses`);
+      const res = await fetch(`${API_URL}/api/v1/courses?status=ALL`);
       const data = await res.json();
       if (Array.isArray(data)) {
         setCourses(data);
@@ -218,6 +218,7 @@ export const CourseManager: React.FC<CourseManagerProps> = ({
   // Summary Metrics
   const totalCoursesCount = courses.length;
   const publishedCoursesCount = courses.filter((c) => c.isPublished !== false).length;
+  const draftCoursesCount = courses.filter((c) => c.isPublished === false).length;
   const totalModulesCount = courses.reduce((acc, c) => acc + (c.modules?.length || 0), 0);
   const totalSkillsCount = courses.reduce((acc, c) => acc + (c.skills?.length || 0), 0);
 
@@ -328,37 +329,120 @@ export const CourseManager: React.FC<CourseManagerProps> = ({
 
       {/* 2. Top Summary Metric Tiles */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-1">
-        <div className="px-3.5 py-2.5 rounded-xl border border-slate-800/60 bg-slate-900/40 flex items-center justify-between">
+        <button
+          type="button"
+          onClick={() => onSelectStatusFilter?.('ALL')}
+          className={`px-3.5 py-2.5 rounded-xl border transition-all text-left flex items-center justify-between cursor-pointer ${
+            selectedStatusFilter === 'ALL' || !selectedStatusFilter
+              ? 'border-emerald-500/40 bg-emerald-500/10 shadow-sm'
+              : 'border-slate-800/60 bg-slate-900/40 hover:bg-slate-900/70'
+          }`}
+          title="Показати всі курси"
+        >
           <div className="flex flex-col">
             <span className="text-[10px] text-slate-500 uppercase tracking-wider font-semibold">Всього Курсів</span>
             <span className="text-base font-bold text-white font-mono">{totalCoursesCount}</span>
           </div>
           <BookOpen className="w-4 h-4 text-emerald-400" />
-        </div>
+        </button>
 
-        <div className="px-3.5 py-2.5 rounded-xl border border-slate-800/60 bg-slate-900/40 flex items-center justify-between">
+        <button
+          type="button"
+          onClick={() => onSelectStatusFilter?.('PUBLISHED')}
+          className={`px-3.5 py-2.5 rounded-xl border transition-all text-left flex items-center justify-between cursor-pointer ${
+            selectedStatusFilter === 'PUBLISHED'
+              ? 'border-emerald-500/50 bg-emerald-500/15 shadow-sm'
+              : 'border-slate-800/60 bg-slate-900/40 hover:bg-slate-900/70'
+          }`}
+          title="Фільтрувати: тільки опубліковані курси"
+        >
           <div className="flex flex-col">
             <span className="text-[10px] text-slate-500 uppercase tracking-wider font-semibold">Опубліковано</span>
-            <span className="text-base font-bold text-indigo-400 font-mono">{publishedCoursesCount}</span>
+            <span className="text-base font-bold text-emerald-400 font-mono">{publishedCoursesCount}</span>
           </div>
-          <CheckCircle2 className="w-4 h-4 text-indigo-400" />
-        </div>
+          <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+        </button>
 
-        <div className="px-3.5 py-2.5 rounded-xl border border-slate-800/60 bg-slate-900/40 flex items-center justify-between">
+        <button
+          type="button"
+          onClick={() => onSelectStatusFilter?.('DRAFT')}
+          className={`px-3.5 py-2.5 rounded-xl border transition-all text-left flex items-center justify-between cursor-pointer ${
+            selectedStatusFilter === 'DRAFT'
+              ? 'border-amber-500/50 bg-amber-500/15 shadow-sm'
+              : 'border-slate-800/60 bg-slate-900/40 hover:bg-slate-900/70'
+          }`}
+          title="Фільтрувати: тільки чернетки курсів"
+        >
           <div className="flex flex-col">
-            <span className="text-[10px] text-slate-500 uppercase tracking-wider font-semibold">Всього Модулів</span>
-            <span className="text-base font-bold text-purple-400 font-mono">{totalModulesCount}</span>
+            <span className="text-[10px] text-slate-500 uppercase tracking-wider font-semibold">Чернетки (В розробці)</span>
+            <span className="text-base font-bold text-amber-400 font-mono">{draftCoursesCount}</span>
           </div>
-          <Layers className="w-4 h-4 text-purple-400" />
-        </div>
+          <Layers className="w-4 h-4 text-amber-400" />
+        </button>
 
         <div className="px-3.5 py-2.5 rounded-xl border border-slate-800/60 bg-slate-900/40 flex items-center justify-between">
           <div className="flex flex-col">
             <span className="text-[10px] text-slate-500 uppercase tracking-wider font-semibold">Навичок у Програмі</span>
-            <span className="text-base font-bold text-amber-400 font-mono">{totalSkillsCount}</span>
+            <span className="text-base font-bold text-purple-400 font-mono">{totalSkillsCount}</span>
           </div>
-          <Target className="w-4 h-4 text-amber-400" />
+          <Target className="w-4 h-4 text-purple-400" />
         </div>
+      </div>
+
+      {/* Status Filter Tabs (All / Published / Drafts) */}
+      <div className="flex items-center justify-between border-b border-slate-800/80 pb-2">
+        <div className="flex items-center gap-1.5">
+          <button
+            type="button"
+            onClick={() => onSelectStatusFilter?.('ALL')}
+            className={`px-3 py-1 rounded-lg text-xs font-semibold transition-colors cursor-pointer flex items-center gap-1.5 ${
+              selectedStatusFilter === 'ALL' || !selectedStatusFilter
+                ? 'bg-slate-800 text-white shadow-sm'
+                : 'text-slate-400 hover:text-white hover:bg-slate-900/60'
+            }`}
+          >
+            <span>Всі</span>
+            <span className="font-mono text-[10px] px-1.5 py-0.2 rounded bg-slate-900 text-slate-300">
+              {totalCoursesCount}
+            </span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => onSelectStatusFilter?.('PUBLISHED')}
+            className={`px-3 py-1 rounded-lg text-xs font-semibold transition-colors cursor-pointer flex items-center gap-1.5 ${
+              selectedStatusFilter === 'PUBLISHED'
+                ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 shadow-sm'
+                : 'text-slate-400 hover:text-white hover:bg-slate-900/60'
+            }`}
+          >
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+            <span>Опубліковані</span>
+            <span className="font-mono text-[10px] px-1.5 py-0.2 rounded bg-slate-900 text-emerald-400">
+              {publishedCoursesCount}
+            </span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => onSelectStatusFilter?.('DRAFT')}
+            className={`px-3 py-1 rounded-lg text-xs font-semibold transition-colors cursor-pointer flex items-center gap-1.5 ${
+              selectedStatusFilter === 'DRAFT'
+                ? 'bg-amber-500/15 text-amber-300 border border-amber-500/30 shadow-sm'
+                : 'text-slate-400 hover:text-white hover:bg-slate-900/60'
+            }`}
+          >
+            <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
+            <span>Чернетки</span>
+            <span className="font-mono text-[10px] px-1.5 py-0.2 rounded bg-slate-900 text-amber-400">
+              {draftCoursesCount}
+            </span>
+          </button>
+        </div>
+
+        <span className="text-[11px] font-mono text-slate-500 hidden sm:inline">
+          Показано: {filteredCourses.length} з {totalCoursesCount}
+        </span>
       </div>
 
       {/* Messages */}
@@ -418,12 +502,12 @@ export const CourseManager: React.FC<CourseManagerProps> = ({
                       </span>
                     )}
                     {course.isPublished !== false ? (
-                      <span className="text-[10px] font-mono text-emerald-400 font-medium">
-                        ✓ Active
+                      <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-medium text-emerald-300 bg-emerald-500/10 border border-emerald-500/20">
+                        ✓ Опубліковано
                       </span>
                     ) : (
-                      <span className="text-[10px] font-mono text-slate-500 font-medium">
-                        Чернетка
+                      <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-medium text-amber-300 bg-amber-500/10 border border-amber-500/20">
+                        ● Чернетка
                       </span>
                     )}
                   </div>

@@ -45,7 +45,7 @@ export const CreateClassroomModal: React.FC<CreateClassroomModalProps> = ({
     const fetchCourses = async () => {
       try {
         setIsLoadingCourses(true);
-        const res = await fetch(`${apiUrl}/api/v1/courses`);
+        const res = await fetch(`${apiUrl}/api/v1/courses?status=PUBLISHED`);
         const data = await res.json();
         const list: CourseOption[] = Array.isArray(data) ? data : data.courses || [];
         setCourses(list);

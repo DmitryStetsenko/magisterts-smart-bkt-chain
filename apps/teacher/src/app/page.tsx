@@ -63,7 +63,7 @@ export default function TeacherDashboardPage() {
   useEffect(() => {
     const fetchCourses = async () => {
       try {
-        const res = await fetch(`${API_URL}/api/v1/courses`);
+        const res = await fetch(`${API_URL}/api/v1/courses?status=PUBLISHED`);
         if (res.ok) {
           const data = await res.json();
           if (Array.isArray(data) && data.length > 0) {
