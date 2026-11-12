@@ -14,10 +14,10 @@
 | **`SBC-EP-W3`** | Web3 Infrastructure & Smart Contracts | 0 |
 | **`SBC-EP-ST`** | Student Portal & Skill Tree Map | 39 |
 | **`SBC-EP-TC`** | Teacher Portal & Analytics CRM | 32 |
-| **`SBC-EP-AD`** | Admin Portal & Knowledge DAG Builder | 28 |
+| **`SBC-EP-AD`** | Admin Portal & Knowledge DAG Builder | 29 |
 | **`SBC-EP-LD`** | Landing Web Page | 9 |
 | **`SBC-EP-MS`** | Master's Thesis Engineering & Academic Text Generation | 9 |
-| **ВСЬОГО** | - | **296** |
+| **ВСЬОГО** | - | **297** |
 
 ---
 
@@ -456,6 +456,7 @@
 | **SBC-411** | `Story` | `AD` | implement interactive navigation across course authoring roadmap steps in studio and create mode | 2026-11-12 | `6edb5a1` |
 | **SBC-412** | `Story` | `AD` | implement sequential guided course creation wizard with locked future steps and backward editing navigation | 2026-11-12 | `c889aa4` |
 | **SBC-413** | `Fix` | `AD` | eliminate redundant course jumper popup and remove duplicated platform course lists from studio drawer | 2026-11-12 | `52e290d` |
+| **SBC-414** | `Fix` | `AD` | ensure draft status for new courses and smooth transition to step 2 without catalog redirection | 2026-11-12 | `pending` |
 
 ---
 

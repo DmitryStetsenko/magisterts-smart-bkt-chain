@@ -145,7 +145,7 @@ export default function AdminCMSDashboard() {
   const [categories, setCategories] = useState<CourseCategoryDto[]>([]);
   const [selectedCourseSlug, setSelectedCourseSlug] = useState<string | null>(null);
   const [selectedCategorySlug, setSelectedCategorySlug] = useState<string | null>(null);
-  const [courseStatusFilter, setCourseStatusFilter] = useState<'ALL' | 'PUBLISHED' | 'DRAFT'>('ALL');
+  const [courseStatusFilter, setCourseStatusFilter] = useState<'ALL' | 'PUBLISHED' | 'DRAFT'>('PUBLISHED');
 
   const updateBrowserUrl = (params: { tab?: AdminTab; mode?: CourseViewMode; courseSlug?: string; moduleSlug?: string }) => {
     if (typeof window === 'undefined') return;
@@ -175,7 +175,7 @@ export default function AdminCMSDashboard() {
 
   const loadCourses = async () => {
     try {
-      const res = await fetch(`${API_URL}/api/v1/courses`);
+      const res = await fetch(`${API_URL}/api/v1/courses?status=ALL`);
       if (res.ok) {
         const data = await res.json();
         if (Array.isArray(data)) setDynamicCourses(data);
@@ -233,12 +233,28 @@ export default function AdminCMSDashboard() {
           }
         }
       } else if (modeParam === 'studio' && courseParam) {
-        const matchCourse = dynamicCourses.find((c) => c.slug === courseParam || c.id === courseParam);
-        if (matchCourse) {
-          setSelectedStudioCourse(matchCourse);
-          setSelectedTheoryModule(null);
-          setCourseViewMode('STUDIO');
-        }
+        setCourseViewMode('STUDIO');
+        setSelectedStudioCourse((currentSelected) => {
+          if (currentSelected && (currentSelected.slug === courseParam || currentSelected.id === courseParam)) {
+            return currentSelected;
+          }
+          const matchCourse = dynamicCourses.find((c) => c.slug === courseParam || c.id === courseParam);
+          if (matchCourse) {
+            setSelectedTheoryModule(null);
+            return matchCourse;
+          }
+          fetch(`${API_URL}/api/v1/courses/${courseParam}`)
+            .then((res) => (res.ok ? res.json() : null))
+            .then((fetched) => {
+              if (fetched) {
+                setSelectedStudioCourse(fetched);
+                setSelectedTheoryModule(null);
+                setCourseViewMode('STUDIO');
+              }
+            })
+            .catch(() => {});
+          return currentSelected;
+        });
       }
     };
 
@@ -1845,8 +1861,12 @@ export default function AdminCMSDashboard() {
             <CourseCreateView
               categories={categories}
               onCreated={(newCourse) => {
+                setDynamicCourses((prev) => {
+                  const exists = prev.some((c) => c.id === newCourse.id || c.slug === newCourse.slug);
+                  return exists ? prev.map((c) => (c.id === newCourse.id ? newCourse : c)) : [newCourse, ...prev];
+                });
+                handleOpenStudio(newCourse, 'CURRICULUM', 2);
                 loadCourses();
-                handleOpenStudio(newCourse);
               }}
               onCancel={handleBackToCoursesList}
             />
@@ -1858,8 +1878,12 @@ export default function AdminCMSDashboard() {
                 <CourseCreateView
                   categories={categories}
                   onCreated={(newCourse) => {
+                    setDynamicCourses((prev) => {
+                      const exists = prev.some((c) => c.id === newCourse.id || c.slug === newCourse.slug);
+                      return exists ? prev.map((c) => (c.id === newCourse.id ? newCourse : c)) : [newCourse, ...prev];
+                    });
+                    handleOpenStudio(newCourse, 'CURRICULUM', 2);
                     loadCourses();
-                    handleOpenStudio(newCourse);
                   }}
                   onCancel={handleBackToCoursesList}
                 />

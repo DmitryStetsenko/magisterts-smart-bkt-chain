@@ -243,12 +243,62 @@
                 "`admin_clean_create_drawer.png` (чистий сайдбар створення курсу без випадаючих списків)",
                 "`admin_clean_studio_drawer.png` (чистий сайдбар студії без дублювання каталогу курсів платформи)."
               ]
+            }
+          ]
+        },
+        {
+          "title": "0.1.7.102 Забезпечення Статусу Чернетки для Нових Курсів та Безшовний Перехід до Кроку 2 (SBC-414, EP-AD)",
+          "level": 3,
+          "paragraphs": [],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "**Контекст та запит користувача:**",
+              "subitems": []
             },
             {
               "type": "text",
-              "raw_text": "**Синхронізація бічного меню (Drawer):**",
+              "raw_text": "Користувач вказав на помилку редиректу в каталог та передчасну появу незавершеного курсу:",
               "subitems": [
-                "Уніфіковано блок `Маршрут автора курсу` як у режимі створення, так і в Студії: кроки `num <= maxUnlockedStep` є доступними для кліку й повернення назад, а кроки `num > maxUnlockedStep` заблоковані для запобігання порушення логічної послідовності наповнення курсу."
+                "*«Я заповнив дані на першому кроці натиснув зберегти та перейти далі до кроку 2 і мене перекинуло на каталог курсів. Потрібно, щоб до момента як курс буде створений він не відображався в курсах, бо він по факту не готовий»*."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Архітектурні та інженерні рішення:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Статус чернетки за замовчуванням ([`CourseCreateView.tsx`](file:///apps/admin/src/features/course-manager/ui/CourseCreateView.tsx), [`course.controller.ts`](file:///apps/api/src/adapters/inbound/http/course.controller.ts)):**",
+              "subitems": [
+                "У `POST /api/v1/courses` змінено значення за замовчуванням `isPublished: body.isPublished ?? false` (замість примусового `true`).",
+                "У формі створення `CourseCreateView.tsx` стан `isPublished` ініціалізується як `false`. Замінено випадковий чекбокс публікації на чітке інформаційне сповіщення: *«Статус курсу: Чернетка (в процесі створення). Курс зберігається як чернетка та не відображається у загальному каталозі курсів, поки не будуть створені модулі, конспекти та виконана фінальна публікація на Кроці 5»*."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Захист від передчасного показу в публічних каталогах ([`course.controller.ts`](file:///apps/api/src/adapters/inbound/http/course.controller.ts), [`apps/admin/src/app/page.tsx`](file:///apps/admin/src/app/page.tsx)):**",
+              "subitems": [
+                "Ендпоінт `GET /api/v1/courses` оновлено: за замовчуванням та для клієнтів студентів і викладачів повертаються виключно готові опубліковані курси (`where.isPublished = true`). Для адміністраторів додано підтримку `status=ALL` та `status=DRAFT`.",
+                "У кабінеті адміністратора за замовчуванням фільтр каталогу встановлено на `PUBLISHED`, тому незавершені курси не засмічують загальний список активних курсів платформи."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Ліквідація редиректу в каталог та гарантований перехід до Кроку 2 ([`apps/admin/src/app/page.tsx`](file:///apps/admin/src/app/page.tsx)):**",
+              "subitems": [
+                "Усунуто асинхронний збій синхронізації URL: при створенні курсу `newCourse` негайно додається в стан `dynamicCourses`, після чого викликається `handleOpenStudio(newCourse, 'CURRICULUM', 2)`.",
+                "В `handleUrlSync` додано захисний механізм: при наявності параметра `mode=studio` режим `courseViewMode` безумовно залишається `'STUDIO'`, а курс підвантажується за слагом з API навіть у разі затримки оновлення загального кешу курсів, запобігаючи несанкціонованому відкату на `'LIST'`."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Кнопка фінальної публікації курсу ([`CourseStudioView.tsx`](file:///apps/admin/src/features/course-manager/ui/CourseStudioView.tsx)):**",
+              "subitems": [
+                "Додано функцію `handleTogglePublish` та інтерактивний бейдж статусу публікації у шапці Студії (`● Чернетка` / `✓ Опубліковано`).",
+                "На Кроці 5 та в навігації реалізовано кнопку `[ 🚀 Опублікувати курс у каталозі ]`, що дозволяє відкрити курс для студентів та викладачів тільки після повного наповнення контентом."
               ]
             },
             {
@@ -258,22 +308,28 @@
             },
             {
               "type": "text",
-              "raw_text": "100% успішна виробнича збірка `apps/admin` (`npm run build:admin`, Next.js 16.3.8 Turbopack, 0 помилок).",
+              "raw_text": "100% успішна виробнича збірка API (`npm run build:api`, 0 помилок).",
               "subitems": []
             },
             {
               "type": "text",
-              "raw_text": "100% успішне проходження повного сьюту Playwright E2E (`e2e/course-and-modules.spec.ts`, 4/4 passed, 17.9s).",
+              "raw_text": "100% успішна виробнича збірка `apps/admin` (`npm run build:admin`, 0 помилок).",
               "subitems": []
             },
             {
               "type": "text",
-              "raw_text": "Збережено візуальні артефакти:",
-              "subitems": [
-                "`admin_wizard_step1_create.png` (новий курс: крок 1 активний, кроки 2-5 заблоковані `🔒`)",
-                "`admin_wizard_step2_studio.png` (студія: горизонтальний степпер, крок 1 `✓`, крок 2 активний)",
-                "`admin_wizard_step1_edit_in_studio.png` (ретроспективне редагування метаданих курсу зі стандартами BKT та поверненням до кроку 2)."
-              ]
+              "raw_text": "100% успішне проходження unit-тестів API `course.controller.spec.ts` (11/11 passed).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "100% успішне проходження Playwright E2E тестів `e2e/course-and-modules.spec.ts` (4/4 passed, 20.5s).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Перевірено перехід у headless браузері через `test_create_flow.js`: `Is Studio Visible: true, Is Catalog Visible: false`.",
+              "subitems": []
             }
           ]
         },

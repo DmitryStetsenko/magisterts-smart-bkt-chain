@@ -415,6 +415,29 @@ export const CourseStudioView: React.FC<CourseStudioViewProps> = ({
     }
   };
 
+  // Toggle Publish Status
+  const handleTogglePublish = async () => {
+    try {
+      const nextStatus = !course.isPublished;
+      const res = await fetch(`${API_URL}/api/v1/courses/${course.id || course.slug}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ isPublished: nextStatus }),
+      });
+      if (res.ok) {
+        const updated = await res.json();
+        setCourse(updated);
+        setSettingsPublished(nextStatus);
+        onCourseUpdated(updated);
+        setMessage(nextStatus ? '🎉 Курс успішно опубліковано у каталозі!' : 'Курс переведено у статус чернетки.');
+      } else {
+        setError('Помилка зміни статусу публікації');
+      }
+    } catch {
+      setError('Помилка мережі при зміні статусу публікації');
+    }
+  };
+
   // Delete Entire Course
   const handleDeleteCourse = async () => {
     if (!window.confirm(`Ви дійсно бажаєте видалити курс «${course.title}»? Ця дія незворотна.`)) {
@@ -463,13 +486,18 @@ export const CourseStudioView: React.FC<CourseStudioViewProps> = ({
                     {(course.category as any).title}
                   </span>
                 )}
-                <span
-                  className={`px-1.5 py-0.5 rounded text-[10px] font-mono font-bold ${
-                    course.isPublished ? 'bg-emerald-500/10 text-emerald-300' : 'bg-slate-800 text-slate-400'
+                <button
+                  type="button"
+                  onClick={handleTogglePublish}
+                  className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold transition-colors cursor-pointer border ${
+                    course.isPublished
+                      ? 'bg-emerald-500/10 text-emerald-300 border-emerald-500/30 hover:bg-emerald-500/20'
+                      : 'bg-amber-500/10 text-amber-300 border-amber-500/30 hover:bg-amber-500/20'
                   }`}
+                  title={course.isPublished ? 'Натисніть, щоб перевести в чернетки' : 'Натисніть, щоб опублікувати курс у каталозі'}
                 >
-                  {course.isPublished ? '✓ Active' : 'Чернетка'}
-                </span>
+                  {course.isPublished ? '✓ Опубліковано' : '● Чернетка'}
+                </button>
               </div>
               <p className="text-xs text-slate-400 truncate max-w-2xl mt-0.5">
                 {course.description || 'Анотація та методичні цілі курсу не вказані'}
@@ -1320,6 +1348,17 @@ export const CourseStudioView: React.FC<CourseStudioViewProps> = ({
               >
                 <span>Далі: Конспекти уроків (Крок 4) →</span>
               </button>
+
+              {!course.isPublished && (
+                <button
+                  type="button"
+                  onClick={handleTogglePublish}
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-amber-500/15 hover:bg-emerald-600 hover:text-white border border-amber-500/30 text-amber-300 text-xs font-semibold transition-all cursor-pointer shadow-sm"
+                  title="Опублікувати курс після завершення всіх етапів"
+                >
+                  <span>🚀 Опублікувати курс</span>
+                </button>
+              )}
             </div>
           </div>
         </div>

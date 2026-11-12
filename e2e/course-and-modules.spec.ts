@@ -101,7 +101,7 @@ test.describe('Course Architecture, Modular Curriculum & BKT Mastery Gating E2E 
     // Verify Full-Page CourseCreateView elements (no modal popup)
     await expect(page.getByRole('heading', { name: 'Створення Нового Навчального Курсу' })).toBeVisible();
     await expect(page.getByPlaceholder(/наприклад, Основи кібербезпеки/i)).toBeVisible();
-    await expect(page.getByText('Опублікувати курс у каталозі')).toBeVisible();
+    await expect(page.getByText(/Статус курсу: Чернетка/i)).toBeVisible();
 
     // Verify Drawer in Course Create Mode has Didactic Presets & Author Roadmap (no redundant catalog button or BKT sidebar section)
     await expect(page.getByRole('button', { name: /Дидактичні шаблони/i })).toBeVisible();

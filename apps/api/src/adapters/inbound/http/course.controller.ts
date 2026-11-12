@@ -32,10 +32,24 @@ export class CourseController {
    */
   @Get()
   @ApiOperation({ summary: 'Get all available academic courses' })
-  async getCourses(@Query('category') categorySlug?: string) {
+  async getCourses(
+    @Query('category') categorySlug?: string,
+    @Query('status') status?: string,
+  ) {
     const where: any = {};
     if (categorySlug && categorySlug !== 'ALL') {
       where.category = { slug: categorySlug };
+    }
+
+    if (status === 'PUBLISHED') {
+      where.isPublished = true;
+    } else if (status === 'DRAFT') {
+      where.isPublished = false;
+    } else if (status === 'ALL') {
+      // Return both published and drafts (admin view)
+    } else {
+      // Default: Only published courses for students, teachers and public catalog
+      where.isPublished = true;
     }
 
     return this.prisma.course.findMany({
@@ -142,7 +156,7 @@ export class CourseController {
         icon: body.icon || 'BookOpen',
         targetAudience: body.targetAudience?.trim() || null,
         defaultMasteryThreshold: body.defaultMasteryThreshold ?? 0.85,
-        isPublished: true,
+        isPublished: body.isPublished ?? false,
         categoryId: body.categoryId || null,
       },
       include: {

@@ -68,7 +68,7 @@ export const CourseCreateView: React.FC<CourseCreateViewProps> = ({
   const [categoryId, setCategoryId] = useState('');
   const [targetAudience, setTargetAudience] = useState('10-11 класи, Студенти коледжів');
   const [defaultMasteryThreshold, setDefaultMasteryThreshold] = useState<number>(0.85);
-  const [isPublished, setIsPublished] = useState<boolean>(true);
+  const [isPublished, setIsPublished] = useState<boolean>(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [appliedPresetName, setAppliedPresetName] = useState<string | null>(null);
@@ -453,26 +453,21 @@ export const CourseCreateView: React.FC<CourseCreateViewProps> = ({
           </div>
         </div>
 
-        {/* Section 2: Visibility & Publication */}
+        {/* Section 2: Visibility & Publication Status */}
         <div className="p-4 rounded-xl bg-slate-950/60 border border-slate-800/80 flex items-center justify-between">
           <div className="flex flex-col">
-            <span className="text-xs font-semibold text-slate-200">Опублікувати курс у каталозі</span>
-            <span className="text-[11px] text-slate-400">
-              {isPublished
-                ? 'Курс буде доступний викладачам для створення навчальних груп та учням у підручнику'
-                : 'Курс збережеться як чернетка (видимий лише адміністраторам)'}
+            <span className="text-xs font-semibold text-slate-200 flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-amber-400"></span>
+              <span>Статус курсу: Чернетка (в процесі створення)</span>
+            </span>
+            <span className="text-[11px] text-slate-400 mt-0.5">
+              Курс зберігається як чернетка та не відображається у загальному каталозі курсів, поки не будуть створені модулі, конспекти та виконана фінальна публікація на Кроці 5.
             </span>
           </div>
 
-          <label className="relative inline-flex items-center cursor-pointer">
-            <input
-              type="checkbox"
-              checked={isPublished}
-              onChange={(e) => setIsPublished(e.target.checked)}
-              className="sr-only peer"
-            />
-            <div className="w-11 h-6 bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
-          </label>
+          <span className="text-[10px] font-mono text-amber-400 bg-amber-500/10 px-2.5 py-1 rounded-full border border-amber-500/20 font-semibold shrink-0">
+            ● Чернетка
+          </span>
         </div>
 
         {/* Actions */}
