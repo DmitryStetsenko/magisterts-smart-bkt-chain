@@ -455,7 +455,7 @@
 | **SBC-410** | `Story` | `AD` | relocate bkt threshold calibration into course create form with interactive standards switcher and remove redundant sidebar button | 2026-11-12 | `4ecd943` |
 | **SBC-411** | `Story` | `AD` | implement interactive navigation across course authoring roadmap steps in studio and create mode | 2026-11-12 | `6edb5a1` |
 | **SBC-412** | `Story` | `AD` | implement sequential guided course creation wizard with locked future steps and backward editing navigation | 2026-11-12 | `c889aa4` |
-| **SBC-413** | `Fix` | `AD` | eliminate redundant course jumper popup and remove duplicated platform course lists from studio drawer | 2026-11-12 | `pending` |
+| **SBC-413** | `Fix` | `AD` | eliminate redundant course jumper popup and remove duplicated platform course lists from studio drawer | 2026-11-12 | `52e290d` |
 
 ---
 
