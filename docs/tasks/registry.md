@@ -452,7 +452,7 @@
 | **SBC-407** | `Story` | `AD` | restore platform courses overview and 1-click course switcher in admin sidebar drawer | 2026-11-12 | `40b00a5` |
 | **SBC-408** | `Story` | `AD` | decouple course catalog and course creation into separate dedicated navigation rail icons in admin portal | 2026-11-12 | `9d7010a` |
 | **SBC-409** | `Story` | `AD` | replace redundant course list with didactic presets and bkt threshold guide in course create drawer | 2026-11-12 | `e69a41c` |
-| **SBC-410** | `Story` | `AD` | relocate bkt threshold calibration into course create form with interactive standards switcher and remove redundant sidebar button | 2026-11-12 | pending |
+| **SBC-410** | `Story` | `AD` | relocate bkt threshold calibration into course create form with interactive standards switcher and remove redundant sidebar button | 2026-11-12 | `4ecd943` |
 
 ---
 
