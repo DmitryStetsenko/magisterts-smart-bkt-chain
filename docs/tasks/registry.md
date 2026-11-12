@@ -453,7 +453,7 @@
 | **SBC-408** | `Story` | `AD` | decouple course catalog and course creation into separate dedicated navigation rail icons in admin portal | 2026-11-12 | `9d7010a` |
 | **SBC-409** | `Story` | `AD` | replace redundant course list with didactic presets and bkt threshold guide in course create drawer | 2026-11-12 | `e69a41c` |
 | **SBC-410** | `Story` | `AD` | relocate bkt threshold calibration into course create form with interactive standards switcher and remove redundant sidebar button | 2026-11-12 | `4ecd943` |
-| **SBC-411** | `Story` | `AD` | implement interactive navigation across course authoring roadmap steps in studio and create mode | 2026-11-12 | pending |
+| **SBC-411** | `Story` | `AD` | implement interactive navigation across course authoring roadmap steps in studio and create mode | 2026-11-12 | `6edb5a1` |
 
 ---
 
