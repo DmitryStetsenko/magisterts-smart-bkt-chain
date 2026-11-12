@@ -29,6 +29,7 @@ import { CreateSkillModal } from './CreateSkillModal';
 import { CreateTaskModal } from './CreateTaskModal';
 import { ModuleTestSandboxModal } from './ModuleTestSandboxModal';
 import { TheoryLessonBuilderModal } from './TheoryLessonBuilderModal';
+import { MASTERY_STANDARDS } from './CourseCreateView';
 
 /**
  * Очищує назву навички від дублюючого префікса «Модуль N:» та запобігає повторенню назви батьківського модуля
@@ -64,6 +65,10 @@ interface CourseStudioViewProps {
   categories?: CourseCategoryDto[];
   activeSubTab?: 'CURRICULUM' | 'SETTINGS';
   onSubTabChange?: (tab: 'CURRICULUM' | 'SETTINGS') => void;
+  authorStep?: number;
+  maxUnlockedStep?: number;
+  onStepChange?: (step: number) => void;
+  onAdvanceStep?: (nextStep: number) => void;
   onBack: () => void;
   onCourseLoaded?: (course: CourseDto) => void;
   onCourseUpdated: (updatedCourse: CourseDto) => void;
@@ -76,6 +81,10 @@ export const CourseStudioView: React.FC<CourseStudioViewProps> = ({
   categories = [],
   activeSubTab: externalSubTab,
   onSubTabChange,
+  authorStep: externalStep,
+  maxUnlockedStep = 5,
+  onStepChange,
+  onAdvanceStep,
   onBack,
   onCourseLoaded,
   onCourseUpdated,
@@ -88,6 +97,26 @@ export const CourseStudioView: React.FC<CourseStudioViewProps> = ({
   const setActiveSubTab = (tab: 'CURRICULUM' | 'SETTINGS') => {
     setLocalSubTab(tab);
     onSubTabChange?.(tab);
+  };
+  const [localStep, setLocalStep] = useState<number>(1);
+  const effectiveStep = externalStep ?? (activeSubTab === 'SETTINGS' ? 1 : localStep);
+
+  const handleStepSelect = (step: number) => {
+    if (step > maxUnlockedStep) return;
+    setLocalStep(step);
+    onStepChange?.(step);
+    if (step === 1) {
+      setActiveSubTab('SETTINGS');
+    } else {
+      setActiveSubTab('CURRICULUM');
+      if (step === 3) {
+        setTimeout(() => window.dispatchEvent(new CustomEvent('admin-studio-focus-skills')), 50);
+      } else if (step === 4 && modules.length > 0 && onOpenTheoryBuilder) {
+        onOpenTheoryBuilder(modules[0]);
+      } else if (step === 5) {
+        setTimeout(() => window.dispatchEvent(new CustomEvent('admin-studio-open-test-module')), 50);
+      }
+    }
   };
   const [modules, setModules] = useState<CourseModuleDto[]>([]);
   const [allCourseSkills, setAllCourseSkills] = useState<SkillNodeDto[]>([]);
@@ -468,7 +497,7 @@ export const CourseStudioView: React.FC<CourseStudioViewProps> = ({
         <div className="flex items-center gap-1 border-b border-slate-800/80 -mb-4 pt-1">
           <button
             type="button"
-            onClick={() => setActiveSubTab('CURRICULUM')}
+            onClick={() => handleStepSelect(2)}
             className={`px-3 py-2 text-xs font-semibold flex items-center gap-1.5 border-b-2 transition-colors cursor-pointer ${
               activeSubTab === 'CURRICULUM'
                 ? 'border-emerald-400 text-emerald-300'
@@ -482,7 +511,7 @@ export const CourseStudioView: React.FC<CourseStudioViewProps> = ({
 
           <button
             type="button"
-            onClick={() => setActiveSubTab('SETTINGS')}
+            onClick={() => handleStepSelect(1)}
             className={`px-3 py-2 text-xs font-semibold flex items-center gap-1.5 border-b-2 transition-colors cursor-pointer ${
               activeSubTab === 'SETTINGS'
                 ? 'border-emerald-400 text-emerald-300'
@@ -492,6 +521,90 @@ export const CourseStudioView: React.FC<CourseStudioViewProps> = ({
             <Edit2 className="w-3.5 h-3.5" />
             <span>Загальні параметри курсу</span>
           </button>
+        </div>
+      </div>
+
+      {/* 5-Step Guided Course Authoring Stepper Header */}
+      <div className="p-3.5 rounded-xl bg-slate-900/60 border border-slate-800/80 flex flex-col gap-2.5 select-none shadow-sm">
+        <div className="flex items-center justify-between text-xs">
+          <span className="font-semibold text-white flex items-center gap-2">
+            <Layers className="w-4 h-4 text-emerald-400" />
+            <span>Маршрут автора курсу: Крок {effectiveStep} з 5</span>
+          </span>
+          <span className="text-[10px] font-mono text-emerald-400 bg-emerald-500/10 px-2.5 py-0.5 rounded-full border border-emerald-500/20 font-semibold">
+            {effectiveStep === 1
+              ? '1. Базові метадані'
+              : effectiveStep === 2
+              ? '2. Модульна структура'
+              : effectiveStep === 3
+              ? '3. Граф компетенцій (DAG)'
+              : effectiveStep === 4
+              ? '4. Конспекти & Підручник'
+              : '5. Банк завдань & Тест'}
+          </span>
+        </div>
+
+        <div className="grid grid-cols-2 sm:grid-cols-5 gap-1.5 pt-0.5">
+          {[
+            { num: 1, title: '1. Метадані', stat: `P(L) ≥ ${course.defaultMasteryThreshold ?? 0.85}` },
+            { num: 2, title: '2. Модулі', stat: `${modules.length} тем` },
+            { num: 3, title: '3. Компетенції', stat: `${allCourseSkills.length} навичок` },
+            {
+              num: 4,
+              title: '4. Конспекти',
+              stat: `${modules.filter((m) => Boolean(m.description?.trim())).length}/${modules.length || 1}`,
+            },
+            {
+              num: 5,
+              title: '5. Завдання & Тест',
+              stat: `${allCourseSkills.reduce((acc, s) => acc + ((s as any).tasks?.length || 0), 0)} вправ`,
+            },
+          ].map((st) => {
+            const isCurrent = effectiveStep === st.num;
+            const isUnlocked = st.num <= maxUnlockedStep;
+            const isLocked = !isUnlocked;
+
+            return (
+              <button
+                key={st.num}
+                type="button"
+                disabled={isLocked}
+                onClick={() => handleStepSelect(st.num)}
+                className={`p-2 rounded-lg text-left transition-colors flex items-center justify-between gap-1.5 ${
+                  isCurrent
+                    ? 'bg-emerald-500/15 border-l-2 border-emerald-400 text-emerald-300 font-semibold cursor-pointer'
+                    : isUnlocked
+                    ? 'bg-slate-950/60 hover:bg-slate-800/80 text-slate-300 cursor-pointer border border-slate-800/60'
+                    : 'bg-slate-950/40 text-slate-600 opacity-50 cursor-not-allowed border border-slate-800/40 select-none'
+                }`}
+                title={
+                  isLocked
+                    ? `Крок ${st.num} заблоковано. Завершіть попередній крок, щоб відкрити.`
+                    : isCurrent
+                    ? `Поточний крок ${st.num}: ${st.title}`
+                    : `Повернутися до кроку ${st.num}: ${st.title}`
+                }
+              >
+                <div className="flex items-center gap-1.5 min-w-0">
+                  <span
+                    className={`w-4 h-4 rounded-full text-[10px] font-mono flex items-center justify-center shrink-0 ${
+                      isCurrent
+                        ? 'bg-emerald-500/20 text-emerald-400'
+                        : isUnlocked
+                        ? 'bg-slate-800 text-slate-300'
+                        : 'bg-slate-900 text-slate-600'
+                    }`}
+                  >
+                    {isLocked ? '🔒' : isCurrent ? st.num : '✓'}
+                  </span>
+                  <span className="text-[11px] truncate">{st.title}</span>
+                </div>
+                <span className="text-[9px] font-mono text-slate-500 shrink-0 hidden sm:inline">
+                  {isLocked ? 'Блок' : isCurrent ? 'Зараз' : st.stat}
+                </span>
+              </button>
+            );
+          })}
         </div>
       </div>
 
@@ -1169,6 +1282,46 @@ export const CourseStudioView: React.FC<CourseStudioViewProps> = ({
               })}
             </div>
           )}
+
+          {/* Step Navigation Bar for Curriculum & DAG */}
+          <div className="flex items-center justify-between gap-3 pt-4 border-t border-slate-800/80 mt-4">
+            <button
+              type="button"
+              onClick={() => handleStepSelect(1)}
+              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold text-slate-400 hover:text-white hover:bg-slate-800 transition-colors cursor-pointer"
+            >
+              <span>← Назад: Базові метадані (Крок 1)</span>
+            </button>
+
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  if (onAdvanceStep) onAdvanceStep(3);
+                  else handleStepSelect(3);
+                  window.dispatchEvent(new CustomEvent('admin-studio-focus-skills'));
+                }}
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-medium transition-colors cursor-pointer border border-slate-700"
+              >
+                <Target className="w-3.5 h-3.5 text-indigo-400" />
+                <span>Граф компетенцій (Крок 3) →</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  if (onAdvanceStep) onAdvanceStep(4);
+                  else handleStepSelect(4);
+                  if (modules.length > 0 && onOpenTheoryBuilder) {
+                    onOpenTheoryBuilder(modules[0]);
+                  }
+                }}
+                className="inline-flex items-center gap-2 px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold transition-all cursor-pointer shadow-md shadow-emerald-950/40"
+              >
+                <span>Далі: Конспекти уроків (Крок 4) →</span>
+              </button>
+            </div>
+          </div>
         </div>
       )}
 
@@ -1224,17 +1377,51 @@ export const CourseStudioView: React.FC<CourseStudioViewProps> = ({
               />
             </div>
 
-            <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-semibold text-slate-300">Нормативний BKT-поріг майстерності</label>
-              <input
-                type="number"
-                step="0.01"
-                min="0.5"
-                max="0.99"
-                value={settingsThreshold}
-                onChange={(e) => setSettingsThreshold(parseFloat(e.target.value))}
-                className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs font-mono text-emerald-400 focus:outline-none focus:border-emerald-500"
-              />
+            {/* In-Form BKT Mastery Threshold Standards Switcher in Studio Settings */}
+            <div className="flex flex-col gap-2 md:col-span-2">
+              <label className="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
+                <Target className="w-4 h-4 text-emerald-400" />
+                <span>Нормативний BKT-поріг майстерності</span>
+              </label>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                {MASTERY_STANDARDS.map((std) => {
+                  const isSelected = Math.abs(settingsThreshold - std.value) < 0.001;
+                  return (
+                    <button
+                      key={std.value}
+                      type="button"
+                      onClick={() => setSettingsThreshold(std.value)}
+                      className={`p-2.5 rounded-xl border text-left transition-all cursor-pointer flex flex-col gap-1 ${
+                        isSelected
+                          ? 'bg-emerald-500/15 border-emerald-500/50 text-white shadow-sm shadow-emerald-950/40'
+                          : 'bg-slate-950/60 border-slate-800/80 text-slate-400 hover:text-slate-200 hover:bg-slate-900/60'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between">
+                        <span className={`text-xs font-semibold ${isSelected ? 'text-emerald-300' : 'text-slate-300'}`}>
+                          {std.title}
+                        </span>
+                        <span className="text-[10px] font-mono text-slate-500">
+                          {std.badge}
+                        </span>
+                      </div>
+                      <span className="text-[10px] text-slate-400 line-clamp-1">{std.tag}</span>
+                    </button>
+                  );
+                })}
+              </div>
+              <div className="flex items-center gap-2 pt-1">
+                <span className="text-[11px] text-slate-400">Точне числове значення:</span>
+                <input
+                  type="number"
+                  step="0.01"
+                  min="0.5"
+                  max="0.99"
+                  value={settingsThreshold}
+                  onChange={(e) => setSettingsThreshold(parseFloat(e.target.value) || 0.85)}
+                  className="w-24 px-2 py-1 bg-slate-950 border border-slate-800 rounded-lg text-xs font-mono text-emerald-400 focus:outline-none focus:border-emerald-500"
+                />
+              </div>
             </div>
 
             <div className="flex flex-col gap-1.5 md:col-span-2">
@@ -1268,14 +1455,26 @@ export const CourseStudioView: React.FC<CourseStudioViewProps> = ({
             </label>
           </div>
 
-          <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-800">
+          {/* Step 1 Actions: Save + Continue to Step 2 */}
+          <div className="flex items-center justify-between gap-3 pt-4 border-t border-slate-800">
             <button
               type="submit"
               disabled={isSavingSettings}
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold transition-all cursor-pointer shadow-md shadow-emerald-950/50"
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white text-xs font-semibold transition-all cursor-pointer"
             >
               <Save className="w-4 h-4" />
-              <span>{isSavingSettings ? 'Збереження...' : 'Зберегти зміни'}</span>
+              <span>{isSavingSettings ? 'Збереження...' : 'Зберегти зміни метаданих'}</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                if (onAdvanceStep) onAdvanceStep(2);
+                else handleStepSelect(2);
+              }}
+              className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold transition-all cursor-pointer shadow-md shadow-emerald-950/50"
+            >
+              <span>Продовжити: Модульна структура (Крок 2) →</span>
             </button>
           </div>
         </form>

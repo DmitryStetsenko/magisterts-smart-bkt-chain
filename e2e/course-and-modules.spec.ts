@@ -184,7 +184,7 @@ test.describe('Course Architecture, Modular Curriculum & BKT Mastery Gating E2E 
     await expect(page.getByRole('button', { name: /До каталогу курсів/i })).toBeVisible();
     await expect(page.getByRole('button', { name: /Курси платформи/i })).toBeVisible();
     await expect(page.getByRole('button', { name: /Маршрут автора курсу/i })).toBeVisible();
-    await expect(page.getByText('5 етапів')).toBeVisible();
+    await expect(page.getByText(/Крок \d з 5/).first()).toBeVisible();
 
     // Verify Studio Roadmap 1-click step navigation
     const studioRoadmapStep1Btn = page.locator('aside button:has-text("Базові метадані")');

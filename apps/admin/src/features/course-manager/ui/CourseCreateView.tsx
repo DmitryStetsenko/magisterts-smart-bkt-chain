@@ -208,6 +208,42 @@ export const CourseCreateView: React.FC<CourseCreateViewProps> = ({
         </button>
       </div>
 
+      {/* 5-Step Guided Course Creation Wizard Stepper Header */}
+      <div className="p-3.5 rounded-xl bg-slate-900/60 border border-slate-800/80 flex flex-col gap-2.5 select-none shadow-sm">
+        <div className="flex items-center justify-between text-xs">
+          <span className="font-semibold text-white flex items-center gap-2">
+            <Layers className="w-4 h-4 text-emerald-400" />
+            <span>Покроковий майстер курсу: Крок 1 з 5</span>
+          </span>
+          <span className="text-[10px] font-mono text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20 font-semibold">
+            Базові метадані (Поточний)
+          </span>
+        </div>
+
+        <div className="grid grid-cols-2 sm:grid-cols-5 gap-1.5 pt-0.5">
+          <div className="p-2 rounded-lg bg-emerald-500/15 border-l-2 border-emerald-400 flex items-center gap-2 text-[11px] font-semibold text-emerald-300">
+            <span className="w-4 h-4 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-[10px] font-mono shrink-0">1</span>
+            <span className="truncate">1. Метадані (Зараз)</span>
+          </div>
+          <div className="p-2 rounded-lg bg-slate-950/40 border border-slate-800/60 flex items-center gap-2 text-[11px] text-slate-500 opacity-60 cursor-not-allowed" title="Крок 2 заблоковано. Спочатку збережіть базові метадані.">
+            <span className="text-[10px] shrink-0">🔒</span>
+            <span className="truncate">2. Модулі</span>
+          </div>
+          <div className="p-2 rounded-lg bg-slate-950/40 border border-slate-800/60 flex items-center gap-2 text-[11px] text-slate-500 opacity-60 cursor-not-allowed" title="Крок 3 заблоковано. Доступно після створення модулів.">
+            <span className="text-[10px] shrink-0">🔒</span>
+            <span className="truncate">3. Компетенції</span>
+          </div>
+          <div className="p-2 rounded-lg bg-slate-950/40 border border-slate-800/60 flex items-center gap-2 text-[11px] text-slate-500 opacity-60 cursor-not-allowed" title="Крок 4 заблоковано. Доступно після налаштування графу.">
+            <span className="text-[10px] shrink-0">🔒</span>
+            <span className="truncate">4. Конспекти</span>
+          </div>
+          <div className="p-2 rounded-lg bg-slate-950/40 border border-slate-800/60 flex items-center gap-2 text-[11px] text-slate-500 opacity-60 cursor-not-allowed" title="Крок 5 заблоковано. Завдання та фінальне тестування.">
+            <span className="text-[10px] shrink-0">🔒</span>
+            <span className="truncate">5. Завдання & Тест</span>
+          </div>
+        </div>
+      </div>
+
       {appliedPresetName && (
         <div className="p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-xl text-emerald-300 text-xs flex items-center justify-between animate-fadeIn">
           <div className="flex items-center gap-2">
@@ -453,10 +489,10 @@ export const CourseCreateView: React.FC<CourseCreateViewProps> = ({
           <button
             type="submit"
             disabled={isSubmitting}
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white text-xs font-semibold transition-all cursor-pointer shadow-md shadow-emerald-950/50"
+            className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white text-xs font-semibold transition-all cursor-pointer shadow-md shadow-emerald-950/50"
           >
             <Save className="w-4 h-4" />
-            <span>{isSubmitting ? 'Збереження...' : 'Створити Навчальний Курс'}</span>
+            <span>{isSubmitting ? 'Створення курсу...' : 'Зберегти та перейти до Модулів (Крок 2) →'}</span>
           </button>
         </div>
       </form>
