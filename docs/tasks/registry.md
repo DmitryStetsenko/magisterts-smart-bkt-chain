@@ -446,7 +446,7 @@
 | **SBC-401** | `Story` | `AD` | transform admin course studio into end-to-end course builder with outline navigator, theory content and task bank inspector | 2026-11-11 | `0c5c0ee` |
 | **SBC-402** | `Story` | `AD` | implement turnkey course authoring with author control panel, skill and task creation modals and module test sandbox | 2026-11-11 | `d80b602` |
 | **SBC-403** | `Story` | `AD` | integrate inline markdown theory editor and course creation theory input in admin studio | 2026-11-12 | `5439bd7` |
-| **SBC-404** | `Story` | `AD` | implement visual block-based theory lesson builder with live student preview and pedagogical presets | 2026-11-12 | pending |
+| **SBC-404** | `Story` | `AD` | implement visual block-based theory lesson builder with live student preview and pedagogical presets | 2026-11-12 | `6d095fd` |
 
 ---
 
