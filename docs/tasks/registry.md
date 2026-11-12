@@ -449,7 +449,7 @@
 | **SBC-404** | `Story` | `AD` | implement visual block-based theory lesson builder with live student preview and pedagogical presets | 2026-11-12 | `6d095fd` |
 | **SBC-405** | `Story` | `AD` | transform theory lesson builder into full-fledged page with breadcrumbs, dedicated sidebar drawer and URL routing | 2026-11-12 | `ee8f53b` |
 | **SBC-406** | `Refactor` | `AD` | enforce minimalist borderless design across theory builder, drawer sections and studio controls | 2026-11-12 | `5f6d520` |
-| **SBC-407** | `Story` | `AD` | restore platform courses overview and 1-click course switcher in admin sidebar drawer | 2026-11-12 | pending |
+| **SBC-407** | `Story` | `AD` | restore platform courses overview and 1-click course switcher in admin sidebar drawer | 2026-11-12 | `40b00a5` |
 
 ---
 
