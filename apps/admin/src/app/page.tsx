@@ -12,6 +12,7 @@ import {
   Filter,
   Sparkles,
   Plus,
+  PlusCircle,
   Search,
   Layers,
   CheckCircle2,
@@ -40,7 +41,7 @@ import { BktAuditVerifierCenter } from '../features/verifier/ui/BktAuditVerifier
 import { UserManagementCenter } from '../features/users/ui/UserManagementCenter';
 
 export default function AdminCMSDashboard() {
-  type AdminTab = 'courses' | 'users' | 'datasets' | 'verifier' | 'system';
+  type AdminTab = 'courses' | 'create_course' | 'users' | 'datasets' | 'verifier' | 'system';
   type CourseViewMode = 'LIST' | 'CREATE' | 'STUDIO' | 'THEORY';
 
   const [activeTab, setActiveTab] = useState<AdminTab>('courses');
@@ -140,11 +141,12 @@ export default function AdminCMSDashboard() {
       const courseParam = params.get('course');
       const moduleParam = params.get('module');
 
-      if (tabParam && ['courses', 'users', 'datasets', 'verifier', 'system'].includes(tabParam)) {
+      if (tabParam && ['courses', 'create_course', 'users', 'datasets', 'verifier', 'system'].includes(tabParam)) {
         setActiveTab(tabParam);
       }
 
-      if (modeParam === 'create') {
+      if (modeParam === 'create' || tabParam === 'create_course') {
+        setActiveTab('create_course');
         setCourseViewMode('CREATE');
         setSelectedStudioCourse(null);
         setSelectedTheoryModule(null);
@@ -174,6 +176,34 @@ export default function AdminCMSDashboard() {
   }, [dynamicCourses]);
 
   const handleTabClick = (tabId: string) => {
+    if (tabId === 'create_course') {
+      if (courseViewMode === 'CREATE' && activeTab === 'create_course') {
+        setIsDrawerOpen((prev) => !prev);
+      } else {
+        setActiveTab('create_course');
+        setCourseViewMode('CREATE');
+        setSelectedStudioCourse(null);
+        setSelectedTheoryModule(null);
+        setIsDrawerOpen(true);
+        updateBrowserUrl({ tab: 'create_course', mode: 'CREATE' });
+      }
+      return;
+    }
+
+    if (tabId === 'courses') {
+      if (activeTab === 'courses' && courseViewMode === 'LIST') {
+        setIsDrawerOpen((prev) => !prev);
+      } else {
+        setActiveTab('courses');
+        setCourseViewMode('LIST');
+        setSelectedStudioCourse(null);
+        setSelectedTheoryModule(null);
+        setIsDrawerOpen(true);
+        updateBrowserUrl({ tab: 'courses', mode: 'LIST' });
+      }
+      return;
+    }
+
     const tab = tabId as AdminTab;
     if (activeTab === tab) {
       setIsDrawerOpen((prev) => !prev);
@@ -189,6 +219,7 @@ export default function AdminCMSDashboard() {
     setSelectedTheoryModule(null);
     setStudioSubTab(initialTab);
     setCourseViewMode('STUDIO');
+    setActiveTab('courses');
     updateBrowserUrl({ tab: 'courses', mode: 'STUDIO', courseSlug: course.slug });
   };
 
@@ -196,17 +227,20 @@ export default function AdminCMSDashboard() {
     setSelectedStudioCourse(course);
     setSelectedTheoryModule(module);
     setCourseViewMode('THEORY');
+    setActiveTab('courses');
     updateBrowserUrl({ tab: 'courses', mode: 'THEORY', courseSlug: course.slug, moduleSlug: module.slug });
   };
 
   const handleBackToStudio = () => {
     setCourseViewMode('STUDIO');
     setSelectedTheoryModule(null);
+    setActiveTab('courses');
     updateBrowserUrl({ tab: 'courses', mode: 'STUDIO', courseSlug: selectedStudioCourse?.slug });
   };
 
   const handleBackToCoursesList = () => {
     setCourseViewMode('LIST');
+    setActiveTab('courses');
     setSelectedStudioCourse(null);
     setSelectedTheoryModule(null);
     setStudioSubTab('CURRICULUM');
@@ -219,7 +253,7 @@ export default function AdminCMSDashboard() {
     let icon = BookOpen;
     let iconColor = 'text-emerald-400';
 
-    if (activeTab === 'courses') {
+    if (activeTab === 'courses' || activeTab === 'create_course') {
       if (courseViewMode === 'THEORY' && selectedStudioCourse && selectedTheoryModule) {
         title = 'Конструктор Теорії';
         icon = BookOpen;
@@ -228,9 +262,9 @@ export default function AdminCMSDashboard() {
         title = 'Навігатор курсу';
         icon = Layers;
         iconColor = 'text-emerald-400';
-      } else if (courseViewMode === 'CREATE') {
+      } else if (courseViewMode === 'CREATE' || activeTab === 'create_course') {
         title = 'Створення Курсу';
-        icon = Plus;
+        icon = PlusCircle;
         iconColor = 'text-emerald-400';
       } else {
         title = 'Каталог Курсів & Завдань';
@@ -812,7 +846,7 @@ export default function AdminCMSDashboard() {
           )}
 
           {/* Drawer: Course Create Mode */}
-          {activeTab === 'courses' && courseViewMode === 'CREATE' && (
+          {((activeTab === 'courses' && courseViewMode === 'CREATE') || activeTab === 'create_course') && (
             <>
               {/* Back to Catalog Button */}
               <div className="p-2 border-b border-slate-800/60">
@@ -1424,8 +1458,8 @@ export default function AdminCMSDashboard() {
             <Breadcrumbs
               className="text-[11px]"
               items={
-                activeTab === 'courses'
-                  ? courseViewMode === 'CREATE'
+                activeTab === 'courses' || activeTab === 'create_course'
+                  ? courseViewMode === 'CREATE' || activeTab === 'create_course'
                     ? [
                         {
                           label: 'CMS Адміністрування',
@@ -1554,7 +1588,13 @@ export default function AdminCMSDashboard() {
             {
               id: 'courses',
               icon: BookOpen,
-              title: 'Керування Курсами, Модулями & Графами Навичок',
+              title: 'Каталог курсів (Керування Курсами, Модулями & DAG)',
+              activeColor: 'bg-emerald-600',
+            },
+            {
+              id: 'create_course',
+              icon: PlusCircle,
+              title: 'Створення нового курсу',
               activeColor: 'bg-emerald-600',
             },
             {
@@ -1576,7 +1616,10 @@ export default function AdminCMSDashboard() {
               activeColor: 'bg-emerald-600',
             },
           ],
-          activeTab: activeTab,
+          activeTab:
+            courseViewMode === 'CREATE' || activeTab === 'create_course'
+              ? 'create_course'
+              : activeTab,
           isDrawerOpen: isDrawerOpen,
           onTabClick: handleTabClick,
           onSettingsClick: () => handleTabClick('system'),
@@ -1586,6 +1629,17 @@ export default function AdminCMSDashboard() {
         mainClassName="p-4 lg:p-6 overflow-y-auto flex flex-col gap-5 bg-slate-950"
       >
         <div className="flex flex-col gap-5 min-h-[400px]">
+          {activeTab === 'create_course' && (
+            <CourseCreateView
+              categories={categories}
+              onCreated={(newCourse) => {
+                loadCourses();
+                handleOpenStudio(newCourse);
+              }}
+              onCancel={handleBackToCoursesList}
+            />
+          )}
+
           {activeTab === 'courses' && (
             <>
               {courseViewMode === 'CREATE' && (
@@ -1657,7 +1711,11 @@ export default function AdminCMSDashboard() {
                   onCategoriesChanged={loadCategories}
                   onCoursesLoaded={setDynamicCourses}
                   onCreateCourseClick={() => {
+                    setActiveTab('create_course');
                     setCourseViewMode('CREATE');
+                    setSelectedStudioCourse(null);
+                    setSelectedTheoryModule(null);
+                    updateBrowserUrl({ tab: 'create_course', mode: 'CREATE' });
                   }}
                   onOpenCourseStudio={handleOpenStudio}
                 />

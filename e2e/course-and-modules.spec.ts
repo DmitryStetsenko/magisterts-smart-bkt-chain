@@ -107,6 +107,18 @@ test.describe('Course Architecture, Modular Curriculum & BKT Mastery Gating E2E 
     await breadcrumbCoursesBtn.click();
     await expect(page.getByText('Управління Навчальними Курсами')).toBeVisible({ timeout: 10000 });
 
+    // Verify dedicated navigation rail icon for Course Creation
+    const createCourseRailBtn = page.locator('nav button[title*="Створення нового курсу"]');
+    await expect(createCourseRailBtn).toBeVisible();
+    await createCourseRailBtn.click();
+    await expect(page.getByRole('heading', { name: 'Створення Нового Навчального Курсу' })).toBeVisible();
+
+    // Verify dedicated navigation rail icon for Course Catalog
+    const catalogRailBtn = page.locator('nav button[title*="Каталог курсів"]');
+    await expect(catalogRailBtn).toBeVisible();
+    await catalogRailBtn.click();
+    await expect(page.getByText('Управління Навчальними Курсами')).toBeVisible({ timeout: 10000 });
+
     // 2.3 Verify Category Filter in sidebar
     await expect(page.getByRole('button', { name: /Предметні категорії/i })).toBeVisible();
     const progCategorySidebarBtn = page.locator('aside button:has-text("Програмування & IT")').first();
