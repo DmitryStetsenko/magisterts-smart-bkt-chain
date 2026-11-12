@@ -457,7 +457,7 @@
 | **SBC-412** | `Story` | `AD` | implement sequential guided course creation wizard with locked future steps and backward editing navigation | 2026-11-12 | `c889aa4` |
 | **SBC-413** | `Fix` | `AD` | eliminate redundant course jumper popup and remove duplicated platform course lists from studio drawer | 2026-11-12 | `52e290d` |
 | **SBC-414** | `Fix` | `AD` | ensure draft status for new courses and smooth transition to step 2 without catalog redirection | 2026-11-12 | `964a894` |
-| **SBC-415** | `Fix` | `AD` | preserve create course rail tab in studio wizard, eliminate theory platform list and expose drafts in catalog | 2026-11-12 | pending |
+| **SBC-415** | `Fix` | `AD` | preserve create course rail tab in studio wizard, eliminate theory platform list and expose drafts in catalog | 2026-11-12 | `88dc24d` |
 
 ---
 
