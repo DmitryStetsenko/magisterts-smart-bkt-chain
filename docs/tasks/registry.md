@@ -14,10 +14,10 @@
 | **`SBC-EP-W3`** | Web3 Infrastructure & Smart Contracts | 0 |
 | **`SBC-EP-ST`** | Student Portal & Skill Tree Map | 39 |
 | **`SBC-EP-TC`** | Teacher Portal & Analytics CRM | 32 |
-| **`SBC-EP-AD`** | Admin Portal & Knowledge DAG Builder | 25 |
+| **`SBC-EP-AD`** | Admin Portal & Knowledge DAG Builder | 26 |
 | **`SBC-EP-LD`** | Landing Web Page | 9 |
 | **`SBC-EP-MS`** | Master's Thesis Engineering & Academic Text Generation | 9 |
-| **ВСЬОГО** | - | **293** |
+| **ВСЬОГО** | - | **294** |
 
 ---
 
@@ -453,6 +453,7 @@
 | **SBC-408** | `Story` | `AD` | decouple course catalog and course creation into separate dedicated navigation rail icons in admin portal | 2026-11-12 | `9d7010a` |
 | **SBC-409** | `Story` | `AD` | replace redundant course list with didactic presets and bkt threshold guide in course create drawer | 2026-11-12 | `e69a41c` |
 | **SBC-410** | `Story` | `AD` | relocate bkt threshold calibration into course create form with interactive standards switcher and remove redundant sidebar button | 2026-11-12 | `4ecd943` |
+| **SBC-411** | `Story` | `AD` | implement interactive navigation across course authoring roadmap steps in studio and create mode | 2026-11-12 | pending |
 
 ---
 

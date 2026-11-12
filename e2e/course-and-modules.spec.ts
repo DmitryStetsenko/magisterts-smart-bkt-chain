@@ -126,6 +126,14 @@ test.describe('Course Architecture, Modular Curriculum & BKT Mastery Gating E2E 
     await expect(page.locator('form input[type="number"]')).toHaveValue('0.9');
     await expect(page.getByText('Для точних наук, криптографії, алгоритміки та кібербезпеки')).toBeVisible();
 
+    // Verify Interactive Course Authoring Roadmap in Create Drawer
+    await expect(page.getByRole('button', { name: /Маршрут автора курсу/i })).toBeVisible();
+    const roadmapStep2Btn = page.locator('aside button:has-text("Модульна структура")');
+    await expect(roadmapStep2Btn).toBeVisible();
+    await roadmapStep2Btn.click();
+    await expect(page.getByText('Крок 2: Модульна структура')).toBeVisible();
+    await expect(page.getByText('Перейти до цього кроку у створених курсах:')).toBeVisible();
+
     // Click "Курси" in Breadcrumbs to return back to Course List
     await breadcrumbCoursesBtn.click();
     await expect(page.getByText('Управління Навчальними Курсами')).toBeVisible({ timeout: 10000 });
@@ -172,9 +180,23 @@ test.describe('Course Architecture, Modular Curriculum & BKT Mastery Gating E2E 
     await expect(page.getByText(/Модуль 1: Змінні, Типи та Оператори/i).first()).toBeVisible();
     await expect(page.getByText(/Модуль 2: Умовні конструкції та Функції/i).first()).toBeVisible();
 
-    // Verify Sidebar Drawer clean navigation (course readiness audit, module test sandbox, courses switcher)
+    // Verify Sidebar Drawer clean navigation (course readiness audit, module test sandbox, courses switcher, author roadmap)
     await expect(page.getByRole('button', { name: /До каталогу курсів/i })).toBeVisible();
     await expect(page.getByRole('button', { name: /Курси платформи/i })).toBeVisible();
+    await expect(page.getByRole('button', { name: /Маршрут автора курсу/i })).toBeVisible();
+    await expect(page.getByText('5 етапів')).toBeVisible();
+
+    // Verify Studio Roadmap 1-click step navigation
+    const studioRoadmapStep1Btn = page.locator('aside button:has-text("Базові метадані")');
+    await expect(studioRoadmapStep1Btn).toBeVisible();
+    await studioRoadmapStep1Btn.click();
+    await expect(page.getByText('Нормативний BKT-поріг майстерності')).toBeVisible({ timeout: 5000 });
+
+    const studioRoadmapStep2Btn = page.locator('aside button:has-text("Модульна структура")');
+    await expect(studioRoadmapStep2Btn).toBeVisible();
+    await studioRoadmapStep2Btn.click();
+    await expect(page.getByText('Тематичні Розділи & Компетенції BKT')).toBeVisible({ timeout: 5000 });
+
     await expect(page.getByRole('button', { name: /Готовність курсу/i })).toBeVisible();
     await expect(page.getByRole('button', { name: /Тестування модуля/i })).toBeVisible();
     await expect(page.getByRole('button', { name: /Дії та інструменти/i })).toBeVisible();

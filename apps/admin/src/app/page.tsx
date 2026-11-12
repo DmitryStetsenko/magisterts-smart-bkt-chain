@@ -121,6 +121,7 @@ export default function AdminCMSDashboard() {
 
   const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(true);
   const [isProfileDrawerOpen, setIsProfileDrawerOpen] = useState<boolean>(false);
+  const [activeRoadmapStepHint, setActiveRoadmapStepHint] = useState<number | null>(null);
 
   // Search & Filter state for Drawer Sections
   const [datasetFilter, setDatasetFilter] = useState<'ALL' | 'SUBMISSIONS' | 'HINTS' | 'THEORY' | 'ANNULMENTS' | 'RESETS'>('ALL');
@@ -768,6 +769,136 @@ export default function AdminCMSDashboard() {
                       </div>
                     </DrawerSection>
 
+                    {/* Interactive Course Authoring Lifecycle Roadmap in Studio */}
+                    <DrawerSection
+                      title="Маршрут автора курсу"
+                      icon={Layers}
+                      badge="5 етапів"
+                      defaultOpen={true}
+                    >
+                      <div className="flex flex-col gap-1.5 pt-1 text-xs">
+                        {/* Step 1: Base Metadata */}
+                        <button
+                          type="button"
+                          onClick={() => setStudioSubTab('SETTINGS')}
+                          className={`w-full p-2 text-left rounded-lg transition-colors flex items-start gap-2.5 cursor-pointer ${
+                            studioSubTab === 'SETTINGS'
+                              ? 'bg-emerald-500/15 border-l-2 border-emerald-400 pl-2 text-emerald-300'
+                              : 'hover:bg-slate-800/60 text-slate-300'
+                          }`}
+                          title="Редагувати базові метадані, назву, категорію та поріг P(L)"
+                        >
+                          <span className="font-mono text-[10px] font-bold text-emerald-400 px-1 py-0.5 rounded bg-emerald-500/20 shrink-0 mt-0.5">
+                            1
+                          </span>
+                          <div className="flex flex-col min-w-0 w-full">
+                            <div className="flex items-center justify-between gap-1">
+                              <span className="font-semibold text-white truncate">Базові метадані</span>
+                              <span className="text-[10px] font-mono text-emerald-400 shrink-0">✓ P(L) ≥ {selectedStudioCourse.defaultMasteryThreshold ?? 0.85}</span>
+                            </div>
+                            <span className="text-[10px] text-slate-400 truncate">Паспорт: /{selectedStudioCourse.slug}</span>
+                          </div>
+                        </button>
+
+                        {/* Step 2: Modular Curriculum */}
+                        <button
+                          type="button"
+                          onClick={() => setStudioSubTab('CURRICULUM')}
+                          className={`w-full p-2 text-left rounded-lg transition-colors flex items-start gap-2.5 cursor-pointer ${
+                            studioSubTab === 'CURRICULUM'
+                              ? 'bg-emerald-500/15 border-l-2 border-emerald-400 pl-2 text-emerald-300'
+                              : 'hover:bg-slate-800/60 text-slate-300'
+                          }`}
+                          title="Перейти до списку модулів та навчального плану"
+                        >
+                          <span className="font-mono text-[10px] font-bold text-emerald-400 px-1 py-0.5 rounded bg-emerald-500/20 shrink-0 mt-0.5">
+                            2
+                          </span>
+                          <div className="flex flex-col min-w-0 w-full">
+                            <div className="flex items-center justify-between gap-1">
+                              <span className="font-semibold text-white truncate">Модульна структура</span>
+                              <span className="text-[10px] font-mono text-emerald-400 shrink-0">✓ {totalMods} тем</span>
+                            </div>
+                            <span className="text-[10px] text-slate-400 truncate">Тематичні розділи курсу</span>
+                          </div>
+                        </button>
+
+                        {/* Step 3: Skill DAG */}
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setStudioSubTab('CURRICULUM');
+                            window.dispatchEvent(new CustomEvent('admin-studio-focus-skills'));
+                          }}
+                          className="w-full p-2 text-left rounded-lg transition-colors flex items-start gap-2.5 hover:bg-slate-800/60 text-slate-300 cursor-pointer"
+                          title="Перейти до графу компетенцій та матриці зв'язків"
+                        >
+                          <span className="font-mono text-[10px] font-bold text-indigo-400 px-1 py-0.5 rounded bg-indigo-500/20 shrink-0 mt-0.5">
+                            3
+                          </span>
+                          <div className="flex flex-col min-w-0 w-full">
+                            <div className="flex items-center justify-between gap-1">
+                              <span className="font-semibold text-white truncate">Граф компетенцій (DAG)</span>
+                              <span className="text-[10px] font-mono text-indigo-400 shrink-0">✓ {tSkills} навичок</span>
+                            </div>
+                            <span className="text-[10px] text-slate-400 truncate">Компетенції та пререквізити BKT</span>
+                          </div>
+                        </button>
+
+                        {/* Step 4: Theory Lessons */}
+                        <button
+                          type="button"
+                          onClick={() => {
+                            if (selectedStudioCourse.modules && selectedStudioCourse.modules.length > 0) {
+                              handleOpenTheory(selectedStudioCourse, selectedStudioCourse.modules[0]);
+                            } else {
+                              setStudioSubTab('CURRICULUM');
+                              window.dispatchEvent(new CustomEvent('admin-studio-open-create-module'));
+                            }
+                          }}
+                          className="w-full p-2 text-left rounded-lg transition-colors flex items-start gap-2.5 hover:bg-slate-800/60 text-slate-300 cursor-pointer"
+                          title="Відкрити повносторінковий конструктор теорії уроку"
+                        >
+                          <span className={`font-mono text-[10px] font-bold px-1 py-0.5 rounded shrink-0 mt-0.5 ${
+                            modsWithTheory > 0 ? 'text-emerald-400 bg-emerald-500/20' : 'text-amber-400 bg-amber-500/20'
+                          }`}>
+                            4
+                          </span>
+                          <div className="flex flex-col min-w-0 w-full">
+                            <div className="flex items-center justify-between gap-1">
+                              <span className="font-semibold text-white truncate">Конспекти & Підручник</span>
+                              <span className={`text-[10px] font-mono shrink-0 ${modsWithTheory > 0 ? 'text-emerald-400' : 'text-amber-400'}`}>
+                                {modsWithTheory > 0 ? `✓ ${modsWithTheory}/${totalMods}` : `${modsWithTheory}/${totalMods}`}
+                              </span>
+                            </div>
+                            <span className="text-[10px] text-slate-400 truncate">5-блочний Zen Focus конспект</span>
+                          </div>
+                        </button>
+
+                        {/* Step 5: Tasks & Sandbox */}
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setStudioSubTab('CURRICULUM');
+                            window.dispatchEvent(new CustomEvent('admin-studio-open-test-module'));
+                          }}
+                          className="w-full p-2 text-left rounded-lg transition-colors flex items-start gap-2.5 hover:bg-slate-800/60 text-slate-300 cursor-pointer"
+                          title="Запустити пісочницю тестування адаптивних завдань"
+                        >
+                          <span className="font-mono text-[10px] font-bold text-indigo-400 px-1 py-0.5 rounded bg-indigo-500/20 shrink-0 mt-0.5">
+                            5
+                          </span>
+                          <div className="flex flex-col min-w-0 w-full">
+                            <div className="flex items-center justify-between gap-1">
+                              <span className="font-semibold text-white truncate">Банк адаптивних завдань</span>
+                              <span className="text-[10px] font-mono text-indigo-400 shrink-0">✓ {tTasks} вправ</span>
+                            </div>
+                            <span className="text-[10px] text-slate-400 truncate">Симуляція BKT та завдання</span>
+                          </div>
+                        </button>
+                      </div>
+                    </DrawerSection>
+
                     {/* 2. Module Testing & Sandbox Runner */}
                     <DrawerSection
                       title="Тестування модуля"
@@ -972,56 +1103,114 @@ export default function AdminCMSDashboard() {
                 icon={Layers}
                 defaultOpen={true}
               >
-                <div className="flex flex-col gap-2 pt-1 text-xs">
-                  <div className="flex items-start gap-2.5 p-2 rounded-md bg-emerald-500/10 border-l-2 border-emerald-400">
-                    <span className="font-mono text-[10px] font-bold text-emerald-400 px-1 py-0.5 rounded bg-emerald-500/20 shrink-0">
+                <div className="flex flex-col gap-1.5 pt-1 text-xs">
+                  {/* Step 1: Active */}
+                  <div className="p-2 rounded-lg bg-emerald-500/10 border-l-2 border-emerald-400 flex items-start gap-2.5">
+                    <span className="font-mono text-[10px] font-bold text-emerald-400 px-1 py-0.5 rounded bg-emerald-500/20 shrink-0 mt-0.5">
                       1
                     </span>
-                    <div className="flex flex-col">
-                      <span className="font-semibold text-emerald-300">Базові метадані (Зараз)</span>
+                    <div className="flex flex-col min-w-0 w-full">
+                      <div className="flex items-center justify-between gap-1">
+                        <span className="font-semibold text-emerald-300">Базові метадані</span>
+                        <span className="text-[10px] font-mono text-emerald-400">Поточний крок</span>
+                      </div>
                       <span className="text-[10px] text-slate-400">Назва, слаг, категорія та BKT-поріг</span>
                     </div>
                   </div>
 
-                  <div className="flex items-start gap-2.5 p-1.5 rounded-md text-slate-400 pl-2">
-                    <span className="font-mono text-[10px] font-bold text-slate-500 px-1 py-0.5 rounded bg-slate-800 shrink-0">
-                      2
-                    </span>
-                    <div className="flex flex-col">
-                      <span className="font-medium text-slate-300">Модульна структура</span>
-                      <span className="text-[10px] text-slate-500">Тематичні розділи курсу</span>
-                    </div>
-                  </div>
+                  {/* Steps 2-5: Interactive Navigation */}
+                  {[
+                    { num: 2, title: 'Модульна структура', sub: 'Тематичні розділи курсу' },
+                    { num: 3, title: 'Граф компетенцій (Skill DAG)', sub: 'Навички та пререквізити BKT' },
+                    { num: 4, title: 'Конспекти & Підручник', sub: '5-блочний Zen Focus конспект' },
+                    { num: 5, title: 'Банк адаптивних завдань', sub: 'Завдання з оцінкою P(T), P(G), P(S)' },
+                  ].map((st) => (
+                    <button
+                      key={st.num}
+                      type="button"
+                      onClick={() => setActiveRoadmapStepHint(activeRoadmapStepHint === st.num ? null : st.num)}
+                      className={`w-full p-2 text-left rounded-lg transition-colors flex items-start gap-2.5 cursor-pointer group ${
+                        activeRoadmapStepHint === st.num
+                          ? 'bg-slate-800 text-white border border-slate-700'
+                          : 'hover:bg-slate-800/60 text-slate-300'
+                      }`}
+                      title={`Натисніть для перегляду кроку ${st.num} у створених курсах`}
+                    >
+                      <span className="font-mono text-[10px] font-bold text-slate-400 px-1 py-0.5 rounded bg-slate-800 group-hover:text-emerald-400 shrink-0 mt-0.5">
+                        {st.num}
+                      </span>
+                      <div className="flex flex-col min-w-0 w-full">
+                        <div className="flex items-center justify-between gap-1">
+                          <span className="font-medium text-slate-300 group-hover:text-white truncate">
+                            {st.title}
+                          </span>
+                          <span className="text-[9px] font-mono text-slate-500 group-hover:text-emerald-400 shrink-0">
+                            {activeRoadmapStepHint === st.num ? '▼' : '▶'}
+                          </span>
+                        </div>
+                        <span className="text-[10px] text-slate-500 truncate">{st.sub}</span>
+                      </div>
+                    </button>
+                  ))}
 
-                  <div className="flex items-start gap-2.5 p-1.5 rounded-md text-slate-400 pl-2">
-                    <span className="font-mono text-[10px] font-bold text-slate-500 px-1 py-0.5 rounded bg-slate-800 shrink-0">
-                      3
-                    </span>
-                    <div className="flex flex-col">
-                      <span className="font-medium text-slate-300">Граф компетенцій (Skill DAG)</span>
-                      <span className="text-[10px] text-slate-500">Навички та пререквізити BKT</span>
+                  {/* Inline Step Details & Created Courses Jumper */}
+                  {activeRoadmapStepHint && (
+                    <div className="p-2.5 rounded-lg bg-slate-900 border border-slate-800 text-[11px] flex flex-col gap-2 animate-fadeIn mt-1">
+                      <div className="flex items-center justify-between">
+                        <span className="font-semibold text-emerald-300">
+                          Крок {activeRoadmapStepHint}: {
+                            activeRoadmapStepHint === 2 ? 'Модульна структура' :
+                            activeRoadmapStepHint === 3 ? 'Граф компетенцій (DAG)' :
+                            activeRoadmapStepHint === 4 ? 'Конспекти & Підручник' : 'Банк адаптивних завдань'
+                          }
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => setActiveRoadmapStepHint(null)}
+                          className="text-slate-500 hover:text-white cursor-pointer px-1 text-xs"
+                        >
+                          ✕
+                        </button>
+                      </div>
+                      <p className="text-[10px] text-slate-400 leading-tight">
+                        У поточному новому курсі цей етап активується після збереження форми.
+                      </p>
+                      {dynamicCourses.length > 0 && (
+                        <div className="flex flex-col gap-1 pt-1.5 border-t border-slate-800/80">
+                          <span className="text-[10px] font-mono text-emerald-400 font-semibold">
+                            Перейти до цього кроку у створених курсах:
+                          </span>
+                          <div className="flex flex-col gap-1 max-h-36 overflow-y-auto pr-0.5">
+                            {dynamicCourses.map((c) => (
+                              <button
+                                key={c.id || c.slug}
+                                type="button"
+                                onClick={() => {
+                                  handleOpenStudio(c);
+                                  if (activeRoadmapStepHint === 1) setStudioSubTab('SETTINGS');
+                                  else if (activeRoadmapStepHint === 4 && c.modules && c.modules.length > 0) {
+                                    handleOpenTheory(c, c.modules[0]);
+                                  } else {
+                                    setStudioSubTab('CURRICULUM');
+                                    if (activeRoadmapStepHint === 5) {
+                                      setTimeout(() => window.dispatchEvent(new CustomEvent('admin-studio-open-test-module')), 100);
+                                    }
+                                  }
+                                }}
+                                className="py-1 px-2 rounded bg-slate-950/80 hover:bg-slate-800 border border-slate-800/60 text-left text-[11px] text-slate-300 hover:text-white flex items-center justify-between group cursor-pointer"
+                                title={`Відкрити «${c.title}» у Студії`}
+                              >
+                                <span className="truncate">{c.title}</span>
+                                <span className="text-[10px] font-mono text-emerald-400 group-hover:translate-x-0.5 transition-transform shrink-0">
+                                  {c.modules?.length || 0} тем →
+                                </span>
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      )}
                     </div>
-                  </div>
-
-                  <div className="flex items-start gap-2.5 p-1.5 rounded-md text-slate-400 pl-2">
-                    <span className="font-mono text-[10px] font-bold text-slate-500 px-1 py-0.5 rounded bg-slate-800 shrink-0">
-                      4
-                    </span>
-                    <div className="flex flex-col">
-                      <span className="font-medium text-slate-300">Конспекти & Підручник</span>
-                      <span className="text-[10px] text-slate-500">5-блочний Zen Focus конспект</span>
-                    </div>
-                  </div>
-
-                  <div className="flex items-start gap-2.5 p-1.5 rounded-md text-slate-400 pl-2">
-                    <span className="font-mono text-[10px] font-bold text-slate-500 px-1 py-0.5 rounded bg-slate-800 shrink-0">
-                      5
-                    </span>
-                    <div className="flex flex-col">
-                      <span className="font-medium text-slate-300">Банк адаптивних завдань</span>
-                      <span className="text-[10px] text-slate-500">Завдання з оцінкою P(T), P(G), P(S)</span>
-                    </div>
-                  </div>
+                  )}
                 </div>
               </DrawerSection>
             </>
