@@ -121,7 +121,7 @@ export default function AdminCMSDashboard() {
 
   const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(true);
   const [isProfileDrawerOpen, setIsProfileDrawerOpen] = useState<boolean>(false);
-  const [activeRoadmapStepHint, setActiveRoadmapStepHint] = useState<number | null>(null);
+
   const [authorStep, setAuthorStep] = useState<number>(1);
   const [maxUnlockedStep, setMaxUnlockedStep] = useState<number>(1);
 
@@ -647,67 +647,6 @@ export default function AdminCMSDashboard() {
           {/* Drawer: Course Studio Mode (Focused outline & course tools, zero platform duplication) */}
           {activeTab === 'courses' && courseViewMode === 'STUDIO' && selectedStudioCourse && (
             <>
-              {/* Back to Catalog Button */}
-              <div className="p-2 border-b border-slate-800/60">
-                <button
-                  type="button"
-                  onClick={handleBackToCoursesList}
-                  className="w-full py-2 px-2.5 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800/70 transition-colors flex items-center gap-2 text-xs cursor-pointer"
-                  title="Повернутися до табличного каталогу курсів"
-                >
-                  <ArrowLeft className="w-3.5 h-3.5 text-slate-400" />
-                  <span>До каталогу курсів</span>
-                </button>
-              </div>
-
-              {/* Course Switcher: Instant 1-click jump to another course */}
-              <DrawerSection
-                title="Курси платформи"
-                icon={BookOpen}
-                badge={`${dynamicCourses.length}`}
-                defaultOpen={true}
-              >
-                <div className="flex flex-col divide-y divide-slate-800/50 pt-1">
-                  {dynamicCourses.map((c) => {
-                    const isCurrent = selectedStudioCourse.slug === c.slug || selectedStudioCourse.id === c.id;
-                    const modsCount = c.modules?.length || 0;
-                    return (
-                      <button
-                        key={c.id || c.slug}
-                        type="button"
-                        onClick={() => {
-                          if (!isCurrent) {
-                            handleOpenStudio(c, studioSubTab);
-                          }
-                        }}
-                        className={`w-full py-2 px-2 text-left text-xs transition-colors cursor-pointer flex items-center justify-between group rounded-md ${
-                          isCurrent
-                            ? 'bg-emerald-500/15 text-emerald-300 font-semibold border-l-2 border-emerald-400 pl-2'
-                            : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
-                        }`}
-                        title={isCurrent ? `Поточний курс: ${c.title}` : `Перемкнути Студію на курс: ${c.title}`}
-                      >
-                        <div className="flex items-center gap-2 min-w-0 pr-1">
-                          <BookOpen
-                            className={`w-3.5 h-3.5 shrink-0 ${
-                              isCurrent ? 'text-emerald-400' : 'text-slate-500 group-hover:text-slate-300'
-                            }`}
-                          />
-                          <span className="truncate">{c.title}</span>
-                        </div>
-                        <span
-                          className={`text-[10px] font-mono shrink-0 ${
-                            isCurrent ? 'text-emerald-300 font-bold' : 'text-slate-500'
-                          }`}
-                        >
-                          {isCurrent ? 'Активний' : `${modsCount} мод.`}
-                        </span>
-                      </button>
-                    );
-                  })}
-                </div>
-              </DrawerSection>
-
               {/* 1. Course Readiness & Quality Audit */}
               {(() => {
                 const mods = selectedStudioCourse.modules || [];
@@ -1131,99 +1070,34 @@ export default function AdminCMSDashboard() {
                     </div>
                   </div>
 
-                  {/* Steps 2-5: Interactive Navigation */}
+                  {/* Steps 2-5: Locked Future Steps in Sequential Creation Wizard */}
                   {[
                     { num: 2, title: 'Модульна структура', sub: 'Тематичні розділи курсу' },
                     { num: 3, title: 'Граф компетенцій (Skill DAG)', sub: 'Навички та пререквізити BKT' },
                     { num: 4, title: 'Конспекти & Підручник', sub: '5-блочний Zen Focus конспект' },
                     { num: 5, title: 'Банк адаптивних завдань', sub: 'Завдання з оцінкою P(T), P(G), P(S)' },
                   ].map((st) => (
-                    <button
+                    <div
                       key={st.num}
-                      type="button"
-                      onClick={() => setActiveRoadmapStepHint(activeRoadmapStepHint === st.num ? null : st.num)}
-                      className={`w-full p-2 text-left rounded-lg transition-colors flex items-start gap-2.5 cursor-pointer group ${
-                        activeRoadmapStepHint === st.num
-                          ? 'bg-slate-800 text-white border border-slate-700'
-                          : 'opacity-60 hover:opacity-100 hover:bg-slate-800/40 text-slate-400'
-                      }`}
-                      title={`Крок ${st.num} заблоковано. Збережіть базові метадані курсу, щоб перейти до цього етапу.`}
+                      className="w-full p-2 text-left rounded-lg transition-colors flex items-start gap-2.5 opacity-40 bg-slate-900/30 text-slate-500 select-none cursor-not-allowed"
+                      title={`Крок ${st.num} заблоковано. Завершіть базові метадані курсу, щоб перейти до цього етапу.`}
                     >
-                      <span className="font-mono text-[10px] font-bold text-slate-500 px-1 py-0.5 rounded bg-slate-900 group-hover:text-amber-400 shrink-0 mt-0.5">
+                      <span className="font-mono text-[10px] font-bold text-slate-600 px-1 py-0.5 rounded bg-slate-950 shrink-0 mt-0.5">
                         🔒
                       </span>
                       <div className="flex flex-col min-w-0 w-full">
                         <div className="flex items-center justify-between gap-1">
-                          <span className="font-medium text-slate-300 group-hover:text-white truncate">
+                          <span className="font-medium text-slate-400 truncate">
                             {st.num}. {st.title}
                           </span>
-                          <span className="text-[9px] font-mono text-slate-500 group-hover:text-amber-400 shrink-0">
-                            {activeRoadmapStepHint === st.num ? '▼ Підказка' : '🔒 Заблоковано'}
+                          <span className="text-[9px] font-mono text-slate-600 shrink-0">
+                            🔒 Заблоковано
                           </span>
                         </div>
-                        <span className="text-[10px] text-slate-500 truncate">{st.sub}</span>
+                        <span className="text-[10px] text-slate-600 truncate">{st.sub}</span>
                       </div>
-                    </button>
-                  ))}
-
-                  {/* Inline Step Details & Created Courses Jumper */}
-                  {activeRoadmapStepHint && (
-                    <div className="p-2.5 rounded-lg bg-slate-900 border border-slate-800 text-[11px] flex flex-col gap-2 animate-fadeIn mt-1">
-                      <div className="flex items-center justify-between">
-                        <span className="font-semibold text-emerald-300">
-                          Крок {activeRoadmapStepHint}: {
-                            activeRoadmapStepHint === 2 ? 'Модульна структура' :
-                            activeRoadmapStepHint === 3 ? 'Граф компетенцій (DAG)' :
-                            activeRoadmapStepHint === 4 ? 'Конспекти & Підручник' : 'Банк адаптивних завдань'
-                          }
-                        </span>
-                        <button
-                          type="button"
-                          onClick={() => setActiveRoadmapStepHint(null)}
-                          className="text-slate-500 hover:text-white cursor-pointer px-1 text-xs"
-                        >
-                          ✕
-                        </button>
-                      </div>
-                      <p className="text-[10px] text-slate-400 leading-tight">
-                        У поточному новому курсі цей етап активується після збереження форми.
-                      </p>
-                      {dynamicCourses.length > 0 && (
-                        <div className="flex flex-col gap-1 pt-1.5 border-t border-slate-800/80">
-                          <span className="text-[10px] font-mono text-emerald-400 font-semibold">
-                            Перейти до цього кроку у створених курсах:
-                          </span>
-                          <div className="flex flex-col gap-1 max-h-36 overflow-y-auto pr-0.5">
-                            {dynamicCourses.map((c) => (
-                              <button
-                                key={c.id || c.slug}
-                                type="button"
-                                onClick={() => {
-                                  handleOpenStudio(c);
-                                  if (activeRoadmapStepHint === 1) setStudioSubTab('SETTINGS');
-                                  else if (activeRoadmapStepHint === 4 && c.modules && c.modules.length > 0) {
-                                    handleOpenTheory(c, c.modules[0]);
-                                  } else {
-                                    setStudioSubTab('CURRICULUM');
-                                    if (activeRoadmapStepHint === 5) {
-                                      setTimeout(() => window.dispatchEvent(new CustomEvent('admin-studio-open-test-module')), 100);
-                                    }
-                                  }
-                                }}
-                                className="py-1 px-2 rounded bg-slate-950/80 hover:bg-slate-800 border border-slate-800/60 text-left text-[11px] text-slate-300 hover:text-white flex items-center justify-between group cursor-pointer"
-                                title={`Відкрити «${c.title}» у Студії`}
-                              >
-                                <span className="truncate">{c.title}</span>
-                                <span className="text-[10px] font-mono text-emerald-400 group-hover:translate-x-0.5 transition-transform shrink-0">
-                                  {c.modules?.length || 0} тем →
-                                </span>
-                              </button>
-                            ))}
-                          </div>
-                        </div>
-                      )}
                     </div>
-                  )}
+                  ))}
                 </div>
               </DrawerSection>
             </>

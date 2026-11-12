@@ -126,13 +126,12 @@ test.describe('Course Architecture, Modular Curriculum & BKT Mastery Gating E2E 
     await expect(page.locator('form input[type="number"]')).toHaveValue('0.9');
     await expect(page.getByText('Для точних наук, криптографії, алгоритміки та кібербезпеки')).toBeVisible();
 
-    // Verify Interactive Course Authoring Roadmap in Create Drawer
+    // Verify Sequential Course Authoring Roadmap in Create Drawer (Steps 2-5 locked without popups)
     await expect(page.getByRole('button', { name: /Маршрут автора курсу/i })).toBeVisible();
-    const roadmapStep2Btn = page.locator('aside button:has-text("Модульна структура")');
-    await expect(roadmapStep2Btn).toBeVisible();
-    await roadmapStep2Btn.click();
-    await expect(page.getByText('Крок 2: Модульна структура')).toBeVisible();
-    await expect(page.getByText('Перейти до цього кроку у створених курсах:')).toBeVisible();
+    const roadmapStep2 = page.locator('aside').getByText('2. Модульна структура');
+    await expect(roadmapStep2).toBeVisible();
+    await expect(page.locator('aside').getByText('🔒 Заблоковано').first()).toBeVisible();
+    await expect(page.getByText('Перейти до цього кроку у створених курсах:')).not.toBeVisible();
 
     // Click "Курси" in Breadcrumbs to return back to Course List
     await breadcrumbCoursesBtn.click();
@@ -180,9 +179,8 @@ test.describe('Course Architecture, Modular Curriculum & BKT Mastery Gating E2E 
     await expect(page.getByText(/Модуль 1: Змінні, Типи та Оператори/i).first()).toBeVisible();
     await expect(page.getByText(/Модуль 2: Умовні конструкції та Функції/i).first()).toBeVisible();
 
-    // Verify Sidebar Drawer clean navigation (course readiness audit, module test sandbox, courses switcher, author roadmap)
-    await expect(page.getByRole('button', { name: /До каталогу курсів/i })).toBeVisible();
-    await expect(page.getByRole('button', { name: /Курси платформи/i })).toBeVisible();
+    // Verify Sidebar Drawer clean navigation (course readiness audit, module test sandbox, author roadmap, no duplicated course lists)
+    await expect(page.locator('aside button:has-text("До каталогу курсів")')).not.toBeVisible();
     await expect(page.getByRole('button', { name: /Маршрут автора курсу/i })).toBeVisible();
     await expect(page.getByText(/Крок \d з 5/).first()).toBeVisible();
 
