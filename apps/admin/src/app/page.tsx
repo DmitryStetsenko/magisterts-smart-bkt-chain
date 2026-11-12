@@ -40,6 +40,75 @@ import { DatasetExportCenter, DatasetStats } from '../features/dataset-export/ui
 import { BktAuditVerifierCenter } from '../features/verifier/ui/BktAuditVerifierCenter';
 import { UserManagementCenter } from '../features/users/ui/UserManagementCenter';
 
+interface CoursePresetItem {
+  id: string;
+  presetTitle: string;
+  title: string;
+  slug: string;
+  categorySlug: string;
+  targetAudience: string;
+  defaultMasteryThreshold: number;
+  description: string;
+  icon: any;
+  color: 'emerald' | 'amber' | 'purple' | 'indigo';
+  badge: string;
+}
+
+const COURSE_PRESETS: CoursePresetItem[] = [
+  {
+    id: 'it-frontend',
+    presetTitle: 'Веб-розробка (Frontend / Fullstack)',
+    title: 'Сучасна веб-розробка та веб-інтерфейси',
+    slug: 'web-engineering-frontend',
+    categorySlug: 'prog-it',
+    targetAudience: '10–11 класи, Студенти IT-спеціальностей',
+    defaultMasteryThreshold: 0.85,
+    description: 'Практичний курс: семантична розмітка HTML5, стилізація CSS Flex/Grid, динамічний JavaScript та робота з DOM.',
+    icon: Code,
+    color: 'emerald',
+    badge: 'P(L) ≥ 0.85 • IT',
+  },
+  {
+    id: 'stem-math',
+    presetTitle: 'Точні Науки & Математика (STEM)',
+    title: 'Дискретна математика та основи алгоритмізації',
+    slug: 'discrete-math-algorithms',
+    categorySlug: 'exact-sciences',
+    targetAudience: 'Студенти 1–2 курсів ВНЗ, Профільні STEM-ліцеї',
+    defaultMasteryThreshold: 0.90,
+    description: 'Фундаментальний курс: теорія графів, комбінаторика, булева алгебра та базові алгоритми з підвищеним порогом BKT.',
+    icon: Binary,
+    color: 'amber',
+    badge: 'P(L) ≥ 0.90 • STEM',
+  },
+  {
+    id: 'law-civics',
+    presetTitle: 'Право & Цифрова Безпека',
+    title: 'Основи правознавства та цифрове право',
+    slug: 'digital-law-civics',
+    categorySlug: 'law-social',
+    targetAudience: 'Старшокласники, Громадянська освіта, Студенти',
+    defaultMasteryThreshold: 0.85,
+    description: 'Конституційні засади правової держави, захист цифрових прав, інтелектуальна власність та захист даних.',
+    icon: Scale,
+    color: 'purple',
+    badge: 'P(L) ≥ 0.85 • Право',
+  },
+  {
+    id: 'languages-english',
+    presetTitle: 'Ділова & Технічна Англійська',
+    title: 'Business & Tech English (B2)',
+    slug: 'business-tech-english',
+    categorySlug: 'languages',
+    targetAudience: 'IT-фахівці, Студенти міжнародних програм',
+    defaultMasteryThreshold: 0.80,
+    description: 'Професійна комунікація для технічних фахівців: технічна документація, ділове листування та підготовка до технічних інтервʼю.',
+    icon: Languages,
+    color: 'indigo',
+    badge: 'P(L) ≥ 0.80 • B2',
+  },
+];
+
 export default function AdminCMSDashboard() {
   type AdminTab = 'courses' | 'create_course' | 'users' | 'datasets' | 'verifier' | 'system';
   type CourseViewMode = 'LIST' | 'CREATE' | 'STUDIO' | 'THEORY';
@@ -861,31 +930,198 @@ export default function AdminCMSDashboard() {
                 </button>
               </div>
 
-              {/* Platform Courses Overview in Create Mode */}
+              {/* 1. Quick Didactic Templates / Presets */}
               <DrawerSection
-                title="Курси платформи"
-                icon={BookOpen}
-                badge={`${dynamicCourses.length}`}
+                title="Дидактичні шаблони"
+                icon={Sparkles}
+                badge={`${COURSE_PRESETS.length}`}
                 defaultOpen={true}
               >
                 <div className="flex flex-col divide-y divide-slate-800/50 pt-1">
-                  {dynamicCourses.map((c) => (
+                  {COURSE_PRESETS.map((preset) => (
                     <button
-                      key={c.id || c.slug}
+                      key={preset.id}
                       type="button"
-                      onClick={() => handleOpenStudio(c)}
-                      className="w-full py-2 px-2 text-left text-xs text-slate-400 hover:text-white hover:bg-slate-800/50 transition-colors cursor-pointer flex items-center justify-between group rounded-md"
-                      title={`Відкрити Студію курсу: ${c.title}`}
+                      onClick={() => {
+                        window.dispatchEvent(
+                          new CustomEvent('admin-course-apply-preset', { detail: preset })
+                        );
+                      }}
+                      className="w-full py-2.5 px-2 text-left transition-colors cursor-pointer flex flex-col gap-1 group rounded-md hover:bg-slate-800/60"
+                      title={`Заповнити форму шаблоном: ${preset.presetTitle}`}
                     >
-                      <div className="flex items-center gap-2 min-w-0 pr-1">
-                        <BookOpen className="w-3.5 h-3.5 shrink-0 text-slate-500 group-hover:text-emerald-400" />
-                        <span className="truncate">{c.title}</span>
+                      <div className="flex items-center justify-between w-full">
+                        <div className="flex items-center gap-2 min-w-0">
+                          <preset.icon
+                            className={`w-3.5 h-3.5 shrink-0 ${
+                              preset.color === 'emerald'
+                                ? 'text-emerald-400'
+                                : preset.color === 'amber'
+                                ? 'text-amber-400'
+                                : preset.color === 'purple'
+                                ? 'text-purple-400'
+                                : 'text-indigo-400'
+                            }`}
+                          />
+                          <span className="text-xs font-medium text-slate-200 group-hover:text-white truncate">
+                            {preset.presetTitle}
+                          </span>
+                        </div>
+                        <span className="text-[10px] font-mono text-slate-400 shrink-0">
+                          {preset.badge}
+                        </span>
                       </div>
-                      <span className="text-[10px] font-mono text-slate-500 shrink-0">
-                        {c.modules?.length || 0} мод.
-                      </span>
+                      <p className="text-[11px] text-slate-400 line-clamp-1 pl-5.5">
+                        {preset.description}
+                      </p>
                     </button>
                   ))}
+                </div>
+              </DrawerSection>
+
+              {/* 2. BKT Mastery Calibration Standards */}
+              <DrawerSection
+                title="Калібрування порогу BKT"
+                icon={Target}
+                defaultOpen={true}
+              >
+                <div className="flex flex-col gap-2 pt-1">
+                  <p className="text-[11px] text-slate-400 leading-relaxed">
+                    Нормативний поріг <span className="font-mono text-emerald-400">P(L)</span> визначає ймовірність того, що учень володіє компетенцією перед видачею атестації.
+                  </p>
+
+                  <div className="flex flex-col divide-y divide-slate-800/50">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        window.dispatchEvent(
+                          new CustomEvent('admin-course-set-threshold', { detail: 0.85 })
+                        );
+                      }}
+                      className="py-2 px-2 text-left hover:bg-slate-800/60 rounded-md transition-colors cursor-pointer group flex items-start justify-between gap-2"
+                      title="Встановити нормативний поріг 0.85"
+                    >
+                      <div className="flex flex-col">
+                        <span className="text-xs font-semibold text-emerald-400 flex items-center gap-1.5">
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                          0.85 — Золотий стандарт
+                        </span>
+                        <span className="text-[10px] text-slate-400 mt-0.5">
+                          Рекомендовано для більшості курсів
+                        </span>
+                      </div>
+                      <span className="text-[10px] font-mono text-slate-500 group-hover:text-emerald-400 shrink-0">
+                        Обрати
+                      </span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        window.dispatchEvent(
+                          new CustomEvent('admin-course-set-threshold', { detail: 0.90 })
+                        );
+                      }}
+                      className="py-2 px-2 text-left hover:bg-slate-800/60 rounded-md transition-colors cursor-pointer group flex items-start justify-between gap-2"
+                      title="Встановити нормативний поріг 0.90"
+                    >
+                      <div className="flex flex-col">
+                        <span className="text-xs font-semibold text-amber-400 flex items-center gap-1.5">
+                          <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
+                          0.90 — Висока строгість
+                        </span>
+                        <span className="text-[10px] text-slate-400 mt-0.5">
+                          Для точних наук, кібербезпеки та математики
+                        </span>
+                      </div>
+                      <span className="text-[10px] font-mono text-slate-500 group-hover:text-amber-400 shrink-0">
+                        Обрати
+                      </span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        window.dispatchEvent(
+                          new CustomEvent('admin-course-set-threshold', { detail: 0.80 })
+                        );
+                      }}
+                      className="py-2 px-2 text-left hover:bg-slate-800/60 rounded-md transition-colors cursor-pointer group flex items-start justify-between gap-2"
+                      title="Встановити нормативний поріг 0.80"
+                    >
+                      <div className="flex flex-col">
+                        <span className="text-xs font-semibold text-indigo-400 flex items-center gap-1.5">
+                          <span className="w-1.5 h-1.5 rounded-full bg-indigo-400" />
+                          0.80 — Оглядовий поріг
+                        </span>
+                        <span className="text-[10px] text-slate-400 mt-0.5">
+                          Для факультативів та гуманітарних дисциплін
+                        </span>
+                      </div>
+                      <span className="text-[10px] font-mono text-slate-500 group-hover:text-indigo-400 shrink-0">
+                        Обрати
+                      </span>
+                    </button>
+                  </div>
+                </div>
+              </DrawerSection>
+
+              {/* 3. Course Creation Lifecycle Roadmap */}
+              <DrawerSection
+                title="Маршрут автора курсу"
+                icon={Layers}
+                defaultOpen={true}
+              >
+                <div className="flex flex-col gap-2 pt-1 text-xs">
+                  <div className="flex items-start gap-2.5 p-2 rounded-md bg-emerald-500/10 border-l-2 border-emerald-400">
+                    <span className="font-mono text-[10px] font-bold text-emerald-400 px-1 py-0.5 rounded bg-emerald-500/20 shrink-0">
+                      1
+                    </span>
+                    <div className="flex flex-col">
+                      <span className="font-semibold text-emerald-300">Базові метадані (Зараз)</span>
+                      <span className="text-[10px] text-slate-400">Назва, слаг, категорія та BKT-поріг</span>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-2.5 p-1.5 rounded-md text-slate-400 pl-2">
+                    <span className="font-mono text-[10px] font-bold text-slate-500 px-1 py-0.5 rounded bg-slate-800 shrink-0">
+                      2
+                    </span>
+                    <div className="flex flex-col">
+                      <span className="font-medium text-slate-300">Модульна структура</span>
+                      <span className="text-[10px] text-slate-500">Тематичні розділи курсу</span>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-2.5 p-1.5 rounded-md text-slate-400 pl-2">
+                    <span className="font-mono text-[10px] font-bold text-slate-500 px-1 py-0.5 rounded bg-slate-800 shrink-0">
+                      3
+                    </span>
+                    <div className="flex flex-col">
+                      <span className="font-medium text-slate-300">Граф компетенцій (Skill DAG)</span>
+                      <span className="text-[10px] text-slate-500">Навички та пререквізити BKT</span>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-2.5 p-1.5 rounded-md text-slate-400 pl-2">
+                    <span className="font-mono text-[10px] font-bold text-slate-500 px-1 py-0.5 rounded bg-slate-800 shrink-0">
+                      4
+                    </span>
+                    <div className="flex flex-col">
+                      <span className="font-medium text-slate-300">Конспекти & Підручник</span>
+                      <span className="text-[10px] text-slate-500">5-блочний Zen Focus конспект</span>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-2.5 p-1.5 rounded-md text-slate-400 pl-2">
+                    <span className="font-mono text-[10px] font-bold text-slate-500 px-1 py-0.5 rounded bg-slate-800 shrink-0">
+                      5
+                    </span>
+                    <div className="flex flex-col">
+                      <span className="font-medium text-slate-300">Банк адаптивних завдань</span>
+                      <span className="text-[10px] text-slate-500">Завдання з оцінкою P(T), P(G), P(S)</span>
+                    </div>
+                  </div>
                 </div>
               </DrawerSection>
             </>

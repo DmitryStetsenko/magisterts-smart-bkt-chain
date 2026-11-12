@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   BookOpen,
   ArrowLeft,
@@ -35,6 +35,44 @@ export const CourseCreateView: React.FC<CourseCreateViewProps> = ({
   const [isPublished, setIsPublished] = useState<boolean>(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [appliedPresetName, setAppliedPresetName] = useState<string | null>(null);
+
+  useEffect(() => {
+    const handleApplyPreset = (e: any) => {
+      const preset = e.detail;
+      if (!preset) return;
+      if (preset.title) setTitle(preset.title);
+      if (preset.slug) setSlug(preset.slug);
+      if (preset.description) setDescription(preset.description);
+      if (preset.targetAudience) setTargetAudience(preset.targetAudience);
+      if (typeof preset.defaultMasteryThreshold === 'number') {
+        setDefaultMasteryThreshold(preset.defaultMasteryThreshold);
+      }
+      if (preset.categoryId) {
+        setCategoryId(preset.categoryId);
+      } else if (preset.categorySlug && categories.length > 0) {
+        const found = categories.find(
+          (c) => c.slug === preset.categorySlug || c.title.toLowerCase().includes(preset.categorySlug.toLowerCase())
+        );
+        if (found) setCategoryId(found.id);
+      }
+      setAppliedPresetName(preset.presetTitle || preset.title);
+      setError(null);
+    };
+
+    const handleSetThreshold = (e: any) => {
+      if (typeof e.detail === 'number') {
+        setDefaultMasteryThreshold(e.detail);
+      }
+    };
+
+    window.addEventListener('admin-course-apply-preset', handleApplyPreset as EventListener);
+    window.addEventListener('admin-course-set-threshold', handleSetThreshold as EventListener);
+    return () => {
+      window.removeEventListener('admin-course-apply-preset', handleApplyPreset as EventListener);
+      window.removeEventListener('admin-course-set-threshold', handleSetThreshold as EventListener);
+    };
+  }, [categories]);
 
   const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
 
@@ -129,6 +167,25 @@ export const CourseCreateView: React.FC<CourseCreateViewProps> = ({
           Скасувати
         </button>
       </div>
+
+      {appliedPresetName && (
+        <div className="p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-xl text-emerald-300 text-xs flex items-center justify-between animate-fadeIn">
+          <div className="flex items-center gap-2">
+            <Sparkles className="w-4 h-4 text-emerald-400 shrink-0" />
+            <span>
+              Застосовано дидактичний шаблон: <strong>{appliedPresetName}</strong>
+            </span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setAppliedPresetName(null)}
+            className="text-slate-400 hover:text-white text-xs px-2 py-0.5 cursor-pointer"
+            title="Приховати"
+          >
+            ✕
+          </button>
+        </div>
+      )}
 
       {error && (
         <div className="p-3 bg-rose-500/10 border border-rose-500/20 rounded-xl text-rose-400 text-xs flex items-center gap-2">

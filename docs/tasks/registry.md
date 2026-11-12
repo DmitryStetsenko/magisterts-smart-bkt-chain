@@ -14,10 +14,10 @@
 | **`SBC-EP-W3`** | Web3 Infrastructure & Smart Contracts | 0 |
 | **`SBC-EP-ST`** | Student Portal & Skill Tree Map | 39 |
 | **`SBC-EP-TC`** | Teacher Portal & Analytics CRM | 32 |
-| **`SBC-EP-AD`** | Admin Portal & Knowledge DAG Builder | 23 |
+| **`SBC-EP-AD`** | Admin Portal & Knowledge DAG Builder | 24 |
 | **`SBC-EP-LD`** | Landing Web Page | 9 |
 | **`SBC-EP-MS`** | Master's Thesis Engineering & Academic Text Generation | 9 |
-| **ВСЬОГО** | - | **291** |
+| **ВСЬОГО** | - | **292** |
 
 ---
 
@@ -451,6 +451,7 @@
 | **SBC-406** | `Refactor` | `AD` | enforce minimalist borderless design across theory builder, drawer sections and studio controls | 2026-11-12 | `5f6d520` |
 | **SBC-407** | `Story` | `AD` | restore platform courses overview and 1-click course switcher in admin sidebar drawer | 2026-11-12 | `40b00a5` |
 | **SBC-408** | `Story` | `AD` | decouple course catalog and course creation into separate dedicated navigation rail icons in admin portal | 2026-11-12 | `9d7010a` |
+| **SBC-409** | `Story` | `AD` | replace redundant course list with didactic presets and bkt threshold guide in course create drawer | 2026-11-12 | pending |
 
 ---
 

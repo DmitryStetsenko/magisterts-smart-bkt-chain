@@ -103,6 +103,26 @@ test.describe('Course Architecture, Modular Curriculum & BKT Mastery Gating E2E 
     await expect(page.getByPlaceholder(/наприклад, Основи кібербезпеки/i)).toBeVisible();
     await expect(page.getByText('Опублікувати курс у каталозі')).toBeVisible();
 
+    // Verify Drawer in Course Create Mode has Didactic Presets, BKT Guidelines & Author Roadmap
+    await expect(page.getByRole('button', { name: /Дидактичні шаблони/i })).toBeVisible();
+    await expect(page.getByRole('button', { name: /Калібрування порогу BKT/i })).toBeVisible();
+    await expect(page.getByRole('button', { name: /Маршрут автора курсу/i })).toBeVisible();
+
+    // Click 1-Click Preset "Веб-розробка (Frontend / Fullstack)"
+    const webPresetBtn = page.locator('aside button:has-text("Веб-розробка (Frontend / Fullstack)")');
+    await expect(webPresetBtn).toBeVisible();
+    await webPresetBtn.click();
+
+    // Verify title and slug are auto-populated
+    await expect(page.locator('input[value="Сучасна веб-розробка та веб-інтерфейси"]')).toBeVisible();
+    await expect(page.locator('input[value="web-engineering-frontend"]')).toBeVisible();
+
+    // Click 0.90 threshold preset in BKT section
+    const thresholdBtn = page.locator('aside button:has-text("0.90 — Висока строгість")');
+    await expect(thresholdBtn).toBeVisible();
+    await thresholdBtn.click();
+    await expect(page.locator('input[type="number"]')).toHaveValue('0.9');
+
     // Click "Курси" in Breadcrumbs to return back to Course List
     await breadcrumbCoursesBtn.click();
     await expect(page.getByText('Управління Навчальними Курсами')).toBeVisible({ timeout: 10000 });
