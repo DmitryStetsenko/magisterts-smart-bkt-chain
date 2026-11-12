@@ -103,10 +103,11 @@ test.describe('Course Architecture, Modular Curriculum & BKT Mastery Gating E2E 
     await expect(page.getByPlaceholder(/наприклад, Основи кібербезпеки/i)).toBeVisible();
     await expect(page.getByText('Опублікувати курс у каталозі')).toBeVisible();
 
-    // Verify Drawer in Course Create Mode has Didactic Presets, BKT Guidelines & Author Roadmap
+    // Verify Drawer in Course Create Mode has Didactic Presets & Author Roadmap (no redundant catalog button or BKT sidebar section)
     await expect(page.getByRole('button', { name: /Дидактичні шаблони/i })).toBeVisible();
-    await expect(page.getByRole('button', { name: /Калібрування порогу BKT/i })).toBeVisible();
     await expect(page.getByRole('button', { name: /Маршрут автора курсу/i })).toBeVisible();
+    await expect(page.locator('aside button:has-text("До каталогу курсів")')).not.toBeVisible();
+    await expect(page.locator('aside button:has-text("Калібрування порогу BKT")')).not.toBeVisible();
 
     // Click 1-Click Preset "Веб-розробка (Frontend / Fullstack)"
     const webPresetBtn = page.locator('aside button:has-text("Веб-розробка (Frontend / Fullstack)")');
@@ -117,11 +118,13 @@ test.describe('Course Architecture, Modular Curriculum & BKT Mastery Gating E2E 
     await expect(page.locator('input[value="Сучасна веб-розробка та веб-інтерфейси"]')).toBeVisible();
     await expect(page.locator('input[value="web-engineering-frontend"]')).toBeVisible();
 
-    // Click 0.90 threshold preset in BKT section
-    const thresholdBtn = page.locator('aside button:has-text("0.90 — Висока строгість")');
+    // Verify In-Form BKT Mastery Threshold Standards Switcher
+    await expect(page.getByText('Нормативний поріг майстерності BKT')).toBeVisible();
+    const thresholdBtn = page.locator('form button:has-text("0.90 — Висока строгість")');
     await expect(thresholdBtn).toBeVisible();
     await thresholdBtn.click();
-    await expect(page.locator('input[type="number"]')).toHaveValue('0.9');
+    await expect(page.locator('form input[type="number"]')).toHaveValue('0.9');
+    await expect(page.getByText('Для точних наук, криптографії, алгоритміки та кібербезпеки')).toBeVisible();
 
     // Click "Курси" in Breadcrumbs to return back to Course List
     await breadcrumbCoursesBtn.click();

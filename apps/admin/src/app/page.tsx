@@ -917,19 +917,6 @@ export default function AdminCMSDashboard() {
           {/* Drawer: Course Create Mode */}
           {((activeTab === 'courses' && courseViewMode === 'CREATE') || activeTab === 'create_course') && (
             <>
-              {/* Back to Catalog Button */}
-              <div className="p-2 border-b border-slate-800/60">
-                <button
-                  type="button"
-                  onClick={handleBackToCoursesList}
-                  className="w-full py-2 px-2.5 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800/70 transition-colors flex items-center gap-2 text-xs cursor-pointer"
-                  title="Повернутися до табличного каталогу курсів"
-                >
-                  <ArrowLeft className="w-3.5 h-3.5 text-slate-400" />
-                  <span>До каталогу курсів</span>
-                </button>
-              </div>
-
               {/* 1. Quick Didactic Templates / Presets */}
               <DrawerSection
                 title="Дидактичні шаблони"
@@ -979,94 +966,7 @@ export default function AdminCMSDashboard() {
                 </div>
               </DrawerSection>
 
-              {/* 2. BKT Mastery Calibration Standards */}
-              <DrawerSection
-                title="Калібрування порогу BKT"
-                icon={Target}
-                defaultOpen={true}
-              >
-                <div className="flex flex-col gap-2 pt-1">
-                  <p className="text-[11px] text-slate-400 leading-relaxed">
-                    Нормативний поріг <span className="font-mono text-emerald-400">P(L)</span> визначає ймовірність того, що учень володіє компетенцією перед видачею атестації.
-                  </p>
-
-                  <div className="flex flex-col divide-y divide-slate-800/50">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        window.dispatchEvent(
-                          new CustomEvent('admin-course-set-threshold', { detail: 0.85 })
-                        );
-                      }}
-                      className="py-2 px-2 text-left hover:bg-slate-800/60 rounded-md transition-colors cursor-pointer group flex items-start justify-between gap-2"
-                      title="Встановити нормативний поріг 0.85"
-                    >
-                      <div className="flex flex-col">
-                        <span className="text-xs font-semibold text-emerald-400 flex items-center gap-1.5">
-                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-                          0.85 — Золотий стандарт
-                        </span>
-                        <span className="text-[10px] text-slate-400 mt-0.5">
-                          Рекомендовано для більшості курсів
-                        </span>
-                      </div>
-                      <span className="text-[10px] font-mono text-slate-500 group-hover:text-emerald-400 shrink-0">
-                        Обрати
-                      </span>
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={() => {
-                        window.dispatchEvent(
-                          new CustomEvent('admin-course-set-threshold', { detail: 0.90 })
-                        );
-                      }}
-                      className="py-2 px-2 text-left hover:bg-slate-800/60 rounded-md transition-colors cursor-pointer group flex items-start justify-between gap-2"
-                      title="Встановити нормативний поріг 0.90"
-                    >
-                      <div className="flex flex-col">
-                        <span className="text-xs font-semibold text-amber-400 flex items-center gap-1.5">
-                          <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
-                          0.90 — Висока строгість
-                        </span>
-                        <span className="text-[10px] text-slate-400 mt-0.5">
-                          Для точних наук, кібербезпеки та математики
-                        </span>
-                      </div>
-                      <span className="text-[10px] font-mono text-slate-500 group-hover:text-amber-400 shrink-0">
-                        Обрати
-                      </span>
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={() => {
-                        window.dispatchEvent(
-                          new CustomEvent('admin-course-set-threshold', { detail: 0.80 })
-                        );
-                      }}
-                      className="py-2 px-2 text-left hover:bg-slate-800/60 rounded-md transition-colors cursor-pointer group flex items-start justify-between gap-2"
-                      title="Встановити нормативний поріг 0.80"
-                    >
-                      <div className="flex flex-col">
-                        <span className="text-xs font-semibold text-indigo-400 flex items-center gap-1.5">
-                          <span className="w-1.5 h-1.5 rounded-full bg-indigo-400" />
-                          0.80 — Оглядовий поріг
-                        </span>
-                        <span className="text-[10px] text-slate-400 mt-0.5">
-                          Для факультативів та гуманітарних дисциплін
-                        </span>
-                      </div>
-                      <span className="text-[10px] font-mono text-slate-500 group-hover:text-indigo-400 shrink-0">
-                        Обрати
-                      </span>
-                    </button>
-                  </div>
-                </div>
-              </DrawerSection>
-
-              {/* 3. Course Creation Lifecycle Roadmap */}
+              {/* 2. Course Creation Lifecycle Roadmap */}
               <DrawerSection
                 title="Маршрут автора курсу"
                 icon={Layers}

@@ -21,6 +21,42 @@ interface CourseCreateViewProps {
   onCancel: () => void;
 }
 
+interface MasteryStandard {
+  value: number;
+  title: string;
+  badge: string;
+  tag: string;
+  color: 'emerald' | 'amber' | 'indigo';
+  description: string;
+}
+
+export const MASTERY_STANDARDS: MasteryStandard[] = [
+  {
+    value: 0.85,
+    title: '0.85 — Золотий стандарт',
+    badge: 'Рекомендовано',
+    tag: 'За замовчуванням',
+    color: 'emerald',
+    description: 'Оптимум Corbett & Anderson. Забезпечує стабільне закріплення знань і формування стійких навичок без когнітивного перевантаження учня. Підходить для більшості навчальних дисциплін.',
+  },
+  {
+    value: 0.90,
+    title: '0.90 — Висока строгість',
+    badge: 'Критичні навички',
+    tag: 'STEM / Безпека',
+    color: 'amber',
+    description: 'Для точних наук, криптографії, алгоритміки та кібербезпеки. Практично виключає фактор випадкового вгадування (Guess) та вимагає від учня глибокого впевненого володіння темою.',
+  },
+  {
+    value: 0.80,
+    title: '0.80 — Оглядовий поріг',
+    badge: 'Швидкий темп',
+    tag: 'Факультативи',
+    color: 'indigo',
+    description: 'Для факультативів, гуманітарних або оглядових курсів. Спрямований на швидке знайомство з матеріалом, загальну ерудицію та мінімальні барʼєри при переході між розділами.',
+  },
+];
+
 export const CourseCreateView: React.FC<CourseCreateViewProps> = ({
   categories = [],
   onCreated,
@@ -36,6 +72,10 @@ export const CourseCreateView: React.FC<CourseCreateViewProps> = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [appliedPresetName, setAppliedPresetName] = useState<string | null>(null);
+
+  const selectedStandard = MASTERY_STANDARDS.find(
+    (s) => Math.abs(defaultMasteryThreshold - s.value) < 0.001
+  );
 
   useEffect(() => {
     const handleApplyPreset = (e: any) => {
@@ -254,37 +294,112 @@ export const CourseCreateView: React.FC<CourseCreateViewProps> = ({
               </select>
             </div>
 
-            <div className="flex flex-col gap-1.5">
+            <div className="flex flex-col gap-1.5 md:col-span-2">
               <label className="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
                 <Users className="w-3 h-3 text-indigo-400" />
                 <span>Цільова аудиторія</span>
               </label>
               <input
                 type="text"
-                placeholder="наприклад, 10-11 класи, ВНЗ"
+                placeholder="наприклад, 10-11 класи, ВНЗ, Профільні IT-ліцеї"
                 value={targetAudience}
                 onChange={(e) => setTargetAudience(e.target.value)}
                 className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-slate-200 placeholder-slate-600 focus:outline-none focus:border-emerald-500 transition-colors"
               />
             </div>
 
-            <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
-                <Target className="w-3 h-3 text-emerald-400" />
-                <span>Нормативний поріг BKT (Mastery Threshold)</span>
-              </label>
-              <input
-                type="number"
-                step="0.01"
-                min="0.5"
-                max="0.99"
-                value={defaultMasteryThreshold}
-                onChange={(e) => setDefaultMasteryThreshold(parseFloat(e.target.value))}
-                className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs font-mono text-emerald-400 focus:outline-none focus:border-emerald-500 transition-colors"
-              />
-              <span className="text-[10px] text-slate-500">
-                Ймовірність P(L), необхідна для зарахування навичок (дефолт: 0.85)
-              </span>
+            {/* BKT Mastery Calibration Standards & Interactive Switcher */}
+            <div className="flex flex-col gap-3 md:col-span-2 p-4 rounded-xl bg-slate-950/80 border border-slate-800/80">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2.5 border-b border-slate-800/60">
+                <div className="flex flex-col">
+                  <label className="text-xs font-semibold text-slate-200 flex items-center gap-1.5">
+                    <Target className="w-3.5 h-3.5 text-emerald-400" />
+                    <span>Нормативний поріг майстерності BKT (Mastery Threshold)</span>
+                  </label>
+                  <span className="text-[11px] text-slate-400 mt-0.5">
+                    Ймовірність впевненості моделі P(L), необхідна для атестації компетенцій
+                  </span>
+                </div>
+
+                {/* Direct Numeric Input with quick step */}
+                <div className="flex items-center gap-2 shrink-0">
+                  <span className="text-xs font-mono font-semibold text-slate-400">P(L) ≥</span>
+                  <input
+                    type="number"
+                    step="0.01"
+                    min="0.5"
+                    max="0.99"
+                    value={defaultMasteryThreshold}
+                    onChange={(e) => {
+                      const val = parseFloat(e.target.value);
+                      setDefaultMasteryThreshold(isNaN(val) ? 0.85 : val);
+                    }}
+                    className="w-20 px-2.5 py-1.5 bg-slate-900 border border-slate-700 rounded-lg text-xs font-mono font-bold text-emerald-400 text-center focus:outline-none focus:border-emerald-500 transition-colors"
+                  />
+                </div>
+              </div>
+
+              {/* Segmented Preset Switcher */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                {MASTERY_STANDARDS.map((std) => {
+                  const isSelected = selectedStandard?.value === std.value;
+                  return (
+                    <button
+                      key={std.value}
+                      type="button"
+                      onClick={() => setDefaultMasteryThreshold(std.value)}
+                      className={`p-3 rounded-xl text-left transition-all cursor-pointer flex flex-col gap-1.5 border relative ${
+                        isSelected
+                          ? std.color === 'emerald'
+                            ? 'bg-emerald-500/15 border-emerald-500/80 text-white shadow-sm'
+                            : std.color === 'amber'
+                            ? 'bg-amber-500/15 border-amber-500/80 text-white shadow-sm'
+                            : 'bg-indigo-500/15 border-indigo-500/80 text-white shadow-sm'
+                          : 'bg-slate-900/50 border-slate-800/80 text-slate-400 hover:text-slate-200 hover:bg-slate-900/80'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between w-full">
+                        <span className={`text-xs font-bold ${isSelected ? 'text-white' : 'text-slate-300'}`}>
+                          {std.title}
+                        </span>
+                        <span
+                          className={`text-[9px] font-mono uppercase px-1.5 py-0.5 rounded ${
+                            isSelected
+                              ? std.color === 'emerald'
+                                ? 'bg-emerald-500/25 text-emerald-300 font-semibold'
+                                : std.color === 'amber'
+                                ? 'bg-amber-500/25 text-amber-300 font-semibold'
+                                : 'bg-indigo-500/25 text-indigo-300 font-semibold'
+                              : 'bg-slate-800 text-slate-500'
+                          }`}
+                        >
+                          {std.badge}
+                        </span>
+                      </div>
+                      <span className="text-[10px] text-slate-500 font-mono">
+                        {std.tag}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Pedagogical Description Callout */}
+              <div className="p-2.5 rounded-lg bg-slate-900/60 border border-slate-800/80 text-[11px] leading-relaxed text-slate-300 flex items-start gap-2.5">
+                <Sparkles className="w-3.5 h-3.5 text-emerald-400 shrink-0 mt-0.5" />
+                <div className="flex flex-col gap-0.5">
+                  <span className="font-semibold text-slate-200">
+                    {selectedStandard
+                      ? `${selectedStandard.title} (${selectedStandard.badge})`
+                      : `Користувацький поріг: P(L) = ${defaultMasteryThreshold}`}
+                  </span>
+                  <span className="text-slate-400">
+                    {selectedStandard
+                      ? selectedStandard.description
+                      : `Індивідуально заданий поріг впевненості моделі BKT. Компетенція зараховується учню при досягненні ймовірності ${Math.round(defaultMasteryThreshold * 100)}%.`}
+                  </span>
+                </div>
+              </div>
             </div>
 
             <div className="flex flex-col gap-1.5 md:col-span-2">
