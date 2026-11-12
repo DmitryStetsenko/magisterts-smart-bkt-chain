@@ -85,7 +85,8 @@ test.describe('Course Architecture, Modular Curriculum & BKT Mastery Gating E2E 
 
     // Verify initial Breadcrumb: CMS Адміністрування / Курси
     await expect(page.getByRole('button', { name: 'CMS Адміністрування' })).toBeVisible();
-    await expect(page.getByText(/Курси/)).toBeVisible();
+    await expect(page.locator('nav[aria-label="Breadcrumb"]').getByText(/Курси/)).toBeVisible();
+    await expect(page.getByRole('button', { name: /Курси платформи/i })).toBeVisible();
 
     // 2.2 Full-page Course Creation View with Breadcrumb drill-down
     const createCourseBtn = page.getByRole('button', { name: 'Створити Новий Курс' });
@@ -136,8 +137,9 @@ test.describe('Course Architecture, Modular Curriculum & BKT Mastery Gating E2E 
     await expect(page.getByText(/Модуль 1: Змінні, Типи та Оператори/i).first()).toBeVisible();
     await expect(page.getByText(/Модуль 2: Умовні конструкції та Функції/i).first()).toBeVisible();
 
-    // Verify Sidebar Drawer clean navigation (course readiness audit, module test sandbox, no duplicate courses)
+    // Verify Sidebar Drawer clean navigation (course readiness audit, module test sandbox, courses switcher)
     await expect(page.getByRole('button', { name: /До каталогу курсів/i })).toBeVisible();
+    await expect(page.getByRole('button', { name: /Курси платформи/i })).toBeVisible();
     await expect(page.getByRole('button', { name: /Готовність курсу/i })).toBeVisible();
     await expect(page.getByRole('button', { name: /Тестування модуля/i })).toBeVisible();
     await expect(page.getByRole('button', { name: /Дії та інструменти/i })).toBeVisible();

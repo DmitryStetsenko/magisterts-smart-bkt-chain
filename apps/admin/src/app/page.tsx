@@ -447,6 +447,54 @@ export default function AdminCMSDashboard() {
                   </a>
                 </div>
               </DrawerSection>
+
+              {/* 5. Platform Courses Switcher */}
+              <DrawerSection
+                title="Курси платформи"
+                icon={BookOpen}
+                badge={`${dynamicCourses.length}`}
+                defaultOpen={false}
+              >
+                <div className="flex flex-col divide-y divide-slate-800/50 pt-1">
+                  {dynamicCourses.map((c) => {
+                    const isCurrent = selectedStudioCourse.slug === c.slug || selectedStudioCourse.id === c.id;
+                    const modsCount = c.modules?.length || 0;
+                    return (
+                      <button
+                        key={c.id || c.slug}
+                        type="button"
+                        onClick={() => {
+                          if (!isCurrent) {
+                            handleOpenStudio(c);
+                          }
+                        }}
+                        className={`w-full py-2 px-2 text-left text-xs transition-colors cursor-pointer flex items-center justify-between group rounded-md ${
+                          isCurrent
+                            ? 'bg-emerald-500/15 text-emerald-300 font-semibold border-l-2 border-emerald-400 pl-2'
+                            : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
+                        }`}
+                        title={isCurrent ? `Поточний курс: ${c.title}` : `Перейти до Студії курсу: ${c.title}`}
+                      >
+                        <div className="flex items-center gap-2 min-w-0 pr-1">
+                          <BookOpen
+                            className={`w-3.5 h-3.5 shrink-0 ${
+                              isCurrent ? 'text-emerald-400' : 'text-slate-500 group-hover:text-slate-300'
+                            }`}
+                          />
+                          <span className="truncate">{c.title}</span>
+                        </div>
+                        <span
+                          className={`text-[10px] font-mono shrink-0 ${
+                            isCurrent ? 'text-emerald-300 font-bold' : 'text-slate-500'
+                          }`}
+                        >
+                          {isCurrent ? 'Активний' : `${modsCount} мод.`}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </DrawerSection>
             </>
           )}
 
@@ -465,6 +513,54 @@ export default function AdminCMSDashboard() {
                   <span>До каталогу курсів</span>
                 </button>
               </div>
+
+              {/* Course Switcher: Instant 1-click jump to another course */}
+              <DrawerSection
+                title="Курси платформи"
+                icon={BookOpen}
+                badge={`${dynamicCourses.length}`}
+                defaultOpen={true}
+              >
+                <div className="flex flex-col divide-y divide-slate-800/50 pt-1">
+                  {dynamicCourses.map((c) => {
+                    const isCurrent = selectedStudioCourse.slug === c.slug || selectedStudioCourse.id === c.id;
+                    const modsCount = c.modules?.length || 0;
+                    return (
+                      <button
+                        key={c.id || c.slug}
+                        type="button"
+                        onClick={() => {
+                          if (!isCurrent) {
+                            handleOpenStudio(c, studioSubTab);
+                          }
+                        }}
+                        className={`w-full py-2 px-2 text-left text-xs transition-colors cursor-pointer flex items-center justify-between group rounded-md ${
+                          isCurrent
+                            ? 'bg-emerald-500/15 text-emerald-300 font-semibold border-l-2 border-emerald-400 pl-2'
+                            : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
+                        }`}
+                        title={isCurrent ? `Поточний курс: ${c.title}` : `Перемкнути Студію на курс: ${c.title}`}
+                      >
+                        <div className="flex items-center gap-2 min-w-0 pr-1">
+                          <BookOpen
+                            className={`w-3.5 h-3.5 shrink-0 ${
+                              isCurrent ? 'text-emerald-400' : 'text-slate-500 group-hover:text-slate-300'
+                            }`}
+                          />
+                          <span className="truncate">{c.title}</span>
+                        </div>
+                        <span
+                          className={`text-[10px] font-mono shrink-0 ${
+                            isCurrent ? 'text-emerald-300 font-bold' : 'text-slate-500'
+                          }`}
+                        >
+                          {isCurrent ? 'Активний' : `${modsCount} мод.`}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </DrawerSection>
 
               {/* 1. Course Readiness & Quality Audit */}
               {(() => {
@@ -715,9 +811,132 @@ export default function AdminCMSDashboard() {
             </>
           )}
 
-          {/* Drawer: Courses List Mode (Clean filter & bank stats, zero duplicate course list) */}
-          {activeTab === 'courses' && courseViewMode !== 'STUDIO' && (
+          {/* Drawer: Course Create Mode */}
+          {activeTab === 'courses' && courseViewMode === 'CREATE' && (
             <>
+              {/* Back to Catalog Button */}
+              <div className="p-2 border-b border-slate-800/60">
+                <button
+                  type="button"
+                  onClick={handleBackToCoursesList}
+                  className="w-full py-2 px-2.5 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800/70 transition-colors flex items-center gap-2 text-xs cursor-pointer"
+                  title="Повернутися до табличного каталогу курсів"
+                >
+                  <ArrowLeft className="w-3.5 h-3.5 text-slate-400" />
+                  <span>До каталогу курсів</span>
+                </button>
+              </div>
+
+              {/* Platform Courses Overview in Create Mode */}
+              <DrawerSection
+                title="Курси платформи"
+                icon={BookOpen}
+                badge={`${dynamicCourses.length}`}
+                defaultOpen={true}
+              >
+                <div className="flex flex-col divide-y divide-slate-800/50 pt-1">
+                  {dynamicCourses.map((c) => (
+                    <button
+                      key={c.id || c.slug}
+                      type="button"
+                      onClick={() => handleOpenStudio(c)}
+                      className="w-full py-2 px-2 text-left text-xs text-slate-400 hover:text-white hover:bg-slate-800/50 transition-colors cursor-pointer flex items-center justify-between group rounded-md"
+                      title={`Відкрити Студію курсу: ${c.title}`}
+                    >
+                      <div className="flex items-center gap-2 min-w-0 pr-1">
+                        <BookOpen className="w-3.5 h-3.5 shrink-0 text-slate-500 group-hover:text-emerald-400" />
+                        <span className="truncate">{c.title}</span>
+                      </div>
+                      <span className="text-[10px] font-mono text-slate-500 shrink-0">
+                        {c.modules?.length || 0} мод.
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              </DrawerSection>
+            </>
+          )}
+
+          {/* Drawer: Courses List Mode (Full Platform Courses Overview & Filtering) */}
+          {activeTab === 'courses' && courseViewMode === 'LIST' && (
+            <>
+              {/* 1. Platform Courses Overview & Quick Switcher */}
+              <DrawerSection
+                title="Курси платформи"
+                icon={BookOpen}
+                badge={`${dynamicCourses.length}`}
+                defaultOpen={true}
+              >
+                <div className="flex flex-col divide-y divide-slate-800/50 pt-1">
+                  {dynamicCourses.length === 0 ? (
+                    <div className="p-3 text-[11px] text-slate-500 italic text-center">
+                      Завантаження курсів...
+                    </div>
+                  ) : (
+                    dynamicCourses.map((c) => {
+                      const isSelected = selectedCourseSlug === c.slug;
+                      const modsCount = c.modules?.length || 0;
+                      const isPublished = c.isPublished !== false;
+
+                      return (
+                        <div
+                          key={c.id || c.slug}
+                          className={`w-full py-1.5 px-2 text-left text-xs transition-colors flex items-center justify-between group rounded-md ${
+                            isSelected
+                              ? 'bg-emerald-500/15 text-emerald-300 font-semibold border-l-2 border-emerald-400 pl-2'
+                              : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
+                          }`}
+                        >
+                          <button
+                            type="button"
+                            onClick={() => setSelectedCourseSlug(isSelected ? null : c.slug)}
+                            className="flex items-center gap-2 min-w-0 pr-1 flex-1 text-left cursor-pointer"
+                            title={isSelected ? `Скинути фільтр курсу: ${c.title}` : `Фільтрувати за курсом: ${c.title}`}
+                          >
+                            <span
+                              className={`w-2 h-2 rounded-full shrink-0 ${
+                                isPublished ? 'bg-emerald-400' : 'bg-amber-400'
+                              }`}
+                              title={isPublished ? 'Опубліковано' : 'Чернетка'}
+                            />
+                            <div className="flex flex-col min-w-0">
+                              <span className="truncate font-medium text-slate-200 group-hover:text-white">
+                                {c.title}
+                              </span>
+                              <span className="text-[10px] font-mono text-slate-500 truncate">
+                                /{c.slug} • {modsCount} {modsCount === 1 ? 'модуль' : modsCount < 5 ? 'модулі' : 'модулів'}
+                              </span>
+                            </div>
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => handleOpenStudio(c)}
+                            className="shrink-0 px-2 py-0.5 rounded text-[10px] font-mono font-medium text-slate-400 hover:text-emerald-300 hover:bg-slate-700/60 transition-colors cursor-pointer border border-transparent hover:border-slate-700"
+                            title="Відкрити Студію курсу"
+                          >
+                            Студія →
+                          </button>
+                        </div>
+                      );
+                    })
+                  )}
+
+                  {selectedCourseSlug && (
+                    <div className="pt-2 px-1">
+                      <button
+                        type="button"
+                        onClick={() => setSelectedCourseSlug(null)}
+                        className="w-full py-1 text-[11px] text-center text-slate-400 hover:text-white hover:bg-slate-800/60 rounded transition-colors cursor-pointer font-mono"
+                      >
+                        ✕ Скинути вибір курсу (показати всі)
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </DrawerSection>
+
+              {/* 2. Subject Categories Filter */}
               <DrawerSection
                 title="Предметні категорії"
                 icon={Folder}
