@@ -125,6 +125,10 @@ export const CourseStudioView: React.FC<CourseStudioViewProps> = ({
   const [editModTheoryUrl, setEditModTheoryUrl] = useState('');
   const [editModThreshold, setEditModThreshold] = useState<number>(0.85);
 
+  // Theory editing state per module
+  const [editingTheoryModuleId, setEditingTheoryModuleId] = useState<string | null>(null);
+  const [editingTheoryContent, setEditingTheoryContent] = useState<string>('');
+
   // Skill assignment state
   const [assigningModuleId, setAssigningModuleId] = useState<string | null>(null);
   const [selectedSkillIds, setSelectedSkillIds] = useState<string[]>([]);
@@ -597,6 +601,19 @@ export const CourseStudioView: React.FC<CourseStudioViewProps> = ({
                     className="px-3 py-1.5 bg-slate-950 border border-slate-800 rounded-lg text-xs font-mono text-emerald-400 focus:outline-none focus:border-emerald-500"
                   />
                 </div>
+
+                <div className="flex flex-col gap-1 sm:col-span-3">
+                  <label className="text-[11px] font-semibold text-slate-300">
+                    Теоретичний конспект / Опис теми (Markdown)
+                  </label>
+                  <textarea
+                    rows={3}
+                    placeholder="Введіть теоретичний матеріал, правила, теги або зразки коду для цього модуля..."
+                    value={newModDesc}
+                    onChange={(e) => setNewModDesc(e.target.value)}
+                    className="px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-xs text-white focus:outline-none focus:border-emerald-500 resize-none font-mono"
+                  />
+                </div>
               </div>
 
               <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-800">
@@ -746,30 +763,120 @@ export const CourseStudioView: React.FC<CourseStudioViewProps> = ({
 
                     {/* Inline Theory Content Unit for this module */}
                     {expandedTheoryModuleIds[mod.id] && (
-                      <div className="p-3.5 bg-slate-950/90 border-t border-b border-emerald-500/30 flex flex-col gap-2.5 animate-fadeIn">
+                      <div className="p-4 bg-slate-950/90 border-t border-b border-emerald-500/30 flex flex-col gap-3 animate-fadeIn">
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
                             <BookOpen className="w-4 h-4 text-emerald-400" />
                             <span className="text-xs font-bold text-white uppercase tracking-wider">
                               Теоретичний Конспект Модуля
                             </span>
+                            {mod.description && (
+                              <span className="px-1.5 py-0.5 rounded text-[9px] font-mono bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                                {mod.description.length} симв.
+                              </span>
+                            )}
                           </div>
-                          {mod.theoryUrl && (
-                            <a
-                              href={mod.theoryUrl}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-xs text-emerald-400 hover:text-emerald-300 font-mono inline-flex items-center gap-1 underline"
+                          <div className="flex items-center gap-2">
+                            {editingTheoryModuleId !== mod.id && (
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setEditingTheoryModuleId(mod.id);
+                                  setEditingTheoryContent(mod.description || '');
+                                }}
+                                className="px-2.5 py-1 rounded text-[11px] font-medium bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 border border-emerald-500/30 transition-colors cursor-pointer flex items-center gap-1.5"
+                              >
+                                <Edit2 className="w-3 h-3 text-emerald-400" />
+                                <span>{mod.description ? 'Редагувати конспект' : 'Створити конспект'}</span>
+                              </button>
+                            )}
+                            {mod.theoryUrl && (
+                              <a
+                                href={mod.theoryUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-xs text-emerald-400 hover:text-emerald-300 font-mono inline-flex items-center gap-1 underline ml-2"
+                              >
+                                <span>Відкрити в Zen Focus Підручника</span>
+                                <ExternalLink className="w-3 h-3" />
+                              </a>
+                            )}
+                          </div>
+                        </div>
+
+                        {editingTheoryModuleId === mod.id ? (
+                          <div className="flex flex-col gap-2 pt-1 animate-fadeIn">
+                            <div className="flex items-center justify-between text-[11px] text-slate-400">
+                              <span>Введіть або відредагуйте теоретичний матеріал модуля у форматі Markdown:</span>
+                              <span className="font-mono text-[10px] text-slate-500">{editingTheoryContent.length} символів</span>
+                            </div>
+                            <textarea
+                              rows={9}
+                              value={editingTheoryContent}
+                              onChange={(e) => setEditingTheoryContent(e.target.value)}
+                              placeholder={`# Тема: ${mod.title}\n\n## 1. Теоретичні поняття\nОпишіть фундаментальні концепції, термінологію та правила...\n\n## 2. Приклад коду\n\`\`\`html\n<!DOCTYPE html>\n<html>\n  <head><title>Моя сторінка</title></head>\n  <body><h1>Привіт, світ!</h1></body>\n</html>\n\`\`\`\n\n## 3. Типові омани учнів (Misconceptions)\n- На що звернути увагу перед практикою...`}
+                              className="w-full p-3 bg-slate-900 border border-emerald-500/50 rounded-lg text-xs font-mono text-slate-200 focus:outline-none focus:ring-1 focus:ring-emerald-500 leading-relaxed resize-y"
+                            />
+                            <div className="flex items-center justify-end gap-2">
+                              <button
+                                type="button"
+                                onClick={() => setEditingTheoryModuleId(null)}
+                                className="px-3 py-1.5 text-xs text-slate-400 hover:text-white transition-colors cursor-pointer"
+                              >
+                                Скасувати
+                              </button>
+                              <button
+                                type="button"
+                                onClick={async () => {
+                                  try {
+                                    const res = await fetch(`${API_URL}/api/v1/courses/${course.id}/modules/${mod.id}`, {
+                                      method: 'PATCH',
+                                      headers: { 'Content-Type': 'application/json' },
+                                      body: JSON.stringify({ description: editingTheoryContent.trim() || null }),
+                                    });
+                                    if (res.ok) {
+                                      setMessage('Теоретичний конспект модуля успішно збережено!');
+                                      setEditingTheoryModuleId(null);
+                                      await fetchFullCourseData();
+                                    } else {
+                                      const err = await res.json();
+                                      setError(err.message || 'Помилка збереження конспекту');
+                                    }
+                                  } catch {
+                                    setError('Помилка мережі при збереженні конспекту');
+                                  }
+                                }}
+                                className="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold rounded-lg transition-colors cursor-pointer flex items-center gap-1.5 shadow"
+                              >
+                                <Save className="w-3.5 h-3.5" />
+                                <span>Зберегти конспект</span>
+                              </button>
+                            </div>
+                          </div>
+                        ) : mod.description ? (
+                          <div className="p-3.5 rounded-lg bg-slate-900 border border-slate-800 text-xs text-slate-200 leading-relaxed font-sans whitespace-pre-wrap max-h-72 overflow-y-auto">
+                            {mod.description}
+                          </div>
+                        ) : (
+                          <div className="p-5 rounded-lg bg-slate-900/60 border border-dashed border-slate-800 text-center flex flex-col items-center gap-2">
+                            <p className="text-xs text-slate-400">
+                              Теоретичний конспект для цього модуля ще не заповнено.
+                            </p>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setEditingTheoryModuleId(mod.id);
+                                setEditingTheoryContent('');
+                              }}
+                              className="px-3 py-1.5 bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 border border-emerald-500/30 text-xs font-medium rounded-lg transition-colors cursor-pointer flex items-center gap-1.5"
                             >
-                              <span>Відкрити в Zen Focus Підручника</span>
-                              <ExternalLink className="w-3 h-3" />
-                            </a>
-                          )}
-                        </div>
-                        <div className="p-2.5 rounded-lg bg-slate-900 border border-slate-800 text-xs text-slate-300 leading-relaxed">
-                          {mod.description || 'Теоретичний конспект для цього модуля доступний у Підручнику теорії (apps/study). Учні вивчають концепції, інтерактивний код та типові омани перед переходом до адаптивного розвʼязання завдань.'}
-                        </div>
-                        <div className="flex items-center justify-between text-[11px] text-slate-500">
+                              <Plus className="w-3.5 h-3.5" />
+                              <span>Написати теоретичний конспект</span>
+                            </button>
+                          </div>
+                        )}
+
+                        <div className="flex items-center justify-between text-[11px] text-slate-500 pt-1 border-t border-slate-800/60">
                           <span>Маршрут підручника: <code className="text-emerald-400 font-mono">{mod.theoryUrl || `/learn/${course.slug}/${mod.slug}`}</code></span>
                           <span className="text-slate-400 font-mono text-[10px]">Zen Focus Reading Engine v2.0</span>
                         </div>

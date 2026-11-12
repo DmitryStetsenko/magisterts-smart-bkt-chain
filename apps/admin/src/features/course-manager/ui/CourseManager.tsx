@@ -601,11 +601,11 @@ export const CourseManager: React.FC<CourseManagerProps> = ({
                   </label>
                   <input
                     type="number"
-                    step="0.05"
+                    step="0.01"
                     min="0.5"
                     max="0.99"
                     value={defaultMasteryThreshold}
-                    onChange={(e) => setDefaultMasteryThreshold(parseFloat(e.target.value))}
+                    onChange={(e) => setDefaultMasteryThreshold(parseFloat(e.target.value) || 0.85)}
                     className="w-full px-3 py-1.5 rounded-lg bg-slate-950 border border-slate-800 text-xs text-white font-mono focus:outline-none focus:border-emerald-500"
                   />
                 </div>

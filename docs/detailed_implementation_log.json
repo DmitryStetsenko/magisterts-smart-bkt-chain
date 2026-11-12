@@ -120,6 +120,71 @@
           ]
         },
         {
+          "title": "0.1.7.91 Вбудований Редактор Теоретичних Конспектів Модулів та Нормалізація Валідації BKT-Параметрів (SBC-403, EP-AD)",
+          "level": 3,
+          "paragraphs": [],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "**Контекст та інженерна проблема:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Користувач звернув увагу на дві проблеми авторського флоу:",
+              "subitems": [
+                "1. У `CreateSkillModal` дефолтні значення параметрів BKT ($0.50, 0.10, 0.10, 0.20$) не проходили браузерну HTML5-валідацію через конфігурацію `min=\"0.01\"` та `step=\"0.05\"` (дозволялися тільки `0.01 + k * 0.05`).",
+                "2. У Студії курсу при відкритті блоку «Теорія» (`[📖 Теорія]`) відображався статичний заглушковий текст без можливості ввести або відредагувати теоретичний конспект модуля, а у формі додавання модуля поле опису було відсутнє."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Архітектурні та інженерні рішення:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Нормалізація валідації числових полів ([`CreateSkillModal.tsx`](file:///apps/admin/src/features/course-manager/ui/CreateSkillModal.tsx), [`CourseEditModal.tsx`](file:///apps/admin/src/features/course-manager/ui/CourseEditModal.tsx), [`CourseManager.tsx`](file:///apps/admin/src/features/course-manager/ui/CourseManager.tsx), [`ModuleManagerModal.tsx`](file:///apps/admin/src/features/course-manager/ui/ModuleManagerModal.tsx)):**",
+              "subitems": [
+                "Змінено крок `step` на `0.01` для всіх числових інпутів BKT ($P(L_0), P(T), P(S), P(G)$ та порогів майстерності).",
+                "Дозволено будь-які дробові значення з точністю до 0.01, що усунуло помилку блокування форми браузером."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Вбудований Markdown-редактор теоретичних конспектів ([`CourseStudioView.tsx`](file:///apps/admin/src/features/course-manager/ui/CourseStudioView.tsx)):**",
+              "subitems": [
+                "Додано поле `Теоретичний конспект / Опис теми (Markdown)` у форму створення нового модуля.",
+                "У розгорнутий блок `[📖 Теорія]` модуля додано інтерактивний режим редагування з кнопкою `[✏️ Редагувати конспект]` (або `[+ Написати теоретичний конспект]` для нових модулів).",
+                "Реалізовано редактор Markdown із підрахунком символів, структурованим підказковим плейсхолдером (концепції, кодові блоки, омани) та кнопками «Зберегти конспект» і «Скасувати».",
+                "При збереженні відправляється запит `PATCH /api/v1/courses/:courseId/modules/:moduleId` із оновленим полем `description`.",
+                "Конспект відображається із збереженням структури абзаців (`whitespace-pre-wrap`), лічильником символів та посиланням на відкриття в режимі Zen Focus."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Верифікація:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "100% успішна виробнича збірка `apps/admin` (`npm run build:admin`, Next.js 16.3.8 Turbopack, 0 помилок).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "100% успішне проходження повного сьюту Playwright E2E (`npm run test:e2e`, 12/12 passed, 52.8s).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Збережено візуальний артефакт: `admin_theory_inline_editor.png`.",
+              "subitems": []
+            }
+          ]
+        },
+        {
           "title": "0.1.7.90 Реалізація Повноцінного Авторського Конструктора Курсу Під Ключ, Пульта Автора та Інтерактивної Пісочниці Тестування Модуля (SBC-402, EP-AD)",
           "level": 3,
           "paragraphs": [],

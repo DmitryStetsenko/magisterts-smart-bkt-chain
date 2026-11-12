@@ -193,11 +193,11 @@ export const CreateSkillModal: React.FC<CreateSkillModalProps> = ({
                 <span className="text-[10px] text-slate-400 font-mono">P(L₀)</span>
                 <input
                   type="number"
-                  step="0.05"
+                  step="0.01"
                   min="0.01"
                   max="0.99"
                   value={pL0}
-                  onChange={(e) => setPL0(parseFloat(e.target.value))}
+                  onChange={(e) => setPL0(parseFloat(e.target.value) || 0)}
                   className="bg-slate-900 border border-slate-800 rounded px-1.5 py-1 text-emerald-400 font-mono text-center text-xs"
                 />
                 <span className="text-[8px] text-slate-400">Початкове</span>
@@ -206,11 +206,11 @@ export const CreateSkillModal: React.FC<CreateSkillModalProps> = ({
                 <span className="text-[10px] text-slate-400 font-mono">P(T)</span>
                 <input
                   type="number"
-                  step="0.05"
+                  step="0.01"
                   min="0.01"
                   max="0.99"
                   value={pT}
-                  onChange={(e) => setPT(parseFloat(e.target.value))}
+                  onChange={(e) => setPT(parseFloat(e.target.value) || 0)}
                   className="bg-slate-900 border border-slate-800 rounded px-1.5 py-1 text-emerald-400 font-mono text-center text-xs"
                 />
                 <span className="text-[8px] text-slate-400">Перехід</span>
@@ -219,11 +219,11 @@ export const CreateSkillModal: React.FC<CreateSkillModalProps> = ({
                 <span className="text-[10px] text-slate-400 font-mono">P(S)</span>
                 <input
                   type="number"
-                  step="0.05"
+                  step="0.01"
                   min="0.01"
                   max="0.99"
                   value={pS}
-                  onChange={(e) => setPS(parseFloat(e.target.value))}
+                  onChange={(e) => setPS(parseFloat(e.target.value) || 0)}
                   className="bg-slate-900 border border-slate-800 rounded px-1.5 py-1 text-rose-400 font-mono text-center text-xs"
                 />
                 <span className="text-[8px] text-slate-400">Помилка</span>
@@ -232,11 +232,11 @@ export const CreateSkillModal: React.FC<CreateSkillModalProps> = ({
                 <span className="text-[10px] text-slate-400 font-mono">P(G)</span>
                 <input
                   type="number"
-                  step="0.05"
+                  step="0.01"
                   min="0.01"
                   max="0.99"
                   value={pG}
-                  onChange={(e) => setPG(parseFloat(e.target.value))}
+                  onChange={(e) => setPG(parseFloat(e.target.value) || 0)}
                   className="bg-slate-900 border border-slate-800 rounded px-1.5 py-1 text-blue-400 font-mono text-center text-xs"
                 />
                 <span className="text-[8px] text-slate-400">Вгадування</span>
