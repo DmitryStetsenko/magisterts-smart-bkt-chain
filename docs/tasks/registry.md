@@ -458,7 +458,7 @@
 | **SBC-413** | `Fix` | `AD` | eliminate redundant course jumper popup and remove duplicated platform course lists from studio drawer | 2026-11-12 | `52e290d` |
 | **SBC-414** | `Fix` | `AD` | ensure draft status for new courses and smooth transition to step 2 without catalog redirection | 2026-11-12 | `964a894` |
 | **SBC-415** | `Fix` | `AD` | preserve create course rail tab in studio wizard, eliminate theory platform list and expose drafts in catalog | 2026-11-12 | `88dc24d` |
-| **SBC-416** | `Story` | `AD` | implement automatic module numbering, live ukrainian transliteration and slug validation in course studio | 2026-11-13 | pending |
+| **SBC-416** | `Story` | `AD` | implement automatic module numbering, live ukrainian transliteration and slug validation in course studio | 2026-11-13 | `549501e` |
 
 ---
 
