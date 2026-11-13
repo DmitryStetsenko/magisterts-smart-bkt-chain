@@ -1,8 +1,9 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Target, X, Check, AlertCircle, Sparkles, Sliders } from 'lucide-react';
+import { Target, X, Check, AlertCircle, Sparkles, Sliders, CheckCircle2 } from 'lucide-react';
 import { TaskDifficulty } from '@sbc/types';
+import { slugify, validateSlug } from '@sbc/routes';
 
 interface CreateSkillModalProps {
   isOpen: boolean;
@@ -48,14 +49,11 @@ export const CreateSkillModal: React.FC<CreateSkillModalProps> = ({
 
   if (!isOpen) return null;
 
+  const slugValidation = validateSlug(slug, { maxLength: 50 });
+
   const handleTitleChange = (val: string) => {
     setTitle(val);
-    const generatedSlug = val
-      .toLowerCase()
-      .trim()
-      .replace(/[^\w\s-]/g, '')
-      .replace(/[\s_-]+/g, '-')
-      .replace(/^-+|-+$/g, '');
+    const generatedSlug = slugify(val, { maxLength: 50 });
     setSlug(generatedSlug);
   };
 
@@ -64,6 +62,14 @@ export const CreateSkillModal: React.FC<CreateSkillModalProps> = ({
     if (!title.trim()) {
       setError('Вкажіть назву компетенції');
       return;
+    }
+
+    if (slug.trim()) {
+      const validation = validateSlug(slug.trim(), { maxLength: 50 });
+      if (!validation.isValid) {
+        setError(validation.error || 'Невалідний слаг компетенції');
+        return;
+      }
     }
 
     try {
@@ -147,14 +153,42 @@ export const CreateSkillModal: React.FC<CreateSkillModalProps> = ({
           {/* Slug & Difficulty */}
           <div className="grid grid-cols-2 gap-3">
             <div className="flex flex-col gap-1">
-              <label className="text-slate-300 font-medium">URL-ідентифікатор (Slug)</label>
+              <div className="flex items-center justify-between">
+                <label className="text-slate-300 font-medium">URL-ідентифікатор (Slug)</label>
+                {slug && (
+                  <button
+                    type="button"
+                    onClick={() => setSlug(slugify(title, { maxLength: 50 }))}
+                    className="text-[10px] text-emerald-400 hover:text-emerald-300 hover:underline cursor-pointer"
+                  >
+                    ↻ З назви
+                  </button>
+                )}
+              </div>
               <input
                 type="text"
                 value={slug}
                 onChange={(e) => setSlug(e.target.value)}
                 placeholder="js-basics"
-                className="bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-slate-300 font-mono text-[11px] placeholder-slate-600 focus:outline-none focus:border-emerald-500"
+                className={`bg-slate-950 border rounded-lg px-3 py-2 text-slate-300 font-mono text-[11px] placeholder-slate-600 focus:outline-none ${
+                  slug && !slugValidation.isValid
+                    ? 'border-rose-500/80 focus:border-rose-500'
+                    : 'border-slate-800 focus:border-emerald-500'
+                }`}
               />
+              {slug && (
+                slugValidation.isValid ? (
+                  <span className="text-[10px] text-emerald-400 flex items-center gap-1">
+                    <CheckCircle2 className="w-3 h-3 text-emerald-400 shrink-0" />
+                    <span>Коректний слаг</span>
+                  </span>
+                ) : (
+                  <span className="text-[10px] text-rose-400 flex items-center gap-1">
+                    <AlertCircle className="w-3 h-3 text-rose-400 shrink-0" />
+                    <span>{slugValidation.error}</span>
+                  </span>
+                )
+              )}
             </div>
             <div className="flex flex-col gap-1">
               <label className="text-slate-300 font-medium">Рівень складності</label>

@@ -238,6 +238,9 @@ export default function AdminCMSDashboard() {
             const matchCourse = dynamicCourses.find((c) => c.slug === courseParam || c.id === courseParam);
             if (matchCourse) {
               setSelectedTheoryModule(null);
+              const hasModules = (matchCourse.modules?.length ?? 0) > 0;
+              setMaxUnlockedStep(hasModules ? 5 : 2);
+              setAuthorStep(2);
               return matchCourse;
             }
             fetch(`${API_URL}/api/v1/courses/${courseParam}`)
@@ -247,6 +250,9 @@ export default function AdminCMSDashboard() {
                   setSelectedStudioCourse(fetched);
                   setSelectedTheoryModule(null);
                   setCourseViewMode('STUDIO');
+                  const hasModules = (fetched.modules?.length ?? 0) > 0;
+                  setMaxUnlockedStep(hasModules ? 5 : 2);
+                  setAuthorStep(2);
                 }
               })
               .catch(() => {});
@@ -276,6 +282,9 @@ export default function AdminCMSDashboard() {
           const matchCourse = dynamicCourses.find((c) => c.slug === courseParam || c.id === courseParam);
           if (matchCourse) {
             setSelectedTheoryModule(null);
+            const hasModules = (matchCourse.modules?.length ?? 0) > 0;
+            setMaxUnlockedStep(hasModules ? 5 : 2);
+            setAuthorStep(2);
             return matchCourse;
           }
           fetch(`${API_URL}/api/v1/courses/${courseParam}`)
@@ -285,6 +294,9 @@ export default function AdminCMSDashboard() {
                 setSelectedStudioCourse(fetched);
                 setSelectedTheoryModule(null);
                 setCourseViewMode('STUDIO');
+                const hasModules = (fetched.modules?.length ?? 0) > 0;
+                setMaxUnlockedStep(hasModules ? 5 : 2);
+                setAuthorStep(2);
               }
             })
             .catch(() => {});

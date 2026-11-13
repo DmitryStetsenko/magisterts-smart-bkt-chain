@@ -120,4 +120,103 @@ test.describe('Course Creation Wizard & Draft Status Verification Suite', () => 
       }
     }
   });
+
+  test('Automated Module Numbering, Live Ukrainian Transliteration and Slug Validation in Course Studio', async ({ page }) => {
+    const studioTimestamp = Date.now();
+    const studioCourseTitle = `Веб-розробка та архітектура ${studioTimestamp}`;
+    const studioCourseSlug = `web-arch-${studioTimestamp}`;
+
+    // 1. Create a draft course via API for reliable isolated testing
+    const createRes = await page.request.post('http://localhost:3000/api/v1/courses', {
+      data: {
+        title: studioCourseTitle,
+        slug: studioCourseSlug,
+        description: 'Тестовий курс для перевірки автоматичної нумерації та транслітерації слага',
+        targetAudience: '10-11 класи',
+        defaultMasteryThreshold: 0.85,
+        isPublished: false,
+      },
+    });
+    expect(createRes.ok()).toBeTruthy();
+    const course = await createRes.json();
+
+    try {
+      // 2. Open Admin Portal in Studio mode for this course
+      await page.goto(`http://localhost:3004/?tab=create_course&mode=studio&course=${studioCourseSlug}`, {
+        waitUntil: 'domcontentloaded',
+        timeout: 30000,
+      });
+
+      await expect(page.getByRole('heading', { name: studioCourseTitle })).toBeVisible({ timeout: 15000 });
+      await expect(page.getByText('Маршрут автора курсу: Крок 2 з 5')).toBeVisible();
+
+      // 3. Click "Додати Модуль"
+      const addModuleBtn = page.locator('main').getByRole('button', { name: /Додати Модуль/i });
+      await expect(addModuleBtn).toBeVisible();
+      await addModuleBtn.click();
+
+      // 4. Verify Automatic Numbering in creation panel (Модуль #1)
+      await expect(page.getByText('Новий тематичний модуль')).toBeVisible();
+      await expect(page.getByText('Модуль #1')).toBeVisible();
+      const orderInput = page.locator('input[type="number"][min="1"]').first();
+      await expect(orderInput).toHaveValue('1');
+
+      // 5. Verify Placeholder does NOT contain "Модуль 6:"
+      const titleInput = page.locator('input[placeholder*="Інтерактивні форми та валідація даних"]');
+      await expect(titleInput).toBeVisible();
+
+      // 6. Type title in Ukrainian with punctuation and verify live transliteration
+      await titleInput.fill('Інтерактивні форми & валідація даних');
+
+      const slugInput = page.locator('input[placeholder="наприклад, interaktyvni-formy"]');
+      await expect(slugInput).toBeVisible();
+
+      // Transliterated slug should automatically be generated on the fly
+      await expect(slugInput).toHaveValue('interaktyvni-formy-and-validatsiya-danykh');
+
+      // Check green validation indicator
+      await expect(page.getByText(/Коректний URL-ідентифікатор/i)).toBeVisible();
+      await expect(page.getByText(new RegExp(`/learn/${studioCourseSlug}/interaktyvni-formy-and-validatsiya-danykh`))).toBeVisible();
+
+      // Check theoryUrl auto-sync
+      const theoryInput = page.locator(`input[value*="/learn/${studioCourseSlug}/interaktyvni-formy-and-validatsiya-danykh"]`);
+      await expect(theoryInput).toBeVisible();
+
+      // Take screenshot of live transliteration & validation
+      await page.screenshot({ path: 'C:/Users/Dima/.gemini/antigravity/brain/f32616d8-c180-4a3d-9dfd-5caf83629066/module_translit_valid.png' });
+
+      // 7. Test invalid slug validation
+      await slugInput.fill('Невалідний слаг!');
+      await expect(page.getByText(/Слаг не може містити кириличні літери/i)).toBeVisible();
+      const saveBtn = page.getByRole('button', { name: 'Зберегти модуль' });
+      await expect(saveBtn).toBeDisabled();
+
+      // 8. Test "↻ З назви" reset button
+      const resetSlugBtn = page.getByRole('button', { name: /↻ З назви/i });
+      await expect(resetSlugBtn).toBeVisible();
+      await resetSlugBtn.click();
+
+      await expect(slugInput).toHaveValue('interaktyvni-formy-and-validatsiya-danykh');
+      await expect(saveBtn).toBeEnabled();
+
+      // 9. Save module
+      await saveBtn.click();
+      await expect(page.getByText('Модуль успішно створено')).toBeVisible();
+
+      // 10. Verify created module in list
+      await expect(page.getByText('Інтерактивні форми & валідація даних')).toBeVisible();
+      await expect(page.getByText('/interaktyvni-formy-and-validatsiya-danykh', { exact: true })).toBeVisible();
+
+      // 11. Click "Додати Модуль" again and verify automatic numbering advances to #2
+      await addModuleBtn.click();
+      await expect(page.getByText('Модуль #2')).toBeVisible();
+      await expect(orderInput).toHaveValue('2');
+
+      // Take screenshot of advancing to Module #2
+      await page.screenshot({ path: 'C:/Users/Dima/.gemini/antigravity/brain/f32616d8-c180-4a3d-9dfd-5caf83629066/module_advance_numbering.png' });
+    } finally {
+      // Clean up test course
+      await page.request.delete(`http://localhost:3000/api/v1/courses/${course.id}`);
+    }
+  });
 });

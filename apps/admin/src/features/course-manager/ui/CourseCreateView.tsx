@@ -14,6 +14,7 @@ import {
   Save,
 } from 'lucide-react';
 import type { CourseDto, CreateCourseDto, CourseCategoryDto } from '@sbc/types';
+import { slugify, validateSlug } from '@sbc/routes';
 
 interface CourseCreateViewProps {
   categories?: CourseCategoryDto[];
@@ -116,22 +117,19 @@ export const CourseCreateView: React.FC<CourseCreateViewProps> = ({
 
   const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
 
-  // Auto-generate slug from title
+  // Auto-generate slug from title with Ukrainian transliteration
+  const autoSlug = (text: string) => {
+    return slugify(text, { maxLength: 50 });
+  };
+
+  const slugValidation = validateSlug(slug, { maxLength: 50 });
+
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newTitle = e.target.value;
     setTitle(newTitle);
     if (!slug || slug === autoSlug(title)) {
       setSlug(autoSlug(newTitle));
     }
-  };
-
-  const autoSlug = (text: string) => {
-    return text
-      .toLowerCase()
-      .trim()
-      .replace(/[\s\W-]+/g, '-')
-      .replace(/^-+|-+$/g, '')
-      .slice(0, 50);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -141,13 +139,20 @@ export const CourseCreateView: React.FC<CourseCreateViewProps> = ({
       return;
     }
 
+    const effectiveSlug = slug.trim() || autoSlug(title);
+    const validation = validateSlug(effectiveSlug, { maxLength: 50 });
+    if (!validation.isValid) {
+      setError(validation.error || 'Невалідний слаг курсу');
+      return;
+    }
+
     setIsSubmitting(true);
     setError(null);
 
     try {
       const payload: CreateCourseDto = {
         title: title.trim(),
-        slug: slug.trim() || autoSlug(title),
+        slug: effectiveSlug,
         description: description.trim() || undefined,
         categoryId: categoryId || undefined,
         targetAudience: targetAudience.trim() || undefined,
@@ -295,20 +300,49 @@ export const CourseCreateView: React.FC<CourseCreateViewProps> = ({
             </div>
 
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-semibold text-slate-300">
-                Ідентифікатор слага (URL-slug) <span className="text-rose-400">*</span>
-              </label>
+              <div className="flex items-center justify-between">
+                <label className="text-xs font-semibold text-slate-300">
+                  Ідентифікатор слага (URL-slug) <span className="text-rose-400">*</span>
+                </label>
+                {slug && slug !== autoSlug(title) && (
+                  <button
+                    type="button"
+                    onClick={() => setSlug(autoSlug(title))}
+                    className="text-[10px] text-emerald-400 hover:text-emerald-300 hover:underline cursor-pointer"
+                  >
+                    ↻ З назви
+                  </button>
+                )}
+              </div>
               <input
                 type="text"
                 placeholder="cybersecurity-basics"
                 value={slug}
                 onChange={(e) => setSlug(e.target.value)}
                 required
-                className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs font-mono text-emerald-400 placeholder-slate-600 focus:outline-none focus:border-emerald-500 transition-colors"
+                className={`w-full px-3.5 py-2.5 bg-slate-950 border rounded-xl text-xs font-mono text-emerald-400 placeholder-slate-600 focus:outline-none transition-colors ${
+                  slug && !slugValidation.isValid
+                    ? 'border-rose-500/80 focus:border-rose-500'
+                    : 'border-slate-800 focus:border-emerald-500'
+                }`}
               />
-              <span className="text-[10px] text-slate-500">
-                Використовується в URL: /learn/{slug || '...'} та /practice/{slug || '...'}
-              </span>
+              {slug ? (
+                slugValidation.isValid ? (
+                  <span className="text-[10px] text-emerald-400 flex items-center gap-1">
+                    <CheckCircle2 className="w-3 h-3 text-emerald-400 shrink-0" />
+                    <span>Використовується в URL: <code className="font-mono text-emerald-300">/learn/{slug}</code> та <code className="font-mono text-emerald-300">/practice/{slug}</code></span>
+                  </span>
+                ) : (
+                  <span className="text-[10px] text-rose-400 flex items-center gap-1">
+                    <AlertCircle className="w-3 h-3 text-rose-400 shrink-0" />
+                    <span>{slugValidation.error}</span>
+                  </span>
+                )
+              ) : (
+                <span className="text-[10px] text-slate-500">
+                  Використовується в URL: /learn/... та /practice/... (транслітерується автоматично)
+                </span>
+              )}
             </div>
 
             <div className="flex flex-col gap-1.5">
