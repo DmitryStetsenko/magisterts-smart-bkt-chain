@@ -193,6 +193,7 @@ def main():
     compile_file("docs/guide/master_guide.md", "docs/guide/master_guide.json", "apps/docs/src/data/master_guide.json")
     compile_file("docs/guide/google_support_guide.md", "docs/guide/google_support_guide.json", "apps/docs/src/data/google_support_guide.json")
     compile_file("docs/guide/bkt_math_and_event_stream_guide.md", "docs/guide/bkt_math_and_event_stream_guide.json", "apps/docs/src/data/bkt_math_and_event_stream_guide.json")
+    compile_file("docs/course_authoring_and_tabular_engine.md", "docs/course_authoring_and_tabular_engine.json", "apps/docs/src/data/course_authoring_and_tabular_engine.json")
 
 if __name__ == "__main__":
     main()
