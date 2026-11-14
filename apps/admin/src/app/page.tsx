@@ -28,6 +28,7 @@ import {
   Target,
   ExternalLink,
   FlaskConical,
+  FileSpreadsheet,
 } from 'lucide-react';
 import { AppShellLayout, Breadcrumbs, UserProfileDrawer, DrawerSection } from '@sbc/ui';
 import { getAppBaseUrl } from '@sbc/routes';
@@ -36,6 +37,7 @@ import { CourseManager } from '../features/course-manager/ui/CourseManager';
 import { CourseCreateView } from '../features/course-manager/ui/CourseCreateView';
 import { CourseStudioView } from '../features/course-manager/ui/CourseStudioView';
 import { TheoryLessonBuilderView } from '../features/course-manager/ui/TheoryLessonBuilderView';
+import { downloadCourseTemplate, downloadCourseExport } from '../features/course-manager/services/courseWorkbookService';
 import { DatasetExportCenter, DatasetStats } from '../features/dataset-export/ui/DatasetExportCenter';
 import { BktAuditVerifierCenter } from '../features/verifier/ui/BktAuditVerifierCenter';
 import { UserManagementCenter } from '../features/users/ui/UserManagementCenter';
@@ -987,6 +989,28 @@ export default function AdminCMSDashboard() {
                       P(L) ≥ {selectedStudioCourse.defaultMasteryThreshold ?? 0.85}
                     </span>
                   </button>
+
+                  <div className="pt-1.5 border-t border-slate-800/60 flex flex-col gap-1.5">
+                    <button
+                      type="button"
+                      onClick={() => downloadCourseExport(selectedStudioCourse)}
+                      className="w-full py-1.5 px-2.5 rounded-lg bg-slate-800/60 hover:bg-slate-800 text-slate-200 border border-slate-700/80 transition-colors flex items-center gap-2 font-medium cursor-pointer"
+                      title="Експортувати курс у 5-вкладковий Excel (.xlsx)"
+                    >
+                      <Download className="w-3.5 h-3.5 text-emerald-400" />
+                      <span>Експорт курсу (.xlsx)</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => downloadCourseTemplate()}
+                      className="w-full py-1.5 px-2.5 rounded-lg bg-slate-900/80 hover:bg-slate-800 text-slate-300 border border-slate-800 transition-colors flex items-center gap-2 font-medium cursor-pointer"
+                      title="Завантажити еталонний шаблон курсу (.xlsx)"
+                    >
+                      <FileSpreadsheet className="w-3.5 h-3.5 text-emerald-400" />
+                      <span>Шаблон Excel (.xlsx)</span>
+                    </button>
+                  </div>
                 </div>
               </DrawerSection>
 

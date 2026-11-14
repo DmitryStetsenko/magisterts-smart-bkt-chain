@@ -95,9 +95,18 @@ export class CourseController {
           include: {
             skills: {
               include: {
-                parentDependencies: true,
+                parentDependencies: {
+                  include: {
+                    parentSkill: {
+                      select: { id: true, slug: true, title: true },
+                    },
+                  },
+                },
                 tasks: {
-                  select: { id: true, title: true, taskType: true, difficulty: true },
+                  include: {
+                    testCases: true,
+                  },
+                  orderBy: { createdAt: 'asc' },
                 },
               },
               orderBy: { orderIndex: 'asc' },
@@ -106,10 +115,19 @@ export class CourseController {
         },
         skills: {
           include: {
-            parentDependencies: true,
+            parentDependencies: {
+              include: {
+                parentSkill: {
+                  select: { id: true, slug: true, title: true },
+                },
+              },
+            },
             module: true,
             tasks: {
-              select: { id: true, title: true, taskType: true, difficulty: true },
+              include: {
+                testCases: true,
+              },
+              orderBy: { createdAt: 'asc' },
             },
           },
           orderBy: { orderIndex: 'asc' },

@@ -203,6 +203,40 @@
 - **Документація:**
   - Деталізований документ сесії збережено у [`docs/brainstorm/20_production_course_creation_ai_scaffolding_and_tabular_integration.md`](file:///docs/brainstorm/20_production_course_creation_ai_scaffolding_and_tabular_integration.md).
 
+### 0.1.7.106 Канонічний 5-Вкладковий Excel-Рушій Експорту Курсу, Генератор Еталонного Шаблону та Браузерний Пайплайн (SBC-418, EP-AD)
+- **Контекст та задача:**
+  - На першому практичному етапі дорожньої карти Сесії 20 (`SBC-418`) реалізовано повноцінний табличний рушій для експорту та завантаження еталонних шаблонів курсів у стандарті Microsoft Excel (`.xlsx`), що дозволяє викладачам і методистам створювати, редагувати та обмінюватися навчальними програмами в офлайн-середовищі (Excel / Google Sheets).
+- **Архітектурні та інженерні рішення:**
+  1. **Інтеграція SheetJS (`xlsx`) у монорепозиторій:**
+     - Підключено бібліотеку `xlsx` до робочого простору `@sbc/admin`, що забезпечує швидку генерацію двійкових OpenXML буферів на стороні клієнта без додаткового навантаження на API сервер.
+  2. **Канонічний 5-вкладковий сервіс курсової книги ([`apps/admin/src/features/course-manager/services/courseWorkbookService.ts`](file:///apps/admin/src/features/course-manager/services/courseWorkbookService.ts)):**
+     - Реалізовано повну відповідність затвердженому стандарту **SBC Course Workbook** із 5 строго типізованими аркушами:
+       - **Аркуш 1 `Course`:** Метадані курсу (`title`, `slug`, `category`, `description`, `targetAudience`, `difficultyLevel`, `bktMasteryThreshold`, `icon`).
+       - **Аркуш 2 `Modules`:** Тематичні розділи (`orderIndex`, `title`, `slug`, `theoryUrl`, `bktThreshold`, `description`).
+       - **Аркуш 3 `Skills`:** Компетентності графу DAG (`moduleSlug`, `orderIndex`, `title`, `slug`, `difficulty`, `prerequisites`, `pL0`, `pT`, `pS`, `pG`). Батьківські залежності автоматично транслюються з внутрішніх UUID у людиночитабельні слаги через кому.
+       - **Аркуш 4 `Theory`:** 5-блочний дидактичний конспект Zen Focus (`moduleSlug`, `hookIntro`, `conceptsMarkdown`, `codeLang`, `codeSnippet`, `codeExplanation`, `misconceptionTitle`, `misconceptionExplanation`, `takeawaysList`). Для вилучення блоків застосовується парсер `parseMarkdownToBlocks`.
+       - **Аркуш 5 `Tasks`:** Банк адаптивних вправ для пісочниці Monaco Editor (`skillSlug`, `orderIndex`, `taskType`, `difficulty`, `title`, `prompt`, `starterCode`, `testCasesJson`, `hintsList`). Тести серіалізуються у валідний JSON, а підказки об'єднуються через розділювач `|`.
+     - **Еталонний генератор шаблону (`generateCourseTemplateWorkbook`):**
+       - Формує навчальний курс-еталон «Основи веб-розробки: Frontend (HTML/CSS/JS)» із 2 модулями, 3 взаємопов'язаними навичками, заповненими уроками та завданнями з тестами. Автоматично розраховує та встановлює ширини колонок (`ws['!cols']`).
+     - **Рушій експорту наявних курсів (`exportCourseToWorkbook`):**
+       - Приймає об'єкт `CourseDto`, збирає пул навичок `uniqueSkillsMap`, розв'язує транзитивні залежності графу DAG та генерує відповідні таблиці для експорту.
+     - **Браузерний завантажувач (`downloadWorkbook`):**
+       - Використовує метод `XLSX.writeFile` із автоматичним Blob-фолбеком (`URL.createObjectURL`) для гарантованого збереження файлу в будь-якому сучасному браузері.
+  3. **Інтерфейсні контролери (UI/UX) за стандартом AppShellLayout (Rule 7):**
+     - **Студія курсу ([`apps/admin/src/features/course-manager/ui/CourseStudioView.tsx`](file:///apps/admin/src/features/course-manager/ui/CourseStudioView.tsx)):**
+       - У верхню панель праворуч додано компактні кнопки `📥 Експорт (.xlsx)` та `📄 Шаблон Excel` поруч із бейджем Target P(L).
+     - **Сайдбар-панель інструментів ([`apps/admin/src/app/page.tsx`](file:///apps/admin/src/app/page.tsx)):**
+       - До секції `DrawerSection` «ДІЇ ТА ІНСТРУМЕНТИ» додано кнопки `Експорт курсу (.xlsx)` та `Шаблон Excel (.xlsx)`.
+     - **Каталог курсів ([`apps/admin/src/features/course-manager/ui/CourseManager.tsx`](file:///apps/admin/src/features/course-manager/ui/CourseManager.tsx)):**
+       - До панелі дій поруч із категоріями додано кнопку «Шаблон Excel».
+       - До кожної картки курсу додано іконку швидкого експорту `Download` з підказкою «Експортувати курс у формат Excel (.xlsx)».
+  4. **Оновлення API бекенду ([`apps/api/src/adapters/inbound/http/course.controller.ts`](file:///apps/api/src/adapters/inbound/http/course.controller.ts)):**
+     - У контролері розширено метод `getCourseBySlug`: додано зв'язки `parentDependencies.parentSkill` та включено `tasks.testCases` для отримання повного набору дидактичних даних для експорту.
+- **Верифікація та тестування:**
+  - **E2E Playwright тест:** `e2e/course-creation-wizard-flow.spec.ts` поповнено тестом `Tabular Workbook Export and Template Download in Course Studio and Catalog (SBC-418)`.
+  - **Результати тестування:** 3/3 тестів пройдено успішно (48.1s).
+  - **Збережено візуальний артефакт:** `course_studio_tabular_export.png` у директорії артефактів.
+
 ### 0.1.7.99 Інтерактивна Наскрізна Навігація за Етапами Життєвого Циклу Курсу (SBC-411, EP-AD)
 - **Контекст та запит користувача:**
   - Користувач поцікавився призначенням блоку «Маршрут автора курсу»: *«що робить цей блок?»*.

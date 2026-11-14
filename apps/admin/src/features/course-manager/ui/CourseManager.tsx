@@ -15,11 +15,14 @@ import {
   AlertCircle,
   Shield,
   Folder,
+  Download,
+  FileSpreadsheet,
 } from 'lucide-react';
 import type { CourseDto, CreateCourseDto, CourseCategoryDto } from '@sbc/types';
 import { CourseEditModal } from './CourseEditModal';
 import { ModuleManagerModal } from './ModuleManagerModal';
 import { CategoryManagerModal } from './CategoryManagerModal';
+import { downloadCourseTemplate, downloadCourseExport } from '../services/courseWorkbookService';
 
 export interface CourseManagerProps {
   selectedCourseFilter?: string | null;
@@ -312,6 +315,19 @@ export const CourseManager: React.FC<CourseManagerProps> = ({
           </button>
 
           <button
+            type="button"
+            onClick={() => {
+              downloadCourseTemplate();
+              setMessage('Завантажено еталонний 5-вкладковий шаблон курсу (.xlsx)');
+            }}
+            className="px-3 py-1.5 rounded-lg bg-slate-800/90 hover:bg-slate-700 border border-slate-700 text-slate-300 font-medium flex items-center gap-1.5 transition-colors cursor-pointer text-xs"
+            title="Завантажити канонічний 5-вкладковий Excel-шаблон курсу (.xlsx)"
+          >
+            <FileSpreadsheet className="w-3.5 h-3.5 text-emerald-400" />
+            <span className="hidden sm:inline">Шаблон Excel</span>
+          </button>
+
+          <button
             onClick={() => {
               if (onCreateCourseClick) {
                 onCreateCourseClick();
@@ -572,6 +588,17 @@ export const CourseManager: React.FC<CourseManagerProps> = ({
                       title="Редагувати параметри курсу в Студії"
                     >
                       <Edit2 className="w-3.5 h-3.5" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        downloadCourseExport(course);
+                        setMessage(`Курс "${course.title}" успішно експортовано в Excel (.xlsx)`);
+                      }}
+                      className="p-1.5 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-emerald-400 transition-colors cursor-pointer"
+                      title="Експортувати курс у формат Excel (.xlsx)"
+                    >
+                      <Download className="w-3.5 h-3.5" />
                     </button>
                     <button
                       onClick={() => handleDeleteCourse(course.id || '', course.title)}

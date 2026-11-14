@@ -23,6 +23,8 @@ import {
   FileCode,
   FlaskConical,
   Sliders,
+  Download,
+  FileSpreadsheet,
 } from 'lucide-react';
 import type { CourseDto, CourseModuleDto, SkillNodeDto, CourseCategoryDto, UpdateCourseDto } from '@sbc/types';
 import { slugify, validateSlug } from '@sbc/routes';
@@ -31,6 +33,7 @@ import { CreateTaskModal } from './CreateTaskModal';
 import { ModuleTestSandboxModal } from './ModuleTestSandboxModal';
 import { TheoryLessonBuilderModal } from './TheoryLessonBuilderModal';
 import { MASTERY_STANDARDS } from './CourseCreateView';
+import { downloadCourseTemplate, downloadCourseExport } from '../services/courseWorkbookService';
 
 /**
  * Очищує назву навички від дублюючого префікса «Модуль N:» та запобігає повторенню назви батьківського модуля
@@ -566,6 +569,32 @@ export const CourseStudioView: React.FC<CourseStudioViewProps> = ({
           </div>
 
           <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => {
+                downloadCourseExport(course, allCourseSkills);
+                setMessage('Курс успішно експортовано у файл Excel (.xlsx)');
+              }}
+              className="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 text-xs font-medium flex items-center gap-1.5 transition-colors cursor-pointer"
+              title="Експортувати повну структуру курсу, навички, конспекти та завдання у 5-вкладковий Excel (.xlsx)"
+            >
+              <Download className="w-3.5 h-3.5 text-emerald-400" />
+              <span className="hidden sm:inline">Експорт (.xlsx)</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                downloadCourseTemplate();
+                setMessage('Завантажено еталонний 5-вкладковий шаблон курсу (.xlsx)');
+              }}
+              className="px-2.5 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 text-xs font-medium flex items-center gap-1.5 transition-colors cursor-pointer"
+              title="Завантажити еталонний шаблон курсу з підказками для заповнення"
+            >
+              <FileSpreadsheet className="w-3.5 h-3.5 text-emerald-400" />
+              <span className="hidden sm:inline">Шаблон Excel</span>
+            </button>
+
             <div className="px-2.5 py-1 rounded-lg bg-emerald-950/40 border border-emerald-500/30 text-[11px] font-mono text-emerald-400">
               Target P(L): <strong>{course.defaultMasteryThreshold ?? 0.85}</strong>
             </div>

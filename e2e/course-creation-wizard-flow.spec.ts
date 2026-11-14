@@ -219,4 +219,97 @@ test.describe('Course Creation Wizard & Draft Status Verification Suite', () => 
       await page.request.delete(`http://localhost:3000/api/v1/courses/${course.id}`);
     }
   });
+
+  test('Tabular Workbook Export and Template Download in Course Studio and Catalog (SBC-418)', async ({ page }) => {
+    const exportTimestamp = Date.now();
+    const exportCourseTitle = `Курс для Експорту в Excel ${exportTimestamp}`;
+    const exportCourseSlug = `excel-export-${exportTimestamp}`;
+
+    // 1. Create a course with modules and skills via API
+    const createRes = await page.request.post('http://localhost:3000/api/v1/courses', {
+      data: {
+        title: exportCourseTitle,
+        slug: exportCourseSlug,
+        description: 'Повноцінний тестовий курс для перевірки 5-вкладкового експорту SBC Workbook',
+        targetAudience: '10-11 класи, Студенти',
+        defaultMasteryThreshold: 0.88,
+        isPublished: true,
+      },
+    });
+    expect(createRes.ok()).toBeTruthy();
+    const course = await createRes.json();
+
+    // Create a module for this course
+    const modRes = await page.request.post(`http://localhost:3000/api/v1/courses/${course.id}/modules`, {
+      data: {
+        title: 'Модуль 1: Основи веб-стандартів',
+        slug: 'osnovy-veb-standartiv',
+        orderIndex: 1,
+        theoryUrl: `/learn/${exportCourseSlug}/osnovy-veb-standartiv`,
+        minMasteryThreshold: 0.88,
+        description: '> 📌 **Короткий огляд теми:**\n> Вступний огляд семантичних веб-стандартів.\n\n### 📖 Теоретичні поняття\n\nСтандарт HTML5 та дерево DOM.\n\n```html\n<!DOCTYPE html>\n```\n\n### 🎯 Ключові висновки\n\n- Валідний HTML5 каркас',
+      },
+    });
+    expect(modRes.ok()).toBeTruthy();
+
+    try {
+      // 2. Open Catalog view
+      await page.goto('http://localhost:3004/?tab=courses', { waitUntil: 'domcontentloaded', timeout: 30000 });
+      await expect(page.getByText('Управління Навчальними Курсами')).toBeVisible({ timeout: 15000 });
+
+      // 3. Verify "Шаблон Excel" button in Catalog toolbar
+      const catalogTemplateBtn = page.locator('main').getByRole('button', { name: /Шаблон Excel/i });
+      await expect(catalogTemplateBtn).toBeVisible();
+
+      // Test Template Download
+      const [templateDownload] = await Promise.all([
+        page.waitForEvent('download'),
+        catalogTemplateBtn.click(),
+      ]);
+      expect(templateDownload.suggestedFilename()).toBe('sbc-course-template.xlsx');
+
+      // 4. Find our created course in catalog and verify export button
+      const courseCard = page.locator('main div.group').filter({ hasText: exportCourseTitle });
+      await expect(courseCard).toBeVisible();
+      const rowExportBtn = courseCard.locator('button[title*="Експортувати курс"]').first();
+      await expect(rowExportBtn).toBeVisible();
+
+      // 5. Open Course Studio for our course
+      await page.goto(`http://localhost:3004/?tab=create_course&mode=studio&course=${exportCourseSlug}`, {
+        waitUntil: 'domcontentloaded',
+        timeout: 30000,
+      });
+      await expect(page.getByRole('heading', { name: exportCourseTitle })).toBeVisible({ timeout: 15000 });
+
+      // 6. Verify "Експорт (.xlsx)" and "Шаблон Excel" in Studio Header
+      const headerExportBtn = page.locator('button[title*="Експортувати повну структуру"]').first();
+      await expect(headerExportBtn).toBeVisible();
+
+      const headerTemplateBtn = page.locator('button[title*="Завантажити еталонний шаблон курсу"]').first();
+      await expect(headerTemplateBtn).toBeVisible();
+
+      // 7. Verify Drawer buttons under ДІЇ ТА ІНСТРУМЕНТИ
+      const drawerExportBtn = page.locator('aside button:has-text("Експорт курсу (.xlsx)")');
+      await expect(drawerExportBtn).toBeVisible();
+
+      const drawerTemplateBtn = page.locator('aside button:has-text("Шаблон Excel (.xlsx)")');
+      await expect(drawerTemplateBtn).toBeVisible();
+
+      // Take screenshot of Studio with Tabular Export Controls
+      await page.screenshot({ path: 'C:/Users/Dima/.gemini/antigravity/brain/f32616d8-c180-4a3d-9dfd-5caf83629066/course_studio_tabular_export.png' });
+
+      // 8. Test Course Export Download in Studio
+      const [courseDownload] = await Promise.all([
+        page.waitForEvent('download'),
+        headerExportBtn.click(),
+      ]);
+      expect(courseDownload.suggestedFilename()).toBe(`sbc-course-${exportCourseSlug}.xlsx`);
+
+      // Verify success notification banner
+      await expect(page.getByText('Курс успішно експортовано у файл Excel (.xlsx)')).toBeVisible();
+    } finally {
+      // Clean up test course
+      await page.request.delete(`http://localhost:3000/api/v1/courses/${course.id}`);
+    }
+  });
 });
