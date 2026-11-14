@@ -2,6 +2,8 @@ import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { SCHOOL_WEB_CURRICULUM } from '@/data/school-web-curriculum';
 import { StudyAppClient } from '@/components/StudyAppClient';
+import { adaptCourseToCurriculum } from '@/lib/curriculum-adapter';
+import { CourseCurriculumDto } from '@sbc/types';
 
 interface LessonUnitPageProps {
   params: Promise<{
@@ -9,6 +11,31 @@ interface LessonUnitPageProps {
     moduleSlug: string;
     unitSlug: string;
   }>;
+}
+
+export const dynamicParams = true;
+
+/**
+ * Отримує структуру курсу (статичну шкільну або динамічну з бекенду)
+ */
+async function getCurriculum(courseSlug: string): Promise<CourseCurriculumDto | null> {
+  if (courseSlug === SCHOOL_WEB_CURRICULUM.courseSlug) {
+    return SCHOOL_WEB_CURRICULUM;
+  }
+
+  try {
+    const res = await fetch(`http://localhost:3000/api/v1/courses/${courseSlug}`, {
+      cache: 'no-store',
+    });
+    if (res.ok) {
+      const data = await res.json();
+      return adaptCourseToCurriculum(data);
+    }
+  } catch (err) {
+    console.warn('Error fetching dynamic course curriculum:', err);
+  }
+
+  return null;
 }
 
 /**
@@ -36,15 +63,17 @@ export async function generateStaticParams() {
  */
 export async function generateMetadata({ params }: LessonUnitPageProps): Promise<Metadata> {
   const { courseSlug, moduleSlug, unitSlug } = await params;
+  const curriculum = await getCurriculum(courseSlug);
 
-  if (courseSlug !== SCHOOL_WEB_CURRICULUM.courseSlug) {
+  if (!curriculum) {
     return {
       title: 'Урок не знайдено | Smart-BKT-Chain',
     };
   }
 
-  const module = SCHOOL_WEB_CURRICULUM.modules.find((m) => m.moduleSlug === moduleSlug);
-  const unit = module?.units.find((u) => u.slug === unitSlug);
+  const module =
+    curriculum.modules.find((m) => m.moduleSlug === moduleSlug) || curriculum.modules[0];
+  const unit = module?.units.find((u) => u.slug === unitSlug) || module?.units[0];
 
   if (!unit || !module) {
     return {
@@ -52,10 +81,10 @@ export async function generateMetadata({ params }: LessonUnitPageProps): Promise
     };
   }
 
-  const canonicalUrl = `http://localhost:3006/courses/${courseSlug}/${moduleSlug}/${unitSlug}`;
+  const canonicalUrl = `http://localhost:3006/courses/${courseSlug}/${module.moduleSlug}/${unit.slug}`;
 
   return {
-    title: `${unit.title} | ${SCHOOL_WEB_CURRICULUM.courseTitle} — Smart-BKT-Chain`,
+    title: `${unit.title} | ${curriculum.courseTitle} — Smart-BKT-Chain`,
     description: unit.summary,
     alternates: {
       canonical: canonicalUrl,
@@ -81,13 +110,15 @@ export async function generateMetadata({ params }: LessonUnitPageProps): Promise
  */
 export default async function LessonUnitPage({ params }: LessonUnitPageProps) {
   const { courseSlug, moduleSlug, unitSlug } = await params;
+  const curriculum = await getCurriculum(courseSlug);
 
-  if (courseSlug !== SCHOOL_WEB_CURRICULUM.courseSlug) {
+  if (!curriculum) {
     notFound();
   }
 
-  const module = SCHOOL_WEB_CURRICULUM.modules.find((m) => m.moduleSlug === moduleSlug);
-  const unit = module?.units.find((u) => u.slug === unitSlug);
+  const module =
+    curriculum.modules.find((m) => m.moduleSlug === moduleSlug) || curriculum.modules[0];
+  const unit = module?.units.find((u) => u.slug === unitSlug) || module?.units[0];
 
   if (!unit || !module) {
     notFound();
@@ -107,8 +138,8 @@ export default async function LessonUnitPage({ params }: LessonUnitPageProps) {
         inLanguage: 'uk-UA',
         isPartOf: {
           '@type': 'Course',
-          name: SCHOOL_WEB_CURRICULUM.courseTitle,
-          description: SCHOOL_WEB_CURRICULUM.description,
+          name: curriculum.courseTitle,
+          description: curriculum.description,
         },
       },
       {
@@ -124,13 +155,13 @@ export default async function LessonUnitPage({ params }: LessonUnitPageProps) {
             '@type': 'ListItem',
             position: 2,
             name: module.title,
-            item: `http://localhost:3006/courses/${courseSlug}/${moduleSlug}`,
+            item: `http://localhost:3006/courses/${courseSlug}/${module.moduleSlug}`,
           },
           {
             '@type': 'ListItem',
             position: 3,
             name: unit.title,
-            item: `http://localhost:3006/courses/${courseSlug}/${moduleSlug}/${unitSlug}`,
+            item: `http://localhost:3006/courses/${courseSlug}/${module.moduleSlug}/${unit.slug}`,
           },
         ],
       },
@@ -145,8 +176,9 @@ export default async function LessonUnitPage({ params }: LessonUnitPageProps) {
       />
       <StudyAppClient
         initialCourseSlug={courseSlug}
-        initialModuleSlug={moduleSlug}
-        initialUnitSlug={unitSlug}
+        initialModuleSlug={module.moduleSlug}
+        initialUnitSlug={unit.slug}
+        curriculum={curriculum}
       />
     </>
   );

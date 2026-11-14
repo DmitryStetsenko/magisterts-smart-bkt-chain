@@ -11,8 +11,13 @@ interface ModuleRedirectPageProps {
 
 export default async function ModuleRedirectPage({ params }: ModuleRedirectPageProps) {
   const { courseSlug, moduleSlug } = await params;
-  const module = SCHOOL_WEB_CURRICULUM.modules.find((m) => m.moduleSlug === moduleSlug);
-  const firstUnitSlug = module?.units[0]?.slug || 'variables-and-types';
 
-  redirect(ROUTES.study.unit(courseSlug, moduleSlug, firstUnitSlug));
+  if (courseSlug === SCHOOL_WEB_CURRICULUM.courseSlug) {
+    const module = SCHOOL_WEB_CURRICULUM.modules.find((m) => m.moduleSlug === moduleSlug);
+    const firstUnitSlug = module?.units[0]?.slug || 'variables-and-types';
+    redirect(ROUTES.study.unit(courseSlug, moduleSlug, firstUnitSlug));
+  }
+
+  // Динамічний курс: переадресація на канонічний урок модуля
+  redirect(`/courses/${courseSlug}/${moduleSlug}/${moduleSlug}`);
 }

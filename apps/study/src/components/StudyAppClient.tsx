@@ -29,7 +29,13 @@ import {
 } from 'lucide-react';
 import { DrawerSection, AppShellLayout, Breadcrumbs, UserProfileDrawer, AuthModal } from '@sbc/ui';
 import { ROUTES, buildStudyToPracticeUrl } from '@sbc/routes';
-import { SCHOOL_WEB_CURRICULUM, LessonUnit, LessonSection, CurriculumModule } from '../data/school-web-curriculum';
+import {
+  SCHOOL_WEB_CURRICULUM,
+  LessonUnit,
+  LessonSection,
+  CurriculumModule,
+  CourseCurriculum,
+} from '../data/school-web-curriculum';
 import { CodePlayground } from './CodePlayground';
 import { 
   ReaderFloatingToolbar, 
@@ -44,18 +50,44 @@ interface StudyAppClientProps {
   initialCourseSlug?: string;
   initialModuleSlug?: string;
   initialUnitSlug?: string;
+  curriculum?: CourseCurriculum;
 }
 
 export function StudyAppClient({
   initialCourseSlug = 'web-algorithms-school',
-  initialModuleSlug = 'school-alg-basics',
-  initialUnitSlug = 'variables-and-types',
+  initialModuleSlug,
+  initialUnitSlug,
+  curriculum,
 }: StudyAppClientProps) {
   const router = useRouter();
+  const activeCurriculum: CourseCurriculum = curriculum || SCHOOL_WEB_CURRICULUM;
 
-  const [activeCourseSlug, setActiveCourseSlug] = useState<string>(initialCourseSlug);
-  const [selectedModuleSlug, setSelectedModuleSlug] = useState<string>(initialModuleSlug);
-  const [selectedUnitSlug, setSelectedUnitSlug] = useState<string>(initialUnitSlug);
+  const defaultModuleSlug =
+    initialModuleSlug || activeCurriculum.modules[0]?.moduleSlug || 'school-alg-basics';
+  const defaultUnitSlug =
+    initialUnitSlug || activeCurriculum.modules[0]?.units[0]?.slug || 'variables-and-types';
+
+  const [activeCourseSlug, setActiveCourseSlug] = useState<string>(
+    initialCourseSlug || activeCurriculum.courseSlug
+  );
+  const [selectedModuleSlug, setSelectedModuleSlug] = useState<string>(defaultModuleSlug);
+  const [selectedUnitSlug, setSelectedUnitSlug] = useState<string>(defaultUnitSlug);
+  const [publishedCourses, setPublishedCourses] = useState<any[]>([]);
+
+  useEffect(() => {
+    const fetchPublishedCourses = async () => {
+      try {
+        const res = await fetch(`http://localhost:3000/api/v1/courses?status=PUBLISHED`);
+        if (res.ok) {
+          const list = await res.json();
+          setPublishedCourses(Array.isArray(list) ? list : list.courses || []);
+        }
+      } catch (err) {
+        console.warn('Failed to fetch published courses in study app:', err);
+      }
+    };
+    fetchPublishedCourses();
+  }, []);
 
   // Оновлюємо стан, якщо змінилися вхідні параметри маршруту
   useEffect(() => {
@@ -248,8 +280,27 @@ export function StudyAppClient({
     router.push(ROUTES.study.unit(activeCourseSlug, moduleSlug, unitSlug));
   };
 
-  const currentModule = SCHOOL_WEB_CURRICULUM.modules.find(m => m.moduleSlug === selectedModuleSlug) || SCHOOL_WEB_CURRICULUM.modules[0];
-  const currentUnit = currentModule.units.find(u => u.slug === selectedUnitSlug) || currentModule.units[0];
+  const currentModule: CurriculumModule =
+    activeCurriculum.modules.find((m) => m.moduleSlug === selectedModuleSlug) ||
+    activeCurriculum.modules[0] || {
+      moduleNumber: 1,
+      moduleSlug: 'module-1',
+      title: 'Модуль 1',
+      description: '',
+      units: [],
+    };
+  const currentUnit: LessonUnit =
+    currentModule.units?.find((u) => u.slug === selectedUnitSlug) ||
+    currentModule.units?.[0] || {
+      slug: 'unit-1',
+      moduleSlug: currentModule.moduleSlug,
+      moduleNumber: currentModule.moduleNumber || 1,
+      title: currentModule.title || 'Вступний урок',
+      gradeLevel: activeCurriculum.gradeLevel || '10–11 класи',
+      estimatedMinutes: 10,
+      summary: currentModule.description || '',
+      sections: [],
+    };
 
   const activeTheme = readerSettings.isFocusMode ? readerSettings.theme : 'night';
   const activeFont = readerSettings.isFocusMode ? readerSettings.font : 'sans';
@@ -331,9 +382,9 @@ export function StudyAppClient({
         courseBadge: (
           <span
             className="text-xs sm:text-[13px] font-normal text-slate-300 select-none tracking-normal"
-            title={`Активний курс: ${SCHOOL_WEB_CURRICULUM.courseTitle}`}
+            title={`Активний курс: ${activeCurriculum.courseTitle}`}
           >
-            {SCHOOL_WEB_CURRICULUM.courseTitle}
+            {activeCurriculum.courseTitle}
           </span>
         ),
         breadcrumbs: (
@@ -342,7 +393,9 @@ export function StudyAppClient({
             items={[
               {
                 label: `Модуль ${currentModule.moduleNumber}`,
-                onClick: () => handleSelectUnit(currentModule.moduleSlug, currentModule.units[0].slug),
+                onClick: () =>
+                  currentModule.units?.[0] &&
+                  handleSelectUnit(currentModule.moduleSlug, currentModule.units[0].slug),
               },
               {
                 label: currentUnit.title,
@@ -420,16 +473,16 @@ export function StudyAppClient({
                         title="Навчальна дисципліна"
                         icon={GraduationCap}
                         iconColor="text-blue-400"
-                        badge="10-11 кл"
+                        badge={activeCurriculum.gradeLevel || '10-11 кл'}
                         badgeColor="blue"
                         defaultOpen={true}
                       >
                         <div className="flex flex-col gap-1.5 p-1">
                           <div className="text-xs font-semibold text-white">
-                            {SCHOOL_WEB_CURRICULUM.courseTitle}
+                            {activeCurriculum.courseTitle}
                           </div>
                           <div className="text-[11px] text-slate-400 leading-relaxed">
-                            {SCHOOL_WEB_CURRICULUM.description}
+                            {activeCurriculum.description}
                           </div>
                         </div>
                       </DrawerSection>
@@ -438,13 +491,13 @@ export function StudyAppClient({
                         title="Тематичні модулі"
                         icon={Layers}
                         iconColor="text-indigo-400"
-                        badge={`${SCHOOL_WEB_CURRICULUM.modules.length}`}
+                        badge={`${activeCurriculum.modules.length}`}
                         badgeColor="indigo"
                         defaultOpen={true}
                       >
                         <div className="flex flex-col divide-y divide-slate-800/50">
-                          {SCHOOL_WEB_CURRICULUM.modules.map((mod) => {
-                            const isUnlocked = unlockedModules[mod.moduleSlug] ?? false;
+                          {activeCurriculum.modules.map((mod) => {
+                            const isUnlocked = unlockedModules[mod.moduleSlug] ?? true;
                             const masteryScore = moduleMasteryScores[mod.moduleSlug] ?? 0;
                             const isCurrent = mod.moduleSlug === selectedModuleSlug;
 
@@ -453,7 +506,7 @@ export function StudyAppClient({
                                 key={mod.moduleSlug}
                                 onClick={() => {
                                   setSelectedModuleSlug(mod.moduleSlug);
-                                  if (mod.units.length > 0) {
+                                  if (mod.units && mod.units.length > 0) {
                                     handleSelectUnit(mod.moduleSlug, mod.units[0].slug);
                                   }
                                 }}
@@ -758,14 +811,27 @@ console.log(greeting, "Номер спроби:", counter);`}
           skillsCount: Object.values(unlockedModules).filter(Boolean).length,
           totalSkillsCount: SCHOOL_WEB_CURRICULUM.modules.length,
           completionPct: Math.round(
-            (Object.values(unlockedModules).filter(Boolean).length / SCHOOL_WEB_CURRICULUM.modules.length) * 100
+            (Object.values(unlockedModules).filter(Boolean).length /
+              Math.max(1, SCHOOL_WEB_CURRICULUM.modules.length)) *
+              100
           ),
         },
+        ...publishedCourses
+          .filter((c) => c.slug !== 'web-algorithms-school')
+          .map((c) => ({
+            slug: c.slug,
+            title: c.title,
+            category: c.category?.title || 'Програмування & IT',
+            skillsCount: (c.modules || []).length > 0 ? 1 : 0,
+            totalSkillsCount: Math.max(1, (c.modules || []).length),
+            completionPct: 0,
+          })),
       ]}
       activeCourseSlug={activeCourseSlug}
       onSelectCourse={(slug) => {
         setActiveCourseSlug(slug);
         setIsProfileDrawerOpen(false);
+        router.push(`/courses/${slug}`);
       }}
       stats={[
         {
@@ -777,7 +843,10 @@ console.log(greeting, "Номер спроби:", counter);`}
         },
         {
           label: 'Опановано модулів',
-          value: `${Object.values(unlockedModules).filter(Boolean).length}/${SCHOOL_WEB_CURRICULUM.modules.length}`,
+          value: `${Object.values(unlockedModules).filter(Boolean).length}/${Math.max(
+            1,
+            activeCurriculum.modules.length
+          )}`,
           icon: ShieldCheck,
           iconColor: 'text-blue-400',
           valueColor: 'text-blue-400',
