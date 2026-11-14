@@ -6,18 +6,18 @@
 ## 📊 Зведена статистика
 | Епік | Назва | Кількість завдань |
 | :--- | :--- | :---: |
-| **`SBC-EP-INF`** | Monorepo & CI/CD Setup | 95 |
+| **`SBC-EP-INF`** | Monorepo & CI/CD Setup | 96 |
 | **`SBC-EP-SH`** | Database Modeling & Shared Packages | 25 |
 | **`SBC-EP-BK`** | Authentication & Core API | 16 |
 | **`SBC-EP-BKT`** | Bayesian Knowledge Tracing & Behavioral Telemetry | 30 |
-| **`SBC-EP-LLM`** | Automated Code Assessment & Open-Text Evaluation | 11 |
+| **`SBC-EP-LLM`** | Automated Code Assessment & Open-Text Evaluation | 12 |
 | **`SBC-EP-W3`** | Web3 Infrastructure & Smart Contracts | 0 |
-| **`SBC-EP-ST`** | Student Portal & Skill Tree Map | 39 |
-| **`SBC-EP-TC`** | Teacher Portal & Analytics CRM | 32 |
+| **`SBC-EP-ST`** | Student Portal & Skill Tree Map | 40 |
+| **`SBC-EP-TC`** | Teacher Portal & Analytics CRM | 33 |
 | **`SBC-EP-AD`** | Admin Portal & Knowledge DAG Builder | 33 |
 | **`SBC-EP-LD`** | Landing Web Page | 9 |
 | **`SBC-EP-MS`** | Master's Thesis Engineering & Academic Text Generation | 9 |
-| **ВСЬОГО** | - | **300** |
+| **ВСЬОГО** | - | **304** |
 
 ---
 
@@ -126,6 +126,7 @@
 | **SBC-382** | `Story` | `INF` | verify end-to-end user onboarding flow, invite redemption and auth test mode with playwright tests | 2026-11-10 | `70737ec` |
 | **SBC-383** | `Docs` | `INF` | document brainstorm 19 on course architecture, modular curriculum, bkt mastery gating and dynamic cms | 2026-11-10 | `27d725b` |
 | **SBC-389** | `Story` | `INF` | verify end-to-end course and module management flow with playwright tests and documentation update | 2026-11-10 | `1a8235d` |
+| **SBC-425** | `Story` | `INF` | specify and design direct cloud Google Sheets sync via URL and export endpoint | 2026-11-14 | backlog |
 
 ---
 
@@ -252,6 +253,7 @@
 | **SBC-197** | `Bug` | `LLM` | prevent keyword stuffing and connect essay telemetry to BKT adjuster | 2026-10-14 | `3f9d9f6` |
 | **SBC-199** | `Bug` | `LLM` | block looping phrase spam and route high-paste submissions to teacher review queue | 2026-10-14 | `ed21a27` |
 | **SBC-420** | `Story` | `LLM` | implement AI one-shot course scaffolder via Gemini 2.5 API with semantic fallback engine | 2026-11-14 | `7cd90e4` |
+| **SBC-421** | `Story` | `LLM` | specify and design in-step AI copilots across 5 course wizard steps | 2026-11-14 | backlog |
 
 ---
 
@@ -337,6 +339,7 @@
 | **SBC-370** | `Fix` | `ST` | constrain MonacoCodeEditor height and flex layout to eliminate infinite vertical expansion loop | 2026-11-10 | `6096911` |
 | **SBC-381** | `Story` | `ST` | implement google sign-in button, /join invite code redemption and enrollment mode gating | 2026-11-10 | `51e412f` |
 | **SBC-388** | `Story` | `ST` | implement modular skill drawer sections, bkt mastery module unlocking and allowed modules filtering in student portal | 2026-11-10 | `198b330` |
+| **SBC-426** | `Story` | `ST` | implement dynamic course and module curriculum rendering in study portal | 2026-11-14 | working-tree |
 
 ---
 
@@ -410,6 +413,7 @@
 | **SBC-369** | `Style` | `TC` | eliminate nested containers and declutter MetricsAuditInspector into minimalist borderless layout | 2026-11-10 | `9b5f1f9` |
 | **SBC-380** | `Story` | `TC` | implement classroom management drawer section, invite code generator and enrollment mode selector | 2026-11-10 | `137f38a` |
 | **SBC-387** | `Story` | `TC` | implement modular course selection and allowed modules filter in teacher classroom creator | 2026-11-10 | `42195a5` |
+| **SBC-427** | `Story` | `TC` | verify cross-app course lifecycle across admin, study, teacher and student portals | 2026-11-14 | pending |
 
 
 
