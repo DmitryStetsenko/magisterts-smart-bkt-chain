@@ -1,4 +1,7 @@
 import { test, expect } from '@playwright/test';
+import * as XLSX from 'xlsx';
+import * as fs from 'fs';
+import * as path from 'path';
 
 test.describe('Course Creation Wizard & Draft Status Verification Suite', () => {
   const timestamp = Date.now();
@@ -310,6 +313,176 @@ test.describe('Course Creation Wizard & Draft Status Verification Suite', () => 
     } finally {
       // Clean up test course
       await page.request.delete(`http://localhost:3000/api/v1/courses/${course.id}`);
+    }
+  });
+
+  test('Two-Way Tabular Workbook Import Modal with Pre-Flight DAG Validation and Atomic DB Transaction', async ({ page }) => {
+    const importTimestamp = Date.now();
+    const importCourseTitle = `Інтернет Речей та Робототехніка ${importTimestamp}`;
+    const importCourseSlug = `iot-robotics-${importTimestamp}`;
+
+    // 1. Generate a valid 5-sheet workbook in memory and write to a temporary file
+    const wb = XLSX.utils.book_new();
+
+    // Course Sheet
+    const courseRows = [
+      {
+        title: importCourseTitle,
+        slug: importCourseSlug,
+        category: 'Інформатика & IT',
+        description: 'Комплексний курс з мікроконтролерів, сенсорів та протоколів звʼязку IoT.',
+        targetAudience: '10-11 класи, Ліцеїсти',
+        difficultyLevel: 'INTERMEDIATE',
+        bktMasteryThreshold: 0.85,
+        icon: 'Cpu',
+      },
+    ];
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(courseRows), 'Course');
+
+    // Modules Sheet
+    const moduleRows = [
+      {
+        orderIndex: 1,
+        title: 'Вступ до мікроконтролерів ESP32',
+        slug: `esp32-intro-${importTimestamp}`,
+        theoryUrl: `/learn/${importCourseSlug}/esp32-intro-${importTimestamp}`,
+        bktThreshold: 0.85,
+        description: 'Архітектура та розпіновка плати ESP32.',
+      },
+      {
+        orderIndex: 2,
+        title: 'Сенсори та протокол MQTT',
+        slug: `mqtt-sensors-${importTimestamp}`,
+        theoryUrl: `/learn/${importCourseSlug}/mqtt-sensors-${importTimestamp}`,
+        bktThreshold: 0.85,
+        description: 'Підключення сенсорів температури та публікація даних у брокер MQTT.',
+      },
+    ];
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(moduleRows), 'Modules');
+
+    // Skills Sheet (with valid DAG dependency)
+    const skillRows = [
+      {
+        moduleSlug: `esp32-intro-${importTimestamp}`,
+        orderIndex: 1,
+        title: 'Базова конфігурація GPIO',
+        slug: `gpio-config-${importTimestamp}`,
+        difficulty: 'EASY',
+        prerequisites: '',
+        pL0: 0.1,
+        pT: 0.2,
+        pS: 0.1,
+        pG: 0.2,
+      },
+      {
+        moduleSlug: `mqtt-sensors-${importTimestamp}`,
+        orderIndex: 2,
+        title: 'Публікація топіків MQTT',
+        slug: `mqtt-publish-${importTimestamp}`,
+        difficulty: 'MEDIUM',
+        prerequisites: `gpio-config-${importTimestamp}`, // Child depends on parent
+        pL0: 0.1,
+        pT: 0.2,
+        pS: 0.1,
+        pG: 0.2,
+      },
+    ];
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(skillRows), 'Skills');
+
+    // Theory Sheet
+    const theoryRows = [
+      {
+        moduleSlug: `esp32-intro-${importTimestamp}`,
+        hookIntro: 'Плата ESP32 поєднує потужний двоядерний процесор із вбудованими модулями Wi-Fi та Bluetooth.',
+        conceptsMarkdown: 'Піни GPIO можуть працювати як на вхід (INPUT), так і на вихід (OUTPUT).',
+        codeLang: 'cpp',
+        codeSnippet: 'pinMode(2, OUTPUT);\ndigitalWrite(2, HIGH);',
+        codeExplanation: 'Вмикає вбудований світлодіод на 2-му піні.',
+        misconceptionTitle: 'Плутанина між цифровими та аналоговими пінами',
+        misconceptionExplanation: 'Не всі піни GPIO підтримують АЦП (аналогове зчитування).',
+        takeawaysList: 'ESP32 має вбудований Wi-Fi | GPIO керує периферією | Вхід/вихід налаштовується через pinMode',
+      },
+    ];
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(theoryRows), 'Theory');
+
+    // Tasks Sheet
+    const taskRows = [
+      {
+        skillSlug: `gpio-config-${importTimestamp}`,
+        orderIndex: 1,
+        taskType: 'CODE',
+        difficulty: 'EASY',
+        title: 'Ініціалізація світлодіода',
+        prompt: 'Налаштуйте пін номер 4 як вихідний.',
+        starterCode: '// Введіть код\n',
+        testCasesJson: JSON.stringify([{ input: '', expectedOutput: 'pinMode(4, OUTPUT)', isSecret: false }]),
+        hintsList: 'Використайте функцію pinMode | Першим аргументом передайте 4',
+      },
+    ];
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(taskRows), 'Tasks');
+
+    const tempFilePath = path.join(process.cwd(), `test-import-${importTimestamp}.xlsx`);
+    XLSX.writeFile(wb, tempFilePath);
+
+    try {
+      // 2. Open Catalog view
+      await page.goto('http://localhost:3004/?tab=courses', { waitUntil: 'domcontentloaded', timeout: 30000 });
+      await expect(page.getByText('Управління Навчальними Курсами')).toBeVisible({ timeout: 15000 });
+
+      // 3. Click "Імпорт (.xlsx)" button in Catalog toolbar
+      const catalogImportBtn = page.locator('main').getByRole('button', { name: /Імпорт \(\.xlsx\)/i });
+      await expect(catalogImportBtn).toBeVisible();
+      await catalogImportBtn.click();
+
+      // 4. Verify Modal opened
+      const modal = page.locator('div.fixed').filter({ hasText: 'Імпорт навчального курсу з таблиці' });
+      await expect(modal).toBeVisible();
+
+      // 5. Upload file via hidden file input
+      const fileInput = modal.locator('input[type="file"]');
+      await fileInput.setInputFiles(tempFilePath);
+
+      // 6. Verify Pre-Flight Inspection summary appears
+      await expect(modal.getByText('Перевірка успішна: курс готовий до атомарного імпорту')).toBeVisible({ timeout: 10000 });
+      await expect(modal.getByText(importCourseTitle)).toBeVisible();
+      await expect(modal.getByText(`/${importCourseSlug}`).first()).toBeVisible();
+      await expect(modal.getByText('2', { exact: true }).first()).toBeVisible();
+
+      // Take screenshot of Pre-Flight Inspection
+      await page.screenshot({ path: 'C:/Users/Dima/.gemini/antigravity/brain/f32616d8-c180-4a3d-9dfd-5caf83629066/course_import_preflight_modal.png' });
+
+      // 7. Click "Імпортувати в систему"
+      const submitBtn = modal.getByRole('button', { name: /Імпортувати в систему/i });
+      await expect(submitBtn).toBeEnabled();
+      await submitBtn.click();
+
+      // 8. Verify navigation into Studio View for this imported course
+      await expect(page.getByRole('heading', { name: importCourseTitle })).toBeVisible({ timeout: 20000 });
+      await expect(page.getByText('Маршрут автора курсу: Крок 2 з 5')).toBeVisible();
+
+      // 9. Verify both imported modules are rendered in Studio
+      await expect(page.getByText('Вступ до мікроконтролерів ESP32')).toBeVisible();
+      await expect(page.getByText('Сенсори та протокол MQTT')).toBeVisible();
+
+      // Take screenshot of Studio with Imported Course
+      await page.screenshot({ path: 'C:/Users/Dima/.gemini/antigravity/brain/f32616d8-c180-4a3d-9dfd-5caf83629066/course_import_studio_result.png' });
+    } finally {
+      // Clean up temp file
+      if (fs.existsSync(tempFilePath)) {
+        try {
+          fs.unlinkSync(tempFilePath);
+        } catch {}
+      }
+
+      // Clean up imported test course from DB
+      const allRes = await page.request.get('http://localhost:3000/api/v1/courses?status=ALL');
+      if (allRes.ok()) {
+        const all = await allRes.json();
+        const created = all.find((c: any) => c.slug === importCourseSlug);
+        if (created) {
+          await page.request.delete(`http://localhost:3000/api/v1/courses/${created.id}`);
+        }
+      }
     }
   });
 });

@@ -29,6 +29,7 @@ import {
   ExternalLink,
   FlaskConical,
   FileSpreadsheet,
+  Upload,
 } from 'lucide-react';
 import { AppShellLayout, Breadcrumbs, UserProfileDrawer, DrawerSection } from '@sbc/ui';
 import { getAppBaseUrl } from '@sbc/routes';
@@ -37,6 +38,7 @@ import { CourseManager } from '../features/course-manager/ui/CourseManager';
 import { CourseCreateView } from '../features/course-manager/ui/CourseCreateView';
 import { CourseStudioView } from '../features/course-manager/ui/CourseStudioView';
 import { TheoryLessonBuilderView } from '../features/course-manager/ui/TheoryLessonBuilderView';
+import { CourseImportModal } from '../features/course-manager/ui/CourseImportModal';
 import { downloadCourseTemplate, downloadCourseExport } from '../features/course-manager/services/courseWorkbookService';
 import { DatasetExportCenter, DatasetStats } from '../features/dataset-export/ui/DatasetExportCenter';
 import { BktAuditVerifierCenter } from '../features/verifier/ui/BktAuditVerifierCenter';
@@ -126,6 +128,7 @@ export default function AdminCMSDashboard() {
 
   const [authorStep, setAuthorStep] = useState<number>(1);
   const [maxUnlockedStep, setMaxUnlockedStep] = useState<number>(1);
+  const [isImportModalOpen, setIsImportModalOpen] = useState<boolean>(false);
 
   // Search & Filter state for Drawer Sections
   const [datasetFilter, setDatasetFilter] = useState<'ALL' | 'SUBMISSIONS' | 'HINTS' | 'THEORY' | 'ANNULMENTS' | 'RESETS'>('ALL');
@@ -991,6 +994,16 @@ export default function AdminCMSDashboard() {
                   </button>
 
                   <div className="pt-1.5 border-t border-slate-800/60 flex flex-col gap-1.5">
+                    <button
+                      type="button"
+                      onClick={() => setIsImportModalOpen(true)}
+                      className="w-full py-1.5 px-2.5 rounded-lg bg-slate-800/60 hover:bg-slate-800 text-slate-200 border border-slate-700/80 transition-colors flex items-center gap-2 font-medium cursor-pointer"
+                      title="Імпортувати навчальний курс з Excel (.xlsx) або Google Sheets"
+                    >
+                      <Upload className="w-3.5 h-3.5 text-emerald-400" />
+                      <span>Імпорт з Excel (.xlsx)</span>
+                    </button>
+
                     <button
                       type="button"
                       onClick={() => downloadCourseExport(selectedStudioCourse)}
@@ -2197,6 +2210,20 @@ export default function AdminCMSDashboard() {
           setSelectedCategorySlug(null);
           setDatasetFilter('ALL');
           setDatasetUserFilter('');
+        }}
+      />
+
+      {/* Global Course Import Modal */}
+      <CourseImportModal
+        isOpen={isImportModalOpen}
+        onClose={() => setIsImportModalOpen(false)}
+        onCourseImported={(importedCourse) => {
+          setSelectedStudioCourse(importedCourse);
+          setActiveTab('create_course');
+          setCourseViewMode('STUDIO');
+          setAuthorStep(2);
+          setMaxUnlockedStep(5);
+          loadCourses();
         }}
       />
     </>

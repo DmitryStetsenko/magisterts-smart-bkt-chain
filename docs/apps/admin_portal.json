@@ -350,6 +350,11 @@
             },
             {
               "type": "text",
+              "raw_text": "Кнопка **«Імпорт (.xlsx)»**: відкриття модального вікна `CourseImportModal` із Drag-and-Drop, Pre-Flight перевіркою та атомарною транзакцією.",
+              "subitems": []
+            },
+            {
+              "type": "text",
               "raw_text": "Кнопка швидкого створення нової дисципліни `+ Створити Новий Курс`.",
               "subitems": []
             },
@@ -485,19 +490,29 @@
             },
             {
               "type": "text",
-              "raw_text": "**Кнопки табличного експорту в шапці Студії:** `📥 Експорт (.xlsx)` та `📄 Шаблон Excel`.",
+              "raw_text": "**Кнопки табличних операцій у шапці Студії:** `📥 Експорт (.xlsx)`, `📄 Шаблон Excel` та `📤 Імпорт (.xlsx)`.",
               "subitems": []
             }
           ]
         },
         {
-          "title": "6.4 Канонічний 5-Вкладковий Excel-Рушій (`courseWorkbookService.ts`)",
+          "title": "6.4 Канонічний 5-Вкладковий Excel-Рушій та Модальне Вікно Імпорту (`courseWorkbookService.ts`, `CourseImportModal.tsx`)",
           "level": 3,
           "paragraphs": [
-            "Забезпечує повну сумісність із Microsoft Excel та Google Таблицями за стандартом SBC Workbook (вкладки `Course`, `Modules`, `Skills`, `Theory`, `Tasks`). Детальніше див. окремий концептуальний документ [`docs/course_authoring_and_tabular_engine.md`](file:///docs/course_authoring_and_tabular_engine.md)."
+            "Забезпечує повну двосторонню інтеграцію з Microsoft Excel та Google Таблицями за канонічним стандартом SBC Workbook (вкладки `Course`, `Modules`, `Skills`, `Theory`, `Tasks`):"
           ],
           "code_blocks": [],
           "items": [
+            {
+              "type": "text",
+              "raw_text": "**Pre-Flight Linter:** клієнтська перевірка структури таблиці, форматів слагаів та виявлення циклів у графі компетенцій за алгоритмом DFS/Tarjan (`detectDagCycles`) до надсилання запиту на сервер.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Атомарний імпорт:** бекенд `POST /api/v1/courses/import-workbook` виконує створення всіх елементів у єдиній транзакції `prisma.$transaction`, гарантуючи відкат у разі будь-якої помилки. Детальніше див. окремий концептуальний документ [`docs/course_authoring_and_tabular_engine.md`](file:///docs/course_authoring_and_tabular_engine.md).",
+              "subitems": []
+            },
             {
               "type": "text",
               "raw_text": "---",

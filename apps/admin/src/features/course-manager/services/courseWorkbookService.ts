@@ -1,7 +1,8 @@
 import * as XLSX from 'xlsx';
 import type { CourseDto, CourseModuleDto, SkillNodeDto } from '@sbc/types';
-import { parseMarkdownToBlocks } from '../ui/TheoryLessonBuilderModal';
+import { parseMarkdownToBlocks, serializeLessonBlocks } from '../ui/TheoryLessonBuilderModal';
 import { formatCleanSkillTitle } from '../ui/CourseStudioView';
+import { validateSlug } from '@sbc/routes';
 
 /**
  * Канонічні назви вкладок стандарту SBC Course Workbook (5 вкладок)
@@ -580,4 +581,444 @@ export function downloadCourseExport(
   const targetFilename = filename || `sbc-course-${safeSlug}.xlsx`;
   const wb = exportCourseToWorkbook(course, allCourseSkills);
   downloadWorkbook(wb, targetFilename);
+}
+
+/**
+ * Структура розібраного курсу з 5 аркушів для атомарного імпорту
+ */
+export interface ParsedCourseImportDto {
+  course: CourseSheetRow;
+  modules: ModuleSheetRow[];
+  skills: SkillSheetRow[];
+  theories: TheorySheetRow[];
+  tasks: TaskSheetRow[];
+}
+
+/**
+ * Результат попередньої валідації книги курсу (Pre-Flight Linter)
+ */
+export interface CourseImportValidationResult {
+  isValid: boolean;
+  errors: string[];
+  warnings: string[];
+  stats: {
+    courseTitle: string;
+    courseSlug: string;
+    category: string;
+    targetPl: number;
+    moduleCount: number;
+    skillCount: number;
+    theoryCount: number;
+    taskCount: number;
+  };
+  payload?: ParsedCourseImportDto;
+}
+
+/**
+ * Перевірка ациклічності графу компетенцій BKT (DAG Cycle Detection)
+ * Використовує DFS із трьома станами (0 - не відвідано, 1 - у поточному стеку, 2 - завершено)
+ */
+export function detectDagCycles(skills: SkillSheetRow[]): { hasCycle: boolean; cyclePath: string[] } {
+  const adj = new Map<string, string[]>();
+  skills.forEach((s) => {
+    if (s.slug) {
+      if (!adj.has(s.slug.trim())) {
+        adj.set(s.slug.trim(), []);
+      }
+    }
+  });
+
+  skills.forEach((s) => {
+    if (s.slug && s.prerequisites) {
+      const prereqs = String(s.prerequisites)
+        .split(/[,;|]/)
+        .map((p) => p.trim())
+        .filter(Boolean);
+      prereqs.forEach((p) => {
+        if (adj.has(p)) {
+          adj.get(p)!.push(s.slug.trim());
+        }
+      });
+    }
+  });
+
+  const state = new Map<string, number>(); // 0: unvisited, 1: visiting, 2: visited
+  let cyclePath: string[] = [];
+
+  function dfs(u: string, stack: string[]): boolean {
+    state.set(u, 1);
+    stack.push(u);
+
+    const neighbors = adj.get(u) || [];
+    for (const v of neighbors) {
+      if (state.get(v) === 1) {
+        const cycleStartIndex = stack.indexOf(v);
+        cyclePath = [...stack.slice(cycleStartIndex), v];
+        return true;
+      }
+      if (!state.get(v)) {
+        if (dfs(v, stack)) return true;
+      }
+    }
+
+    stack.pop();
+    state.set(u, 2);
+    return false;
+  }
+
+  for (const node of adj.keys()) {
+    if (!state.get(node)) {
+      if (dfs(node, [])) {
+        return { hasCycle: true, cyclePath };
+      }
+    }
+  }
+
+  return { hasCycle: false, cyclePath: [] };
+}
+
+/**
+ * Перетворює рядок таблиці Theory у стандартизований 5-блочний Markdown Zen Focus
+ */
+export function serializeLessonBlocksFromRow(row: TheorySheetRow, moduleTitle: string = 'Тема'): string {
+  const rawTakeaways = row.takeawaysList ? String(row.takeawaysList) : '';
+  const takeaways = rawTakeaways
+    .split(/[\n|•\-]/)
+    .map((t) => t.trim())
+    .filter(Boolean);
+
+  return serializeLessonBlocks(
+    {
+      summary: row.hookIntro ? String(row.hookIntro).trim() : '',
+      conceptExplanation: row.conceptsMarkdown ? String(row.conceptsMarkdown).trim() : '',
+      hasCode: Boolean(row.codeSnippet),
+      codeLang: row.codeLang ? String(row.codeLang).trim() : 'html',
+      codeSnippet: row.codeSnippet ? String(row.codeSnippet).trim() : '',
+      codeExplanation: row.codeExplanation ? String(row.codeExplanation).trim() : '',
+      hasMisconception: Boolean(row.misconceptionTitle || row.misconceptionExplanation),
+      wrongBelief: row.misconceptionTitle ? String(row.misconceptionTitle).trim() : '',
+      realityExplanation: row.misconceptionExplanation ? String(row.misconceptionExplanation).trim() : '',
+      fixTip: '',
+      takeaways: takeaways.length > 0 ? takeaways : [''],
+    },
+    moduleTitle
+  );
+}
+
+/**
+ * Виконує глибокий аналіз та попередню валідацію (Pre-flight Inspection) файлу таблиці курсу
+ */
+export function parseCourseWorkbook(fileBuffer: ArrayBuffer | Uint8Array): CourseImportValidationResult {
+  const errors: string[] = [];
+  const warnings: string[] = [];
+
+  let wb: XLSX.WorkBook;
+  try {
+    wb = XLSX.read(fileBuffer, { type: 'array' });
+  } catch (err: any) {
+    return {
+      isValid: false,
+      errors: [`Не вдалося розпізнати файл як книгу Excel або OpenDocument: ${err?.message || 'Пошкоджений формат'}`],
+      warnings: [],
+      stats: {
+        courseTitle: '',
+        courseSlug: '',
+        category: '',
+        targetPl: 0.85,
+        moduleCount: 0,
+        skillCount: 0,
+        theoryCount: 0,
+        taskCount: 0,
+      },
+    };
+  }
+
+  // 1. Перевірка наявності канонічних вкладок
+  const sheetNames = wb.SheetNames;
+  const canonicalSheets = [
+    WORKBOOK_SHEETS.COURSE,
+    WORKBOOK_SHEETS.MODULES,
+    WORKBOOK_SHEETS.SKILLS,
+    WORKBOOK_SHEETS.THEORY,
+    WORKBOOK_SHEETS.TASKS,
+  ];
+
+  const missingSheets = canonicalSheets.filter((s) => !sheetNames.includes(s));
+  if (missingSheets.length > 0) {
+    errors.push(`У завантаженому файлі відсутні обов'язкові аркуші стандарту SBC: ${missingSheets.join(', ')}`);
+  }
+
+  // Читання рядків
+  const rawCourseRows: any[] = sheetNames.includes(WORKBOOK_SHEETS.COURSE)
+    ? XLSX.utils.sheet_to_json(wb.Sheets[WORKBOOK_SHEETS.COURSE] || {})
+    : [];
+  const rawModuleRows: any[] = sheetNames.includes(WORKBOOK_SHEETS.MODULES)
+    ? XLSX.utils.sheet_to_json(wb.Sheets[WORKBOOK_SHEETS.MODULES] || {})
+    : [];
+  const rawSkillRows: any[] = sheetNames.includes(WORKBOOK_SHEETS.SKILLS)
+    ? XLSX.utils.sheet_to_json(wb.Sheets[WORKBOOK_SHEETS.SKILLS] || {})
+    : [];
+  const rawTheoryRows: any[] = sheetNames.includes(WORKBOOK_SHEETS.THEORY)
+    ? XLSX.utils.sheet_to_json(wb.Sheets[WORKBOOK_SHEETS.THEORY] || {})
+    : [];
+  const rawTaskRows: any[] = sheetNames.includes(WORKBOOK_SHEETS.TASKS)
+    ? XLSX.utils.sheet_to_json(wb.Sheets[WORKBOOK_SHEETS.TASKS] || {})
+    : [];
+
+  // 2. Валідація паспорта курсу (Course)
+  let courseRow: CourseSheetRow = {
+    title: '',
+    slug: '',
+    category: 'Загальна',
+    description: '',
+    targetAudience: '',
+    difficultyLevel: 'BEGINNER',
+    bktMasteryThreshold: 0.85,
+    icon: 'BookOpen',
+  };
+
+  if (rawCourseRows.length === 0) {
+    errors.push('Аркуш "Course" не містить жодного рядка з паспортом курсу');
+  } else {
+    const r = rawCourseRows[0];
+    const title = String(r.title || r.Title || '').trim();
+    const slug = String(r.slug || r.Slug || '').trim();
+
+    if (!title) {
+      errors.push('Аркуш "Course": назва курсу (title) обовʼязкова');
+    }
+    if (!slug) {
+      errors.push('Аркуш "Course": URL-ідентифікатор курсу (slug) обовʼязковий');
+    } else {
+      const slugValidation = validateSlug(slug);
+      if (!slugValidation.isValid) {
+        errors.push(`Аркуш "Course": слаг "${slug}" некоректний — ${slugValidation.error}`);
+      }
+    }
+
+    const rawPl = parseFloat(r.bktMasteryThreshold || r.targetPl || r.BktThreshold);
+    const targetPl = !isNaN(rawPl) && rawPl >= 0.5 && rawPl <= 0.99 ? rawPl : 0.85;
+
+    courseRow = {
+      title,
+      slug,
+      category: String(r.category || r.Category || 'Інформатика & IT').trim(),
+      description: String(r.description || r.Description || '').trim(),
+      targetAudience: String(r.targetAudience || r.TargetAudience || '').trim(),
+      difficultyLevel: String(r.difficultyLevel || r.Difficulty || 'BEGINNER').trim(),
+      bktMasteryThreshold: targetPl,
+      icon: String(r.icon || r.Icon || 'BookOpen').trim(),
+    };
+  }
+
+  // 3. Валідація модулів (Modules)
+  const modules: ModuleSheetRow[] = [];
+  const moduleSlugsSet = new Set<string>();
+
+  if (rawModuleRows.length === 0) {
+    errors.push('Аркуш "Modules": повинен містити хоча б один навчальний модуль');
+  } else {
+    rawModuleRows.forEach((r, idx) => {
+      const rowNum = idx + 2;
+      const title = String(r.title || r.Title || '').trim();
+      const slug = String(r.slug || r.Slug || r.moduleSlug || '').trim();
+
+      if (!title) {
+        errors.push(`Аркуш "Modules" (рядок ${rowNum}): модуль не має назви`);
+      }
+      if (!slug) {
+        errors.push(`Аркуш "Modules" (рядок ${rowNum}): модуль "${title || 'без назви'}" не має слага`);
+      } else {
+        const val = validateSlug(slug);
+        if (!val.isValid) {
+          errors.push(`Аркуш "Modules" (рядок ${rowNum}): слаг "${slug}" некоректний — ${val.error}`);
+        } else if (moduleSlugsSet.has(slug)) {
+          errors.push(`Аркуш "Modules" (рядок ${rowNum}): дублювання слага модуля "${slug}"`);
+        } else {
+          moduleSlugsSet.add(slug);
+        }
+      }
+
+      const orderIndex = parseInt(r.orderIndex || r.OrderIndex || idx + 1) || idx + 1;
+      const bktThreshold = parseFloat(r.bktThreshold || r.threshold || courseRow.bktMasteryThreshold) || courseRow.bktMasteryThreshold;
+
+      modules.push({
+        orderIndex,
+        title,
+        slug,
+        theoryUrl: String(r.theoryUrl || r.TheoryUrl || `/learn/${courseRow.slug}/${slug}`).trim(),
+        bktThreshold,
+        description: String(r.description || r.Description || '').trim(),
+      });
+    });
+  }
+
+  // 4. Валідація компетенцій BKT (Skills)
+  const skills: SkillSheetRow[] = [];
+  const skillSlugsSet = new Set<string>();
+
+  if (rawSkillRows.length === 0) {
+    errors.push('Аркуш "Skills": повинен містити хоча б одну компетенцію BKT для побудови DAG');
+  } else {
+    rawSkillRows.forEach((r, idx) => {
+      const rowNum = idx + 2;
+      const title = String(r.title || r.Title || '').trim();
+      const slug = String(r.slug || r.Slug || r.skillSlug || '').trim();
+      const moduleSlug = String(r.moduleSlug || r.ModuleSlug || '').trim();
+
+      if (!title) {
+        errors.push(`Аркуш "Skills" (рядок ${rowNum}): навичка не має назви`);
+      }
+      if (!slug) {
+        errors.push(`Аркуш "Skills" (рядок ${rowNum}): навичка "${title || 'без назви'}" не має слага`);
+      } else {
+        const val = validateSlug(slug);
+        if (!val.isValid) {
+          errors.push(`Аркуш "Skills" (рядок ${rowNum}): слаг навички "${slug}" некоректний — ${val.error}`);
+        } else if (skillSlugsSet.has(slug)) {
+          errors.push(`Аркуш "Skills" (рядок ${rowNum}): дублювання слага навички "${slug}"`);
+        } else {
+          skillSlugsSet.add(slug);
+        }
+      }
+
+      if (!moduleSlug) {
+        errors.push(`Аркуш "Skills" (рядок ${rowNum}): навичка "${title}" не прив'язана до moduleSlug`);
+      } else if (!moduleSlugsSet.has(moduleSlug)) {
+        errors.push(`Аркуш "Skills" (рядок ${rowNum}): навичка "${title}" посилається на неіснуючий moduleSlug "${moduleSlug}"`);
+      }
+
+      const pL0 = parseFloat(r.pL0 || r.pInit || 0.1) || 0.1;
+      const pT = parseFloat(r.pT || r.pTransit || 0.2) || 0.2;
+      const pS = parseFloat(r.pS || r.pSlip || 0.1) || 0.1;
+      const pG = parseFloat(r.pG || r.pGuess || 0.2) || 0.2;
+
+      skills.push({
+        moduleSlug,
+        orderIndex: parseInt(r.orderIndex || idx + 1) || idx + 1,
+        title,
+        slug,
+        difficulty: String(r.difficulty || 'EASY').trim().toUpperCase(),
+        prerequisites: String(r.prerequisites || r.Prerequisites || '').trim(),
+        pL0,
+        pT,
+        pS,
+        pG,
+      });
+    });
+
+    // Перевірка пререквізитів та ациклічності DAG
+    skills.forEach((s) => {
+      if (s.prerequisites) {
+        const prereqs = s.prerequisites.split(/[,;|]/).map((p) => p.trim()).filter(Boolean);
+        prereqs.forEach((prereq) => {
+          if (!skillSlugsSet.has(prereq)) {
+            errors.push(`Аркуш "Skills": навичка "${s.title}" (${s.slug}) посилається на невідомий пререквізит "${prereq}"`);
+          }
+        });
+      }
+    });
+
+    const dagCheck = detectDagCycles(skills);
+    if (dagCheck.hasCycle) {
+      errors.push(`Аркуш "Skills": виявлено циклічну залежність у графі компетенцій BKT: ${dagCheck.cyclePath.join(' ➔ ')}`);
+    }
+  }
+
+  // 5. Валідація уроків теорії (Theory)
+  const theories: TheorySheetRow[] = [];
+  rawTheoryRows.forEach((r, idx) => {
+    const rowNum = idx + 2;
+    const moduleSlug = String(r.moduleSlug || r.ModuleSlug || '').trim();
+    if (moduleSlug && !moduleSlugsSet.has(moduleSlug)) {
+      warnings.push(`Аркуш "Theory" (рядок ${rowNum}): конспект для "${moduleSlug}" не знайдено серед модулів`);
+    }
+    theories.push({
+      moduleSlug,
+      hookIntro: String(r.hookIntro || '').trim(),
+      conceptsMarkdown: String(r.conceptsMarkdown || '').trim(),
+      codeLang: String(r.codeLang || 'html').trim(),
+      codeSnippet: String(r.codeSnippet || '').trim(),
+      codeExplanation: String(r.codeExplanation || '').trim(),
+      misconceptionTitle: String(r.misconceptionTitle || '').trim(),
+      misconceptionExplanation: String(r.misconceptionExplanation || '').trim(),
+      takeawaysList: String(r.takeawaysList || '').trim(),
+    });
+  });
+
+  // 6. Валідація банку завдань (Tasks)
+  const tasks: TaskSheetRow[] = [];
+  rawTaskRows.forEach((r, idx) => {
+    const rowNum = idx + 2;
+    const skillSlug = String(r.skillSlug || r.SkillSlug || '').trim();
+    const title = String(r.title || r.Title || '').trim();
+
+    if (!title) {
+      errors.push(`Аркуш "Tasks" (рядок ${rowNum}): завдання не має назви`);
+    }
+    if (!skillSlug) {
+      errors.push(`Аркуш "Tasks" (рядок ${rowNum}): завдання "${title || 'без назви'}" не привʼязане до skillSlug`);
+    } else if (!skillSlugsSet.has(skillSlug)) {
+      errors.push(`Аркуш "Tasks" (рядок ${rowNum}): завдання "${title}" посилається на неіснуючу навичку "${skillSlug}"`);
+    }
+
+    const testCasesRaw = String(r.testCasesJson || r.TestCasesJson || '').trim();
+    if (testCasesRaw) {
+      try {
+        const parsed = JSON.parse(testCasesRaw);
+        if (!Array.isArray(parsed)) {
+          errors.push(`Аркуш "Tasks" (рядок ${rowNum}): testCasesJson повинен бути JSON-масивом [ { input, expectedOutput } ]`);
+        }
+      } catch (jsonErr: any) {
+        errors.push(`Аркуш "Tasks" (рядок ${rowNum}): помилка синтаксису JSON у testCasesJson — ${jsonErr.message}`);
+      }
+    }
+
+    tasks.push({
+      skillSlug,
+      orderIndex: parseInt(r.orderIndex || idx + 1) || idx + 1,
+      taskType: String(r.taskType || 'CODE').trim().toUpperCase(),
+      difficulty: String(r.difficulty || 'EASY').trim().toUpperCase(),
+      title,
+      prompt: String(r.prompt || r.description || '').trim(),
+      starterCode: String(r.starterCode || '').trim(),
+      testCasesJson: testCasesRaw,
+      hintsList: String(r.hintsList || '').trim(),
+    });
+  });
+
+  // Перевірка покриття навичок завданнями (warnings)
+  const skillsWithTasks = new Set(tasks.map((t) => t.skillSlug));
+  skills.forEach((s) => {
+    if (!skillsWithTasks.has(s.slug)) {
+      warnings.push(`Навичка "${s.title}" (${s.slug}) не має жодного практичного завдання у банку`);
+    }
+  });
+
+  const isValid = errors.length === 0;
+
+  return {
+    isValid,
+    errors,
+    warnings,
+    stats: {
+      courseTitle: courseRow.title,
+      courseSlug: courseRow.slug,
+      category: courseRow.category,
+      targetPl: courseRow.bktMasteryThreshold,
+      moduleCount: modules.length,
+      skillCount: skills.length,
+      theoryCount: theories.length,
+      taskCount: tasks.length,
+    },
+    payload: isValid
+      ? {
+          course: courseRow,
+          modules,
+          skills,
+          theories,
+          tasks,
+        }
+      : undefined,
+  };
 }

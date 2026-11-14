@@ -106,3 +106,64 @@ export interface CreateCourseDto {
   defaultMasteryThreshold?: number;
   categoryId?: string | null;
 }
+
+/**
+ * DTO імпорту структури курсу з таблиць (Excel / Google Sheets)
+ */
+export interface ImportCourseWorkbookDto {
+  course: {
+    title: string;
+    slug: string;
+    category?: string;
+    description?: string;
+    targetAudience?: string;
+    difficultyLevel?: string;
+    bktMasteryThreshold?: number;
+    icon?: string;
+    isPublished?: boolean;
+  };
+  modules: Array<{
+    orderIndex: number;
+    title: string;
+    slug: string;
+    theoryUrl?: string;
+    bktThreshold?: number;
+    description?: string;
+  }>;
+  skills: Array<{
+    moduleSlug: string;
+    orderIndex: number;
+    title: string;
+    slug: string;
+    difficulty?: string;
+    prerequisites?: string;
+    pL0?: number;
+    pT?: number;
+    pS?: number;
+    pG?: number;
+  }>;
+  theories?: Array<{
+    moduleSlug: string;
+    hookIntro?: string;
+    conceptsMarkdown?: string;
+    codeLang?: string;
+    codeSnippet?: string;
+    codeExplanation?: string;
+    misconceptionTitle?: string;
+    misconceptionExplanation?: string;
+    takeawaysList?: string;
+  }>;
+  tasks?: Array<{
+    skillSlug: string;
+    orderIndex?: number;
+    taskType?: string;
+    difficulty?: string;
+    title: string;
+    prompt: string;
+    starterCode?: string;
+    testCasesJson?: string;
+    hintsList?: string;
+  }>;
+  overwriteExisting?: boolean;
+}
+

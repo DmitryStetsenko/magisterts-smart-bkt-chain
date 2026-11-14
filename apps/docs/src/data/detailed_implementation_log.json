@@ -735,6 +735,106 @@
           ]
         },
         {
+          "title": "0.1.7.108 Двосторонній Імпорт Курсу з Excel / Google Sheets із Pre-Flight Валідатором, DFS/Tarjan Ациклічністю DAG та Атомарною Транзакцією PostgreSQL (SBC-419, EP-AD)",
+          "level": 3,
+          "paragraphs": [],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "**Контекст та задача:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Реалізація другого обов'язкового мікро-кроку виробничої дорожньої карти Сесії 20 (`SBC-419`): створення надійного інженерного рушія імпорту навчальних планів із файлів Microsoft Excel (`.xlsx`, `.xls`) та експортованих Google Sheets із попередньою всебічною валідацією (Pre-Flight Inspection) та 100% гарантією атомарності бази даних PostgreSQL.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Архітектурні та інженерні рішення:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Браузерний аналізатор та перевірка графу DAG ([`apps/admin/src/features/course-manager/services/courseWorkbookService.ts`](file:///apps/admin/src/features/course-manager/services/courseWorkbookService.ts)):**",
+              "subitems": [
+                "Розроблено функцію `parseCourseWorkbook(fileBuffer: ArrayBuffer | Uint8Array)`, яка розбирає структуру з 5 обов'язкових аркушів (`Course`, `Modules`, `Skills`, `Theory`, `Tasks`).",
+                "**Алгоритмічний детектор циклічних залежностей BKT (DFS / Tarjan DAG Cycle Detection):**",
+                "Реалізовано функцію `detectDagCycles(skills)`: алгоритм триколірного пошуку в глибину (0 - невідвідано, 1 - у поточному стеку, 2 - оброблено), який виявляє будь-які взаємні або транзитивні зациклення навичок (наприклад, $S_1 \\to S_2 \\to S_1$) до відправки на сервер і повертає точний ланцюжок циклу для виправлення в таблиці:",
+                "$$\\text{State}(v) = 1 \\implies \\text{CycleDetected}(\\text{Stack}[v \\dots u] \\cup \\{v\\})$$",
+                "**Валідація синтаксису тест-кейсів та обов'язкових полів:**",
+                "Перевірка обов'язковості та унікальності слагаів модулів і компетенцій за стандартом КМУ №55 через функцію `validateSlug`.",
+                "Синтаксичний парсинг `testCasesJson` через `JSON.parse` із перевіркою формату масиву вхідних/очікуваних даних `[{ input, expectedOutput, isSecret }]`.",
+                "Автоматичне зіставлення текстових рядків теорії з 5-блочною схемою Zen Focus через `serializeLessonBlocksFromRow`."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Модальне вікно імпорту курсу ([`apps/admin/src/features/course-manager/ui/CourseImportModal.tsx`](file:///apps/admin/src/features/course-manager/ui/CourseImportModal.tsx)):**",
+              "subitems": [
+                "Створено повнофункціональний компонент на базі канонічного макету Opera Shell v2.0 (Rule 7, безрамковий мінімалістичний дизайн).",
+                "Зона **Drag-and-Drop** для перетягування файлів `.xlsx` та інтерактивний файловий діалог.",
+                "Кнопка швидкого завантаження еталонного шаблону та висувна інструкція експорту з Google Таблиць.",
+                "**Pre-Flight Inspection Preview:**",
+                "Візуальний статус готовності: 🟢 *«✓ Валідація пройдена: 100% готовність до імпорту»* або 🔴 *«⚠️ Виявлено блокуючі помилки (N)»*.",
+                "Картка метаданих курсу: назва, слаг, категорія, цільовий норматив $P(L)$.",
+                "Сітка з 4 лічильників: кількість модулів, компетенцій BKT, конспектів Zen Focus та практичних завдань у банку.",
+                "Скрольований блок помилок із зазначенням конкретного аркуша та номера рядка таблиці.",
+                "Опція перезапису наявної чернетки: чекбокс `[x] Перезаписати курс, якщо чернетка зі слагом ... вже існує`."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Атомарний ендпоінт бекенду `POST /api/v1/courses/import-workbook` ([`apps/api/src/adapters/inbound/http/course.controller.ts`](file:///apps/api/src/adapters/inbound/http/course.controller.ts)):**",
+              "subitems": [
+                "Реалізовано транзакційне створення курсу в межах єдиної сесії **`this.prisma.$transaction`**:",
+                "1. Пошук та зв'язування з предметною категорією `CourseCategory`.",
+                "2. Створення паспорта курсу `Course` зі статусом чернетки (`isPublished: false`).",
+                "3. Створення модулів `CourseModule` зі згенерованими маршрутами `theoryUrl` та Markdown-конспектами теорії Zen Focus у полі `description`.",
+                "4. Створення вузлів компетенцій `SkillNode` із прив'язкою до модулів та курсу.",
+                "5. Створення напрямлених ребер графу `SkillDependency` (пререквізити BKT) із цільовим порогом майстерності.",
+                "6. Створення банку завдань `Task` з валідаційними тест-кейсами `TestCase` та багаторівневими Сократівськими підказками `socraticHints`.",
+                "**Гарантія надійності (ACID):** у разі помилки валідації на будь-якому кроці транзакція миттєво відкочується назад (Rollback), база даних залишається цілісною без «напівстворених» курсів."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Інтеграція в інтерфейси адмін-порталу:**",
+              "subitems": [
+                "Додано кнопку `[ 📤 Імпорт (.xlsx) ]` на головну панель інструментів Каталогу курсів ([`CourseManager.tsx`](file:///apps/admin/src/features/course-manager/ui/CourseManager.tsx)).",
+                "Додано кнопку `[ 📤 Імпорт (.xlsx) ]` у верхню панель Студії курсу ([`CourseStudioView.tsx`](file:///apps/admin/src/features/course-manager/ui/CourseStudioView.tsx)).",
+                "Додано швидку дію `Імпорт з Excel (.xlsx)` у бічну панель DrawerSection «ДІЇ ТА ІНСТРУМЕНТИ» ([`apps/admin/src/app/page.tsx`](file:///apps/admin/src/app/page.tsx))."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Верифікація та тестування:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Скрізне тестування Playwright E2E:**",
+              "subitems": [
+                "Створено автоматичний тест `Two-Way Tabular Workbook Import Modal with Pre-Flight DAG Validation and Atomic DB Transaction` у файлі [`e2e/course-creation-wizard-flow.spec.ts`](file:///e2e/course-creation-wizard-flow.spec.ts).",
+                "Згенеровано тестову 5-аркушеву книгу Excel у пам'яті, завантажено через модальне вікно, перевірено індикатор pre-flight валідації (2 модулі, 2 навички, 1 задача), підтверджено імпорт, перевірено перехід у Студію курсу та відображення створеної структури.",
+                "Усі 4 тести сьюту завершилися успішно (**4/4 passed, 48.8s**).",
+                "Збережено візуальні артефакти:",
+                "`course_import_preflight_modal.png` (вікно перевірки валідності перед імпортом).",
+                "`course_import_studio_result.png` (імпортований курс у робочій студії майстра)."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Верифікація виробничої збірки:**",
+              "subitems": [
+                "`npm run build:admin` (Next.js Turbopack, 4/4 static pages, 0 помилок).",
+                "`npm run build:api` (NestJS build, 0 помилок)."
+              ]
+            }
+          ]
+        },
+        {
           "title": "0.1.7.107 Окрема Концептуальна Специфікація Інжинірингу Курсів, Табличного Стандарту та ШІ-Скеффолдингу (SBC-424, EP-AD)",
           "level": 3,
           "paragraphs": [],

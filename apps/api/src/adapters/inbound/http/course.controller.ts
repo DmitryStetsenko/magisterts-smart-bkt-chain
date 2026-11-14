@@ -18,6 +18,7 @@ import type {
   UpdateCourseDto,
   CreateCourseModuleDto,
   UpdateCourseModuleDto,
+  ImportCourseWorkbookDto,
 } from '@sbc/types';
 
 @ApiTags('Courses')
@@ -181,6 +182,265 @@ export class CourseController {
 
     this.logger.log(`Created new course: "${course.title}" (${course.slug})`);
     return course;
+  }
+
+  /**
+   * Атомарний імпорт повної структури курсу з таблиці Excel / Google Sheets
+   * Забезпечує транзакційне створення курсу, модулів, DAG-навичок та банку завдань
+   */
+  @Post('import-workbook')
+  @ApiOperation({ summary: 'Atomically import complete course structure from tabular workbook' })
+  async importCourseWorkbook(@Body() dto: ImportCourseWorkbookDto) {
+    if (!dto || !dto.course || !dto.course.title || !dto.course.slug) {
+      throw new BadRequestException('Некоректний формат даних курсу для імпорту');
+    }
+
+    const courseSlug = dto.course.slug.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+    const courseTitle = dto.course.title.trim();
+
+    // Перевірка наявності курсу
+    const existing = await this.prisma.course.findUnique({
+      where: { slug: courseSlug },
+      include: { _count: { select: { enrollments: true } } },
+    });
+
+    if (existing) {
+      if (!dto.overwriteExisting) {
+        throw new BadRequestException(
+          `Курс із слагом "${courseSlug}" вже існує в системі. Будь ласка, вкажіть інший слаг або підтвердіть оновлення (overwriteExisting: true).`
+        );
+      }
+      if (existing._count.enrollments > 0) {
+        throw new BadRequestException(
+          `Неможливо перезаписати курс "${courseTitle}": на нього вже зараховано ${existing._count.enrollments} учнів.`
+        );
+      }
+    }
+
+    // Запуск атомарної транзакції бази даних
+    return this.prisma.$transaction(async (tx) => {
+      // Якщо обрано перезапис існуючого курсу
+      if (existing) {
+        await tx.course.delete({ where: { id: existing.id } });
+      }
+
+      // 1. Пошук категорії курсу
+      let categoryId: string | null = null;
+      if (dto.course.category) {
+        const cat = await tx.courseCategory.findFirst({
+          where: {
+            OR: [
+              { title: { equals: dto.course.category.trim(), mode: 'insensitive' } },
+              { slug: { equals: dto.course.category.trim().toLowerCase(), mode: 'insensitive' } },
+            ],
+          },
+        });
+        if (cat) {
+          categoryId = cat.id;
+        }
+      }
+
+      // 2. Створення паспорта курсу
+      const course = await tx.course.create({
+        data: {
+          title: courseTitle,
+          slug: courseSlug,
+          description: dto.course.description?.trim() || courseTitle,
+          targetAudience: dto.course.targetAudience?.trim() || null,
+          icon: dto.course.icon?.trim() || 'BookOpen',
+          defaultMasteryThreshold: dto.course.bktMasteryThreshold ?? 0.85,
+          isPublished: dto.course.isPublished ?? false,
+          categoryId,
+        },
+      });
+
+      // Карта ID створених модулів: moduleSlug -> moduleId
+      const moduleMap = new Map<string, string>();
+
+      // 3. Створення модулів курсу з 5-блочною теорією Zen Focus
+      for (const m of dto.modules || []) {
+        const modSlug = m.slug.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+
+        let moduleDescription = m.description?.trim() || null;
+        const theoryRow = dto.theories?.find((t) => t.moduleSlug.trim() === modSlug);
+        if (theoryRow && (theoryRow.conceptsMarkdown || theoryRow.hookIntro)) {
+          const parts: string[] = [];
+          if (theoryRow.hookIntro?.trim()) {
+            parts.push(`> 📌 **Короткий огляд теми:**\n> ${theoryRow.hookIntro.trim().replace(/\n/g, '\n> ')}`);
+          }
+          if (theoryRow.conceptsMarkdown?.trim()) {
+            parts.push(`### 📖 Теоретичні поняття\n\n${theoryRow.conceptsMarkdown.trim()}`);
+          }
+          if (theoryRow.codeSnippet?.trim()) {
+            const lang = theoryRow.codeLang || 'html';
+            let codeBlock = `### 💻 Приклад коду (${lang.toUpperCase()})\n\n\`\`\`${lang}\n${theoryRow.codeSnippet.trim()}\n\`\`\``;
+            if (theoryRow.codeExplanation?.trim()) {
+              codeBlock += `\n\n*${theoryRow.codeExplanation.trim()}*`;
+            }
+            parts.push(codeBlock);
+          }
+          if (theoryRow.misconceptionTitle?.trim() || theoryRow.misconceptionExplanation?.trim()) {
+            let misc = `### ⚠️ Типова омана учнів (Misconception Alert)\n`;
+            if (theoryRow.misconceptionTitle?.trim()) {
+              misc += `> ❌ **Хибне уявлення:** ${theoryRow.misconceptionTitle.trim()}\n>\n`;
+            }
+            if (theoryRow.misconceptionExplanation?.trim()) {
+              misc += `> ✅ **Реальність:** ${theoryRow.misconceptionExplanation.trim()}\n`;
+            }
+            parts.push(misc);
+          }
+          if (theoryRow.takeawaysList?.trim()) {
+            const items = theoryRow.takeawaysList.split(/[\n|•\-]/).map((t) => t.trim()).filter(Boolean);
+            if (items.length > 0) {
+              parts.push(`### 🎯 Ключові висновки (Takeaways)\n\n${items.map((t) => `- ${t}`).join('\n')}`);
+            }
+          }
+          moduleDescription = parts.join('\n\n');
+        }
+
+        const createdModule = await tx.courseModule.create({
+          data: {
+            courseId: course.id,
+            slug: modSlug,
+            title: m.title.trim(),
+            description: moduleDescription,
+            orderIndex: m.orderIndex,
+            theoryUrl: m.theoryUrl?.trim() || `/learn/${courseSlug}/${modSlug}`,
+            minMasteryThreshold: m.bktThreshold ?? course.defaultMasteryThreshold,
+          },
+        });
+        moduleMap.set(modSlug, createdModule.id);
+      }
+
+      // Карта ID створених навичок: skillSlug -> skillId
+      const skillMap = new Map<string, string>();
+
+      // 4. Створення навичок BKT
+      for (const s of dto.skills || []) {
+        const skillSlug = s.slug.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+        const targetModuleId = moduleMap.get(s.moduleSlug.trim().toLowerCase());
+
+        const createdSkill = await tx.skillNode.create({
+          data: {
+            courseId: course.id,
+            moduleId: targetModuleId || null,
+            slug: skillSlug,
+            title: s.title.trim(),
+            description: s.title.trim(),
+            category: dto.course.category?.trim() || 'Основна',
+            difficulty: (['EASY', 'MEDIUM', 'HARD'].includes(s.difficulty || '') ? s.difficulty : 'EASY') as any,
+            orderIndex: s.orderIndex,
+          },
+        });
+        skillMap.set(skillSlug, createdSkill.id);
+      }
+
+      // 5. Створення зв'язків графу компетенцій (DAG Prerequisites)
+      for (const s of dto.skills || []) {
+        if (!s.prerequisites) continue;
+        const currentSkillId = skillMap.get(s.slug.trim().toLowerCase());
+        if (!currentSkillId) continue;
+
+        const prereqSlugs = s.prerequisites.split(/[,;|]/).map((p) => p.trim().toLowerCase()).filter(Boolean);
+        for (const prereqSlug of prereqSlugs) {
+          const parentSkillId = skillMap.get(prereqSlug);
+          if (parentSkillId && parentSkillId !== currentSkillId) {
+            await tx.skillDependency.create({
+              data: {
+                parentSkillId,
+                childSkillId: currentSkillId,
+                requiredMastery: course.defaultMasteryThreshold,
+              },
+            });
+          }
+        }
+      }
+
+      // 6. Створення банку адаптивних завдань (Tasks & TestCases)
+      for (const t of dto.tasks || []) {
+        const targetSkillId = skillMap.get(t.skillSlug.trim().toLowerCase());
+        if (!targetSkillId) continue;
+
+        const taskType = (['CODE', 'MULTIPLE_CHOICE'].includes(t.taskType || '') ? t.taskType : 'CODE') as any;
+        const difficulty = (['EASY', 'MEDIUM', 'HARD'].includes(t.difficulty || '') ? t.difficulty : 'EASY') as any;
+
+        let testCases: Array<{ input: string; expectedOutput: string; isSecret: boolean }> = [];
+        if (t.testCasesJson && t.testCasesJson.trim()) {
+          try {
+            const rawTests = JSON.parse(t.testCasesJson);
+            if (Array.isArray(rawTests)) {
+              testCases = rawTests.map((tc: any) => ({
+                input: String(tc.input ?? ''),
+                expectedOutput: String(tc.expectedOutput ?? ''),
+                isSecret: Boolean(tc.isSecret),
+              }));
+            }
+          } catch {
+            // ігноруємо помилки парсингу
+          }
+        }
+
+        let socraticHints: any = null;
+        if (t.hintsList && t.hintsList.trim()) {
+          const hints = t.hintsList.split(/[\n|•]/).map((h) => h.trim()).filter(Boolean);
+          if (hints.length > 0) {
+            socraticHints = hints.map((h, i) => ({
+              level: i + 1,
+              hint: h,
+              penaltyPct: (i + 1) * 10,
+            }));
+          }
+        }
+
+        await tx.task.create({
+          data: {
+            skillId: targetSkillId,
+            title: t.title.trim(),
+            description: t.prompt?.trim() || t.title.trim(),
+            taskType,
+            difficulty,
+            starterCode: t.starterCode || (taskType === 'CODE' ? '// Напишіть ваш розвʼязок тут\n' : null),
+            socraticHints,
+            topic: t.title.trim(),
+            testCases: testCases.length > 0
+              ? {
+                  create: testCases.map((tc) => ({
+                    input: tc.input,
+                    expectedOutput: tc.expectedOutput,
+                    isSecret: tc.isSecret,
+                  })),
+                }
+              : undefined,
+          },
+        });
+      }
+
+      this.logger.log(`Workbook atomically imported: Course "${course.title}" (${course.slug}) with ${moduleMap.size} modules, ${skillMap.size} skills`);
+
+      return tx.course.findUnique({
+        where: { id: course.id },
+        include: {
+          category: true,
+          modules: {
+            orderBy: { orderIndex: 'asc' },
+            include: {
+              skills: {
+                orderBy: { orderIndex: 'asc' },
+              },
+            },
+          },
+          skills: {
+            include: {
+              parentDependencies: true,
+              tasks: {
+                include: { testCases: true },
+              },
+            },
+            orderBy: { orderIndex: 'asc' },
+          },
+        },
+      });
+    });
   }
 
   /**

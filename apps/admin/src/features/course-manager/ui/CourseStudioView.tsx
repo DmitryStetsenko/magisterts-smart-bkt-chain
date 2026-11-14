@@ -25,6 +25,7 @@ import {
   Sliders,
   Download,
   FileSpreadsheet,
+  Upload,
 } from 'lucide-react';
 import type { CourseDto, CourseModuleDto, SkillNodeDto, CourseCategoryDto, UpdateCourseDto } from '@sbc/types';
 import { slugify, validateSlug } from '@sbc/routes';
@@ -32,6 +33,7 @@ import { CreateSkillModal } from './CreateSkillModal';
 import { CreateTaskModal } from './CreateTaskModal';
 import { ModuleTestSandboxModal } from './ModuleTestSandboxModal';
 import { TheoryLessonBuilderModal } from './TheoryLessonBuilderModal';
+import { CourseImportModal } from './CourseImportModal';
 import { MASTERY_STANDARDS } from './CourseCreateView';
 import { downloadCourseTemplate, downloadCourseExport } from '../services/courseWorkbookService';
 
@@ -142,6 +144,7 @@ export const CourseStudioView: React.FC<CourseStudioViewProps> = ({
   const [taskCreationSkill, setTaskCreationSkill] = useState<{ id: string; title: string } | null>(null);
   const [testingSandboxModule, setTestingSandboxModule] = useState<CourseModuleDto | null>(null);
   const [theoryBuilderModule, setTheoryBuilderModule] = useState<CourseModuleDto | null>(null);
+  const [isImportModalOpen, setIsImportModalOpen] = useState(false);
 
   // Inline Task creation state per skill
   const [addingTaskSkillId, setAddingTaskSkillId] = useState<string | null>(null);
@@ -569,6 +572,16 @@ export const CourseStudioView: React.FC<CourseStudioViewProps> = ({
           </div>
 
           <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setIsImportModalOpen(true)}
+              className="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 text-xs font-medium flex items-center gap-1.5 transition-colors cursor-pointer"
+              title="Імпортувати оновлений курс з таблиці Excel (.xlsx) або Google Sheets"
+            >
+              <Upload className="w-3.5 h-3.5 text-emerald-400" />
+              <span className="hidden sm:inline">Імпорт (.xlsx)</span>
+            </button>
+
             <button
               type="button"
               onClick={() => {
@@ -1844,6 +1857,18 @@ export const CourseStudioView: React.FC<CourseStudioViewProps> = ({
           }}
         />
       )}
+
+      {/* Course Import Modal */}
+      <CourseImportModal
+        isOpen={isImportModalOpen}
+        onClose={() => setIsImportModalOpen(false)}
+        onCourseImported={async (importedCourse) => {
+          setMessage(`🎉 Курс «${importedCourse.title}» успішно оновлено з таблиці!`);
+          setCourse(importedCourse);
+          onCourseUpdated(importedCourse);
+          await fetchFullCourseData();
+        }}
+      />
     </div>
   );
 };
