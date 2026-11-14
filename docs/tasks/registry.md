@@ -413,7 +413,7 @@
 | **SBC-369** | `Style` | `TC` | eliminate nested containers and declutter MetricsAuditInspector into minimalist borderless layout | 2026-11-10 | `9b5f1f9` |
 | **SBC-380** | `Story` | `TC` | implement classroom management drawer section, invite code generator and enrollment mode selector | 2026-11-10 | `137f38a` |
 | **SBC-387** | `Story` | `TC` | implement modular course selection and allowed modules filter in teacher classroom creator | 2026-11-10 | `42195a5` |
-| **SBC-427** | `Story` | `TC` | verify cross-app course lifecycle across admin, study, teacher and student portals | 2026-11-14 | pending |
+| **SBC-427** | `Story` | `TC` | verify cross-app course lifecycle across admin, study, teacher and student portals | 2026-11-14 | `3adef5f` |
 
 
 
