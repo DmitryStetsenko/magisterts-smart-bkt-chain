@@ -251,7 +251,7 @@
 | **SBC-192** | `Task` | `LLM` | update daily progress and detailed log for gibberish filter fix | 2026-10-14 | `7268459` |
 | **SBC-197** | `Bug` | `LLM` | prevent keyword stuffing and connect essay telemetry to BKT adjuster | 2026-10-14 | `3f9d9f6` |
 | **SBC-199** | `Bug` | `LLM` | block looping phrase spam and route high-paste submissions to teacher review queue | 2026-10-14 | `ed21a27` |
-| **SBC-420** | `Story` | `LLM` | implement AI one-shot course scaffolder via Gemini 2.5 API with semantic fallback engine | 2026-11-14 | pending |
+| **SBC-420** | `Story` | `LLM` | implement AI one-shot course scaffolder via Gemini 2.5 API with semantic fallback engine | 2026-11-14 | `7cd90e4` |
 
 ---
 
