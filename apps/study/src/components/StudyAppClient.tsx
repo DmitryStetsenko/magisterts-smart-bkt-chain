@@ -370,8 +370,7 @@ export function StudyAppClient({
   }[activeTab];
 
   return (
-    <>
-      <AppShellLayout
+    <AppShellLayout
         currentApp="study"
         className={`${themeClasses[activeTheme]} ${fontClasses[activeFont]} antialiased transition-colors duration-200 selection:bg-blue-500/20`}
       header={{
@@ -639,6 +638,117 @@ console.log(greeting, "Номер спроби:", counter);`}
             }
           : undefined
       }
+      overlays={
+        <>
+          {/* 👤 Спільний уніфікований Drawer профілю користувача */}
+          <UserProfileDrawer
+            isOpen={isProfileDrawerOpen}
+            onClose={() => setIsProfileDrawerOpen(false)}
+            user={{
+              name: currentUserName,
+              roleName:
+                currentUserRole === 'TEACHER'
+                  ? 'Викладач'
+                  : currentUserRole === 'ADMIN'
+                  ? 'Адміністратор'
+                  : 'Учень',
+              roleBadge: currentUserRole,
+              subtitle: currentUser
+                ? `${currentUser.email} · ${currentUser.authProvider || 'LOCAL'}`
+                : '10–11 класи · Профільний рівень',
+              initials: currentUserInitials,
+              avatarGradient: 'bg-gradient-to-tr from-blue-600 to-indigo-500',
+            }}
+            courses={[
+              {
+                slug: 'web-algorithms-school',
+                title: SCHOOL_WEB_CURRICULUM.courseTitle,
+                category: 'Інформатика 10-11',
+                skillsCount: Object.values(unlockedModules).filter(Boolean).length,
+                totalSkillsCount: SCHOOL_WEB_CURRICULUM.modules.length,
+                completionPct: Math.round(
+                  (Object.values(unlockedModules).filter(Boolean).length /
+                    Math.max(1, SCHOOL_WEB_CURRICULUM.modules.length)) *
+                    100
+                ),
+              },
+              ...publishedCourses
+                .filter((c) => c.slug !== 'web-algorithms-school')
+                .map((c) => ({
+                  slug: c.slug,
+                  title: c.title,
+                  category: c.category?.title || 'Програмування & IT',
+                  skillsCount: (c.modules || []).length > 0 ? 1 : 0,
+                  totalSkillsCount: Math.max(1, (c.modules || []).length),
+                  completionPct: 0,
+                })),
+            ]}
+            activeCourseSlug={activeCourseSlug}
+            onSelectCourse={(slug) => {
+              setActiveCourseSlug(slug);
+              setIsProfileDrawerOpen(false);
+              router.push(`/courses/${slug}`);
+            }}
+            stats={[
+              {
+                label: 'Ударний стрік',
+                value: '4 дні',
+                icon: Flame,
+                iconColor: 'text-amber-400',
+                valueColor: 'text-white',
+              },
+              {
+                label: 'Опановано модулів',
+                value: `${Object.values(unlockedModules).filter(Boolean).length}/${Math.max(
+                  1,
+                  activeCurriculum.modules.length
+                )}`,
+                icon: ShieldCheck,
+                iconColor: 'text-blue-400',
+                valueColor: 'text-blue-400',
+              },
+            ]}
+            onOpenAuthModal={() => {
+              setIsProfileDrawerOpen(false);
+              setIsAuthModalOpen(true);
+            }}
+            onLogout={handleLogout}
+            quickLinks={[
+              {
+                label: 'Перейти до Тренажера BKT',
+                href: practiceUrl,
+                icon: GraduationCap,
+                iconColor: 'text-indigo-400',
+              },
+            ]}
+          />
+
+          {/* 🔐 Модальне вікно авторизації */}
+          <AuthModal
+            isOpen={isAuthModalOpen}
+            onClose={() => setIsAuthModalOpen(false)}
+            currentUser={
+              currentUser
+                ? {
+                    id: currentUser.id,
+                    email: currentUser.email,
+                    name: currentUserName,
+                    role: currentUserRole,
+                    authProvider: currentUser.authProvider,
+                  }
+                : null
+            }
+            testModeEnabled={testModeEnabled}
+            googleClientId={googleClientId}
+            onGoogleLogin={handleGoogleLogin}
+            onMockLogin={handleMockLogin}
+            onLogout={handleLogout}
+            onJoinCode={(joinCode) => {
+              window.location.href = `/join/${joinCode}`;
+            }}
+          />
+        </>
+      }
       onMainScroll={handleScroll}
       mainClassName={`px-4 py-8 sm:px-8 lg:px-12 items-center transition-all ${
         readerSettings.isFocusMode ? 'focus-mode' : ''
@@ -789,104 +899,6 @@ console.log(greeting, "Номер спроби:", counter);`}
             scrollProgressPct={scrollProgress}
             estimatedMinutesLeft={currentUnit.estimatedMinutes}
           />
-    </AppShellLayout>
-
-    {/* 👤 Спільний уніфікований Drawer профілю користувача */}
-    <UserProfileDrawer
-      isOpen={isProfileDrawerOpen}
-      onClose={() => setIsProfileDrawerOpen(false)}
-      user={{
-        name: currentUserName,
-        roleName: currentUserRole === 'TEACHER' ? 'Викладач' : currentUserRole === 'ADMIN' ? 'Адміністратор' : 'Учень',
-        roleBadge: currentUserRole,
-        subtitle: currentUser ? `${currentUser.email} · ${currentUser.authProvider || 'LOCAL'}` : '10–11 класи · Профільний рівень',
-        initials: currentUserInitials,
-        avatarGradient: 'bg-gradient-to-tr from-blue-600 to-indigo-500',
-      }}
-      courses={[
-        {
-          slug: 'web-algorithms-school',
-          title: SCHOOL_WEB_CURRICULUM.courseTitle,
-          category: 'Інформатика 10-11',
-          skillsCount: Object.values(unlockedModules).filter(Boolean).length,
-          totalSkillsCount: SCHOOL_WEB_CURRICULUM.modules.length,
-          completionPct: Math.round(
-            (Object.values(unlockedModules).filter(Boolean).length /
-              Math.max(1, SCHOOL_WEB_CURRICULUM.modules.length)) *
-              100
-          ),
-        },
-        ...publishedCourses
-          .filter((c) => c.slug !== 'web-algorithms-school')
-          .map((c) => ({
-            slug: c.slug,
-            title: c.title,
-            category: c.category?.title || 'Програмування & IT',
-            skillsCount: (c.modules || []).length > 0 ? 1 : 0,
-            totalSkillsCount: Math.max(1, (c.modules || []).length),
-            completionPct: 0,
-          })),
-      ]}
-      activeCourseSlug={activeCourseSlug}
-      onSelectCourse={(slug) => {
-        setActiveCourseSlug(slug);
-        setIsProfileDrawerOpen(false);
-        router.push(`/courses/${slug}`);
-      }}
-      stats={[
-        {
-          label: 'Ударний стрік',
-          value: '4 дні',
-          icon: Flame,
-          iconColor: 'text-amber-400',
-          valueColor: 'text-white',
-        },
-        {
-          label: 'Опановано модулів',
-          value: `${Object.values(unlockedModules).filter(Boolean).length}/${Math.max(
-            1,
-            activeCurriculum.modules.length
-          )}`,
-          icon: ShieldCheck,
-          iconColor: 'text-blue-400',
-          valueColor: 'text-blue-400',
-        },
-      ]}
-      onOpenAuthModal={() => {
-        setIsProfileDrawerOpen(false);
-        setIsAuthModalOpen(true);
-      }}
-      onLogout={handleLogout}
-      quickLinks={[
-        {
-          label: 'Перейти до Тренажера BKT',
-          href: practiceUrl,
-          icon: GraduationCap,
-          iconColor: 'text-indigo-400',
-        },
-      ]}
-    />
-
-    {/* 🔐 Модальне вікно авторизації */}
-    <AuthModal
-      isOpen={isAuthModalOpen}
-      onClose={() => setIsAuthModalOpen(false)}
-      currentUser={currentUser ? {
-        id: currentUser.id,
-        email: currentUser.email,
-        name: currentUserName,
-        role: currentUserRole,
-        authProvider: currentUser.authProvider,
-      } : null}
-      testModeEnabled={testModeEnabled}
-      googleClientId={googleClientId}
-      onGoogleLogin={handleGoogleLogin}
-      onMockLogin={handleMockLogin}
-      onLogout={handleLogout}
-      onJoinCode={(joinCode) => {
-        window.location.href = `/join/${joinCode}`;
-      }}
-    />
-    </>
+      </AppShellLayout>
   );
 }

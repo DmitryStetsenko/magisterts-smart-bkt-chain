@@ -339,7 +339,7 @@
 | **SBC-370** | `Fix` | `ST` | constrain MonacoCodeEditor height and flex layout to eliminate infinite vertical expansion loop | 2026-11-10 | `6096911` |
 | **SBC-381** | `Story` | `ST` | implement google sign-in button, /join invite code redemption and enrollment mode gating | 2026-11-10 | `51e412f` |
 | **SBC-388** | `Story` | `ST` | implement modular skill drawer sections, bkt mastery module unlocking and allowed modules filtering in student portal | 2026-11-10 | `198b330` |
-| **SBC-426** | `Story` | `ST` | implement dynamic course and module curriculum rendering in study portal | 2026-11-14 | working-tree |
+| **SBC-426** | `Story` | `ST` | implement dynamic course and module curriculum rendering in study portal | 2026-11-14 | `4b97c97` |
 
 ---
 

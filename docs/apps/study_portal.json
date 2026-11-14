@@ -368,7 +368,68 @@
       "subsections": []
     },
     {
-      "title": "🛠️ 8. Запуск та Розробка",
+      "title": "🔀 8. Динамічна Адаптація Курсів та Маршрутизація Підручника (`curriculum-adapter.ts`)",
+      "level": 2,
+      "paragraphs": [
+        "Підручник теорії підтримує як базовий статичний курс шкільної інформатики 10–11 класів, так і будь-які створені в Admin Portal курси через динамічний адаптер:"
+      ],
+      "code_blocks": [],
+      "items": [
+        {
+          "type": "text",
+          "raw_text": "**Шлюз теорії `/learn/:courseSlug/:moduleSlug`:**",
+          "subitems": []
+        },
+        {
+          "type": "text",
+          "raw_text": "Приймає canonical `theoryUrl` з моделі модуля в базі даних та автоматично переадресовує запит на канонічний App Router маршрут: `/courses/:courseSlug/:moduleSlug/:unitSlug`.",
+          "subitems": []
+        },
+        {
+          "type": "text",
+          "raw_text": "**Динамічний адаптер навчального плану (`curriculum-adapter.ts`):**",
+          "subitems": []
+        },
+        {
+          "type": "text",
+          "raw_text": "Функція `adaptCourseToCurriculum(course)` транслює БД-модель курсу в строгий інтерфейс `CourseCurriculumDto`.",
+          "subitems": []
+        },
+        {
+          "type": "text",
+          "raw_text": "Автоматично розбиває збережений Markdown-конспект на 5 дидактичних блоків (Вступ та інтуїція, Практичний зразок коду, Фізична модель, Типова омана, Ключові тези уроку).",
+          "subitems": []
+        },
+        {
+          "type": "text",
+          "raw_text": "**SEO & Schema.org (JSON-LD):**",
+          "subitems": []
+        },
+        {
+          "type": "text",
+          "raw_text": "Динамічна генерація метаданих `generateMetadata` згідно з Правилом 10 та мікророзмітка `LearningResource` + `BreadcrumbList` для індексації уроків пошуковими роботами.",
+          "subitems": []
+        },
+        {
+          "type": "text",
+          "raw_text": "**Міжкурсовий перемикач у `UserProfileDrawer`:**",
+          "subitems": []
+        },
+        {
+          "type": "text",
+          "raw_text": "Дозволяє учню миттєво перемикатися між опублікованими курсами з оновленням лівої панелі тем та прогресу опанування.",
+          "subitems": []
+        },
+        {
+          "type": "text",
+          "raw_text": "---",
+          "subitems": []
+        }
+      ],
+      "subsections": []
+    },
+    {
+      "title": "🛠️ 9. Запуск та Розробка",
       "level": 2,
       "paragraphs": [
         "Next.js 16 (Webpack dev mode), React 19, Tailwind CSS v4, Lucide React, `@sbc/types`, `@sbc/ui`."

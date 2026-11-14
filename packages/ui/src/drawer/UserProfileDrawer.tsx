@@ -140,6 +140,9 @@ export function UserProfileDrawer({
               <div className="divide-y divide-slate-800/50">
                 {courses.map((course) => {
                   const isActive = course.slug === activeCourseSlug;
+                  const categoryLabel = typeof course.category === 'object' && course.category !== null
+                    ? (course.category as any).title
+                    : course.category;
                   return (
                     <button
                       key={course.slug}
@@ -161,9 +164,9 @@ export function UserProfileDrawer({
                         )}
                       </div>
 
-                      {(course.category || (isActive && course.skillsCount !== undefined)) && (
+                      {(categoryLabel || (isActive && course.skillsCount !== undefined)) && (
                         <div className="flex items-center justify-between text-[10px] text-slate-500">
-                          <span>{course.category || 'Напрям'}</span>
+                          <span>{categoryLabel || 'Напрям'}</span>
                           {isActive && course.skillsCount !== undefined && course.totalSkillsCount !== undefined && (
                             <span className="font-mono text-purple-300">
                               {course.skillsCount}/{course.totalSkillsCount} навичок

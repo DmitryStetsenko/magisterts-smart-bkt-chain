@@ -313,6 +313,62 @@
 
 ---
 
+### 0.1.7.110 Архітектурна Концепція In-Step AI Co-Pilots та Хмарної Прямої Синхронізації з Google Sheets (SBC-421, SBC-425, EP-LLM, EP-INF)
+- **Контекст та інженерна задача:**
+  - На виконання стратегічних вимог архітектурного брейншторму Сесії 20 зафіксовано покрокову концептуальну специфікацію двох ключових розширень платформи для майбутніх виробничих спринтів:
+    1. *In-Step AI Co-Pilots (SBC-421, EP-LLM):* контекстні точкові ШІ-асистенти для кожного з 5 кроків майстра створення курсу на противагу монолітному one-shot поколінню:
+       - Крок 1 (Метадані): генерація структурованих назв, анотацій, цільової аудиторії та рекомендація оптимального $P(L)$ порогу за таксономією Блума.
+       - Крок 2 (Модулі): автоматичне планування послідовності тематичних розділів, жива транслітерація слага за КМУ №55 та формування Canonical Theory URLs.
+       - Крок 3 (Skill DAG): синтез орієнтованого ациклічного графу пререквізитів із калібруванням BKT параметрів ($P(L_0), P(T), P(S), P(G)$) та валідацією триколірним DFS.
+       - Крок 4 (Конспекти Zen Focus): генерація повноцінних 5-блокових конспектів уроку з інтерактивними зразками коду, фізичною метафорою рушія V8 та картками когнітивних оман (Misconceptions).
+       - Крок 5 (Банк адаптивних завдань): синтез завдань для пісочниці Monaco Editor з юніт-тестами (`input`, `expectedOutput`, `isSecret`) та 3-рівневими підказками Сократа.
+    2. *Cloud Direct Google Sheets Sync via URL (SBC-425, EP-INF):* пряма синхронізація через Google Sheets API v4 за публічним/сервісним URL без потреби ручного завантаження файлів `.xlsx`.
+- **Документація та беклог:**
+  - Деталізовано розділи 5.2 та 5.3 у спеціалізованому документі [`docs/course_authoring_and_tabular_engine.md`](file:///docs/course_authoring_and_tabular_engine.md).
+  - Зареєстровано завдання в реєстрах [`docs/roadmap.md`](file:///docs/roadmap.md), [`docs/project_management.md`](file:///docs/project_management.md) та [`docs/tasks/registry.md`](file:///docs/tasks/registry.md).
+
+---
+
+### 0.1.7.111 Динамічний Адаптер Навчального Плану та Канонічна Маршрутизація Підручника Теорії у Study Portal (SBC-426, EP-ST)
+- **Контекст та інженерна задача:**
+  - Забезпечення універсальної підтримки динамічних курсів та модулів у веб-підручнику `apps/study` (порт 3006). До цього підручник спирався на статичний файл `school-web-curriculum.ts`.
+- **Архітектурні та інженерні рішення:**
+  1. **Динамічний адаптер ([`apps/study/src/lib/curriculum-adapter.ts`](file:///apps/study/src/lib/curriculum-adapter.ts)):**
+     - Функція `adaptCourseToCurriculum(course)` виконує мапінг між реляційною моделлю БД та інтерфейсом `CourseCurriculumDto`.
+     - Автоматичний парсер `parseMarkdownToSections(content, moduleTitle)` розбирає введений викладачем Markdown на 5 дидактичних блоків стандарту Zen Focus із гарантованою присутністю масиву тез `keyTakeaways: string[]`.
+     - Автогенерація анотацій `extractSummary(content)` для метаданих OpenGraph та карток навігації.
+  2. **Модульний шлюз теорії ([`apps/study/src/app/learn/[courseSlug]/[moduleSlug]/page.tsx`](file:///apps/study/src/app/learn/[courseSlug]/[moduleSlug]/page.tsx)):**
+     - Реалізує автоматичну переадресацію (307 redirect) з уніфікованого `theoryUrl` модуля на сторінку App Router `/courses/:courseSlug/:moduleSlug/:unitSlug`.
+  3. **Вкладені маршрути App Router ([`apps/study/src/app/courses/`](file:///apps/study/src/app/courses/)):**
+     - Підтримка динамічного завантаження даних `getCurriculum(courseSlug)` через REST API `http://localhost:3000/api/v1/courses/slug/:slug` з фолбеком на шкільну інформатику.
+     - `export const dynamicParams = true` для динамічного рендерингу створених курсів.
+     - Генерація SEO-метаданих та мікророзмітки Schema.org (`LearningResource` + `BreadcrumbList`) для кожного динамічного уроку.
+  4. **Інтеграція в `StudyAppClient.tsx`:**
+     - Підтримка пропсу `curriculum?: CourseCurriculum`.
+     - Динамічне підтягування опублікованих курсів з бекенду для перемикача курсів у `UserProfileDrawer`.
+     - Переміщення модальних вікон профілю та авторизації у властивість `overlays` макету `AppShellLayout` згідно з Архітектурним стандартом Rule 7.
+
+---
+
+### 0.1.7.112 Наскрізна Синхронізація Життєвого Циклу Курсів в Екосистемі: Study, Teacher та Student Портали із Захистом Схеми Категорій (SBC-427, EP-TC)
+- **Контекст та інженерна задача:**
+  - Реалізація скрізної E2E верифікації життєвого циклу курсу та його модулів у всіх підсистемах комплексу:
+    - *Study Portal (3006):* відображення динамічного курсу та списку опублікованих дисциплін у `UserProfileDrawer`.
+    - *Teacher Portal (3003):* вибір створеного курсу у `CreateClassroomModal` та динамічне завантаження його модулів при увімкненні вибіркового доступу («Обрані модулі»).
+    - *Student Portal (3002):* висувний Drawer профілю `StudentProfileDrawer`, вибір курсу зі списку та динамічне перемикання активного предмету з оновленням графу навичок.
+- **Діагностика та усунення критичного рантайм-крашу React:**
+  - *Симптом:* У Student Portal при кліку на профіль студента виникала помилка:
+    `Objects are not valid as a React child (found: object with keys {id, slug, title, description, icon, orderIndex, createdAt, updatedAt})`.
+  - *RCA (Root Cause Analysis):* Ендпоінт `GET /api/v1/courses` повертає пов'язану категорію як об'єкт Prisma `category: { id, slug, title, ... }`. При передачі в `StudentProfileDrawer` та `UserProfileDrawer` вираз `<span>{course.category}</span>` намагався зрендерити JavaScript об'єкт як React child, що призводило до збою рендерингу та приховування панелі.
+  - *Виправлення:* У `packages/ui/src/drawer/UserProfileDrawer.tsx` та `apps/student/src/components/StudentProfileDrawer.tsx` додано безпечне вилучення заголовка категорії: `typeof course.category === 'object' && course.category !== null ? (course.category as any).title : (course.category || 'Навчальний напрям')`.
+- **E2E Playwright верифікація ([`e2e/course-ecosystem-cross-app-sync.spec.ts`](file:///e2e/course-ecosystem-cross-app-sync.spec.ts)):**
+  - Тест 1 (Study Portal): рендеринг `JavaScript & Web Engineering`, переадресація з `/learn/js-dev/syntax-and-variables`, відкриття `UserProfileDrawer`, валідація наявності курсу.
+  - Тест 2 (Teacher Portal): перехід у `Навчальні Групи & Інвайт-коди`, вибір курсу, перемикання на «Обрані модулі», перевірка чекбоксів тем.
+  - Тест 3 (Student Portal): відкриття `UserProfileDrawer`, клік по картці курсу, перемикання та валідація хедера.
+  - **Результат:** 100% успішне проходження (3 passed, 14.0s).
+
+---
+
 ### 0.1.7.108 Двосторонній Імпорт Курсу з Excel / Google Sheets із Pre-Flight Валідатором, DFS/Tarjan Ациклічністю DAG та Атомарною Транзакцією PostgreSQL (SBC-419, EP-AD)
 - **Контекст та задача:**
   - Реалізація другого обов'язкового мікро-кроку виробничої дорожньої карти Сесії 20 (`SBC-419`): створення надійного інженерного рушія імпорту навчальних планів із файлів Microsoft Excel (`.xlsx`, `.xls`) та експортованих Google Sheets із попередньою всебічною валідацією (Pre-Flight Inspection) та 100% гарантією атомарності бази даних PostgreSQL.

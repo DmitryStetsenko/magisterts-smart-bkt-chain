@@ -47,7 +47,10 @@ export const StudentProfileDrawer: React.FC<StudentProfileDrawerProps> = ({
   const drawerCourses: UserProfileDrawerCourse[] = courses.map((c) => ({
     slug: c.slug,
     title: c.title,
-    category: c.category || 'Навчальний напрям',
+    category:
+      typeof c.category === 'object' && c.category !== null
+        ? (c.category as any).title
+        : c.category || 'Навчальний напрям',
     skillsCount: c.slug === activeCourseSlug ? masteredSkillsCount : undefined,
     totalSkillsCount: c.slug === activeCourseSlug ? totalSkillsCount : undefined,
     completionPct: c.slug === activeCourseSlug ? courseCompletionPct : undefined,

@@ -5,7 +5,49 @@
 ## 📅 14 листопада 2026 року
 
 ### ✅ Що зроблено за день:
-1. **ШІ One-Shot Генератор курсу під ключ через Gemini 2.5 API із семантичним евристичним фолбеком (`SBC-420`, `EP-LLM`):**
+1. **Наскрізна Playwright E2E верифікація життєвого циклу динамічних курсів у Study, Teacher та Student порталах із захистом схеми категорій (`SBC-427`, `EP-TC`):**
+   - **Контекст та інженерна задача:**
+     - Реалізація обов'язкового наскрізного E2E тестування життєвого циклу курсів у реальному Headless Chromium (`Rule 4`) для підтвердження міжпортальної цілісності екосистеми:
+       1. *Study Portal (`apps/study`, порт 3006):* перевірка коректності рендерингу динамічних курсів і переадресації з канонічного `/learn/:courseSlug/:moduleSlug` на App Router маршрут.
+       2. *Teacher Portal (`apps/teacher`, порт 3003):* перевірка вибору курсу у модальному вікні створення класу `CreateClassroomModal` та динамічного розгортання модульних чекбоксів при виборі режиму «Обрані модулі».
+       3. *Student Portal (`apps/student`, порт 3002):* перевірка відображення списку опублікованих курсів у висувній бічній панелі профілю `UserProfileDrawer` та безпомилкового перемикання активного курсу з оновленням карти компетенцій.
+   - **Виявлена та виправлена критична помилка рендерингу:**
+     - Під час відкриття панелі профілю учня в `apps/student` виникав збій React:
+       `Objects are not valid as a React child (found: object with keys {id, slug, title, description, icon, orderIndex, createdAt, updatedAt})`.
+     - *Причина:* бекенд `GET /api/v1/courses` повертає категорію курсу як реляційний об'єкт `CategoryDto`, а компонент `StudentProfileDrawer` та `UserProfileDrawer` передавали його напряму в JSX `<span>{course.category}</span>`.
+     - *Виправлення:* у `packages/ui/src/drawer/UserProfileDrawer.tsx` та `apps/student/src/components/StudentProfileDrawer.tsx` впроваджено захисне приведення типу: `typeof course.category === 'object' && course.category !== null ? course.category.title : course.category`.
+   - **Результати E2E тестування:**
+     - Створено автоматизований сьют [`e2e/course-ecosystem-cross-app-sync.spec.ts`](file:///e2e/course-ecosystem-cross-app-sync.spec.ts).
+     - **100% успішне проходження:** 3 із 3 тестів пройдено успішно (**3 passed, 14.0s**).
+     - Збережено артефакти:
+       - `cross_app_study_portal.png` (підручник теорії з активним динамічним курсом та списком опублікованих дисциплін у профілі).
+       - `cross_app_teacher_classroom.png` (кабінет викладача з вибором курсу та динамічним списком модулів у режимі вибіркового доступу).
+       - `cross_app_student_portal.png` (тренажер студента з успішно перемкнутим курсом JavaScript & Web Engineering).
+
+2. **Динамічний адаптер навчального плану та канонічна маршрутизація підручника теорії у Study Portal (`SBC-426`, `EP-ST`):**
+   - **Контекст та інженерна задача:**
+     - Підручник теорії `apps/study` спочатку підтримував лише фіксований статичний масив шкільної інформатики `school-web-curriculum.ts`. Необхідно було забезпечити повноцінну динамічну підтримку будь-яких дисциплін, створених через майстер в Admin Portal або згенерованих ШІ.
+   - **Виконані інженерні рішення:**
+     - **Адаптер навчального плану ([`curriculum-adapter.ts`](file:///apps/study/src/lib/curriculum-adapter.ts)):**
+       - Реалізовано функцію `adaptCourseToCurriculum(course)`, що перетворює БД-модель курсу в строгий інтерфейс `CourseCurriculumDto`.
+       - Реалізовано автопарсинг Markdown-конспекту `parseMarkdownToSections`, що розбиває збережений текст модуля на 5 дидактичних блоків стандарту Zen Focus (Вступ, Код, Фізична модель, Омани, Ключові тези).
+     - **Модульний шлюз та динамічні маршрути:**
+       - Створено шлюз [`/learn/[courseSlug]/[moduleSlug]/page.tsx`](file:///apps/study/src/app/learn/[courseSlug]/[moduleSlug]/page.tsx) для безшовної переадресації з `theoryUrl` модуля на сторінку уроку в App Router.
+       - Оновлено сторінки [`/courses/[courseSlug]/page.tsx`](file:///apps/study/src/app/courses/[courseSlug]/page.tsx) та [`/courses/[courseSlug]/[moduleSlug]/[unitSlug]/page.tsx`](file:///apps/study/src/app/courses/[courseSlug]/[moduleSlug]/[unitSlug]/page.tsx) з підтримкою `export const dynamicParams = true` та динамічним завантаженням через API з фолбеком на шкільний курс.
+     - **Інтеграція в `StudyAppClient`:**
+       - Забезпечено відображення динамічних модулів, підтягування опублікованих курсів у `UserProfileDrawer` та переміщення модалок у `overlays` пропс `AppShellLayout` (Rule 7).
+   - **Верифікація:**
+     - 100% успішна компіляція та збірка `apps/study` (`npm run build --prefix apps/study`, 10/10 сторінок).
+
+3. **Концептуалізація та реєстрація в беклозі In-Step AI Co-Pilots та Cloud Direct Google Sheets Sync (`SBC-421`, `SBC-425`, `EP-LLM`, `EP-INF`):**
+   - **Контекст та задача:**
+     - На виконання вказівок користувача детально зафіксувати архітектурні концепції для майбутніх спринтів розробки та зареєструвати задачі у виробничому реєстрі монорепозиторію.
+   - **Виконані рішення:**
+     - У документі [`docs/course_authoring_and_tabular_engine.md`](file:///docs/course_authoring_and_tabular_engine.md) деталізовано розділ 5.2 щодо контекстних асистентів In-Step AI Co-Pilots на кожному з 5 кроків майстра курсу (генерація назви та анотації, структуризація модулів, автоматичний пререквізитний DAG із BKT-калібруванням, синтез 5-блочних конспектів Zen Focus, автогенерація unit-тестів Monaco Editor).
+     - Додано розділ 5.3 щодо прямої хмарної синхронізації з Google Sheets через URL та Google Sheets API v4.
+     - Зареєстровано задачі `SBC-421` (In-Step AI Co-Pilots) та `SBC-425` (Google Sheets Direct Cloud Sync) у стратегічній дорожній карті [`docs/roadmap.md`](file:///docs/roadmap.md), системі управління проєктом [`docs/project_management.md`](file:///docs/project_management.md) та реєстрі завдань [`docs/tasks/registry.md`](file:///docs/tasks/registry.md).
+
+4. **ШІ One-Shot Генератор курсу під ключ через Gemini 2.5 API із семантичним евристичним фолбеком (`SBC-420`, `EP-LLM`):**
    - **Контекст та інженерна задача:**
      - Реалізація третього обов'язкового мікро-кроку виробничої дорожньої карти Сесії 20 (`SBC-420`): створення автономного інтелектуального движка генерації повноцінного навчального курсу (One-Shot Course Scaffolder) за одним користувацьким промптом або темою.
      - Подолання проблеми холодного старту авторського конструювання: замість 40–80 годин ручного створення модулів, пререквізитів DAG, BKT-параметрів, уроків Zen Focus та завдань для пісочниці Monaco Editor, автор отримує готовий 5-аркушевий каркас за лічені секунди.
