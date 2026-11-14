@@ -461,7 +461,7 @@
 | **SBC-416** | `Story` | `AD` | implement automatic module numbering, live ukrainian transliteration and slug validation in course studio | 2026-11-13 | `549501e` |
 | **SBC-417** | `Docs` | `AD` | establish production course creation architecture, ai scaffolding and tabular integration brainstorm in session 20 | 2026-11-13 | `5ee56d6` |
 | **SBC-418** | `Story` | `AD` | implement canonical 5-sheet tabular workbook parser, export engine and sample template generator for courses | 2026-11-14 | `4db67bb` |
-| **SBC-424** | `Docs` | `AD` | create dedicated conceptual specification for course authoring wizard, tabular engine and ai scaffolding | 2026-11-14 | pending |
+| **SBC-424** | `Docs` | `AD` | create dedicated conceptual specification for course authoring wizard, tabular engine and ai scaffolding | 2026-11-14 | `0591d02` |
 
 ---
 
