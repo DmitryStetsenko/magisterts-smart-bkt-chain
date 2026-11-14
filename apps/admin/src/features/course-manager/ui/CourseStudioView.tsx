@@ -34,6 +34,7 @@ import { CreateTaskModal } from './CreateTaskModal';
 import { ModuleTestSandboxModal } from './ModuleTestSandboxModal';
 import { TheoryLessonBuilderModal } from './TheoryLessonBuilderModal';
 import { CourseImportModal } from './CourseImportModal';
+import { AiCourseScaffolderModal } from './AiCourseScaffolderModal';
 import { MASTERY_STANDARDS } from './CourseCreateView';
 import { downloadCourseTemplate, downloadCourseExport } from '../services/courseWorkbookService';
 
@@ -145,6 +146,7 @@ export const CourseStudioView: React.FC<CourseStudioViewProps> = ({
   const [testingSandboxModule, setTestingSandboxModule] = useState<CourseModuleDto | null>(null);
   const [theoryBuilderModule, setTheoryBuilderModule] = useState<CourseModuleDto | null>(null);
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
+  const [isAiScaffoldModalOpen, setIsAiScaffoldModalOpen] = useState(false);
 
   // Inline Task creation state per skill
   const [addingTaskSkillId, setAddingTaskSkillId] = useState<string | null>(null);
@@ -580,6 +582,16 @@ export const CourseStudioView: React.FC<CourseStudioViewProps> = ({
             >
               <Upload className="w-3.5 h-3.5 text-emerald-400" />
               <span className="hidden sm:inline">Імпорт (.xlsx)</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setIsAiScaffoldModalOpen(true)}
+              className="px-2.5 py-1 rounded-lg bg-purple-600/20 hover:bg-purple-600/30 border border-purple-500/40 text-purple-300 text-xs font-medium flex items-center gap-1.5 transition-colors cursor-pointer"
+              title="ШІ-Генератор: згенерувати повноцінну структуру за допомогою Gemini 2.5 API"
+            >
+              <Sparkles className="w-3.5 h-3.5 text-purple-400" />
+              <span className="hidden sm:inline">ШІ-Генератор</span>
             </button>
 
             <button
@@ -1868,6 +1880,19 @@ export const CourseStudioView: React.FC<CourseStudioViewProps> = ({
           onCourseUpdated(importedCourse);
           await fetchFullCourseData();
         }}
+      />
+
+      {/* AI Course Scaffolder Modal */}
+      <AiCourseScaffolderModal
+        isOpen={isAiScaffoldModalOpen}
+        onClose={() => setIsAiScaffoldModalOpen(false)}
+        onCourseCreated={async (newCourse) => {
+          setMessage(`✨ Каркас курсу «${newCourse.title}» створено за допомогою ШІ!`);
+          setCourse(newCourse);
+          onCourseUpdated(newCourse);
+          await fetchFullCourseData();
+        }}
+        apiUrl={API_URL}
       />
     </div>
   );

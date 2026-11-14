@@ -21,12 +21,12 @@ export const WORKBOOK_SHEETS = {
 export interface CourseSheetRow {
   title: string;
   slug: string;
-  category: string;
-  description: string;
-  targetAudience: string;
-  difficultyLevel: string;
-  bktMasteryThreshold: number;
-  icon: string;
+  category?: string;
+  description?: string;
+  targetAudience?: string;
+  difficultyLevel?: string;
+  bktMasteryThreshold?: number;
+  icon?: string;
 }
 
 /**
@@ -584,6 +584,53 @@ export function downloadCourseExport(
 }
 
 /**
+ * Експортує розібраний DTO курсу (наприклад, згенерований ШІ) у повноцінну книгу XLSX
+ */
+export function exportParsedDtoToWorkbook(data: ParsedCourseImportDto): XLSX.WorkBook {
+  const wb = XLSX.utils.book_new();
+
+  // 1. Course
+  const wsCourse = XLSX.utils.json_to_sheet([data.course]);
+  setWorksheetColWidths(wsCourse, [35, 20, 20, 50, 25, 15, 20, 15]);
+  XLSX.utils.book_append_sheet(wb, wsCourse, WORKBOOK_SHEETS.COURSE);
+
+  // 2. Modules
+  const wsModules = XLSX.utils.json_to_sheet(data.modules);
+  setWorksheetColWidths(wsModules, [12, 40, 35, 45, 15, 50]);
+  XLSX.utils.book_append_sheet(wb, wsModules, WORKBOOK_SHEETS.MODULES);
+
+  // 3. Skills
+  const wsSkills = XLSX.utils.json_to_sheet(data.skills);
+  setWorksheetColWidths(wsSkills, [35, 12, 35, 30, 12, 30, 10, 10, 10, 10]);
+  XLSX.utils.book_append_sheet(wb, wsSkills, WORKBOOK_SHEETS.SKILLS);
+
+  // 4. Theory
+  const wsTheory = XLSX.utils.json_to_sheet(data.theories || []);
+  setWorksheetColWidths(wsTheory, [35, 40, 50, 12, 45, 35, 30, 45, 50]);
+  XLSX.utils.book_append_sheet(wb, wsTheory, WORKBOOK_SHEETS.THEORY);
+
+  // 5. Tasks
+  const wsTasks = XLSX.utils.json_to_sheet(data.tasks || []);
+  setWorksheetColWidths(wsTasks, [25, 12, 12, 12, 35, 50, 40, 35, 50]);
+  XLSX.utils.book_append_sheet(wb, wsTasks, WORKBOOK_SHEETS.TASKS);
+
+  return wb;
+}
+
+/**
+ * Завантажує розібраний DTO курсу у файл Excel
+ */
+export function downloadParsedCourseWorkbook(
+  data: ParsedCourseImportDto,
+  filename?: string
+): void {
+  const safeSlug = data.course.slug || 'course';
+  const targetFilename = filename || `sbc-course-${safeSlug}.xlsx`;
+  const wb = exportParsedDtoToWorkbook(data);
+  downloadWorkbook(wb, targetFilename);
+}
+
+/**
  * Структура розібраного курсу з 5 аркушів для атомарного імпорту
  */
 export interface ParsedCourseImportDto {
@@ -840,7 +887,7 @@ export function parseCourseWorkbook(fileBuffer: ArrayBuffer | Uint8Array): Cours
       }
 
       const orderIndex = parseInt(r.orderIndex || r.OrderIndex || idx + 1) || idx + 1;
-      const bktThreshold = parseFloat(r.bktThreshold || r.threshold || courseRow.bktMasteryThreshold) || courseRow.bktMasteryThreshold;
+      const bktThreshold = parseFloat(r.bktThreshold || r.threshold || courseRow.bktMasteryThreshold) || (courseRow.bktMasteryThreshold ?? 0.85);
 
       modules.push({
         orderIndex,
@@ -1004,8 +1051,8 @@ export function parseCourseWorkbook(fileBuffer: ArrayBuffer | Uint8Array): Cours
     stats: {
       courseTitle: courseRow.title,
       courseSlug: courseRow.slug,
-      category: courseRow.category,
-      targetPl: courseRow.bktMasteryThreshold,
+      category: courseRow.category || 'Загальна категорія',
+      targetPl: courseRow.bktMasteryThreshold ?? 0.85,
       moduleCount: modules.length,
       skillCount: skills.length,
       theoryCount: theories.length,

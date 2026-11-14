@@ -127,7 +127,11 @@ export const CourseImportModal: React.FC<CourseImportModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto animate-fadeIn">
+    <div
+      role="dialog"
+      aria-label="Імпорт навчального курсу з таблиці"
+      className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto animate-fadeIn"
+    >
       <div className="bg-slate-900 border border-slate-800 rounded-2xl max-w-2xl w-full shadow-2xl flex flex-col overflow-hidden my-auto border-t-emerald-500/30 border-t">
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-slate-800/80 bg-slate-900/50">

@@ -1,11 +1,13 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { CourseController } from './course.controller';
 import { PrismaService } from '../../outbound/persistence/prisma.service';
+import { AiCourseScaffolderService } from '../../../domain/course/ai-course-scaffolder.service';
 import { NotFoundException, BadRequestException } from '@nestjs/common';
 
 describe('CourseController', () => {
   let controller: CourseController;
   let prisma: any;
+  let mockAiScaffolder: any;
 
   const mockPrisma = {
     course: {
@@ -25,16 +27,32 @@ describe('CourseController', () => {
     },
     skillNode: {
       updateMany: jest.fn(),
+      findMany: jest.fn().mockResolvedValue([]),
+      deleteMany: jest.fn().mockResolvedValue({ count: 0 }),
+    },
+    skillDependency: {
+      deleteMany: jest.fn().mockResolvedValue({ count: 0 }),
+    },
+    task: {
+      deleteMany: jest.fn().mockResolvedValue({ count: 0 }),
     },
   };
 
   beforeEach(async () => {
+    mockAiScaffolder = {
+      scaffoldCourse: jest.fn(),
+    };
+
     const module: TestingModule = await Test.createTestingModule({
       controllers: [CourseController],
       providers: [
         {
           provide: PrismaService,
           useValue: mockPrisma,
+        },
+        {
+          provide: AiCourseScaffolderService,
+          useValue: mockAiScaffolder,
         },
       ],
     }).compile();
@@ -268,6 +286,34 @@ describe('CourseController', () => {
         },
       });
       expect(result?.skills?.length).toBe(2);
+    });
+  });
+
+  describe('aiScaffoldCourse', () => {
+    it('should throw BadRequestException if prompt is missing', async () => {
+      await expect(controller.aiScaffoldCourse({ prompt: '' })).rejects.toThrow(BadRequestException);
+    });
+
+    it('should delegate to AiCourseScaffolderService', async () => {
+      const mockResult: any = {
+        course: { title: 'Test AI Course', slug: 'test-ai-course' },
+        modules: [],
+        skills: [],
+        theories: [],
+        tasks: [],
+      };
+      mockAiScaffolder.scaffoldCourse.mockResolvedValue(mockResult);
+
+      const result = await controller.aiScaffoldCourse({
+        prompt: 'Основи Python',
+        moduleCount: 3,
+      });
+
+      expect(result).toEqual(mockResult);
+      expect(mockAiScaffolder.scaffoldCourse).toHaveBeenCalledWith({
+        prompt: 'Основи Python',
+        moduleCount: 3,
+      });
     });
   });
 });

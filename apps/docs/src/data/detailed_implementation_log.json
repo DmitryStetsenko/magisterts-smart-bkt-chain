@@ -735,6 +735,153 @@
           ]
         },
         {
+          "title": "0.1.7.109 ШІ One-Shot Генератор Курсу під Ключ через Gemini 2.5 API із Семантичним Евристичним Фолбеком (SBC-420, EP-LLM)",
+          "level": 3,
+          "paragraphs": [],
+          "code_blocks": [
+            {
+              "lang": "typescript",
+              "content": "export interface AiCourseScaffoldRequestDto {\n         prompt: string;\n         category?: string;\n         targetAudience?: string;\n         moduleCount?: number;\n         targetPl?: number;\n         apiKey?: string;\n       }"
+            },
+            {
+              "lang": "typescript",
+              "content": "return this.prisma.$transaction(async (tx) => { ... }, {\n         maxWait: 15000,\n         timeout: 35000,\n       });"
+            }
+          ],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "**Контекст та інженерна задача:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Реалізація третього обов'язкового етапу дорожньої карти Сесії 20 (`SBC-420`): створення автономного інтелектуального движка генерації навчальних курсів «під ключ» за одним промптом (One-Shot Course Scaffolding).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Створення BKT-курсу традиційно забирає десятки годин ручної праці викладача (розбиття на теми, розрахунок BKT-параметрів, формулювання умов завдань, підбір тест-кейсів, написання конспектів із картками оман).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Новий модуль надає автору вибір: або згенерувати повну 5-аркушеву структуру через Google Gemini 2.5 Flash API у режимі Structured Outputs (`responseMimeType: \"application/json\"`), або скористатися детерміністичним семантичним евристичним рушієм (Semantic Heuristic Engine), що працює автономно без сторонніх підключень.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Архітектурні та інженерні рішення:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Спільні DTO-контракти та стандартизація типізації ([`packages/types/src/course.types.ts`](file:///packages/types/src/course.types.ts)):**",
+              "subitems": [
+                "Додано інтерфейс `AiCourseScaffoldRequestDto`:",
+                "Введено канонічний аліас `export type ParsedCourseImportDto = ImportCourseWorkbookDto`, що уніфікує табличний формат експорту/імпорту та ШІ-каркасу курсу."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Доменний сервіс ШІ-генератора ([`apps/api/src/domain/course/ai-course-scaffolder.service.ts`](file:///apps/api/src/domain/course/ai-course-scaffolder.service.ts)):**",
+              "subitems": [
+                "Реалізовано метод `scaffoldCourse(dto: AiCourseScaffoldRequestDto): Promise<ParsedCourseImportDto>`.",
+                "**Інтеграція Google Gemini 2.5 API:**",
+                "Використовує ендпоінт `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent`.",
+                "Конфігурація: `temperature: 0.3`, `responseMimeType: 'application/json'`.",
+                "Суворий системний промпт зобов'язує модель повертати 5 канонічних сутностей книги: `course`, `modules`, `skills`, `theories`, `tasks`.",
+                "Санітизація та перевірка: очищення можливих markdown-огорож (`json ...`), парсинг, перевірка зв'язності зовнішніх ключів (`moduleSlug`, `skillSlug`) та усунення колізій слагаів.",
+                "**Детерміністичний Семантичний Евристичний Двигун (Semantic Heuristic Fallback Engine):**",
+                "Працює автоматично у разі відсутності ключа `GEMINI_API_KEY`, перевищення квот або мережевих збоїв.",
+                "Покриває 5 дидактичних напрямків на базі семантичного аналізу ключових слів запиту:",
+                "1. *Python & Алгоритмізація*: Оцінка Big-O $O(1), O(\\log N), O(N), O(N^2)$, лінійні структури Stack/Queue (LIFO/FIFO), хеш-таблиці та пошук дублікатів за $O(1)$, динамічне програмування та мемоїзація Фібоначчі, графічні алгоритми BFS/DFS.",
+                "2. *Frontend & Веб-інженерія*: Семантика HTML5 та Accessible DOM, одновимірний Flexbox та двовимірний CSS Grid, DOM-події та Event Delegation, асинхронні Promise/Fetch, компонентний підхід.",
+                "3. *Бази Даних & SQL*: Реляційна модель та нормалізація 1NF/2NF/3NF, DDL/DML, JOIN (INNER/LEFT), транзакції та властивості ACID, індекси B-Tree.",
+                "4. *Кібербезпека & OWASP*: Вразливості OWASP Top-10 (XSS, SQLi, CSRF), автентифікація JWT/OAuth2, модель нульової довіри (Zero Trust), безпечні HTTP-заголовки CSP/HSTS.",
+                "5. *Універсальний дидактичний шаблон*: Фундаментальні концепції, структурні моделі, критерії якості розв'язку.",
+                "**Гарантія ациклічності графу компетенцій (Acyclic DAG Guarantee):**",
+                "Кожна згенерована навичка опирається на попередню в топологічному порядку, унеможливлюючи появу циклів:",
+                "$$\text{Prerequisite}(S_{i+1}) = S_i, \\quad \forall i \\in [1, K-1]$$",
+                "Створення унікальних слагаів: для уникнення колізій і перевищення ліміту у 60 символів кожен слаг навички формується як:",
+                "$$\text{SkillSlug} = \text{modSlug}[0\\dots 20] \\mathbin{\\Vert} \text{cleanSkillTitle}[0\\dots 30] \\mathbin{\\Vert} \text{index}$$"
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Атомарний контролер та оптимізація транзакцій ([`apps/api/src/adapters/inbound/http/course.controller.ts`](file:///apps/api/src/adapters/inbound/http/course.controller.ts)):**",
+              "subitems": [
+                "Додано REST-ендпоінт `@Post('ai-scaffold')`.",
+                "Розширено таймаут інтерактивної транзакції Prisma `$transaction` для захисту від таймауту 5000 мс при одночасному створенні 3+ модулів та десятків навичок і тест-кейсів:",
+                "У методі `importCourseWorkbook`: реалізовано безпечне оновлення наявних навичок через `tx.skillNode.findUnique` + `update`/`create`, та очищення старих тестів і пререквізитів перед імпортом.",
+                "У методі `deleteCourse`: реалізовано очищення прив'язаних компетенцій, зв'язків `skillDependency` та тестів перед видаленням курсу, що запобігає появі \"сирітських\" записів із зайнятими слагами."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Модальне вікно ШІ One-Shot генератора ([`apps/admin/src/features/course-manager/ui/AiCourseScaffolderModal.tsx`](file:///apps/admin/src/features/course-manager/ui/AiCourseScaffolderModal.tsx)):**",
+              "subitems": [
+                "Інтерфейс відповідає Архітектурному Правилу 7 (Minimalist Borderless Opera Shell v2.0).",
+                "4 готові швидкі пресети дисциплін (Python, Frontend, SQL, OWASP).",
+                "Регулятори: кількість модулів (2..5), цільовий поріг засвоєння $P(L)$ (0.80..0.95), опціональне поле для персонального Gemini API Key.",
+                "Анімований індикатор прогресу генерації за 4 мікро-кроками.",
+                "**Картка Pre-Flight перевірки:** лічильники модулів, BKT-навичок, конспектів Zen Focus та завдань, а також бейдж *«Pre-flight OK • Граф DAG ациклічний»*.",
+                "Дві ключові дії: `[ 📥 Завантажити як Excel (.xlsx) ]` та `[ 🚀 Створити та відкрити в Студії ]`."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Інтеграція в адмін-портал:**",
+              "subitems": [
+                "Додано кнопку `[ ✨ ШІ-Генератор ]` на тулбар Каталогу курсів ([`CourseManager.tsx`](file:///apps/admin/src/features/course-manager/ui/CourseManager.tsx)).",
+                "Додано кнопку `[ ✨ ШІ-Генератор ]` у верхню панель Студії ([`CourseStudioView.tsx`](file:///apps/admin/src/features/course-manager/ui/CourseStudioView.tsx)).",
+                "Додано швидку дію `✨ Згенерувати курс (ШІ)` у бічну панель DrawerSection «ДІЇ ТА ІНСТРУМЕНТИ» ([`apps/admin/src/app/page.tsx`](file:///apps/admin/src/app/page.tsx))."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Верифікація та тестування:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Unit-тестування API (`course.controller.spec.ts`):**",
+              "subitems": [
+                "Усі 13 unit-тестів виконано успішно (**13/13 passed**)."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Скрізне тестування Playwright E2E (`e2e/course-creation-wizard-flow.spec.ts`):**",
+              "subitems": [
+                "Додано Test 5: перевірка відкриття модального вікна, вибору пресету Python, конфігурації 3 модулів, виклику генерації, валідації Pre-flight картки, збереження в БД та автоматичного переходу до Студії курсу.",
+                "**Повний сьют із 5 тестів успішно пройдено (5/5 passed, 1.1m)**."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Збережено візуальні артефакти:**",
+              "subitems": [
+                "`course_ai_scaffold_modal.png` (модальне вікно ШІ-генератора з Pre-Flight карткою).",
+                "`course_ai_studio_created.png` (курс, створений ШІ та відкритий у Студії)."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Виробнича збірка:**",
+              "subitems": [
+                "`npm run build:api` (NestJS build, 0 помилок).",
+                "`npm run build:admin` (Next.js Turbopack, 4/4 static pages, 0 помилок)."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "---",
+              "subitems": []
+            }
+          ]
+        },
+        {
           "title": "0.1.7.108 Двосторонній Імпорт Курсу з Excel / Google Sheets із Pre-Flight Валідатором, DFS/Tarjan Ациклічністю DAG та Атомарною Транзакцією PostgreSQL (SBC-419, EP-AD)",
           "level": 3,
           "paragraphs": [],

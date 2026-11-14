@@ -19,6 +19,7 @@ import { AuthService } from './domain/auth/auth.service';
 import { SystemConfigService } from './domain/config/system-config.service';
 import { ClassroomService } from './domain/classroom/classroom.service';
 import { UserService } from './domain/user/user.service';
+import { AiCourseScaffolderService } from './domain/course/ai-course-scaffolder.service';
 
 @Module({
   imports: [
@@ -48,6 +49,7 @@ import { UserService } from './domain/user/user.service';
     SystemConfigService,
     ClassroomService,
     UserService,
+    AiCourseScaffolderService,
   ],
 })
 export class AppModule {}

@@ -24,6 +24,7 @@ import { CourseEditModal } from './CourseEditModal';
 import { ModuleManagerModal } from './ModuleManagerModal';
 import { CategoryManagerModal } from './CategoryManagerModal';
 import { CourseImportModal } from './CourseImportModal';
+import { AiCourseScaffolderModal } from './AiCourseScaffolderModal';
 import { downloadCourseTemplate, downloadCourseExport } from '../services/courseWorkbookService';
 
 export interface CourseManagerProps {
@@ -76,6 +77,9 @@ export const CourseManager: React.FC<CourseManagerProps> = ({
 
   // Import workbook modal state
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
+
+  // AI Course Scaffolder modal state
+  const [isAiScaffoldModalOpen, setIsAiScaffoldModalOpen] = useState(false);
 
   // Form State for creating new course
   const [title, setTitle] = useState('');
@@ -340,6 +344,16 @@ export const CourseManager: React.FC<CourseManagerProps> = ({
           >
             <Upload className="w-3.5 h-3.5 text-emerald-400" />
             <span className="hidden sm:inline">Імпорт (.xlsx)</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setIsAiScaffoldModalOpen(true)}
+            className="px-3 py-1.5 rounded-lg bg-purple-600/20 hover:bg-purple-600/30 border border-purple-500/40 text-purple-300 font-medium flex items-center gap-1.5 transition-colors cursor-pointer text-xs shadow-sm"
+            title="Автоматична генерація повного курсу за допомогою ШІ (Gemini 2.5 API)"
+          >
+            <Sparkles className="w-3.5 h-3.5 text-purple-400" />
+            <span className="hidden sm:inline">ШІ-Генератор</span>
           </button>
 
           <button
@@ -813,6 +827,21 @@ export const CourseManager: React.FC<CourseManagerProps> = ({
             onOpenCourseStudio(importedCourse);
           }
         }}
+      />
+
+      {/* AI Course Scaffolder Modal (Gemini 2.5 API + Heuristic Fallback) */}
+      <AiCourseScaffolderModal
+        isOpen={isAiScaffoldModalOpen}
+        onClose={() => setIsAiScaffoldModalOpen(false)}
+        onCourseCreated={(createdCourse) => {
+          setMessage(`✨ Каркас курсу «${createdCourse.title}» створено за допомогою ШІ!`);
+          fetchCourses();
+          onCategoriesChanged?.();
+          if (onOpenCourseStudio) {
+            onOpenCourseStudio(createdCourse);
+          }
+        }}
+        apiUrl={API_URL}
       />
     </div>
   );

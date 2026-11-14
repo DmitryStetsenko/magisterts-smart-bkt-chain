@@ -39,6 +39,7 @@ import { CourseCreateView } from '../features/course-manager/ui/CourseCreateView
 import { CourseStudioView } from '../features/course-manager/ui/CourseStudioView';
 import { TheoryLessonBuilderView } from '../features/course-manager/ui/TheoryLessonBuilderView';
 import { CourseImportModal } from '../features/course-manager/ui/CourseImportModal';
+import { AiCourseScaffolderModal } from '../features/course-manager/ui/AiCourseScaffolderModal';
 import { downloadCourseTemplate, downloadCourseExport } from '../features/course-manager/services/courseWorkbookService';
 import { DatasetExportCenter, DatasetStats } from '../features/dataset-export/ui/DatasetExportCenter';
 import { BktAuditVerifierCenter } from '../features/verifier/ui/BktAuditVerifierCenter';
@@ -129,6 +130,7 @@ export default function AdminCMSDashboard() {
   const [authorStep, setAuthorStep] = useState<number>(1);
   const [maxUnlockedStep, setMaxUnlockedStep] = useState<number>(1);
   const [isImportModalOpen, setIsImportModalOpen] = useState<boolean>(false);
+  const [isAiScaffoldModalOpen, setIsAiScaffoldModalOpen] = useState<boolean>(false);
 
   // Search & Filter state for Drawer Sections
   const [datasetFilter, setDatasetFilter] = useState<'ALL' | 'SUBMISSIONS' | 'HINTS' | 'THEORY' | 'ANNULMENTS' | 'RESETS'>('ALL');
@@ -994,6 +996,16 @@ export default function AdminCMSDashboard() {
                   </button>
 
                   <div className="pt-1.5 border-t border-slate-800/60 flex flex-col gap-1.5">
+                    <button
+                      type="button"
+                      onClick={() => setIsAiScaffoldModalOpen(true)}
+                      className="w-full py-1.5 px-2.5 rounded-lg bg-purple-600/20 hover:bg-purple-600/30 text-purple-200 border border-purple-500/40 transition-colors flex items-center gap-2 font-medium cursor-pointer"
+                      title="ШІ-Генератор: побудувати новий навчальний курс (Gemini 2.5 API)"
+                    >
+                      <Sparkles className="w-3.5 h-3.5 text-purple-400" />
+                      <span>✨ Згенерувати курс (ШІ)</span>
+                    </button>
+
                     <button
                       type="button"
                       onClick={() => setIsImportModalOpen(true)}
@@ -2219,6 +2231,20 @@ export default function AdminCMSDashboard() {
         onClose={() => setIsImportModalOpen(false)}
         onCourseImported={(importedCourse) => {
           setSelectedStudioCourse(importedCourse);
+          setActiveTab('create_course');
+          setCourseViewMode('STUDIO');
+          setAuthorStep(2);
+          setMaxUnlockedStep(5);
+          loadCourses();
+        }}
+      />
+
+      {/* Global AI Course Scaffolder Modal */}
+      <AiCourseScaffolderModal
+        isOpen={isAiScaffoldModalOpen}
+        onClose={() => setIsAiScaffoldModalOpen(false)}
+        onCourseCreated={(createdCourse) => {
+          setSelectedStudioCourse(createdCourse);
           setActiveTab('create_course');
           setCourseViewMode('STUDIO');
           setAuthorStep(2);

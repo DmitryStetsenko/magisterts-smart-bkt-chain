@@ -13,12 +13,15 @@ import {
 } from '@nestjs/common';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { PrismaService } from '../../outbound/persistence/prisma.service';
+import { AiCourseScaffolderService } from '../../../domain/course/ai-course-scaffolder.service';
 import type {
   CreateCourseDto,
   UpdateCourseDto,
   CreateCourseModuleDto,
   UpdateCourseModuleDto,
   ImportCourseWorkbookDto,
+  AiCourseScaffoldRequestDto,
+  ParsedCourseImportDto,
 } from '@sbc/types';
 
 @ApiTags('Courses')
@@ -26,7 +29,10 @@ import type {
 export class CourseController {
   private readonly logger = new Logger(CourseController.name);
 
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly aiScaffolder: AiCourseScaffolderService
+  ) {}
 
   /**
    * Отримати перелік усіх доступних курсів із модулями, категоріями та навичками
@@ -185,6 +191,18 @@ export class CourseController {
   }
 
   /**
+   * One-Shot генерація повного каркасу курсу за допомогою ШІ (Gemini 2.5 API + евристичний фолбек)
+   */
+  @Post('ai-scaffold')
+  @ApiOperation({ summary: 'One-shot AI scaffold course structure (Gemini 2.5 API with heuristic fallback)' })
+  async aiScaffoldCourse(@Body() dto: AiCourseScaffoldRequestDto): Promise<ParsedCourseImportDto> {
+    if (!dto || !dto.prompt || !dto.prompt.trim()) {
+      throw new BadRequestException('Промпт або тема курсу є обовʼязковим полем для генерації ШІ');
+    }
+    return this.aiScaffolder.scaffoldCourse(dto);
+  }
+
+  /**
    * Атомарний імпорт повної структури курсу з таблиці Excel / Google Sheets
    * Забезпечує транзакційне створення курсу, модулів, DAG-навичок та банку завдань
    */
@@ -217,7 +235,7 @@ export class CourseController {
       }
     }
 
-    // Запуск атомарної транзакції бази даних
+    // Запуск атомарної транзакції бази даних з розширеним таймаутом для великих курсів
     return this.prisma.$transaction(async (tx) => {
       // Якщо обрано перезапис існуючого курсу
       if (existing) {
@@ -320,18 +338,44 @@ export class CourseController {
         const skillSlug = s.slug.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
         const targetModuleId = moduleMap.get(s.moduleSlug.trim().toLowerCase());
 
-        const createdSkill = await tx.skillNode.create({
-          data: {
-            courseId: course.id,
-            moduleId: targetModuleId || null,
-            slug: skillSlug,
-            title: s.title.trim(),
-            description: s.title.trim(),
-            category: dto.course.category?.trim() || 'Основна',
-            difficulty: (['EASY', 'MEDIUM', 'HARD'].includes(s.difficulty || '') ? s.difficulty : 'EASY') as any,
-            orderIndex: s.orderIndex,
-          },
-        });
+        const existingSkill = await tx.skillNode.findUnique({ where: { slug: skillSlug } });
+        let createdSkill;
+        if (existingSkill) {
+          await tx.task.deleteMany({ where: { skillId: existingSkill.id } });
+          await tx.skillDependency.deleteMany({
+            where: {
+              OR: [
+                { parentSkillId: existingSkill.id },
+                { childSkillId: existingSkill.id },
+              ],
+            },
+          });
+          createdSkill = await tx.skillNode.update({
+            where: { id: existingSkill.id },
+            data: {
+              courseId: course.id,
+              moduleId: targetModuleId || null,
+              title: s.title.trim(),
+              description: s.title.trim(),
+              category: dto.course.category?.trim() || 'Основна',
+              difficulty: (['EASY', 'MEDIUM', 'HARD'].includes(s.difficulty || '') ? s.difficulty : 'EASY') as any,
+              orderIndex: s.orderIndex,
+            },
+          });
+        } else {
+          createdSkill = await tx.skillNode.create({
+            data: {
+              courseId: course.id,
+              moduleId: targetModuleId || null,
+              slug: skillSlug,
+              title: s.title.trim(),
+              description: s.title.trim(),
+              category: dto.course.category?.trim() || 'Основна',
+              difficulty: (['EASY', 'MEDIUM', 'HARD'].includes(s.difficulty || '') ? s.difficulty : 'EASY') as any,
+              orderIndex: s.orderIndex,
+            },
+          });
+        }
         skillMap.set(skillSlug, createdSkill.id);
       }
 
@@ -345,8 +389,17 @@ export class CourseController {
         for (const prereqSlug of prereqSlugs) {
           const parentSkillId = skillMap.get(prereqSlug);
           if (parentSkillId && parentSkillId !== currentSkillId) {
-            await tx.skillDependency.create({
-              data: {
+            await tx.skillDependency.upsert({
+              where: {
+                parentSkillId_childSkillId: {
+                  parentSkillId,
+                  childSkillId: currentSkillId,
+                },
+              },
+              update: {
+                requiredMastery: course.defaultMasteryThreshold,
+              },
+              create: {
                 parentSkillId,
                 childSkillId: currentSkillId,
                 requiredMastery: course.defaultMasteryThreshold,
@@ -440,6 +493,9 @@ export class CourseController {
           },
         },
       });
+    }, {
+      maxWait: 15000,
+      timeout: 35000,
     });
   }
 
@@ -499,6 +555,29 @@ export class CourseController {
 
     if (!course) {
       throw new NotFoundException(`Курс із ID ${id} не знайдено`);
+    }
+
+    // Clean up attached skills, dependencies and tasks
+    const attachedSkills = await this.prisma.skillNode.findMany({
+      where: { courseId: id },
+      select: { id: true },
+    });
+    const attachedSkillIds = attachedSkills.map((s) => s.id);
+    if (attachedSkillIds.length > 0) {
+      await this.prisma.skillDependency.deleteMany({
+        where: {
+          OR: [
+            { parentSkillId: { in: attachedSkillIds } },
+            { childSkillId: { in: attachedSkillIds } },
+          ],
+        },
+      });
+      await this.prisma.task.deleteMany({
+        where: { skillId: { in: attachedSkillIds } },
+      });
+      await this.prisma.skillNode.deleteMany({
+        where: { id: { in: attachedSkillIds } },
+      });
     }
 
     // Cascade delete in Prisma is configured for enrollments and classrooms, but let's log

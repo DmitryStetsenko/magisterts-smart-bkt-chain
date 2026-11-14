@@ -237,6 +237,82 @@
   - **Результати тестування:** 3/3 тестів пройдено успішно (48.1s).
   - **Збережено візуальний артефакт:** `course_studio_tabular_export.png` у директорії артефактів.
 
+### 0.1.7.109 ШІ One-Shot Генератор Курсу під Ключ через Gemini 2.5 API із Семантичним Евристичним Фолбеком (SBC-420, EP-LLM)
+- **Контекст та інженерна задача:**
+  - Реалізація третього обов'язкового етапу дорожньої карти Сесії 20 (`SBC-420`): створення автономного інтелектуального движка генерації навчальних курсів «під ключ» за одним промптом (One-Shot Course Scaffolding).
+  - Створення BKT-курсу традиційно забирає десятки годин ручної праці викладача (розбиття на теми, розрахунок BKT-параметрів, формулювання умов завдань, підбір тест-кейсів, написання конспектів із картками оман).
+  - Новий модуль надає автору вибір: або згенерувати повну 5-аркушеву структуру через Google Gemini 2.5 Flash API у режимі Structured Outputs (`responseMimeType: "application/json"`), або скористатися детерміністичним семантичним евристичним рушієм (Semantic Heuristic Engine), що працює автономно без сторонніх підключень.
+- **Архітектурні та інженерні рішення:**
+  1. **Спільні DTO-контракти та стандартизація типізації ([`packages/types/src/course.types.ts`](file:///packages/types/src/course.types.ts)):**
+     - Додано інтерфейс `AiCourseScaffoldRequestDto`:
+       ```typescript
+       export interface AiCourseScaffoldRequestDto {
+         prompt: string;
+         category?: string;
+         targetAudience?: string;
+         moduleCount?: number;
+         targetPl?: number;
+         apiKey?: string;
+       }
+       ```
+     - Введено канонічний аліас `export type ParsedCourseImportDto = ImportCourseWorkbookDto`, що уніфікує табличний формат експорту/імпорту та ШІ-каркасу курсу.
+  2. **Доменний сервіс ШІ-генератора ([`apps/api/src/domain/course/ai-course-scaffolder.service.ts`](file:///apps/api/src/domain/course/ai-course-scaffolder.service.ts)):**
+     - Реалізовано метод `scaffoldCourse(dto: AiCourseScaffoldRequestDto): Promise<ParsedCourseImportDto>`.
+     - **Інтеграція Google Gemini 2.5 API:**
+       - Використовує ендпоінт `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent`.
+       - Конфігурація: `temperature: 0.3`, `responseMimeType: 'application/json'`.
+       - Суворий системний промпт зобов'язує модель повертати 5 канонічних сутностей книги: `course`, `modules`, `skills`, `theories`, `tasks`.
+       - Санітизація та перевірка: очищення можливих markdown-огорож (`json ...`), парсинг, перевірка зв'язності зовнішніх ключів (`moduleSlug`, `skillSlug`) та усунення колізій слагаів.
+     - **Детерміністичний Семантичний Евристичний Двигун (Semantic Heuristic Fallback Engine):**
+       - Працює автоматично у разі відсутності ключа `GEMINI_API_KEY`, перевищення квот або мережевих збоїв.
+       - Покриває 5 дидактичних напрямків на базі семантичного аналізу ключових слів запиту:
+         1. *Python & Алгоритмізація*: Оцінка Big-O $O(1), O(\log N), O(N), O(N^2)$, лінійні структури Stack/Queue (LIFO/FIFO), хеш-таблиці та пошук дублікатів за $O(1)$, динамічне програмування та мемоїзація Фібоначчі, графічні алгоритми BFS/DFS.
+         2. *Frontend & Веб-інженерія*: Семантика HTML5 та Accessible DOM, одновимірний Flexbox та двовимірний CSS Grid, DOM-події та Event Delegation, асинхронні Promise/Fetch, компонентний підхід.
+         3. *Бази Даних & SQL*: Реляційна модель та нормалізація 1NF/2NF/3NF, DDL/DML, JOIN (INNER/LEFT), транзакції та властивості ACID, індекси B-Tree.
+         4. *Кібербезпека & OWASP*: Вразливості OWASP Top-10 (XSS, SQLi, CSRF), автентифікація JWT/OAuth2, модель нульової довіри (Zero Trust), безпечні HTTP-заголовки CSP/HSTS.
+         5. *Універсальний дидактичний шаблон*: Фундаментальні концепції, структурні моделі, критерії якості розв'язку.
+       - **Гарантія ациклічності графу компетенцій (Acyclic DAG Guarantee):**
+         - Кожна згенерована навичка опирається на попередню в топологічному порядку, унеможливлюючи появу циклів:
+           $$	ext{Prerequisite}(S_{i+1}) = S_i, \quad orall i \in [1, K-1]$$
+         - Створення унікальних слагаів: для уникнення колізій і перевищення ліміту у 60 символів кожен слаг навички формується як:
+           $$	ext{SkillSlug} = 	ext{modSlug}[0\dots 20] \mathbin{\Vert} 	ext{cleanSkillTitle}[0\dots 30] \mathbin{\Vert} 	ext{index}$$
+  3. **Атомарний контролер та оптимізація транзакцій ([`apps/api/src/adapters/inbound/http/course.controller.ts`](file:///apps/api/src/adapters/inbound/http/course.controller.ts)):**
+     - Додано REST-ендпоінт `@Post('ai-scaffold')`.
+     - Розширено таймаут інтерактивної транзакції Prisma `$transaction` для захисту від таймауту 5000 мс при одночасному створенні 3+ модулів та десятків навичок і тест-кейсів:
+       ```typescript
+       return this.prisma.$transaction(async (tx) => { ... }, {
+         maxWait: 15000,
+         timeout: 35000,
+       });
+       ```
+     - У методі `importCourseWorkbook`: реалізовано безпечне оновлення наявних навичок через `tx.skillNode.findUnique` + `update`/`create`, та очищення старих тестів і пререквізитів перед імпортом.
+     - У методі `deleteCourse`: реалізовано очищення прив'язаних компетенцій, зв'язків `skillDependency` та тестів перед видаленням курсу, що запобігає появі "сирітських" записів із зайнятими слагами.
+  4. **Модальне вікно ШІ One-Shot генератора ([`apps/admin/src/features/course-manager/ui/AiCourseScaffolderModal.tsx`](file:///apps/admin/src/features/course-manager/ui/AiCourseScaffolderModal.tsx)):**
+     - Інтерфейс відповідає Архітектурному Правилу 7 (Minimalist Borderless Opera Shell v2.0).
+     - 4 готові швидкі пресети дисциплін (Python, Frontend, SQL, OWASP).
+     - Регулятори: кількість модулів (2..5), цільовий поріг засвоєння $P(L)$ (0.80..0.95), опціональне поле для персонального Gemini API Key.
+     - Анімований індикатор прогресу генерації за 4 мікро-кроками.
+     - **Картка Pre-Flight перевірки:** лічильники модулів, BKT-навичок, конспектів Zen Focus та завдань, а також бейдж *«Pre-flight OK • Граф DAG ациклічний»*.
+     - Дві ключові дії: `[ 📥 Завантажити як Excel (.xlsx) ]` та `[ 🚀 Створити та відкрити в Студії ]`.
+  5. **Інтеграція в адмін-портал:**
+     - Додано кнопку `[ ✨ ШІ-Генератор ]` на тулбар Каталогу курсів ([`CourseManager.tsx`](file:///apps/admin/src/features/course-manager/ui/CourseManager.tsx)).
+     - Додано кнопку `[ ✨ ШІ-Генератор ]` у верхню панель Студії ([`CourseStudioView.tsx`](file:///apps/admin/src/features/course-manager/ui/CourseStudioView.tsx)).
+     - Додано швидку дію `✨ Згенерувати курс (ШІ)` у бічну панель DrawerSection «ДІЇ ТА ІНСТРУМЕНТИ» ([`apps/admin/src/app/page.tsx`](file:///apps/admin/src/app/page.tsx)).
+- **Верифікація та тестування:**
+  - **Unit-тестування API (`course.controller.spec.ts`):**
+    - Усі 13 unit-тестів виконано успішно (**13/13 passed**).
+  - **Скрізне тестування Playwright E2E (`e2e/course-creation-wizard-flow.spec.ts`):**
+    - Додано Test 5: перевірка відкриття модального вікна, вибору пресету Python, конфігурації 3 модулів, виклику генерації, валідації Pre-flight картки, збереження в БД та автоматичного переходу до Студії курсу.
+    - **Повний сьют із 5 тестів успішно пройдено (5/5 passed, 1.1m)**.
+  - **Збережено візуальні артефакти:**
+    - `course_ai_scaffold_modal.png` (модальне вікно ШІ-генератора з Pre-Flight карткою).
+    - `course_ai_studio_created.png` (курс, створений ШІ та відкритий у Студії).
+  - **Виробнича збірка:**
+    - `npm run build:api` (NestJS build, 0 помилок).
+    - `npm run build:admin` (Next.js Turbopack, 4/4 static pages, 0 помилок).
+
+---
+
 ### 0.1.7.108 Двосторонній Імпорт Курсу з Excel / Google Sheets із Pre-Flight Валідатором, DFS/Tarjan Ациклічністю DAG та Атомарною Транзакцією PostgreSQL (SBC-419, EP-AD)
 - **Контекст та задача:**
   - Реалізація другого обов'язкового мікро-кроку виробничої дорожньої карти Сесії 20 (`SBC-419`): створення надійного інженерного рушія імпорту навчальних планів із файлів Microsoft Excel (`.xlsx`, `.xls`) та експортованих Google Sheets із попередньою всебічною валідацією (Pre-Flight Inspection) та 100% гарантією атомарності бази даних PostgreSQL.

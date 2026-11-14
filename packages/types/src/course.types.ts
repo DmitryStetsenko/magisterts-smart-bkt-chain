@@ -167,3 +167,22 @@ export interface ImportCourseWorkbookDto {
   overwriteExisting?: boolean;
 }
 
+/**
+ * DTO запиту на генерацію каркасу курсу за допомогою ШІ (Gemini 2.5 API)
+ */
+export interface AiCourseScaffoldRequestDto {
+  prompt: string;
+  targetAudience?: string;
+  category?: string;
+  moduleCount?: number;
+  tasksPerSkill?: number;
+  targetPl?: number;
+  apiKey?: string;
+}
+
+/**
+ * Канонічна структура розібраного курсу з 5 аркушів для передачі між ШІ/клієнтом та бекендом
+ */
+export type ParsedCourseImportDto = ImportCourseWorkbookDto;
+
+

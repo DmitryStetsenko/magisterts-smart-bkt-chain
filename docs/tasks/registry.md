@@ -10,7 +10,7 @@
 | **`SBC-EP-SH`** | Database Modeling & Shared Packages | 25 |
 | **`SBC-EP-BK`** | Authentication & Core API | 16 |
 | **`SBC-EP-BKT`** | Bayesian Knowledge Tracing & Behavioral Telemetry | 30 |
-| **`SBC-EP-LLM`** | Automated Code Assessment & Open-Text Evaluation | 10 |
+| **`SBC-EP-LLM`** | Automated Code Assessment & Open-Text Evaluation | 11 |
 | **`SBC-EP-W3`** | Web3 Infrastructure & Smart Contracts | 0 |
 | **`SBC-EP-ST`** | Student Portal & Skill Tree Map | 39 |
 | **`SBC-EP-TC`** | Teacher Portal & Analytics CRM | 32 |
@@ -251,6 +251,7 @@
 | **SBC-192** | `Task` | `LLM` | update daily progress and detailed log for gibberish filter fix | 2026-10-14 | `7268459` |
 | **SBC-197** | `Bug` | `LLM` | prevent keyword stuffing and connect essay telemetry to BKT adjuster | 2026-10-14 | `3f9d9f6` |
 | **SBC-199** | `Bug` | `LLM` | block looping phrase spam and route high-paste submissions to teacher review queue | 2026-10-14 | `ed21a27` |
+| **SBC-420** | `Story` | `LLM` | implement AI one-shot course scaffolder via Gemini 2.5 API with semantic fallback engine | 2026-11-14 | pending |
 
 ---
 
