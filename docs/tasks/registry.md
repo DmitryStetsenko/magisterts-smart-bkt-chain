@@ -521,7 +521,7 @@
 | **SBC-348** | `Story` | `MS` | implement native Word Equation OMML math, two-level tab stops, DSTU table and quality audit for IICTE-2026 | 2026-11-18 | `6b850bc` |
 | **SBC-349** | `Story` | `MS` | institute soft scientific problem framing rule, refine BKT math logic and release V-1.2 for IICTE-2026 | 2026-11-18 | `f072f7a` |
 | **SBC-350** | `Story` | `MS` | eliminate subjective exaggerations, enforce calm academic style and release milestone V-2.0 | 2026-11-18 | `b810344` |
-| **SBC-351** | `Story` | `MS` | resolve BiDi math rendering, eliminate formula 2 singularity, fix typography and release V-2.1 | 2026-11-18 | pending |
+| **SBC-351** | `Story` | `MS` | resolve BiDi math rendering, eliminate formula 2 singularity, fix typography and release V-2.1 | 2026-11-18 | `eea5a80` |
 
 
 ---
