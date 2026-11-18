@@ -516,7 +516,7 @@
 | **SBC-343** | `Fix` | `MS` | replace hash terminology, fix comment threading in Google Docs, justify test time limits and release V-14.0 | 2026-11-06 | `159b71c` |
 | **SBC-344** | `Fix` | `MS` | eliminate plural modestiae and artificial author labels for pure academic style in V-14.1 | 2026-11-06 | `eed1937` |
 | **SBC-345** | `Fix` | `MS` | embed in-text citations and empirical context for dropout statistics in V-14.2 | 2026-11-06 | `6cd7266` |
-| **SBC-346** | `Story` | `MS` | establish conference thesis workspace, academic guidelines and automated docx generator for IICTE-2026 | 2026-11-18 | `pending` |
+| **SBC-346** | `Story` | `MS` | establish conference thesis workspace, academic guidelines and automated docx generator for IICTE-2026 | 2026-11-18 | `ca13c08` |
 
 
 ---
