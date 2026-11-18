@@ -16,8 +16,8 @@
 | **`SBC-EP-TC`** | Teacher Portal & Analytics CRM | 33 |
 | **`SBC-EP-AD`** | Admin Portal & Knowledge DAG Builder | 33 |
 | **`SBC-EP-LD`** | Landing Web Page | 9 |
-| **`SBC-EP-MS`** | Master's Thesis Engineering & Academic Text Generation | 20 |
-| **ВСЬОГО** | - | **305** |
+| **`SBC-EP-MS`** | Master's Thesis Engineering & Academic Text Generation | 21 |
+| **ВСЬОГО** | - | **306** |
 
 ---
 
@@ -520,6 +520,7 @@
 | **SBC-347** | `Story` | `MS` | introduce scientific publishing standard Rule 14, author profile, release isolation and versioning V-1.0 | 2026-11-18 | `e1be228` |
 | **SBC-348** | `Story` | `MS` | implement native Word Equation OMML math, two-level tab stops, DSTU table and quality audit for IICTE-2026 | 2026-11-18 | `6b850bc` |
 | **SBC-349** | `Story` | `MS` | institute soft scientific problem framing rule, refine BKT math logic and release V-1.2 for IICTE-2026 | 2026-11-18 | `f072f7a` |
+| **SBC-350** | `Story` | `MS` | eliminate subjective exaggerations, enforce calm academic style and release milestone V-2.0 | 2026-11-18 | pending |
 
 
 ---

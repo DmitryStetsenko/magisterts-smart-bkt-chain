@@ -14,7 +14,7 @@ import docx
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 CONFERENCE_DIR = os.path.dirname(SCRIPT_DIR)
 RELEASE_DIR = os.path.join(CONFERENCE_DIR, "RELEASE")
-DOCX_PATH = os.path.join(RELEASE_DIR, "V-1.2-Стеценко_тези.docx")
+DOCX_PATH = os.path.join(RELEASE_DIR, "V-2.0-Стеценко_тези.docx")
 
 BANNED_CLICHES = [
     r'варто зазначити',
@@ -35,6 +35,13 @@ BANNED_CLICHES = [
     r'унеможливлює',
     r'чорні скриньки',
     r'тактичний відступ',
+    r'провідне місце',
+    r'повну аналітичну',
+    r'масштабним поширенням',
+    r'суворого пререквізиту',
+    r'максимальної пластичності',
+    r'безпідставне зростання',
+    r'впроваджено як аналітичне ядро',
 ]
 
 RUSSIAN_PATTERNS = [
