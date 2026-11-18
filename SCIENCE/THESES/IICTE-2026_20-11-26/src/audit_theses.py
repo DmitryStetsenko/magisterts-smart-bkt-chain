@@ -14,7 +14,7 @@ import docx
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 CONFERENCE_DIR = os.path.dirname(SCRIPT_DIR)
 RELEASE_DIR = os.path.join(CONFERENCE_DIR, "RELEASE")
-DOCX_PATH = os.path.join(RELEASE_DIR, "V-1.1-Стеценко_тези.docx")
+DOCX_PATH = os.path.join(RELEASE_DIR, "V-1.2-Стеценко_тези.docx")
 
 BANNED_CLICHES = [
     r'варто зазначити',
@@ -31,7 +31,10 @@ BANNED_CLICHES = [
     r'глухий кут',
     r'вичерпали',
     r'безпорадність',
-    r'пастка'
+    r'пастка',
+    r'унеможливлює',
+    r'чорні скриньки',
+    r'тактичний відступ',
 ]
 
 RUSSIAN_PATTERNS = [
@@ -93,11 +96,11 @@ def run_audit():
         print("✅ [OK]: Обсяг ідеально вкладається у встановлені оргкомітетом рамки (2–4 сторінки)!")
 
     # Перевірка формул
-    if omath_count < 6:
-        print(f"⚠️ [ПОПЕРЕДЖЕННЯ]: Очікувалося 6 формул oMath, виявлено {omath_count}!")
+    if omath_count < 7:
+        print(f"⚠️ [ПОПЕРЕДЖЕННЯ]: Очікувалося 7 формул oMath, виявлено {omath_count}!")
         passed = False
     else:
-        print("✅ [OK]: Усі 6 формул згенеровано як нативні Word Equation (m:oMath) із вертикальними дробами!")
+        print(f"✅ [OK]: Усі {omath_count} формул згенеровано як нативні Word Equation (m:oMath) із вертикальними дробами!")
 
     # 2. Перевірка на анти-AI кліше
     print("\n🛡️ --- АУДИТ КАНЦЕЛЯРИЗМІВ ТА КЛІШЕ ШІ ---")

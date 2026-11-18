@@ -26,7 +26,7 @@ SPEC_PATH = os.path.join(CONFERENCE_DIR, "theses_spec.json")
 
 os.makedirs(RELEASE_DIR, exist_ok=True)
 
-VERSION = "V-1.1"
+VERSION = "V-1.2"
 AUTHOR_SURNAME = "Стеценко"
 
 THESES_VERSIONED_PATH = os.path.join(RELEASE_DIR, f"{VERSION}-{AUTHOR_SURNAME}_тези.docx")
@@ -72,13 +72,13 @@ def build_native_omath(num_id: str):
     elif num_id == "(3)":
         return parse_xml(
             f'<m:oMath xmlns:m="{M}">'
-            f'{r("P(")}{sub("L", "n+1")}{r(")=P(")}{sub("L", "n")}{r("|")}{sub("Y", "n")}{r(")+(1-P(")}{sub("L", "n")}{r("|")}{sub("Y", "n")}{r("))·P(T)")}'
+            f'{r("P(")}{sub("L", "n")}{r(")=P(")}{sub("L", "n")}{r("|")}{sub("Y", "n")}{r(")+(1-P(")}{sub("L", "n")}{r("|")}{sub("Y", "n")}{r("))·P(T)")}'
             f'</m:oMath>'
         )
     elif num_id == "(4)":
         return parse_xml(
             f'<m:oMath xmlns:m="{M}">'
-            f'{r("P(")}{sub("L", "n")}{r(")≥")}{sub("τ", "mastery")}{r(",   ")}{sub("τ", "mastery")}{r("=0,85")}'
+            f'{r("P(")}{sub("L", "n")}{r(")≥")}{sub("τ", "mastery")}'
             f'</m:oMath>'
         )
     elif num_id == "(5)":
@@ -91,6 +91,12 @@ def build_native_omath(num_id: str):
         return parse_xml(
             f'<m:oMath xmlns:m="{M}">'
             f'{sub("C", "trust")}{r("=")}{sub("w", "1")}{r("·ψ(WPM)+")}{sub("w", "2")}{r("·(1-")}{sub("R", "paste")}{r(")+")}{sub("w", "3")}{r("·φ(Δ")}{sub("t", "pause")}{r(")")}'
+            f'</m:oMath>'
+        )
+    elif num_id == "(7)":
+        return parse_xml(
+            f'<m:oMath xmlns:m="{M}">'
+            f'{sub("P", "adj")}{r("(G)=P(G)+(1-P(G))·(1-")}{sub("C", "trust")}{r(")")}'
             f'</m:oMath>'
         )
     return None
@@ -111,13 +117,46 @@ def clean_inline_math(text: str) -> str:
         (r'\Delta', 'Δ'), (r'\theta', 'θ'), (r'\tau', 'τ'),
         (r'\alpha', 'α'), (r'\beta', 'β'), (r'\psi', 'ψ'), (r'\phi', 'φ'),
         (r'\sigma', 'σ'), (r'\mu', 'μ'), (r'\lambda', 'λ'),
-        (r'\quad', '  '), (r'\text', ''), (r'\\_', '_'),
+        (r'\to', '→'), (r'\quad', '  '), (r'\text', ''), (r'\\_', '_'),
     ]
     for r_from, r_to in replacements:
         t = t.replace(r_from, r_to)
         
     t = re.sub(r'\{([^{}]+)\}', r'\1', t)
     t = t.replace('\\', '')
+    
+    # Текстові специфічні математичні заміни для академічної чистоти
+    text_replacements = [
+        ('psi(WPM)', 'ψ(WPM)'),
+        ('phi(Delta t_pause)', 'φ(Δt_pause)'),
+        ('Delta t_pause', 'Δt_pause'),
+        ('Δ t_pause', 'Δt_pause'),
+        ('Δ t', 'Δt'),
+        ('tau_mastery', 'τ_mastery'),
+        ('P(L_n-1)', 'P(L_{n-1})'),
+        ('KC_j', 'KC_j'),
+        ('KC_i', 'KC_i'),
+        ('R_paste', 'R_paste'),
+        ('C_trust', 'C_trust'),
+        ('P_adj(G)', 'P_adj(G)'),
+        ('w_1, w_2, w_3', 'w_1, w_2, w_3'),
+        ('Explainable AI XAI', 'Explainable AI (XAI)'),
+        ('26,4 %', '26,4%'),
+        ('18,6 %', '18,6%'),
+        ('11,5 %', '11,5%'),
+        ('38,1 %', '38,1%'),
+        ('35,5 %', '35,5%'),
+    ]
+    for r_from, r_to in text_replacements:
+        t = t.replace(r_from, r_to)
+
+    # Виправлення кириличних гомогліфів у латинських термінах
+    t = re.sub(r'[\u041D]MM', 'HMM', t)           # Кирилиfront 'Н' в HMM
+    t = re.sub(r'[\u0412]ayesian', 'Bayesian', t)   # Кирилична 'В' в Bayesian
+    t = re.sub(r'[\u041A\u0421]{2}_j', 'KC_j', t)   # Кириличне 'КС' в KC_j
+    t = re.sub(r'[\u041A\u0421]{2}_i', 'KC_i', t)   # Кириличне 'КС' в KC_i
+    t = re.sub(r'n\s*=\s*1,\s*2,\s*\.\.\.,\s*№', 'n = 1, 2, ..., N', t) # Заміна знака номера на N
+
     return t
 
 def set_cell_margins(cell, top=100, bottom=100, left=150, right=150):
@@ -411,7 +450,20 @@ def compile_theses_from_spec(spec_data: dict, output_path: str):
                 continue
 
             # Якщо це експлікація змінних (починається з "де:" або перелічує змінні)
-            is_expl = p_text.startswith('де:') or (p_text.startswith('P(') and '—' in p_text) or (p_text.startswith('R_') and '—' in p_text) or (p_text.startswith('w_') and '—' in p_text) or (p_text.startswith('psi(') and '—' in p_text) or (p_text.startswith('phi(') and '—' in p_text)
+            is_expl = (
+                p_text.startswith('де:') or 
+                (p_text.startswith('P(') and '—' in p_text) or 
+                (p_text.startswith('P_{adj}') and '—' in p_text) or
+                (p_text.startswith('R_') and '—' in p_text) or 
+                (p_text.startswith('w_') and '—' in p_text) or 
+                (p_text.startswith('psi(') and '—' in p_text) or 
+                ('\\psi' in p_text and '—' in p_text) or 
+                (p_text.startswith('phi(') and '—' in p_text) or
+                ('\\phi' in p_text and '—' in p_text) or
+                ('\\tau' in p_text and '—' in p_text) or
+                ('Pre(' in p_text and '—' in p_text) or
+                p_text.startswith('Отримане значення P(L_n) стає апріорною')
+            )
             
             p = doc.add_paragraph()
             p.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
