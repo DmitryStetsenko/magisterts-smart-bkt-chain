@@ -2,7 +2,7 @@
 Професійний генератор тез доповіді та заявки для конференції IICTE-2026
 відповідно до інженерних стандартів магістерського дослідження:
 - Повна підтримка нативних Word Equation (m:oMath / OMML) з вертикальними дробами (m:f) та підрядковими індексами (m:sSub);
-- Дворівнева табуляція для формул: центр 80 мм (WD_TAB_ALIGNMENT.CENTER), правий край 160 мм (WD_TAB_ALIGNMENT.RIGHT);
+- Дворівнева табуляція для формул: центр 80 мм (WD_TAB_ALIGNMENT.CENTER), правий край 158 мм (WD_TAB_ALIGNMENT.RIGHT);
 - Реальні таблиці за стандартом ДСТУ (Table Grid, заливка шапки, точні ширини колонок у сумі 160 мм);
 - Всі поля сторінки рівно 25 мм з усіх чотирьох сторін;
 - Шрифт Times New Roman: заголовок 18 пт жирний по центру, автор 14 пт bold italic, керівник 14 пт italic, основний текст 14 пт justify, список джерел 12 пт;
@@ -26,7 +26,7 @@ SPEC_PATH = os.path.join(CONFERENCE_DIR, "theses_spec.json")
 
 os.makedirs(RELEASE_DIR, exist_ok=True)
 
-VERSION = "V-2.1"
+VERSION = "V-2.2"
 AUTHOR_SURNAME = "Стеценко"
 
 THESES_VERSIONED_PATH = os.path.join(RELEASE_DIR, f"{VERSION}-{AUTHOR_SURNAME}_тези.docx")
@@ -54,53 +54,59 @@ def frac(num_xml, den_xml):
     return f'<m:f xmlns:m="{M}"><m:num>{num_xml}</m:num><m:den>{den_xml}</m:den></m:f>'
 
 def build_native_omath(num_id: str):
-    """Будує нативний об'єкт m:oMath Word Equation для відповідної формули"""
+    """Будує нативний об'єкт m:oMath Word Equation для відповідної формули з повною підтримкою Unicode-операторів."""
     if num_id == "(1)":
         return parse_xml(
             f'<m:oMath xmlns:m="{M}">'
-            f'{r("P(")}{sub("L", "n")}{r("|")}{sub("Y", "n")}{r("=1)=")}'
-            f'{frac(r("P(") + sub("L", "n-1") + r(")·(1-P(S))"), r("P(") + sub("L", "n-1") + r(")·(1-P(S))+(1-P(") + sub("L", "n-1") + r("))·P(G)"))}'
+            f'{r("P(")}{sub("L", "n")}{r(" | ")}{sub("Y", "n")}{r(" = 1) = ")}'
+            f'{frac(r("P(") + sub("L", "n-1") + r(") \u00b7 (1 \u2212 P(S))"), r("P(") + sub("L", "n-1") + r(") \u00b7 (1 \u2212 P(S)) + (1 \u2212 P(") + sub("L", "n-1") + r(")) \u00b7 P(G)"))}'
             f'</m:oMath>'
         )
     elif num_id == "(2)":
         return parse_xml(
             f'<m:oMath xmlns:m="{M}">'
-            f'{r("P(")}{sub("L", "n")}{r("|")}{sub("Y", "n")}{r("=0)=")}'
-            f'{frac(r("P(") + sub("L", "n-1") + r(")·P(S)"), r("P(") + sub("L", "n-1") + r(")·P(S)+(1-P(") + sub("L", "n-1") + r("))·(1-P(G))"))}'
+            f'{r("P(")}{sub("L", "n")}{r(" | ")}{sub("Y", "n")}{r(" = 0) = ")}'
+            f'{frac(r("P(") + sub("L", "n-1") + r(") \u00b7 P(S)"), r("P(") + sub("L", "n-1") + r(") \u00b7 P(S) + (1 \u2212 P(") + sub("L", "n-1") + r(")) \u00b7 (1 \u2212 P(G))"))}'
             f'</m:oMath>'
         )
     elif num_id == "(3)":
         return parse_xml(
             f'<m:oMath xmlns:m="{M}">'
-            f'{r("P(")}{sub("L", "n")}{r(")=P(")}{sub("L", "n")}{r("|")}{sub("Y", "n")}{r(")+(1-P(")}{sub("L", "n")}{r("|")}{sub("Y", "n")}{r("))·P(T)")}'
+            f'{r("P(")}{sub("L", "n")}{r(") = P(")}{sub("L", "n")}{r(" | ")}{sub("Y", "n")}{r(") + (1 \u2212 P(")}{sub("L", "n")}{r(" | ")}{sub("Y", "n")}{r(")) \u00b7 P(T)")}'
             f'</m:oMath>'
         )
     elif num_id == "(4)":
         return parse_xml(
             f'<m:oMath xmlns:m="{M}">'
-            f'{r("P(")}{sub("L", "n")}{r(")≥")}{sub("τ", "mastery")}'
+            f'{r("P(")}{sub("L", "n")}{r(") \u2265 ")}{sub("\u03c4", "mastery")}'
             f'</m:oMath>'
         )
     elif num_id == "(5)":
         return parse_xml(
             f'<m:oMath xmlns:m="{M}">'
-            f'{r("∀")}{sub("KC", "i")}{r(" ∈ ")}'
+            f'{r("\u2200")}{sub("KC", "i")}{r(" \u2208 ")}'
             f'<m:r><m:rPr><m:nor/></m:rPr><m:t>Pre</m:t></m:r>'
             f'{r("(") + sub("KC", "j") + r("): P(")}'
             f'<m:sSub><m:e>{r("L")}</m:e><m:sub><m:sSub><m:e>{r("KC")}</m:e><m:sub>{r("i")}</m:sub></m:sSub></m:sub></m:sSub>'
-            f'{r(") ≥ ") + sub("τ", "mastery")}'
+            f'{r(") \u2265 ") + sub("\u03c4", "mastery")}'
             f'</m:oMath>'
         )
     elif num_id == "(6)":
         return parse_xml(
             f'<m:oMath xmlns:m="{M}">'
-            f'{sub("C", "trust")}{r("=")}{sub("w", "1")}{r("·ψ(WPM)+")}{sub("w", "2")}{r("·(1-")}{sub("R", "paste")}{r(")+")}{sub("w", "3")}{r("·φ(Δ")}{sub("t", "pause")}{r(")")}'
+            f'<m:sSub><m:e>{r("C")}</m:e><m:sub><m:r><m:rPr><m:nor/></m:rPr><m:t>trust</m:t></m:r></m:sub></m:sSub>'
+            f'{r(" = ")}{sub("w", "1")}{r(" \u00b7 \u03c8(WPM) + ")}{sub("w", "2")}{r(" \u00b7 (1 \u2212 ")}'
+            f'<m:sSub><m:e>{r("R")}</m:e><m:sub><m:r><m:rPr><m:nor/></m:rPr><m:t>paste</m:t></m:r></m:sub></m:sSub>'
+            f'{r(") + ")}{sub("w", "3")}{r(" \u00b7 \u03c6(\u0394")}{sub("t", "pause")}{r(")")}'
             f'</m:oMath>'
         )
     elif num_id == "(7)":
         return parse_xml(
             f'<m:oMath xmlns:m="{M}">'
-            f'{sub("P", "adj")}{r("(G)=min(0,85, P(G)+(1-P(G))·(1-")}{sub("C", "trust")}{r("))")}'
+            f'<m:sSub><m:e>{r("P")}</m:e><m:sub><m:r><m:rPr><m:nor/></m:rPr><m:t>adj</m:t></m:r></m:sub></m:sSub>'
+            f'{r("(G) = min(0,90, P(G) + (1 \u2212 P(G)) \u00b7 (1 \u2212 ")}'
+            f'<m:sSub><m:e>{r("C")}</m:e><m:sub><m:r><m:rPr><m:nor/></m:rPr><m:t>trust</m:t></m:r></m:sub></m:sSub>'
+            f'{r("))")}'
             f'</m:oMath>'
         )
     return None
@@ -117,6 +123,9 @@ def enforce_ltr(p):
 def clean_inline_math(text: str) -> str:
     """Очищує параграф від сирого LaTeX і замінює на чисті математичні юнікод-символи"""
     t = text
+    # Зберігаємо екрановані фігурні дужки множин \{ ... \}
+    t = t.replace(r'\{', '__LBRACE__').replace(r'\}', '__RBRACE__')
+
     t = re.sub(r'\\frac\{((?:[^{}]|\{[^{}]*\})*)\}\{((?:[^{}]|\{[^{}]*\})*)\}', r'[\1] / [\2]', t)
     t = re.sub(r'\\sqrt\{((?:[^{}]|\{[^{}]*\})*)\}', r'√(\1)', t)
     
@@ -135,6 +144,9 @@ def clean_inline_math(text: str) -> str:
         
     t = re.sub(r'\{([^{}]+)\}', r'\1', t)
     t = t.replace('\\', '')
+    
+    # Відновлюємо дужки множин
+    t = t.replace('__LBRACE__', '{').replace('__RBRACE__', '}')
     
     # Текстові специфічні математичні заміни для академічної чистоти
     text_replacements = [
@@ -160,27 +172,25 @@ def clean_inline_math(text: str) -> str:
         ('35,5 %', '35,5%'),
         ('обгрунтування', 'обґрунтування'),
         ('необгрунтований', 'необґрунтований'),
-        ('на поточному кроці п', 'на поточному кроці n'),
-        ('т_mastery', 'τ_mastery'),
         ('0,15 P(T)', '0,15, P(T)'),
-        ('C_trust → 1', 'C_trust → 1'),
-        ('C_trust → 0', 'C_trust → 0'),
         ('K_err ≥ 3', 'K_err ≥ 3'),
     ]
     for r_from, r_to in text_replacements:
         t = t.replace(r_from, r_to)
 
-    # Виправлення кириличних гомогліфів у латинських термінах
-    t = re.sub(r'[\u041D]MM', 'HMM', t)           # Кирилична 'Н' в HMM
-    t = re.sub(r'[\u0412]ayesian', 'Bayesian', t)   # Кирилична 'В' в Bayesian
-    t = re.sub(r'[\u041A\u0421]{2}_j', 'KC_j', t)   # Кириличне 'КС' в KC_j
-    t = re.sub(r'[\u041A\u0421]{2}_i', 'KC_i', t)   # Кириличне 'КС' в KC_i
-    t = re.sub(r'n\s*=\s*1,\s*2,\s*\.\.\.,\s*№', 'n = 1, 2, ..., N', t) # Заміна знака номера на N
+    # Виправлення можливих кириличних гомогліфів у латинських термінах та математиці
+    t = re.sub(r'[\u041D]MM', 'HMM', t)                       # Кирилична 'Н' в HMM
+    t = re.sub(r'[\u0412]ayesian', 'Bayesian', t)               # Кирилична 'В' в Bayesian
+    t = re.sub(r'[KКkк][CСcс]_[jј]', 'KC_j', t)               # Будь-які комбінації гомогліфів KC_j
+    t = re.sub(r'[KКkк][CСcс]_[iі]', 'KC_i', t)               # Будь-які комбінації гомогліфів KC_i
+    t = re.sub(r'на поточному кроці [\u043Fп]', 'на поточному кроці n', t) # Кирилична 'п' -> латинська n
+    t = re.sub(r'[\u0442т]_mastery', 'τ_mastery', t)           # Кирилична 'т' -> грецька τ
+    t = re.sub(r'n\s*=\s*1,\s*2,\s*\.\.\.,\s*№', 'n = 1, 2, ..., N', t) # Знак номера -> N
 
     return t
 
-def set_cell_margins(cell, top=100, bottom=100, left=150, right=150):
-    """Встановлює внутрішні поля комірки таблиці."""
+def set_cell_margins(cell, top=60, bottom=60, left=80, right=80):
+    """Встановлює компактні внутрішні поля комірки таблиці."""
     tcPr = cell._element.get_or_add_tcPr()
     tcMar = OxmlElement('w:tcMar')
     for m_name, val in [('top', top), ('bottom', bottom), ('left', left), ('right', right)]:
@@ -199,15 +209,14 @@ def set_cell_background(cell, hex_color="F2F4F8"):
 def render_formula(doc, raw_formula_text):
     """
     Рендерить математичну формулу згідно з академічним стандартом магістерської роботи:
-    - Відступи: 0 см зліва, без абзацного відступу;
-    - Дворівнева табуляція: центр 80 мм (для 160 мм друкованої області), правий край 160 мм;
+    - Відступи: 0 см зліва і справа, без абзацного відступу;
+    - Дворівнева табуляція: центр 80 мм (для 160 мм друкованої області), правий край 158.0 мм (із запасом);
     - Нативний Word Equation (m:oMath) з вертикальними дробами та нижніми індексами;
     - Номер формули (1) праворуч у Times New Roman 14 pt (звичайний);
     - Компактні відступи 2.5 pt перед і після формули.
     """
     clean = re.sub(r'^\[Формула:\s*', '', raw_formula_text.strip()).rstrip(']')
     
-    # Витягуємо номер формули з кінця (наприклад, | (1))
     m_num = re.search(r'\|\s*(\(\d+\))\s*$', clean)
     if m_num:
         num_str = m_num.group(1).strip()
@@ -219,32 +228,30 @@ def render_formula(doc, raw_formula_text):
     p = doc.add_paragraph()
     enforce_ltr(p)
     p.alignment = WD_ALIGN_PARAGRAPH.LEFT
+    p.paragraph_format.left_indent = Mm(0)
+    p.paragraph_format.right_indent = Mm(0)
     p.paragraph_format.first_line_indent = Mm(0)
     p.paragraph_format.space_before = Pt(2.5)
     p.paragraph_format.space_after = Pt(2.5)
     p.paragraph_format.line_spacing = 1.0
 
-    # Табулятори: 80 мм (центр 160 мм ширини), 160 мм (правий край)
+    # Табулятори: 80 мм (центр), 158.0 мм (правий край із запасом 2 мм для уникнення переносу номера)
     tab_stops = p.paragraph_format.tab_stops
     tab_stops.add_tab_stop(Mm(80), WD_TAB_ALIGNMENT.CENTER)
-    tab_stops.add_tab_stop(Mm(160), WD_TAB_ALIGNMENT.RIGHT)
+    tab_stops.add_tab_stop(Mm(158.0), WD_TAB_ALIGNMENT.RIGHT)
 
-    # Табуляція до центру
     p.add_run('\t')
 
-    # Будуємо нативний m:oMath
     omath_elem = build_native_omath(num_str)
     if omath_elem is not None:
         p._element.append(omath_elem)
     else:
-        # Резервний вивід з математичним юнікодом
         clean_body = clean_inline_math(formula_body)
         run_f = p.add_run(clean_body)
         run_f.font.name = 'Times New Roman'
         run_f.font.size = Pt(13)
         run_f.italic = True
 
-    # Табуляція до правого краю та номер формули
     if num_str:
         p.add_run('\t')
         run_n = p.add_run(num_str)
@@ -295,15 +302,15 @@ def render_real_table(doc, raw_table_text):
     for i, h_text in enumerate(headers):
         cell = row_hdr.cells[i]
         cell.width = col_widths[i]
-        set_cell_margins(cell, top=60, bottom=60, left=80, right=80)
+        set_cell_margins(cell, top=45, bottom=45, left=70, right=70)
         set_cell_background(cell, "F2F4F8")
         p = cell.paragraphs[0]
         enforce_ltr(p)
         p.alignment = WD_ALIGN_PARAGRAPH.CENTER
         p.paragraph_format.line_spacing = 1.0
         p.paragraph_format.first_line_indent = Mm(0)
-        p.paragraph_format.space_before = Pt(1.5)
-        p.paragraph_format.space_after = Pt(1.5)
+        p.paragraph_format.space_before = Pt(1.0)
+        p.paragraph_format.space_after = Pt(1.0)
         run = p.add_run(clean_inline_math(h_text))
         run.bold = True
         run.font.name = 'Times New Roman'
@@ -318,7 +325,7 @@ def render_real_table(doc, raw_table_text):
         for c_idx, val in enumerate(r_data):
             cell = row_data.cells[c_idx]
             cell.width = col_widths[c_idx]
-            set_cell_margins(cell, top=50, bottom=50, left=80, right=80)
+            set_cell_margins(cell, top=40, bottom=40, left=70, right=70)
             if r_idx % 2 == 1:
                 set_cell_background(cell, "FAFAFB")
 
@@ -326,8 +333,8 @@ def render_real_table(doc, raw_table_text):
             enforce_ltr(p)
             p.paragraph_format.line_spacing = 1.0
             p.paragraph_format.first_line_indent = Mm(0)
-            p.paragraph_format.space_before = Pt(1.5)
-            p.paragraph_format.space_after = Pt(1.5)
+            p.paragraph_format.space_before = Pt(1.0)
+            p.paragraph_format.space_after = Pt(1.0)
             p.alignment = WD_ALIGN_PARAGRAPH.LEFT if c_idx == 0 else WD_ALIGN_PARAGRAPH.CENTER
 
             run = p.add_run(clean_inline_math(val))
@@ -362,7 +369,7 @@ def compile_theses_from_spec(spec_data: dict, output_path: str):
     enforce_ltr(p_title)
     p_title.alignment = WD_ALIGN_PARAGRAPH.CENTER
     p_title.paragraph_format.space_before = Pt(0)
-    p_title.paragraph_format.space_after = Pt(12)
+    p_title.paragraph_format.space_after = Pt(10)
     p_title.paragraph_format.line_spacing = 1.0
     run_title = p_title.add_run(meta['title'].upper())
     run_title.font.name = 'Times New Roman'
@@ -420,7 +427,7 @@ def compile_theses_from_spec(spec_data: dict, output_path: str):
         run_sl.font.size = Pt(14)
         run_sl.font.italic = True
 
-    # Порожній рядок (1 інтервал) перед текстом
+    # Порожній рядок перед текстом
     p_blank = doc.add_paragraph()
     enforce_ltr(p_blank)
     p_blank.paragraph_format.line_spacing = 1.0
@@ -443,23 +450,24 @@ def compile_theses_from_spec(spec_data: dict, output_path: str):
                 i += 1
                 continue
 
-            # Якщо це назва таблиці
-            if p_text.startswith('Таблиця ') and ('—' in p_text or '-' in p_text):
+            # Якщо це назва таблиці (без відступу першого рядка та з keep_with_next)
+            if p_text.startswith('Таблиця ') and ('.' in p_text or '—' in p_text or '-' in p_text):
                 p_tbl_title = doc.add_paragraph()
                 enforce_ltr(p_tbl_title)
                 p_tbl_title.alignment = WD_ALIGN_PARAGRAPH.LEFT
-                p_tbl_title.paragraph_format.first_line_indent = Mm(12.5)
+                p_tbl_title.paragraph_format.left_indent = Mm(0)
+                p_tbl_title.paragraph_format.first_line_indent = Mm(0)
                 p_tbl_title.paragraph_format.space_before = Pt(4)
                 p_tbl_title.paragraph_format.space_after = Pt(2)
                 p_tbl_title.paragraph_format.line_spacing = 1.0
-                r_tt = p_tbl_title.add_run(p_text)
+                p_tbl_title.paragraph_format.keep_with_next = True
+                r_tt = p_tbl_title.add_run(clean_inline_math(p_text))
                 r_tt.font.name = 'Times New Roman'
                 r_tt.font.size = Pt(14)
                 r_tt.bold = False
 
                 # Наступний параграф має бути вмістом таблиці
                 if i + 1 < len(paragraphs) and paragraphs[i+1].startswith('[Таблиця:'):
-                    # Збираємо всі рядки таблиці
                     tbl_lines = [paragraphs[i+1]]
                     j = i + 2
                     while j < len(paragraphs) and (paragraphs[j].startswith('- ') or paragraphs[j].startswith('• ')):
@@ -480,12 +488,14 @@ def compile_theses_from_spec(spec_data: dict, output_path: str):
                 (p_text.startswith('w_') and '—' in p_text) or 
                 (p_text.startswith('psi(') and '—' in p_text) or 
                 ('\\psi' in p_text and '—' in p_text) or 
+                ('ψ(' in p_text and '—' in p_text) or
                 (p_text.startswith('phi(') and '—' in p_text) or
                 ('\\phi' in p_text and '—' in p_text) or
+                ('φ(' in p_text and '—' in p_text) or
                 ('\\tau' in p_text and '—' in p_text) or
+                ('τ' in p_text and '—' in p_text) or
                 ('Pre(' in p_text and '—' in p_text) or
-                p_text.startswith('Отримане значення P(L_n) стає апріорною') or
-                p_text.startswith('При цьому динамічна адаптація')
+                p_text.startswith('Отримане значення P(L_n) стає апріорною')
             )
             
             p = doc.add_paragraph()
@@ -518,8 +528,8 @@ def compile_theses_from_spec(spec_data: dict, output_path: str):
     enforce_ltr(p_ref_head)
     p_ref_head.alignment = WD_ALIGN_PARAGRAPH.CENTER
     p_ref_head.paragraph_format.line_spacing = 1.0
-    p_ref_head.paragraph_format.space_before = Pt(8)
-    p_ref_head.paragraph_format.space_after = Pt(3)
+    p_ref_head.paragraph_format.space_before = Pt(6)
+    p_ref_head.paragraph_format.space_after = Pt(2)
     run_rh = p_ref_head.add_run("Список використаних джерел")
     run_rh.font.name = 'Times New Roman'
     run_rh.font.size = Pt(12)
