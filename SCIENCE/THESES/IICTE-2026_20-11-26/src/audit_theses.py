@@ -14,7 +14,7 @@ import docx
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 CONFERENCE_DIR = os.path.dirname(SCRIPT_DIR)
 RELEASE_DIR = os.path.join(CONFERENCE_DIR, "RELEASE")
-DOCX_PATH = os.path.join(RELEASE_DIR, "V-2.0-Стеценко_тези.docx")
+DOCX_PATH = os.path.join(RELEASE_DIR, "V-2.1-Стеценко_тези.docx")
 
 BANNED_CLICHES = [
     r'варто зазначити',

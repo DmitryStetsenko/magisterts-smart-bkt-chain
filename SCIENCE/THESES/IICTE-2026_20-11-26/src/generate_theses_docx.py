@@ -26,7 +26,7 @@ SPEC_PATH = os.path.join(CONFERENCE_DIR, "theses_spec.json")
 
 os.makedirs(RELEASE_DIR, exist_ok=True)
 
-VERSION = "V-2.0"
+VERSION = "V-2.1"
 AUTHOR_SURNAME = "Стеценко"
 
 THESES_VERSIONED_PATH = os.path.join(RELEASE_DIR, f"{VERSION}-{AUTHOR_SURNAME}_тези.docx")
@@ -84,7 +84,11 @@ def build_native_omath(num_id: str):
     elif num_id == "(5)":
         return parse_xml(
             f'<m:oMath xmlns:m="{M}">'
-            f'{r("∀")}{sub("KC", "i")}{r("∈Pre(")}{sub("KC", "j")}{r("): P(")}{sub("L", "KC_i")}{r(")≥")}{sub("τ", "mastery")}'
+            f'{r("∀")}{sub("KC", "i")}{r(" ∈ ")}'
+            f'<m:r><m:rPr><m:nor/></m:rPr><m:t>Pre</m:t></m:r>'
+            f'{r("(") + sub("KC", "j") + r("): P(")}'
+            f'<m:sSub><m:e>{r("L")}</m:e><m:sub><m:sSub><m:e>{r("KC")}</m:e><m:sub>{r("i")}</m:sub></m:sSub></m:sub></m:sSub>'
+            f'{r(") ≥ ") + sub("τ", "mastery")}'
             f'</m:oMath>'
         )
     elif num_id == "(6)":
@@ -96,12 +100,19 @@ def build_native_omath(num_id: str):
     elif num_id == "(7)":
         return parse_xml(
             f'<m:oMath xmlns:m="{M}">'
-            f'{sub("P", "adj")}{r("(G)=P(G)+(1-P(G))·(1-")}{sub("C", "trust")}{r(")")}'
+            f'{sub("P", "adj")}{r("(G)=min(0,85, P(G)+(1-P(G))·(1-")}{sub("C", "trust")}{r("))")}'
             f'</m:oMath>'
         )
     return None
 
 # --- TEXT & TABLE HELPERS ---
+
+def enforce_ltr(p):
+    """Явно встановлює w:bidi val="0", запобігаючи довільному включенню RTL під час експорту у PDF."""
+    pPr = p._element.get_or_add_pPr()
+    for b in pPr.findall(qn('w:bidi')):
+        pPr.remove(b)
+    pPr.append(parse_xml(f'<w:bidi {nsdecls("w")} w:val="0"/>'))
 
 def clean_inline_math(text: str) -> str:
     """Очищує параграф від сирого LaTeX і замінює на чисті математичні юнікод-символи"""
@@ -141,17 +152,26 @@ def clean_inline_math(text: str) -> str:
         ('P_adj(G)', 'P_adj(G)'),
         ('w_1, w_2, w_3', 'w_1, w_2, w_3'),
         ('Explainable AI XAI', 'Explainable AI (XAI)'),
+        ('Deep Knowledge Tracing DKT', 'Deep Knowledge Tracing (DKT)'),
         ('26,4 %', '26,4%'),
         ('18,6 %', '18,6%'),
         ('11,5 %', '11,5%'),
         ('38,1 %', '38,1%'),
         ('35,5 %', '35,5%'),
+        ('обгрунтування', 'обґрунтування'),
+        ('необгрунтований', 'необґрунтований'),
+        ('на поточному кроці п', 'на поточному кроці n'),
+        ('т_mastery', 'τ_mastery'),
+        ('0,15 P(T)', '0,15, P(T)'),
+        ('C_trust → 1', 'C_trust → 1'),
+        ('C_trust → 0', 'C_trust → 0'),
+        ('K_err ≥ 3', 'K_err ≥ 3'),
     ]
     for r_from, r_to in text_replacements:
         t = t.replace(r_from, r_to)
 
     # Виправлення кириличних гомогліфів у латинських термінах
-    t = re.sub(r'[\u041D]MM', 'HMM', t)           # Кирилиfront 'Н' в HMM
+    t = re.sub(r'[\u041D]MM', 'HMM', t)           # Кирилична 'Н' в HMM
     t = re.sub(r'[\u0412]ayesian', 'Bayesian', t)   # Кирилична 'В' в Bayesian
     t = re.sub(r'[\u041A\u0421]{2}_j', 'KC_j', t)   # Кириличне 'КС' в KC_j
     t = re.sub(r'[\u041A\u0421]{2}_i', 'KC_i', t)   # Кириличне 'КС' в KC_i
@@ -183,7 +203,7 @@ def render_formula(doc, raw_formula_text):
     - Дворівнева табуляція: центр 80 мм (для 160 мм друкованої області), правий край 160 мм;
     - Нативний Word Equation (m:oMath) з вертикальними дробами та нижніми індексами;
     - Номер формули (1) праворуч у Times New Roman 14 pt (звичайний);
-    - Компактні відступи 6 pt перед і після формули.
+    - Компактні відступи 2.5 pt перед і після формули.
     """
     clean = re.sub(r'^\[Формула:\s*', '', raw_formula_text.strip()).rstrip(']')
     
@@ -197,10 +217,11 @@ def render_formula(doc, raw_formula_text):
         formula_body = clean.strip()
 
     p = doc.add_paragraph()
+    enforce_ltr(p)
     p.alignment = WD_ALIGN_PARAGRAPH.LEFT
     p.paragraph_format.first_line_indent = Mm(0)
-    p.paragraph_format.space_before = Pt(6)
-    p.paragraph_format.space_after = Pt(6)
+    p.paragraph_format.space_before = Pt(2.5)
+    p.paragraph_format.space_after = Pt(2.5)
     p.paragraph_format.line_spacing = 1.0
 
     # Табулятори: 80 мм (центр 160 мм ширини), 160 мм (правий край)
@@ -274,14 +295,15 @@ def render_real_table(doc, raw_table_text):
     for i, h_text in enumerate(headers):
         cell = row_hdr.cells[i]
         cell.width = col_widths[i]
-        set_cell_margins(cell, top=100, bottom=100, left=120, right=120)
+        set_cell_margins(cell, top=60, bottom=60, left=80, right=80)
         set_cell_background(cell, "F2F4F8")
         p = cell.paragraphs[0]
+        enforce_ltr(p)
         p.alignment = WD_ALIGN_PARAGRAPH.CENTER
         p.paragraph_format.line_spacing = 1.0
         p.paragraph_format.first_line_indent = Mm(0)
-        p.paragraph_format.space_before = Pt(2)
-        p.paragraph_format.space_after = Pt(2)
+        p.paragraph_format.space_before = Pt(1.5)
+        p.paragraph_format.space_after = Pt(1.5)
         run = p.add_run(clean_inline_math(h_text))
         run.bold = True
         run.font.name = 'Times New Roman'
@@ -296,26 +318,21 @@ def render_real_table(doc, raw_table_text):
         for c_idx, val in enumerate(r_data):
             cell = row_data.cells[c_idx]
             cell.width = col_widths[c_idx]
-            set_cell_margins(cell, top=80, bottom=80, left=100, right=100)
+            set_cell_margins(cell, top=50, bottom=50, left=80, right=80)
             if r_idx % 2 == 1:
                 set_cell_background(cell, "FAFAFB")
 
             p = cell.paragraphs[0]
+            enforce_ltr(p)
             p.paragraph_format.line_spacing = 1.0
             p.paragraph_format.first_line_indent = Mm(0)
-            p.paragraph_format.space_before = Pt(2)
-            p.paragraph_format.space_after = Pt(2)
+            p.paragraph_format.space_before = Pt(1.5)
+            p.paragraph_format.space_after = Pt(1.5)
             p.alignment = WD_ALIGN_PARAGRAPH.LEFT if c_idx == 0 else WD_ALIGN_PARAGRAPH.CENTER
 
             run = p.add_run(clean_inline_math(val))
             run.font.name = 'Times New Roman'
             run.font.size = Pt(11)
-
-    # Порожній простір після таблиці
-    p_sp = doc.add_paragraph()
-    p_sp.paragraph_format.line_spacing = 1.0
-    p_sp.paragraph_format.space_before = Pt(4)
-    p_sp.paragraph_format.space_after = Pt(4)
 
 def compile_theses_from_spec(spec_data: dict, output_path: str):
     """Створює повний Word-документ тез на основі specification."""
@@ -342,6 +359,7 @@ def compile_theses_from_spec(spec_data: dict, output_path: str):
 
     # 3. Назва доповіді (18 пт, жирний, центр)
     p_title = doc.add_paragraph()
+    enforce_ltr(p_title)
     p_title.alignment = WD_ALIGN_PARAGRAPH.CENTER
     p_title.paragraph_format.space_before = Pt(0)
     p_title.paragraph_format.space_after = Pt(12)
@@ -354,6 +372,7 @@ def compile_theses_from_spec(spec_data: dict, output_path: str):
     # 4. Відомості про автора (праворуч)
     auth = meta['author']
     p_author = doc.add_paragraph()
+    enforce_ltr(p_author)
     p_author.alignment = WD_ALIGN_PARAGRAPH.RIGHT
     p_author.paragraph_format.line_spacing = 1.0
     p_author.paragraph_format.space_before = Pt(0)
@@ -379,6 +398,7 @@ def compile_theses_from_spec(spec_data: dict, output_path: str):
     # 5. Відомості про наукового керівника
     sup = meta['supervisor']
     p_sup = doc.add_paragraph()
+    enforce_ltr(p_sup)
     p_sup.alignment = WD_ALIGN_PARAGRAPH.RIGHT
     p_sup.paragraph_format.line_spacing = 1.0
     p_sup.paragraph_format.space_before = Pt(4)
@@ -402,6 +422,7 @@ def compile_theses_from_spec(spec_data: dict, output_path: str):
 
     # Порожній рядок (1 інтервал) перед текстом
     p_blank = doc.add_paragraph()
+    enforce_ltr(p_blank)
     p_blank.paragraph_format.line_spacing = 1.0
 
     # 6. Основний текст із формулами та таблицями
@@ -425,10 +446,11 @@ def compile_theses_from_spec(spec_data: dict, output_path: str):
             # Якщо це назва таблиці
             if p_text.startswith('Таблиця ') and ('—' in p_text or '-' in p_text):
                 p_tbl_title = doc.add_paragraph()
+                enforce_ltr(p_tbl_title)
                 p_tbl_title.alignment = WD_ALIGN_PARAGRAPH.LEFT
                 p_tbl_title.paragraph_format.first_line_indent = Mm(12.5)
-                p_tbl_title.paragraph_format.space_before = Pt(8)
-                p_tbl_title.paragraph_format.space_after = Pt(4)
+                p_tbl_title.paragraph_format.space_before = Pt(4)
+                p_tbl_title.paragraph_format.space_after = Pt(2)
                 p_tbl_title.paragraph_format.line_spacing = 1.0
                 r_tt = p_tbl_title.add_run(p_text)
                 r_tt.font.name = 'Times New Roman'
@@ -462,17 +484,19 @@ def compile_theses_from_spec(spec_data: dict, output_path: str):
                 ('\\phi' in p_text and '—' in p_text) or
                 ('\\tau' in p_text and '—' in p_text) or
                 ('Pre(' in p_text and '—' in p_text) or
-                p_text.startswith('Отримане значення P(L_n) стає апріорною')
+                p_text.startswith('Отримане значення P(L_n) стає апріорною') or
+                p_text.startswith('При цьому динамічна адаптація')
             )
             
             p = doc.add_paragraph()
+            enforce_ltr(p)
             p.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
             p.paragraph_format.line_spacing = 1.0
             p.paragraph_format.first_line_indent = Mm(12.5)
 
             if is_expl:
                 p.paragraph_format.space_before = Pt(0)
-                p.paragraph_format.space_after = Pt(2)
+                p.paragraph_format.space_after = Pt(1.5)
             else:
                 p.paragraph_format.space_before = Pt(0)
                 p.paragraph_format.space_after = Pt(0)
@@ -490,14 +514,12 @@ def compile_theses_from_spec(spec_data: dict, output_path: str):
             i += 1
 
     # 7. Список використаних джерел (12 пт, без автонумерації)
-    p_blank2 = doc.add_paragraph()
-    p_blank2.paragraph_format.line_spacing = 1.0
-
     p_ref_head = doc.add_paragraph()
+    enforce_ltr(p_ref_head)
     p_ref_head.alignment = WD_ALIGN_PARAGRAPH.CENTER
     p_ref_head.paragraph_format.line_spacing = 1.0
     p_ref_head.paragraph_format.space_before = Pt(8)
-    p_ref_head.paragraph_format.space_after = Pt(4)
+    p_ref_head.paragraph_format.space_after = Pt(3)
     run_rh = p_ref_head.add_run("Список використаних джерел")
     run_rh.font.name = 'Times New Roman'
     run_rh.font.size = Pt(12)
@@ -505,11 +527,12 @@ def compile_theses_from_spec(spec_data: dict, output_path: str):
 
     for idx, ref_text in enumerate(spec_data['references'], start=1):
         p_ref = doc.add_paragraph()
+        enforce_ltr(p_ref)
         p_ref.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         p_ref.paragraph_format.line_spacing = 1.0
         p_ref.paragraph_format.first_line_indent = Mm(12.5)
         p_ref.paragraph_format.space_before = Pt(0)
-        p_ref.paragraph_format.space_after = Pt(2)
+        p_ref.paragraph_format.space_after = Pt(1.5)
         run_ref = p_ref.add_run(f"{idx}. {ref_text}")
         run_ref.font.name = 'Times New Roman'
         run_ref.font.size = Pt(12)
@@ -531,6 +554,7 @@ def compile_application_document(meta: dict, output_path: str):
     conf = meta['conference']
 
     p_app = doc.add_paragraph()
+    enforce_ltr(p_app)
     p_app.alignment = WD_ALIGN_PARAGRAPH.CENTER
     p_app.paragraph_format.space_after = Pt(4)
     r1 = p_app.add_run("З А Я В К А\n")
@@ -539,6 +563,7 @@ def compile_application_document(meta: dict, output_path: str):
     r1.font.bold = True
 
     p_sub = doc.add_paragraph()
+    enforce_ltr(p_sub)
     p_sub.alignment = WD_ALIGN_PARAGRAPH.CENTER
     p_sub.paragraph_format.space_after = Pt(12)
     r2 = p_sub.add_run(
@@ -577,6 +602,7 @@ def compile_application_document(meta: dict, output_path: str):
         set_cell_margins(c_val, top=80, bottom=80, left=100, right=100)
 
         p_l = c_lbl.paragraphs[0]
+        enforce_ltr(p_l)
         p_l.paragraph_format.line_spacing = 1.0
         r_l = p_l.add_run(label)
         r_l.font.name = 'Times New Roman'
@@ -584,6 +610,7 @@ def compile_application_document(meta: dict, output_path: str):
         r_l.font.bold = True
 
         p_v = c_val.paragraphs[0]
+        enforce_ltr(p_v)
         p_v.paragraph_format.line_spacing = 1.0
         r_v = p_v.add_run(str(val))
         r_v.font.name = 'Times New Roman'
