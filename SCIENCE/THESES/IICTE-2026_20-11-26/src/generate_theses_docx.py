@@ -1,27 +1,33 @@
 """
 Генератор тез доповіді та заявки для конференції IICTE-2026
-відповідно до офіційних вимог Полтавського національного педагогічного університету імені В. Г. Короленка:
-- Формат: A4, усі поля рівно 25 мм (2.5 см).
-- Шрифт: Times New Roman, 14 пт, міжрядковий інтервал 1.0 (одинарний).
-- Заголовок: 18 пт, напівжирний, по центру.
-- Дані автора: праворуч, прізвище та ініціали (14 пт bold italic), посада/навчання/email (14 пт italic).
-- Основний текст: 14 пт, вирівнювання за шириною, абзацний відступ 1.25 см.
-- Список використаних джерел: 12 пт, без автоматичної нумерації.
-- Обсяг: 2–4 повні сторінки формату А4.
+відповідно до офіційних вимог Полтавського національного педагогічного університету імені В. Г. Короленка.
+
+Усі вихідні документи автоматично версіонуються та зберігаються у підкаталозі RELEASE/.
 """
 
 import os
+import shutil
 from docx import Document
 from docx.shared import Inches, Pt, Mm, RGBColor
 from docx.enum.text import WD_ALIGN_PARAGRAPH
-from docx.enum.style import WD_STYLE_TYPE
-from docx.oxml import OxmlElement, parse_xml
-from docx.oxml.ns import nsdecls, qn
+from docx.oxml import OxmlElement
+from docx.oxml.ns import qn
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-OUTPUT_DIR = os.path.dirname(SCRIPT_DIR)
-THESES_DOCX_PATH = os.path.join(OUTPUT_DIR, "Тези_IICTE_2026.docx")
-APPLICATION_DOCX_PATH = os.path.join(OUTPUT_DIR, "Заявка_IICTE_2026.docx")
+CONFERENCE_DIR = os.path.dirname(SCRIPT_DIR)
+RELEASE_DIR = os.path.join(CONFERENCE_DIR, "RELEASE")
+os.makedirs(RELEASE_DIR, exist_ok=True)
+
+# Версіонування вихідних документів
+VERSION = "V-1.0"
+AUTHOR_SURNAME = "Стеценко"
+
+THESES_VERSIONED_PATH = os.path.join(RELEASE_DIR, f"{VERSION}-{AUTHOR_SURNAME}_тези.docx")
+APPLICATION_VERSIONED_PATH = os.path.join(RELEASE_DIR, f"{VERSION}-{AUTHOR_SURNAME}_заявка.docx")
+
+# Копії без версійного префікса для зручної відправки до оргкомітету
+THESES_SUBMISSION_PATH = os.path.join(RELEASE_DIR, f"{AUTHOR_SURNAME}_тези.docx")
+APPLICATION_SUBMISSION_PATH = os.path.join(RELEASE_DIR, f"{AUTHOR_SURNAME}_заявка.docx")
 
 def set_cell_margins(cell, top=100, bottom=100, left=150, right=150):
     """Встановлює внутрішні відступи комірки таблиці."""
@@ -162,7 +168,7 @@ def create_theses_document(
         run_ref.font.size = Pt(12)
 
     doc.save(output_path)
-    print(f"✅ Тези успішно згенеровано: {output_path}")
+    print(f"✅ Тези збережено у RELEASE: {output_path}")
 
 def create_application_document(app_data: dict, output_path: str):
     """Створює документ заявки учасника за формою оргкомітету."""
@@ -239,20 +245,20 @@ def create_application_document(app_data: dict, output_path: str):
         r_val.font.size = Pt(12)
 
     doc.save(output_path)
-    print(f"✅ Заявку успішно згенеровано: {output_path}")
+    print(f"✅ Заявку збережено у RELEASE: {output_path}")
 
 if __name__ == '__main__':
-    # Метадані та текст тез
     title = "Застосування ймовірнісних моделей штучного інтелекту для динамічної персоналізації освітніх траєкторій"
-    author_name = "Автор П. І."
+    author_name = "Стеценко Д."
     author_info = [
         "студент 2 курсу магістратури, спеціальність 122 «Комп'ютерні науки»",
         "Полтавський національний педагогічний університет імені В. Г. Короленка, м. Полтава, Україна",
-        "e-mail: author.email@example.com"
+        "e-mail: ebusines2010@gmail.com"
     ]
     supervisor_info = [
-        "Керівник Н. П., кандидат технічних наук, доцент",
-        "доцент кафедри комп'ютерних наук та інформаційних технологій"
+        "Барболіна Т. М., доктор фізико-математичних наук, доцент",
+        "доцент кафедри математичного аналізу та інформатики",
+        "Полтавський національний педагогічний університет імені В. Г. Короленка, м. Полтава, Україна"
     ]
 
     sections = [
@@ -302,6 +308,7 @@ if __name__ == '__main__':
         "Pelánek R. Bayesian knowledge tracing, logistic models, and beyond: an overview of learner modeling techniques. User Modeling and User-Adapted Interaction. 2017. Vol. 27, No. 3–5. P. 313–350. DOI: 10.1007/s11257-017-9193-2."
     ]
 
+    # Генерація версіонованого документа
     create_theses_document(
         title=title,
         author_name=author_name,
@@ -309,22 +316,28 @@ if __name__ == '__main__':
         supervisor_info_lines=supervisor_info,
         sections=sections,
         references=references,
-        output_path=THESES_DOCX_PATH
+        output_path=THESES_VERSIONED_PATH
     )
 
+    # Генерація копії без версії для надсилання
+    shutil.copyfile(THESES_VERSIONED_PATH, THESES_SUBMISSION_PATH)
+    print(f"✅ Копію тез для подання збережено: {THESES_SUBMISSION_PATH}")
+
     app_data = {
-        "surname": "Прізвище",
-        "name": "Ім'я",
-        "patronymic": "По батькові",
+        "surname": AUTHOR_SURNAME,
+        "name": "Дмитро",
+        "patronymic": "",
         "organization": "Полтавський національний педагогічний університет імені В. Г. Короленка",
         "position": "Студент магістратури (2 курс), спеціальність 122 «Комп'ютерні науки»",
         "degree": "немає",
         "academic_rank": "немає",
         "phone": "+38 (0XX) XXX-XX-XX",
-        "email": "author.email@example.com",
+        "email": "ebusines2010@gmail.com",
         "section": "Секція 1. Штучний інтелект в освіті",
         "topic": title,
-        "supervisor": "Керівник Н. П., к.т.н., доцент"
+        "supervisor": "Барболіна Т. М., д.ф.-м.н., доцент"
     }
 
-    create_application_document(app_data, APPLICATION_DOCX_PATH)
+    create_application_document(app_data, APPLICATION_VERSIONED_PATH)
+    shutil.copyfile(APPLICATION_VERSIONED_PATH, APPLICATION_SUBMISSION_PATH)
+    print(f"✅ Копію заявки для подання збережено: {APPLICATION_SUBMISSION_PATH}")
