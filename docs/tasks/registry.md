@@ -518,6 +518,7 @@
 | **SBC-345** | `Fix` | `MS` | embed in-text citations and empirical context for dropout statistics in V-14.2 | 2026-11-06 | `6cd7266` |
 | **SBC-346** | `Story` | `MS` | establish conference thesis workspace, academic guidelines and automated docx generator for IICTE-2026 | 2026-11-18 | `ca13c08` |
 | **SBC-347** | `Story` | `MS` | introduce scientific publishing standard Rule 14, author profile, release isolation and versioning V-1.0 | 2026-11-18 | `e1be228` |
+| **SBC-348** | `Story` | `MS` | implement native Word Equation OMML math, two-level tab stops, DSTU table and quality audit for IICTE-2026 | 2026-11-18 | `pending` |
 
 
 ---

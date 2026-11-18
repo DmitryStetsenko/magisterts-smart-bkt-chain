@@ -1,66 +1,298 @@
 """
-Генератор тез доповіді та заявки для конференції IICTE-2026
-відповідно до офіційних вимог Полтавського національного педагогічного університету імені В. Г. Короленка.
-
-Усі вихідні документи автоматично версіонуються та зберігаються у підкаталозі RELEASE/.
+Професійний генератор тез доповіді та заявки для конференції IICTE-2026
+відповідно до інженерних стандартів магістерського дослідження:
+- Повна підтримка нативних Word Equation (m:oMath / OMML) з вертикальними дробами (m:f) та підрядковими індексами (m:sSub);
+- Дворівнева табуляція для формул: центр 80 мм (WD_TAB_ALIGNMENT.CENTER), правий край 160 мм (WD_TAB_ALIGNMENT.RIGHT);
+- Реальні таблиці за стандартом ДСТУ (Table Grid, заливка шапки, точні ширини колонок у сумі 160 мм);
+- Всі поля сторінки рівно 25 мм з усіх чотирьох сторін;
+- Шрифт Times New Roman: заголовок 18 пт жирний по центру, автор 14 пт bold italic, керівник 14 пт italic, основний текст 14 пт justify, список джерел 12 пт;
+- Повна ізоляція та версіонування у підкаталозі RELEASE/.
 """
 
 import os
+import re
+import json
 import shutil
 from docx import Document
-from docx.shared import Inches, Pt, Mm, RGBColor
-from docx.enum.text import WD_ALIGN_PARAGRAPH
-from docx.oxml import OxmlElement
-from docx.oxml.ns import qn
+from docx.shared import Pt, Mm, RGBColor
+from docx.enum.text import WD_ALIGN_PARAGRAPH, WD_TAB_ALIGNMENT
+from docx.oxml import parse_xml, OxmlElement
+from docx.oxml.ns import qn, nsdecls
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 CONFERENCE_DIR = os.path.dirname(SCRIPT_DIR)
 RELEASE_DIR = os.path.join(CONFERENCE_DIR, "RELEASE")
+SPEC_PATH = os.path.join(CONFERENCE_DIR, "theses_spec.json")
+
 os.makedirs(RELEASE_DIR, exist_ok=True)
 
-# Версіонування вихідних документів
-VERSION = "V-1.0"
+VERSION = "V-1.1"
 AUTHOR_SURNAME = "Стеценко"
 
 THESES_VERSIONED_PATH = os.path.join(RELEASE_DIR, f"{VERSION}-{AUTHOR_SURNAME}_тези.docx")
 APPLICATION_VERSIONED_PATH = os.path.join(RELEASE_DIR, f"{VERSION}-{AUTHOR_SURNAME}_заявка.docx")
-
-# Копії без версійного префікса для зручної відправки до оргкомітету
 THESES_SUBMISSION_PATH = os.path.join(RELEASE_DIR, f"{AUTHOR_SURNAME}_тези.docx")
 APPLICATION_SUBMISSION_PATH = os.path.join(RELEASE_DIR, f"{AUTHOR_SURNAME}_заявка.docx")
 
+M = 'http://schemas.openxmlformats.org/officeDocument/2006/math'
+W = 'http://schemas.openxmlformats.org/wordprocessingml/2006/main'
+
+# --- MATH OMML BUILDERS ---
+
+def r(text):
+    return f'<m:r xmlns:m="{M}"><m:t>{text}</m:t></m:r>'
+
+def sub(base, subscript):
+    return (
+        f'<m:sSub xmlns:m="{M}">'
+        f'<m:e>{r(base)}</m:e>'
+        f'<m:sub>{r(subscript)}</m:sub>'
+        f'</m:sSub>'
+    )
+
+def frac(num_xml, den_xml):
+    return f'<m:f xmlns:m="{M}"><m:num>{num_xml}</m:num><m:den>{den_xml}</m:den></m:f>'
+
+def build_native_omath(num_id: str):
+    """Будує нативний об'єкт m:oMath Word Equation для відповідної формули"""
+    if num_id == "(1)":
+        return parse_xml(
+            f'<m:oMath xmlns:m="{M}">'
+            f'{r("P(")}{sub("L", "n")}{r("|")}{sub("Y", "n")}{r("=1)=")}'
+            f'{frac(r("P(") + sub("L", "n-1") + r(")·(1-P(S))"), r("P(") + sub("L", "n-1") + r(")·(1-P(S))+(1-P(") + sub("L", "n-1") + r("))·P(G)"))}'
+            f'</m:oMath>'
+        )
+    elif num_id == "(2)":
+        return parse_xml(
+            f'<m:oMath xmlns:m="{M}">'
+            f'{r("P(")}{sub("L", "n")}{r("|")}{sub("Y", "n")}{r("=0)=")}'
+            f'{frac(r("P(") + sub("L", "n-1") + r(")·P(S)"), r("P(") + sub("L", "n-1") + r(")·P(S)+(1-P(") + sub("L", "n-1") + r("))·(1-P(G))"))}'
+            f'</m:oMath>'
+        )
+    elif num_id == "(3)":
+        return parse_xml(
+            f'<m:oMath xmlns:m="{M}">'
+            f'{r("P(")}{sub("L", "n+1")}{r(")=P(")}{sub("L", "n")}{r("|")}{sub("Y", "n")}{r(")+(1-P(")}{sub("L", "n")}{r("|")}{sub("Y", "n")}{r("))·P(T)")}'
+            f'</m:oMath>'
+        )
+    elif num_id == "(4)":
+        return parse_xml(
+            f'<m:oMath xmlns:m="{M}">'
+            f'{r("P(")}{sub("L", "n")}{r(")≥")}{sub("τ", "mastery")}{r(",   ")}{sub("τ", "mastery")}{r("=0,85")}'
+            f'</m:oMath>'
+        )
+    elif num_id == "(5)":
+        return parse_xml(
+            f'<m:oMath xmlns:m="{M}">'
+            f'{r("∀")}{sub("KC", "i")}{r("∈Pre(")}{sub("KC", "j")}{r("): P(")}{sub("L", "KC_i")}{r(")≥")}{sub("τ", "mastery")}'
+            f'</m:oMath>'
+        )
+    elif num_id == "(6)":
+        return parse_xml(
+            f'<m:oMath xmlns:m="{M}">'
+            f'{sub("C", "trust")}{r("=")}{sub("w", "1")}{r("·ψ(WPM)+")}{sub("w", "2")}{r("·(1-")}{sub("R", "paste")}{r(")+")}{sub("w", "3")}{r("·φ(Δ")}{sub("t", "pause")}{r(")")}'
+            f'</m:oMath>'
+        )
+    return None
+
+# --- TEXT & TABLE HELPERS ---
+
+def clean_inline_math(text: str) -> str:
+    """Очищує параграф від сирого LaTeX і замінює на чисті математичні юнікод-символи"""
+    t = text
+    t = re.sub(r'\\frac\{((?:[^{}]|\{[^{}]*\})*)\}\{((?:[^{}]|\{[^{}]*\})*)\}', r'[\1] / [\2]', t)
+    t = re.sub(r'\\sqrt\{((?:[^{}]|\{[^{}]*\})*)\}', r'√(\1)', t)
+    
+    replacements = [
+        (r'\rightarrow', '→'), (r'\leftarrow', '←'), (r'\leftrightarrow', '↔'),
+        (r'\approx', '≈'), (r'\neq', '≠'), (r'\ge', '≥'), (r'\le', '≤'),
+        (r'\in', '∈'), (r'\notin', '∉'), (r'\cdot', '·'), (r'\times', '×'),
+        (r'\sum', '∑'), (r'\forall', '∀'), (r'\exists', '∃'),
+        (r'\Delta', 'Δ'), (r'\theta', 'θ'), (r'\tau', 'τ'),
+        (r'\alpha', 'α'), (r'\beta', 'β'), (r'\psi', 'ψ'), (r'\phi', 'φ'),
+        (r'\sigma', 'σ'), (r'\mu', 'μ'), (r'\lambda', 'λ'),
+        (r'\quad', '  '), (r'\text', ''), (r'\\_', '_'),
+    ]
+    for r_from, r_to in replacements:
+        t = t.replace(r_from, r_to)
+        
+    t = re.sub(r'\{([^{}]+)\}', r'\1', t)
+    t = t.replace('\\', '')
+    return t
+
 def set_cell_margins(cell, top=100, bottom=100, left=150, right=150):
-    """Встановлює внутрішні відступи комірки таблиці."""
+    """Встановлює внутрішні поля комірки таблиці."""
     tcPr = cell._element.get_or_add_tcPr()
     tcMar = OxmlElement('w:tcMar')
-    for m, val in [('top', top), ('bottom', bottom), ('left', left), ('right', right)]:
-        node = OxmlElement(f'w:{m}')
+    for m_name, val in [('top', top), ('bottom', bottom), ('left', left), ('right', right)]:
+        node = OxmlElement(f'w:{m_name}')
         node.set(qn('w:w'), str(val))
         node.set(qn('w:type'), 'dxa')
         tcMar.append(node)
     tcPr.append(tcMar)
 
-def create_theses_document(
-    title: str,
-    author_name: str,
-    author_info_lines: list,
-    supervisor_info_lines: list,
-    sections: list,
-    references: list,
-    output_path: str
-):
-    doc = Document()
-    
-    # 1. Налаштування параметрів сторінки (усі поля рівно 25 мм)
-    for section in doc.sections:
-        section.top_margin = Mm(25)
-        section.bottom_margin = Mm(25)
-        section.left_margin = Mm(25)
-        section.right_margin = Mm(25)
-        section.page_width = Mm(210)
-        section.page_height = Mm(297)
+def set_cell_background(cell, hex_color="F2F4F8"):
+    """Встановлює фонову заливку комірки таблиці."""
+    tcPr = cell._element.get_or_add_tcPr()
+    shd = parse_xml(f'<w:shd {nsdecls("w")} w:val="clear" w:color="auto" w:fill="{hex_color}"/>')
+    tcPr.append(shd)
 
-    # 2. Налаштування базового стилю Normal
+def render_formula(doc, raw_formula_text):
+    """
+    Рендерить математичну формулу згідно з академічним стандартом магістерської роботи:
+    - Відступи: 0 см зліва, без абзацного відступу;
+    - Дворівнева табуляція: центр 80 мм (для 160 мм друкованої області), правий край 160 мм;
+    - Нативний Word Equation (m:oMath) з вертикальними дробами та нижніми індексами;
+    - Номер формули (1) праворуч у Times New Roman 14 pt (звичайний);
+    - Компактні відступи 6 pt перед і після формули.
+    """
+    clean = re.sub(r'^\[Формула:\s*', '', raw_formula_text.strip()).rstrip(']')
+    
+    # Витягуємо номер формули з кінця (наприклад, | (1))
+    m_num = re.search(r'\|\s*(\(\d+\))\s*$', clean)
+    if m_num:
+        num_str = m_num.group(1).strip()
+        formula_body = clean[:m_num.start()].strip()
+    else:
+        num_str = ""
+        formula_body = clean.strip()
+
+    p = doc.add_paragraph()
+    p.alignment = WD_ALIGN_PARAGRAPH.LEFT
+    p.paragraph_format.first_line_indent = Mm(0)
+    p.paragraph_format.space_before = Pt(6)
+    p.paragraph_format.space_after = Pt(6)
+    p.paragraph_format.line_spacing = 1.0
+
+    # Табулятори: 80 мм (центр 160 мм ширини), 160 мм (правий край)
+    tab_stops = p.paragraph_format.tab_stops
+    tab_stops.add_tab_stop(Mm(80), WD_TAB_ALIGNMENT.CENTER)
+    tab_stops.add_tab_stop(Mm(160), WD_TAB_ALIGNMENT.RIGHT)
+
+    # Табуляція до центру
+    p.add_run('\t')
+
+    # Будуємо нативний m:oMath
+    omath_elem = build_native_omath(num_str)
+    if omath_elem is not None:
+        p._element.append(omath_elem)
+    else:
+        # Резервний вивід з математичним юнікодом
+        clean_body = clean_inline_math(formula_body)
+        run_f = p.add_run(clean_body)
+        run_f.font.name = 'Times New Roman'
+        run_f.font.size = Pt(13)
+        run_f.italic = True
+
+    # Табуляція до правого краю та номер формули
+    if num_str:
+        p.add_run('\t')
+        run_n = p.add_run(num_str)
+        run_n.font.name = 'Times New Roman'
+        run_n.font.size = Pt(14)
+        run_n.bold = False
+
+def render_real_table(doc, raw_table_text):
+    """
+    Парсить розмітку таблиці та генерує реальну Word-таблицю за стандартом ДСТУ:
+    Ширина колонок строго розподілена до 160 мм.
+    """
+    lines = raw_table_text.strip().split('\n')
+    header_line = lines[0].strip()
+    clean_hdr = re.sub(r'^\[Таблиця:\s*', '', header_line).rstrip(']')
+    headers = [h.strip() for h in clean_hdr.split('|') if h.strip()]
+    
+    data_rows = []
+    for line in lines[1:]:
+        l = line.strip()
+        if not l:
+            continue
+        l = re.sub(r'^[•\-\*]\s*', '', l).rstrip(';')
+        parts = [p.strip() for p in l.split('|')]
+        while len(parts) < len(headers):
+            parts.append('')
+        if len(parts) > len(headers):
+            parts = parts[:len(headers)]
+        data_rows.append(parts)
+
+    table = doc.add_table(rows=0, cols=len(headers))
+    table.style = 'Table Grid'
+    table.autofit = False
+
+    # Розподіл ширин для 4 колонок (разом = 160 мм)
+    if len(headers) == 4:
+        col_widths = [Mm(52), Mm(32), Mm(44), Mm(32)]
+    else:
+        avg_w = 160.0 / len(headers)
+        col_widths = [Mm(avg_w)] * len(headers)
+
+    # 1. Шапка таблиці
+    row_hdr = table.add_row()
+    trPr = row_hdr._element.get_or_add_trPr()
+    trPr.append(parse_xml(f'<w:tblHeader {nsdecls("w")}/>'))
+    trPr.append(parse_xml(f'<w:cantSplit {nsdecls("w")}/>'))
+
+    for i, h_text in enumerate(headers):
+        cell = row_hdr.cells[i]
+        cell.width = col_widths[i]
+        set_cell_margins(cell, top=100, bottom=100, left=120, right=120)
+        set_cell_background(cell, "F2F4F8")
+        p = cell.paragraphs[0]
+        p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        p.paragraph_format.line_spacing = 1.0
+        p.paragraph_format.first_line_indent = Mm(0)
+        p.paragraph_format.space_before = Pt(2)
+        p.paragraph_format.space_after = Pt(2)
+        run = p.add_run(clean_inline_math(h_text))
+        run.bold = True
+        run.font.name = 'Times New Roman'
+        run.font.size = Pt(11)
+
+    # 2. Рядки даних
+    for r_idx, r_data in enumerate(data_rows):
+        row_data = table.add_row()
+        trPr_d = row_data._element.get_or_add_trPr()
+        trPr_d.append(parse_xml(f'<w:cantSplit {nsdecls("w")}/>'))
+
+        for c_idx, val in enumerate(r_data):
+            cell = row_data.cells[c_idx]
+            cell.width = col_widths[c_idx]
+            set_cell_margins(cell, top=80, bottom=80, left=100, right=100)
+            if r_idx % 2 == 1:
+                set_cell_background(cell, "FAFAFB")
+
+            p = cell.paragraphs[0]
+            p.paragraph_format.line_spacing = 1.0
+            p.paragraph_format.first_line_indent = Mm(0)
+            p.paragraph_format.space_before = Pt(2)
+            p.paragraph_format.space_after = Pt(2)
+            p.alignment = WD_ALIGN_PARAGRAPH.LEFT if c_idx == 0 else WD_ALIGN_PARAGRAPH.CENTER
+
+            run = p.add_run(clean_inline_math(val))
+            run.font.name = 'Times New Roman'
+            run.font.size = Pt(11)
+
+    # Порожній простір після таблиці
+    p_sp = doc.add_paragraph()
+    p_sp.paragraph_format.line_spacing = 1.0
+    p_sp.paragraph_format.space_before = Pt(4)
+    p_sp.paragraph_format.space_after = Pt(4)
+
+def compile_theses_from_spec(spec_data: dict, output_path: str):
+    """Створює повний Word-документ тез на основі specification."""
+    doc = Document()
+    meta = spec_data['metadata']
+
+    # 1. Поля сторінки рівно 25 мм
+    for s in doc.sections:
+        s.top_margin = Mm(25)
+        s.bottom_margin = Mm(25)
+        s.left_margin = Mm(25)
+        s.right_margin = Mm(25)
+        s.page_width = Mm(210)
+        s.page_height = Mm(297)
+
+    # 2. Базовий стиль Normal
     normal_style = doc.styles['Normal']
     normal_style.font.name = 'Times New Roman'
     normal_style.font.size = Pt(14)
@@ -69,120 +301,182 @@ def create_theses_document(
     normal_style.paragraph_format.space_before = Pt(0)
     normal_style.paragraph_format.space_after = Pt(0)
 
-    # 3. Назва доповіді (18 пт, напівжирний, по центру)
+    # 3. Назва доповіді (18 пт, жирний, центр)
     p_title = doc.add_paragraph()
     p_title.alignment = WD_ALIGN_PARAGRAPH.CENTER
     p_title.paragraph_format.space_before = Pt(0)
     p_title.paragraph_format.space_after = Pt(12)
     p_title.paragraph_format.line_spacing = 1.0
-    run_title = p_title.add_run(title.upper())
+    run_title = p_title.add_run(meta['title'].upper())
     run_title.font.name = 'Times New Roman'
     run_title.font.size = Pt(18)
     run_title.font.bold = True
 
     # 4. Відомості про автора (праворуч)
+    auth = meta['author']
     p_author = doc.add_paragraph()
     p_author.alignment = WD_ALIGN_PARAGRAPH.RIGHT
     p_author.paragraph_format.line_spacing = 1.0
     p_author.paragraph_format.space_before = Pt(0)
     p_author.paragraph_format.space_after = Pt(2)
     
-    run_an = p_author.add_run(author_name + "\n")
+    run_an = p_author.add_run(auth['initials'] + "\n")
     run_an.font.name = 'Times New Roman'
     run_an.font.size = Pt(14)
     run_an.font.bold = True
     run_an.font.italic = True
 
-    for line in author_info_lines:
-        run_ai = p_author.add_run(line + "\n")
-        run_ai.font.name = 'Times New Roman'
-        run_ai.font.size = Pt(14)
-        run_ai.font.italic = True
+    author_lines = [
+        f"{auth['position']}, спеціальність {auth['specialty']}",
+        f"{auth['university']}, {auth['city']}",
+        f"e-mail: {auth['email']}"
+    ]
+    for l in author_lines:
+        run_al = p_author.add_run(l + "\n")
+        run_al.font.name = 'Times New Roman'
+        run_al.font.size = Pt(14)
+        run_al.font.italic = True
 
-    if supervisor_info_lines:
-        p_sup = doc.add_paragraph()
-        p_sup.alignment = WD_ALIGN_PARAGRAPH.RIGHT
-        p_sup.paragraph_format.line_spacing = 1.0
-        p_sup.paragraph_format.space_before = Pt(4)
-        p_sup.paragraph_format.space_after = Pt(0)
-        run_sup_lbl = p_sup.add_run("Науковий керівник:\n")
-        run_sup_lbl.font.name = 'Times New Roman'
-        run_sup_lbl.font.size = Pt(14)
-        run_sup_lbl.font.bold = True
-        for line in supervisor_info_lines:
-            run_si = p_sup.add_run(line + "\n")
-            run_si.font.name = 'Times New Roman'
-            run_si.font.size = Pt(14)
-            run_si.font.italic = True
+    # 5. Відомості про наукового керівника
+    sup = meta['supervisor']
+    p_sup = doc.add_paragraph()
+    p_sup.alignment = WD_ALIGN_PARAGRAPH.RIGHT
+    p_sup.paragraph_format.line_spacing = 1.0
+    p_sup.paragraph_format.space_before = Pt(4)
+    p_sup.paragraph_format.space_after = Pt(0)
+    
+    run_slbl = p_sup.add_run("Науковий керівник:\n")
+    run_slbl.font.name = 'Times New Roman'
+    run_slbl.font.size = Pt(14)
+    run_slbl.font.bold = True
+
+    supervisor_lines = [
+        f"{sup['initials']}, {sup['degree']}, {sup['academic_rank']}",
+        f"{sup['position']}",
+        f"{sup['university']}, {sup['city']}"
+    ]
+    for l in supervisor_lines:
+        run_sl = p_sup.add_run(l + "\n")
+        run_sl.font.name = 'Times New Roman'
+        run_sl.font.size = Pt(14)
+        run_sl.font.italic = True
 
     # Порожній рядок (1 інтервал) перед текстом
     p_blank = doc.add_paragraph()
     p_blank.paragraph_format.line_spacing = 1.0
-    p_blank.paragraph_format.space_before = Pt(0)
-    p_blank.paragraph_format.space_after = Pt(0)
 
-    # 5. Текст тез (14 пт, вирівнювання за шириною, відступ 1.25 см)
-    for sec_heading, paragraphs in sections:
-        for idx, para_text in enumerate(paragraphs):
+    # 6. Основний текст із формулами та таблицями
+    for sec in spec_data['sections']:
+        paragraphs = sec['paragraphs']
+        heading = sec.get('heading', '')
+        
+        i = 0
+        while i < len(paragraphs):
+            p_text = paragraphs[i].strip()
+            if not p_text:
+                i += 1
+                continue
+
+            # Якщо це формула
+            if p_text.startswith('[Формула:'):
+                render_formula(doc, p_text)
+                i += 1
+                continue
+
+            # Якщо це назва таблиці
+            if p_text.startswith('Таблиця ') and ('—' in p_text or '-' in p_text):
+                p_tbl_title = doc.add_paragraph()
+                p_tbl_title.alignment = WD_ALIGN_PARAGRAPH.LEFT
+                p_tbl_title.paragraph_format.first_line_indent = Mm(12.5)
+                p_tbl_title.paragraph_format.space_before = Pt(8)
+                p_tbl_title.paragraph_format.space_after = Pt(4)
+                p_tbl_title.paragraph_format.line_spacing = 1.0
+                r_tt = p_tbl_title.add_run(p_text)
+                r_tt.font.name = 'Times New Roman'
+                r_tt.font.size = Pt(14)
+                r_tt.bold = False
+
+                # Наступний параграф має бути вмістом таблиці
+                if i + 1 < len(paragraphs) and paragraphs[i+1].startswith('[Таблиця:'):
+                    # Збираємо всі рядки таблиці
+                    tbl_lines = [paragraphs[i+1]]
+                    j = i + 2
+                    while j < len(paragraphs) and (paragraphs[j].startswith('- ') or paragraphs[j].startswith('• ')):
+                        tbl_lines.append(paragraphs[j])
+                        j += 1
+                    render_real_table(doc, '\n'.join(tbl_lines))
+                    i = j
+                    continue
+                i += 1
+                continue
+
+            # Якщо це експлікація змінних (починається з "де:" або перелічує змінні)
+            is_expl = p_text.startswith('де:') or (p_text.startswith('P(') and '—' in p_text) or (p_text.startswith('R_') and '—' in p_text) or (p_text.startswith('w_') and '—' in p_text) or (p_text.startswith('psi(') and '—' in p_text) or (p_text.startswith('phi(') and '—' in p_text)
+            
             p = doc.add_paragraph()
             p.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
             p.paragraph_format.line_spacing = 1.0
             p.paragraph_format.first_line_indent = Mm(12.5)
-            p.paragraph_format.space_before = Pt(0)
-            p.paragraph_format.space_after = Pt(0)
-            
-            # Якщо це перший абзац секції і є заголовок
-            if idx == 0 and sec_heading:
-                run_h = p.add_run(sec_heading + " ")
+
+            if is_expl:
+                p.paragraph_format.space_before = Pt(0)
+                p.paragraph_format.space_after = Pt(2)
+            else:
+                p.paragraph_format.space_before = Pt(0)
+                p.paragraph_format.space_after = Pt(0)
+
+            # Якщо це перший параграф секції і є заголовок
+            if i == 0 and heading:
+                run_h = p.add_run(heading + " ")
                 run_h.font.name = 'Times New Roman'
                 run_h.font.size = Pt(14)
-                run_h.font.bold = True
+                run_h.bold = True
 
-            run_body = p.add_run(para_text)
+            run_body = p.add_run(clean_inline_math(p_text))
             run_body.font.name = 'Times New Roman'
             run_body.font.size = Pt(14)
+            i += 1
 
-    # 6. Список використаних джерел (12 пт, через 1 інтервал, без автонумерації)
+    # 7. Список використаних джерел (12 пт, без автонумерації)
     p_blank2 = doc.add_paragraph()
     p_blank2.paragraph_format.line_spacing = 1.0
 
     p_ref_head = doc.add_paragraph()
     p_ref_head.alignment = WD_ALIGN_PARAGRAPH.CENTER
     p_ref_head.paragraph_format.line_spacing = 1.0
-    p_ref_head.paragraph_format.space_before = Pt(6)
+    p_ref_head.paragraph_format.space_before = Pt(8)
     p_ref_head.paragraph_format.space_after = Pt(4)
     run_rh = p_ref_head.add_run("Список використаних джерел")
     run_rh.font.name = 'Times New Roman'
     run_rh.font.size = Pt(12)
-    run_rh.font.bold = True
+    run_rh.bold = True
 
-    for i, ref in enumerate(references, start=1):
+    for idx, ref_text in enumerate(spec_data['references'], start=1):
         p_ref = doc.add_paragraph()
         p_ref.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
         p_ref.paragraph_format.line_spacing = 1.0
         p_ref.paragraph_format.first_line_indent = Mm(12.5)
         p_ref.paragraph_format.space_before = Pt(0)
         p_ref.paragraph_format.space_after = Pt(2)
-        run_ref = p_ref.add_run(f"{i}. {ref}")
+        run_ref = p_ref.add_run(f"{idx}. {ref_text}")
         run_ref.font.name = 'Times New Roman'
         run_ref.font.size = Pt(12)
 
     doc.save(output_path)
-    print(f"✅ Тези збережено у RELEASE: {output_path}")
+    print(f"✅ Тези успішно скомпільовано: {output_path}")
 
-def create_application_document(app_data: dict, output_path: str):
-    """Створює документ заявки учасника за формою оргкомітету."""
+def compile_application_document(meta: dict, output_path: str):
+    """Створює офіційну заявку учасника за формою оргкомітету."""
     doc = Document()
-    for section in doc.sections:
-        section.top_margin = Mm(25)
-        section.bottom_margin = Mm(25)
-        section.left_margin = Mm(25)
-        section.right_margin = Mm(25)
+    for s in doc.sections:
+        s.top_margin = Mm(25)
+        s.bottom_margin = Mm(25)
+        s.left_margin = Mm(25)
+        s.right_margin = Mm(25)
 
-    normal_style = doc.styles['Normal']
-    normal_style.font.name = 'Times New Roman'
-    normal_style.font.size = Pt(14)
-    normal_style.paragraph_format.line_spacing = 1.0
+    auth = meta['author']
+    sup = meta['supervisor']
+    conf = meta['conference']
 
     p_app = doc.add_paragraph()
     p_app.alignment = WD_ALIGN_PARAGRAPH.CENTER
@@ -196,9 +490,8 @@ def create_application_document(app_data: dict, output_path: str):
     p_sub.alignment = WD_ALIGN_PARAGRAPH.CENTER
     p_sub.paragraph_format.space_after = Pt(12)
     r2 = p_sub.add_run(
-        "на участь у X Всеукраїнській науково-практичній інтернет-конференції\n"
-        "«Новітні інформаційно-комунікаційні технології в освіті» (IICTE-2026)\n"
-        "(26–27 листопада 2026 року, м. Полтава)"
+        f"на участь у {conf['full_name']} ({conf['short_name']})\n"
+        f"({conf['date']}, {conf['city']})"
     )
     r2.font.name = 'Times New Roman'
     r2.font.size = Pt(13)
@@ -209,135 +502,54 @@ def create_application_document(app_data: dict, output_path: str):
     table.autofit = False
 
     fields = [
-        ("Прізвище", app_data.get("surname", "")),
-        ("Ім’я", app_data.get("name", "")),
-        ("По батькові", app_data.get("patronymic", "")),
-        ("Назва організації (закладу освіти)", app_data.get("organization", "")),
-        ("Посада / курс, спеціальність", app_data.get("position", "")),
-        ("Науковий ступінь", app_data.get("degree", "немає")),
-        ("Вчене звання", app_data.get("academic_rank", "немає")),
-        ("Телефон", app_data.get("phone", "")),
-        ("E-mail", app_data.get("email", "")),
-        ("Номер і назва секції", app_data.get("section", "Секція 1. Штучний інтелект в освіті")),
-        ("Назва доповіді", app_data.get("topic", "")),
-        ("Науковий керівник", app_data.get("supervisor", "")),
+        ("Прізвище", auth['surname']),
+        ("Ім’я", auth['name']),
+        ("По батькові", auth.get('patronymic', '')),
+        ("Назва організації (закладу освіти)", auth['university']),
+        ("Посада / курс, спеціальність", f"{auth['position']}, спеціальність {auth['specialty']}"),
+        ("Науковий ступінь", auth.get('degree', 'немає')),
+        ("Вчене звання", auth.get('academic_rank', 'немає')),
+        ("Телефон", auth.get('phone', '')),
+        ("E-mail", auth['email']),
+        ("Номер і назва секції", f"Секція {meta['section_number']}. {meta['section_title']}"),
+        ("Назва доповіді", meta['title']),
+        ("Науковий керівник", f"{sup['full_name']}, {sup['degree']}, {sup['academic_rank']}"),
     ]
 
     for label, val in fields:
         row = table.add_row()
-        cell_lbl, cell_val = row.cells[0], row.cells[1]
-        cell_lbl.width = Mm(65)
-        cell_val.width = Mm(95)
-        set_cell_margins(cell_lbl, top=80, bottom=80, left=100, right=100)
-        set_cell_margins(cell_val, top=80, bottom=80, left=100, right=100)
+        c_lbl, c_val = row.cells[0], row.cells[1]
+        c_lbl.width = Mm(65)
+        c_val.width = Mm(95)
+        set_cell_margins(c_lbl, top=80, bottom=80, left=100, right=100)
+        set_cell_margins(c_val, top=80, bottom=80, left=100, right=100)
 
-        p_lbl = cell_lbl.paragraphs[0]
-        p_lbl.paragraph_format.line_spacing = 1.0
-        r_lbl = p_lbl.add_run(label)
-        r_lbl.font.name = 'Times New Roman'
-        r_lbl.font.size = Pt(12)
-        r_lbl.font.bold = True
+        p_l = c_lbl.paragraphs[0]
+        p_l.paragraph_format.line_spacing = 1.0
+        r_l = p_l.add_run(label)
+        r_l.font.name = 'Times New Roman'
+        r_l.font.size = Pt(12)
+        r_l.font.bold = True
 
-        p_val = cell_val.paragraphs[0]
-        p_val.paragraph_format.line_spacing = 1.0
-        r_val = p_val.add_run(str(val))
-        r_val.font.name = 'Times New Roman'
-        r_val.font.size = Pt(12)
+        p_v = c_val.paragraphs[0]
+        p_v.paragraph_format.line_spacing = 1.0
+        r_v = p_v.add_run(str(val))
+        r_v.font.name = 'Times New Roman'
+        r_v.font.size = Pt(12)
 
     doc.save(output_path)
-    print(f"✅ Заявку збережено у RELEASE: {output_path}")
+    print(f"✅ Заявку успішно скомпільовано: {output_path}")
 
 if __name__ == '__main__':
-    title = "Застосування ймовірнісних моделей штучного інтелекту для динамічної персоналізації освітніх траєкторій"
-    author_name = "Стеценко Д."
-    author_info = [
-        "студент 2 курсу магістратури, спеціальність 122 «Комп'ютерні науки»",
-        "Полтавський національний педагогічний університет імені В. Г. Короленка, м. Полтава, Україна",
-        "e-mail: ebusines2010@gmail.com"
-    ]
-    supervisor_info = [
-        "Барболіна Т. М., доктор фізико-математичних наук, доцент",
-        "доцент кафедри математичного аналізу та інформатики",
-        "Полтавський національний педагогічний університет імені В. Г. Короленка, м. Полтава, Україна"
-    ]
+    with open(SPEC_PATH, 'r', encoding='utf-8') as f:
+        spec = json.load(f)
 
-    sections = [
-        (
-            "Постановка проблеми у загальному вигляді та її зв'язок із важливими науковими чи практичними завданнями.",
-            [
-                "Сучасний етап розвитку цифрової освіти характеризується масштабним поширенням генеративних систем штучного інтелекту (ШІ) та великих мовних моделей (LLM). Поряд із новими можливостями це створює суттєві педагогічні виклики: здобувачі освіти нерідко вдаються до некритичного копіювання згенерованого коду без належного когнітивного осмислення алгоритмічних структур. Традиційні системи керування навчанням (LMS) орієнтовані переважно на статичний розподіл матеріалу та фіксацію підсумкових зрізів (CTT/MCQ), що унеможливлює тонку діагностику когнітивного поступу здобувача в реальному часі. У зв'язку з цим актуалізується завдання розробки методів адаптивного моделювання знань здобувачів та динамічного планування освітніх траєкторій, здатних своєчасно виявляти прогалини, надавати дозований навчальний супровід (scaffolding) та контролювати автентичність навчальної діяльності."
-            ]
-        ),
-        (
-            "Аналіз останніх досліджень і публікацій.",
-            [
-                "Теоретичні засади проєктування комп'ютерно-орієнтованих систем адаптивного навчання та цифровізації освіти досліджено у працях В. Ю. Бикова, О. М. Спіріна, Н. В. Морзе, С. О. Семерікова та ін. Серед методів моделювання знань здобувачів (Student Modeling) в інтелектуальних навчальних системах (ITS) ключове місце посідає модель відстеження знань на основі байєсівського висновку — Bayesian Knowledge Tracing (BKT), запропонована A. T. Corbett та J. R. Anderson [1]. Її модифікації та емпіричні дослідження висвітлено у роботах R. S. Baker [2], Z. A. Pardos [3]. На відміну від глибоких нейромережевих моделей (Deep Knowledge Tracing — DKT), які функціонують як «чорні скриньки» та вимагають масивних навчальних датасетів, класичний апарат BKT є представником пояснюваного штучного інтелекту (Explainable AI — XAI), забезпечуючи повну інтерпретованість кожного кроку діагностики для педагога."
-            ]
-        ),
-        (
-            "Формулювання мети роботи.",
-            [
-                "Метою дослідження є теоретичне обґрунтування та формалізація комплексу методів штучного інтелекту на основі моделі Bayesian Knowledge Tracing, орієнтованого ациклічного графа навичок (Skill DAG) та поведінкової телеметрії взаємодії, спрямованих на динамічну персоналізацію індивідуальних освітніх маршрутів та забезпечення академічної доброчесності."
-            ]
-        ),
-        (
-            "Виклад основного матеріалу дослідження.",
-            [
-                "1. Ймовірнісне моделювання когнітивного стану здобувача на основі BKT. У межах парадигми ITS кожна навчальна мікро-навичка або концепт (Knowledge Component, KC) моделюється як прихований бінарний стан: навичка або сформована (опанована, L=1), або не сформована (L=0). Здобувач взаємодіє з навчальним середовищем, виконуючи дискретні практичні кроки n = 1, 2, ..., N. Модель BKT базується на апараті динамічних прихованих марковських моделей (HMM) і визначається чотирма канонічними параметрами: P(L0) — апріорна ймовірність володіння навичкою до початку навчання; P(T) — ймовірність переходу навички з неопанованого стану в опанований після виконання навчальної дії (Transition); P(G) — ймовірність випадкового вгадування або збігу за відсутності сформованої навички (Guess); P(S) — ймовірність припущення механічної помилки чи описки за умови фактичного володіння навичкою (Slip).",
-                "При отриманні спостережуваного результату виконання завдання здобувачем на кроці n здійснюється байєсівський перерахунок апостеріорної ймовірності володіння навичкою. При правильній відповіді:\nP(L_n | Action_n = 1) = [P(L_{n-1}) * (1 - P(S))] / [P(L_{n-1}) * (1 - P(S)) + (1 - P(L_{n-1})) * P(G)].\nПри помилковій відповіді:\nP(L_n | Action_n = 0) = [P(L_{n-1}) * P(S)] / [P(L_{n-1}) * P(S)) + (1 - P(L_{n-1})) * (1 - P(G))].\nНа наступному кроці ймовірність володіння оновлюється з урахуванням приросту знань: P(L_{n+1}) = P(L_n | Action_n) + (1 - P(L_n | Action_n)) * P(T). Навичка вважається засвоєною здобувачем, коли поточна оцінка досягає порогу майстерності: P(L_n) >= 0.85.",
-                "2. Алгоритм динамічного секвенування завдань у графі пререквізитів (Skill DAG). Предметна область структурується у вигляді орієнтованого ациклічного графа знань G = (V, E), де вершини V представляють змістові одиниці курсу, а орієнтовані дуги E задають відношення суворого пререквізиту. Алгоритм динамічного планування освітньої траєкторії функціонує за евристичним принципом зони найближчого розвитку (ZPD): формується фронт доступних навичок, для яких засвоєні всі батьківські пререквізити; обирається вершина з максимальною потребою у закріпленні; генерується завдання каліброваної складності. При виявленні серії повторних помилок алгоритм здійснює адаптивний тактичний відступ (DAG Backtracking), направляючи учня до пререквізитів або розвантажувальних вправ (remediation), що запобігає накопиченню когнітивної втоми.",
-                "3. Інтелектуальний діагностичний контур та поведінкова телеметрія. Для мінімізації ризиків некритичного копіювання коду із зовнішніх LLM-сервісів система збирає телеметричні метрики: швидкість набору коду (WPM), розподіл когнітивних пауз осмислення, обсяг і частоту вставок із буфера обміну. У разі фіксації нетипових стрибків додавання тексту без передуючого набору вага підтвердження навички знижується (P(G) тимчасово збільшується), а система ініціює інтерактивні Сократівські підказки замість надання готового коду, активізуючи самостійний евристичний пошук здобувача.",
-                "4. Результати моделювання та обговорення. Імітаційне моделювання навчального процесу показало, що поєднання BKT та Skill DAG забезпечує скорочення надлишкових тренувальних завдань на 26,4 % порівняно з лінійною навчальною траєкторією, зменшення невиявлених когнітивних оман на 38,1 % завдяки своєчасному тактичному відступу та підтримку стабільно високої залученості здобувачів."
-            ]
-        ),
-        (
-            "Висновки.",
-            [
-                "Запропоновано комплекс моделей штучного інтелекту для динамічної персоналізації освітніх траєкторій, що поєднує ймовірнісний висновок Bayesian Knowledge Tracing для оцінки когнітивного стану здобувача, евристичний алгоритм навігації в просторі станів орієнтованого графа пререквізитів та телеметричний моніторинг поведінки здобувача для захисту академічної доброчесності. Результати дослідження інтегровано як аналітичне ядро експериментальної навчальної онлайн-платформи Smart-BKT-Chain. Подальші дослідження будуть спрямовані на масштабування моделі та проведення розгорнутого педагогічного експерименту в закладах загальної середньої та вищої освіти."
-            ]
-        )
-    ]
+    # 1. Компіляція версіонованих документів
+    compile_theses_from_spec(spec, THESES_VERSIONED_PATH)
+    compile_application_document(spec['metadata'], APPLICATION_VERSIONED_PATH)
 
-    references = [
-        "Corbett A. T., Anderson J. R. Knowledge tracing: Modeling the acquisition of procedural knowledge. User Modeling and User-Adapted Interaction. 1994. Vol. 4, No. 4. P. 253–278. DOI: 10.1007/BF01099821.",
-        "Baker R. S., Corbett A. T., Aleven V. More accurate student modeling through contextual estimation of slip and guess probabilities. Proceedings of the 9th International Conference on Intelligent Tutoring Systems (ITS 2008). Berlin : Springer, 2008. P. 406–415. DOI: 10.1007/978-3-540-69132-7_44.",
-        "Pardos Z. A., Heffernan N. T. Modeling individualization in a bayesian networks implementation of knowledge tracing. User Modeling, Adaptation, and Personalization (UMAP 2010). Berlin : Springer, 2010. P. 255–266. DOI: 10.1007/978-3-642-13835-5_24.",
-        "Биков В. Ю. Моделі організаційних систем відкритої освіти : монографія. Київ : Атіка, 2009. 684 с.",
-        "Морзе Н. В., Буйницька О. П., Варченко-Троценко Л. О. Створення сучасного цифрового освітнього середовища університету. Інформаційні технології і засоби навчання. 2018. Т. 67, № 5. С. 233–245. DOI: 10.33407/itlt.v67i5.2346.",
-        "Семеріков С. О., Теплицький І. О., Шокалюк С. В. Комп'ютерне моделювання як засіб навчання фундаментальних дисциплін у вищій школі. Науковий часопис НПУ імені М. П. Драгоманова. Серія 2. Комп'ютерно-орієнтовані системи навчання. 2008. № 6 (13). С. 13–21.",
-        "Pelánek R. Bayesian knowledge tracing, logistic models, and beyond: an overview of learner modeling techniques. User Modeling and User-Adapted Interaction. 2017. Vol. 27, No. 3–5. P. 313–350. DOI: 10.1007/s11257-017-9193-2."
-    ]
-
-    # Генерація версіонованого документа
-    create_theses_document(
-        title=title,
-        author_name=author_name,
-        author_info_lines=author_info,
-        supervisor_info_lines=supervisor_info,
-        sections=sections,
-        references=references,
-        output_path=THESES_VERSIONED_PATH
-    )
-
-    # Генерація копії без версії для надсилання
+    # 2. Створення робочих дублікатів для подання
     shutil.copyfile(THESES_VERSIONED_PATH, THESES_SUBMISSION_PATH)
-    print(f"✅ Копію тез для подання збережено: {THESES_SUBMISSION_PATH}")
-
-    app_data = {
-        "surname": AUTHOR_SURNAME,
-        "name": "Дмитро",
-        "patronymic": "",
-        "organization": "Полтавський національний педагогічний університет імені В. Г. Короленка",
-        "position": "Студент магістратури (2 курс), спеціальність 122 «Комп'ютерні науки»",
-        "degree": "немає",
-        "academic_rank": "немає",
-        "phone": "+38 (0XX) XXX-XX-XX",
-        "email": "ebusines2010@gmail.com",
-        "section": "Секція 1. Штучний інтелект в освіті",
-        "topic": title,
-        "supervisor": "Барболіна Т. М., д.ф.-м.н., доцент"
-    }
-
-    create_application_document(app_data, APPLICATION_VERSIONED_PATH)
     shutil.copyfile(APPLICATION_VERSIONED_PATH, APPLICATION_SUBMISSION_PATH)
-    print(f"✅ Копію заявки для подання збережено: {APPLICATION_SUBMISSION_PATH}")
+
+    print(f"🎉 Реліз {VERSION} готовий у папці: {RELEASE_DIR}")
