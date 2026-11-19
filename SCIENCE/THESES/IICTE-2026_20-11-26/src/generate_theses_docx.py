@@ -26,7 +26,7 @@ SPEC_PATH = os.path.join(CONFERENCE_DIR, "theses_spec.json")
 
 os.makedirs(RELEASE_DIR, exist_ok=True)
 
-VERSION = "V-2.2"
+VERSION = "V-3.0"
 AUTHOR_SURNAME = "Стеценко"
 
 THESES_VERSIONED_PATH = os.path.join(RELEASE_DIR, f"{VERSION}-{AUTHOR_SURNAME}_тези.docx")
@@ -392,7 +392,7 @@ def compile_theses_from_spec(spec_data: dict, output_path: str):
     run_an.font.italic = True
 
     author_lines = [
-        f"{auth['position']}, спеціальність {auth['specialty']}",
+        f"{auth['position']}",
         f"{auth['university']}, {auth['city']}",
         f"e-mail: {auth['email']}"
     ]
@@ -402,30 +402,8 @@ def compile_theses_from_spec(spec_data: dict, output_path: str):
         run_al.font.size = Pt(14)
         run_al.font.italic = True
 
-    # 5. Відомості про наукового керівника
-    sup = meta['supervisor']
-    p_sup = doc.add_paragraph()
-    enforce_ltr(p_sup)
-    p_sup.alignment = WD_ALIGN_PARAGRAPH.RIGHT
-    p_sup.paragraph_format.line_spacing = 1.0
-    p_sup.paragraph_format.space_before = Pt(4)
-    p_sup.paragraph_format.space_after = Pt(0)
-    
-    run_slbl = p_sup.add_run("Науковий керівник:\n")
-    run_slbl.font.name = 'Times New Roman'
-    run_slbl.font.size = Pt(14)
-    run_slbl.font.bold = True
-
-    supervisor_lines = [
-        f"{sup['initials']}, {sup['degree']}, {sup['academic_rank']}",
-        f"{sup['position']}",
-        f"{sup['university']}, {sup['city']}"
-    ]
-    for l in supervisor_lines:
-        run_sl = p_sup.add_run(l + "\n")
-        run_sl.font.name = 'Times New Roman'
-        run_sl.font.size = Pt(14)
-        run_sl.font.italic = True
+    # 5. Відомості про наукового керівника: за вимогою оргкомітету та наукового керівника
+    # не включаються у шапку тез (зазначаються лише в офіційній заявці учасника)
 
     # Порожній рядок перед текстом
     p_blank = doc.add_paragraph()
@@ -593,7 +571,7 @@ def compile_application_document(meta: dict, output_path: str):
         ("Ім’я", auth['name']),
         ("По батькові", auth.get('patronymic', '')),
         ("Назва організації (закладу освіти)", auth['university']),
-        ("Посада / курс, спеціальність", f"{auth['position']}, спеціальність {auth['specialty']}"),
+        ("Посада / курс, спеціальність", auth['position']),
         ("Науковий ступінь", auth.get('degree', 'немає')),
         ("Вчене звання", auth.get('academic_rank', 'немає')),
         ("Телефон", auth.get('phone', '')),

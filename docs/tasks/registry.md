@@ -16,8 +16,8 @@
 | **`SBC-EP-TC`** | Teacher Portal & Analytics CRM | 33 |
 | **`SBC-EP-AD`** | Admin Portal & Knowledge DAG Builder | 33 |
 | **`SBC-EP-LD`** | Landing Web Page | 9 |
-| **`SBC-EP-MS`** | Master's Thesis Engineering & Academic Text Generation | 24 |
-| **ВСЬОГО** | - | **309** |
+| **`SBC-EP-MS`** | Master's Thesis Engineering & Academic Text Generation | 25 |
+| **ВСЬОГО** | - | **310** |
 
 ---
 
@@ -524,6 +524,7 @@
 | **SBC-351** | `Story` | `MS` | resolve BiDi math rendering, eliminate formula 2 singularity, fix typography and release V-2.1 | 2026-11-18 | `eea5a80` |
 | **SBC-428** | `Docs` | `MS` | document comparative analysis of conference theses vs master dissertation and bibliography verification in science workspace | 2026-11-18 | `f9bf36a` |
 | **SBC-429** | `Fix` | `MS` | resolve formula 7 review points, fix table formatting, eliminate homoglyphs and release V-2.2 | 2026-11-18 | `d5de25d` |
+| **SBC-430** | `Story` | `MS` | differentiate baseline BKT from author proposals, update college affiliation and release V-3.0 | 2026-11-19 | pending |
 
 
 ---
