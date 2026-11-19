@@ -26,7 +26,7 @@ SPEC_PATH = os.path.join(CONFERENCE_DIR, "theses_spec.json")
 
 os.makedirs(RELEASE_DIR, exist_ok=True)
 
-VERSION = "V-3.0"
+VERSION = "V-3.1"
 AUTHOR_SURNAME = "Стеценко"
 
 THESES_VERSIONED_PATH = os.path.join(RELEASE_DIR, f"{VERSION}-{AUTHOR_SURNAME}_тези.docx")
