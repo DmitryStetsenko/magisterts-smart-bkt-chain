@@ -154,6 +154,11 @@
               "type": "text",
               "raw_text": "**Верифікація:** Успішна збірка `npm run build:study` та проходження нового регресійного E2E-тесту [`e2e/study-bkt-gating-sync.spec.ts`](file:///e2e/study-bkt-gating-sync.spec.ts) (`1 passed`).",
               "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Додатковий UI-фікс у `apps/student`:** У [`StudentPortalApp.tsx`](file:///apps/student/src/components/StudentPortalApp.tsx) вимкнено нативний `title` (`undefined` при `!isTheoryUnlocked`, збережено `aria-label`) на заблокованій кнопці експрес-теорії `Теорія 2+`, щоб усунути накладання системного чорного тултіпа на кастомний popover.",
+              "subitems": []
             }
           ]
         },

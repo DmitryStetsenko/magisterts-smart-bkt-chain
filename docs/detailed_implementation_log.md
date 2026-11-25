@@ -37,6 +37,7 @@
   - Додано `useEffect` синхронізації з `GET /api/v1/courses/${activeCourseSlug}` та `GET /api/v1/bkt/state/${currentUserId}` із розрахунком середнього $P(L)$ по навичках кожного модуля та суворою послідовною перевіркою `chainUnlocked && prevMastery >= prevThreshold`.
   - Fallback у рендері змінено на `unlockedModules[mod.moduleSlug] ?? (modIdx === 0)`.
 - **Верифікація:** Успішна збірка `npm run build:study` та проходження нового регресійного E2E-тесту [`e2e/study-bkt-gating-sync.spec.ts`](file:///e2e/study-bkt-gating-sync.spec.ts) (`1 passed`).
+- **Додатковий UI-фікс у `apps/student`:** У [`StudentPortalApp.tsx`](file:///apps/student/src/components/StudentPortalApp.tsx) вимкнено нативний `title` (`undefined` при `!isTheoryUnlocked`, збережено `aria-label`) на заблокованій кнопці експрес-теорії `Теорія 2+`, щоб усунути накладання системного чорного тултіпа на кастомний popover.
 
 ### 0.1.7.109 Трек живої демонстрації та синхронізація плану виступу для конференції IICTE-2026 (`SBC-432`, `EP-MS`)
 - **Синхронізація `SPEECH_PLAN.md` із поданими тезами (`V-4.0`):**

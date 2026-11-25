@@ -16,7 +16,7 @@
           "items": [
             {
               "type": "text",
-              "raw_text": "**Усунення хардкоду BKT (`92%`) та неконсистентного гейтингу модулів у `apps/study` + регресійний E2E-тест (`SBC-437`, `EP-ST`):**",
+              "raw_text": "**Усунення хардкоду BKT (`92%`) та неконсистентного гейтингу модулів у `apps/study` + усунення дублювання нативного `title` у `apps/student` (`SBC-437`, `EP-ST`):**",
               "subitems": []
             },
             {
@@ -32,6 +32,11 @@
             {
               "type": "text",
               "raw_text": "Додано регресійний Playwright E2E-тест [`e2e/study-bkt-gating-sync.spec.ts`](file:///e2e/study-bkt-gating-sync.spec.ts), який перевіряє інваріант нульового стану (`0%` на Модулі 1, відсутність фейкових `92%`) та монотонність блокування модулів; `npm run build:study` і E2E-тест (`1/1 passed`) пройшли успішно.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "У [`apps/student/src/components/StudentPortalApp.tsx`](file:///apps/student/src/components/StudentPortalApp.tsx) прибрано нативний атрибут `title` на заблокованій кнопці «Теорія 2+» (замінено на `aria-label`), щоб не дублювався чорний системний тултіп поверх кастомного popover `jit-theory-locked-tooltip`.",
               "subitems": []
             },
             {
