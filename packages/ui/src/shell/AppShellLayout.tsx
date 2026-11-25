@@ -11,6 +11,7 @@ import {
   X
 } from 'lucide-react';
 import { AppName, getAppBaseUrl } from '@sbc/routes';
+import { ThemeProvider } from '../theme/ThemeContext';
 
 export interface NavTabItem {
   id: string;
@@ -119,192 +120,194 @@ export function AppShellLayout({
   ];
 
   return (
-    <div className={`h-screen w-screen bg-slate-950 text-slate-100 flex flex-col font-sans overflow-hidden relative ${className}`}>
-      
-      {/* 📌 1. STICKY TOP NAVIGATION BAR (Minimalist Borderless Header h-[56px]) */}
-      {!header.hideHeader && (
-        <header className="h-[56px] w-full bg-slate-900 border-b border-slate-800/80 px-4 flex items-center justify-between shrink-0 z-30">
-          <div className="flex items-center gap-2.5 shrink-0">
-            <div className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 ${header.logoColor || 'bg-blue-500/15 text-blue-400'}`}>
-              <HeaderLogo className="w-4 h-4" />
+    <ThemeProvider>
+      <div className={`h-screen w-screen bg-[var(--sbc-bg-root,#121215)] text-[var(--sbc-text-primary,#f4f4f5)] flex flex-col font-sans overflow-hidden relative ${className}`}>
+        
+        {/* 📌 1. STICKY TOP NAVIGATION BAR (Minimalist Borderless Header h-[56px]) */}
+        {!header.hideHeader && (
+          <header className="h-[56px] w-full bg-[var(--sbc-bg-surface,#18181b)] border-b border-[var(--sbc-border-subtle,#27272a)] px-4 flex items-center justify-between shrink-0 z-30 transition-colors">
+            <div className="flex items-center gap-2.5 shrink-0">
+              <div className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 ${header.logoColor || 'bg-blue-500/15 text-blue-400'}`}>
+                <HeaderLogo className="w-4 h-4" />
+              </div>
+
+              <div className="flex flex-col justify-center">
+                <div className="flex items-center gap-2">
+                  <h1 className="text-xs sm:text-[13px] font-bold text-[var(--sbc-text-primary,#f4f4f5)] flex items-center gap-1.5 leading-none">
+                    <span>{header.appName}</span>
+                    <span className="text-[10px] font-mono font-normal text-[var(--sbc-text-tertiary,#71717a)]">
+                      {header.badgeText}
+                    </span>
+                  </h1>
+
+                  {header.courseBadge && (
+                    <>
+                      <div className="h-3 w-[1px] bg-[var(--sbc-border-subtle,#27272a)] ml-1 hidden sm:block" />
+                      <div className="hidden sm:flex items-center pl-1 leading-none">
+                        {header.courseBadge}
+                      </div>
+                    </>
+                  )}
+                </div>
+
+                {header.breadcrumbs && (
+                  <div className="flex items-center mt-1.5">
+                    {header.breadcrumbs}
+                  </div>
+                )}
+              </div>
             </div>
 
-            <div className="flex flex-col justify-center">
-              <div className="flex items-center gap-2">
-                <h1 className="text-xs sm:text-[13px] font-bold text-white flex items-center gap-1.5 leading-none">
-                  <span>{header.appName}</span>
-                  <span className="text-[10px] font-mono font-normal text-slate-500">
-                    {header.badgeText}
-                  </span>
-                </h1>
+            {header.centerSlot && (
+              <div className="hidden md:flex items-center gap-2">
+                {header.centerSlot}
+              </div>
+            )}
 
-                {header.courseBadge && (
+            {header.rightSlot && (
+              <div className="flex items-center gap-2.5">
+                {header.rightSlot}
+              </div>
+            )}
+          </header>
+        )}
+
+        {/* 🚀 2. ГОЛОВНИЙ РОБОЧИЙ ПРОСТІР (Opera Rail + Side Drawer + Main Canvas) */}
+        <div className="flex-1 flex overflow-hidden relative">
+
+          {/* 📑 2.1 ВЕРТИКАЛЬНА РЕЙКА НАВІГАЦІЇ (Minimalist Borderless Icon Rail w-12) */}
+          {!navigationRail.hideRail && (
+            <nav className="w-12 bg-[var(--sbc-bg-surface,#18181b)] border-r border-[var(--sbc-border-subtle,#27272a)] flex flex-col items-center py-2.5 justify-between shrink-0 z-20 select-none transition-colors">
+              {/* Верхній блок: Таби поточного застосунку */}
+              <div className="flex flex-col items-center gap-1.5">
+                {navigationRail.tabs.map((tab) => {
+                  const TabIcon = tab.icon;
+                  const isActive = navigationRail.activeTab === tab.id;
+                  const isDrawerOpen = navigationRail.isDrawerOpen;
+
+                  return (
+                    <button
+                      key={tab.id}
+                      onClick={() => navigationRail.onTabClick(tab.id)}
+                      className={`w-9 h-9 rounded-lg flex items-center justify-center transition-colors cursor-pointer relative ${
+                        isActive
+                          ? 'bg-[var(--sbc-bg-subtle,#222226)] text-[var(--sbc-text-primary,#f4f4f5)]'
+                          : 'text-[var(--sbc-text-muted,#a1a1aa)] hover:bg-[var(--sbc-bg-subtle,#222226)] hover:text-[var(--sbc-text-primary,#f4f4f5)]'
+                      }`}
+                      title={tab.title}
+                    >
+                      <TabIcon className="w-[18px] h-[18px]" />
+                      {tab.badge !== undefined && tab.badge !== 0 && (
+                        <span className="absolute -top-0.5 -right-0.5 px-1 py-0.1 rounded-full text-[8px] font-bold bg-amber-500 text-zinc-950 font-mono">
+                          {tab.badge}
+                        </span>
+                      )}
+                      {isActive && (
+                        <span
+                          className={`absolute -left-1.5 w-0.5 rounded-r-full transition-all ${
+                            isDrawerOpen ? 'h-5 bg-purple-400' : 'h-2.5 bg-purple-400/60'
+                          }`}
+                        />
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Нижній блок: Міжпортальні переходи монорепозиторію + Налаштування */}
+              <div className="flex flex-col items-center gap-1 mt-auto">
+                <div className="w-6 h-[1px] bg-[var(--sbc-border-subtle,#27272a)] my-1"></div>
+
+                {ecosystemPortals
+                  .filter((p) => p.app !== currentApp)
+                  .map((portal) => {
+                    const PortalIcon = portal.icon;
+                    const portalUrl = getAppBaseUrl(portal.app);
+
+                    return (
+                      <a
+                        key={portal.app}
+                        href={portalUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className={`w-8 h-8 rounded-lg flex items-center justify-center text-[var(--sbc-text-muted,#a1a1aa)] transition-colors cursor-pointer hover:bg-[var(--sbc-bg-subtle,#222226)] hover:text-[var(--sbc-text-primary,#f4f4f5)]`}
+                        title={portal.title}
+                      >
+                        <PortalIcon className="w-4 h-4" />
+                      </a>
+                    );
+                  })}
+
+                {navigationRail.onSettingsClick && (
                   <>
-                    <div className="h-3 w-[1px] bg-slate-800 ml-1 hidden sm:block" />
-                    <div className="hidden sm:flex items-center pl-1 leading-none">
-                      {header.courseBadge}
-                    </div>
+                    <div className="w-6 h-[1px] bg-[var(--sbc-border-subtle,#27272a)] my-1"></div>
+                    <button
+                      onClick={navigationRail.onSettingsClick}
+                      className={`w-9 h-9 rounded-lg flex items-center justify-center transition-colors cursor-pointer relative ${
+                        navigationRail.isSettingsActive
+                          ? 'bg-[var(--sbc-bg-subtle,#222226)] text-amber-400'
+                          : 'text-[var(--sbc-text-muted,#a1a1aa)] hover:bg-[var(--sbc-bg-subtle,#222226)] hover:text-[var(--sbc-text-primary,#f4f4f5)]'
+                      }`}
+                      title="Налаштування"
+                    >
+                      <Settings className="w-[18px] h-[18px]" />
+                      {navigationRail.isSettingsActive && (
+                        <span className="absolute -left-1.5 w-0.5 h-5 bg-amber-400 rounded-r-full" />
+                      )}
+                    </button>
                   </>
                 )}
               </div>
-
-              {header.breadcrumbs && (
-                <div className="flex items-center mt-1.5">
-                  {header.breadcrumbs}
-                </div>
-              )}
-            </div>
-          </div>
-
-          {header.centerSlot && (
-            <div className="hidden md:flex items-center gap-2">
-              {header.centerSlot}
-            </div>
+            </nav>
           )}
 
-          {header.rightSlot && (
-            <div className="flex items-center gap-2.5">
-              {header.rightSlot}
-            </div>
-          )}
-        </header>
-      )}
-
-      {/* 🚀 2. ГОЛОВНИЙ РОБОЧИЙ ПРОСТІР (Opera Rail + Side Drawer + Main Canvas) */}
-      <div className="flex-1 flex overflow-hidden relative">
-
-        {/* 📑 2.1 ВЕРТИКАЛЬНА РЕЙКА НАВІГАЦІЇ (Minimalist Borderless Icon Rail w-12) */}
-        {!navigationRail.hideRail && (
-          <nav className="w-12 bg-slate-900 border-r border-slate-800/80 flex flex-col items-center py-2.5 justify-between shrink-0 z-20 select-none">
-            {/* Верхній блок: Таби поточного застосунку */}
-            <div className="flex flex-col items-center gap-1.5">
-              {navigationRail.tabs.map((tab) => {
-                const TabIcon = tab.icon;
-                const isActive = navigationRail.activeTab === tab.id;
-                const isDrawerOpen = navigationRail.isDrawerOpen;
-
-                return (
-                  <button
-                    key={tab.id}
-                    onClick={() => navigationRail.onTabClick(tab.id)}
-                    className={`w-9 h-9 rounded-lg flex items-center justify-center transition-colors cursor-pointer relative ${
-                      isActive
-                        ? 'bg-slate-800/90 text-white'
-                        : 'text-slate-500 hover:bg-slate-800/50 hover:text-slate-200'
-                    }`}
-                    title={tab.title}
-                  >
-                    <TabIcon className="w-[18px] h-[18px]" />
-                    {tab.badge !== undefined && tab.badge !== 0 && (
-                      <span className="absolute -top-0.5 -right-0.5 px-1 py-0.1 rounded-full text-[8px] font-bold bg-amber-500 text-slate-950 font-mono">
-                        {tab.badge}
-                      </span>
-                    )}
-                    {isActive && (
-                      <span
-                        className={`absolute -left-1.5 w-0.5 rounded-r-full transition-all ${
-                          isDrawerOpen ? 'h-5 bg-purple-400' : 'h-2.5 bg-purple-400/60'
-                        }`}
-                      />
-                    )}
-                  </button>
-                );
-              })}
-            </div>
-
-            {/* Нижній блок: Міжпортальні переходи монорепозиторію + Налаштування */}
-            <div className="flex flex-col items-center gap-1 mt-auto">
-              <div className="w-6 h-[1px] bg-slate-800/80 my-1"></div>
-
-              {ecosystemPortals
-                .filter((p) => p.app !== currentApp)
-                .map((portal) => {
-                  const PortalIcon = portal.icon;
-                  const portalUrl = getAppBaseUrl(portal.app);
-
-                  return (
-                    <a
-                      key={portal.app}
-                      href={portalUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className={`w-8 h-8 rounded-lg flex items-center justify-center text-slate-500 transition-colors cursor-pointer ${portal.hoverColor}`}
-                      title={portal.title}
+          {/* 📂 2.2 ВИСУВНИЙ САЙДБАР (Clean Side Drawer Shell) */}
+          {drawer && drawer.isOpen && (
+            <aside className={`${drawer.widthClass || 'w-72 sm:w-80'} bg-[var(--sbc-bg-surface,#18181b)] border-r border-[var(--sbc-border-subtle,#27272a)] flex flex-col shrink-0 animate-fadeIn z-10 overflow-hidden transition-colors`}>
+              {/* Шапка сайдбара */}
+              <div className="px-3.5 py-2.5 border-b border-[var(--sbc-border-subtle,#27272a)] flex items-center justify-between shrink-0">
+                <h2 className="text-[11px] font-semibold text-[var(--sbc-text-primary,#f4f4f5)] uppercase tracking-wider flex items-center gap-2">
+                  {drawer.icon && <drawer.icon className={`w-3.5 h-3.5 ${drawer.iconColor || 'text-purple-400'}`} />}
+                  <span>{drawer.title}</span>
+                </h2>
+                <div className="flex items-center gap-1.5">
+                  {drawer.headerBadge && (
+                    <span className="px-1.5 py-0.5 rounded text-[9px] font-mono text-[var(--sbc-text-muted,#a1a1aa)] bg-[var(--sbc-bg-subtle,#222226)]">
+                      {drawer.headerBadge}
+                    </span>
+                  )}
+                  {drawer.onClose && (
+                    <button
+                      onClick={drawer.onClose}
+                      className="p-1 text-[var(--sbc-text-muted,#a1a1aa)] hover:text-[var(--sbc-text-primary,#f4f4f5)] hover:bg-[var(--sbc-bg-subtle,#222226)] rounded transition-colors cursor-pointer"
+                      title="Згорнути бічну панель"
                     >
-                      <PortalIcon className="w-4 h-4" />
-                    </a>
-                  );
-                })}
-
-              {navigationRail.onSettingsClick && (
-                <>
-                  <div className="w-6 h-[1px] bg-slate-800/80 my-1"></div>
-                  <button
-                    onClick={navigationRail.onSettingsClick}
-                    className={`w-9 h-9 rounded-lg flex items-center justify-center transition-colors cursor-pointer relative ${
-                      navigationRail.isSettingsActive
-                        ? 'bg-slate-800/90 text-amber-400'
-                        : 'text-slate-500 hover:bg-slate-800/50 hover:text-slate-200'
-                    }`}
-                    title="Налаштування"
-                  >
-                    <Settings className="w-[18px] h-[18px]" />
-                    {navigationRail.isSettingsActive && (
-                      <span className="absolute -left-1.5 w-0.5 h-5 bg-amber-400 rounded-r-full" />
-                    )}
-                  </button>
-                </>
-              )}
-            </div>
-          </nav>
-        )}
-
-        {/* 📂 2.2 ВИСУВНИЙ САЙДБАР (Clean Side Drawer Shell) */}
-        {drawer && drawer.isOpen && (
-          <aside className={`${drawer.widthClass || 'w-72 sm:w-80'} bg-slate-900 border-r border-slate-800/80 flex flex-col shrink-0 animate-fadeIn z-10 overflow-hidden`}>
-            {/* Шапка сайдбара */}
-            <div className="px-3.5 py-2.5 border-b border-slate-800/80 flex items-center justify-between shrink-0">
-              <h2 className="text-[11px] font-semibold text-slate-300 uppercase tracking-wider flex items-center gap-2">
-                {drawer.icon && <drawer.icon className={`w-3.5 h-3.5 ${drawer.iconColor || 'text-purple-400'}`} />}
-                <span>{drawer.title}</span>
-              </h2>
-              <div className="flex items-center gap-1.5">
-                {drawer.headerBadge && (
-                  <span className="px-1.5 py-0.5 rounded text-[9px] font-mono text-slate-400 bg-slate-800/60">
-                    {drawer.headerBadge}
-                  </span>
-                )}
-                {drawer.onClose && (
-                  <button
-                    onClick={drawer.onClose}
-                    className="p-1 text-slate-500 hover:text-white hover:bg-slate-800/60 rounded transition-colors cursor-pointer"
-                    title="Згорнути бічну панель"
-                  >
-                    <X className="w-3.5 h-3.5" />
-                  </button>
-                )}
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  )}
+                </div>
               </div>
-            </div>
 
-            {/* Вміст сайдбара з власним ізольованим скролом */}
-            <div className="flex-1 overflow-y-auto px-3.5 py-3 flex flex-col gap-3">
-              {drawer.children}
-            </div>
-          </aside>
-        )}
+              {/* Вміст сайдбара з власним ізольованим скролом */}
+              <div className="flex-1 overflow-y-auto px-3.5 py-3 flex flex-col gap-3">
+                {drawer.children}
+              </div>
+            </aside>
+          )}
 
-        {/* 📖 2.3 ГОЛОВНИЙ РОБОЧИЙ ПРОСТІР */}
-        <main
-          ref={mainScrollRef as any}
-          onScroll={onMainScroll}
-          className={`flex-1 relative h-full overflow-y-auto flex flex-col ${mainClassName || 'items-center'}`}
-        >
-          {children}
-        </main>
+          {/* 📖 2.3 ГОЛОВНИЙ РОБОЧИЙ ПРОСТІР */}
+          <main
+            ref={mainScrollRef as any}
+            onScroll={onMainScroll}
+            className={`flex-1 relative h-full overflow-y-auto flex flex-col ${mainClassName || 'items-center'}`}
+          >
+            {children}
+          </main>
+        </div>
+
+        {/* 🧩 3. OVERLAYS */}
+        {overlays}
       </div>
-
-      {/* 🧩 3. OVERLAYS */}
-      {overlays}
-    </div>
+    </ThemeProvider>
   );
 }

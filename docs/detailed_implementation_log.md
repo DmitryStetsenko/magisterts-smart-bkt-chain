@@ -30,6 +30,22 @@
   5. *Build Next.js Documentation Site* (`npm run build:docs`) — збірка статичного експорту (`output: "export"`, `trailingSlash: true`, `basePath: "/magisterts-smart-bkt-chain"`).
   6. *Upload Artifact & Deploy Pages* (`actions/upload-pages-artifact@v3` + `actions/deploy-pages@v4`).
 
+### 0.1.7.102 Наскрізна Система Тем, Графітово-Сіра Палітра та Центр Кастомізації (SBC-433, EP-SH)
+- **Контекст та архітектурне обґрунтування:**
+  - Реалізовано наскрізну підтримку Світлої та Темної тем для всіх порталів екосистеми Smart-BKT-Chain (`apps/study`, `apps/student`, `apps/teacher`, `apps/admin`, `apps/docs`).
+  - Здійснено рефакторинг темної теми: усунено надлишковий синій відтінок (`slate-950` / `#090d16`) на користь благородного нейтрального темно-сірого та графітово-цинкового спектру (`#121215`, `#18181b`, `#27272a`).
+  - Світла тема реалізована за стандартом м'якого паперу (`#f4f4f6`) та чистих білих карток (`#ffffff`).
+- **Створені модулі у пакеті `@sbc/ui`:**
+  - `packages/ui/src/theme/theme.types.ts`: структури токенів `ColorPaletteTokens` (`bgRoot`, `bgSurface`, `bgSubtle`, `borderSubtle`, `borderStrong`, `textPrimary`, `textMuted`, `textTertiary`), режими `ThemeMode` та конфіг `CustomThemeConfig`.
+  - `packages/ui/src/theme/defaultTokens.ts`: значення за замовчуванням для темної та світлої палітри.
+  - `packages/ui/src/theme/ThemeContext.tsx`: контекст `ThemeProvider` з підтримкою `localStorage`, відстеження системних параметрів `matchMedia`, синхронізації між вкладками браузера за подією `storage` та динамічного інжектування змінних у CSS DOM.
+  - `packages/ui/src/theme/ThemeToggle.tsx`: компонент кнопки швидкого перемикання теми з векторними іконками `Sun` / `Moon`.
+- **Інтеграція в інтерфейси платформи:**
+  - `UserProfileDrawer`: додано секцію «Тема Оформлення» з інтерактивним перемикачем (доступно в усіх порталах).
+  - `AppShellLayout`: кореневий контейнер переведено на використання семантичних токенів `var(--sbc-bg-root)`, `var(--sbc-bg-surface)` тощо.
+  - `globals.css`: оновлено у `apps/student`, `apps/study`, `apps/admin`, `apps/teacher`, `apps/docs`.
+  - `apps/admin/src/features/theme-customizer/ui/ThemeCustomizerView.tsx`: розроблено повноцінний UI редагування наскрізної палітри кольорів у табі `system` адмінки з інтерактивним Live Preview та пресетами.
+
 ### 0.1.7.101 Аналіз Правок Т. М. Барболіної V-4.0 та Розробка Плану Виступу на IICTE-2026 (SBC-432, EP-MS)
 - **Контекст та аудит правок наукового керівника V-4.0:**
   - Здійснено поабзацне порівняння документа тез `V-4.0-Стеценко_тези.docx` із версією `V-3.1`.

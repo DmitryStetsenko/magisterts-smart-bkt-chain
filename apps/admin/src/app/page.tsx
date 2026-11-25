@@ -44,6 +44,7 @@ import { downloadCourseTemplate, downloadCourseExport } from '../features/course
 import { DatasetExportCenter, DatasetStats } from '../features/dataset-export/ui/DatasetExportCenter';
 import { BktAuditVerifierCenter } from '../features/verifier/ui/BktAuditVerifierCenter';
 import { UserManagementCenter } from '../features/users/ui/UserManagementCenter';
+import { ThemeCustomizerView } from '../features/theme-customizer/ui/ThemeCustomizerView';
 
 interface CoursePresetItem {
   id: string;
@@ -1967,7 +1968,7 @@ export default function AdminCMSDashboard() {
           isSettingsActive: activeTab === 'system',
         }}
         drawer={getDrawerConfig()}
-        mainClassName="p-4 lg:p-6 overflow-y-auto flex flex-col gap-5 bg-slate-950"
+        mainClassName="p-4 lg:p-6 overflow-y-auto flex flex-col gap-5 bg-[var(--sbc-bg-root,#121215)]"
       >
         <div className="flex flex-col gap-5 min-h-[400px]">
           {activeTab === 'create_course' && (
@@ -2161,15 +2162,21 @@ export default function AdminCMSDashboard() {
           {activeTab === 'verifier' && <BktAuditVerifierCenter apiUrl={API_URL} />}
 
           {activeTab === 'system' && (
-            <div className="flex flex-col gap-4">
-              <div className="pb-3 border-b border-slate-800/80">
-                <h3 className="text-sm font-bold text-white flex items-center gap-2">
-                  <Settings className="w-4 h-4 text-purple-400" />
-                  <span>Конфігурація Релейєра Web3 & Смарт-Контрактів</span>
-                </h3>
-                <p className="text-xs text-slate-400 mt-0.5">
-                  Статус підключення Hardhat/Foundry, гаманців релейєра для Gasless SBT мінтингу.
-                </p>
+            <div className="flex flex-col gap-6">
+              {/* 🎨 1. Повноцінний центр налаштування палітри та тем */}
+              <ThemeCustomizerView />
+
+              {/* ⚙️ 2. Конфігурація Web3 & Релейєра */}
+              <div className="flex flex-col gap-4 pt-6 border-t border-[var(--sbc-border-subtle,#27272a)] max-w-4xl mx-auto w-full">
+                <div className="pb-3 border-b border-[var(--sbc-border-subtle,#27272a)]">
+                  <h3 className="text-sm font-bold text-[var(--sbc-text-primary,#f4f4f5)] flex items-center gap-2">
+                    <Settings className="w-4 h-4 text-purple-400" />
+                    <span>Конфігурація Релейєра Web3 & Смарт-Контрактів</span>
+                  </h3>
+                  <p className="text-xs text-[var(--sbc-text-muted,#a1a1aa)] mt-0.5">
+                    Статус підключення Hardhat/Foundry, гаманців релейєра для Gasless SBT мінтингу.
+                  </p>
+                </div>
               </div>
             </div>
           )}

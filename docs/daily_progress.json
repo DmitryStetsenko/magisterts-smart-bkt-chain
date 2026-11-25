@@ -16,6 +16,51 @@
           "items": [
             {
               "type": "text",
+              "raw_text": "**Наскрізна система тем (Світла/Темна), перехід темної теми на нейтральні сірі тони та кастомізатор палітри в Admin Portal (`SBC-433`, `EP-SH`):**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Створено гілку `feat/theme-system-tokens`.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Проведено мозковий штурм та сформовано документ [`docs/brainstorm/21_cross_app_theme_system_and_neutral_gray_palette.md`](file:///docs/brainstorm/21_cross_app_theme_system_and_neutral_gray_palette.md).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "У пакеті `@sbc/ui` реалізовано модуль керування темами:",
+              "subitems": [
+                "`theme.types.ts`: типізація режимів `ThemeMode ('dark' | 'light' | 'system')`, палітри `ColorPaletteTokens` та `CustomThemeConfig`.",
+                "`defaultTokens.ts`: базові палітри нейтрального графіту/цинку (усунення холодного синього/slate відтінку) для темної теми та м'якого паперу для світлої теми.",
+                "`ThemeContext.tsx` та `ThemeProvider`: збереження в `localStorage`, реакція на системні налаштування (`matchMedia`), синхронізація між вкладками через `window.addEventListener('storage')` та інжектування CSS-змінних.",
+                "`ThemeToggle.tsx`: компактний перемикач теми з підтримкою іконок `Sun` / `Moon`."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "Інтегровано перемикач тем у канонічний `UserProfileDrawer` (доступний автоматично в усіх додатках екосистеми) та оновлено семантичні змінні в `AppShellLayout`.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Оновлено `globals.css` в усіх застосунках (`apps/student`, `apps/study`, `apps/teacher`, `apps/admin`, `apps/docs`).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Створено повноцінний центр конфігурації тем `ThemeCustomizerView` в `apps/admin` (таб `system` / Налаштування) з color pickers, пресетами («Graphite Neutral», «Deep Zinc», «Clean Paper») та інтерактивним Live Preview.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Проведено успішну збірку всіх веб-застосунків монорепозиторію (`build:admin`, `build:student`, `build:study`, `build:teacher`).",
+              "subitems": []
+            },
+            {
+              "type": "text",
               "raw_text": "**Аналіз правок наукового керівника V-4.0 та оновлення авторського профілю (`SBC-432`, `EP-MS`):**",
               "subitems": []
             },

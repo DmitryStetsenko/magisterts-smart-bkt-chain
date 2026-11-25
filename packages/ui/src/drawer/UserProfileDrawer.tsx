@@ -11,9 +11,12 @@ import {
   ExternalLink, 
   LucideIcon,
   LogIn,
-  LogOut
+  LogOut,
+  Palette
 } from 'lucide-react';
 import { DrawerSection } from '../drawer/DrawerSection';
+import { useTheme } from '../theme/ThemeContext';
+import { ThemeToggle } from '../theme/ThemeToggle';
 
 export interface UserProfileDrawerCourse {
   slug: string;
@@ -218,6 +221,20 @@ export function UserProfileDrawer({
           )}
 
           {children}
+
+          {/* СЕКЦІЯ ТЕМИ ТА СТИЛЮ */}
+          <div className="pt-3">
+            <DrawerSection
+              title="Тема Оформлення"
+              icon={Palette}
+              defaultOpen={true}
+            >
+              <div className="py-2 px-1 flex items-center justify-between">
+                <span className="text-xs text-zinc-400">Режим інтерфейсу</span>
+                <ThemeToggle showLabel={true} />
+              </div>
+            </DrawerSection>
+          </div>
 
           {/* СЕКЦІЯ 3: Швидкі переходи та керування сесією */}
           {(onResetDemoState || onOpenAuthModal || onLogout || (quickLinks && quickLinks.length > 0)) && (

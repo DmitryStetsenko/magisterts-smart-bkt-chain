@@ -3,14 +3,14 @@
 
 @layer base {
   :root {
-    --background: #070a13;
-    --foreground: #f8fafc;
-    --card: #0f172a;
-    --card-foreground: #f8fafc;
+    --background: var(--sbc-bg-root, #121215);
+    --foreground: var(--sbc-text-primary, #f4f4f5);
+    --card: var(--sbc-bg-surface, #18181b);
+    --card-foreground: var(--sbc-text-primary, #f4f4f5);
     --primary: #3b82f6;
     --primary-foreground: #ffffff;
     --accent: #10b981;
-    --border: #1e293b;
+    --border: var(--sbc-border-subtle, #27272a);
   }
 
   body {

@@ -8,3 +8,7 @@ export * from './shell/AppShellLayout';
 export * from './breadcrumbs/Breadcrumbs';
 export * from './auth/GoogleSignInButton';
 export * from './auth/AuthModal';
+export * from './theme/theme.types';
+export * from './theme/defaultTokens';
+export * from './theme/ThemeContext';
+export * from './theme/ThemeToggle';
