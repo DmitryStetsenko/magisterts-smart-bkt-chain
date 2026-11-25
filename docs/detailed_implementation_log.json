@@ -120,6 +120,54 @@
           ]
         },
         {
+          "title": "0.1.7.103 Уніфікація блоків роботи з кодом на базі Monaco Editor (`SBC-435`, `EP-SH`)",
+          "level": 3,
+          "paragraphs": [],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "**Архітектурне рішення (Правило 6 — DRY & Reusability):**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Створено спільний компонент [`packages/ui/src/code/CodePlayground.tsx`](file:///packages/ui/src/code/CodePlayground.tsx) у пакеті `@sbc/ui` на базі `@monaco-editor/react` (`^4.7.0`).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Підтримує динамічну висоту редактора, автосинхронізацію теми через `useTheme()` (`vs` / `vs-dark`), запуск JS-коду у пісочниці (`Ctrl+Enter`), копіювання, скидання та компактний режим (`compact`) для вузьких сайдбарів без обрізання елементів керування.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Інтеграція по застосунках:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "`apps/study/src/components/CodePlayground.tsx` переведено на реекспорт спільного `@sbc/ui` компонента.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "`apps/study/src/components/StudyAppClient.tsx`: вкладку `playground` обгорнуто в `<DrawerSection>` із розширеною шириною `w-96 sm:w-[440px]` та `compact={true}`; усі інлайн-приклади уроків (`sec.codeSnippet`) тепер працюють у повноцінному Monaco Editor.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "`apps/student/src/features/theory-capsule/ui/JustInTimeTheoryDrawer.tsx`: статичні `<pre><code>` замінено на інтерактивний Monaco `CodePlayground`.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Верифікація:** `build:study`, `build:student` та Playwright E2E-тест `Study Portal sidebar and lesson code blocks use Monaco Editor with unclipped buttons` пройдено (100%).",
+              "subitems": []
+            }
+          ]
+        },
+        {
           "title": "0.1.7.102 Наскрізна Система Тем, Графітово-Сіра Палітра та Центр Кастомізації (SBC-433, EP-SH)",
           "level": 3,
           "paragraphs": [],

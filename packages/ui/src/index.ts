@@ -14,3 +14,4 @@ export * from './theme/ThemeContext';
 export * from './theme/ThemeToggle';
 export * from './theme/ThemeSettingsSection';
 export * from './theme/ThemeInitScript';
+export * from './code/CodePlayground';

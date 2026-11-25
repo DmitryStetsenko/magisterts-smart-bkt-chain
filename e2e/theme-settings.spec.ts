@@ -132,4 +132,42 @@ test.describe('Cross-App Settings Theme Switcher (SBC-433)', () => {
     expect(flashCount).toBe(0);
     await expect(page.locator('html')).not.toHaveClass(/\bdark\b/);
   });
+
+  test('Study Portal sidebar and lesson code blocks use Monaco Editor with unclipped buttons', async ({ page }) => {
+    await page.addInitScript(() => {
+      localStorage.setItem('sbc_theme_mode', 'light');
+      localStorage.setItem('sbc_theme_mode_updated_at', String(Date.now() + 60000));
+    });
+
+    await page.goto('http://localhost:3006/courses/web-algorithms-school/school-alg-basics/variables-and-types', {
+      waitUntil: 'domcontentloaded',
+      timeout: 60000,
+    });
+
+    // 1. Verify lesson inline CodePlayground uses Monaco
+    const lessonPlayground = page.locator('main [data-testid="monaco-code-playground"]').first();
+    await expect(lessonPlayground).toBeVisible({ timeout: 20000 });
+    await expect(lessonPlayground.locator('.monaco-editor')).toBeVisible({ timeout: 20000 });
+
+    // 2. Open Sidebar Playground tab and verify Monaco + unclipped Run button
+    const playgroundTab = page.locator('button[title="Інтерактивна пісочниця коду"]').first();
+    await expect(playgroundTab).toBeVisible({ timeout: 15000 });
+    await playgroundTab.click();
+
+    const sidebar = page.locator('aside').first();
+    const sidebarPlayground = sidebar.locator('[data-testid="monaco-code-playground"]').first();
+    await expect(sidebarPlayground).toBeVisible({ timeout: 15000 });
+    await expect(sidebarPlayground.locator('.monaco-editor')).toBeVisible({ timeout: 20000 });
+
+    const runBtn = sidebarPlayground.locator('[data-testid="playground-run-btn"]');
+    await expect(runBtn).toBeVisible();
+    const asideBox = await sidebar.boundingBox();
+    const btnBox = await runBtn.boundingBox();
+    expect(asideBox).toBeTruthy();
+    expect(btnBox).toBeTruthy();
+    expect(btnBox!.x + btnBox!.width).toBeLessThanOrEqual(asideBox!.x + asideBox!.width + 2);
+
+    await runBtn.click();
+    await expect(sidebarPlayground).toContainText('Привіт, 10 клас! Номер спроби: 2');
+  });
 });

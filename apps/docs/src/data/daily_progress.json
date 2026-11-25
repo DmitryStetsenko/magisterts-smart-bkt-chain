@@ -119,6 +119,26 @@
                 "Замінено всі застарілі темніші fallback-кольори `#121215` / `#18181b` на актуальні `#181818` / `#1f1f1f` в `AppShellLayout`, `layout.tsx`, `StudentPortalApp` та `apps/admin` (і оновлено метадані заголовка `apps/admin`).",
                 "Додано захист `isInitialized` у `ThemeProvider` (`ThemeContext.tsx`), що повністю усуває 1-кадровий спалах темної теми при клієнтському перемиканні модулів/роутів у світлому режимі (підтверджено Playwright `MutationObserver` тестом у `e2e/theme-settings.spec.ts`: `flashCount === 0`)."
               ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Уніфікація всіх блоків роботи з кодом на базі Monaco Editor (`SBC-435`, `EP-SH`):**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "У пакеті `@sbc/ui` створено спільний компонент `packages/ui/src/code/CodePlayground.tsx` на базі `@monaco-editor/react` (VS Code Engine) із підсвіткою синтаксису, нумерацією рядків, автосинхронізацією теми (`vs` / `vs-dark`), гарячою клавішею `Ctrl+Enter`, копіюванням/скиданням коду та компактним безрамковим тулбаром (`compact={true}`), де кнопки ніколи не обрізаються.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Переведено на Monaco `CodePlayground` усі навчальні блоки коду в `apps/study` (уроки + розширена бічна панель пісочниці `w-96 sm:w-[440px]` у `<DrawerSection>`) та зразки коду в експрес-теорії `JustInTimeTheoryDrawer` у `apps/student`.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Проведено успішні збірки `build:study`, `build:student` та Playwright E2E-перевірку (Monaco Editor + перевірка відсутності обрізання кнопки «Запустити» + живе виконання JS у консолі).",
+              "subitems": []
             }
           ]
         },

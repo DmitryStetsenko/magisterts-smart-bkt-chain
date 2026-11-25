@@ -9,6 +9,7 @@
     "build-storybook": "storybook build"
   },
   "dependencies": {
+    "@monaco-editor/react": "^4.7.0",
     "@sbc/routes": "*",
     "lucide-react": "^0.475.0",
     "react": "^19.0.0",

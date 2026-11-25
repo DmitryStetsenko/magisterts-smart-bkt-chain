@@ -460,6 +460,7 @@ export function StudyAppClient({
         !readerSettings.isFocusMode
           ? {
               isOpen: isDrawerOpen,
+              widthClass: activeTab === 'playground' ? 'w-96 sm:w-[440px]' : undefined,
               title: drawerConfig.title,
               icon: drawerConfig.icon,
               iconColor: drawerConfig.iconColor,
@@ -581,19 +582,28 @@ export function StudyAppClient({
                   )}
 
                   {activeTab === 'playground' && (
-                    <div className="p-2 flex flex-col gap-3">
-                      <div className="text-xs text-slate-400 leading-relaxed">
-                        Ви можете експериментувати з кодом безпосередньо у бічній панелі. Результат виконання виводиться у реальному часі.
-                      </div>
-                      <CodePlayground
-                        initialCode={`// Спробуйте змінити значення:
+                    <DrawerSection
+                      title="Інтерактивний редактор JS"
+                      icon={Code2}
+                      iconColor="text-emerald-400"
+                      titleColor="text-emerald-400 group-hover:text-emerald-300"
+                      defaultOpen={true}
+                    >
+                      <div className="flex flex-col gap-2.5 pt-1">
+                        <p className="text-[11px] text-slate-400 leading-relaxed">
+                          Експериментуйте з кодом у вбудованому редакторі Monaco (VS Code). Натисніть <kbd className="px-1 py-0.5 rounded bg-[var(--sbc-bg-subtle,#262626)] border border-[var(--sbc-border-subtle,#2b2b2b)] font-mono text-[10px]">Ctrl+Enter</kbd> для запуску.
+                        </p>
+                        <CodePlayground
+                          compact={true}
+                          initialCode={`// Спробуйте змінити значення:
 const greeting = "Привіт, 10 клас!";
 let counter = 1;
 counter = counter + 1;
 console.log(greeting, "Номер спроби:", counter);`}
-                        autoRun={true}
-                      />
-                    </div>
+                          autoRun={true}
+                        />
+                      </div>
+                    </DrawerSection>
                   )}
 
                   {activeTab === 'glossary' && (
@@ -818,6 +828,8 @@ console.log(greeting, "Номер спроби:", counter);`}
                     <div className="flex flex-col gap-2 my-2">
                       <CodePlayground
                         initialCode={sec.codeSnippet.code}
+                        language={sec.codeSnippet.language || 'javascript'}
+                        title="Інтерактивний приклад коду"
                         autoRun={true}
                       />
                       {sec.codeSnippet.explanation && (

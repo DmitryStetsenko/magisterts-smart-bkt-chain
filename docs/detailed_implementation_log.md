@@ -30,6 +30,16 @@
   5. *Build Next.js Documentation Site* (`npm run build:docs`) — збірка статичного експорту (`output: "export"`, `trailingSlash: true`, `basePath: "/magisterts-smart-bkt-chain"`).
   6. *Upload Artifact & Deploy Pages* (`actions/upload-pages-artifact@v3` + `actions/deploy-pages@v4`).
 
+### 0.1.7.103 Уніфікація блоків роботи з кодом на базі Monaco Editor (`SBC-435`, `EP-SH`)
+- **Архітектурне рішення (Правило 6 — DRY & Reusability):**
+  - Створено спільний компонент [`packages/ui/src/code/CodePlayground.tsx`](file:///packages/ui/src/code/CodePlayground.tsx) у пакеті `@sbc/ui` на базі `@monaco-editor/react` (`^4.7.0`).
+  - Підтримує динамічну висоту редактора, автосинхронізацію теми через `useTheme()` (`vs` / `vs-dark`), запуск JS-коду у пісочниці (`Ctrl+Enter`), копіювання, скидання та компактний режим (`compact`) для вузьких сайдбарів без обрізання елементів керування.
+- **Інтеграція по застосунках:**
+  - `apps/study/src/components/CodePlayground.tsx` переведено на реекспорт спільного `@sbc/ui` компонента.
+  - `apps/study/src/components/StudyAppClient.tsx`: вкладку `playground` обгорнуто в `<DrawerSection>` із розширеною шириною `w-96 sm:w-[440px]` та `compact={true}`; усі інлайн-приклади уроків (`sec.codeSnippet`) тепер працюють у повноцінному Monaco Editor.
+  - `apps/student/src/features/theory-capsule/ui/JustInTimeTheoryDrawer.tsx`: статичні `<pre><code>` замінено на інтерактивний Monaco `CodePlayground`.
+- **Верифікація:** `build:study`, `build:student` та Playwright E2E-тест `Study Portal sidebar and lesson code blocks use Monaco Editor with unclipped buttons` пройдено (100%).
+
 ### 0.1.7.102 Наскрізна Система Тем, Графітово-Сіра Палітра та Центр Кастомізації (SBC-433, EP-SH)
 - **Контекст та архітектурне обґрунтування:**
   - Реалізовано наскрізну підтримку Світлої та Темної тем для всіх порталів екосистеми Smart-BKT-Chain (`apps/study`, `apps/student`, `apps/teacher`, `apps/admin`, `apps/docs`).

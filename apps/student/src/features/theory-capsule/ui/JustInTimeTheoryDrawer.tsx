@@ -11,7 +11,7 @@ import {
   Clock,
   ArrowLeft,
 } from 'lucide-react';
-import { DrawerSection } from '@sbc/ui';
+import { DrawerSection, CodePlayground } from '@sbc/ui';
 import type { MisconceptionDto, TheoryCapsuleDto } from '@sbc/types';
 
 export interface JustInTimeTheoryDrawerProps {
@@ -148,9 +148,14 @@ export function JustInTimeTheoryDrawer({
                         {example.language}
                       </span>
                     </div>
-                    <pre className="p-2.5 rounded-lg bg-slate-950/90 text-slate-200 font-mono text-[11px] leading-relaxed overflow-x-auto">
-                      <code>{example.code}</code>
-                    </pre>
+                    <CodePlayground
+                      initialCode={example.code}
+                      language={example.language || 'javascript'}
+                      title={example.title}
+                      compact={true}
+                      readOnly={false}
+                      runnable={(example.language || 'javascript').toLowerCase().includes('js') || (example.language || 'javascript').toLowerCase() === 'javascript'}
+                    />
                   </div>
                 ))}
               </div>

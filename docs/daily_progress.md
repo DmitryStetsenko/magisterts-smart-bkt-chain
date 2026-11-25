@@ -46,6 +46,11 @@
      - Замінено всі застарілі темніші fallback-кольори `#121215` / `#18181b` на актуальні `#181818` / `#1f1f1f` в `AppShellLayout`, `layout.tsx`, `StudentPortalApp` та `apps/admin` (і оновлено метадані заголовка `apps/admin`).
      - Додано захист `isInitialized` у `ThemeProvider` (`ThemeContext.tsx`), що повністю усуває 1-кадровий спалах темної теми при клієнтському перемиканні модулів/роутів у світлому режимі (підтверджено Playwright `MutationObserver` тестом у `e2e/theme-settings.spec.ts`: `flashCount === 0`).
 
+3. **Уніфікація всіх блоків роботи з кодом на базі Monaco Editor (`SBC-435`, `EP-SH`):**
+   - У пакеті `@sbc/ui` створено спільний компонент `packages/ui/src/code/CodePlayground.tsx` на базі `@monaco-editor/react` (VS Code Engine) із підсвіткою синтаксису, нумерацією рядків, автосинхронізацією теми (`vs` / `vs-dark`), гарячою клавішею `Ctrl+Enter`, копіюванням/скиданням коду та компактним безрамковим тулбаром (`compact={true}`), де кнопки ніколи не обрізаються.
+   - Переведено на Monaco `CodePlayground` усі навчальні блоки коду в `apps/study` (уроки + розширена бічна панель пісочниці `w-96 sm:w-[440px]` у `<DrawerSection>`) та зразки коду в експрес-теорії `JustInTimeTheoryDrawer` у `apps/student`.
+   - Проведено успішні збірки `build:study`, `build:student` та Playwright E2E-перевірку (Monaco Editor + перевірка відсутності обрізання кнопки «Запустити» + живе виконання JS у консолі).
+
 ### 🎯 Наступні дії (Next Steps):
 1. **Фінальне тестування з живим Docker/API та злиття гілки `feat/theme-system-tokens` у `dev`:**
    - Після запуску Docker Desktop (`sbc-postgres`, `sbc-redis`) прогнати повний набір E2E-тестів (`e2e/theme-settings.spec.ts` + `e2e/light-theme-contrast.spec.ts`) на живих даних курсів та за потреби виконати merge у `dev`.
