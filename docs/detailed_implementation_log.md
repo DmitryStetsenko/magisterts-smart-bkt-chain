@@ -34,7 +34,8 @@
 - **Нелінійна топологія БД (`packages/database/prisma/seed.ts`):**
   - Залежності курсу `web-algorithms-school` оновлено з лінійного ланцюжка на справжній орієнтований ациклічний граф із порогом `requiredMastery = 0.85`: `1 (Basics) → 2 (Branching) → { 3 (Loops) → 5 (Arrays), 4 (Functions) } → 6 (DOM) → 7 (Projects)`.
 - **Візуалізація топологічного DAG (`packages/ui/src/skill-graph/GameSkillTreeWidget.tsx`):**
-  - Додано перемикач `layoutMode: 'path' | 'dag'` (чекбокс **«Граф DAG»** із іконкою `GitFork` у верхній панелі віджета) — автоматично доступний в `apps/student` і `apps/teacher`.
+  - Додано перемикач `layoutMode: 'path' | 'dag'` (чекбокс **«Граф DAG»** із іконкою `GitFork`, активний за замовчуванням) — автоматично доступний в `apps/student` і `apps/teacher`.
+  - У [`apps/student/src/components/StudentPortalApp.tsx`](file:///apps/student/src/components/StudentPortalApp.tsx) у `confirmCourseSwitch()` додано синхронізацію URL (`window.history.replaceState(null, '', '/practice/' + slug)`), щоб при `F5` не повертався попередній курс із URL-параметра `initialCourseSlug`.
   - Реалізовано обчислення топологічних шарів за `parentSkillIds` (із захистом від циклів), горизонтальне розведення паралельних гілок та рендеринг спрямованих SVG-ребер із маркерами-стрілками (`dagArrowMastered`, `dagArrowActive`, `dagArrowLocked`).
 - **Документація та слайди:**
   - Додано підрозділ `1.2 Принцип Нелінійного Проєктування Курсів (Fork / Join Skill DAG)` у [`docs/course_authoring_and_tabular_engine.md`](file:///docs/course_authoring_and_tabular_engine.md) та підрозділ `2.1` із Mermaid-схемою в [`docs/apps/study_portal.md`](file:///docs/apps/study_portal.md).

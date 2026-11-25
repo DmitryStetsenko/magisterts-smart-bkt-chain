@@ -58,7 +58,7 @@ export function GameSkillTreeWidget({
 }: GameSkillTreeWidgetProps) {
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
   const [treeDisplayMode, setTreeDisplayMode] = useState<'skills' | 'anomalies'>('skills');
-  const [layoutMode, setLayoutMode] = useState<'path' | 'dag'>('path');
+  const [layoutMode, setLayoutMode] = useState<'path' | 'dag'>('dag');
 
   // Compute stats
   const totalSkills = nodes.length;

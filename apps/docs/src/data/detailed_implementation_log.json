@@ -142,7 +142,12 @@
             },
             {
               "type": "text",
-              "raw_text": "Додано перемикач `layoutMode: 'path' | 'dag'` (чекбокс **«Граф DAG»** із іконкою `GitFork` у верхній панелі віджета) — автоматично доступний в `apps/student` і `apps/teacher`.",
+              "raw_text": "Додано перемикач `layoutMode: 'path' | 'dag'` (чекбокс **«Граф DAG»** із іконкою `GitFork`, активний за замовчуванням) — автоматично доступний в `apps/student` і `apps/teacher`.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "У [`apps/student/src/components/StudentPortalApp.tsx`](file:///apps/student/src/components/StudentPortalApp.tsx) у `confirmCourseSwitch()` додано синхронізацію URL (`window.history.replaceState(null, '', '/practice/' + slug)`), щоб при `F5` не повертався попередній курс із URL-параметра `initialCourseSlug`.",
               "subitems": []
             },
             {

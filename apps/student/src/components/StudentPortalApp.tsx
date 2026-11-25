@@ -248,6 +248,10 @@ export function StudentPortalContent({
     setActiveCourseSlug(slug);
     if (typeof window !== 'undefined') {
       localStorage.setItem('sbc_student_active_course', slug);
+      // Синхронізуємо URL маршруту, щоб після F5 завантажувався саме обраний курс
+      if (window.location.pathname.startsWith('/practice/')) {
+        window.history.replaceState(null, '', `/practice/${slug}`);
+      }
     }
     const targetCourse = courses.find((c) => c.slug === slug);
     const title = targetCourse ? targetCourse.title : slug;

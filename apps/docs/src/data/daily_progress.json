@@ -26,7 +26,12 @@
             },
             {
               "type": "text",
-              "raw_text": "У спільному віджеті [`packages/ui/src/skill-graph/GameSkillTreeWidget.tsx`](file:///packages/ui/src/skill-graph/GameSkillTreeWidget.tsx) (використовується в `apps/student` та `apps/teacher`) додано галочку-перемикач **«Граф DAG»** із топологічним розміщенням вершин по шарах та спрямованими SVG-стрілками пререквізитів (`parentSkillIds`).",
+              "raw_text": "У спільному віджеті [`packages/ui/src/skill-graph/GameSkillTreeWidget.tsx`](file:///packages/ui/src/skill-graph/GameSkillTreeWidget.tsx) (використовується в `apps/student` та `apps/teacher`) додано галочку-перемикач **«Граф DAG»** (увімкнено за замовчуванням для негайного показу розгалужень) із топологічним розміщенням вершин по шарах та спрямованими SVG-стрілками пререквізитів (`parentSkillIds`).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "У [`apps/student/src/components/StudentPortalApp.tsx`](file:///apps/student/src/components/StudentPortalApp.tsx) виправлено скидання курсу після `F5`: при перемиканні курсу синхронізується URL `/practice/${slug}` через `window.history.replaceState`.",
               "subitems": []
             },
             {
