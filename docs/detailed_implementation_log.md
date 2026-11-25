@@ -34,7 +34,7 @@
 - **Нелінійна топологія БД (`packages/database/prisma/seed.ts`):**
   - Залежності курсу `web-algorithms-school` оновлено з лінійного ланцюжка на справжній орієнтований ациклічний граф із порогом `requiredMastery = 0.85`: `1 (Basics) → 2 (Branching) → { 3 (Loops) → 5 (Arrays), 4 (Functions) } → 6 (DOM) → 7 (Projects)`.
 - **Візуалізація топологічного DAG (`packages/ui/src/skill-graph/GameSkillTreeWidget.tsx`):**
-  - «Дерево Знань» завжди використовує реальну топологію `parentSkillIds` (розгалуження й злиття видимі і з увімкненою, і з вимкненою галочкою), а чекбокс **«Граф DAG»** (`layoutMode === 'dag'`, активний за замовчуванням) додає спрямовані SVG-стрілки пререквізитів.
+  - «Дерево Знань» завжди рендерить реальну топологію `parentSkillIds` зі спрямованими стрілками. Зайвий чекбокс прибрано для ролі `student`, а для `role === 'teacher'` додано чекбокс **«Метрики графа»** (`showTeacherMetrics`), який відображає порогові мітки `≥0.85` безпосередньо на ребрах DAG.
   - У [`apps/student/src/components/StudentPortalApp.tsx`](file:///apps/student/src/components/StudentPortalApp.tsx) усунено миготіння заголовка `JavaScript & Web Dev` та race condition при перезавантаженні (`F5`): додано `web-algorithms-school` у `DEFAULT_COURSES`, індикатор `Завантаження курсу...` до завершення `isCourseHydrated`, `courseFetchSeqRef` та синхронізацію URL. Верифіковано Playwright E2E-тестом [`e2e/student-course-reload-dag.spec.ts`](file:///e2e/student-course-reload-dag.spec.ts) (`1 passed`).
   - Реалізовано обчислення топологічних шарів за `parentSkillIds` (із захистом від циклів), горизонтальне розведення паралельних гілок та рендеринг спрямованих SVG-ребер із маркерами-стрілками (`dagArrowMastered`, `dagArrowActive`, `dagArrowLocked`).
 - **Документація та слайди:**

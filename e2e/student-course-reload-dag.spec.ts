@@ -17,10 +17,9 @@ test.describe('Student Portal Course Reload & Non-Linear DAG Sync', () => {
     // 3. Відкриваємо Дерево знань
     await page.getByRole('button', { name: /Дерево знань/i }).first().click();
 
-    // 4. Перевіряємо, що галочка "Граф DAG" увімкнена за замовчуванням і вузли 3 та 4 стоять на одному шарі (розгалуження!)
-    const dagCheckbox = page.locator('label', { hasText: 'Граф DAG' }).locator('input[type="checkbox"]');
-    await expect(dagCheckbox).toBeVisible({ timeout: 10000 });
-    await expect(dagCheckbox).toBeChecked();
+    // 4. Перевіряємо, що у студента немає зайвої галочки, а вузли 3 та 4 одразу стоять на одному шарі (розгалуження!)
+    await expect(page.locator('label', { hasText: 'Метрики графа' })).toHaveCount(0);
+    await expect(page.locator('label', { hasText: 'Граф DAG' })).toHaveCount(0);
 
     const loopsNode = page.locator('text=Циклічні алгоритми').first();
     const funcsNode = page.locator('text=Функції та модульна').first();

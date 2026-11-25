@@ -58,7 +58,7 @@ export function GameSkillTreeWidget({
 }: GameSkillTreeWidgetProps) {
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
   const [treeDisplayMode, setTreeDisplayMode] = useState<'skills' | 'anomalies'>('skills');
-  const [layoutMode, setLayoutMode] = useState<'path' | 'dag'>('dag');
+  const [showTeacherMetrics, setShowTeacherMetrics] = useState<boolean>(false);
 
   // Compute stats
   const totalSkills = nodes.length;
@@ -255,19 +255,19 @@ export function GameSkillTreeWidget({
             )}
           </button>
 
-          {treeDisplayMode === 'skills' && (
+          {treeDisplayMode === 'skills' && role === 'teacher' && (
             <label
               className="ml-2 pl-2 border-l border-slate-700/70 flex items-center gap-1.5 px-2 py-1 text-xs text-slate-300 hover:text-white cursor-pointer select-none"
-              title="Перемкнути між лінійним маршрутом та орієнтованим графом пререквізитів Skill DAG"
+              title="Показати пороги допуску (≥ 0.85) та телеметрію (WPM, копіпаст) прямо на вузлах і ребрах графа"
             >
               <input
                 type="checkbox"
-                checked={layoutMode === 'dag'}
-                onChange={(e) => setLayoutMode(e.target.checked ? 'dag' : 'path')}
+                checked={showTeacherMetrics}
+                onChange={(e) => setShowTeacherMetrics(e.target.checked)}
                 className="accent-indigo-500 rounded cursor-pointer"
               />
               <GitFork className="w-3.5 h-3.5 text-indigo-400" />
-              <span>Граф DAG</span>
+              <span>Метрики графа</span>
             </label>
           )}
         </div>
@@ -352,8 +352,7 @@ export function GameSkillTreeWidget({
                 const isMasteredConnection = fromNode.pMastery >= 0.85;
                 const isActiveConnection = fromNode.pMastery >= 0.75 && toNode.status !== 'LOCKED';
 
-                // For DAG mode, offset start/end slightly so arrowheads sit cleanly at node borders
-                const yOffset = layoutMode === 'dag' ? 36 : 0;
+                const yOffset = hasRealDependencies ? 36 : 0;
                 const sy = fromPos.y + yOffset;
                 const ey = toPos.y - yOffset;
                 const deltaY = ey - sy;
@@ -362,14 +361,16 @@ export function GameSkillTreeWidget({
                 const cp2x = toPos.x;
                 const cp2y = sy + deltaY * 0.5;
                 const d = `M ${fromPos.x} ${sy} C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${toPos.x} ${ey}`;
-                const markerEnd =
-                  layoutMode === 'dag'
-                    ? isMasteredConnection
-                      ? 'url(#dagArrowMastered)'
-                      : isActiveConnection
-                      ? 'url(#dagArrowActive)'
-                      : 'url(#dagArrowLocked)'
-                    : undefined;
+                const markerEnd = hasRealDependencies
+                  ? isMasteredConnection
+                    ? 'url(#dagArrowMastered)'
+                    : isActiveConnection
+                    ? 'url(#dagArrowActive)'
+                    : 'url(#dagArrowLocked)'
+                  : undefined;
+
+                const midX = (fromPos.x + toPos.x) / 2;
+                const midY = (sy + ey) / 2;
 
                 return (
                   <g key={`edge-${id}`}>
@@ -390,15 +391,40 @@ export function GameSkillTreeWidget({
                           ? 'url(#masteredBeam)'
                           : isActiveConnection
                           ? 'url(#activeBeam)'
-                          : layoutMode === 'dag'
+                          : hasRealDependencies
                           ? '#64748b'
                           : 'url(#lockedBeam)'
                       }
-                      strokeWidth={isMasteredConnection || isActiveConnection ? '3' : layoutMode === 'dag' ? '2' : '1.5'}
+                      strokeWidth={isMasteredConnection || isActiveConnection ? '3' : hasRealDependencies ? '2' : '1.5'}
                       strokeDasharray={isMasteredConnection ? 'none' : isActiveConnection ? '6 4' : '4 4'}
                       markerEnd={markerEnd}
                       className={isActiveConnection ? 'animate-pulse' : ''}
                     />
+                    {/* Пороговий підпис на ребрі для викладача */}
+                    {role === 'teacher' && showTeacherMetrics && (
+                      <g transform={`translate(${midX}, ${midY})`}>
+                        <rect
+                          x="-22"
+                          y="-9"
+                          width="44"
+                          height="18"
+                          rx="6"
+                          fill={isMasteredConnection ? '#059669' : '#334155'}
+                          fillOpacity="0.9"
+                        />
+                        <text
+                          x="0"
+                          y="3"
+                          textAnchor="middle"
+                          fontSize="9"
+                          fontFamily="monospace"
+                          fontWeight="700"
+                          fill="#ffffff"
+                        >
+                          ≥0.85
+                        </text>
+                      </g>
+                    )}
                   </g>
                 );
               })}
@@ -521,9 +547,26 @@ export function GameSkillTreeWidget({
                     >
                       {node.title}
                     </span>
-                    <span className="text-[9px] font-mono text-slate-500 uppercase">
+                    <span className="text-[9px] font-mono text-slate-500 uppercase block">
                       {isMastered ? '★ Опановано' : isLocked ? 'Заблоковано' : 'У процесі'}
                     </span>
+                    {role === 'teacher' && showTeacherMetrics && (
+                      <div className="mt-1 flex flex-wrap items-center justify-center gap-1 text-[9px] font-mono">
+                        <span className="px-1 py-0.2 rounded bg-slate-800/80 text-indigo-300">
+                          P(L)={node.pMastery.toFixed(2)}
+                        </span>
+                        {node.telemetry && (
+                          <span className="px-1 py-0.2 rounded bg-slate-800/80 text-slate-300">
+                            {Math.round(node.telemetry.wpm)} WPM
+                          </span>
+                        )}
+                        {node.telemetry && node.telemetry.copyPasteRatio > 0 && (
+                          <span className="px-1 py-0.2 rounded bg-amber-500/20 text-amber-300">
+                            Paste {Math.round(node.telemetry.copyPasteRatio * 100)}%
+                          </span>
+                        )}
+                      </div>
+                    )}
                   </div>
                 </div>
               );
