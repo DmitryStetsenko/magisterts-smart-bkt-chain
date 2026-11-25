@@ -30,6 +30,14 @@
   5. *Build Next.js Documentation Site* (`npm run build:docs`) — збірка статичного експорту (`output: "export"`, `trailingSlash: true`, `basePath: "/magisterts-smart-bkt-chain"`).
   6. *Upload Artifact & Deploy Pages* (`actions/upload-pages-artifact@v3` + `actions/deploy-pages@v4`).
 
+### 0.1.7.110 Жива синхронізація BKT-гейтингу в `apps/study` та E2E-інваріант монотонності (`SBC-437`, `EP-ST`)
+- **Причина дефекту:** У [`apps/study/src/components/StudyAppClient.tsx`](file:///apps/study/src/components/StudyAppClient.tsx) зберігалися прототипні мок-стани (`moduleMasteryScores['school-alg-basics'] = 92`) і статичний словник `unlockedModules` зі старими слагами (`school-web-dom`, `school-web-projects` замість `school-web-dom-events`, `school-web-applied-projects`) у поєднанні з небезпечним fallback `unlockedModules[mod.moduleSlug] ?? true`. Через це новий студент бачив `92%` на Модулі 1, а Модулі 6–7 (та всі модулі інших курсів) відображалися відкритими після заблокованих модулів 2–3.
+- **Виправлення:**
+  - Початковий стан динамічно формується з `activeCurriculum.modules` (`idx === 0` відкритий, `idx > 0` заблоковані, усі оцінки `0%`).
+  - Додано `useEffect` синхронізації з `GET /api/v1/courses/${activeCourseSlug}` та `GET /api/v1/bkt/state/${currentUserId}` із розрахунком середнього $P(L)$ по навичках кожного модуля та суворою послідовною перевіркою `chainUnlocked && prevMastery >= prevThreshold`.
+  - Fallback у рендері змінено на `unlockedModules[mod.moduleSlug] ?? (modIdx === 0)`.
+- **Верифікація:** Успішна збірка `npm run build:study` та проходження нового регресійного E2E-тесту [`e2e/study-bkt-gating-sync.spec.ts`](file:///e2e/study-bkt-gating-sync.spec.ts) (`1 passed`).
+
 ### 0.1.7.109 Трек живої демонстрації та синхронізація плану виступу для конференції IICTE-2026 (`SBC-432`, `EP-MS`)
 - **Синхронізація `SPEECH_PLAN.md` із поданими тезами (`V-4.0`):**
   - Замінено застарілі оцінки в розділі результатів плану виступу на точні показники Таблиці 1 поданих тез (Монте-Карло: $M=500$, $m=15$, $P(L_0)=0{,}15, P(T)=0{,}20, P(G)=0{,}15, P(S)=0{,}10$): скорочення середньої кількості завдань із `19,3` до `14,2` (**−26,4%**), зниження частки нескомпенсованих труднощів із `18,6%` до `11,5%` (**−38,1%**), зростання індексу збереження пізнавальної залученості з `0,62` до `0,84` (**+35,5%**).

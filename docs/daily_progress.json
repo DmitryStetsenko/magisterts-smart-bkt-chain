@@ -16,6 +16,26 @@
           "items": [
             {
               "type": "text",
+              "raw_text": "**Усунення хардкоду BKT (`92%`) та неконсистентного гейтингу модулів у `apps/study` + регресійний E2E-тест (`SBC-437`, `EP-ST`):**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Видалено застарілі захардкоджені значення майстерності (`'school-alg-basics': 92`, `'school-alg-branching': 45`) та статичну мапу `unlockedModules` із незбіжними слагами у [`apps/study/src/components/StudyAppClient.tsx`](file:///apps/study/src/components/StudyAppClient.tsx).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Підключено живу синхронізацію з бекендом (`GET /api/v1/courses/:courseSlug` + `GET /api/v1/bkt/state/:userId`) із суворим послідовним BKT-гейтингом (`chainUnlocked` за порогом `minMasteryThreshold ?? 0.85`) та безпечним fallback `modIdx === 0` замість `?? true` для всіх курсів платформи.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Додано регресійний Playwright E2E-тест [`e2e/study-bkt-gating-sync.spec.ts`](file:///e2e/study-bkt-gating-sync.spec.ts), який перевіряє інваріант нульового стану (`0%` на Модулі 1, відсутність фейкових `92%`) та монотонність блокування модулів; `npm run build:study` і E2E-тест (`1/1 passed`) пройшли успішно.",
+              "subitems": []
+            },
+            {
+              "type": "text",
               "raw_text": "**Підготовка треку живої демонстрації та синхронізація плану виступу до конференції IICTE-2026 (`SBC-432`, `EP-MS`):**",
               "subitems": []
             },

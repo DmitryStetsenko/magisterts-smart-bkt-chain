@@ -120,6 +120,44 @@
           ]
         },
         {
+          "title": "0.1.7.110 Жива синхронізація BKT-гейтингу в `apps/study` та E2E-інваріант монотонності (`SBC-437`, `EP-ST`)",
+          "level": 3,
+          "paragraphs": [],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "**Причина дефекту:** У [`apps/study/src/components/StudyAppClient.tsx`](file:///apps/study/src/components/StudyAppClient.tsx) зберігалися прототипні мок-стани (`moduleMasteryScores['school-alg-basics'] = 92`) і статичний словник `unlockedModules` зі старими слагами (`school-web-dom`, `school-web-projects` замість `school-web-dom-events`, `school-web-applied-projects`) у поєднанні з небезпечним fallback `unlockedModules[mod.moduleSlug] ?? true`. Через це новий студент бачив `92%` на Модулі 1, а Модулі 6–7 (та всі модулі інших курсів) відображалися відкритими після заблокованих модулів 2–3.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Виправлення:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Початковий стан динамічно формується з `activeCurriculum.modules` (`idx === 0` відкритий, `idx > 0` заблоковані, усі оцінки `0%`).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Додано `useEffect` синхронізації з `GET /api/v1/courses/${activeCourseSlug}` та `GET /api/v1/bkt/state/${currentUserId}` із розрахунком середнього $P(L)$ по навичках кожного модуля та суворою послідовною перевіркою `chainUnlocked && prevMastery >= prevThreshold`.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Fallback у рендері змінено на `unlockedModules[mod.moduleSlug] ?? (modIdx === 0)`.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Верифікація:** Успішна збірка `npm run build:study` та проходження нового регресійного E2E-тесту [`e2e/study-bkt-gating-sync.spec.ts`](file:///e2e/study-bkt-gating-sync.spec.ts) (`1 passed`).",
+              "subitems": []
+            }
+          ]
+        },
+        {
           "title": "0.1.7.109 Трек живої демонстрації та синхронізація плану виступу для конференції IICTE-2026 (`SBC-432`, `EP-MS`)",
           "level": 3,
           "paragraphs": [],

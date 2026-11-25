@@ -96,25 +96,21 @@ export function StudyAppClient({
     if (initialUnitSlug) setSelectedUnitSlug(initialUnitSlug);
   }, [initialCourseSlug, initialModuleSlug, initialUnitSlug]);
 
-  // 🔒 Mastery-Gated Progression State (відслідковування опанованих модулів та P(L))
-  const [unlockedModules, setUnlockedModules] = useState<Record<string, boolean>>({
-    'school-alg-basics': true, // Модуль 1 відкритий за замовчуванням
-    'school-alg-branching': false,
-    'school-alg-loops': false,
-    'school-alg-functions': false,
-    'school-alg-data-structures': false,
-    'school-web-dom': false,
-    'school-web-projects': false,
+  // 🔒 Mastery-Gated Progression State (реальні дані BKT із API, без хардкоду)
+  const [unlockedModules, setUnlockedModules] = useState<Record<string, boolean>>(() => {
+    const initial: Record<string, boolean> = {};
+    activeCurriculum.modules.forEach((mod, idx) => {
+      initial[mod.moduleSlug] = idx === 0;
+    });
+    return initial;
   });
 
-  const [moduleMasteryScores, setModuleMasteryScores] = useState<Record<string, number>>({
-    'school-alg-basics': 92, // Модуль 1 уже закріплений на 92%
-    'school-alg-branching': 45,
-    'school-alg-loops': 0,
-    'school-alg-functions': 0,
-    'school-alg-data-structures': 0,
-    'school-web-dom': 0,
-    'school-web-projects': 0,
+  const [moduleMasteryScores, setModuleMasteryScores] = useState<Record<string, number>>(() => {
+    const initial: Record<string, number> = {};
+    activeCurriculum.modules.forEach((mod) => {
+      initial[mod.moduleSlug] = 0;
+    });
+    return initial;
   });
 
   // Navigation Rail state
@@ -129,10 +125,88 @@ export function StudyAppClient({
   const [testModeEnabled, setTestModeEnabled] = useState<boolean>(true);
   const [googleClientId, setGoogleClientId] = useState<string | undefined>(undefined);
 
+  const currentUserId = currentUser?.id || 'demo-student';
   const currentUserName = currentUser?.profile?.firstName
     ? `${currentUser.profile.firstName} ${currentUser.profile.lastName || ''}`.trim()
     : currentUser?.email || 'Дмитро Стеценко';
   const currentUserRole = currentUser?.role || 'УЧЕНЬ';
+
+  // 🔄 Синхронізація реального BKT-стану та гейтингу модулів із бекендом (для всіх курсів)
+  useEffect(() => {
+    let isCancelled = false;
+
+    const syncLiveBktState = async () => {
+      // Базовий стан для будь-якого курсу: відкритий лише 1-й модуль, усі інші заблоковані, 0%
+      const nextUnlocked: Record<string, boolean> = {};
+      const nextScores: Record<string, number> = {};
+      activeCurriculum.modules.forEach((mod, idx) => {
+        nextUnlocked[mod.moduleSlug] = idx === 0;
+        nextScores[mod.moduleSlug] = 0;
+      });
+
+      try {
+        const [courseRes, bktRes] = await Promise.all([
+          fetch(`http://localhost:3000/api/v1/courses/${activeCourseSlug}`),
+          fetch(`http://localhost:3000/api/v1/bkt/state/${currentUserId}`),
+        ]);
+
+        const bktMap: Record<string, number> = {};
+        if (bktRes.ok) {
+          const states: Array<{ skillId: string; pMastery: number }> = await bktRes.json();
+          states.forEach((s) => {
+            bktMap[s.skillId] = s.pMastery;
+          });
+        }
+
+        if (courseRes.ok) {
+          const courseData = await courseRes.json();
+          const dbModules = [...(courseData.modules || [])].sort(
+            (a: any, b: any) => (a.orderIndex || 0) - (b.orderIndex || 0)
+          );
+          const dbSkills = courseData.skills || [];
+          const defaultThreshold = courseData.defaultMasteryThreshold ?? 0.85;
+
+          const dbMasteryById: Record<string, number> = {};
+          dbModules.forEach((mod: any) => {
+            const modSkills = dbSkills.filter((s: any) => s.moduleId === mod.id);
+            const avg =
+              modSkills.length === 0
+                ? 0
+                : modSkills.reduce((acc: number, s: any) => acc + (bktMap[s.id] ?? 0), 0) /
+                  modSkills.length;
+            dbMasteryById[mod.id] = avg;
+            nextScores[mod.slug] = Math.round(avg * 100);
+          });
+
+          // Послідовний BKT-гейтинг: кожен наступний модуль відкривається лише після опанування попереднього
+          let chainUnlocked = true;
+          dbModules.forEach((mod: any, idx: number) => {
+            if (idx === 0) {
+              nextUnlocked[mod.slug] = true;
+            } else {
+              const prevMod = dbModules[idx - 1];
+              const prevMastery = dbMasteryById[prevMod.id] ?? 0;
+              const prevThreshold = prevMod.minMasteryThreshold ?? defaultThreshold;
+              chainUnlocked = chainUnlocked && prevMastery >= prevThreshold;
+              nextUnlocked[mod.slug] = chainUnlocked;
+            }
+          });
+        }
+      } catch (err) {
+        console.warn('Failed to sync live BKT state in study app:', err);
+      }
+
+      if (!isCancelled) {
+        setUnlockedModules(nextUnlocked);
+        setModuleMasteryScores(nextScores);
+      }
+    };
+
+    syncLiveBktState();
+    return () => {
+      isCancelled = true;
+    };
+  }, [activeCourseSlug, currentUserId, activeCurriculum]);
   const currentUserInitials = currentUserName
     .split(' ')
     .filter(Boolean)
@@ -496,8 +570,8 @@ export function StudyAppClient({
                         defaultOpen={true}
                       >
                         <div className="flex flex-col divide-y divide-slate-800/50">
-                          {activeCurriculum.modules.map((mod) => {
-                            const isUnlocked = unlockedModules[mod.moduleSlug] ?? true;
+                          {activeCurriculum.modules.map((mod, modIdx) => {
+                            const isUnlocked = unlockedModules[mod.moduleSlug] ?? (modIdx === 0);
                             const masteryScore = moduleMasteryScores[mod.moduleSlug] ?? 0;
                             const isCurrent = mod.moduleSlug === selectedModuleSlug;
 
