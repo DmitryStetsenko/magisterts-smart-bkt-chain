@@ -11,6 +11,7 @@ import { CategoryController } from './adapters/inbound/http/category.controller'
 import { AuthController } from './adapters/inbound/http/auth.controller';
 import { ClassroomController } from './adapters/inbound/http/classroom.controller';
 import { UserController } from './adapters/inbound/http/user.controller';
+import { SystemConfigController } from './adapters/inbound/http/system-config.controller';
 import { TelemetryGateway } from './adapters/inbound/websocket/telemetry.gateway';
 
 import { OpenAnswerEvaluatorService } from './domain/evaluation/open-answer-evaluator.service';
@@ -39,6 +40,7 @@ import { AiCourseScaffolderService } from './domain/course/ai-course-scaffolder.
     AuthController,
     ClassroomController,
     UserController,
+    SystemConfigController,
   ],
   providers: [
     TelemetryGateway,

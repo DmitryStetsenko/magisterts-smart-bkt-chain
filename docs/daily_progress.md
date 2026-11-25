@@ -26,7 +26,11 @@
      - У пакеті `@sbc/ui` створено перевикористовуваний компонент `packages/ui/src/theme/ThemeSettingsSection.tsx` (на базі `<DrawerSection>` за Правилом 7) з 3-режимним перемикачем **Темна / Світла / Авто** та індикатором активної палітри.
      - Інтегровано `ThemeSettingsSection` у вкладку «Налаштування» (`settings` / `system`) всіх 4 порталів: `apps/student`, `apps/study`, `apps/teacher` (сайдбар + основна панель налаштувань), `apps/admin`.
      - Адаптовано блок підтвердження компетенції у `apps/study/src/components/StudyAppClient.tsx` під нейтральні дизайн-токени (усунено синьо-індиго градієнт та жорсткий білий текст).
-     - Проведено успішну production-збірку всіх 4 веб-застосунків (`build:student`, `build:study`, `build:teacher`, `build:admin`) та наскрізну перевірку у Playwright E2E (`e2e/theme-settings.spec.ts`: 4/4 тестів пройдено).
+   - **Глобальна тема за замовчуванням для всіх застосунків через БД (`SystemConfig`):**
+     - Додано REST-контролер `apps/api/src/adapters/inbound/http/system-config.controller.ts` (`GET/PUT /api/v1/system-config/theme`, ключі `SYSTEM_DEFAULT_THEME`, `SYSTEM_CUSTOM_THEME_TOKENS`).
+     - Оновлено `ThemeContext` у `@sbc/ui` (`defaultTheme`, `setDefaultTheme`, `hasLocalThemeOverride`, `clearLocalThemeOverride`): портали без локального перевизначення автоматично підхоплюють глобальну тему за замовчуванням з бекенду.
+     - Додано секцію «Тема за замовчуванням для всіх застосунків» у `ThemeCustomizerView` (`apps/admin`).
+     - Проведено успішну збірку (`build:api`, `build:student`, `build:study`, `build:teacher`, `build:admin`) та наскрізну перевірку у Playwright E2E (`e2e/theme-settings.spec.ts`: 5/5 тестів пройдено, включно з трансляцією глобальної теми з Admin на Student із чистим `localStorage`).
 
 2. **Аналіз правок наукового керівника V-4.0 та оновлення авторського профілю (`SBC-432`, `EP-MS`):**
    - Проведено поабзацний та посимвольний порівняльний аудит файлу `V-4.0-Стеценко_тези.docx` з попередньою версією `V-3.1`.

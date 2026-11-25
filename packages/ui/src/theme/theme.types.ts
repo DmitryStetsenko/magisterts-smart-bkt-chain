@@ -21,6 +21,10 @@ export interface ThemeContextValue {
   resolvedTheme: 'dark' | 'light';
   setTheme: (mode: ThemeMode) => void;
   toggleTheme: () => void;
+  defaultTheme: ThemeMode;
+  setDefaultTheme: (mode: ThemeMode) => Promise<void>;
+  hasLocalThemeOverride: boolean;
+  clearLocalThemeOverride: () => void;
   customTokens: CustomThemeConfig;
   updateCustomTokens: (updater: Partial<CustomThemeConfig> | ((prev: CustomThemeConfig) => CustomThemeConfig)) => void;
   resetCustomTokens: () => void;

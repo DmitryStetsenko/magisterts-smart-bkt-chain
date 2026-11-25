@@ -49,10 +49,13 @@
   - **Адаптація CTA-блоку в `StudyAppClient.tsx`:** замінено хардкод-градієнт `from-blue-950/40 via-indigo-950/40` та кнопку з синім світінням на нейтральні дизайн-токени `var(--sbc-bg-surface)`, `var(--sbc-border-subtle)`, `var(--sbc-text-primary)` / `var(--sbc-text-muted)` для повної сумісності з Antigravity Dark і Clean Paper Light.
   - `AppShellLayout`: кореневий контейнер переведено на використання семантичних токенів `var(--sbc-bg-root)`, `var(--sbc-bg-surface)` тощо.
   - `globals.css`: оновлено у `apps/student`, `apps/study`, `apps/admin`, `apps/teacher`, `apps/docs`.
-  - `apps/admin/src/features/theme-customizer/ui/ThemeCustomizerView.tsx`: розроблено повноцінний UI редагування наскрізної палітри кольорів у табі `system` адмінки з інтерактивним Live Preview та пресетами.
+  - `apps/admin/src/features/theme-customizer/ui/ThemeCustomizerView.tsx`: розроблено повноцінний UI редагування наскрізної палітри кольорів у табі `system` адмінки з інтерактивним Live Preview, пресетами та секцією **«Тема за замовчуванням для всіх застосунків»** (`SYSTEM_DEFAULT_THEME`).
+- **Бекенд-персистентність глобальної теми за замовчуванням (`apps/api`):**
+  - Створено `apps/api/src/adapters/inbound/http/system-config.controller.ts` з ендпоінтами `GET /api/v1/system-config/theme` та `PUT /api/v1/system-config/theme` на базі існуючого `SystemConfigService` (таблиця PostgreSQL `system_configs`).
+  - `ThemeProvider` у `@sbc/ui` завантажує глобальну тему за замовчуванням із API та застосовує її на всіх порталах (різних портах/доменах), якщо користувач не задав локальне перевизначення у `localStorage`.
 - **Верифікація:**
-  - Усі 4 production-збірки (`build:student`, `build:study`, `build:teacher`, `build:admin`) пройшли без помилок.
-  - Наскрізний Playwright E2E-тест `e2e/theme-settings.spec.ts` підтвердив перемикання `light` / `dark`, оновлення класу `html.dark` та збереження в `localStorage['sbc_theme_mode']` на порталах 3002, 3003, 3004 та 3006 (4/4 passed).
+  - Усі production-збірки (`build:api`, `build:student`, `build:study`, `build:teacher`, `build:admin`) пройшли без помилок.
+  - Наскрізний Playwright E2E-тест `e2e/theme-settings.spec.ts` підтвердив перемикання `light` / `dark` у Налаштуваннях усіх 4 порталів та трансляцію глобальної теми за замовчуванням з Admin (3004) на Student (3002) із чистим `localStorage` (**5/5 passed**).
 
 ### 0.1.7.101 Аналіз Правок Т. М. Барболіної V-4.0 та Розробка Плану Виступу на IICTE-2026 (SBC-432, EP-MS)
 - **Контекст та аудит правок наукового керівника V-4.0:**

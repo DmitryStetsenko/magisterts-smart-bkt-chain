@@ -217,7 +217,22 @@
             },
             {
               "type": "text",
-              "raw_text": "`apps/admin/src/features/theme-customizer/ui/ThemeCustomizerView.tsx`: розроблено повноцінний UI редагування наскрізної палітри кольорів у табі `system` адмінки з інтерактивним Live Preview та пресетами.",
+              "raw_text": "`apps/admin/src/features/theme-customizer/ui/ThemeCustomizerView.tsx`: розроблено повноцінний UI редагування наскрізної палітри кольорів у табі `system` адмінки з інтерактивним Live Preview, пресетами та секцією **«Тема за замовчуванням для всіх застосунків»** (`SYSTEM_DEFAULT_THEME`).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Бекенд-персистентність глобальної теми за замовчуванням (`apps/api`):**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Створено `apps/api/src/adapters/inbound/http/system-config.controller.ts` з ендпоінтами `GET /api/v1/system-config/theme` та `PUT /api/v1/system-config/theme` на базі існуючого `SystemConfigService` (таблиця PostgreSQL `system_configs`).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "`ThemeProvider` у `@sbc/ui` завантажує глобальну тему за замовчуванням із API та застосовує її на всіх порталах (різних портах/доменах), якщо користувач не задав локальне перевизначення у `localStorage`.",
               "subitems": []
             },
             {
@@ -227,12 +242,12 @@
             },
             {
               "type": "text",
-              "raw_text": "Усі 4 production-збірки (`build:student`, `build:study`, `build:teacher`, `build:admin`) пройшли без помилок.",
+              "raw_text": "Усі production-збірки (`build:api`, `build:student`, `build:study`, `build:teacher`, `build:admin`) пройшли без помилок.",
               "subitems": []
             },
             {
               "type": "text",
-              "raw_text": "Наскрізний Playwright E2E-тест `e2e/theme-settings.spec.ts` підтвердив перемикання `light` / `dark`, оновлення класу `html.dark` та збереження в `localStorage['sbc_theme_mode']` на порталах 3002, 3003, 3004 та 3006 (4/4 passed).",
+              "raw_text": "Наскрізний Playwright E2E-тест `e2e/theme-settings.spec.ts` підтвердив перемикання `light` / `dark` у Налаштуваннях усіх 4 порталів та трансляцію глобальної теми за замовчуванням з Admin (3004) на Student (3002) із чистим `localStorage` (**5/5 passed**).",
               "subitems": []
             }
           ]

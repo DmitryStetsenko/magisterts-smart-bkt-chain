@@ -10,10 +10,10 @@ import {
   Sparkles, 
   Sliders, 
   Eye, 
-  Info,
+  Globe,
   Laptop
 } from 'lucide-react';
-import { useTheme, DEFAULT_THEME_TOKENS, CustomThemeConfig, ColorPaletteTokens } from '@sbc/ui';
+import { useTheme, DEFAULT_THEME_TOKENS, ThemeMode, ColorPaletteTokens } from '@sbc/ui';
 
 interface ColorFieldProps {
   label: string;
@@ -54,8 +54,11 @@ function ColorField({ label, description, value, onChange }: ColorFieldProps) {
 export function ThemeCustomizerView() {
   const { 
     theme, 
-    resolvedTheme, 
     setTheme, 
+    defaultTheme,
+    setDefaultTheme,
+    hasLocalThemeOverride,
+    clearLocalThemeOverride,
     customTokens, 
     updateCustomTokens, 
     resetCustomTokens 
@@ -63,6 +66,19 @@ export function ThemeCustomizerView() {
 
   const [activeEditingMode, setActiveEditingMode] = useState<'dark' | 'light'>('dark');
   const [saveSuccess, setSaveSuccess] = useState(false);
+  const [defaultThemeStatus, setDefaultThemeStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
+
+  const handleSelectDefaultTheme = async (mode: ThemeMode) => {
+    setDefaultThemeStatus('saving');
+    try {
+      await setDefaultTheme(mode);
+      setDefaultThemeStatus('saved');
+      setTimeout(() => setDefaultThemeStatus('idle'), 2500);
+    } catch {
+      setDefaultThemeStatus('error');
+      setTimeout(() => setDefaultThemeStatus('idle'), 3000);
+    }
+  };
 
   const activeTokens = activeEditingMode === 'dark' ? customTokens.dark : customTokens.light;
 
@@ -134,7 +150,86 @@ export function ThemeCustomizerView() {
         </div>
       </div>
 
-      {/* 2. Швидке перемикання активного режиму перегляду */}
+      {/* 1.5 Глобальна тема за замовчуванням для всіх застосунків (SystemConfig DB) */}
+      <div
+        data-testid="global-default-theme-section"
+        className="flex flex-col gap-3 p-4 rounded-xl bg-[var(--sbc-bg-surface,#1f1f1f)] border border-[var(--sbc-border-subtle,#2b2b2b)]"
+      >
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+          <div>
+            <h3 className="text-xs font-bold text-[var(--sbc-text-primary,#cccccc)] flex items-center gap-2">
+              <Globe className="w-4 h-4 text-emerald-400" />
+              <span>Тема за замовчуванням для всіх застосунків</span>
+            </h3>
+            <p className="text-[11px] text-[var(--sbc-text-muted,#909090)] mt-0.5">
+              Зберігається в БД (SystemConfig) та автоматично застосовується на Student, Study, Teacher і Admin для користувачів без власного перевизначення.
+            </p>
+          </div>
+          {defaultThemeStatus === 'saving' && (
+            <span className="text-[11px] font-mono text-amber-400 shrink-0">Збереження...</span>
+          )}
+          {defaultThemeStatus === 'saved' && (
+            <span className="text-[11px] font-mono text-emerald-400 flex items-center gap-1 shrink-0 animate-fadeIn">
+              <Check className="w-3.5 h-3.5" /> Збережено для всіх порталів
+            </span>
+          )}
+          {defaultThemeStatus === 'error' && (
+            <span className="text-[11px] font-mono text-rose-400 shrink-0">Помилка збереження в API</span>
+          )}
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-2.5">
+          {(
+            [
+              { mode: 'dark' as ThemeMode, title: 'Темна (за замовч.)', desc: 'Antigravity Dark', icon: Moon, iconClass: 'text-emerald-400' },
+              { mode: 'light' as ThemeMode, title: 'Світла (за замовч.)', desc: 'Clean Paper Light', icon: Sun, iconClass: 'text-amber-500' },
+              { mode: 'system' as ThemeMode, title: 'Системна ОС', desc: 'Слідує налаштуванням ОС', icon: Laptop, iconClass: 'text-indigo-400' },
+            ]
+          ).map((item) => {
+            const Icon = item.icon;
+            const isSelected = defaultTheme === item.mode;
+            return (
+              <button
+                key={item.mode}
+                type="button"
+                data-testid={`default-theme-${item.mode}`}
+                onClick={() => handleSelectDefaultTheme(item.mode)}
+                className={`p-3 rounded-lg border flex items-center justify-between text-left cursor-pointer transition-colors ${
+                  isSelected
+                    ? 'border-emerald-500/70 bg-emerald-500/10'
+                    : 'border-[var(--sbc-border-subtle,#2b2b2b)] bg-[var(--sbc-bg-root,#181818)] hover:bg-[var(--sbc-bg-subtle,#2a2d2e)]'
+                }`}
+              >
+                <div className="flex items-center gap-2.5">
+                  <Icon className={`w-4 h-4 shrink-0 ${item.iconClass}`} />
+                  <div>
+                    <div className="text-xs font-semibold text-[var(--sbc-text-primary,#cccccc)]">{item.title}</div>
+                    <div className="text-[10px] text-[var(--sbc-text-muted,#909090)]">{item.desc}</div>
+                  </div>
+                </div>
+                {isSelected && <Check className="w-4 h-4 text-emerald-400 shrink-0" />}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* 2. Швидке перемикання локального режиму перегляду */}
+      <div className="flex flex-col gap-2">
+        <div className="flex items-center justify-between">
+          <span className="text-[11px] font-semibold uppercase tracking-wider text-[var(--sbc-text-muted,#909090)]">
+            Локальний режим перегляду (лише у цьому браузері)
+          </span>
+          {hasLocalThemeOverride && (
+            <button
+              type="button"
+              onClick={clearLocalThemeOverride}
+              className="text-[11px] text-amber-400 hover:text-amber-300 underline underline-offset-2 cursor-pointer"
+            >
+              Скинути до глобальної ({defaultTheme})
+            </button>
+          )}
+        </div>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
         <div 
           onClick={() => setTheme('dark')}
@@ -195,6 +290,7 @@ export function ThemeCustomizerView() {
           </div>
           {theme === 'system' && <Check className="w-4 h-4 text-emerald-400" />}
         </div>
+      </div>
       </div>
 
       {/* 3. Перемикач режиму редагування (Dark / Light) */}

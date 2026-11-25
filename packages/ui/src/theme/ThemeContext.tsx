@@ -7,6 +7,11 @@ import { DEFAULT_THEME_TOKENS } from './defaultTokens';
 const THEME_MODE_STORAGE_KEY = 'sbc_theme_mode';
 const THEME_TOKENS_STORAGE_KEY = 'sbc_custom_theme_tokens';
 
+function getApiBaseUrl(): string {
+  const envUrl = typeof process !== 'undefined' ? process.env.NEXT_PUBLIC_API_URL : undefined;
+  return (envUrl || 'http://localhost:3000/api/v1').replace(/\/+$/, '');
+}
+
 const ThemeContext = createContext<ThemeContextValue | null>(null);
 
 function applyThemeVariables(resolvedTheme: 'dark' | 'light', tokens: CustomThemeConfig) {
@@ -69,20 +74,24 @@ function applyThemeVariables(resolvedTheme: 'dark' | 'light', tokens: CustomThem
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [theme, setThemeState] = useState<ThemeMode>('dark');
+  const [defaultTheme, setDefaultThemeState] = useState<ThemeMode>('dark');
+  const [hasLocalThemeOverride, setHasLocalThemeOverride] = useState<boolean>(false);
   const [systemIsDark, setSystemIsDark] = useState<boolean>(true);
   const [customTokens, setCustomTokensState] = useState<CustomThemeConfig>(DEFAULT_THEME_TOKENS);
 
-  // Ініціалізація з localStorage
+  // Ініціалізація з localStorage + завантаження глобальної теми за замовчуванням із бекенду
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
-    // 1. Зчитування збереженого режиму
+    // 1. Зчитування збереженого локального режиму
     const savedMode = localStorage.getItem(THEME_MODE_STORAGE_KEY) as ThemeMode | null;
-    if (savedMode && (savedMode === 'dark' || savedMode === 'light' || savedMode === 'system')) {
+    const hasLocal = Boolean(savedMode && (savedMode === 'dark' || savedMode === 'light' || savedMode === 'system'));
+    if (hasLocal && savedMode) {
       setThemeState(savedMode);
+      setHasLocalThemeOverride(true);
     }
 
-    // 2. Зчитування кастомних токенів
+    // 2. Зчитування локальних кастомних токенів
     const savedTokens = localStorage.getItem(THEME_TOKENS_STORAGE_KEY);
     if (savedTokens) {
       try {
@@ -96,6 +105,31 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
       }
     }
 
+    // 2.5 Завантаження глобального налаштування теми за замовчуванням з SystemConfig API
+    let isMounted = true;
+    fetch(`${getApiBaseUrl()}/system-config/theme`, { cache: 'no-store' })
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (!isMounted || !data) return;
+        const remoteDefault = data.defaultTheme as ThemeMode | undefined;
+        if (remoteDefault === 'dark' || remoteDefault === 'light' || remoteDefault === 'system') {
+          setDefaultThemeState(remoteDefault);
+          // Застосовуємо глобальну тему за замовчуванням, якщо користувач не обрав локальне перевизначення
+          if (!localStorage.getItem(THEME_MODE_STORAGE_KEY)) {
+            setThemeState(remoteDefault);
+          }
+        }
+        if (data.customTokens && !localStorage.getItem(THEME_TOKENS_STORAGE_KEY)) {
+          setCustomTokensState({
+            dark: { ...DEFAULT_THEME_TOKENS.dark, ...(data.customTokens.dark || {}) },
+            light: { ...DEFAULT_THEME_TOKENS.light, ...(data.customTokens.light || {}) },
+          });
+        }
+      })
+      .catch(() => {
+        // Silent fallback when API is offline
+      });
+
     // 3. Відстеження системної теми
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
     setSystemIsDark(mediaQuery.matches);
@@ -108,8 +142,13 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
     // 4. Слухач storage для міжвкладкової синхронізації вводу
     const handleStorage = (e: StorageEvent) => {
-      if (e.key === THEME_MODE_STORAGE_KEY && e.newValue) {
-        setThemeState(e.newValue as ThemeMode);
+      if (e.key === THEME_MODE_STORAGE_KEY) {
+        if (e.newValue === 'dark' || e.newValue === 'light' || e.newValue === 'system') {
+          setThemeState(e.newValue);
+          setHasLocalThemeOverride(true);
+        } else if (e.newValue === null) {
+          setHasLocalThemeOverride(false);
+        }
       }
       if (e.key === THEME_TOKENS_STORAGE_KEY && e.newValue) {
         try {
@@ -124,6 +163,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     window.addEventListener('storage', handleStorage);
 
     return () => {
+      isMounted = false;
       mediaQuery.removeEventListener('change', handleMediaChange);
       window.removeEventListener('storage', handleStorage);
     };
@@ -143,10 +183,35 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
   const setTheme = useCallback((mode: ThemeMode) => {
     setThemeState(mode);
+    setHasLocalThemeOverride(true);
     if (typeof window !== 'undefined') {
       localStorage.setItem(THEME_MODE_STORAGE_KEY, mode);
       // Відправляємо кастомну подію для синхронізації в рамках одного вікна
       window.dispatchEvent(new Event('sbc-theme-change'));
+    }
+  }, []);
+
+  const clearLocalThemeOverride = useCallback(() => {
+    setHasLocalThemeOverride(false);
+    setThemeState(defaultTheme);
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem(THEME_MODE_STORAGE_KEY);
+      window.dispatchEvent(new Event('sbc-theme-change'));
+    }
+  }, [defaultTheme]);
+
+  const setDefaultTheme = useCallback(async (mode: ThemeMode) => {
+    setDefaultThemeState(mode);
+    if (typeof window !== 'undefined' && !localStorage.getItem(THEME_MODE_STORAGE_KEY)) {
+      setThemeState(mode);
+    }
+    const res = await fetch(`${getApiBaseUrl()}/system-config/theme`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ defaultTheme: mode }),
+    });
+    if (!res.ok) {
+      throw new Error(`Failed to persist default theme (${res.status})`);
     }
   }, []);
 
@@ -182,10 +247,26 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     resolvedTheme,
     setTheme,
     toggleTheme,
+    defaultTheme,
+    setDefaultTheme,
+    hasLocalThemeOverride,
+    clearLocalThemeOverride,
     customTokens,
     updateCustomTokens,
     resetCustomTokens,
-  }), [theme, resolvedTheme, setTheme, toggleTheme, customTokens, updateCustomTokens, resetCustomTokens]);
+  }), [
+    theme,
+    resolvedTheme,
+    setTheme,
+    toggleTheme,
+    defaultTheme,
+    setDefaultTheme,
+    hasLocalThemeOverride,
+    clearLocalThemeOverride,
+    customTokens,
+    updateCustomTokens,
+    resetCustomTokens,
+  ]);
 
   return (
     <ThemeContext.Provider value={value}>
@@ -203,6 +284,10 @@ export function useTheme(): ThemeContextValue {
       resolvedTheme: 'dark',
       setTheme: () => {},
       toggleTheme: () => {},
+      defaultTheme: 'dark',
+      setDefaultTheme: async () => {},
+      hasLocalThemeOverride: false,
+      clearLocalThemeOverride: () => {},
       customTokens: DEFAULT_THEME_TOKENS,
       updateCustomTokens: () => {},
       resetCustomTokens: () => {},

@@ -37,4 +37,50 @@ test.describe('Cross-App Settings Theme Switcher (SBC-433)', () => {
       expect(savedDark).toBe('dark');
     });
   }
+
+  test('Admin global default theme propagates to other portals with clean localStorage', async ({ browser, request }) => {
+    const adminContext = await browser.newContext();
+    const adminPage = await adminContext.newPage();
+
+    try {
+      await adminPage.goto('http://localhost:3004', { waitUntil: 'networkidle', timeout: 60000 });
+      const settingsBtn = adminPage.locator('button[title="Налаштування"]').first();
+      await expect(settingsBtn).toBeVisible({ timeout: 30000 });
+      await settingsBtn.click();
+
+      const globalSection = adminPage.locator('[data-testid="global-default-theme-section"]');
+      await expect(globalSection).toBeVisible({ timeout: 15000 });
+
+      // Set global default theme to Light in Admin Portal
+      const putPromise = adminPage.waitForResponse(
+        (res) => res.url().includes('/system-config/theme') && res.request().method() === 'PUT' && res.ok()
+      );
+      await globalSection.locator('[data-testid="default-theme-light"]').click();
+      await putPromise;
+
+      // Verify backend persisted 'light'
+      const apiRes = await request.get('http://localhost:3000/api/v1/system-config/theme');
+      expect(apiRes.ok()).toBeTruthy();
+      const apiData = await apiRes.json();
+      expect(apiData.defaultTheme).toBe('light');
+
+      // Open a brand new browser context (empty localStorage) on Student Portal (port 3002)
+      const studentContext = await browser.newContext();
+      const studentPage = await studentContext.newPage();
+      await studentPage.goto('http://localhost:3002', { waitUntil: 'networkidle', timeout: 60000 });
+
+      // Student Portal should automatically adopt Light theme from Admin default
+      await expect(studentPage.locator('html')).not.toHaveClass(/\bdark\b/, { timeout: 10000 });
+      await studentContext.close();
+
+      // Restore global default back to Dark
+      const restorePromise = adminPage.waitForResponse(
+        (res) => res.url().includes('/system-config/theme') && res.request().method() === 'PUT' && res.ok()
+      );
+      await globalSection.locator('[data-testid="default-theme-dark"]').click();
+      await restorePromise;
+    } finally {
+      await adminContext.close();
+    }
+  });
 });
