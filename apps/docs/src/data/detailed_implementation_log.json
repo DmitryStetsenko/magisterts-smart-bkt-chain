@@ -164,6 +164,11 @@
               "type": "text",
               "raw_text": "У [`packages/ui/src/theme/light-theme.css`](file:///packages/ui/src/theme/light-theme.css) додано спільний клас `.sbc-zebra-list` (секція 6) для делікатного чергування тону парних рядків у світлій та темній темах і застосовано в `AnomalyTreeWidget` (`@sbc/ui` та `apps/teacher`), `StudentAnalyticsTable`, `CourseGraphViewer`, `MetricsAuditInspector` і `DatasetExportCenter`.",
               "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "У [`apps/teacher/src/features/metrics-audit/ui/MetricsAuditInspector.tsx`](file:///apps/teacher/src/features/metrics-audit/ui/MetricsAuditInspector.tsx) прибрано градієнтні підкладки банера «Реєстр Адаптивних, Поведінкових та Педагогічних Механізмів» і правої панелі розрахунку BKT на користь чистого плоского фону `bg-slate-900 border border-slate-800` із коректним контрастом заголовків у світлій і темній темах.",
+              "subitems": []
             }
           ]
         },

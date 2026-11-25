@@ -198,6 +198,11 @@
               "type": "text",
               "raw_text": "**Делікатне чергування фонів рядків (`.sbc-zebra-list`) для списків і таблиць (`SBC-434`, `EP-SH`):** у `packages/ui/src/theme/light-theme.css` введено перевикористовуваний клас `.sbc-zebra-list` із м'якою тональною відмінністю парних рядків (`rgba(0,0,0,0.028)` у світлій та `rgba(255,255,255,0.025)` у темній темі + hover `0.055`) та підключено до списків інцидентів `AnomalyTreeWidget` і таблиць `StudentAnalyticsTable`, `CourseGraphViewer`, `MetricsAuditInspector`, `DatasetExportCenter`.",
               "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Прибрано градієнтні банери в `MetricsAuditInspector.tsx` (`SBC-434`, `EP-TC`):** замінено `bg-gradient-to-r from-amber-950/40 via-slate-900 to-purple-950/40` (шапка «Реєстр Адаптивних, Поведінкових та Педагогічних Механізмів») та `bg-gradient-to-b from-slate-900 to-slate-950` (панель результату BKT) на чистий плоский фон `bg-slate-900 border border-slate-800`, що усунуло розмитий градієнт і білий текст на світлому фоні у світлій темі.",
+              "subitems": []
             }
           ]
         },
