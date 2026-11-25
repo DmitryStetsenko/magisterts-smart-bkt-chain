@@ -5,18 +5,20 @@
 ## 📅 25 листопада 2026 року
 
 ### ✅ Що зроблено за день:
-1. **Наскрізна система тем (Світла/Темна), перехід темної теми на нейтральні сірі тони та кастомізатор палітри в Admin Portal (`SBC-433`, `EP-SH`):**
+1. **Наскрізна система тем (Світла/Темна), глобальне усунення синіх тонів на користь нейтрального сірого/цинку та кастомізатор палітри в Admin Portal (`SBC-433`, `EP-SH`):**
    - Створено гілку `feat/theme-system-tokens`.
    - Проведено мозковий штурм та сформовано документ [`docs/brainstorm/21_cross_app_theme_system_and_neutral_gray_palette.md`](file:///docs/brainstorm/21_cross_app_theme_system_and_neutral_gray_palette.md).
    - У пакеті `@sbc/ui` реалізовано модуль керування темами:
      - `theme.types.ts`: типізація режимів `ThemeMode ('dark' | 'light' | 'system')`, палітри `ColorPaletteTokens` та `CustomThemeConfig`.
      - `defaultTokens.ts`: базові палітри нейтрального графіту/цинку (усунення холодного синього/slate відтінку) для темної теми та м'якого паперу для світлої теми.
-     - `ThemeContext.tsx` та `ThemeProvider`: збереження в `localStorage`, реакція на системні налаштування (`matchMedia`), синхронізація між вкладками через `window.addEventListener('storage')` та інжектування CSS-змінних.
+     - `ThemeContext.tsx` та `ThemeProvider`: збереження в `localStorage`, реакція на системні налаштування (`matchMedia`), синхронізація між вкладками через `window.addEventListener('storage')`, інжектування CSS-змінних та динамічне перекриття палітри `slate` на нейтральні цинкові тони.
      - `ThemeToggle.tsx`: компактний перемикач теми з підтримкою іконок `Sun` / `Moon`.
-   - Інтегровано перемикач тем у канонічний `UserProfileDrawer` (доступний автоматично в усіх додатках екосистеми) та оновлено семантичні змінні в `AppShellLayout`.
-   - Оновлено `globals.css` в усіх застосунках (`apps/student`, `apps/study`, `apps/teacher`, `apps/admin`, `apps/docs`).
+   - **Повне усунення синіх hardcoded тонів по всіх веб-застосунках платформи:**
+     - `apps/student`: заміна жорстких синіх фонів `bg-[#090d16]`, індиго-карток завдань, кнопок варіантів тестування у `QuizTaskEditor`, банерів адаптивності та умов завдань на нейтральні цинкові поверхні `bg-[var(--sbc-bg-surface)]` та розділювачі `border-[var(--sbc-border-subtle)]`.
+     - `apps/study`, `apps/teacher`, `apps/admin`: видалено хардкод `bg-[#070a13]` та `bg-slate-950` у `layout.tsx` та `globals.css` із повним переведенням на дизайн-токени.
+     - Tailwind v4 `@theme`: налаштовано перекриття палітри `--color-slate-*` на відповідні сіро-графітові тони, що автоматично позбавило всі наявні компоненти холодного синього відтінку без порушення верстки.
    - Створено повноцінний центр конфігурації тем `ThemeCustomizerView` в `apps/admin` (таб `system` / Налаштування) з color pickers, пресетами («Graphite Neutral», «Deep Zinc», «Clean Paper») та інтерактивним Live Preview.
-   - Проведено успішну збірку всіх веб-застосунків монорепозиторію (`build:admin`, `build:student`, `build:study`, `build:teacher`).
+   - Проведено успішну збірку всіх 4 веб-застосунків монорепозиторію (`build:student`, `build:study`, `build:teacher`, `build:admin`).
 
 2. **Аналіз правок наукового керівника V-4.0 та оновлення авторського профілю (`SBC-432`, `EP-MS`):**
    - Проведено поабзацний та посимвольний порівняльний аудит файлу `V-4.0-Стеценко_тези.docx` з попередньою версією `V-3.1`.

@@ -16,7 +16,7 @@
           "items": [
             {
               "type": "text",
-              "raw_text": "**Наскрізна система тем (Світла/Темна), перехід темної теми на нейтральні сірі тони та кастомізатор палітри в Admin Portal (`SBC-433`, `EP-SH`):**",
+              "raw_text": "**Наскрізна система тем (Світла/Темна), глобальне усунення синіх тонів на користь нейтрального сірого/цинку та кастомізатор палітри в Admin Portal (`SBC-433`, `EP-SH`):**",
               "subitems": []
             },
             {
@@ -35,19 +35,18 @@
               "subitems": [
                 "`theme.types.ts`: типізація режимів `ThemeMode ('dark' | 'light' | 'system')`, палітри `ColorPaletteTokens` та `CustomThemeConfig`.",
                 "`defaultTokens.ts`: базові палітри нейтрального графіту/цинку (усунення холодного синього/slate відтінку) для темної теми та м'якого паперу для світлої теми.",
-                "`ThemeContext.tsx` та `ThemeProvider`: збереження в `localStorage`, реакція на системні налаштування (`matchMedia`), синхронізація між вкладками через `window.addEventListener('storage')` та інжектування CSS-змінних.",
+                "`ThemeContext.tsx` та `ThemeProvider`: збереження в `localStorage`, реакція на системні налаштування (`matchMedia`), синхронізація між вкладками через `window.addEventListener('storage')`, інжектування CSS-змінних та динамічне перекриття палітри `slate` на нейтральні цинкові тони.",
                 "`ThemeToggle.tsx`: компактний перемикач теми з підтримкою іконок `Sun` / `Moon`."
               ]
             },
             {
               "type": "text",
-              "raw_text": "Інтегровано перемикач тем у канонічний `UserProfileDrawer` (доступний автоматично в усіх додатках екосистеми) та оновлено семантичні змінні в `AppShellLayout`.",
-              "subitems": []
-            },
-            {
-              "type": "text",
-              "raw_text": "Оновлено `globals.css` в усіх застосунках (`apps/student`, `apps/study`, `apps/teacher`, `apps/admin`, `apps/docs`).",
-              "subitems": []
+              "raw_text": "**Повне усунення синіх hardcoded тонів по всіх веб-застосунках платформи:**",
+              "subitems": [
+                "`apps/student`: заміна жорстких синіх фонів `bg-[#090d16]`, індиго-карток завдань, кнопок варіантів тестування у `QuizTaskEditor`, банерів адаптивності та умов завдань на нейтральні цинкові поверхні `bg-[var(--sbc-bg-surface)]` та розділювачі `border-[var(--sbc-border-subtle)]`.",
+                "`apps/study`, `apps/teacher`, `apps/admin`: видалено хардкод `bg-[#070a13]` та `bg-slate-950` у `layout.tsx` та `globals.css` із повним переведенням на дизайн-токени.",
+                "Tailwind v4 `@theme`: налаштовано перекриття палітри `--color-slate-*` на відповідні сіро-графітові тони, що автоматично позбавило всі наявні компоненти холодного синього відтінку без порушення верстки."
+              ]
             },
             {
               "type": "text",
@@ -56,7 +55,7 @@
             },
             {
               "type": "text",
-              "raw_text": "Проведено успішну збірку всіх веб-застосунків монорепозиторію (`build:admin`, `build:student`, `build:study`, `build:teacher`).",
+              "raw_text": "Проведено успішну збірку всіх 4 веб-застосунків монорепозиторію (`build:student`, `build:study`, `build:teacher`, `build:admin`).",
               "subitems": []
             },
             {

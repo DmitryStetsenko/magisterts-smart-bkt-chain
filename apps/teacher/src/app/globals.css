@@ -1,6 +1,20 @@
 @import "tailwindcss";
 @source "../../../../packages/ui/src";
 
+@theme {
+  --color-slate-950: var(--color-slate-950, #121215);
+  --color-slate-900: var(--color-slate-900, #18181b);
+  --color-slate-800: var(--color-slate-800, #222226);
+  --color-slate-700: var(--color-slate-700, #3f3f46);
+  --color-slate-600: var(--color-slate-600, #71717a);
+  --color-slate-500: var(--color-slate-500, #71717a);
+  --color-slate-400: var(--color-slate-400, #a1a1aa);
+  --color-slate-300: var(--color-slate-300, #d4d4d8);
+  --color-slate-200: var(--color-slate-200, #e4e4e7);
+  --color-slate-100: var(--color-slate-100, #f4f4f5);
+  --color-slate-50: var(--color-slate-50, #fafafa);
+}
+
 @layer base {
   :root {
     --background: var(--sbc-bg-root, #121215);

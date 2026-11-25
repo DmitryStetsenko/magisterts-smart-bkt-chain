@@ -85,15 +85,15 @@ export function QuizTaskEditor({
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex items-center justify-between pb-2.5 border-b border-slate-800/80">
+      <div className="flex items-center justify-between pb-2.5 border-b border-[var(--sbc-border-subtle,#27272a)]">
         <div className="flex items-center gap-2 text-indigo-400">
           <HelpCircle className="w-4 h-4" />
-          <h3 className="font-semibold text-slate-200 text-xs uppercase tracking-wider">
+          <h3 className="font-semibold text-[var(--sbc-text-primary,#f4f4f5)] text-xs uppercase tracking-wider">
             {taskType === 'SINGLE_CHOICE' ? 'Оберіть один варіант відповіді:' : 'Оберіть усі правильні варіанти:'}
           </h3>
         </div>
 
-        <div className="flex items-center gap-1.5 text-[11px] font-mono text-slate-500">
+        <div className="flex items-center gap-1.5 text-[11px] font-mono text-[var(--sbc-text-muted,#a1a1aa)]">
           <Clock className="w-3 h-3 text-indigo-400" />
           <span>Телеметрія активна</span>
         </div>
@@ -116,10 +116,10 @@ export function QuizTaskEditor({
                 isPassed
                   ? active
                     ? 'bg-emerald-500/10 border-emerald-500/50 text-white cursor-default shadow-sm shadow-emerald-950/40'
-                    : 'bg-slate-900/30 border-slate-800/50 text-slate-500 cursor-not-allowed opacity-60'
+                    : 'bg-zinc-900/30 border-zinc-800/50 text-zinc-500 cursor-not-allowed opacity-60'
                   : active
-                  ? 'bg-indigo-600/15 border-indigo-500/70 text-white shadow-md shadow-indigo-950/50 ring-1 ring-indigo-500/40'
-                  : 'bg-slate-900/50 border-slate-800/80 hover:border-slate-700 hover:bg-slate-800/50 text-slate-200'
+                  ? 'bg-zinc-800/90 border-indigo-500 text-white shadow-md shadow-zinc-950/50 ring-1 ring-indigo-500/40'
+                  : 'bg-zinc-900/80 border-zinc-800 hover:border-zinc-700 hover:bg-zinc-800/50 text-zinc-200'
               }`}
             >
               <div className="flex items-start gap-3 flex-1 min-w-0">
@@ -129,16 +129,16 @@ export function QuizTaskEditor({
                   } flex items-center justify-center font-mono font-bold text-xs transition-colors shrink-0 mt-0.5 ${
                     isPassed
                       ? active
-                        ? 'bg-emerald-500 text-slate-950'
-                        : 'bg-slate-800 text-slate-500'
+                        ? 'bg-emerald-500 text-zinc-950'
+                        : 'bg-zinc-800 text-zinc-500'
                       : active
                       ? 'bg-indigo-600 text-white'
-                      : 'bg-slate-800/90 border border-slate-700/60 text-slate-300'
+                      : 'bg-zinc-800 border border-zinc-700/60 text-zinc-300'
                   }`}
                 >
                   {active ? <CheckCircle2 className="w-3.5 h-3.5 stroke-[2.5]" /> : letter}
                 </div>
-                <span className={`text-sm leading-relaxed ${active ? 'font-semibold text-white' : 'font-normal text-slate-300'}`}>
+                <span className={`text-sm leading-relaxed ${active ? 'font-semibold text-white' : 'font-normal text-zinc-300'}`}>
                   {opt.text}
                 </span>
               </div>
@@ -149,7 +149,7 @@ export function QuizTaskEditor({
                     ✓ Обрано
                   </span>
                 )}
-                <span className="text-[11px] font-mono text-slate-600">{letter}</span>
+                <span className="text-[11px] font-mono text-zinc-500">{letter}</span>
               </div>
             </div>
           );

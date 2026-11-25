@@ -38,6 +38,35 @@ function applyThemeVariables(resolvedTheme: 'dark' | 'light', tokens: CustomThem
   root.style.setProperty('--card', currentTokens.bgSurface);
   root.style.setProperty('--card-foreground', currentTokens.textPrimary);
   root.style.setProperty('--border', currentTokens.borderSubtle);
+
+  // 🩶 Перевизначаємо Tailwind кольори slate (slate-950, slate-900, slate-800, slate-700),
+  // щоб усунути холодну синяву в усіх готових компонентах на користь нейтрального сірого/цинку!
+  if (resolvedTheme === 'dark') {
+    root.style.setProperty('--color-slate-950', currentTokens.bgRoot);      // було #020617 (синій) -> #121215 (графіт)
+    root.style.setProperty('--color-slate-900', currentTokens.bgSurface);   // було #0f172a (синій) -> #18181b (цинк)
+    root.style.setProperty('--color-slate-800', currentTokens.bgSubtle);    // було #1e293b (синій) -> #222226
+    root.style.setProperty('--color-slate-700', currentTokens.borderStrong);
+    root.style.setProperty('--color-slate-600', currentTokens.textTertiary);
+    root.style.setProperty('--color-slate-500', currentTokens.textTertiary);
+    root.style.setProperty('--color-slate-400', currentTokens.textMuted);
+    root.style.setProperty('--color-slate-300', currentTokens.textPrimary);
+    root.style.setProperty('--color-slate-200', currentTokens.textPrimary);
+    root.style.setProperty('--color-slate-100', '#fafafa');
+    root.style.setProperty('--color-slate-50', '#ffffff');
+  } else {
+    // У світлій темі темні класи slate-950/slate-900 мапуються на світлий папір та білі картки
+    root.style.setProperty('--color-slate-950', currentTokens.bgRoot);      // світлий папір #f4f4f6
+    root.style.setProperty('--color-slate-900', currentTokens.bgSurface);   // чистий білий #ffffff
+    root.style.setProperty('--color-slate-800', currentTokens.bgSubtle);    // світло-сірий #eaecef
+    root.style.setProperty('--color-slate-700', currentTokens.borderSubtle);
+    root.style.setProperty('--color-slate-600', currentTokens.borderStrong);
+    root.style.setProperty('--color-slate-500', currentTokens.textTertiary);
+    root.style.setProperty('--color-slate-400', currentTokens.textMuted);
+    root.style.setProperty('--color-slate-300', currentTokens.textPrimary);
+    root.style.setProperty('--color-slate-200', currentTokens.textPrimary);
+    root.style.setProperty('--color-slate-100', currentTokens.textPrimary);
+    root.style.setProperty('--color-slate-50', currentTokens.textPrimary);
+  }
 }
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
