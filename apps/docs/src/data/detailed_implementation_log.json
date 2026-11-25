@@ -195,7 +195,7 @@
             },
             {
               "type": "text",
-              "raw_text": "Створено централізований регламент [`PRESENTATION/PRESENTATION_RULES.md`](file:///SCIENCE/THESES/IICTE-2026_20-11-26/PRESENTATION/PRESENTATION_RULES.md) та автоматичний скрипт-аудитор [`PRESENTATION/audit_presentation.py`](file:///SCIENCE/THESES/IICTE-2026_20-11-26/PRESENTATION/audit_presentation.py) (перевірка на 5 категорій порушень: 1-ша особа множини, категоричні заперечення щодо інших підходів, ШІ-кліше, формалізм/мета-блоки, застарілі цифри). Випущено версію слайдів `V-6.1` (`V-6.1-SLIDES_SCRIPT.md` / `SLIDES_SCRIPT.md`) із `0` порушень автоаудиту.",
+              "raw_text": "Створено централізований регламент [`PRESENTATION/PRESENTATION_RULES.md`](file:///SCIENCE/THESES/IICTE-2026_20-11-26/PRESENTATION/PRESENTATION_RULES.md) та автоматичний скрипт-аудитор [`PRESENTATION/audit_presentation.py`](file:///SCIENCE/THESES/IICTE-2026_20-11-26/PRESENTATION/audit_presentation.py). Випущено версію слайдів `V-6.2` (`V-6.2-SLIDES_SCRIPT.md` / `SLIDES_SCRIPT.md`) із `0` порушень автоаудиту: узагальнено сферу застосування (шкільна програма як приклад), замінено термін «гейтинг» на «пороговий допуск» та додано виноску з обґрунтуванням порогів `3,5 с`, `120 WPM` і `5 с` на Слайді 6.",
               "subitems": []
             },
             {
