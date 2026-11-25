@@ -142,7 +142,12 @@
             },
             {
               "type": "text",
-              "raw_text": "«Дерево Знань» завжди рендерить реальну топологію `parentSkillIds` зі спрямованими стрілками. Зайвий чекбокс прибрано для ролі `student`, а для `role === 'teacher'` додано чекбокс **«Метрики графа»** (`showTeacherMetrics`), який відображає порогові мітки `≥0.85` безпосередньо на ребрах DAG.",
+              "raw_text": "«Дерево Знань» завжди рендерить реальну топологію `parentSkillIds` зі спрямованими стрілками. Зайвий чекбокс прибрано для ролі `student`, а для `role === 'teacher'` додано чекбокс **«Метрики графа»** (`showTeacherMetrics`), який відображає **реальний `requiredMastery` кожного ребра з БД** (`parentThresholds` у `SkillGraphNode`, замаплено в `StudentPortalApp` і `apps/teacher/src/app/page.tsx`) та живі метрики `P(L)`, `WPM`, `Paste %` під вузлами.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Створено довідник доповідача [`PRESENTATION/docs/FORMULAS_AND_METRICS_GUIDE.md`](file:///SCIENCE/THESES/IICTE-2026_20-11-26/PRESENTATION/docs/FORMULAS_AND_METRICS_GUIDE.md) (вимова всіх математичних позначень українською, розбір 7 формул тез, зведена таблиця походження й керованості всіх цифр у системі та цикл EM-калібрування).",
               "subitems": []
             },
             {

@@ -140,7 +140,14 @@ export function GameSkillTreeWidget({
   const svgHeight = hasRealDependencies ? dagLayout.height : Math.max(550, nodes.length * 135 + 100);
 
   // Ребра завжди відповідають реальним залежностям parentSkillIds (без фіктивних лінійних зв'язків 3->4->5)
-  const graphEdges: Array<{ id: string; fromNode: SkillGraphNode; toNode: SkillGraphNode; fromPos: { x: number; y: number }; toPos: { x: number; y: number } }> = [];
+  const graphEdges: Array<{
+    id: string;
+    fromNode: SkillGraphNode;
+    toNode: SkillGraphNode;
+    fromPos: { x: number; y: number };
+    toPos: { x: number; y: number };
+    requiredMastery: number;
+  }> = [];
   if (hasRealDependencies) {
     const indexById = new Map(nodes.map((n, i) => [n.id, i]));
     nodes.forEach((child, childIdx) => {
@@ -153,6 +160,7 @@ export function GameSkillTreeWidget({
             toNode: child,
             fromPos: nodePositions[parentIdx],
             toPos: nodePositions[childIdx],
+            requiredMastery: child.parentThresholds?.[pid] ?? 0.85,
           });
         }
       });
@@ -166,6 +174,7 @@ export function GameSkillTreeWidget({
         toNode: node,
         fromPos: nodePositions[idx - 1],
         toPos: nodePositions[idx],
+        requiredMastery: 0.85,
       });
     });
   }
@@ -348,8 +357,8 @@ export function GameSkillTreeWidget({
               </defs>
 
               {/* Render Connecting Lines between Sequential / Dependent Nodes */}
-              {graphEdges.map(({ id, fromNode, toNode, fromPos, toPos }) => {
-                const isMasteredConnection = fromNode.pMastery >= 0.85;
+              {graphEdges.map(({ id, fromNode, toNode, fromPos, toPos, requiredMastery }) => {
+                const isMasteredConnection = fromNode.pMastery >= requiredMastery;
                 const isActiveConnection = fromNode.pMastery >= 0.75 && toNode.status !== 'LOCKED';
 
                 const yOffset = hasRealDependencies ? 36 : 0;
@@ -421,7 +430,7 @@ export function GameSkillTreeWidget({
                           fontWeight="700"
                           fill="#ffffff"
                         >
-                          ≥0.85
+                          ≥{requiredMastery.toFixed(2)}
                         </text>
                       </g>
                     )}

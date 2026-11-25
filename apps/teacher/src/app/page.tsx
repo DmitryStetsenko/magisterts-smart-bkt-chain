@@ -351,6 +351,14 @@ export default function TeacherDashboardPage() {
       const parentIds = Array.isArray(skill.parentDependencies)
         ? skill.parentDependencies.map((d: any) => d.parentSkillId)
         : [];
+      const parentThresholds: Record<string, number> = {};
+      if (Array.isArray(skill.parentDependencies)) {
+        skill.parentDependencies.forEach((d: any) => {
+          if (d.parentSkillId) {
+            parentThresholds[d.parentSkillId] = typeof d.requiredMastery === 'number' ? d.requiredMastery : 0.85;
+          }
+        });
+      }
       const parentMastered =
         parentIds.length === 0 ||
         parentIds.every((pid: string) => {
@@ -382,6 +390,7 @@ export default function TeacherDashboardPage() {
         pMastery: p,
         status: isMastered ? 'MASTERED' : parentMastered ? 'IN_PROGRESS' : 'LOCKED',
         parentSkillIds: parentIds,
+        parentThresholds,
         tasksCount: skillTasks.length,
         telemetry: telemetry ? {
           wpm: telemetry.wpm ?? 0,

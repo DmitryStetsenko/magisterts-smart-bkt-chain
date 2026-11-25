@@ -408,6 +408,12 @@ export function StudentPortalContent({
           const p = bktMap[skill.id] ?? 0.0;
           const isMastered = p >= 0.90; // Gold Mastery threshold
           const parentIds = skill.parentDependencies?.map((d: any) => d.parentSkillId) || [];
+          const parentThresholds: Record<string, number> = {};
+          (skill.parentDependencies || []).forEach((d: any) => {
+            if (d.parentSkillId) {
+              parentThresholds[d.parentSkillId] = typeof d.requiredMastery === 'number' ? d.requiredMastery : 0.85;
+            }
+          });
           const parentMastered =
             parentIds.length === 0 || parentIds.every((pid: string) => (bktMap[pid] ?? 0) >= 0.75);
 
@@ -440,6 +446,7 @@ export function StudentPortalContent({
             pMastery: p,
             status,
             parentSkillIds: parentIds,
+            parentThresholds,
             moduleId: skill.moduleId,
             moduleTitle: skill.module?.title,
             moduleOrder: skill.module?.orderIndex,

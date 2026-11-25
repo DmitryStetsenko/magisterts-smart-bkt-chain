@@ -28,6 +28,7 @@ export interface SkillGraphNode {
   pMastery: number;
   status: SkillStatus;
   parentSkillIds: string[];
+  parentThresholds?: Record<string, number>;
   tasksCount?: number;
   telemetry?: SkillTelemetryStats;
   recentAdjustments?: SkillAdjustmentSummary[];

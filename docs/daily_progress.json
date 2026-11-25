@@ -26,7 +26,12 @@
             },
             {
               "type": "text",
-              "raw_text": "У спільному віджеті [`packages/ui/src/skill-graph/GameSkillTreeWidget.tsx`](file:///packages/ui/src/skill-graph/GameSkillTreeWidget.tsx) переведено «Дерево Знань» на постійну нелінійну топологію пререквізитів (`parentSkillIds`) зі стрілками: у студента (`role === 'student'`) прибрано зайву галочку з тулбара, а для викладача (`role === 'teacher'`) додано чекбокс **«Метрики графа»**, який виводить порогові бейджі `≥0.85` на ребрах графа.",
+              "raw_text": "У спільному віджеті [`packages/ui/src/skill-graph/GameSkillTreeWidget.tsx`](file:///packages/ui/src/skill-graph/GameSkillTreeWidget.tsx) переведено «Дерево Знань» на постійну нелінійну топологію пререквізитів (`parentSkillIds`) зі стрілками: у студента (`role === 'student'`) прибрано зайву галочку з тулбара, а для викладача (`role === 'teacher'`) додано чекбокс **«Метрики графа»**, який виводить **реальний `requiredMastery` кожного ребра з БД** (`parentThresholds`) та живі `P(L)`, `WPM`, `Paste %` під вузлами.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Створено довідник доповідача [`SCIENCE/THESES/IICTE-2026_20-11-26/PRESENTATION/docs/FORMULAS_AND_METRICS_GUIDE.md`](file:///SCIENCE/THESES/IICTE-2026_20-11-26/PRESENTATION/docs/FORMULAS_AND_METRICS_GUIDE.md) із вимовою всіх символів українською, поясненням усіх 7 формул та повною таблицею походження й керованості кожної цифри проєкту.",
               "subitems": []
             },
             {
