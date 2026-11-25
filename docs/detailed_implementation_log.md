@@ -40,11 +40,18 @@
   - `packages/ui/src/theme/defaultTokens.ts`: значення за замовчуванням для темної та світлої палітри.
   - `packages/ui/src/theme/ThemeContext.tsx`: контекст `ThemeProvider` з підтримкою `localStorage`, відстеження системних параметрів `matchMedia`, синхронізації між вкладками браузера за подією `storage` та динамічного інжектування змінних у CSS DOM.
   - `packages/ui/src/theme/ThemeToggle.tsx`: компонент кнопки швидкого перемикання теми з векторними іконками `Sun` / `Moon`.
+  - `packages/ui/src/theme/ThemeSettingsSection.tsx`: уніфікований безрамковий компонент вибору режиму теми (`Темна` / `Світла` / `Авто`) у форматах `drawer` (на базі `<DrawerSection>`) та `panel`.
+- **Калібрування палітри під Antigravity IDE (Dark) та Clean Paper (Light):**
+  - Темна тема відкалібрована під м'які нейтральні тони Antigravity IDE (`#181818` root, `#1f1f1f` surface, `#2b2b2b` / `#333333` borders, `#cccccc` / `#909090` text).
 - **Інтеграція в інтерфейси платформи:**
   - `UserProfileDrawer`: додано секцію «Тема Оформлення» з інтерактивним перемикачем (доступно в усіх порталах).
+  - **Вкладка «Налаштування» (`settings` / `system`) у всіх 4 веб-застосунках:** інтегровано `<ThemeSettingsSection />` у `apps/student/src/components/StudentPortalApp.tsx`, `apps/study/src/components/StudyAppClient.tsx`, `apps/teacher/src/app/page.tsx` (сайдбар та головна область налаштувань) і `apps/admin/src/app/page.tsx`.
   - `AppShellLayout`: кореневий контейнер переведено на використання семантичних токенів `var(--sbc-bg-root)`, `var(--sbc-bg-surface)` тощо.
   - `globals.css`: оновлено у `apps/student`, `apps/study`, `apps/admin`, `apps/teacher`, `apps/docs`.
   - `apps/admin/src/features/theme-customizer/ui/ThemeCustomizerView.tsx`: розроблено повноцінний UI редагування наскрізної палітри кольорів у табі `system` адмінки з інтерактивним Live Preview та пресетами.
+- **Верифікація:**
+  - Усі 4 production-збірки (`build:student`, `build:study`, `build:teacher`, `build:admin`) пройшли без помилок.
+  - Наскрізний Playwright E2E-тест `e2e/theme-settings.spec.ts` підтвердив перемикання `light` / `dark`, оновлення класу `html.dark` та збереження в `localStorage['sbc_theme_mode']` на порталах 3002, 3003, 3004 та 3006 (4/4 passed).
 
 ### 0.1.7.101 Аналіз Правок Т. М. Барболіної V-4.0 та Розробка Плану Виступу на IICTE-2026 (SBC-432, EP-MS)
 - **Контекст та аудит правок наукового керівника V-4.0:**

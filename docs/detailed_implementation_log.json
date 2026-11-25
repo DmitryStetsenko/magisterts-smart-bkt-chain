@@ -172,12 +172,32 @@
             },
             {
               "type": "text",
+              "raw_text": "`packages/ui/src/theme/ThemeSettingsSection.tsx`: уніфікований безрамковий компонент вибору режиму теми (`Темна` / `Світла` / `Авто`) у форматах `drawer` (на базі `<DrawerSection>`) та `panel`.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Калібрування палітри під Antigravity IDE (Dark) та Clean Paper (Light):**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Темна тема відкалібрована під м'які нейтральні тони Antigravity IDE (`#181818` root, `#1f1f1f` surface, `#2b2b2b` / `#333333` borders, `#cccccc` / `#909090` text).",
+              "subitems": []
+            },
+            {
+              "type": "text",
               "raw_text": "**Інтеграція в інтерфейси платформи:**",
               "subitems": []
             },
             {
               "type": "text",
               "raw_text": "`UserProfileDrawer`: додано секцію «Тема Оформлення» з інтерактивним перемикачем (доступно в усіх порталах).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Вкладка «Налаштування» (`settings` / `system`) у всіх 4 веб-застосунках:** інтегровано `<ThemeSettingsSection />` у `apps/student/src/components/StudentPortalApp.tsx`, `apps/study/src/components/StudyAppClient.tsx`, `apps/teacher/src/app/page.tsx` (сайдбар та головна область налаштувань) і `apps/admin/src/app/page.tsx`.",
               "subitems": []
             },
             {
@@ -193,6 +213,21 @@
             {
               "type": "text",
               "raw_text": "`apps/admin/src/features/theme-customizer/ui/ThemeCustomizerView.tsx`: розроблено повноцінний UI редагування наскрізної палітри кольорів у табі `system` адмінки з інтерактивним Live Preview та пресетами.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Верифікація:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Усі 4 production-збірки (`build:student`, `build:study`, `build:teacher`, `build:admin`) пройшли без помилок.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Наскрізний Playwright E2E-тест `e2e/theme-settings.spec.ts` підтвердив перемикання `light` / `dark`, оновлення класу `html.dark` та збереження в `localStorage['sbc_theme_mode']` на порталах 3002, 3003, 3004 та 3006 (4/4 passed).",
               "subitems": []
             }
           ]

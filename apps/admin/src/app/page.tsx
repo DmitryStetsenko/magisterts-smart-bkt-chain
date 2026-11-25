@@ -31,7 +31,7 @@ import {
   FileSpreadsheet,
   Upload,
 } from 'lucide-react';
-import { AppShellLayout, Breadcrumbs, UserProfileDrawer, DrawerSection } from '@sbc/ui';
+import { AppShellLayout, Breadcrumbs, UserProfileDrawer, DrawerSection, ThemeSettingsSection } from '@sbc/ui';
 import { getAppBaseUrl } from '@sbc/routes';
 import type { CourseDto, CourseCategoryDto, CourseModuleDto } from '@sbc/types';
 import { CourseManager } from '../features/course-manager/ui/CourseManager';
@@ -1712,26 +1712,34 @@ export default function AdminCMSDashboard() {
 
           {/* Drawer: System Sidebar */}
           {activeTab === 'system' && (
-            <DrawerSection
-              title="Web3 SBT Релейєр"
-              icon={ShieldCheck}
-              defaultOpen={true}
-            >
-              <div className="flex flex-col gap-2 pt-1 text-xs text-slate-400">
-                <div className="flex items-center justify-between">
-                  <span>Мережа:</span>
-                  <span className="font-mono text-emerald-400">Hardhat Local (31337)</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span>Релейєр:</span>
-                  <span className="text-emerald-400 font-semibold">Активний (Gasless)</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span>Контракт SBT:</span>
-                  <span className="font-mono text-[10px] text-purple-300">0x5FbDB...7108</span>
-                </div>
+            <>
+              <div className="pb-3">
+                <ThemeSettingsSection />
               </div>
-            </DrawerSection>
+
+              <div className="pt-3">
+                <DrawerSection
+                  title="Web3 SBT Релейєр"
+                  icon={ShieldCheck}
+                  defaultOpen={true}
+                >
+                  <div className="flex flex-col gap-2 pt-1 text-xs text-slate-400">
+                    <div className="flex items-center justify-between">
+                      <span>Мережа:</span>
+                      <span className="font-mono text-emerald-400">Hardhat Local (31337)</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span>Релейєр:</span>
+                      <span className="text-emerald-400 font-semibold">Активний (Gasless)</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span>Контракт SBT:</span>
+                      <span className="font-mono text-[10px] text-purple-300">0x5FbDB...7108</span>
+                    </div>
+                  </div>
+                </DrawerSection>
+              </div>
+            </>
           )}
         </div>
       ),

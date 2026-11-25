@@ -12,7 +12,7 @@ import { StudentProfileDrawer } from './StudentProfileDrawer';
 import { AbandonTaskModal } from './AbandonTaskModal';
 import { JustInTimeTheoryDrawer } from '../features/theory-capsule/ui/JustInTimeTheoryDrawer';
 import { resolveTheoryCapsule } from '../features/theory-capsule/model/theory-capsules';
-import { GameSkillTreeWidget, SkillGraphNode, DrawerSection, AppShellLayout, Breadcrumbs, AuthModal } from '@sbc/ui';
+import { GameSkillTreeWidget, SkillGraphNode, DrawerSection, AppShellLayout, Breadcrumbs, AuthModal, ThemeSettingsSection } from '@sbc/ui';
 import {
   TaskDto,
   CourseDto,
@@ -1447,26 +1447,32 @@ export function StudentPortalContent({
 
               {/* Content Drawer 3: Settings */}
               {activeTab === 'settings' && (
-                <div className="flex flex-col gap-3">
-                  <DrawerSection
-                    title="Діагностика та середовище"
-                    icon={Settings}
-                    iconColor="text-amber-400"
-                    titleColor="text-amber-400 group-hover:text-amber-300"
-                    defaultOpen={true}
-                  >
-                    <div className="flex flex-col gap-3 text-xs text-slate-300 py-1">
-                      <p className="text-slate-400 text-xs leading-relaxed">Параметри середовища розробки та актуалізації моделі знань.</p>
-                      <button
-                        type="button"
-                        onClick={() => fetchRecommendedTask(activeCourseSlug)}
-                        className="w-full py-2 px-3 bg-slate-800/60 hover:bg-slate-800 text-slate-300 hover:text-white border border-slate-700/60 hover:border-indigo-500/40 rounded-lg text-xs font-medium cursor-pointer transition-colors flex items-center justify-center gap-2 select-none"
-                      >
-                        <RefreshCw className="w-3.5 h-3.5 text-indigo-400" />
-                        <span>Перезавантажити стан BKT</span>
-                      </button>
-                    </div>
-                  </DrawerSection>
+                <div className="flex flex-col divide-y divide-slate-800/70">
+                  <div className="pb-3">
+                    <ThemeSettingsSection />
+                  </div>
+
+                  <div className="pt-3">
+                    <DrawerSection
+                      title="Діагностика та середовище"
+                      icon={Settings}
+                      iconColor="text-amber-400"
+                      titleColor="text-amber-400 group-hover:text-amber-300"
+                      defaultOpen={true}
+                    >
+                      <div className="flex flex-col gap-3 text-xs text-slate-300 py-1">
+                        <p className="text-slate-400 text-xs leading-relaxed">Параметри середовища розробки та актуалізації моделі знань.</p>
+                        <button
+                          type="button"
+                          onClick={() => fetchRecommendedTask(activeCourseSlug)}
+                          className="w-full py-2 px-3 bg-slate-800/60 hover:bg-slate-800 text-slate-300 hover:text-white border border-slate-700/60 hover:border-indigo-500/40 rounded-lg text-xs font-medium cursor-pointer transition-colors flex items-center justify-center gap-2 select-none"
+                        >
+                          <RefreshCw className="w-3.5 h-3.5 text-indigo-400" />
+                          <span>Перезавантажити стан BKT</span>
+                        </button>
+                      </div>
+                    </DrawerSection>
+                  </div>
                 </div>
               )}
             

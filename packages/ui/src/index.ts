@@ -12,3 +12,4 @@ export * from './theme/theme.types';
 export * from './theme/defaultTokens';
 export * from './theme/ThemeContext';
 export * from './theme/ThemeToggle';
+export * from './theme/ThemeSettingsSection';

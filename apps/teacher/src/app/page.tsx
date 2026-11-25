@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { io } from 'socket.io-client';
 import { ShieldCheck, Network, Users, BarChart3, Code2, BookOpen, Scale, ChevronDown, ChevronUp, X, Search, RotateCcw, AlertTriangle, CheckCircle2, Lock, HelpCircle, Code, FileText, CheckSquare, Sparkles, Keyboard, Copy, Activity, Info, GitBranch, Layers, ClipboardCheck, Tag, FlaskConical, Compass, User, Globe, Plus, Minus, GraduationCap, Clock } from 'lucide-react';
 import { StudentAnalyticsItem } from '../features/analytics/model/analytics.types';
-import { AnomalyTreeWidget, GameSkillTreeWidget, SkillGraphNode, AppShellLayout, Breadcrumbs, UserProfileDrawer } from '@sbc/ui';
+import { AnomalyTreeWidget, GameSkillTreeWidget, SkillGraphNode, AppShellLayout, Breadcrumbs, UserProfileDrawer, ThemeSettingsSection } from '@sbc/ui';
 import { CourseDto, TaskDto } from '@sbc/types';
 import { ReviewQueueInspector } from '../features/reviews/ui/ReviewQueueInspector';
 import { CourseGraphViewer } from '../features/course-map/ui/CourseGraphViewer';
@@ -1174,7 +1174,11 @@ export default function TeacherDashboardPage() {
           {/* Drawer 3: Settings */}
           {activeTab === 'settings' && (
             <div className="flex flex-col divide-y divide-slate-800/70 text-xs text-slate-300">
-              <div className="pb-3 flex flex-col gap-1.5">
+              <div className="pb-3">
+                <ThemeSettingsSection />
+              </div>
+
+              <div className="py-3 flex flex-col gap-1.5">
                 <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-400">
                   Поріг Майстерності BKT
                 </span>
@@ -1993,11 +1997,17 @@ export default function TeacherDashboardPage() {
 
           {/* Main View 3: Settings Details */}
           {activeTab === 'settings' && (
-            <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl flex flex-col gap-4">
-              <h2 className="text-lg font-bold text-white">Параметри Оцінювання та Алгоритму BKT</h2>
-              <p className="text-xs text-slate-400 leading-relaxed">
-                Тут показуються загальні параметри сітки оцінювання BKT: ймовірності вгадування $P(G)$, вислизання $P(S)$, та поріг майстерності $P(L) \ge 0.95$.
-              </p>
+            <div className="flex flex-col divide-y divide-slate-800/70 max-w-3xl">
+              <div className="pb-5">
+                <ThemeSettingsSection variant="panel" title="Тема оформлення інтерфейсу" className="max-w-sm" />
+              </div>
+
+              <div className="pt-5 flex flex-col gap-2">
+                <h2 className="text-base font-bold text-slate-100">Параметри Оцінювання та Алгоритму BKT</h2>
+                <p className="text-xs text-slate-400 leading-relaxed">
+                  Тут показуються загальні параметри сітки оцінювання BKT: ймовірності вгадування P(G), вислизання P(S) та поріг майстерності P(L) ≥ 0.95.
+                </p>
+              </div>
             </div>
           )}
         

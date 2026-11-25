@@ -27,7 +27,7 @@ import {
   Lock,
   Unlock
 } from 'lucide-react';
-import { DrawerSection, AppShellLayout, Breadcrumbs, UserProfileDrawer, AuthModal } from '@sbc/ui';
+import { DrawerSection, AppShellLayout, Breadcrumbs, UserProfileDrawer, AuthModal, ThemeSettingsSection } from '@sbc/ui';
 import { ROUTES, buildStudyToPracticeUrl } from '@sbc/routes';
 import {
   SCHOOL_WEB_CURRICULUM,
@@ -621,15 +621,23 @@ console.log(greeting, "Номер спроби:", counter);`}
                   )}
 
                   {activeTab === 'settings' && (
-                    <div className="p-2 flex flex-col gap-4 text-xs text-slate-300">
-                      <div className="p-3 rounded-xl bg-slate-800/40 border border-slate-700/60 flex flex-col gap-2">
-                        <span className="font-bold text-white flex items-center gap-2">
-                          <Sparkles className="w-4 h-4 text-amber-400" />
-                          <span>Режим фокусного читання (Zen Focus)</span>
-                        </span>
-                        <p className="text-[11px] text-slate-400 leading-relaxed">
-                          Натисніть клавішу <kbd className="px-1.5 py-0.5 bg-slate-800 text-amber-300 rounded font-mono border border-slate-700">F</kbd> на клавіатурі або скористайтеся плаваючою панеллю інструментів унизу екрана для приховування меню та вибору теми.
-                        </p>
+                    <div className="flex flex-col divide-y divide-slate-800/70 text-xs text-slate-300">
+                      <div className="pb-3">
+                        <ThemeSettingsSection />
+                      </div>
+
+                      <div className="pt-3">
+                        <DrawerSection
+                          title="Режим фокусного читання"
+                          icon={Sparkles}
+                          iconColor="text-amber-400"
+                          titleColor="text-amber-400 group-hover:text-amber-300"
+                          defaultOpen={true}
+                        >
+                          <p className="text-[11px] text-slate-400 leading-relaxed py-1">
+                            Натисніть клавішу <kbd className="px-1.5 py-0.5 bg-slate-800 text-amber-300 rounded font-mono border border-slate-700">F</kbd> на клавіатурі або скористайтеся плаваючою панеллю інструментів унизу екрана для приховування меню та вибору стилю читання.
+                          </p>
+                        </DrawerSection>
                       </div>
                     </div>
                   )}

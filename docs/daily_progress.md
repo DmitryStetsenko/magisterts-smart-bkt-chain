@@ -22,7 +22,10 @@
      - Встановлено фірмовий спокійний темний фон Antigravity (`#181818`), поверхні сайдбарів та карток (`#1f1f1f`), приглушений м'який текст (`#cccccc` та `#909090`), що усуває ефект сліпучого High Contrast та створює комфортне середовище для тривалого читання й кодингу.
      - Оновлено `QuizTaskEditor`, `StudentPortalApp`, `defaultTokens.ts`, `ThemeContext.tsx` та `globals.css` в усіх веб-застосунках.
    - Створено повноцінний центр конфігурації тем `ThemeCustomizerView` в `apps/admin` (таб `system` / Налаштування) з color pickers, пресетами («Antigravity Neutral», «Deep Zinc», «Clean Paper») та інтерактивним Live Preview.
-   - Проведено успішну збірку всіх 4 веб-застосунків монорепозиторію (`build:student`, `build:study`, `build:teacher`, `build:admin`).
+   - **Уніфікований перемикач теми в Налаштуваннях усіх порталів (`ThemeSettingsSection`):**
+     - У пакеті `@sbc/ui` створено перевикористовуваний компонент `packages/ui/src/theme/ThemeSettingsSection.tsx` (на базі `<DrawerSection>` за Правилом 7) з 3-режимним перемикачем **Темна / Світла / Авто** та індикатором активної палітри.
+     - Інтегровано `ThemeSettingsSection` у вкладку «Налаштування» (`settings` / `system`) всіх 4 порталів: `apps/student`, `apps/study`, `apps/teacher` (сайдбар + основна панель налаштувань), `apps/admin`.
+     - Проведено успішну production-збірку всіх 4 веб-застосунків (`build:student`, `build:study`, `build:teacher`, `build:admin`) та наскрізну перевірку у Playwright E2E (`e2e/theme-settings.spec.ts`: 4/4 тестів пройдено).
 
 2. **Аналіз правок наукового керівника V-4.0 та оновлення авторського профілю (`SBC-432`, `EP-MS`):**
    - Проведено поабзацний та посимвольний порівняльний аудит файлу `V-4.0-Стеценко_тези.docx` з попередньою версією `V-3.1`.
