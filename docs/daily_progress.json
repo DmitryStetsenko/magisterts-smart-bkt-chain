@@ -183,6 +183,11 @@
               "type": "text",
               "raw_text": "**Підняття `ThemeProvider` у кореневі `layout.tsx` усіх 4 порталів (`SBC-434`, `EP-SH`):** усунено ізоляцію правого сайдбара користувача `UserProfileDrawer` від контексту теми (коли `ThemeToggle` рендерився поза `AppShellLayout` і залишався в темному fallback-стані `bg-zinc-900` з темним текстом у світлій темі). Додано автоматичну дедуплікацію вкладеного `ThemeProvider` у `packages/ui/src/theme/ThemeContext.tsx` та обгорнуто `{children}` у `ThemeProvider` в усіх 4 `layout.tsx` (`teacher`, `student`, `study`, `admin`).",
               "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Контрастність `hover:` та `group-hover:` станів у Світлій темі (`SBC-434`, `EP-SH`):** у `packages/ui/src/theme/light-theme.css` додано централізований мапінг усіх пастельних `hover:text-*-200/300/400` і `group-hover:text-*-200/300/400` у висококонтрастні темні акценти (WCAG AAA) та перетворення `hover:bg-*-900/950/*` (наприклад, `hover:bg-rose-950/20 hover:text-rose-300` у `UserProfileDrawer`, `AuthModal`, `CourseManager`, `AnomalyRadarWidget`) на чисті світлі напівпрозорі фони.",
+              "subitems": []
             }
           ]
         },

@@ -149,6 +149,11 @@
               "type": "text",
               "raw_text": "У [`packages/ui/src/theme/ThemeToggle.tsx`](file:///packages/ui/src/theme/ThemeToggle.tsx) покращено контрастність рамки та тексту в обох режимах.",
               "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "У [`packages/ui/src/theme/light-theme.css`](file:///packages/ui/src/theme/light-theme.css) додано секції 4–5 для наскрізного виправлення контрастності `hover:text-*-200/300/400`, `group-hover:text-*-200/300/400` та `hover:bg-*-900/950/*` (зокрема кнопок «Скинути BKT стан для демо» / «Вийти з акаунта» у `UserProfileDrawer`, модалок у `apps/admin`, віджетів у `apps/teacher`, `apps/student` та `apps/study`).",
+              "subitems": []
             }
           ]
         },

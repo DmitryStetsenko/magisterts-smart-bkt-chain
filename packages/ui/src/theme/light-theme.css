@@ -174,3 +174,102 @@ html:not(.dark) :is(
   background-color: rgba(244, 63, 94, 0.10);
   border-color: rgba(225, 29, 72, 0.28);
 }
+
+/* 4. Hover & Group-Hover pastel accent text shades -> high-contrast WCAG AAA dark shades */
+html:not(.dark) :is(.hover\:text-emerald-200, .hover\:text-emerald-300, .hover\:text-emerald-400):hover,
+html:not(.dark) .group:hover :is(.group-hover\:text-emerald-200, .group-hover\:text-emerald-300, .group-hover\:text-emerald-400) {
+  color: #065f46;
+}
+html:not(.dark) :is(.hover\:text-blue-200, .hover\:text-blue-300, .hover\:text-blue-400):hover,
+html:not(.dark) .group:hover :is(.group-hover\:text-blue-200, .group-hover\:text-blue-300, .group-hover\:text-blue-400) {
+  color: #1e40af;
+}
+html:not(.dark) :is(.hover\:text-indigo-200, .hover\:text-indigo-300, .hover\:text-indigo-400):hover,
+html:not(.dark) .group:hover :is(.group-hover\:text-indigo-200, .group-hover\:text-indigo-300, .group-hover\:text-indigo-400) {
+  color: #3730a3;
+}
+html:not(.dark) :is(
+  .hover\:text-purple-200, .hover\:text-purple-300, .hover\:text-purple-400,
+  .hover\:text-violet-200, .hover\:text-violet-300, .hover\:text-violet-400
+):hover,
+html:not(.dark) .group:hover :is(
+  .group-hover\:text-purple-200, .group-hover\:text-purple-300, .group-hover\:text-purple-400,
+  .group-hover\:text-violet-200, .group-hover\:text-violet-300, .group-hover\:text-violet-400
+) {
+  color: #5b21b6;
+}
+html:not(.dark) :is(
+  .hover\:text-amber-200, .hover\:text-amber-300, .hover\:text-amber-400,
+  .hover\:text-yellow-200, .hover\:text-yellow-300, .hover\:text-yellow-400
+):hover,
+html:not(.dark) .group:hover :is(
+  .group-hover\:text-amber-200, .group-hover\:text-amber-300, .group-hover\:text-amber-400,
+  .group-hover\:text-yellow-200, .group-hover\:text-yellow-300, .group-hover\:text-yellow-400
+) {
+  color: #92400e;
+}
+html:not(.dark) :is(
+  .hover\:text-rose-200, .hover\:text-rose-300, .hover\:text-rose-400,
+  .hover\:text-red-200, .hover\:text-red-300, .hover\:text-red-400
+):hover,
+html:not(.dark) .group:hover :is(
+  .group-hover\:text-rose-200, .group-hover\:text-rose-300, .group-hover\:text-rose-400,
+  .group-hover\:text-red-200, .group-hover\:text-red-300, .group-hover\:text-red-400
+) {
+  color: #9f1239;
+}
+html:not(.dark) :is(
+  .hover\:text-cyan-200, .hover\:text-cyan-300, .hover\:text-cyan-400,
+  .hover\:text-sky-200, .hover\:text-sky-300, .hover\:text-sky-400,
+  .hover\:text-teal-200, .hover\:text-teal-300, .hover\:text-teal-400
+):hover,
+html:not(.dark) .group:hover :is(
+  .group-hover\:text-cyan-200, .group-hover\:text-cyan-300, .group-hover\:text-cyan-400,
+  .group-hover\:text-sky-200, .group-hover\:text-sky-300, .group-hover\:text-sky-400,
+  .group-hover\:text-teal-200, .group-hover\:text-teal-300, .group-hover\:text-teal-400
+) {
+  color: #075985;
+}
+html:not(.dark) :is(.hover\:text-zinc-100, .hover\:text-zinc-200, .hover\:text-zinc-300, .hover\:text-zinc-400):hover,
+html:not(.dark) .group:hover :is(.group-hover\:text-zinc-100, .group-hover\:text-zinc-200, .group-hover\:text-zinc-300) {
+  color: var(--sbc-text-primary, #18181b);
+}
+
+/* 5. Hover dark-only 900/950 backgrounds -> clean soft light hover tints */
+html:not(.dark) :is(
+  [class*="hover:bg-rose-950"], [class*="hover:bg-rose-900"],
+  [class*="hover:bg-red-950"], [class*="hover:bg-red-900"]
+):hover {
+  background-color: rgba(244, 63, 94, 0.10);
+}
+html:not(.dark) :is(
+  [class*="hover:bg-amber-950"], [class*="hover:bg-amber-900"]
+):hover {
+  background-color: rgba(245, 158, 11, 0.12);
+}
+html:not(.dark) :is(
+  [class*="hover:bg-emerald-950"], [class*="hover:bg-emerald-900"]
+):hover {
+  background-color: rgba(16, 185, 129, 0.12);
+}
+html:not(.dark) :is(
+  [class*="hover:bg-blue-950"], [class*="hover:bg-blue-900"]
+):hover {
+  background-color: rgba(59, 130, 246, 0.10);
+}
+html:not(.dark) :is(
+  [class*="hover:bg-indigo-950"], [class*="hover:bg-indigo-900"]
+):hover {
+  background-color: rgba(99, 102, 241, 0.10);
+}
+html:not(.dark) :is(
+  [class*="hover:bg-purple-950"], [class*="hover:bg-purple-900"]
+):hover {
+  background-color: rgba(139, 92, 246, 0.10);
+}
+html:not(.dark) :is(
+  [class*="hover:bg-cyan-950"], [class*="hover:bg-cyan-900"],
+  [class*="hover:bg-sky-950"], [class*="hover:bg-teal-950"]
+):hover {
+  background-color: rgba(6, 182, 212, 0.12);
+}
