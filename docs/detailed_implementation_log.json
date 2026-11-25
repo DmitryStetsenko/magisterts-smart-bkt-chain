@@ -147,7 +147,7 @@
             },
             {
               "type": "text",
-              "raw_text": "У [`apps/student/src/components/StudentPortalApp.tsx`](file:///apps/student/src/components/StudentPortalApp.tsx) усунено race condition при перезавантаженні (`F5`): додано `isCourseHydrated` (очікування гідрації збереженого курсу з `localStorage` перед першим запитом), `courseFetchSeqRef` (ігнорування застарілих відповідей `fetchCourseStructureAndState`) та синхронізацію URL (`window.history.replaceState(null, '', '/practice/' + slug)`).",
+              "raw_text": "У [`apps/student/src/components/StudentPortalApp.tsx`](file:///apps/student/src/components/StudentPortalApp.tsx) усунено миготіння заголовка `JavaScript & Web Dev` та race condition при перезавантаженні (`F5`): додано `web-algorithms-school` у `DEFAULT_COURSES`, індикатор `Завантаження курсу...` до завершення `isCourseHydrated`, `courseFetchSeqRef` та синхронізацію URL. Верифіковано Playwright E2E-тестом [`e2e/student-course-reload-dag.spec.ts`](file:///e2e/student-course-reload-dag.spec.ts) (`1 passed`).",
               "subitems": []
             },
             {

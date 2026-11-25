@@ -29,9 +29,10 @@ export type TaskDetail = TaskDto;
 export type CourseItem = Partial<CourseDto> & { slug: string; title: string; category?: string };
 
 const DEFAULT_COURSES: CourseItem[] = [
-  { slug: 'js-dev', title: 'JavaScript & Web Dev', category: 'Programming' },
-  { slug: 'english-b2', title: 'Business & Tech English (B2)', category: 'Languages' },
-  { slug: 'ukraine-law', title: 'Правознавство України', category: 'Jurisprudence' },
+  { slug: 'web-algorithms-school', title: 'Вебтехнології та алгоритмізація (10–11 класи)', category: 'Програмування & IT' },
+  { slug: 'js-dev', title: 'JavaScript & Web Engineering', category: 'Програмування & IT' },
+  { slug: 'english-b2', title: 'Business & Tech English (B2)', category: 'Іноземні Мови' },
+  { slug: 'ukraine-law', title: 'Правознавство України', category: 'Право & Суспільствознавство' },
 ];
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
@@ -1528,9 +1529,15 @@ export function StudentPortalContent({
         courseBadge: (
           <span
             className="text-xs sm:text-[13px] font-normal text-slate-300 select-none tracking-normal"
-            title={`Активний курс: ${courses.find((c) => c.slug === activeCourseSlug)?.title || activeCourseSlug}`}
+            title={
+              !isCourseHydrated
+                ? 'Завантаження курсу...'
+                : `Активний курс: ${courses.find((c) => c.slug === activeCourseSlug)?.title || activeCourseSlug}`
+            }
           >
-            {courses.find((c) => c.slug === activeCourseSlug)?.title || activeCourseSlug}
+            {!isCourseHydrated
+              ? 'Завантаження курсу...'
+              : courses.find((c) => c.slug === activeCourseSlug)?.title || activeCourseSlug}
           </span>
         ),
         breadcrumbs: (
