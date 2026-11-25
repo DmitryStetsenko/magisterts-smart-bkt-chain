@@ -195,7 +195,7 @@
             },
             {
               "type": "text",
-              "raw_text": "Створено та оновлено до версії `V-2.0` слайдовий сценарій [`PRESENTATION/slides/V-2.0-SLIDES_SCRIPT.md`](file:///SCIENCE/THESES/IICTE-2026_20-11-26/PRESENTATION/slides/V-2.0-SLIDES_SCRIPT.md) (дзеркало `SLIDES_SCRIPT.md` + `RELEASE_LOG.md`): 10 слайдів чистого науково-професійного тексту по суті дослідження без мета-блоків і шаблонного формалізму, синхронізованого з тезами `V-4.0` та планом `V-2.1`.",
+              "raw_text": "Оновлено слайдовий сценарій до версії `V-3.0` ([`PRESENTATION/slides/V-3.0-SLIDES_SCRIPT.md`](file:///SCIENCE/THESES/IICTE-2026_20-11-26/PRESENTATION/slides/V-3.0-SLIDES_SCRIPT.md), дзеркало `SLIDES_SCRIPT.md`): витримано наскрізну лінію адаптивної освітньої траєкторії, усунено категоричну критику існуючих систем (Rule 9), додано точний числовий доказ впливу $P_{\\text{adj}}(G)$ (`15% → 61%` проти `15% → 32%`) та природний студентський стиль викладу.",
               "subitems": []
             },
             {
