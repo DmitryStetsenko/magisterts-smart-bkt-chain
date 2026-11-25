@@ -30,6 +30,14 @@
   5. *Build Next.js Documentation Site* (`npm run build:docs`) — збірка статичного експорту (`output: "export"`, `trailingSlash: true`, `basePath: "/magisterts-smart-bkt-chain"`).
   6. *Upload Artifact & Deploy Pages* (`actions/upload-pages-artifact@v3` + `actions/deploy-pages@v4`).
 
+### 0.1.7.109 Трек живої демонстрації та синхронізація плану виступу для конференції IICTE-2026 (`SBC-432`, `EP-MS`)
+- **Синхронізація `SPEECH_PLAN.md` із поданими тезами (`V-4.0`):**
+  - Замінено застарілі оцінки в розділі результатів плану виступу на точні показники Таблиці 1 поданих тез (Монте-Карло: $M=500$, $m=15$, $P(L_0)=0{,}15, P(T)=0{,}20, P(G)=0{,}15, P(S)=0{,}10$): скорочення середньої кількості завдань із `19,3` до `14,2` (**−26,4%**), зниження частки нескомпенсованих труднощів із `18,6%` до `11,5%` (**−38,1%**), зростання індексу збереження пізнавальної залученості з `0,62` до `0,84` (**+35,5%**).
+  - Узгоджено блок 4-хвилинної демонстрації з реальним сценарієм у `DEMO_TRACK.md`.
+- **Створення режисерського сценарію `SCIENCE/THESES/IICTE-2026_20-11-26/PRESENTATION/DEMO_TRACK.md`:**
+  - Перевірено реальні пороги детекції у `apps/api/src/domain/bkt/behavioral-adjuster.ts` (`FAST_CHOICE_LATENCY_MS = 3500` → $P_{\text{adj}}(G) = 0{,}85$; `OPEN_TEXT` paste/WPM > 120 → $P_{\text{adj}}(G) = 0{,}90$) та маршрутизацію в чергу викладача у `apps/api/src/adapters/inbound/http/bkt.controller.ts` (`PENDING_REVIEW`).
+  - Спроєктовано 4-актний демо-трек на курсі `web-algorithms-school` («Вебтехнології та алгоритмізація, 10–11 класи») із точними репліками, фрагментами коду (`convertToUsd`), передстартовим чек-листом (Light Theme, `SYSTEM_AUTH_TEST_MODE`, скидання BKT) та шпаргалкою Q&A.
+
 ### 0.1.7.108 Підняття `ThemeProvider` у кореневі `layout.tsx` та синхронізація `ThemeToggle` у `UserProfileDrawer` (`SBC-434`, `EP-SH`)
 - **Причина дефекту:** `ThemeProvider` раніше монтувався лише всередині `AppShellLayout`, тоді як правий сайдбар профілю `UserProfileDrawer` рендерився на рівні сторінки як сусідній елемент (поза `AppShellLayout`). Через це `ThemeToggle` всередині `UserProfileDrawer` отримував fallback-контекст `resolvedTheme: 'dark'` із порожнім `toggleTheme`, відображаючи темну кнопку `bg-zinc-900` із темним текстом `#27272a` (від `light-theme.css`) у світлій темі.
 - **Виправлення:**

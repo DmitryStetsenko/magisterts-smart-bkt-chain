@@ -5,6 +5,9 @@
 ## 📅 25 листопада 2026 року
 
 ### ✅ Що зроблено за день:
+0. **Підготовка треку живої демонстрації та синхронізація плану виступу до конференції IICTE-2026 (`SBC-432`, `EP-MS`):**
+   - Проведено аудит відповідності [`SCIENCE/THESES/IICTE-2026_20-11-26/PRESENTATION/SPEECH_PLAN.md`](file:///SCIENCE/THESES/IICTE-2026_20-11-26/PRESENTATION/SPEECH_PLAN.md) поданим тезам `V-4.0` ([`src/theses_draft.md`](file:///SCIENCE/THESES/IICTE-2026_20-11-26/src/theses_draft.md)): усунено розсинхрон чисельних метрик експерименту Монте-Карло, підставивши точні показники Таблиці 1 (`−26,4%` завдань до опанування, `−38,1%` нескомпенсованих труднощів, `+35,5%` індексу збереження залученості).
+   - Створено покроковий сценарій живої 4-хвилинної демонстрації [`SCIENCE/THESES/IICTE-2026_20-11-26/PRESENTATION/DEMO_TRACK.md`](file:///SCIENCE/THESES/IICTE-2026_20-11-26/PRESENTATION/DEMO_TRACK.md), звірений із реальним кодом `BehavioralAdjuster`, `bkt.controller.ts` та сидом шкільного курсу `web-algorithms-school` (4 акти: Skill DAG → аномалії телеметрії та динамічне $P_{\text{adj}}(G)$ → діагностика омани, Сократівські підказки та `JustInTimeTheoryDrawer` → кабінет викладача `ReviewQueueInspector` + `MetricsAuditInspector` + бонус `BktAuditVerifierCenter`).
 1. **Наскрізна система тем (Світла/Темна), глобальне усунення синіх тонів на користь нейтрального сірого/цинку та кастомізатор палітри в Admin Portal (`SBC-433`, `EP-SH`):**
    - Створено гілку `feat/theme-system-tokens`.
    - Проведено мозковий штурм та сформовано документ [`docs/brainstorm/21_cross_app_theme_system_and_neutral_gray_palette.md`](file:///docs/brainstorm/21_cross_app_theme_system_and_neutral_gray_palette.md).
