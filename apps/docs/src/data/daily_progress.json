@@ -56,7 +56,7 @@
             },
             {
               "type": "text",
-              "raw_text": "Створено версіонований простір слайдового тексту виступу [`SCIENCE/THESES/IICTE-2026_20-11-26/PRESENTATION/slides/`](file:///SCIENCE/THESES/IICTE-2026_20-11-26/PRESENTATION/slides/) (`V-6.0-SLIDES_SCRIPT.md`, дзеркало `SLIDES_SCRIPT.md`, `RELEASE_LOG.md`): 10 слайдів із суворою науковою обережністю (ризики/ймовірності замість безапеляційних фактів), чіткою демаркацією стандартного BKT (Слайд 4) та 4 авторських покращень (Слайд 5), прикладами мікро- й макро-адаптивності та нейтральним безособовим стилем (0 «ми/наш»).",
+              "raw_text": "Створено єдиний регламент доповіді [`PRESENTATION/PRESENTATION_RULES.md`](file:///SCIENCE/THESES/IICTE-2026_20-11-26/PRESENTATION/PRESENTATION_RULES.md) (правила магістерської + тез + нові правила доповіді), автоматичний лінтер [`PRESENTATION/audit_presentation.py`](file:///SCIENCE/THESES/IICTE-2026_20-11-26/PRESENTATION/audit_presentation.py) та версіонований слайдовий сценарій [`PRESENTATION/slides/V-6.1-SLIDES_SCRIPT.md`](file:///SCIENCE/THESES/IICTE-2026_20-11-26/PRESENTATION/slides/V-6.1-SLIDES_SCRIPT.md) (дзеркало `SLIDES_SCRIPT.md`), що пройшов автоаудит із `0` порушень (0 «ми/наш», 0 категоричних заперечень, 0 ШІ-кліше).",
               "subitems": []
             },
             {
