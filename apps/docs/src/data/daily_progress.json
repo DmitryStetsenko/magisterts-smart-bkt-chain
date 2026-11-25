@@ -56,6 +56,11 @@
             },
             {
               "type": "text",
+              "raw_text": "Створено версіонований простір слайдового тексту виступу [`SCIENCE/THESES/IICTE-2026_20-11-26/PRESENTATION/slides/`](file:///SCIENCE/THESES/IICTE-2026_20-11-26/PRESENTATION/slides/) (`V-1.0-SLIDES_SCRIPT.md`, дзеркало `SLIDES_SCRIPT.md`, `RELEASE_LOG.md`): 10 структурованих слайдів із ключовими тезами для NotebookLM та готовим живим текстом доповіді на 12–15 хв.",
+              "subitems": []
+            },
+            {
+              "type": "text",
               "raw_text": "Створено покроковий сценарій живої 4-хвилинної демонстрації [`SCIENCE/THESES/IICTE-2026_20-11-26/PRESENTATION/DEMO_TRACK.md`](file:///SCIENCE/THESES/IICTE-2026_20-11-26/PRESENTATION/DEMO_TRACK.md), звірений із реальним кодом `BehavioralAdjuster`, `bkt.controller.ts` та сидом шкільного курсу `web-algorithms-school` (4 акти: Skill DAG → аномалії телеметрії та динамічне $P_{\\text{adj}}(G)$ → діагностика омани, Сократівські підказки та `JustInTimeTheoryDrawer` → кабінет викладача `ReviewQueueInspector` + `MetricsAuditInspector` + бонус `BktAuditVerifierCenter`).",
               "subitems": []
             },
