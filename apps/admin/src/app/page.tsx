@@ -1976,7 +1976,7 @@ export default function AdminCMSDashboard() {
           isSettingsActive: activeTab === 'system',
         }}
         drawer={getDrawerConfig()}
-        mainClassName="p-4 lg:p-6 overflow-y-auto flex flex-col gap-5 bg-[var(--sbc-bg-root,#121215)]"
+        mainClassName="p-4 lg:p-6 overflow-y-auto flex flex-col gap-5 bg-[var(--sbc-bg-root,#181818)]"
       >
         <div className="flex flex-col gap-5 min-h-[400px]">
           {activeTab === 'create_course' && (

@@ -1592,7 +1592,7 @@ export function StudentPortalContent({
         isSettingsActive: activeTab === 'settings',
       }}
       drawer={getDrawerConfig()}
-      mainClassName="overflow-hidden flex flex-col bg-[var(--sbc-bg-root,#121215)]"
+      mainClassName="overflow-hidden flex flex-col bg-[var(--sbc-bg-root,#181818)]"
       overlays={
         <>
           {/* 🔔 Floating Course Switch Toast Notification */}

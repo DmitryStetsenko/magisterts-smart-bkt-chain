@@ -121,11 +121,11 @@ export function AppShellLayout({
 
   return (
     <ThemeProvider>
-      <div className={`h-screen w-screen bg-[var(--sbc-bg-root,#121215)] text-[var(--sbc-text-primary,#f4f4f5)] flex flex-col font-sans overflow-hidden relative ${className}`}>
+      <div className={`h-screen w-screen bg-[var(--sbc-bg-root,#181818)] text-[var(--sbc-text-primary,#cccccc)] flex flex-col font-sans overflow-hidden relative ${className}`}>
         
         {/* 📌 1. STICKY TOP NAVIGATION BAR (Minimalist Borderless Header h-[56px]) */}
         {!header.hideHeader && (
-          <header className="h-[56px] w-full bg-[var(--sbc-bg-surface,#18181b)] border-b border-[var(--sbc-border-subtle,#27272a)] px-4 flex items-center justify-between shrink-0 z-30 transition-colors">
+          <header className="h-[56px] w-full bg-[var(--sbc-bg-surface,#1f1f1f)] border-b border-[var(--sbc-border-subtle,#2b2b2b)] px-4 flex items-center justify-between shrink-0 z-30 transition-colors">
             <div className="flex items-center gap-2.5 shrink-0">
               <div className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 ${header.logoColor || 'bg-blue-500/15 text-blue-400'}`}>
                 <HeaderLogo className="w-4 h-4" />

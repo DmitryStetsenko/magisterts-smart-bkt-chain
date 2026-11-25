@@ -18,7 +18,7 @@ html:not(.dark) .text-white:not(
   .bg-sky-600, .bg-sky-700,
   .bg-green-600, .bg-green-700,
   .bg-violet-600, .bg-violet-700,
-  [class*="bg-gradient-to-"], .bg-zinc-900, .bg-zinc-950, .bg-neutral-900, .bg-black
+  [class*="bg-gradient-to-"], .bg-zinc-800, .bg-zinc-900, .bg-zinc-950, .bg-neutral-800, .bg-neutral-900, .bg-black
 ) {
   color: var(--sbc-text-primary, #18181b);
 }
@@ -37,7 +37,7 @@ html:not(.dark) :is(
   .bg-sky-600, .bg-sky-700,
   .bg-green-600, .bg-green-700,
   .bg-violet-600, .bg-violet-700,
-  [class*="bg-gradient-to-"], .bg-zinc-900, .bg-zinc-950, .bg-neutral-900, .bg-black
+  [class*="bg-gradient-to-"], .bg-zinc-800, .bg-zinc-900, .bg-zinc-950, .bg-neutral-800, .bg-neutral-900, .bg-black
 ) .text-white {
   color: #ffffff;
 }

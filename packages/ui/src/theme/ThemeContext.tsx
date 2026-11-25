@@ -6,6 +6,7 @@ import { DEFAULT_THEME_TOKENS } from './defaultTokens';
 
 const THEME_MODE_STORAGE_KEY = 'sbc_theme_mode';
 const THEME_MODE_UPDATED_AT_KEY = 'sbc_theme_mode_updated_at';
+const THEME_LAST_RESOLVED_KEY = 'sbc_last_resolved_theme';
 const THEME_TOKENS_STORAGE_KEY = 'sbc_custom_theme_tokens';
 
 function getApiBaseUrl(): string {
@@ -198,6 +199,9 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   // Застосування змінних до DOM при зміні теми або токенів
   useEffect(() => {
     applyThemeVariables(resolvedTheme, customTokens);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(THEME_LAST_RESOLVED_KEY, resolvedTheme);
+    }
   }, [resolvedTheme, customTokens]);
 
   const setTheme = useCallback((mode: ThemeMode) => {

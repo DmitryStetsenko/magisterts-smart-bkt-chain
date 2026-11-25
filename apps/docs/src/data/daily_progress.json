@@ -108,8 +108,16 @@
             },
             {
               "type": "text",
-              "raw_text": "Створено та пройдено автоматичний Playwright WCAG-аудит контрастності `e2e/light-theme-contrast.spec.ts` з Canvas 2D підтримкою `oklch(...)` (4/4 портали: 0 порушень контрастності).",
+              "raw_text": "Створено та пройдено автоматичний Playwright WCAG-аудит контрастності `e2e/light-theme-contrast.spec.ts` з Canvas 2D підтримкою `oklch(...)` (4/4 портали: 177 елементів перевірено, 0 порушень контрастності).",
               "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Усунення FOUC-миготіння при перезавантаженні (`ThemeInitScript`):**",
+              "subitems": [
+                "Створено синхронний блокуючий `<ThemeInitScript />` у `packages/ui/src/theme/ThemeInitScript.tsx` і вбудовано в `<head>` усіх 4 `layout.tsx` (`student`, `study`, `teacher`, `admin`) із кешуванням останньої розв'язаної теми `sbc_last_resolved_theme`.",
+                "Замінено всі застарілі темніші fallback-кольори `#121215` / `#18181b` на актуальні `#181818` / `#1f1f1f` в `AppShellLayout`, `layout.tsx`, `StudentPortalApp` та `apps/admin` (і оновлено метадані заголовка `apps/admin`)."
+              ]
             }
           ]
         },

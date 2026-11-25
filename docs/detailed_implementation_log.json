@@ -272,7 +272,12 @@
             },
             {
               "type": "text",
-              "raw_text": "Додано Playwright WCAG-сканер `e2e/light-theme-contrast.spec.ts` із Canvas 2D конвертацією Tailwind v4 `oklch(...)` кольорів: **4/4 портали пройшли з 0 порушень контрастності**.",
+              "raw_text": "Додано Playwright WCAG-сканер `e2e/light-theme-contrast.spec.ts` із Canvas 2D конвертацією Tailwind v4 `oklch(...)` кольорів: **4/4 портали (177 текстових елементів) пройшли з 0 порушень контрастності**.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Zero-FOUC при перезавантаженні (`packages/ui/src/theme/ThemeInitScript.tsx`):** додано синхронний inline-скрипт у `<head>` усіх 4 `layout.tsx` та прибрано застарілі `#121215` fallback-фони (які викликали видиме просвітлення `#121215 → #181818` або темний спалах перед світлою темою).",
               "subitems": []
             }
           ]

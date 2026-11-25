@@ -40,7 +40,10 @@
      - Адаптація темних підкладок `bg-*-950/*` у м'які світлі паперові акценти.
    - Посилено базові токени світлої теми в `packages/ui/src/theme/defaultTokens.ts` (`textPrimary: #18181b`, `textMuted: #52525b`, `textTertiary: #5c5c66`).
    - Синхронізовано тему редактора коду в `apps/student/src/features/code-editor/ui/MonacoCodeEditor.tsx` через `useTheme()` (`vs` у світлій / `vs-dark` у темній).
-   - Створено та пройдено автоматичний Playwright WCAG-аудит контрастності `e2e/light-theme-contrast.spec.ts` з Canvas 2D підтримкою `oklch(...)` (4/4 портали: 0 порушень контрастності).
+   - Створено та пройдено автоматичний Playwright WCAG-аудит контрастності `e2e/light-theme-contrast.spec.ts` з Canvas 2D підтримкою `oklch(...)` (4/4 портали: 177 елементів перевірено, 0 порушень контрастності).
+   - **Усунення FOUC-миготіння при перезавантаженні (`ThemeInitScript`):**
+     - Створено синхронний блокуючий `<ThemeInitScript />` у `packages/ui/src/theme/ThemeInitScript.tsx` і вбудовано в `<head>` усіх 4 `layout.tsx` (`student`, `study`, `teacher`, `admin`) із кешуванням останньої розв'язаної теми `sbc_last_resolved_theme`.
+     - Замінено всі застарілі темніші fallback-кольори `#121215` / `#18181b` на актуальні `#181818` / `#1f1f1f` в `AppShellLayout`, `layout.tsx`, `StudentPortalApp` та `apps/admin` (і оновлено метадані заголовка `apps/admin`).
 
 ### 🎯 Наступні дії (Next Steps):
 1. **Фінальне тестування з живим Docker/API та злиття гілки `feat/theme-system-tokens` у `dev`:**

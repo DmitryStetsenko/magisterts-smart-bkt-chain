@@ -431,7 +431,7 @@ export function ThemeCustomizerView() {
             <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-[var(--sbc-bg-subtle,#222226)] text-[var(--sbc-text-tertiary,#71717a)] border border-[var(--sbc-border-subtle,#27272a)]">
               P(L)=0.88
             </span>
-            <button className="px-2.5 py-1 text-xs font-medium rounded-md bg-emerald-500 hover:bg-emerald-600 text-white cursor-pointer transition-colors">
+            <button className="px-2.5 py-1 text-xs font-medium rounded-md bg-emerald-600 hover:bg-emerald-700 text-white cursor-pointer transition-colors">
               Перевірити
             </button>
           </div>
