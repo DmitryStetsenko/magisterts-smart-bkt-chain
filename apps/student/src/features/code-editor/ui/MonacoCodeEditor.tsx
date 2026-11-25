@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useRef } from 'react';
+import React, { useRef, useEffect, useCallback } from 'react';
 import Editor, { OnMount } from '@monaco-editor/react';
 import { Activity, Zap, Trash2, Clipboard, Play, ArrowRight } from 'lucide-react';
 import { useTheme } from '@sbc/ui';
@@ -32,10 +32,39 @@ export function MonacoCodeEditor({
   const { resolvedTheme } = useTheme();
   const { metrics, handleKeyDown, handleDelete, handlePaste } = useTelemetry(userId, taskId);
   const editorRef = useRef<any>(null);
+  const monacoRef = useRef<any>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+
+  const applyMonacoTheme = useCallback(() => {
+    if (!monacoRef.current) return;
+    const isDomDark =
+      typeof document !== 'undefined'
+        ? document.documentElement.classList.contains('dark')
+        : resolvedTheme === 'dark';
+    monacoRef.current.editor.setTheme(isDomDark ? 'vs-dark' : 'vs');
+  }, [resolvedTheme]);
+
+  useEffect(() => {
+    applyMonacoTheme();
+  }, [applyMonacoTheme]);
+
+  useEffect(() => {
+    if (typeof document === 'undefined') return;
+    const observer = new MutationObserver(() => {
+      applyMonacoTheme();
+    });
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+    return () => observer.disconnect();
+  }, [applyMonacoTheme]);
 
   const handleEditorDidMount: OnMount = (editor, monaco) => {
     editorRef.current = editor;
+    monacoRef.current = monaco;
+    const isDomDark =
+      typeof document !== 'undefined'
+        ? document.documentElement.classList.contains('dark')
+        : resolvedTheme === 'dark';
+    monaco.editor.setTheme(isDomDark ? 'vs-dark' : 'vs');
 
     editor.onKeyDown((e) => {
       handleKeyDown(e as any);
@@ -102,7 +131,7 @@ export function MonacoCodeEditor({
             className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
               isPassed
                 ? 'bg-emerald-600 hover:bg-emerald-500 text-white cursor-pointer'
-                : 'bg-slate-900 text-slate-600 cursor-not-allowed opacity-50'
+                : 'bg-slate-900 border border-slate-800/80 text-slate-500 cursor-not-allowed opacity-70'
             }`}
           >
             <span>Наступне завдання</span>
@@ -114,7 +143,7 @@ export function MonacoCodeEditor({
             disabled={isSubmitting || isPassed}
             className={`inline-flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-xs font-medium transition-colors ${
               isPassed
-                ? 'bg-slate-900 text-slate-500 cursor-not-allowed opacity-60'
+                ? 'bg-slate-900 border border-slate-800/80 text-slate-500 cursor-not-allowed opacity-70'
                 : 'bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white cursor-pointer'
             }`}
           >

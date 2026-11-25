@@ -53,9 +53,32 @@ export function CodePlayground({
   const [hasRun, setHasRun] = useState<boolean>(false);
   const [copied, setCopied] = useState<boolean>(false);
   const codeRef = useRef<string>(initialCode);
+  const monacoRef = useRef<any>(null);
 
   const monacoLang = normalizeLanguage(language);
   const canRun = runnable && (monacoLang === 'javascript' || monacoLang === 'typescript');
+
+  const applyMonacoTheme = useCallback(() => {
+    if (!monacoRef.current) return;
+    const isDomDark =
+      typeof document !== 'undefined'
+        ? document.documentElement.classList.contains('dark')
+        : resolvedTheme === 'dark';
+    monacoRef.current.editor.setTheme(isDomDark ? 'vs-dark' : 'vs');
+  }, [resolvedTheme]);
+
+  useEffect(() => {
+    applyMonacoTheme();
+  }, [applyMonacoTheme]);
+
+  useEffect(() => {
+    if (typeof document === 'undefined') return;
+    const observer = new MutationObserver(() => {
+      applyMonacoTheme();
+    });
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+    return () => observer.disconnect();
+  }, [applyMonacoTheme]);
 
   useEffect(() => {
     setCode(initialCode);
@@ -128,6 +151,13 @@ export function CodePlayground({
   };
 
   const handleEditorMount: OnMount = (editor, monaco) => {
+    monacoRef.current = monaco;
+    const isDomDark =
+      typeof document !== 'undefined'
+        ? document.documentElement.classList.contains('dark')
+        : resolvedTheme === 'dark';
+    monaco.editor.setTheme(isDomDark ? 'vs-dark' : 'vs');
+
     if (canRun) {
       editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter, () => {
         executeCode(editor.getValue());

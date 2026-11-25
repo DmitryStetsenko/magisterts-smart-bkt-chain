@@ -105,6 +105,12 @@ html:not(.dark) :is(.text-zinc-100, .text-zinc-200, .text-zinc-300) {
 html:not(.dark) .text-zinc-400 {
   color: #52525b;
 }
+html:not(.dark) .text-slate-600 {
+  color: var(--sbc-text-tertiary, #5c5c66);
+}
+html:not(.dark) .text-slate-700 {
+  color: var(--sbc-text-muted, #52525b);
+}
 
 /* 3. Dark-only 950 tinted alert/banner backgrounds -> soft light paper tints */
 html:not(.dark) [class*="bg-amber-950"] {

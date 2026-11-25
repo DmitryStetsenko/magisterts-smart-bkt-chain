@@ -30,6 +30,13 @@
   5. *Build Next.js Documentation Site* (`npm run build:docs`) — збірка статичного експорту (`output: "export"`, `trailingSlash: true`, `basePath: "/magisterts-smart-bkt-chain"`).
   6. *Upload Artifact & Deploy Pages* (`actions/upload-pages-artifact@v3` + `actions/deploy-pages@v4`).
 
+### 0.1.7.105 Виправлення асинхронної синхронізації теми Monaco Editor та контрасту `text-slate-600/700` у Світлій темі (`SBC-434`, `EP-SH`)
+- **Причина темного блоку редактора у світлій темі:** `@monaco-editor/react` не застосовував зміну пропа `theme` (`vs-dark` → `vs`), якщо `ThemeProvider` встигав перемкнути тему під час асинхронного завантаження Monaco з CDN (`isEditorReady === false`).
+- **Виправлення:**
+  - У [`apps/student/src/features/code-editor/ui/MonacoCodeEditor.tsx`](file:///apps/student/src/features/code-editor/ui/MonacoCodeEditor.tsx) та [`packages/ui/src/code/CodePlayground.tsx`](file:///packages/ui/src/code/CodePlayground.tsx) додано `monacoRef`, явний виклик `monaco.editor.setTheme(isDomDark ? 'vs-dark' : 'vs')` у `onMount`, `useEffect([applyMonacoTheme])` та `MutationObserver` за атрибутом `class` кореневого елемента `<html>`.
+  - У [`packages/ui/src/theme/light-theme.css`](file:///packages/ui/src/theme/light-theme.css) додано правила для `.text-slate-600` (`var(--sbc-text-tertiary, #5c5c66)`) та `.text-slate-700` (`var(--sbc-text-muted, #52525b)`), оскільки змінні `--sbc-slate-600/700` у світлій темі використовуються для світлих меж.
+  - Оновлено контраст неактивної кнопки «Наступне завдання» у `MonacoCodeEditor.tsx`, `QuizTaskEditor.tsx` та `EssayTaskEditor.tsx`.
+
 ### 0.1.7.104 Безрамковий рефакторинг спільного віджета `GameSkillTreeWidget` у `@sbc/ui` (`SBC-434`, `EP-SH`)
 - **Проблема (ефект «матрьошки»):** спільний віджет [`packages/ui/src/skill-graph/GameSkillTreeWidget.tsx`](file:///packages/ui/src/skill-graph/GameSkillTreeWidget.tsx), який використовується одночасно в Кабінеті Студента (`apps/student`) та Кабінеті Викладача (`apps/teacher`), зберігав зовнішній рамковий контейнер `rounded-2xl border border-indigo-500/30 shadow-2xl`, рамочні бейджі та вкладені картки в інспекторі, а в батьківських сторінках додатково обгортався в `p-4 lg:p-6` (`StudentPortalApp.tsx`) та `rounded-xl border border-slate-800/80` (`apps/teacher/src/app/page.tsx`).
 - **Рішення за Правилом 7 (Minimalist Borderless Design):**

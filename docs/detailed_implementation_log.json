@@ -120,6 +120,39 @@
           ]
         },
         {
+          "title": "0.1.7.105 Виправлення асинхронної синхронізації теми Monaco Editor та контрасту `text-slate-600/700` у Світлій темі (`SBC-434`, `EP-SH`)",
+          "level": 3,
+          "paragraphs": [],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "**Причина темного блоку редактора у світлій темі:** `@monaco-editor/react` не застосовував зміну пропа `theme` (`vs-dark` → `vs`), якщо `ThemeProvider` встигав перемкнути тему під час асинхронного завантаження Monaco з CDN (`isEditorReady === false`).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Виправлення:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "У [`apps/student/src/features/code-editor/ui/MonacoCodeEditor.tsx`](file:///apps/student/src/features/code-editor/ui/MonacoCodeEditor.tsx) та [`packages/ui/src/code/CodePlayground.tsx`](file:///packages/ui/src/code/CodePlayground.tsx) додано `monacoRef`, явний виклик `monaco.editor.setTheme(isDomDark ? 'vs-dark' : 'vs')` у `onMount`, `useEffect([applyMonacoTheme])` та `MutationObserver` за атрибутом `class` кореневого елемента `<html>`.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "У [`packages/ui/src/theme/light-theme.css`](file:///packages/ui/src/theme/light-theme.css) додано правила для `.text-slate-600` (`var(--sbc-text-tertiary, #5c5c66)`) та `.text-slate-700` (`var(--sbc-text-muted, #52525b)`), оскільки змінні `--sbc-slate-600/700` у світлій темі використовуються для світлих меж.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Оновлено контраст неактивної кнопки «Наступне завдання» у `MonacoCodeEditor.tsx`, `QuizTaskEditor.tsx` та `EssayTaskEditor.tsx`.",
+              "subitems": []
+            }
+          ]
+        },
+        {
           "title": "0.1.7.104 Безрамковий рефакторинг спільного віджета `GameSkillTreeWidget` у `@sbc/ui` (`SBC-434`, `EP-SH`)",
           "level": 3,
           "paragraphs": [],

@@ -108,7 +108,7 @@ export function EssayTaskEditor({
           className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-xs transition-colors ${
             isPassed
               ? 'bg-emerald-600 hover:bg-emerald-500 text-white cursor-pointer'
-              : 'bg-slate-900 text-slate-600 cursor-not-allowed opacity-50'
+              : 'bg-slate-900 border border-slate-800/80 text-slate-500 cursor-not-allowed opacity-70'
           }`}
         >
           <span>Наступне завдання</span>
