@@ -120,6 +120,39 @@
           ]
         },
         {
+          "title": "0.1.7.104 Безрамковий рефакторинг спільного віджета `GameSkillTreeWidget` у `@sbc/ui` (`SBC-434`, `EP-SH`)",
+          "level": 3,
+          "paragraphs": [],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "**Проблема (ефект «матрьошки»):** спільний віджет [`packages/ui/src/skill-graph/GameSkillTreeWidget.tsx`](file:///packages/ui/src/skill-graph/GameSkillTreeWidget.tsx), який використовується одночасно в Кабінеті Студента (`apps/student`) та Кабінеті Викладача (`apps/teacher`), зберігав зовнішній рамковий контейнер `rounded-2xl border border-indigo-500/30 shadow-2xl`, рамочні бейджі та вкладені картки в інспекторі, а в батьківських сторінках додатково обгортався в `p-4 lg:p-6` (`StudentPortalApp.tsx`) та `rounded-xl border border-slate-800/80` (`apps/teacher/src/app/page.tsx`).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Рішення за Правилом 7 (Minimalist Borderless Design):**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "У [`packages/ui/src/skill-graph/GameSkillTreeWidget.tsx`](file:///packages/ui/src/skill-graph/GameSkillTreeWidget.tsx) знято зовнішні рамку, скруглення та тінь; верхню панель статусу (`h-14`), перемикач режимів «Дерево Знань / Дерево Аномалій», прогрес-бар та праву панель інспектора (`<aside>`) переведено на чистий безрамковий стиль із тонкими семантичними розділювачами (`border-b border-slate-800/80`, `border-t border-slate-800/80`, `divide-y divide-slate-800/50`).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "У [`apps/student/src/components/StudentPortalApp.tsx`](file:///apps/student/src/components/StudentPortalApp.tsx) прибрано зовнішній `p-4 lg:p-6` навколо `GameSkillTreeWidget`, щоб полотно дерева знань прилягало впритул до меж AppShell.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "У [`apps/teacher/src/app/page.tsx`](file:///apps/teacher/src/app/page.tsx) прибрано зовнішню рамку `rounded-xl border border-slate-800/80` навколо `GameSkillTreeWidget`.",
+              "subitems": []
+            }
+          ]
+        },
+        {
           "title": "0.1.7.103 Уніфікація блоків роботи з кодом на базі Monaco Editor (`SBC-435`, `EP-SH`)",
           "level": 3,
           "paragraphs": [],

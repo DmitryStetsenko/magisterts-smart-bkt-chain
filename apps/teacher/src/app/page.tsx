@@ -1739,7 +1739,7 @@ export default function TeacherDashboardPage() {
 
               {/* 🌟 Dynamic View Mode: RPG Game Skill Tree vs Activity Timeline vs Traditional Metrics */}
               {activeStudentView === 'tree' ? (
-                <div className="w-full h-[680px] rounded-xl overflow-hidden border border-slate-800/80">
+                <div className="w-full h-[680px] overflow-hidden">
                   <GameSkillTreeWidget
                     nodes={studentGraphNodes}
                     courseTitle={activeCourse.title}

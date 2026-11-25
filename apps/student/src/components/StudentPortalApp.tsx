@@ -1674,7 +1674,7 @@ export function StudentPortalContent({
     >
       
           {mainView === 'tree' ? (
-            <div className="w-full h-full p-4 lg:p-6 overflow-hidden flex flex-col">
+            <div className="w-full h-full overflow-hidden flex flex-col">
               <GameSkillTreeWidget
                 nodes={graphNodes}
                 adjustments={studentAdjustments}

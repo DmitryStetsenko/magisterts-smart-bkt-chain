@@ -95,7 +95,7 @@ export function GameSkillTreeWidget({
       })));
 
   return (
-    <div className="w-full h-full flex flex-col bg-slate-950 text-slate-100 rounded-2xl overflow-hidden border border-indigo-500/30 shadow-2xl relative select-none">
+    <div className="w-full h-full flex flex-col bg-slate-950 text-slate-100 overflow-hidden relative select-none">
       {/* 🌌 Background RPG Cyber Grid & Particle Glows */}
       <div 
         className="absolute inset-0 pointer-events-none opacity-20"
@@ -110,11 +110,11 @@ export function GameSkillTreeWidget({
       />
 
       {/* 🏆 RPG Top Status Bar (Player Level, EXP, Mastery % and Controls) */}
-      <div className="h-16 bg-slate-900/90 border-b border-indigo-500/20 px-5 flex items-center justify-between shrink-0 z-20 backdrop-blur-md">
+      <div className="h-14 bg-slate-950/80 border-b border-slate-800/80 px-5 flex items-center justify-between shrink-0 z-20 backdrop-blur-md">
         <div className="flex items-center gap-4">
           {/* Level Crest Badge */}
           <div className="relative group flex items-center gap-2.5">
-            <div className="px-3 py-1.5 rounded-xl bg-gradient-to-br from-indigo-500/20 via-purple-500/20 to-pink-500/20 border border-indigo-500/40 shadow-lg shadow-indigo-500/20 flex items-center gap-1.5">
+            <div className="px-2.5 py-1 rounded-lg bg-indigo-500/10 flex items-center gap-1.5">
               <span className="text-[10px] font-black font-mono text-indigo-400 uppercase tracking-wider">LVL</span>
               <span className="text-base font-black font-mono text-white leading-none">{playerLevel}</span>
             </div>
@@ -124,7 +124,7 @@ export function GameSkillTreeWidget({
                   <Flame className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
                   {studentName ? `${studentName} • ${courseTitle}` : courseTitle}
                 </span>
-                <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+                <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-indigo-500/10 text-indigo-400">
                   EXP {totalExp}
                 </span>
               </div>
@@ -136,13 +136,13 @@ export function GameSkillTreeWidget({
         </div>
 
         {/* Mode Switcher: Knowledge Tree vs Anomaly Tree */}
-        <div className="flex items-center gap-1 bg-slate-950/80 p-1 rounded-xl border border-indigo-500/30">
+        <div className="flex items-center gap-1 bg-slate-900/70 p-0.5 rounded-lg">
           <button
             onClick={() => setTreeDisplayMode('skills')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-bold font-mono flex items-center gap-1.5 transition-all cursor-pointer ${
+            className={`px-3 py-1.5 rounded-md text-xs font-medium flex items-center gap-1.5 transition-colors cursor-pointer ${
               treeDisplayMode === 'skills'
-                ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-md shadow-indigo-600/30'
-                : 'text-slate-400 hover:text-white hover:bg-slate-900'
+                ? 'bg-indigo-600 text-white'
+                : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
             }`}
           >
             <Layers className="w-3.5 h-3.5" />
@@ -151,21 +151,21 @@ export function GameSkillTreeWidget({
 
           <button
             onClick={() => setTreeDisplayMode('anomalies')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-bold font-mono flex items-center gap-1.5 transition-all cursor-pointer ${
+            className={`px-3 py-1.5 rounded-md text-xs font-medium flex items-center gap-1.5 transition-colors cursor-pointer ${
               treeDisplayMode === 'anomalies'
-                ? 'bg-amber-600 text-white shadow-md shadow-amber-600/30'
-                : 'text-slate-400 hover:text-white hover:bg-slate-900'
+                ? 'bg-amber-600 text-white'
+                : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
             }`}
           >
             <Zap className="w-3.5 h-3.5" />
             <span>Дерево Аномалій</span>
             {activeAdjustments.length > 0 && (
-              <span className={`px-1.5 py-0.2 text-[9px] rounded-full font-black ${
+              <span className={`text-[10px] font-mono font-bold ${
                 treeDisplayMode === 'anomalies'
-                  ? 'bg-white text-amber-900'
-                  : 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
+                  ? 'text-white/90'
+                  : 'text-amber-400'
               }`}>
-                {activeAdjustments.length}
+                ({activeAdjustments.length})
               </span>
             )}
           </button>
@@ -178,7 +178,7 @@ export function GameSkillTreeWidget({
               <span className="text-slate-400">Прогрес Дерева Знань</span>
               <span className="text-indigo-400 font-bold">{completionPercentage}%</span>
             </div>
-            <div className="w-full h-2 bg-slate-950 rounded-full overflow-hidden border border-slate-800">
+            <div className="w-full h-1.5 bg-slate-800/80 rounded-full overflow-hidden">
               <div 
                 className="h-full bg-gradient-to-r from-indigo-500 via-purple-500 to-emerald-400 transition-all duration-700"
                 style={{ width: `${completionPercentage}%` }}
@@ -412,21 +412,21 @@ export function GameSkillTreeWidget({
 
         {/* Right: RPG Skill Inspector & Node Card */}
         {showInspector && selectedNode && (
-          <aside className="w-88 bg-slate-900/95 border-l border-indigo-500/20 p-5 flex flex-col justify-between shrink-0 shadow-2xl backdrop-blur-xl z-20 overflow-y-auto">
+          <aside className="w-88 bg-slate-950/90 border-l border-slate-800/80 p-5 flex flex-col justify-between shrink-0 z-20 overflow-y-auto">
             <div className="flex flex-col gap-4">
               {/* Header Badge */}
-              <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-                <span className="px-2.5 py-1 rounded-full text-[10px] font-mono font-bold uppercase tracking-wider bg-indigo-500/10 text-indigo-400 border border-indigo-500/30 flex items-center gap-1.5">
+              <div className="flex items-center justify-between border-b border-slate-800/80 pb-3">
+                <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-indigo-400 flex items-center gap-1.5">
                   <Shield className="w-3.5 h-3.5" />
                   Модуль Графа BKT
                 </span>
                 <span 
-                  className={`text-[10px] font-bold font-mono px-2 py-0.5 rounded-full border ${
+                  className={`text-[10px] font-bold font-mono px-2 py-0.5 rounded-md ${
                     selectedNode.pMastery >= 0.95
-                      ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30'
+                      ? 'bg-emerald-500/10 text-emerald-400'
                       : selectedNode.status === 'LOCKED'
-                      ? 'bg-slate-800 text-slate-400 border-slate-700'
-                      : 'bg-indigo-500/10 text-indigo-300 border-indigo-500/30'
+                      ? 'bg-slate-800/60 text-slate-400'
+                      : 'bg-indigo-500/10 text-indigo-300'
                   }`}
                 >
                   {selectedNode.pMastery >= 0.95 ? 'Засвоєно' : selectedNode.status === 'LOCKED' ? 'Заблоковано' : 'Активно'}
@@ -442,7 +442,7 @@ export function GameSkillTreeWidget({
               </div>
 
               {/* RPG BKT Mastery Metrics */}
-              <div className="bg-slate-950/80 border border-slate-800 rounded-xl p-3 flex flex-col gap-2">
+              <div className="pt-4 border-t border-slate-800/80 flex flex-col gap-2">
                 <div className="flex justify-between items-center text-xs">
                   <span className="text-slate-400 font-semibold flex items-center gap-1.5">
                     <Sparkles className="w-3.5 h-3.5 text-purple-400" />
@@ -453,11 +453,11 @@ export function GameSkillTreeWidget({
                   </span>
                 </div>
                 {/* Progress bar */}
-                <div className="w-full h-2 bg-slate-900 rounded-full overflow-hidden border border-slate-800">
+                <div className="w-full h-1.5 bg-slate-800/80 rounded-full overflow-hidden">
                   <div
                     className={`h-full transition-all duration-500 ${
                       selectedNode.pMastery >= 0.90
-                        ? 'bg-emerald-400 shadow-sm shadow-emerald-400'
+                        ? 'bg-emerald-400'
                         : 'bg-gradient-to-r from-amber-500 to-indigo-500'
                     }`}
                     style={{ width: `${Math.min(100, selectedNode.pMastery * 100)}%` }}
@@ -471,20 +471,20 @@ export function GameSkillTreeWidget({
 
               {/* 📊 Модульна Телеметрія Студента (Тільки для Викладача або якщо доступна) */}
               {role === 'teacher' && (
-                <div className="bg-slate-950/90 border border-slate-800 rounded-xl p-3 flex flex-col gap-2.5">
-                  <div className="flex items-center justify-between border-b border-slate-800/80 pb-2">
+                <div className="pt-4 border-t border-slate-800/80 flex flex-col gap-2.5">
+                  <div className="flex items-center justify-between">
                     <span className="text-[11px] font-bold uppercase tracking-wider text-slate-300 flex items-center gap-1.5">
                       <BarChart3 className="w-3.5 h-3.5 text-indigo-400" />
                       <span>Телеметрія Модуля</span>
                     </span>
-                    <span className="text-[9px] font-mono text-slate-500 bg-slate-900 px-1.5 py-0.5 rounded border border-slate-800">
+                    <span className="text-[9px] font-mono text-slate-500">
                       Live Session
                     </span>
                   </div>
 
                   <div className="grid grid-cols-3 gap-2 text-center">
                     {/* WPM */}
-                    <div className="bg-slate-900/80 p-2 rounded-lg border border-slate-800/80 flex flex-col items-center">
+                    <div className="bg-slate-900/50 p-2 rounded-lg flex flex-col items-center">
                       <div className="flex items-center gap-1 text-[9px] text-slate-400 font-semibold mb-0.5">
                         <Keyboard className="w-3 h-3 text-blue-400" />
                         <span>WPM</span>
@@ -495,10 +495,10 @@ export function GameSkillTreeWidget({
                     </div>
 
                     {/* Copy-Paste Ratio */}
-                    <div className={`p-2 rounded-lg border flex flex-col items-center ${
+                    <div className={`p-2 rounded-lg flex flex-col items-center ${
                       (selectedNode.telemetry?.copyPasteRatio ?? 0) >= 0.60
-                        ? 'bg-red-950/30 border-red-500/40'
-                        : 'bg-slate-900/80 border-slate-800/80'
+                        ? 'bg-red-950/30'
+                        : 'bg-slate-900/50'
                     }`}>
                       <div className="flex items-center gap-1 text-[9px] text-slate-400 font-semibold mb-0.5">
                         <Copy className="w-3 h-3 text-amber-400" />
@@ -514,7 +514,7 @@ export function GameSkillTreeWidget({
                     </div>
 
                     {/* Fatigue Index */}
-                    <div className="bg-slate-900/80 p-2 rounded-lg border border-slate-800/80 flex flex-col items-center">
+                    <div className="bg-slate-900/50 p-2 rounded-lg flex flex-col items-center">
                       <div className="flex items-center gap-1 text-[9px] text-slate-400 font-semibold mb-0.5">
                         <Activity className="w-3 h-3 text-purple-400" />
                         <span>Втома</span>
@@ -527,7 +527,7 @@ export function GameSkillTreeWidget({
 
                   {/* Anomaly banner if copy-paste ratio >= 60% */}
                   {(selectedNode.hasCopyPasteAnomaly || (selectedNode.telemetry?.copyPasteRatio ?? 0) >= 0.60) && (
-                    <div className="p-2.5 rounded-lg bg-red-950/40 border border-red-500/40 flex items-start gap-2 text-[11px] text-red-200">
+                    <div className="p-2.5 rounded-lg bg-red-950/30 flex items-start gap-2 text-[11px] text-red-200">
                       <AlertTriangle className="w-4 h-4 text-red-400 shrink-0 mt-0.5" />
                       <div>
                         <strong className="text-red-300 block font-semibold">Аномалія Копіпасту (&ge; 60%):</strong>
@@ -538,7 +538,7 @@ export function GameSkillTreeWidget({
 
                   {/* Anomaly banner if Guessing was detected (P(Guess) > 0.3) */}
                   {selectedNode.hasGuessAnomaly && (
-                    <div className="p-2.5 rounded-lg bg-amber-950/40 border border-amber-500/40 flex items-start gap-2 text-[11px] text-amber-200 animate-pulse">
+                    <div className="p-2.5 rounded-lg bg-amber-950/30 flex items-start gap-2 text-[11px] text-amber-200 animate-pulse">
                       <Zap className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
                       <div>
                         <strong className="text-amber-300 block font-semibold">Аномалія Вгадування (P(Guess) &gt; 0.3):</strong>
@@ -554,7 +554,7 @@ export function GameSkillTreeWidget({
                         <Sparkles className="w-3 h-3 text-amber-400" />
                         <span>Останні телеметричні коригування:</span>
                       </span>
-                      <div className="flex flex-col gap-1">
+                      <div className="flex flex-col divide-y divide-slate-800/50">
                         {selectedNode.recentAdjustments.map((adj, aIdx) => (
                           <div
                             key={aIdx}
@@ -563,14 +563,14 @@ export function GameSkillTreeWidget({
                                 onSelectSkill(selectedNode.slug);
                               }
                             }}
-                            className={`p-2 rounded-lg border text-[10px] font-mono flex items-center justify-between gap-2 transition-all ${
-                              adj.taskId ? 'cursor-pointer hover:border-amber-400/60' : ''
+                            className={`py-2 px-1 text-[10px] font-mono flex items-center justify-between gap-2 transition-colors ${
+                              adj.taskId ? 'cursor-pointer hover:bg-slate-800/40' : ''
                             } ${
                               adj.pGuessUsed && adj.pGuessUsed > 0.3
-                                ? 'bg-amber-950/30 border-amber-500/30 text-amber-200'
+                                ? 'text-amber-300'
                                 : adj.pSlipUsed && adj.pSlipUsed > 0.2
-                                ? 'bg-indigo-950/30 border-indigo-500/30 text-indigo-200'
-                                : 'bg-slate-900 border-slate-800 text-slate-400'
+                                ? 'text-indigo-300'
+                                : 'text-slate-400'
                             }`}
                           >
                             <div className="flex items-center gap-1.5 truncate">
@@ -597,7 +597,7 @@ export function GameSkillTreeWidget({
               )}
 
               {/* Prerequisites & Requirements */}
-              <div className="flex flex-col gap-1.5 text-xs">
+              <div className="pt-4 border-t border-slate-800/80 flex flex-col gap-1.5 text-xs">
                 <div className="flex items-center justify-between">
                   <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1">
                     <Target className="w-3.5 h-3.5 text-indigo-400" />
@@ -609,7 +609,7 @@ export function GameSkillTreeWidget({
                     </span>
                   )}
                 </div>
-                <p className="text-[11px] text-slate-400 bg-slate-950/60 p-2.5 rounded-lg border border-slate-800/80 leading-relaxed">
+                <p className="text-[11px] text-slate-400 leading-relaxed">
                   {selectedNode.parentSkillIds.length === 0
                     ? '🟢 Базовий вузол курсу. Доступний одразу.'
                     : selectedNode.status === 'LOCKED'
