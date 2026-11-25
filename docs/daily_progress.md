@@ -61,6 +61,7 @@
    - У `StudentPortalApp.tsx` (`apps/student`) відновлено `revealedHintLevel` із відповіді `GET /api/v1/tasks/recommended`, замінено хардкод `'demo-student'` на `currentUserId` у `logActivity`, `handleEvaluate`, `handleConfirmSkillReset` та `handleConfirmAbandonAndStudy`, а також додано `keepalive: true` у `logActivity` для гарантованого запису події перед миттєвим перезавантаженням.
    - Додано unit-тести у `audit-log.service.spec.ts` та підтверджено проходження тестів і збірок `apps/api` й `apps/student`.
    - **Контрастність темних `900`/`950` плашок у Світлій темі (`SBC-434`, `EP-SH`):** у `packages/ui/src/theme/light-theme.css` додано світлі паперові підкладки для `bg-cyan/sky/teal/violet/green/yellow-900/950` та `900`-відтінків усіх акцентів без зачіпання `hover:bg-*`, а в `StudentActivityTimelineWidget.tsx` (`apps/teacher`) виправлено відображення рядкового `detectedMisconception`.
+   - **Заміна емоджі на векторні іконки та семантичні індикатори у Кабінеті Викладача (`SBC-434`, `EP-TC`):** у `apps/teacher/src/app/page.tsx` (секція «Розподіл групи»), `CourseGraphViewer.tsx` та `StudentActivityTimelineWidget.tsx` прибрано Unicode-емоджі (`🏆`, `🟢`, `🟡`, `🔴`, `⚠️`) та замінено їх на іконки `lucide-react` (`Trophy`, `AlertTriangle`) й акуратні колірні точки-індикатори.
 
 ### 🎯 Наступні дії (Next Steps):
 1. **Фінальне тестування з живим Docker/API та злиття гілки `feat/theme-system-tokens` у `dev`:**

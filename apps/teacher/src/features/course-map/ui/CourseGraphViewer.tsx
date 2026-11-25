@@ -246,21 +246,24 @@ export function CourseGraphViewer({
     switch (diff) {
       case 'HARD':
         return (
-          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-rose-500/10 border border-rose-500/20 text-rose-300 text-[10px] font-semibold">
-            🔴 Складне (100%)
+          <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-rose-500/10 border border-rose-500/20 text-rose-300 text-[10px] font-semibold">
+            <span className="w-1.5 h-1.5 rounded-full bg-rose-500 shrink-0" />
+            <span>Складне (100%)</span>
           </span>
         );
       case 'MEDIUM':
         return (
-          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-amber-500/10 border border-amber-500/20 text-amber-300 text-[10px] font-semibold">
-            🟡 Нормальне (100%)
+          <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-amber-500/10 border border-amber-500/20 text-amber-300 text-[10px] font-semibold">
+            <span className="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0" />
+            <span>Нормальне (100%)</span>
           </span>
         );
       case 'EASY':
       default:
         return (
-          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 text-[10px] font-semibold">
-            🟢 Полегшене (70%)
+          <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 text-[10px] font-semibold">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
+            <span>Полегшене (70%)</span>
           </span>
         );
     }
@@ -506,9 +509,9 @@ export function CourseGraphViewer({
               className="bg-slate-900/80 border border-slate-800 rounded-lg px-2.5 py-1 text-xs text-slate-300 focus:outline-none focus:border-purple-500 font-mono"
             >
               <option value="ALL">Всі рівні</option>
-              <option value="EASY">🟢 Полегшені</option>
-              <option value="MEDIUM">🟡 Нормальні</option>
-              <option value="HARD">🔴 Складні</option>
+              <option value="EASY">Полегшені</option>
+              <option value="MEDIUM">Нормальні</option>
+              <option value="HARD">Складні</option>
             </select>
 
             {viewMode === 'full' && (
@@ -733,9 +736,15 @@ export function CourseGraphViewer({
             <thead>
               <tr className="border-b border-slate-800 text-[11px] font-mono text-slate-400 uppercase tracking-wider">
                 <th className="py-2.5 pr-4">Тематична Гілка & Підконцепти</th>
-                <th className="py-2.5 px-3 text-emerald-400">🟢 EASY (70%)</th>
-                <th className="py-2.5 px-3 text-amber-400">🟡 MEDIUM (100%)</th>
-                <th className="py-2.5 pl-3 text-rose-400">🔴 HARD (100%)</th>
+                <th className="py-2.5 px-3 text-emerald-400">
+                  <span className="inline-flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-emerald-500" />EASY (70%)</span>
+                </th>
+                <th className="py-2.5 px-3 text-amber-400">
+                  <span className="inline-flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-amber-500" />MEDIUM (100%)</span>
+                </th>
+                <th className="py-2.5 pl-3 text-rose-400">
+                  <span className="inline-flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-rose-500" />HARD (100%)</span>
+                </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-800/60 text-xs">

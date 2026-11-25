@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { io } from 'socket.io-client';
-import { ShieldCheck, Network, Users, BarChart3, Code2, BookOpen, Scale, ChevronDown, ChevronUp, X, Search, RotateCcw, AlertTriangle, CheckCircle2, Lock, HelpCircle, Code, FileText, CheckSquare, Sparkles, Keyboard, Copy, Activity, Info, GitBranch, Layers, ClipboardCheck, Tag, FlaskConical, Compass, User, Globe, Plus, Minus, GraduationCap, Clock } from 'lucide-react';
+import { ShieldCheck, Network, Users, BarChart3, Code2, BookOpen, Scale, ChevronDown, ChevronUp, X, Search, RotateCcw, AlertTriangle, CheckCircle2, Lock, HelpCircle, Code, FileText, CheckSquare, Sparkles, Keyboard, Copy, Activity, Info, GitBranch, Layers, ClipboardCheck, Tag, FlaskConical, Compass, User, Globe, Plus, Minus, GraduationCap, Clock, Trophy } from 'lucide-react';
 import { StudentAnalyticsItem } from '../features/analytics/model/analytics.types';
 import { AnomalyTreeWidget, GameSkillTreeWidget, SkillGraphNode, AppShellLayout, Breadcrumbs, UserProfileDrawer, ThemeSettingsSection } from '@sbc/ui';
 import { CourseDto, TaskDto } from '@sbc/types';
@@ -558,7 +558,10 @@ export default function TeacherDashboardPage() {
                             : 'hover:bg-slate-800/50 text-slate-400'
                         }`}
                       >
-                        <span className="text-[11px] text-amber-400">🏆 Mastery</span>
+                        <span className="text-[11px] text-amber-400 inline-flex items-center gap-1.5">
+                          <Trophy className="w-3 h-3 shrink-0" />
+                          <span>Mastery</span>
+                        </span>
                         <span className="font-mono text-[11px] font-bold text-slate-200">{cohortMasteryStudents.length}</span>
                       </button>
 
@@ -570,7 +573,10 @@ export default function TeacherDashboardPage() {
                             : 'hover:bg-slate-800/50 text-slate-400'
                         }`}
                       >
-                        <span className="text-[11px] text-emerald-400">🟢 Proficient</span>
+                        <span className="text-[11px] text-emerald-400 inline-flex items-center gap-1.5">
+                          <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" />
+                          <span>Proficient</span>
+                        </span>
                         <span className="font-mono text-[11px] font-bold text-slate-200">{cohortProficientStudents.length}</span>
                       </button>
 
@@ -582,7 +588,10 @@ export default function TeacherDashboardPage() {
                             : 'hover:bg-slate-800/50 text-slate-400'
                         }`}
                       >
-                        <span className="text-[11px] text-blue-400">🟡 Basic</span>
+                        <span className="text-[11px] text-blue-400 inline-flex items-center gap-1.5">
+                          <span className="w-2 h-2 rounded-full bg-blue-500 shrink-0" />
+                          <span>Basic</span>
+                        </span>
                         <span className="font-mono text-[11px] font-bold text-slate-200">{cohortBasicStudents.length}</span>
                       </button>
 
@@ -594,7 +603,10 @@ export default function TeacherDashboardPage() {
                             : 'hover:bg-slate-800/50 text-slate-400'
                         }`}
                       >
-                        <span className="text-[11px] text-rose-400">🔴 At Risk</span>
+                        <span className="text-[11px] text-rose-400 inline-flex items-center gap-1.5">
+                          <span className="w-2 h-2 rounded-full bg-rose-500 shrink-0" />
+                          <span>At Risk</span>
+                        </span>
                         <span className="font-mono text-[11px] font-bold text-slate-200">{cohortAtRiskStudents.length}</span>
                       </button>
                     </div>

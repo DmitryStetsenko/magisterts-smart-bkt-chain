@@ -312,8 +312,9 @@ export const StudentActivityTimelineWidget: React.FC<StudentActivityTimelineWidg
                         )}
                       </div>
                       {payload.detectedMisconception && (
-                        <div className="text-[11px] text-amber-300 bg-amber-950/30 px-2 py-1 rounded border border-amber-800/40">
-                          ⚠️ Омана: <strong>{typeof payload.detectedMisconception === 'string' ? payload.detectedMisconception : (payload.detectedMisconception.title || payload.detectedMisconception.key)}</strong>
+                        <div className="text-[11px] text-amber-300 bg-amber-950/30 px-2 py-1 rounded border border-amber-800/40 flex items-center gap-1.5">
+                          <AlertTriangle className="w-3 h-3 shrink-0" />
+                          <span>Омана: <strong>{typeof payload.detectedMisconception === 'string' ? payload.detectedMisconception : (payload.detectedMisconception.title || payload.detectedMisconception.key)}</strong></span>
                         </div>
                       )}
                     </div>
