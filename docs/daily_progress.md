@@ -55,6 +55,12 @@
    - Переведено на Monaco `CodePlayground` усі навчальні блоки коду в `apps/study` (уроки + розширена бічна панель пісочниці `w-96 sm:w-[440px]` у `<DrawerSection>`) та зразки коду в експрес-теорії `JustInTimeTheoryDrawer` у `apps/student`.
    - Проведено успішні збірки `build:study`, `build:student` та Playwright E2E-перевірку (Monaco Editor + перевірка відсутності обрізання кнопки «Запустити» + живе виконання JS у консолі).
 
+4. **Серверна персистентність та відновлення розкритих Сократівських підказок після оновлення сторінки (`SBC-436`, `EP-ST`):**
+   - У `AuditLogService` (`apps/api/src/domain/audit/audit-log.service.ts`) додано перевикористовуваний метод `getActiveRevealedHintLevel(...)`, який обчислює максимальний розкритий рівень підказок (`HINT_REQUESTED`) для пари `(userId, taskId)` після останнього скидання прогресу (`STUDENT_SKILL_RESET` або `TEACHER_MODULE_REVOKED`).
+   - У `TaskController.getRecommendedTask` (`GET /api/v1/tasks/recommended`) додано повернення поля `revealedHintLevel`, а у `BktController.evaluateSubmission` (`POST /api/v1/bkt/evaluate`) — серверний захист від обходу штрафу через перезавантаження сторінки (`effectiveRevealedHintLevel = Math.max(dto.revealedHintLevel, persistedHintLevel)`).
+   - У `StudentPortalApp.tsx` (`apps/student`) відновлено `revealedHintLevel` із відповіді `GET /api/v1/tasks/recommended`, замінено хардкод `'demo-student'` на `currentUserId` у `logActivity`, `handleEvaluate`, `handleConfirmSkillReset` та `handleConfirmAbandonAndStudy`, а також додано `keepalive: true` у `logActivity` для гарантованого запису події перед миттєвим перезавантаженням.
+   - Додано unit-тести у `audit-log.service.spec.ts` та підтверджено проходження тестів і збірок `apps/api` й `apps/student`.
+
 ### 🎯 Наступні дії (Next Steps):
 1. **Фінальне тестування з живим Docker/API та злиття гілки `feat/theme-system-tokens` у `dev`:**
    - Після запуску Docker Desktop (`sbc-postgres`, `sbc-redis`) прогнати повний набір E2E-тестів (`e2e/theme-settings.spec.ts` + `e2e/light-theme-contrast.spec.ts`) на живих даних курсів та за потреби виконати merge у `dev`.

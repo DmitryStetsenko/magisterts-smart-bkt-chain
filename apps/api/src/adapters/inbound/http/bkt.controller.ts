@@ -38,7 +38,13 @@ export class BktController {
       where: { id: dto.taskId },
       include: {
         testCases: true,
-        skill: true,
+        skill: {
+          include: {
+            course: {
+              select: { slug: true },
+            },
+          },
+        },
       },
     });
 
@@ -384,16 +390,29 @@ export class BktController {
       semanticDetectedMisconceptions: semanticDetails?.detectedMisconceptions,
     });
 
-    // Resolve Socratic hint penalty percentage (explicit or derived from revealedHintLevel)
+    // Resolve Socratic hint penalty percentage (combining client payload & server-persisted HINT_REQUESTED logs)
+    const persistedHintLevel = await this.auditLogService.getActiveRevealedHintLevel({
+      userId: user.id,
+      taskId: task.id,
+      skillId: task.skillId,
+      courseSlug: (task.skill as any)?.course?.slug ?? null,
+    });
+    const effectiveRevealedHintLevel = Math.max(
+      typeof dto.revealedHintLevel === 'number' && dto.revealedHintLevel > 0 ? dto.revealedHintLevel : 0,
+      persistedHintLevel,
+    );
+
     let appliedHintPenaltyPct = 0;
     if (typeof dto.appliedPenaltyPct === 'number' && dto.appliedPenaltyPct > 0) {
       appliedHintPenaltyPct = Math.min(80, Math.max(0, dto.appliedPenaltyPct));
-    } else if (typeof dto.revealedHintLevel === 'number' && dto.revealedHintLevel > 0 && Array.isArray(task.socraticHints)) {
+    }
+    if (effectiveRevealedHintLevel > 0 && Array.isArray(task.socraticHints)) {
       const hintEntry = (task.socraticHints as Array<{ level?: number; penaltyPct?: number }>).find(
-        (h) => h && h.level === dto.revealedHintLevel,
+        (h) => h && h.level === effectiveRevealedHintLevel,
       );
       if (hintEntry && typeof hintEntry.penaltyPct === 'number') {
-        appliedHintPenaltyPct = Math.min(80, Math.max(0, hintEntry.penaltyPct));
+        const derivedPenalty = Math.min(80, Math.max(0, hintEntry.penaltyPct));
+        appliedHintPenaltyPct = Math.max(appliedHintPenaltyPct, derivedPenalty);
       }
     }
 
@@ -495,7 +514,7 @@ export class BktController {
           feedbackText: feedback,
           attemptNumber,
           isAbandoned: dto.isAbandoned || false,
-          revealedHintLevel: dto.revealedHintLevel,
+          revealedHintLevel: effectiveRevealedHintLevel > 0 ? effectiveRevealedHintLevel : dto.revealedHintLevel,
           appliedHintPenaltyPct,
           detectedMisconception: detectedMisconception?.title || null,
           trace: mathTrace,

@@ -143,6 +143,31 @@
               "type": "text",
               "raw_text": "Проведено успішні збірки `build:study`, `build:student` та Playwright E2E-перевірку (Monaco Editor + перевірка відсутності обрізання кнопки «Запустити» + живе виконання JS у консолі).",
               "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Серверна персистентність та відновлення розкритих Сократівських підказок після оновлення сторінки (`SBC-436`, `EP-ST`):**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "У `AuditLogService` (`apps/api/src/domain/audit/audit-log.service.ts`) додано перевикористовуваний метод `getActiveRevealedHintLevel(...)`, який обчислює максимальний розкритий рівень підказок (`HINT_REQUESTED`) для пари `(userId, taskId)` після останнього скидання прогресу (`STUDENT_SKILL_RESET` або `TEACHER_MODULE_REVOKED`).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "У `TaskController.getRecommendedTask` (`GET /api/v1/tasks/recommended`) додано повернення поля `revealedHintLevel`, а у `BktController.evaluateSubmission` (`POST /api/v1/bkt/evaluate`) — серверний захист від обходу штрафу через перезавантаження сторінки (`effectiveRevealedHintLevel = Math.max(dto.revealedHintLevel, persistedHintLevel)`).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "У `StudentPortalApp.tsx` (`apps/student`) відновлено `revealedHintLevel` із відповіді `GET /api/v1/tasks/recommended`, замінено хардкод `'demo-student'` на `currentUserId` у `logActivity`, `handleEvaluate`, `handleConfirmSkillReset` та `handleConfirmAbandonAndStudy`, а також додано `keepalive: true` у `logActivity` для гарантованого запису події перед миттєвим перезавантаженням.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Додано unit-тести у `audit-log.service.spec.ts` та підтверджено проходження тестів і збірок `apps/api` й `apps/student`.",
+              "subitems": []
             }
           ]
         },

@@ -24,6 +24,7 @@ describe('AuditLogService', () => {
       studentActivityLog: {
         count: jest.fn().mockResolvedValue(5),
         deleteMany: jest.fn().mockResolvedValue({ count: 5 }),
+        findFirst: jest.fn().mockResolvedValue(null),
         create: jest.fn().mockImplementation(({ data }) =>
           Promise.resolve({
             id: 'log-1',
@@ -212,6 +213,57 @@ describe('AuditLogService', () => {
           actorRole: 'ADMIN',
         }),
       );
+    });
+  });
+
+  describe('getActiveRevealedHintLevel', () => {
+    it('should return highest revealed hint level when no reset event exists', async () => {
+      prisma.studentActivityLog.findFirst.mockResolvedValueOnce(null);
+      prisma.studentActivityLog.findMany.mockResolvedValueOnce([
+        { payload: { level: 1, penaltyPct: 15 } },
+        { payload: { level: 2, penaltyPct: 30 } },
+      ]);
+
+      const level = await service.getActiveRevealedHintLevel({
+        userId: 'user-123',
+        taskId: 'task-1',
+        skillId: 'var-types',
+        courseSlug: 'js-dev',
+      });
+
+      expect(level).toBe(2);
+      expect(prisma.studentActivityLog.findMany).toHaveBeenCalledWith({
+        where: {
+          userId: 'user-123',
+          taskId: 'task-1',
+          eventType: 'HINT_REQUESTED',
+        },
+        select: { payload: true },
+      });
+    });
+
+    it('should filter HINT_REQUESTED logs strictly after the latest reset timestamp', async () => {
+      const resetDate = new Date('2026-11-25T12:00:00.000Z');
+      prisma.studentActivityLog.findFirst.mockResolvedValueOnce({ createdAt: resetDate });
+      prisma.studentActivityLog.findMany.mockResolvedValueOnce([]);
+
+      const level = await service.getActiveRevealedHintLevel({
+        userId: 'user-123',
+        taskId: 'task-1',
+        skillId: 'var-types',
+        courseSlug: 'js-dev',
+      });
+
+      expect(level).toBe(0);
+      expect(prisma.studentActivityLog.findMany).toHaveBeenCalledWith({
+        where: {
+          userId: 'user-123',
+          taskId: 'task-1',
+          eventType: 'HINT_REQUESTED',
+          createdAt: { gt: resetDate },
+        },
+        select: { payload: true },
+      });
     });
   });
 });

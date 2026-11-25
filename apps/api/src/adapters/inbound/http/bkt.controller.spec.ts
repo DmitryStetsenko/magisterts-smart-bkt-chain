@@ -46,6 +46,7 @@ describe('BktController (Analytics & Telemetry reset integration)', () => {
 
   const mockAuditLogService = {
     logEvent: jest.fn().mockResolvedValue({ id: 'log-1', eventType: 'TASK_SUBMITTED' }),
+    getActiveRevealedHintLevel: jest.fn().mockResolvedValue(0),
     getStudentLogs: jest.fn().mockResolvedValue([]),
     getRecentLogs: jest.fn().mockResolvedValue([]),
     annulSubmission: jest.fn().mockResolvedValue({ success: true, submissionId: 'sub-1' }),

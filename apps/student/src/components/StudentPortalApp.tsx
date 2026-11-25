@@ -294,8 +294,9 @@ export function StudentPortalContent({
       await fetch(`${API_URL}/api/v1/bkt/activity-logs`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        keepalive: true,
         body: JSON.stringify({
-          userId: 'demo-student',
+          userId: currentUserId,
           courseId: activeCourseSlug,
           skillId: task?.skillId,
           taskId: task?.id,
@@ -475,7 +476,8 @@ export function StudentPortalContent({
         setHasRemediationTask(data.hasRemediationTask ?? true);
         setCode(data.task.starterCode || '');
         setEssayAnswer('');
-        setRevealedHintLevel(0);
+        const restoredHintLevel = typeof data.revealedHintLevel === 'number' ? data.revealedHintLevel : 0;
+        setRevealedHintLevel(restoredHintLevel);
         setIsTheoryDrawerOpen(false);
 
         if (data.recommendation?.isExhausted || data.recommendation?.reason === 'MODULE_TASKS_EXHAUSTED') {
@@ -507,7 +509,7 @@ export function StudentPortalContent({
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          userId: 'demo-student',
+          userId: currentUserId,
           skillId: exhaustedModalData.skillId,
         }),
       });
@@ -611,6 +613,7 @@ export function StudentPortalContent({
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          userId: currentUserId,
           taskId: task.id,
           ...payload,
           ...(revealedHintLevel > 0
@@ -661,7 +664,7 @@ export function StudentPortalContent({
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          userId: 'demo-student',
+          userId: currentUserId,
           skillId: task.skillId,
         }),
       });

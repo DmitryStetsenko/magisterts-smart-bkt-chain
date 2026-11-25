@@ -2,12 +2,16 @@ import { Controller, Get, Param, Query, NotFoundException } from '@nestjs/common
 import { ApiTags, ApiOperation, ApiQuery } from '@nestjs/swagger';
 import { PrismaService } from '../../outbound/persistence/prisma.service';
 import { TaskSequencer } from '../../../domain/sequencing/task-sequencer';
+import { AuditLogService } from '../../../domain/audit/audit-log.service';
 import { SubmissionStatus } from '@sbc/database';
 
 @ApiTags('Tasks')
 @Controller('tasks')
 export class TaskController {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly auditLogService: AuditLogService,
+  ) {}
 
   @Get()
   @ApiOperation({ summary: 'Get all available tasks grouped by skill' })
@@ -209,10 +213,18 @@ export class TaskController {
          (fullTask.difficulty !== 'EASY' && t.difficulty === 'EASY'))
     );
 
+    const revealedHintLevel = await this.auditLogService.getActiveRevealedHintLevel({
+      userId: targetUserId!,
+      taskId: fullTask.id,
+      skillId: fullTask.skillId,
+      courseSlug,
+    });
+
     return {
       recommendation: recommendation || { targetSkillSlug: fullTask.skill.slug, reason: 'First task in course' },
       task: fullTask,
       hasRemediationTask,
+      revealedHintLevel,
     };
   }
 

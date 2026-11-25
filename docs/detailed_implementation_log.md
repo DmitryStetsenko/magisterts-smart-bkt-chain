@@ -30,6 +30,20 @@
   5. *Build Next.js Documentation Site* (`npm run build:docs`) — збірка статичного експорту (`output: "export"`, `trailingSlash: true`, `basePath: "/magisterts-smart-bkt-chain"`).
   6. *Upload Artifact & Deploy Pages* (`actions/upload-pages-artifact@v3` + `actions/deploy-pages@v4`).
 
+### 0.1.7.106 Серверна персистентність та відновлення стану Сократівських підказок після перезавантаження сторінки (`SBC-436`, `EP-ST`)
+- **Проблема:** У [`apps/student/src/components/StudentPortalApp.tsx`](file:///apps/student/src/components/StudentPortalApp.tsx) стан розкритих підказок (`revealedHintLevel`) зберігався лише в ефемерному React `useState(0)` та скидався в `0` при кожному виклику `fetchRecommendedTask`. Після оновлення сторінки розкриті підказки знову закривалися, що одночасно погіршувало UX і дозволяло скинути штраф `-15% / -30%` до BKT-приросту перед відправкою відповіді.
+- **Архітектурне рішення (Backend as Single Source of Truth):**
+  1. **Метод `AuditLogService.getActiveRevealedHintLevel`** ([`apps/api/src/domain/audit/audit-log.service.ts`](file:///apps/api/src/domain/audit/audit-log.service.ts)):
+     - Шукає останню релевантну подію скидання (`STUDENT_SKILL_RESET` для поточного `skillId` або `TEACHER_MODULE_REVOKED` глобально / для `courseSlug`).
+     - Вибирає всі події `HINT_REQUESTED` із таблиці `student_activity_logs` для `(userId, taskId)` після моменту скидання та повертає максимальний `payload.level`.
+  2. **Відновлення на завантаженні завдання (`GET /api/v1/tasks/recommended`):**
+     - [`apps/api/src/adapters/inbound/http/task.controller.ts`](file:///apps/api/src/adapters/inbound/http/task.controller.ts) інжектує `AuditLogService` і додає `revealedHintLevel` у відповідь ендпоінту.
+  3. **Серверний контроль штрафу (`POST /api/v1/bkt/evaluate`):**
+     - [`apps/api/src/adapters/inbound/http/bkt.controller.ts`](file:///apps/api/src/adapters/inbound/http/bkt.controller.ts) обчислює `effectiveRevealedHintLevel = Math.max(dto.revealedHintLevel ?? 0, persistedHintLevel)` і застосовує відповідний `appliedHintPenaltyPct` незалежно від перезавантаження клієнта.
+  4. **Клієнтська синхронізація (`StudentPortalApp.tsx`):**
+     - `fetchRecommendedTask` відновлює `revealedHintLevel` із `data.revealedHintLevel ?? 0` (завдяки чому секція «Сократівські підказки» автоматично залишається відкритою, відображає відкриті підказки, штрафний бейдж і статус розблокування теорії).
+     - У `logActivity` додано `keepalive: true` та передачу `currentUserId` замість захардкодженого `'demo-student'` (аналогічно оновлено `handleEvaluate`, `handleConfirmSkillReset` і `handleConfirmAbandonAndStudy`).
+
 ### 0.1.7.105 Виправлення асинхронної синхронізації теми Monaco Editor та контрасту `text-slate-600/700` у Світлій темі (`SBC-434`, `EP-SH`)
 - **Причина темного блоку редактора у світлій темі:** `@monaco-editor/react` не застосовував зміну пропа `theme` (`vs-dark` → `vs`), якщо `ThemeProvider` встигав перемкнути тему під час асинхронного завантаження Monaco з CDN (`isEditorReady === false`).
 - **Виправлення:**

@@ -157,6 +157,59 @@ export class AuditLogService {
   }
 
   /**
+   * Повертає максимальний розкритий рівень Сократівських підказок для (userId, taskId)
+   * з урахуванням останнього скидання прогресу (STUDENT_SKILL_RESET або TEACHER_MODULE_REVOKED).
+   */
+  async getActiveRevealedHintLevel(params: {
+    userId: string;
+    taskId: string;
+    skillId?: string | null;
+    courseSlug?: string | null;
+  }): Promise<number> {
+    const { userId, taskId, skillId, courseSlug } = params;
+    if (!userId || !taskId) return 0;
+
+    const resetOrConditions: Array<Record<string, any>> = [
+      { eventType: 'TEACHER_MODULE_REVOKED', courseId: null },
+    ];
+    if (skillId) {
+      resetOrConditions.push({ eventType: 'STUDENT_SKILL_RESET', skillId });
+    }
+    if (courseSlug) {
+      resetOrConditions.push({ eventType: 'TEACHER_MODULE_REVOKED', courseId: courseSlug });
+    }
+
+    const lastReset = await this.prisma.studentActivityLog.findFirst({
+      where: {
+        userId,
+        OR: resetOrConditions,
+      },
+      orderBy: { createdAt: 'desc' },
+      select: { createdAt: true },
+    });
+
+    const hintLogs = await this.prisma.studentActivityLog.findMany({
+      where: {
+        userId,
+        taskId,
+        eventType: 'HINT_REQUESTED',
+        ...(lastReset ? { createdAt: { gt: lastReset.createdAt } } : {}),
+      },
+      select: { payload: true },
+    });
+
+    let maxLevel = 0;
+    for (const log of hintLogs) {
+      const payload = (log.payload as Record<string, any>) || {};
+      const level = Number(payload.level);
+      if (Number.isFinite(level) && level > maxLevel) {
+        maxLevel = level;
+      }
+    }
+    return maxLevel;
+  }
+
+  /**
    * Отримання останніх логів студента у хронологічному порядку
    */
   async getStudentLogs(userId: string, limit = 50): Promise<StudentActivityLogDto[]> {
