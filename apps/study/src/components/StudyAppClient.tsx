@@ -864,24 +864,24 @@ console.log(greeting, "Номер спроби:", counter);`}
             </div>
 
             {/* 🚀 ШЛЮЗ ПІДТВЕРДЖЕННЯ КОМПЕТЕНЦІЇ ТА ВІДКРИТТЯ НАСТУПНИХ ТЕМ */}
-            <div className="p-6 rounded-2xl bg-gradient-to-r from-blue-950/40 via-indigo-950/40 to-emerald-950/40 border border-blue-500/30 flex flex-col md:flex-row items-start md:items-center justify-between gap-5 mt-6 shadow-xl backdrop-blur-md">
+            <div className="p-6 rounded-2xl bg-[var(--sbc-bg-surface,#1f1f1f)] border border-[var(--sbc-border-subtle,#2b2b2b)] flex flex-col md:flex-row items-start md:items-center justify-between gap-5 mt-6 transition-colors">
               <div className="flex items-start gap-4">
-                <div className="p-3 rounded-2xl bg-blue-600/20 text-blue-400 border border-blue-500/30 shrink-0">
+                <div className="p-3 rounded-xl bg-[var(--sbc-bg-subtle,#2a2d2e)] text-emerald-500 border border-[var(--sbc-border-subtle,#2b2b2b)] shrink-0">
                   <GraduationCap className="w-6 h-6" />
                 </div>
                 <div className="flex flex-col gap-1.5">
-                  <div className="flex items-center gap-2">
-                    <span className="text-[10px] font-mono uppercase font-bold tracking-wider px-2 py-0.5 rounded-md bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="text-[10px] font-mono uppercase font-bold tracking-wider px-2 py-0.5 rounded-md bg-emerald-500/10 text-emerald-500 border border-emerald-500/20">
                       Теоретичний блок опрацьовано
                     </span>
-                    <span className="text-[10px] font-mono text-slate-400">
+                    <span className="text-[10px] font-mono text-[var(--sbc-text-tertiary,#6b6b6b)]">
                       BKT-поріг для розблокування: ≥ 85%
                     </span>
                   </div>
-                  <h4 className="text-sm font-bold text-white">
+                  <h4 className="text-sm font-bold text-[var(--sbc-text-primary,#cccccc)]">
                     Відкрито практичний модуль підтвердження компетенції
                   </h4>
-                  <p className="text-xs text-slate-300 max-w-xl leading-relaxed">
+                  <p className="text-xs text-[var(--sbc-text-muted,#909090)] max-w-xl leading-relaxed">
                     Щоб розблокувати наступний модуль курсу, підтвердіть засвоєння навички в Тренажері. 
                     Після успішного розв'язання практичних задач BKT-секвенсор автоматично відкриє доступ до наступної теми.
                   </p>
@@ -892,7 +892,7 @@ console.log(greeting, "Номер спроби:", counter);`}
                 href={practiceUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="px-5 py-3 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold text-xs flex items-center gap-2 shadow-lg shadow-blue-600/30 transition-all cursor-pointer shrink-0"
+                className="px-4 py-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs flex items-center gap-2 transition-colors cursor-pointer shrink-0"
               >
                 <span>Підтвердити компетенцію в Тренажері</span>
                 <ArrowRight className="w-4 h-4" />

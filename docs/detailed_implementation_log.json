@@ -202,6 +202,11 @@
             },
             {
               "type": "text",
+              "raw_text": "**Адаптація CTA-блоку в `StudyAppClient.tsx`:** замінено хардкод-градієнт `from-blue-950/40 via-indigo-950/40` та кнопку з синім світінням на нейтральні дизайн-токени `var(--sbc-bg-surface)`, `var(--sbc-border-subtle)`, `var(--sbc-text-primary)` / `var(--sbc-text-muted)` для повної сумісності з Antigravity Dark і Clean Paper Light.",
+              "subitems": []
+            },
+            {
+              "type": "text",
               "raw_text": "`AppShellLayout`: кореневий контейнер переведено на використання семантичних токенів `var(--sbc-bg-root)`, `var(--sbc-bg-surface)` тощо.",
               "subitems": []
             },

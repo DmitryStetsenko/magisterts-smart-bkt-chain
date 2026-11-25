@@ -25,6 +25,7 @@
    - **Уніфікований перемикач теми в Налаштуваннях усіх порталів (`ThemeSettingsSection`):**
      - У пакеті `@sbc/ui` створено перевикористовуваний компонент `packages/ui/src/theme/ThemeSettingsSection.tsx` (на базі `<DrawerSection>` за Правилом 7) з 3-режимним перемикачем **Темна / Світла / Авто** та індикатором активної палітри.
      - Інтегровано `ThemeSettingsSection` у вкладку «Налаштування» (`settings` / `system`) всіх 4 порталів: `apps/student`, `apps/study`, `apps/teacher` (сайдбар + основна панель налаштувань), `apps/admin`.
+     - Адаптовано блок підтвердження компетенції у `apps/study/src/components/StudyAppClient.tsx` під нейтральні дизайн-токени (усунено синьо-індиго градієнт та жорсткий білий текст).
      - Проведено успішну production-збірку всіх 4 веб-застосунків (`build:student`, `build:study`, `build:teacher`, `build:admin`) та наскрізну перевірку у Playwright E2E (`e2e/theme-settings.spec.ts`: 4/4 тестів пройдено).
 
 2. **Аналіз правок наукового керівника V-4.0 та оновлення авторського профілю (`SBC-432`, `EP-MS`):**

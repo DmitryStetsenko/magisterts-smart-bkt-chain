@@ -46,6 +46,7 @@
 - **Інтеграція в інтерфейси платформи:**
   - `UserProfileDrawer`: додано секцію «Тема Оформлення» з інтерактивним перемикачем (доступно в усіх порталах).
   - **Вкладка «Налаштування» (`settings` / `system`) у всіх 4 веб-застосунках:** інтегровано `<ThemeSettingsSection />` у `apps/student/src/components/StudentPortalApp.tsx`, `apps/study/src/components/StudyAppClient.tsx`, `apps/teacher/src/app/page.tsx` (сайдбар та головна область налаштувань) і `apps/admin/src/app/page.tsx`.
+  - **Адаптація CTA-блоку в `StudyAppClient.tsx`:** замінено хардкод-градієнт `from-blue-950/40 via-indigo-950/40` та кнопку з синім світінням на нейтральні дизайн-токени `var(--sbc-bg-surface)`, `var(--sbc-border-subtle)`, `var(--sbc-text-primary)` / `var(--sbc-text-muted)` для повної сумісності з Antigravity Dark і Clean Paper Light.
   - `AppShellLayout`: кореневий контейнер переведено на використання семантичних токенів `var(--sbc-bg-root)`, `var(--sbc-bg-surface)` тощо.
   - `globals.css`: оновлено у `apps/student`, `apps/study`, `apps/admin`, `apps/teacher`, `apps/docs`.
   - `apps/admin/src/features/theme-customizer/ui/ThemeCustomizerView.tsx`: розроблено повноцінний UI редагування наскрізної палітри кольорів у табі `system` адмінки з інтерактивним Live Preview та пресетами.
