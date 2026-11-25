@@ -30,6 +30,16 @@
   5. *Build Next.js Documentation Site* (`npm run build:docs`) — збірка статичного експорту (`output: "export"`, `trailingSlash: true`, `basePath: "/magisterts-smart-bkt-chain"`).
   6. *Upload Artifact & Deploy Pages* (`actions/upload-pages-artifact@v3` + `actions/deploy-pages@v4`).
 
+### 0.1.7.111 Нелінійний Skill DAG (Fork/Join) у шкільному курсі та перемикач «Граф DAG» у `GameSkillTreeWidget` (`SBC-438`, `EP-SH`)
+- **Нелінійна топологія БД (`packages/database/prisma/seed.ts`):**
+  - Залежності курсу `web-algorithms-school` оновлено з лінійного ланцюжка на справжній орієнтований ациклічний граф із порогом `requiredMastery = 0.85`: `1 (Basics) → 2 (Branching) → { 3 (Loops) → 5 (Arrays), 4 (Functions) } → 6 (DOM) → 7 (Projects)`.
+- **Візуалізація топологічного DAG (`packages/ui/src/skill-graph/GameSkillTreeWidget.tsx`):**
+  - Додано перемикач `layoutMode: 'path' | 'dag'` (чекбокс **«Граф DAG»** із іконкою `GitFork` у верхній панелі віджета) — автоматично доступний в `apps/student` і `apps/teacher`.
+  - Реалізовано обчислення топологічних шарів за `parentSkillIds` (із захистом від циклів), горизонтальне розведення паралельних гілок та рендеринг спрямованих SVG-ребер із маркерами-стрілками (`dagArrowMastered`, `dagArrowActive`, `dagArrowLocked`).
+- **Документація та слайди:**
+  - Додано підрозділ `1.2 Принцип Нелінійного Проєктування Курсів (Fork / Join Skill DAG)` у [`docs/course_authoring_and_tabular_engine.md`](file:///docs/course_authoring_and_tabular_engine.md) та підрозділ `2.1` із Mermaid-схемою в [`docs/apps/study_portal.md`](file:///docs/apps/study_portal.md).
+  - Випущено версію слайдів [`V-6.3-SLIDES_SCRIPT.md`](file:///SCIENCE/THESES/IICTE-2026_20-11-26/PRESENTATION/slides/V-6.3-SLIDES_SCRIPT.md) із прикладом нелінійного графа та перемикачем «Граф DAG».
+
 ### 0.1.7.110 Жива синхронізація BKT-гейтингу в `apps/study` та E2E-інваріант монотонності (`SBC-437`, `EP-ST`)
 - **Причина дефекту:** У [`apps/study/src/components/StudyAppClient.tsx`](file:///apps/study/src/components/StudyAppClient.tsx) зберігалися прототипні мок-стани (`moduleMasteryScores['school-alg-basics'] = 92`) і статичний словник `unlockedModules` зі старими слагами (`school-web-dom`, `school-web-projects` замість `school-web-dom-events`, `school-web-applied-projects`) у поєднанні з небезпечним fallback `unlockedModules[mod.moduleSlug] ?? true`. Через це новий студент бачив `92%` на Модулі 1, а Модулі 6–7 (та всі модулі інших курсів) відображалися відкритими після заблокованих модулів 2–3.
 - **Виправлення:**

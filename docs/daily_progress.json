@@ -16,6 +16,31 @@
           "items": [
             {
               "type": "text",
+              "raw_text": "**Нелінійний Skill DAG у шкільному курсі, перемикач «Граф DAG» у `GameSkillTreeWidget`, оновлення концепції курсів та слайдів `V-6.3` (`SBC-438`, `EP-SH`):**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Переведено залежності шкільного курсу `web-algorithms-school` у [`packages/database/prisma/seed.ts`](file:///packages/database/prisma/seed.ts) на реальний нелінійний орієнтований ациклічний граф (`requiredMastery = 0.85`): розгалуження `2 (Умови) → {3 (Цикли) → 5 (Масиви), 4 (Функції)}` та злиття `{4, 5} → 6 (DOM та події) → 7 (Проєкти)`.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "У спільному віджеті [`packages/ui/src/skill-graph/GameSkillTreeWidget.tsx`](file:///packages/ui/src/skill-graph/GameSkillTreeWidget.tsx) (використовується в `apps/student` та `apps/teacher`) додано галочку-перемикач **«Граф DAG»** із топологічним розміщенням вершин по шарах та спрямованими SVG-стрілками пререквізитів (`parentSkillIds`).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Описано принцип нелінійного проєктування курсів (Fork/Join) у [`docs/course_authoring_and_tabular_engine.md`](file:///docs/course_authoring_and_tabular_engine.md) та [`docs/apps/study_portal.md`](file:///docs/apps/study_portal.md).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Додано приклад нелінійного графа Skill DAG у слайди [`V-6.3-SLIDES_SCRIPT.md`](file:///SCIENCE/THESES/IICTE-2026_20-11-26/PRESENTATION/slides/V-6.3-SLIDES_SCRIPT.md) (`audit_presentation.py`: `0 violations`).",
+              "subitems": []
+            },
+            {
+              "type": "text",
               "raw_text": "**Усунення хардкоду BKT (`92%`) та неконсистентного гейтингу модулів у `apps/study` + усунення дублювання нативного `title` у `apps/student` (`SBC-437`, `EP-ST`):**",
               "subitems": []
             },

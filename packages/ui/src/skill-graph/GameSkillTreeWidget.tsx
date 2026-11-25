@@ -21,7 +21,8 @@ import {
   AlertTriangle,
   ExternalLink,
   BookOpen,
-  BarChart3
+  BarChart3,
+  GitFork
 } from 'lucide-react';
 import { SkillGraphNode } from './skill-graph.types';
 import { AnomalyTreeWidget, AnomalyItem } from '../analytics/AnomalyTreeWidget';
@@ -57,6 +58,7 @@ export function GameSkillTreeWidget({
 }: GameSkillTreeWidgetProps) {
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
   const [treeDisplayMode, setTreeDisplayMode] = useState<'skills' | 'anomalies'>('skills');
+  const [layoutMode, setLayoutMode] = useState<'path' | 'dag'>('path');
 
   // Compute stats
   const totalSkills = nodes.length;
@@ -74,16 +76,97 @@ export function GameSkillTreeWidget({
     nodes.find((n) => n.slug === activeSkillSlug) || 
     nodes[0];
 
-  // Visual layout helpers: layout sequential nodes along a curved pathway
-  const nodePositions = nodes.map((_, index) => {
+  // Visual layout helpers: either RPG pathway OR true topological Skill DAG
+  const canvasWidth = 600;
+  const hasRealDependencies = nodes.some((n) => (n.parentSkillIds?.length ?? 0) > 0);
+
+  const dagLayout = (() => {
+    const nodeById = new Map(nodes.map((n) => [n.id, n]));
+    const layerMemo = new Map<string, number>();
+
+    const getLayer = (id: string, visiting = new Set<string>()): number => {
+      if (layerMemo.has(id)) return layerMemo.get(id)!;
+      if (visiting.has(id)) return 0; // cycle guard
+      visiting.add(id);
+      const node = nodeById.get(id);
+      const validParents = (node?.parentSkillIds || []).filter((pid) => nodeById.has(pid));
+      const layer =
+        validParents.length === 0
+          ? 0
+          : 1 + Math.max(...validParents.map((pid) => getLayer(pid, new Set(visiting))));
+      layerMemo.set(id, layer);
+      return layer;
+    };
+
+    const layersMap = new Map<number, SkillGraphNode[]>();
+    nodes.forEach((node, idx) => {
+      const layer = hasRealDependencies ? getLayer(node.id) : idx;
+      const list = layersMap.get(layer) || [];
+      list.push(node);
+      layersMap.set(layer, list);
+    });
+
+    const positionsById = new Map<string, { x: number; y: number }>();
+    const maxLayer = Math.max(0, ...Array.from(layersMap.keys()));
+
+    layersMap.forEach((layerNodes, layerIdx) => {
+      const count = layerNodes.length;
+      const y = 85 + layerIdx * 135;
+      layerNodes.forEach((n, posIdx) => {
+        const x =
+          count === 1
+            ? canvasWidth / 2
+            : 150 + (posIdx * (canvasWidth - 300)) / (count - 1);
+        positionsById.set(n.id, { x, y });
+      });
+    });
+
+    return {
+      positions: nodes.map((n) => positionsById.get(n.id) || { x: canvasWidth / 2, y: 85 }),
+      height: Math.max(550, (maxLayer + 1) * 145 + 100),
+    };
+  })();
+
+  const pathPositions = nodes.map((_, index) => {
     const y = 80 + index * 125;
-    // Alternating horizontal wave pattern
     const pattern = [250, 150, 350, 200, 300, 180, 320];
     const x = pattern[index % pattern.length];
     return { x, y };
   });
 
-  const svgHeight = Math.max(550, nodes.length * 135 + 100);
+  const nodePositions = layoutMode === 'dag' ? dagLayout.positions : pathPositions;
+  const svgHeight = layoutMode === 'dag' ? dagLayout.height : Math.max(550, nodes.length * 135 + 100);
+
+  // Build directed edges depending on layoutMode
+  const graphEdges: Array<{ id: string; fromNode: SkillGraphNode; toNode: SkillGraphNode; fromPos: { x: number; y: number }; toPos: { x: number; y: number } }> = [];
+  if (layoutMode === 'dag' && hasRealDependencies) {
+    const indexById = new Map(nodes.map((n, i) => [n.id, i]));
+    nodes.forEach((child, childIdx) => {
+      (child.parentSkillIds || []).forEach((pid) => {
+        const parentIdx = indexById.get(pid);
+        if (parentIdx !== undefined) {
+          graphEdges.push({
+            id: `${pid}->${child.id}`,
+            fromNode: nodes[parentIdx],
+            toNode: child,
+            fromPos: nodePositions[parentIdx],
+            toPos: nodePositions[childIdx],
+          });
+        }
+      });
+    });
+  } else {
+    nodes.forEach((node, idx) => {
+      if (idx === 0) return;
+      graphEdges.push({
+        id: `seq-${nodes[idx - 1].id}->${node.id}`,
+        fromNode: nodes[idx - 1],
+        toNode: node,
+        fromPos: nodePositions[idx - 1],
+        toPos: nodePositions[idx],
+      });
+    });
+  }
 
   // Derive adjustments to display: from props or from node
   const activeAdjustments = adjustments.length > 0 
@@ -169,6 +252,22 @@ export function GameSkillTreeWidget({
               </span>
             )}
           </button>
+
+          {treeDisplayMode === 'skills' && (
+            <label
+              className="ml-2 pl-2 border-l border-slate-700/70 flex items-center gap-1.5 px-2 py-1 text-xs text-slate-300 hover:text-white cursor-pointer select-none"
+              title="Перемкнути між лінійним маршрутом та орієнтованим графом пререквізитів Skill DAG"
+            >
+              <input
+                type="checkbox"
+                checked={layoutMode === 'dag'}
+                onChange={(e) => setLayoutMode(e.target.checked ? 'dag' : 'path')}
+                className="accent-indigo-500 rounded cursor-pointer"
+              />
+              <GitFork className="w-3.5 h-3.5 text-indigo-400" />
+              <span>Граф DAG</span>
+            </label>
+          )}
         </div>
 
         {/* Global Progress Bar */}
@@ -234,27 +333,44 @@ export function GameSkillTreeWidget({
                   <stop offset="0%" stopColor="#334155" stopOpacity="0.4" />
                   <stop offset="100%" stopColor="#1e293b" stopOpacity="0.2" />
                 </linearGradient>
+                {/* Directed DAG Arrowheads */}
+                <marker id="dagArrowMastered" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+                  <path d="M 0 1 L 7 4 L 0 7 z" fill="#10b981" />
+                </marker>
+                <marker id="dagArrowActive" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+                  <path d="M 0 1 L 7 4 L 0 7 z" fill="#6366f1" />
+                </marker>
+                <marker id="dagArrowLocked" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+                  <path d="M 0 1 L 7 4 L 0 7 z" fill="#64748b" />
+                </marker>
               </defs>
 
               {/* Render Connecting Lines between Sequential / Dependent Nodes */}
-              {nodes.map((node, idx) => {
-                if (idx === 0) return null;
-                const startPos = nodePositions[idx - 1];
-                const endPos = nodePositions[idx];
-                const prevNode = nodes[idx - 1];
-                const isMasteredConnection = prevNode.pMastery >= 0.90;
-                const isActiveConnection = prevNode.pMastery >= 0.75 && node.status !== 'LOCKED';
+              {graphEdges.map(({ id, fromNode, toNode, fromPos, toPos }) => {
+                const isMasteredConnection = fromNode.pMastery >= 0.85;
+                const isActiveConnection = fromNode.pMastery >= 0.75 && toNode.status !== 'LOCKED';
 
-                // Curving Bezier Path for Natural RPG Tree Branching
-                const deltaY = endPos.y - startPos.y;
-                const cp1x = startPos.x;
-                const cp1y = startPos.y + deltaY * 0.5;
-                const cp2x = endPos.x;
-                const cp2y = startPos.y + deltaY * 0.5;
-                const d = `M ${startPos.x} ${startPos.y} C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${endPos.x} ${endPos.y}`;
+                // For DAG mode, offset start/end slightly so arrowheads sit cleanly at node borders
+                const yOffset = layoutMode === 'dag' ? 36 : 0;
+                const sy = fromPos.y + yOffset;
+                const ey = toPos.y - yOffset;
+                const deltaY = ey - sy;
+                const cp1x = fromPos.x;
+                const cp1y = sy + deltaY * 0.5;
+                const cp2x = toPos.x;
+                const cp2y = sy + deltaY * 0.5;
+                const d = `M ${fromPos.x} ${sy} C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${toPos.x} ${ey}`;
+                const markerEnd =
+                  layoutMode === 'dag'
+                    ? isMasteredConnection
+                      ? 'url(#dagArrowMastered)'
+                      : isActiveConnection
+                      ? 'url(#dagArrowActive)'
+                      : 'url(#dagArrowLocked)'
+                    : undefined;
 
                 return (
-                  <g key={`edge-${node.id}`}>
+                  <g key={`edge-${id}`}>
                     {/* Shadow / Outer Glow */}
                     <path
                       d={d}
@@ -272,10 +388,13 @@ export function GameSkillTreeWidget({
                           ? 'url(#masteredBeam)'
                           : isActiveConnection
                           ? 'url(#activeBeam)'
+                          : layoutMode === 'dag'
+                          ? '#64748b'
                           : 'url(#lockedBeam)'
                       }
-                      strokeWidth={isMasteredConnection || isActiveConnection ? '3' : '1.5'}
+                      strokeWidth={isMasteredConnection || isActiveConnection ? '3' : layoutMode === 'dag' ? '2' : '1.5'}
                       strokeDasharray={isMasteredConnection ? 'none' : isActiveConnection ? '6 4' : '4 4'}
+                      markerEnd={markerEnd}
                       className={isActiveConnection ? 'animate-pulse' : ''}
                     />
                   </g>

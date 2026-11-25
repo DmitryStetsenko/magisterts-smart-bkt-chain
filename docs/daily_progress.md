@@ -5,7 +5,12 @@
 ## 📅 25 листопада 2026 року
 
 ### ✅ Що зроблено за день:
-0. **Усунення хардкоду BKT (`92%`) та неконсистентного гейтингу модулів у `apps/study` + усунення дублювання нативного `title` у `apps/student` (`SBC-437`, `EP-ST`):**
+0. **Нелінійний Skill DAG у шкільному курсі, перемикач «Граф DAG» у `GameSkillTreeWidget`, оновлення концепції курсів та слайдів `V-6.3` (`SBC-438`, `EP-SH`):**
+   - Переведено залежності шкільного курсу `web-algorithms-school` у [`packages/database/prisma/seed.ts`](file:///packages/database/prisma/seed.ts) на реальний нелінійний орієнтований ациклічний граф (`requiredMastery = 0.85`): розгалуження `2 (Умови) → {3 (Цикли) → 5 (Масиви), 4 (Функції)}` та злиття `{4, 5} → 6 (DOM та події) → 7 (Проєкти)`.
+   - У спільному віджеті [`packages/ui/src/skill-graph/GameSkillTreeWidget.tsx`](file:///packages/ui/src/skill-graph/GameSkillTreeWidget.tsx) (використовується в `apps/student` та `apps/teacher`) додано галочку-перемикач **«Граф DAG»** із топологічним розміщенням вершин по шарах та спрямованими SVG-стрілками пререквізитів (`parentSkillIds`).
+   - Описано принцип нелінійного проєктування курсів (Fork/Join) у [`docs/course_authoring_and_tabular_engine.md`](file:///docs/course_authoring_and_tabular_engine.md) та [`docs/apps/study_portal.md`](file:///docs/apps/study_portal.md).
+   - Додано приклад нелінійного графа Skill DAG у слайди [`V-6.3-SLIDES_SCRIPT.md`](file:///SCIENCE/THESES/IICTE-2026_20-11-26/PRESENTATION/slides/V-6.3-SLIDES_SCRIPT.md) (`audit_presentation.py`: `0 violations`).
+1. **Усунення хардкоду BKT (`92%`) та неконсистентного гейтингу модулів у `apps/study` + усунення дублювання нативного `title` у `apps/student` (`SBC-437`, `EP-ST`):**
    - Видалено застарілі захардкоджені значення майстерності (`'school-alg-basics': 92`, `'school-alg-branching': 45`) та статичну мапу `unlockedModules` із незбіжними слагами у [`apps/study/src/components/StudyAppClient.tsx`](file:///apps/study/src/components/StudyAppClient.tsx).
    - Підключено живу синхронізацію з бекендом (`GET /api/v1/courses/:courseSlug` + `GET /api/v1/bkt/state/:userId`) із суворим послідовним BKT-гейтингом (`chainUnlocked` за порогом `minMasteryThreshold ?? 0.85`) та безпечним fallback `modIdx === 0` замість `?? true` для всіх курсів платформи.
    - Додано регресійний Playwright E2E-тест [`e2e/study-bkt-gating-sync.spec.ts`](file:///e2e/study-bkt-gating-sync.spec.ts), який перевіряє інваріант нульового стану (`0%` на Модулі 1, відсутність фейкових `92%`) та монотонність блокування модулів; `npm run build:study` і E2E-тест (`1/1 passed`) пройшли успішно.

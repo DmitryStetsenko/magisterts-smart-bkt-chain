@@ -719,18 +719,20 @@ async function main() {
     },
   });
 
-  // Шкільні залежності графа навичок (Педагогічна послідовність)
+  // Нелінійний орієнтований ациклічний граф навичок (Skill DAG із розгалуженням і злиттям):
+  // 1 (Змінні) -> 2 (Умови) -> { 3 (Цикли) -> 5 (Масиви), 4 (Функції) } -> 6 (DOM та події) -> 7 (Проєкти)
   const schoolDeps = [
     { parent: schoolBasics, child: schoolBranching },
     { parent: schoolBranching, child: schoolLoops },
-    { parent: schoolLoops, child: schoolFunctions },
-    { parent: schoolFunctions, child: schoolArrays },
+    { parent: schoolBranching, child: schoolFunctions },
+    { parent: schoolLoops, child: schoolArrays },
+    { parent: schoolFunctions, child: schoolDom },
     { parent: schoolArrays, child: schoolDom },
     { parent: schoolDom, child: schoolProjects },
   ];
   for (const dep of schoolDeps) {
     await prisma.skillDependency.create({
-      data: { parentSkillId: dep.parent.id, childSkillId: dep.child.id, requiredMastery: 0.7 },
+      data: { parentSkillId: dep.parent.id, childSkillId: dep.child.id, requiredMastery: 0.85 },
     });
   }
 
