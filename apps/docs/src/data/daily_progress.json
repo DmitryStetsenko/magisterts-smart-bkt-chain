@@ -56,7 +56,7 @@
             },
             {
               "type": "text",
-              "raw_text": "Створено версіонований простір слайдового тексту виступу [`SCIENCE/THESES/IICTE-2026_20-11-26/PRESENTATION/slides/`](file:///SCIENCE/THESES/IICTE-2026_20-11-26/PRESENTATION/slides/) (`V-4.0-SLIDES_SCRIPT.md`, дзеркало `SLIDES_SCRIPT.md`, `RELEASE_LOG.md`): 10 слайдів у нейтральному безособовому стилі (0 «ми/наш»), із наскрізною лінією адаптивної траєкторії та повним обґрунтуванням кожної числової метрики з прив'язкою до реального коду платформи (`BktEngine`, `BehavioralAdjuster`, `BktAuditVerifierCenter`).",
+              "raw_text": "Створено версіонований простір слайдового тексту виступу [`SCIENCE/THESES/IICTE-2026_20-11-26/PRESENTATION/slides/`](file:///SCIENCE/THESES/IICTE-2026_20-11-26/PRESENTATION/slides/) (`V-4.1-SLIDES_SCRIPT.md`, дзеркало `SLIDES_SCRIPT.md`, `RELEASE_LOG.md`): 10 слайдів у нейтральному безособовому стилі (0 «ми/наш»), із чітким розмежуванням походження всіх чисел (літературні пріори BKT для холодного старту + EM-калібрування, експертні евристики `BehavioralAdjuster`, методичні коефіцієнти демпфування, арифметичний доказ `15% → 61%` vs `15% → 32%` та симуляція Монте-Карло).",
               "subitems": []
             },
             {
