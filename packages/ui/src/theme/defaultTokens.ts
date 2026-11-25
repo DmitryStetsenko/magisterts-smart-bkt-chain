@@ -24,8 +24,8 @@ export const DEFAULT_THEME_TOKENS: CustomThemeConfig = {
     bgSubtle: '#ebebeb',     // Світлий фон кнопок
     borderSubtle: '#e5e5e5', // Тонкі межі
     borderStrong: '#d4d4d4', // Рамки контролів
-    textPrimary: '#222222',  // Темно-сірий читабельний текст
-    textMuted: '#666666',    // Другорядний текст
-    textTertiary: '#888888', // Третинний сірий
+    textPrimary: '#18181b',  // Контрастний темно-вугільний текст (WCAG AAA)
+    textMuted: '#52525b',    // Другорядний текст (WCAG AA/AAA)
+    textTertiary: '#5c5c66', // Третинний сірий з гарантованим контрастом >= 5:1
   },
 };

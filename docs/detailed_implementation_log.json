@@ -257,12 +257,22 @@
             },
             {
               "type": "text",
-              "raw_text": "**Зафіксовані наступні дії (`SBC-434` / `[BACKLOG-11]`):**",
+              "raw_text": "**Реалізація аудиту контрастності Світлої Теми (`SBC-434` / `[BACKLOG-11]`):**",
               "subitems": []
             },
             {
               "type": "text",
-              "raw_text": "Заплановано повний аудит та виправлення контрастності елементів у Світлій темі across `apps/study`, `apps/student`, `apps/teacher`, `apps/admin` та `@sbc/ui` (усунення `text-white` на світлому фоні, адаптація акцентних `text-*-200/300` і `bg-*-950/*`, синхронізація теми `MonacoCodeEditor` та графів навичок).",
+              "raw_text": "Створено `packages/ui/src/theme/light-theme.css` (підключено в `globals.css` усіх 4 порталів) із WCAG AA/AAA ремапінгом нейтрального `text-white`, пастельних/яскравих акцентів `200..500` (включно з `/opacity`) та темних підкладок `bg-*-950/*` виключно під `html:not(.dark)`.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Оновлено `DEFAULT_THEME_TOKENS.light` (`#18181b` / `#52525b` / `#5c5c66`) та підключено `useTheme()` у `MonacoCodeEditor.tsx` (`vs` / `vs-dark`).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Додано Playwright WCAG-сканер `e2e/light-theme-contrast.spec.ts` із Canvas 2D конвертацією Tailwind v4 `oklch(...)` кольорів: **4/4 портали пройшли з 0 порушень контрастності**.",
               "subitems": []
             }
           ]

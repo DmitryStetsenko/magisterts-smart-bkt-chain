@@ -3,6 +3,7 @@
 import React, { useRef } from 'react';
 import Editor, { OnMount } from '@monaco-editor/react';
 import { Activity, Zap, Trash2, Clipboard, Play, ArrowRight } from 'lucide-react';
+import { useTheme } from '@sbc/ui';
 import { useTelemetry } from '../lib/useTelemetry';
 
 interface MonacoCodeEditorProps {
@@ -28,6 +29,7 @@ export function MonacoCodeEditor({
   isPassed = false,
   height,
 }: MonacoCodeEditorProps) {
+  const { resolvedTheme } = useTheme();
   const { metrics, handleKeyDown, handleDelete, handlePaste } = useTelemetry(userId, taskId);
   const editorRef = useRef<any>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -131,7 +133,7 @@ export function MonacoCodeEditor({
         <Editor
           height="100%"
           defaultLanguage="javascript"
-          theme="vs-dark"
+          theme={resolvedTheme === 'dark' ? 'vs-dark' : 'vs'}
           value={initialCode}
           onChange={(val) => onChange(val || '')}
           onMount={handleEditorDidMount}

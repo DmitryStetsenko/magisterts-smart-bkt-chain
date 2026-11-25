@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @source "../../../../packages/ui/src";
+@import "../../../../packages/ui/src/theme/light-theme.css";
 
 @theme inline {
   --color-slate-950: var(--sbc-slate-950);

@@ -33,13 +33,18 @@
      - Усунено циклічні CSS-токени `--color-slate-*` у `globals.css` усіх 4 порталів (переведено на `@theme inline` + `--sbc-slate-*` у `:root`, що ліквідувало білі рамки та миготіння старих стилів при перезавантаженні) і додано пріоритет за міткою часу `updatedAt` для миттєвого застосування глобальної теми адміна поверх застарілого `localStorage`.
      - Проведено успішну збірку (`build:api`, `build:student`, `build:study`, `build:teacher`, `build:admin`) та наскрізну перевірку у Playwright E2E (`e2e/theme-settings.spec.ts`: 5/5 тестів пройдено, включно з трансляцією глобальної теми з Admin на Student/Study поверх старого `localStorage`).
 
+2. **Аудит та адаптація контрастності Світлої Теми (WCAG AA/AAA) по всіх застосунках (`SBC-434`, `[BACKLOG-11]`, `EP-SH`):**
+   - Створено централізований семантичний шар світлої теми `packages/ui/src/theme/light-theme.css` (суворо під `html:not(.dark)` без впливу на темну тему) та підключено у `globals.css` усіх 4 порталів (`apps/study`, `apps/student`, `apps/teacher`, `apps/admin`):
+     - Автоматичне перетворення нейтрального `text-white` / `hover:text-white` / `group-hover:text-white` на темно-вугільний текст `var(--sbc-text-primary)` зі збереженням білого тексту на суцільних кольорових CTA-кнопках, аватарах і градієнтах.
+     - Затемнення пастельних і яскравих акцентів (`text-emerald/blue/indigo/purple/amber/rose/cyan-200..500`, включно з `/opacity` варіантами) до контрастних WCAG AA/AAA відтінків (`#047857`, `#1d4ed8`, `#4338ca`, `#6d28d9`, `#b45309`, `#be123c`, `#0369a1`).
+     - Адаптація темних підкладок `bg-*-950/*` у м'які світлі паперові акценти.
+   - Посилено базові токени світлої теми в `packages/ui/src/theme/defaultTokens.ts` (`textPrimary: #18181b`, `textMuted: #52525b`, `textTertiary: #5c5c66`).
+   - Синхронізовано тему редактора коду в `apps/student/src/features/code-editor/ui/MonacoCodeEditor.tsx` через `useTheme()` (`vs` у світлій / `vs-dark` у темній).
+   - Створено та пройдено автоматичний Playwright WCAG-аудит контрастності `e2e/light-theme-contrast.spec.ts` з Canvas 2D підтримкою `oklch(...)` (4/4 портали: 0 порушень контрастності).
+
 ### 🎯 Наступні дії (Next Steps):
-1. **Повний аудит і доопрацювання контрастності Світлої Теми по всіх застосунках (`SBC-434`, `[BACKLOG-11]`, `EP-SH`):**
-   - Пройтися по всіх екранах і компонентах у `apps/study`, `apps/student`, `apps/teacher`, `apps/admin` та `@sbc/ui` у світлому режимі (`Clean Paper Light`) і виправити елементи з низькою контрастністю / нечитабельним текстом:
-     - Замінити захардкоджені `text-white`, `hover:text-white`, `text-slate-100/200` (поза кольоровими кнопками) на семантичні змінні `text-[var(--sbc-text-primary)]` або адаптивні `dark:text-white text-zinc-900`.
-     - Адаптувати кольорові підписи й бейджі (`text-amber-200/300`, `text-emerald-200/300`, `text-blue-200/300`, `text-indigo-200/300`, `text-purple-200/300`) під світлий фон (`text-*-700 dark:text-*-300`) та прибрати темні `bg-*-950/*` підкладки у світлій темі.
-     - Перевірити читабельність `CodePlayground`, `MisconceptionAlert`, `MonacoCodeEditor` (перемикання теми редактора `vs` / `vs-dark`), `SkillDagMap` / `GameSkillTreeWidget`, `UserProfileDrawer`, `DrawerSection` та таблиць аналітики в `Teacher` і `Admin`.
-     - Додати візуальну / Playwright перевірку контрастності ключових екранів у світлій темі.
+1. **Фінальне тестування з живим Docker/API та злиття гілки `feat/theme-system-tokens` у `dev`:**
+   - Після запуску Docker Desktop (`sbc-postgres`, `sbc-redis`) прогнати повний набір E2E-тестів (`e2e/theme-settings.spec.ts` + `e2e/light-theme-contrast.spec.ts`) на живих даних курсів та за потреби виконати merge у `dev`.
 
 2. **Аналіз правок наукового керівника V-4.0 та оновлення авторського профілю (`SBC-432`, `EP-MS`):**
    - Проведено поабзацний та посимвольний порівняльний аудит файлу `V-4.0-Стеценко_тези.docx` з попередньою версією `V-3.1`.

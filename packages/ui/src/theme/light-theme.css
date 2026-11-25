@@ -1,0 +1,134 @@
+/* ☀️ Unified Light Mode Semantic Contrast Layer (SBC-434 / WCAG AA-AAA)
+ * Strictly scoped to html:not(.dark) so Dark Mode (Antigravity Dark) is completely untouched.
+ */
+
+/* 1. Neutral text-white on light surfaces -> charcoal text
+ * Exclude solid 600/700/gradient/dark buttons, avatars & badges (without translucent / opacity).
+ */
+html:not(.dark) .text-white:not(
+  .bg-blue-600, .bg-blue-700,
+  .bg-indigo-600, .bg-indigo-700,
+  .bg-emerald-600, .bg-emerald-700, .bg-emerald-500,
+  .bg-purple-600, .bg-purple-700,
+  .bg-rose-600, .bg-rose-700,
+  .bg-red-600, .bg-red-700,
+  .bg-amber-600, .bg-amber-700,
+  .bg-teal-600, .bg-teal-700,
+  .bg-cyan-600, .bg-cyan-700,
+  .bg-sky-600, .bg-sky-700,
+  .bg-green-600, .bg-green-700,
+  .bg-violet-600, .bg-violet-700,
+  [class*="bg-gradient-to-"], .bg-zinc-900, .bg-zinc-950, .bg-neutral-900, .bg-black
+) {
+  color: var(--sbc-text-primary, #18181b);
+}
+
+/* Preserve white text inside solid colored buttons, avatars & gradient banners */
+html:not(.dark) :is(
+  .bg-blue-600, .bg-blue-700,
+  .bg-indigo-600, .bg-indigo-700,
+  .bg-emerald-600, .bg-emerald-700, .bg-emerald-500,
+  .bg-purple-600, .bg-purple-700,
+  .bg-rose-600, .bg-rose-700,
+  .bg-red-600, .bg-red-700,
+  .bg-amber-600, .bg-amber-700,
+  .bg-teal-600, .bg-teal-700,
+  .bg-cyan-600, .bg-cyan-700,
+  .bg-sky-600, .bg-sky-700,
+  .bg-green-600, .bg-green-700,
+  .bg-violet-600, .bg-violet-700,
+  [class*="bg-gradient-to-"], .bg-zinc-900, .bg-zinc-950, .bg-neutral-900, .bg-black
+) .text-white {
+  color: #ffffff;
+}
+
+html:not(.dark) .hover\:text-white:hover:not(
+  .bg-blue-600, .bg-indigo-600, .bg-emerald-600, .bg-emerald-500,
+  .bg-purple-600, .bg-rose-600, .bg-amber-600, [class*="bg-gradient-to-"]
+) {
+  color: var(--sbc-text-primary, #18181b);
+}
+
+html:not(.dark) .group:hover .group-hover\:text-white {
+  color: var(--sbc-text-primary, #18181b);
+}
+
+/* 2. Pastel & bright mid-tone accent text shades (200..500, including /opacity variants) -> high-contrast WCAG AA/AAA dark shades */
+html:not(.dark) :is(
+  .text-emerald-200, .text-emerald-300, .text-emerald-400, .text-emerald-500,
+  [class*="text-emerald-200/"], [class*="text-emerald-300/"], [class*="text-emerald-400/"], [class*="text-emerald-500/"]
+) {
+  color: #047857;
+}
+html:not(.dark) :is(
+  .text-blue-200, .text-blue-300, .text-blue-400, .text-blue-500,
+  [class*="text-blue-200/"], [class*="text-blue-300/"], [class*="text-blue-400/"], [class*="text-blue-500/"]
+) {
+  color: #1d4ed8;
+}
+html:not(.dark) :is(
+  .text-indigo-200, .text-indigo-300, .text-indigo-400,
+  [class*="text-indigo-200/"], [class*="text-indigo-300/"], [class*="text-indigo-400/"]
+) {
+  color: #4338ca;
+}
+html:not(.dark) :is(
+  .text-purple-200, .text-purple-300, .text-purple-400, .text-violet-200, .text-violet-300, .text-violet-400,
+  [class*="text-purple-200/"], [class*="text-purple-300/"], [class*="text-purple-400/"]
+) {
+  color: #6d28d9;
+}
+html:not(.dark) :is(
+  .text-amber-200, .text-amber-300, .text-amber-400, .text-amber-500,
+  .text-yellow-300, .text-yellow-400, .text-yellow-500,
+  [class*="text-amber-200/"], [class*="text-amber-300/"], [class*="text-amber-400/"], [class*="text-amber-500/"]
+) {
+  color: #b45309;
+}
+html:not(.dark) :is(
+  .text-rose-200, .text-rose-300, .text-rose-400, .text-red-200, .text-red-300, .text-red-400,
+  [class*="text-rose-200/"], [class*="text-rose-300/"], [class*="text-rose-400/"], [class*="text-red-400/"]
+) {
+  color: #be123c;
+}
+html:not(.dark) :is(
+  .text-cyan-200, .text-cyan-300, .text-cyan-400, .text-cyan-500,
+  .text-sky-200, .text-sky-300, .text-sky-400, .text-sky-500,
+  .text-teal-200, .text-teal-300, .text-teal-400, .text-teal-500,
+  [class*="text-cyan-400/"], [class*="text-sky-400/"], [class*="text-teal-400/"]
+) {
+  color: #0369a1;
+}
+html:not(.dark) :is(.text-zinc-100, .text-zinc-200, .text-zinc-300) {
+  color: #27272a;
+}
+html:not(.dark) .text-zinc-400 {
+  color: #52525b;
+}
+
+/* 3. Dark-only 950 tinted alert/banner backgrounds -> soft light paper tints */
+html:not(.dark) [class*="bg-amber-950"] {
+  background-color: rgba(245, 158, 11, 0.10);
+  border-color: rgba(217, 119, 6, 0.28);
+}
+html:not(.dark) [class*="bg-emerald-950"] {
+  background-color: rgba(16, 185, 129, 0.10);
+  border-color: rgba(5, 150, 105, 0.28);
+}
+html:not(.dark) [class*="bg-blue-950"] {
+  background-color: rgba(59, 130, 246, 0.08);
+  border-color: rgba(37, 99, 235, 0.25);
+}
+html:not(.dark) [class*="bg-indigo-950"] {
+  background-color: rgba(99, 102, 241, 0.08);
+  border-color: rgba(79, 70, 229, 0.25);
+}
+html:not(.dark) [class*="bg-purple-950"] {
+  background-color: rgba(139, 92, 246, 0.08);
+  border-color: rgba(124, 58, 237, 0.25);
+}
+html:not(.dark) [class*="bg-rose-950"],
+html:not(.dark) [class*="bg-red-950"] {
+  background-color: rgba(244, 63, 94, 0.08);
+  border-color: rgba(225, 29, 72, 0.25);
+}

@@ -171,7 +171,7 @@
 | **SBC-376** | `Story` | `SH` | extend prisma schema with classroom, course enrollment, auth provider and system config | 2026-11-10 | `988cf65` |
 | **SBC-384** | `Story` | `SH` | extend prisma schema with CourseModule model, allowedModuleIds fields and typescript dto contracts | 2026-11-10 | `682f7d3` |
 | **SBC-433** | `Story` | `SH` | implement cross-app light/dark theme system, antigravity dark palette, admin customizer and unified settings switcher | 2026-11-25 | `65d0bad` |
-| **SBC-434** | `Story` | `SH` | audit and fix light theme contrast and readability across study, student, teacher, admin portals and @sbc/ui | 2026-11-25 | `backlog` |
+| **SBC-434** | `Story` | `SH` | audit and fix light theme contrast and readability across study, student, teacher, admin portals and @sbc/ui | 2026-11-25 | `done` |
 
 ---
 

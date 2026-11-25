@@ -57,8 +57,10 @@
 - **Верифікація:**
   - Усі production-збірки (`build:api`, `build:student`, `build:study`, `build:teacher`, `build:admin`) пройшли без помилок.
   - Наскрізний Playwright E2E-тест `e2e/theme-settings.spec.ts` підтвердив перемикання `light` / `dark` у Налаштуваннях усіх 4 порталів та трансляцію глобальної теми за замовчуванням з Admin (3004) на Student (3002) із чистим `localStorage` (**5/5 passed**).
-- **Зафіксовані наступні дії (`SBC-434` / `[BACKLOG-11]`):**
-  - Заплановано повний аудит та виправлення контрастності елементів у Світлій темі across `apps/study`, `apps/student`, `apps/teacher`, `apps/admin` та `@sbc/ui` (усунення `text-white` на світлому фоні, адаптація акцентних `text-*-200/300` і `bg-*-950/*`, синхронізація теми `MonacoCodeEditor` та графів навичок).
+- **Реалізація аудиту контрастності Світлої Теми (`SBC-434` / `[BACKLOG-11]`):**
+  - Створено `packages/ui/src/theme/light-theme.css` (підключено в `globals.css` усіх 4 порталів) із WCAG AA/AAA ремапінгом нейтрального `text-white`, пастельних/яскравих акцентів `200..500` (включно з `/opacity`) та темних підкладок `bg-*-950/*` виключно під `html:not(.dark)`.
+  - Оновлено `DEFAULT_THEME_TOKENS.light` (`#18181b` / `#52525b` / `#5c5c66`) та підключено `useTheme()` у `MonacoCodeEditor.tsx` (`vs` / `vs-dark`).
+  - Додано Playwright WCAG-сканер `e2e/light-theme-contrast.spec.ts` із Canvas 2D конвертацією Tailwind v4 `oklch(...)` кольорів: **4/4 портали пройшли з 0 порушень контрастності**.
 
 ### 0.1.7.101 Аналіз Правок Т. М. Барболіної V-4.0 та Розробка Плану Виступу на IICTE-2026 (SBC-432, EP-MS)
 - **Контекст та аудит правок наукового керівника V-4.0:**
