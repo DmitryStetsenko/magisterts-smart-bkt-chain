@@ -115,11 +115,11 @@ export function QuizTaskEditor({
               className={`p-3.5 sm:p-4 rounded-xl border transition-all flex items-start justify-between gap-3 cursor-pointer ${
                 isPassed
                   ? active
-                    ? 'bg-emerald-500/10 border-emerald-500/50 text-white cursor-default shadow-sm shadow-emerald-950/40'
-                    : 'bg-zinc-900/30 border-zinc-800/50 text-zinc-500 cursor-not-allowed opacity-60'
+                    ? 'bg-emerald-500/10 border-emerald-500/30 text-white cursor-default'
+                    : 'bg-[#1e1e1e] border-[#2b2b2b] text-[#6e6e6e] cursor-not-allowed opacity-60'
                   : active
-                  ? 'bg-zinc-800/90 border-indigo-500 text-white shadow-md shadow-zinc-950/50 ring-1 ring-indigo-500/40'
-                  : 'bg-zinc-900/80 border-zinc-800 hover:border-zinc-700 hover:bg-zinc-800/50 text-zinc-200'
+                  ? 'bg-[#252525] border-indigo-500/60 text-white shadow-sm ring-1 ring-indigo-500/20'
+                  : 'bg-[#1e1e1e] border-[#2b2b2b] hover:border-[#383838] hover:bg-[#232323] text-[#cccccc]'
               }`}
             >
               <div className="flex items-start gap-3 flex-1 min-w-0">
@@ -129,16 +129,16 @@ export function QuizTaskEditor({
                   } flex items-center justify-center font-mono font-bold text-xs transition-colors shrink-0 mt-0.5 ${
                     isPassed
                       ? active
-                        ? 'bg-emerald-500 text-zinc-950'
-                        : 'bg-zinc-800 text-zinc-500'
+                        ? 'bg-emerald-500 text-black'
+                        : 'bg-[#2b2b2b] text-[#6e6e6e]'
                       : active
                       ? 'bg-indigo-600 text-white'
-                      : 'bg-zinc-800 border border-zinc-700/60 text-zinc-300'
+                      : 'bg-[#2b2b2b] border border-[#333333] text-[#909090]'
                   }`}
                 >
                   {active ? <CheckCircle2 className="w-3.5 h-3.5 stroke-[2.5]" /> : letter}
                 </div>
-                <span className={`text-sm leading-relaxed ${active ? 'font-semibold text-white' : 'font-normal text-zinc-300'}`}>
+                <span className={`text-sm leading-relaxed ${active ? 'font-semibold text-white' : 'font-normal text-[#cccccc]'}`}>
                   {opt.text}
                 </span>
               </div>
@@ -149,7 +149,7 @@ export function QuizTaskEditor({
                     ✓ Обрано
                   </span>
                 )}
-                <span className="text-[11px] font-mono text-zinc-500">{letter}</span>
+                <span className="text-[11px] font-mono text-[#6e6e6e]">{letter}</span>
               </div>
             </div>
           );

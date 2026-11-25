@@ -1733,25 +1733,25 @@ export function StudentPortalContent({
 
               {/* ⚠️ Top Adaptive Degradation Notice Banner */}
               {recommendation?.isDifficultyDegraded && (
-                <div className="w-full bg-zinc-900/90 border border-amber-500/40 rounded-xl p-3.5 flex items-start sm:items-center justify-between gap-4 animate-fadeIn shadow-sm">
+                <div className="w-full bg-[#1e1e1e] border border-amber-500/25 rounded-xl p-3.5 flex items-start sm:items-center justify-between gap-4 animate-fadeIn">
                   <div className="flex items-start sm:items-center gap-3">
                     <div className="p-1.5 rounded-lg bg-amber-500/10 text-amber-400 shrink-0 mt-0.5 sm:mt-0">
                       <AlertTriangle className="w-4 h-4" />
                     </div>
                     <div>
                       <div className="flex items-center gap-2 flex-wrap">
-                        <span className="text-xs font-semibold text-[var(--sbc-text-primary,#f4f4f5)]">Рівень складності адаптовано</span>
-                        <span className="text-[10px] font-mono font-medium text-amber-400">
+                        <span className="text-xs font-semibold text-[#cccccc]">Рівень складності адаптовано</span>
+                        <span className="text-[10px] font-mono font-medium text-amber-400/90">
                           (Макс. бал: {recommendation?.maxScoreCap ?? 70}%)
                         </span>
                       </div>
-                      <p className="text-xs text-zinc-300 mt-0.5 leading-relaxed max-w-3xl">
+                      <p className="text-xs text-[#909090] mt-0.5 leading-relaxed max-w-3xl">
                         Система помітила труднощі в попередніх завданнях і тимчасово надала допоміжні питання для закріплення базових концепцій. Ви зможете повернутися до 100% балу після успішного освоєння теми.
                       </p>
                     </div>
                   </div>
                   <div className="hidden md:flex items-center gap-2 shrink-0">
-                    <span className="text-[10px] font-mono text-amber-400/90">
+                    <span className="text-[10px] font-mono text-amber-400/80">
                       Тема: {task.topic || task.skill?.title || 'Навичка'}
                     </span>
                   </div>
@@ -1898,15 +1898,15 @@ export function StudentPortalContent({
               {task.description && (
                 <div
                   data-testid="task-condition-card"
-                  className="w-full rounded-xl bg-[var(--sbc-bg-surface,#18181b)] border border-[var(--sbc-border-subtle,#27272a)] p-4 sm:p-5 relative overflow-hidden transition-all shadow-sm"
+                  className="w-full rounded-xl bg-[#1e1e1e] border border-[#2b2b2b] p-4 sm:p-5 relative overflow-hidden transition-all"
                 >
-                  <div className="absolute top-0 left-0 bottom-0 w-1 bg-indigo-500 rounded-l" />
+                  <div className="absolute top-0 left-0 bottom-0 w-1 bg-indigo-500/80 rounded-l" />
                   <div className="flex items-center justify-between gap-3 mb-2.5">
                     <div className="flex items-center gap-2 text-xs font-semibold text-indigo-400 uppercase tracking-wider">
                       <HelpCircle className="w-3.5 h-3.5 text-indigo-400" />
                       <span>Умова завдання</span>
                     </div>
-                    <span className="text-[11px] font-mono text-[var(--sbc-text-muted,#a1a1aa)] font-medium">
+                    <span className="text-[11px] font-mono text-[#6e6e6e] font-medium">
                       {task.taskType === 'CODE'
                         ? 'Практичний кодинг'
                         : task.taskType === 'TEXT_ESSAY'
@@ -1914,12 +1914,12 @@ export function StudentPortalContent({
                         : 'Тестове опитування'}
                     </span>
                   </div>
-                  <div className="text-sm sm:text-base font-medium text-[var(--sbc-text-primary,#f4f4f5)] leading-relaxed pl-0.5 font-sans max-w-4xl">
+                  <div className="text-sm sm:text-base font-medium text-[#cccccc] leading-relaxed pl-0.5 font-sans max-w-4xl">
                     {task.description.split(/(`[^`]+`)/g).map((part, i) =>
                       part.startsWith('`') && part.endsWith('`') ? (
                         <code
                           key={i}
-                          className="px-2 py-0.5 mx-1 rounded-md bg-[var(--sbc-bg-subtle,#222226)] border border-[var(--sbc-border-strong,#3f3f46)] text-indigo-300 font-mono text-xs sm:text-sm font-semibold"
+                          className="px-2 py-0.5 mx-1 rounded-md bg-[#262626] border border-[#333333] text-indigo-300 font-mono text-xs sm:text-sm font-semibold"
                         >
                           {part.slice(1, -1)}
                         </code>

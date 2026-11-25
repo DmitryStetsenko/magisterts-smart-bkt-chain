@@ -17,7 +17,11 @@
      - `apps/student`: заміна жорстких синіх фонів `bg-[#090d16]`, індиго-карток завдань, кнопок варіантів тестування у `QuizTaskEditor`, банерів адаптивності та умов завдань на нейтральні цинкові поверхні `bg-[var(--sbc-bg-surface)]` та розділювачі `border-[var(--sbc-border-subtle)]`.
      - `apps/study`, `apps/teacher`, `apps/admin`: видалено хардкод `bg-[#070a13]` та `bg-slate-950` у `layout.tsx` та `globals.css` із повним переведенням на дизайн-токени.
      - Tailwind v4 `@theme`: налаштовано перекриття палітри `--color-slate-*` на відповідні сіро-графітові тони, що автоматично позбавило всі наявні компоненти холодного синього відтінку без порушення верстки.
-   - Створено повноцінний центр конфігурації тем `ThemeCustomizerView` в `apps/admin` (таб `system` / Налаштування) з color pickers, пресетами («Graphite Neutral», «Deep Zinc», «Clean Paper») та інтерактивним Live Preview.
+   - **Калібрування кольорової гами під палітру Antigravity IDE (VS Code Dark Modern):**
+     - Знижено контрастність рамок та розділювачів (перехід з різких білуватих ліній на м'які `#2b2b2b` та `#333333`).
+     - Встановлено фірмовий спокійний темний фон Antigravity (`#181818`), поверхні сайдбарів та карток (`#1f1f1f`), приглушений м'який текст (`#cccccc` та `#909090`), що усуває ефект сліпучого High Contrast та створює комфортне середовище для тривалого читання й кодингу.
+     - Оновлено `QuizTaskEditor`, `StudentPortalApp`, `defaultTokens.ts`, `ThemeContext.tsx` та `globals.css` в усіх веб-застосунках.
+   - Створено повноцінний центр конфігурації тем `ThemeCustomizerView` в `apps/admin` (таб `system` / Налаштування) з color pickers, пресетами («Antigravity Neutral», «Deep Zinc», «Clean Paper») та інтерактивним Live Preview.
    - Проведено успішну збірку всіх 4 веб-застосунків монорепозиторію (`build:student`, `build:study`, `build:teacher`, `build:admin`).
 
 2. **Аналіз правок наукового керівника V-4.0 та оновлення авторського профілю (`SBC-432`, `EP-MS`):**

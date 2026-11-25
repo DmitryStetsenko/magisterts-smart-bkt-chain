@@ -50,7 +50,16 @@
             },
             {
               "type": "text",
-              "raw_text": "Створено повноцінний центр конфігурації тем `ThemeCustomizerView` в `apps/admin` (таб `system` / Налаштування) з color pickers, пресетами («Graphite Neutral», «Deep Zinc», «Clean Paper») та інтерактивним Live Preview.",
+              "raw_text": "**Калібрування кольорової гами під палітру Antigravity IDE (VS Code Dark Modern):**",
+              "subitems": [
+                "Знижено контрастність рамок та розділювачів (перехід з різких білуватих ліній на м'які `#2b2b2b` та `#333333`).",
+                "Встановлено фірмовий спокійний темний фон Antigravity (`#181818`), поверхні сайдбарів та карток (`#1f1f1f`), приглушений м'який текст (`#cccccc` та `#909090`), що усуває ефект сліпучого High Contrast та створює комфортне середовище для тривалого читання й кодингу.",
+                "Оновлено `QuizTaskEditor`, `StudentPortalApp`, `defaultTokens.ts`, `ThemeContext.tsx` та `globals.css` в усіх веб-застосунках."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "Створено повноцінний центр конфігурації тем `ThemeCustomizerView` в `apps/admin` (таб `system` / Налаштування) з color pickers, пресетами («Antigravity Neutral», «Deep Zinc», «Clean Paper») та інтерактивним Live Preview.",
               "subitems": []
             },
             {
