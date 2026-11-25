@@ -71,6 +71,7 @@
   - Створено `packages/ui/src/theme/light-theme.css` (підключено в `globals.css` усіх 4 порталів) із WCAG AA/AAA ремапінгом нейтрального `text-white`, пастельних/яскравих акцентів `200..500` (включно з `/opacity`) та темних підкладок `bg-*-950/*` виключно під `html:not(.dark)`.
   - Оновлено `DEFAULT_THEME_TOKENS.light` (`#18181b` / `#52525b` / `#5c5c66`) та підключено `useTheme()` у `MonacoCodeEditor.tsx` (`vs` / `vs-dark`).
   - Додано Playwright WCAG-сканер `e2e/light-theme-contrast.spec.ts` із Canvas 2D конвертацією Tailwind v4 `oklch(...)` кольорів: **4/4 портали (177 текстових елементів) пройшли з 0 порушень контрастності**.
+  - **Візуальне розмежування хедера, рейки та сайдбара (`AppShellLayout.tsx`):** додано окремі токени `--sbc-bg-header` (`#141414` dark / `#eef0f4` light із рамкою `--sbc-border-strong`) та `--sbc-bg-rail` (`#181818` dark / `#f4f5f7` light), які чітко відокремлюють верхній хедер та рейку навігації від бічної панелі (`--sbc-bg-surface`) в усіх 4 порталах.
   - **Zero-FOUC при перезавантаженні та навігації (`packages/ui/src/theme/ThemeInitScript.tsx`, `ThemeContext.tsx`):** додано синхронний inline-скрипт у `<head>` усіх 4 `layout.tsx`, прибрано застарілі `#121215` fallback-фони та додано guard `isInitialized` у `ThemeProvider`, щоб перемонтування провайдера при переході між модулями ніколи не вмикало `.dark` до зчитування активної теми (підтверджено `MutationObserver` E2E-тестом: 0 спалахів).
 
 ### 0.1.7.101 Аналіз Правок Т. М. Барболіної V-4.0 та Розробка Плану Виступу на IICTE-2026 (SBC-432, EP-MS)

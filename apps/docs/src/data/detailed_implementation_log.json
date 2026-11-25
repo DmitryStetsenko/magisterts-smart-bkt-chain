@@ -325,6 +325,11 @@
             },
             {
               "type": "text",
+              "raw_text": "**Візуальне розмежування хедера, рейки та сайдбара (`AppShellLayout.tsx`):** додано окремі токени `--sbc-bg-header` (`#141414` dark / `#eef0f4` light із рамкою `--sbc-border-strong`) та `--sbc-bg-rail` (`#181818` dark / `#f4f5f7` light), які чітко відокремлюють верхній хедер та рейку навігації від бічної панелі (`--sbc-bg-surface`) в усіх 4 порталах.",
+              "subitems": []
+            },
+            {
+              "type": "text",
               "raw_text": "**Zero-FOUC при перезавантаженні та навігації (`packages/ui/src/theme/ThemeInitScript.tsx`, `ThemeContext.tsx`):** додано синхронний inline-скрипт у `<head>` усіх 4 `layout.tsx`, прибрано застарілі `#121215` fallback-фони та додано guard `isInitialized` у `ThemeProvider`, щоб перемонтування провайдера при переході між модулями ніколи не вмикало `.dark` до зчитування активної теми (підтверджено `MutationObserver` E2E-тестом: 0 спалахів).",
               "subitems": []
             }

@@ -33,6 +33,8 @@ function applyThemeVariables(resolvedTheme: 'dark' | 'light', tokens: CustomThem
   root.style.setProperty('--sbc-bg-root', currentTokens.bgRoot);
   root.style.setProperty('--sbc-bg-surface', currentTokens.bgSurface);
   root.style.setProperty('--sbc-bg-subtle', currentTokens.bgSubtle);
+  root.style.setProperty('--sbc-bg-header', resolvedTheme === 'dark' ? '#141414' : '#eef0f4');
+  root.style.setProperty('--sbc-bg-rail', resolvedTheme === 'dark' ? '#181818' : '#f4f5f7');
   root.style.setProperty('--sbc-border-subtle', currentTokens.borderSubtle);
   root.style.setProperty('--sbc-border-strong', currentTokens.borderStrong);
   root.style.setProperty('--sbc-text-primary', currentTokens.textPrimary);

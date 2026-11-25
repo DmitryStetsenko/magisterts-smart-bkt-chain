@@ -41,8 +41,9 @@
    - Посилено базові токени світлої теми в `packages/ui/src/theme/defaultTokens.ts` (`textPrimary: #18181b`, `textMuted: #52525b`, `textTertiary: #5c5c66`).
    - Синхронізовано тему редактора коду в `apps/student/src/features/code-editor/ui/MonacoCodeEditor.tsx` через `useTheme()` (`vs` у світлій / `vs-dark` у темній).
    - Створено та пройдено автоматичний Playwright WCAG-аудит контрастності `e2e/light-theme-contrast.spec.ts` з Canvas 2D підтримкою `oklch(...)` (4/4 портали: 177 елементів перевірено, 0 порушень контрастності).
-   - **Усунення FOUC-миготіння при перезавантаженні (`ThemeInitScript`):**
+   - **Усунення FOUC-миготіння при перезавантаженні (`ThemeInitScript`) та візуальне розділення зон Shell:**
      - Створено синхронний блокуючий `<ThemeInitScript />` у `packages/ui/src/theme/ThemeInitScript.tsx` і вбудовано в `<head>` усіх 4 `layout.tsx` (`student`, `study`, `teacher`, `admin`) із кешуванням останньої розв'язаної теми `sbc_last_resolved_theme`.
+     - Введено окремі семантичні токени `--sbc-bg-header` (`#141414` dark / `#eef0f4` light) та `--sbc-bg-rail` (`#181818` dark / `#f4f5f7` light) у `AppShellLayout`, щоб верхній хедер і ліва рейка чітко відокремлювалися від висувної бічної панелі (`--sbc-bg-surface`) без злиття інтерфейсу.
      - Замінено всі застарілі темніші fallback-кольори `#121215` / `#18181b` на актуальні `#181818` / `#1f1f1f` в `AppShellLayout`, `layout.tsx`, `StudentPortalApp` та `apps/admin` (і оновлено метадані заголовка `apps/admin`).
      - Додано захист `isInitialized` у `ThemeProvider` (`ThemeContext.tsx`), що повністю усуває 1-кадровий спалах темної теми при клієнтському перемиканні модулів/роутів у світлому режимі (підтверджено Playwright `MutationObserver` тестом у `e2e/theme-settings.spec.ts`: `flashCount === 0`).
 

@@ -19,6 +19,8 @@ if(r==='dark'){el.classList.add('dark');}else{el.classList.remove('dark');}
 el.style.setProperty('--sbc-bg-root',c.bgRoot);
 el.style.setProperty('--sbc-bg-surface',c.bgSurface);
 el.style.setProperty('--sbc-bg-subtle',c.bgSubtle);
+el.style.setProperty('--sbc-bg-header',r==='dark'?'#141414':'#eef0f4');
+el.style.setProperty('--sbc-bg-rail',r==='dark'?'#181818':'#f4f5f7');
 el.style.setProperty('--sbc-border-subtle',c.borderSubtle);
 el.style.setProperty('--sbc-border-strong',c.borderStrong);
 el.style.setProperty('--sbc-text-primary',c.textPrimary);

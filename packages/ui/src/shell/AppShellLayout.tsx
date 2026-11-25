@@ -125,7 +125,7 @@ export function AppShellLayout({
         
         {/* 📌 1. STICKY TOP NAVIGATION BAR (Minimalist Borderless Header h-[56px]) */}
         {!header.hideHeader && (
-          <header className="h-[56px] w-full bg-[var(--sbc-bg-surface,#1f1f1f)] border-b border-[var(--sbc-border-subtle,#2b2b2b)] px-4 flex items-center justify-between shrink-0 z-30 transition-colors">
+          <header className="h-[56px] w-full bg-[var(--sbc-bg-header,#141414)] border-b border-[var(--sbc-border-strong,#333333)] px-4 flex items-center justify-between shrink-0 z-30 transition-colors">
             <div className="flex items-center gap-2.5 shrink-0">
               <div className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 ${header.logoColor || 'bg-blue-500/15 text-blue-400'}`}>
                 <HeaderLogo className="w-4 h-4" />
@@ -177,7 +177,7 @@ export function AppShellLayout({
 
           {/* 📑 2.1 ВЕРТИКАЛЬНА РЕЙКА НАВІГАЦІЇ (Minimalist Borderless Icon Rail w-12) */}
           {!navigationRail.hideRail && (
-            <nav className="w-12 bg-[var(--sbc-bg-surface,#18181b)] border-r border-[var(--sbc-border-subtle,#27272a)] flex flex-col items-center py-2.5 justify-between shrink-0 z-20 select-none transition-colors">
+            <nav className="w-12 bg-[var(--sbc-bg-rail,#181818)] border-r border-[var(--sbc-border-subtle,#2b2b2b)] flex flex-col items-center py-2.5 justify-between shrink-0 z-20 select-none transition-colors">
               {/* Верхній блок: Таби поточного застосунку */}
               <div className="flex flex-col items-center gap-1.5">
                 {navigationRail.tabs.map((tab) => {
