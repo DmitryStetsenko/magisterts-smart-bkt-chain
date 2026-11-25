@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { ThemeInitScript } from '@sbc/ui';
+import { ThemeInitScript, ThemeProvider } from '@sbc/ui';
 import './globals.css';
 
 export const metadata: Metadata = {
@@ -18,7 +18,7 @@ export default function RootLayout({
         <ThemeInitScript />
       </head>
       <body className="bg-[var(--sbc-bg-root,#181818)] text-[var(--sbc-text-primary,#cccccc)] antialiased selection:bg-blue-600 selection:text-white transition-colors">
-        {children}
+        <ThemeProvider>{children}</ThemeProvider>
       </body>
     </html>
   );

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import { ThemeInitScript } from "@sbc/ui";
+import { ThemeInitScript, ThemeProvider } from "@sbc/ui";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -29,7 +29,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <ThemeInitScript />
       </head>
       <body className="min-h-full flex flex-col bg-[var(--sbc-bg-root,#181818)] text-[var(--sbc-text-primary,#cccccc)] transition-colors">
-        {children}
+        <ThemeProvider>{children}</ThemeProvider>
       </body>
     </html>
   );

@@ -23,9 +23,9 @@ export function ThemeToggle({ className = '', showLabel = false }: ThemeTogglePr
       onClick={toggleTheme}
       title={isDark ? 'Увімкнути світлу тему' : 'Увімкнути темну тему'}
       className={`relative inline-flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-colors cursor-pointer select-none ${
-        isDark 
-          ? 'text-zinc-300 hover:text-white hover:bg-zinc-800/80 bg-zinc-900 border border-zinc-800' 
-          : 'text-zinc-700 hover:text-zinc-950 hover:bg-zinc-200/80 bg-zinc-100 border border-zinc-300'
+        isDark
+          ? 'text-zinc-200 hover:text-white hover:bg-zinc-800 bg-zinc-900 border border-zinc-700/80'
+          : 'text-zinc-800 hover:text-zinc-950 hover:bg-zinc-200/80 bg-zinc-100 border border-zinc-300'
       } ${className}`}
     >
       {isDark ? (

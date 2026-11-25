@@ -120,6 +120,39 @@
           ]
         },
         {
+          "title": "0.1.7.108 Підняття `ThemeProvider` у кореневі `layout.tsx` та синхронізація `ThemeToggle` у `UserProfileDrawer` (`SBC-434`, `EP-SH`)",
+          "level": 3,
+          "paragraphs": [],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "**Причина дефекту:** `ThemeProvider` раніше монтувався лише всередині `AppShellLayout`, тоді як правий сайдбар профілю `UserProfileDrawer` рендерився на рівні сторінки як сусідній елемент (поза `AppShellLayout`). Через це `ThemeToggle` всередині `UserProfileDrawer` отримував fallback-контекст `resolvedTheme: 'dark'` із порожнім `toggleTheme`, відображаючи темну кнопку `bg-zinc-900` із темним текстом `#27272a` (від `light-theme.css`) у світлій темі.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Виправлення:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "У [`packages/ui/src/theme/ThemeContext.tsx`](file:///packages/ui/src/theme/ThemeContext.tsx) додано автоматичну дедуплікацію: якщо вище за деревом вже існує `ThemeContext`, вкладений `ThemeProvider` (наприклад, у `AppShellLayout`) прозоро повертає `{children}` без створення дублікатного стану.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "В усіх 4 кореневих лейаутах ([`apps/teacher/src/app/layout.tsx`](file:///apps/teacher/src/app/layout.tsx), [`apps/student/src/app/layout.tsx`](file:///apps/student/src/app/layout.tsx), [`apps/study/src/app/layout.tsx`](file:///apps/study/src/app/layout.tsx), [`apps/admin/src/app/layout.tsx`](file:///apps/admin/src/app/layout.tsx)) обгорнуто `{children}` у `<ThemeProvider>`, завдяки чому `UserProfileDrawer`, модальні вікна та всі маршрути використовують єдиний живий контекст теми.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "У [`packages/ui/src/theme/ThemeToggle.tsx`](file:///packages/ui/src/theme/ThemeToggle.tsx) покращено контрастність рамки та тексту в обох режимах.",
+              "subitems": []
+            }
+          ]
+        },
+        {
           "title": "0.1.7.107 Контрастність темних 900/950 плашок у Світлій темі (`SBC-434`, `EP-SH`)",
           "level": 3,
           "paragraphs": [],

@@ -30,6 +30,13 @@
   5. *Build Next.js Documentation Site* (`npm run build:docs`) — збірка статичного експорту (`output: "export"`, `trailingSlash: true`, `basePath: "/magisterts-smart-bkt-chain"`).
   6. *Upload Artifact & Deploy Pages* (`actions/upload-pages-artifact@v3` + `actions/deploy-pages@v4`).
 
+### 0.1.7.108 Підняття `ThemeProvider` у кореневі `layout.tsx` та синхронізація `ThemeToggle` у `UserProfileDrawer` (`SBC-434`, `EP-SH`)
+- **Причина дефекту:** `ThemeProvider` раніше монтувався лише всередині `AppShellLayout`, тоді як правий сайдбар профілю `UserProfileDrawer` рендерився на рівні сторінки як сусідній елемент (поза `AppShellLayout`). Через це `ThemeToggle` всередині `UserProfileDrawer` отримував fallback-контекст `resolvedTheme: 'dark'` із порожнім `toggleTheme`, відображаючи темну кнопку `bg-zinc-900` із темним текстом `#27272a` (від `light-theme.css`) у світлій темі.
+- **Виправлення:**
+  - У [`packages/ui/src/theme/ThemeContext.tsx`](file:///packages/ui/src/theme/ThemeContext.tsx) додано автоматичну дедуплікацію: якщо вище за деревом вже існує `ThemeContext`, вкладений `ThemeProvider` (наприклад, у `AppShellLayout`) прозоро повертає `{children}` без створення дублікатного стану.
+  - В усіх 4 кореневих лейаутах ([`apps/teacher/src/app/layout.tsx`](file:///apps/teacher/src/app/layout.tsx), [`apps/student/src/app/layout.tsx`](file:///apps/student/src/app/layout.tsx), [`apps/study/src/app/layout.tsx`](file:///apps/study/src/app/layout.tsx), [`apps/admin/src/app/layout.tsx`](file:///apps/admin/src/app/layout.tsx)) обгорнуто `{children}` у `<ThemeProvider>`, завдяки чому `UserProfileDrawer`, модальні вікна та всі маршрути використовують єдиний живий контекст теми.
+  - У [`packages/ui/src/theme/ThemeToggle.tsx`](file:///packages/ui/src/theme/ThemeToggle.tsx) покращено контрастність рамки та тексту в обох режимах.
+
 ### 0.1.7.107 Контрастність темних 900/950 плашок у Світлій темі (`SBC-434`, `EP-SH`)
 - **Проблема:** У [`packages/ui/src/theme/light-theme.css`](file:///packages/ui/src/theme/light-theme.css) правила для темних підкладок охоплювали лише `bg-{amber,emerald,blue,indigo,purple,rose,red}-950`, через що плашки з `bg-cyan-950/60` (зокрема індикатори часу вивчення теорії `5 сек` / `29 сек` у [`StudentActivityTimelineWidget.tsx`](file:///apps/teacher/src/features/analytics/ui/StudentActivityTimelineWidget.tsx)) та `bg-*-900/*` залишалися темно-синьо-сірими з темним текстом `#0369a1` у світлій темі.
 - **Виправлення:**

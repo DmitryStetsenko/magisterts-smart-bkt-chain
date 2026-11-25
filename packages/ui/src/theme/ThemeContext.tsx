@@ -85,6 +85,14 @@ function applyThemeVariables(resolvedTheme: 'dark' | 'light', tokens: CustomThem
 }
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
+  const existingContext = useContext(ThemeContext);
+  if (existingContext) {
+    return <>{children}</>;
+  }
+  return <ThemeProviderInner>{children}</ThemeProviderInner>;
+}
+
+function ThemeProviderInner({ children }: { children: React.ReactNode }) {
   const [theme, setThemeState] = useState<ThemeMode>('dark');
   const [defaultTheme, setDefaultThemeState] = useState<ThemeMode>('dark');
   const [hasLocalThemeOverride, setHasLocalThemeOverride] = useState<boolean>(false);
