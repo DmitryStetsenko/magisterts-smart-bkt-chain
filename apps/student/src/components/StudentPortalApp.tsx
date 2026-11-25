@@ -870,7 +870,7 @@ export function StudentPortalContent({
                                           Складність знижена в адаптивному режимі, оскільки попередня спроба викликала труднощі.
                                         </p>
                                         <p className="text-[10px] text-amber-400/90 mt-2 font-medium">
-                                          💡 Після засвоєння поверніться до оригінального завдання для 100% майстерності.
+                                          Після засвоєння поверніться до оригінального завдання для 100% майстерності.
                                         </p>
                                       </div>
                                     </>
@@ -1050,7 +1050,8 @@ export function StudentPortalContent({
                                     <div className="flex flex-col gap-1">
                                       <div className="flex items-center justify-between font-bold text-[11px] text-amber-300">
                                         <span className="flex items-center gap-1.5">
-                                          <span>💡 Підказка {hintObj.level}:</span>
+                                          <HelpCircle className="w-3 h-3 shrink-0" />
+                                          <span>Підказка {hintObj.level}:</span>
                                           {hintObj.level >= 2 && (
                                             <span className="text-[10px] font-normal text-emerald-400 flex items-center gap-0.5">
                                               <Unlock className="w-2.5 h-2.5" />
@@ -1410,12 +1411,23 @@ export function StudentPortalContent({
                         defaultOpen={true}
                         className="border-t border-slate-800/80 pt-2.5"
                       >
-                        <div className="text-[11px] text-slate-300 py-1">
-                          {inspectedSkill.parentSkillIds.length === 0
-                            ? '🟢 Базовий стартовий вузол курсу.'
-                            : inspectedSkill.status === 'LOCKED'
-                            ? '🔒 Потребує опанування попередніх навичок (P(L) ≥ 0.75).'
-                            : '✨ Усі пререквізити виконано! Модуль відкрито.'}
+                        <div className="text-[11px] text-slate-300 py-1 flex items-center gap-1.5">
+                          {inspectedSkill.parentSkillIds.length === 0 ? (
+                            <>
+                              <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" />
+                              <span>Базовий стартовий вузол курсу.</span>
+                            </>
+                          ) : inspectedSkill.status === 'LOCKED' ? (
+                            <>
+                              <Lock className="w-3 h-3 text-slate-400 shrink-0" />
+                              <span>Потребує опанування попередніх навичок (P(L) ≥ 0.75).</span>
+                            </>
+                          ) : (
+                            <>
+                              <Sparkles className="w-3 h-3 text-emerald-400 shrink-0" />
+                              <span>Усі пререквізити виконано! Модуль відкрито.</span>
+                            </>
+                          )}
                         </div>
                       </DrawerSection>
 
@@ -1437,7 +1449,14 @@ export function StudentPortalContent({
                             : 'bg-slate-800/60 hover:bg-slate-800 text-indigo-300 hover:text-white border border-slate-700/60 hover:border-indigo-500/40'
                         }`}
                       >
-                        <span>{inspectedSkill.status === 'LOCKED' ? '🔒 Заблоковано' : inspectedSkill.pMastery >= 0.90 ? 'Повторити тему' : 'Розпочати вправу вузла →'}</span>
+                        {inspectedSkill.status === 'LOCKED' ? (
+                          <>
+                            <Lock className="w-3.5 h-3.5 shrink-0" />
+                            <span>Заблоковано</span>
+                          </>
+                        ) : (
+                          <span>{inspectedSkill.pMastery >= 0.90 ? 'Повторити тему' : 'Розпочати вправу вузла →'}</span>
+                        )}
                       </button>
                     </div>
                   ) : (
@@ -1820,7 +1839,7 @@ export function StudentPortalContent({
                       title={
                         isTheoryUnlocked
                           ? 'Відкрити вбудовану теоретичну капсулу без переходу на іншу вкладку'
-                          : '🔒 Експрес-теорія заблокована. Спочатку відкрийте підказки Сократа (рівень 2+) у бічній панелі.'
+                          : 'Експрес-теорія заблокована. Спочатку відкрийте підказки Сократа (рівень 2+) у бічній панелі.'
                       }
                     >
                       {isTheoryUnlocked ? (

@@ -544,12 +544,23 @@ export function GameSkillTreeWidget({
                     </span>
                   )}
                 </div>
-                <p className="text-[11px] text-slate-400 bg-slate-950/60 p-2.5 rounded-lg border border-slate-800/80 leading-relaxed">
-                  {selectedNode.parentSkillIds.length === 0
-                    ? '🟢 Базовий вузол курсу. Доступний одразу.'
-                    : selectedNode.status === 'LOCKED'
-                    ? '🔒 Необхідно закрити попередні залежні модулі на рівень P(L) ≥ 0.95.'
-                    : '✨ Усі пререквізити виконано! Вузол відкрито для студента.'}
+                <p className="text-[11px] text-slate-400 bg-slate-950/60 p-2.5 rounded-lg border border-slate-800/80 leading-relaxed flex items-center gap-1.5">
+                  {selectedNode.parentSkillIds.length === 0 ? (
+                    <>
+                      <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" />
+                      <span>Базовий вузол курсу. Доступний одразу.</span>
+                    </>
+                  ) : selectedNode.status === 'LOCKED' ? (
+                    <>
+                      <Lock className="w-3 h-3 text-slate-400 shrink-0" />
+                      <span>Необхідно закрити попередні залежні модулі на рівень P(L) ≥ 0.95.</span>
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles className="w-3 h-3 text-emerald-400 shrink-0" />
+                      <span>Усі пререквізити виконано! Вузол відкрито для студента.</span>
+                    </>
+                  )}
                 </p>
               </div>
             </div>

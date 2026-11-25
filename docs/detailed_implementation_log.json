@@ -154,6 +154,11 @@
               "type": "text",
               "raw_text": "У [`packages/ui/src/theme/light-theme.css`](file:///packages/ui/src/theme/light-theme.css) додано секції 4–5 для наскрізного виправлення контрастності `hover:text-*-200/300/400`, `group-hover:text-*-200/300/400` та `hover:bg-*-900/950/*` (зокрема кнопок «Скинути BKT стан для демо» / «Вийти з акаунта» у `UserProfileDrawer`, модалок у `apps/admin`, віджетів у `apps/teacher`, `apps/student` та `apps/study`).",
               "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "У [`apps/student/src/components/StudentPortalApp.tsx`](file:///apps/student/src/components/StudentPortalApp.tsx), [`packages/ui/src/skill-graph/GameSkillTreeWidget.tsx`](file:///packages/ui/src/skill-graph/GameSkillTreeWidget.tsx) та [`apps/teacher/src/features/skill-graph/ui/GameSkillTreeWidget.tsx`](file:///apps/teacher/src/features/skill-graph/ui/GameSkillTreeWidget.tsx) замінено Unicode-емоджі (`🟢`, `🔒`, `✨`, `💡`) у деталізації вузла дерева та підказках на векторні іконки `Lock`, `Sparkles`, `HelpCircle` й семантичні колірні точки.",
+              "subitems": []
             }
           ]
         },
