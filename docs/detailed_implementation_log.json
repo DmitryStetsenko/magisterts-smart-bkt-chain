@@ -254,6 +254,16 @@
               "type": "text",
               "raw_text": "Наскрізний Playwright E2E-тест `e2e/theme-settings.spec.ts` підтвердив перемикання `light` / `dark` у Налаштуваннях усіх 4 порталів та трансляцію глобальної теми за замовчуванням з Admin (3004) на Student (3002) із чистим `localStorage` (**5/5 passed**).",
               "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Зафіксовані наступні дії (`SBC-434` / `[BACKLOG-11]`):**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Заплановано повний аудит та виправлення контрастності елементів у Світлій темі across `apps/study`, `apps/student`, `apps/teacher`, `apps/admin` та `@sbc/ui` (усунення `text-white` на світлому фоні, адаптація акцентних `text-*-200/300` і `bg-*-950/*`, синхронізація теми `MonacoCodeEditor` та графів навичок).",
+              "subitems": []
             }
           ]
         },

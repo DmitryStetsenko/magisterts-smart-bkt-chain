@@ -81,6 +81,29 @@
                 "Усунено циклічні CSS-токени `--color-slate-*` у `globals.css` усіх 4 порталів (переведено на `@theme inline` + `--sbc-slate-*` у `:root`, що ліквідувало білі рамки та миготіння старих стилів при перезавантаженні) і додано пріоритет за міткою часу `updatedAt` для миттєвого застосування глобальної теми адміна поверх застарілого `localStorage`.",
                 "Проведено успішну збірку (`build:api`, `build:student`, `build:study`, `build:teacher`, `build:admin`) та наскрізну перевірку у Playwright E2E (`e2e/theme-settings.spec.ts`: 5/5 тестів пройдено, включно з трансляцією глобальної теми з Admin на Student/Study поверх старого `localStorage`)."
               ]
+            }
+          ]
+        },
+        {
+          "title": "🎯 Наступні дії (Next Steps):",
+          "level": 3,
+          "paragraphs": [],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "**Повний аудит і доопрацювання контрастності Світлої Теми по всіх застосунках (`SBC-434`, `[BACKLOG-11]`, `EP-SH`):**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Пройтися по всіх екранах і компонентах у `apps/study`, `apps/student`, `apps/teacher`, `apps/admin` та `@sbc/ui` у світлому режимі (`Clean Paper Light`) і виправити елементи з низькою контрастністю / нечитабельним текстом:",
+              "subitems": [
+                "Замінити захардкоджені `text-white`, `hover:text-white`, `text-slate-100/200` (поза кольоровими кнопками) на семантичні змінні `text-[var(--sbc-text-primary)]` або адаптивні `dark:text-white text-zinc-900`.",
+                "Адаптувати кольорові підписи й бейджі (`text-amber-200/300`, `text-emerald-200/300`, `text-blue-200/300`, `text-indigo-200/300`, `text-purple-200/300`) під світлий фон (`text-*-700 dark:text-*-300`) та прибрати темні `bg-*-950/*` підкладки у світлій темі.",
+                "Перевірити читабельність `CodePlayground`, `MisconceptionAlert`, `MonacoCodeEditor` (перемикання теми редактора `vs` / `vs-dark`), `SkillDagMap` / `GameSkillTreeWidget`, `UserProfileDrawer`, `DrawerSection` та таблиць аналітики в `Teacher` і `Admin`.",
+                "Додати візуальну / Playwright перевірку контрастності ключових екранів у світлій темі."
+              ]
             },
             {
               "type": "text",

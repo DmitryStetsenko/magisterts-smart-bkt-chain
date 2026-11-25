@@ -9,6 +9,7 @@
 
 | ID | Jira Key | Пріоритет | Статус | Цільовий компонент / модуль | Короткий опис задачі |
 | :--- | :--- | :--- | :--- | :--- | :--- |
+| **`[BACKLOG-11]`** | `SBC-434` | 🔴 **P1 (Critical)** | `ACCEPTED` | `packages/ui`, `apps/study`, `apps/student`, `apps/teacher`, `apps/admin` | **Повний аудит і адаптація контрастності Світлої Теми (WCAG AA/AAA): усунення нечитабельних `text-white`, світлих акцентів `text-*-200/300`, темних `bg-*-950/*` та перемикання Monaco/CodePlayground** |
 | **`[BACKLOG-10]`** | `SBC-315` | 🔴 **P1 (Critical)** | `ACCEPTED` | `packages/ui`, `apps/*` | **Побудова канонічного FSD Shared UI-Kit (Button, Modal, Badge, Tooltip, Select) у `@sbc/ui`** |
 | **`[BACKLOG-9]`** | `SBC-311` | 🟠 **P2 (High)** | `ACCEPTED` | `apps/student` | **Режим експрес-підтвердження знань екстерном (Test-Out Fast-Track) у тренажері без проходження всієї теорії** |
 | **`[BACKLOG-7]`** | `TBD` | 🟡 **P2 (High)** | `IN_PROGRESS` | `apps/student`, `domain/learning` | Інтерактивний дидактичний шар навчання: доопрацювання inline-капсули теорії ($P(L_n) < 0.35$) та Misconception Engine для квізів/коду (база створена в `SBC-271`, `SBC-281`, `SBC-287`) |
