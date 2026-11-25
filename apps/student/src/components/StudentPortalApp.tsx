@@ -415,7 +415,8 @@ export function StudentPortalContent({
             }
           });
           const parentMastered =
-            parentIds.length === 0 || parentIds.every((pid: string) => (bktMap[pid] ?? 0) >= 0.75);
+            parentIds.length === 0 ||
+            parentIds.every((pid: string) => (bktMap[pid] ?? 0) >= (parentThresholds[pid] ?? 0.85));
 
           const isModUnlocked = skill.moduleId ? (moduleUnlockMap[skill.moduleId] ?? true) : true;
           const isAllowedSkill =
@@ -1377,11 +1378,15 @@ export function StudentPortalContent({
                           <p className="text-xs text-slate-300 leading-relaxed">
                             {inspectedSkill.description || 'Ключовий модуль курсу для набуття практичних навичок.'}
                           </p>
-                          {inspectedSkill.status === 'LOCKED' && (
-                            <div className="pl-2.5 border-l-2 border-rose-500/50 text-[11px] text-rose-300 mt-1">
-                              Необхідно спершу засвоїти попередні залежні модулі до рівня P(L) ≥ 0.75.
-                            </div>
-                          )}
+                          {inspectedSkill.status === 'LOCKED' && (() => {
+                            const reqVals = Object.values(inspectedSkill.parentThresholds || {});
+                            const reqThr = reqVals.length > 0 ? Math.max(...reqVals) : 0.85;
+                            return (
+                              <div className="pl-2.5 border-l-2 border-rose-500/50 text-[11px] text-rose-300 mt-1">
+                                Необхідно спершу засвоїти попередні залежні модулі до рівня P(L) ≥ {reqThr.toFixed(2)}.
+                              </div>
+                            );
+                          })()}
                         </div>
                       </DrawerSection>
 
@@ -1418,7 +1423,9 @@ export function StudentPortalContent({
                           </div>
                           <div className="flex justify-between text-[10px] text-slate-500 font-mono">
                             <span>0%</span>
-                            <span>Поріг: ≥ 90%</span>
+                            <span>
+                              Поріг: ≥ {Math.round((Object.values(inspectedSkill.parentThresholds || {}).length > 0 ? Math.max(...Object.values(inspectedSkill.parentThresholds || {})) : 0.85) * 100)}%
+                            </span>
                           </div>
                         </div>
                       </DrawerSection>
@@ -1441,7 +1448,9 @@ export function StudentPortalContent({
                           ) : inspectedSkill.status === 'LOCKED' ? (
                             <>
                               <Lock className="w-3 h-3 text-slate-400 shrink-0" />
-                              <span>Потребує опанування попередніх навичок (P(L) ≥ 0.75).</span>
+                              <span>
+                                Потребує опанування попередніх навичок (P(L) ≥ {(Object.values(inspectedSkill.parentThresholds || {}).length > 0 ? Math.max(...Object.values(inspectedSkill.parentThresholds || {})) : 0.85).toFixed(2)}).
+                              </span>
                             </>
                           ) : (
                             <>

@@ -147,6 +147,11 @@
             },
             {
               "type": "text",
+              "raw_text": "Уніфіковано всі підписи та умови розблокування пререквізитів у `StudentPortalApp.tsx` і `GameSkillTreeWidget.tsx`: усунено застарілі статичні константи `0.75` / `90%` на користь реального `requiredMastery` із `parentThresholds` (`0.85` за замовчуванням).",
+              "subitems": []
+            },
+            {
+              "type": "text",
               "raw_text": "Створено довідник доповідача [`PRESENTATION/docs/FORMULAS_AND_METRICS_GUIDE.md`](file:///SCIENCE/THESES/IICTE-2026_20-11-26/PRESENTATION/docs/FORMULAS_AND_METRICS_GUIDE.md) (вимова всіх математичних позначень українською, розбір 7 формул тез, зведена таблиця походження й керованості всіх цифр у системі та цикл EM-калібрування).",
               "subitems": []
             },

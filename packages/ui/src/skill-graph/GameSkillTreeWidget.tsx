@@ -359,7 +359,7 @@ export function GameSkillTreeWidget({
               {/* Render Connecting Lines between Sequential / Dependent Nodes */}
               {graphEdges.map(({ id, fromNode, toNode, fromPos, toPos, requiredMastery }) => {
                 const isMasteredConnection = fromNode.pMastery >= requiredMastery;
-                const isActiveConnection = fromNode.pMastery >= 0.75 && toNode.status !== 'LOCKED';
+                const isActiveConnection = fromNode.pMastery >= requiredMastery && toNode.status !== 'LOCKED';
 
                 const yOffset = hasRealDependencies ? 36 : 0;
                 const sy = fromPos.y + yOffset;
@@ -638,7 +638,9 @@ export function GameSkillTreeWidget({
                 </div>
                 <div className="flex justify-between text-[10px] text-slate-500 font-mono">
                   <span>Старт: 0%</span>
-                  <span className="text-emerald-400">Поріг: ≥ 90.0% (Gold) / 75.0% (Відкрито)</span>
+                  <span className="text-emerald-400">
+                    Поріг допуску: ≥ {Math.round((Object.values(selectedNode.parentThresholds || {}).length > 0 ? Math.max(...Object.values(selectedNode.parentThresholds || {})) : 0.85) * 100)}% (P(L) ≥ {(Object.values(selectedNode.parentThresholds || {}).length > 0 ? Math.max(...Object.values(selectedNode.parentThresholds || {})) : 0.85).toFixed(2)})
+                  </span>
                 </div>
               </div>
 
@@ -791,7 +793,9 @@ export function GameSkillTreeWidget({
                   ) : selectedNode.status === 'LOCKED' ? (
                     <>
                       <Lock className="w-3 h-3 text-slate-400 shrink-0" />
-                      <span>Необхідно закрити попередні залежні модулі на рівень P(L) ≥ 0.75.</span>
+                      <span>
+                        Необхідно закрити попередні залежні модулі на рівень P(L) ≥ {(Object.values(selectedNode.parentThresholds || {}).length > 0 ? Math.max(...Object.values(selectedNode.parentThresholds || {})) : 0.85).toFixed(2)}.
+                      </span>
                     </>
                   ) : (
                     <>

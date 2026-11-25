@@ -31,6 +31,11 @@
             },
             {
               "type": "text",
+              "raw_text": "Уніфіковано відображення та перевірку порогу допуску по всьому UI (`StudentPortalApp.tsx`, `GameSkillTreeWidget.tsx`): замінено застарілі статичні написи `0.75` / `90.0% (Gold) / 75.0%` на динамічне зчитування реального `requiredMastery` кожного ребра з БД (`0.85`).",
+              "subitems": []
+            },
+            {
+              "type": "text",
               "raw_text": "Створено довідник доповідача [`SCIENCE/THESES/IICTE-2026_20-11-26/PRESENTATION/docs/FORMULAS_AND_METRICS_GUIDE.md`](file:///SCIENCE/THESES/IICTE-2026_20-11-26/PRESENTATION/docs/FORMULAS_AND_METRICS_GUIDE.md) із вимовою всіх символів українською, поясненням усіх 7 формул та повною таблицею походження й керованості кожної цифри проєкту.",
               "subitems": []
             },
