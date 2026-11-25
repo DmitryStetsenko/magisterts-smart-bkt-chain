@@ -26,7 +26,7 @@
             },
             {
               "type": "text",
-              "raw_text": "У спільному віджеті [`packages/ui/src/skill-graph/GameSkillTreeWidget.tsx`](file:///packages/ui/src/skill-graph/GameSkillTreeWidget.tsx) (використовується в `apps/student` та `apps/teacher`) додано галочку-перемикач **«Граф DAG»** (увімкнено за замовчуванням для негайного показу розгалужень) із топологічним розміщенням вершин по шарах та спрямованими SVG-стрілками пререквізитів (`parentSkillIds`).",
+              "raw_text": "У спільному віджеті [`packages/ui/src/skill-graph/GameSkillTreeWidget.tsx`](file:///packages/ui/src/skill-graph/GameSkillTreeWidget.tsx) (використовується в `apps/student` та `apps/teacher`) переведено відображення «Дерева Знань» на реальну нелінійну топологію пререквізитів (`parentSkillIds`) в обох режимах (усунуто фіктивні лінійні ребра `3 → 4 → 5`), а чекбокс **«Граф DAG»** (увімкнено за замовчуванням) додає спрямовані SVG-стрілки пререквізитів.",
               "subitems": []
             },
             {

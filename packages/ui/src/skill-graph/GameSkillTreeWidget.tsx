@@ -134,12 +134,14 @@ export function GameSkillTreeWidget({
     return { x, y };
   });
 
-  const nodePositions = layoutMode === 'dag' ? dagLayout.positions : pathPositions;
-  const svgHeight = layoutMode === 'dag' ? dagLayout.height : Math.max(550, nodes.length * 135 + 100);
+  // Завжди використовуємо реальну топологію розгалужень (dagLayout), коли курс має пререквізити;
+  // чекбокс «Граф DAG» додає інженерне оформлення (спрямовані стрілки пререквізитів та підписи шарів)
+  const nodePositions = hasRealDependencies ? dagLayout.positions : pathPositions;
+  const svgHeight = hasRealDependencies ? dagLayout.height : Math.max(550, nodes.length * 135 + 100);
 
-  // Build directed edges depending on layoutMode
+  // Ребра завжди відповідають реальним залежностям parentSkillIds (без фіктивних лінійних зв'язків 3->4->5)
   const graphEdges: Array<{ id: string; fromNode: SkillGraphNode; toNode: SkillGraphNode; fromPos: { x: number; y: number }; toPos: { x: number; y: number } }> = [];
-  if (layoutMode === 'dag' && hasRealDependencies) {
+  if (hasRealDependencies) {
     const indexById = new Map(nodes.map((n, i) => [n.id, i]));
     nodes.forEach((child, childIdx) => {
       (child.parentSkillIds || []).forEach((pid) => {
