@@ -575,7 +575,7 @@ export const DatasetExportCenter: React.FC<DatasetExportCenterProps> = ({
                 <th className="py-2.5 px-3 text-right">JSON</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-800/60 font-sans text-xs">
+            <tbody className="divide-y divide-slate-800/60 font-sans text-xs sbc-zebra-list">
               {isLoading && logs.length === 0 ? (
                 <tr>
                   <td colSpan={6} className="py-12 text-center text-slate-500 text-xs font-mono">

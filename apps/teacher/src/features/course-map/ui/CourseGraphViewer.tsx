@@ -747,7 +747,7 @@ export function CourseGraphViewer({
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-800/60 text-xs">
+            <tbody className="divide-y divide-slate-800/60 text-xs sbc-zebra-list">
               {Object.values(topicTriads)
                 .filter((tg) => selectedTopic === null || tg.topic === selectedTopic)
                 .filter((tg) => {

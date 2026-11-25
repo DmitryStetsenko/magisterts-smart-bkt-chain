@@ -159,6 +159,11 @@
               "type": "text",
               "raw_text": "У [`apps/student/src/components/StudentPortalApp.tsx`](file:///apps/student/src/components/StudentPortalApp.tsx), [`packages/ui/src/skill-graph/GameSkillTreeWidget.tsx`](file:///packages/ui/src/skill-graph/GameSkillTreeWidget.tsx) та [`apps/teacher/src/features/skill-graph/ui/GameSkillTreeWidget.tsx`](file:///apps/teacher/src/features/skill-graph/ui/GameSkillTreeWidget.tsx) замінено Unicode-емоджі (`🟢`, `🔒`, `✨`, `💡`) у деталізації вузла дерева та підказках на векторні іконки `Lock`, `Sparkles`, `HelpCircle` й семантичні колірні точки.",
               "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "У [`packages/ui/src/theme/light-theme.css`](file:///packages/ui/src/theme/light-theme.css) додано спільний клас `.sbc-zebra-list` (секція 6) для делікатного чергування тону парних рядків у світлій та темній темах і застосовано в `AnomalyTreeWidget` (`@sbc/ui` та `apps/teacher`), `StudentAnalyticsTable`, `CourseGraphViewer`, `MetricsAuditInspector` і `DatasetExportCenter`.",
+              "subitems": []
             }
           ]
         },

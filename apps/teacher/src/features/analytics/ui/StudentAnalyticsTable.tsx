@@ -74,7 +74,7 @@ export const StudentAnalyticsTable: React.FC<StudentAnalyticsTableProps> = ({
               <th className="p-3 text-right">Дії</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-800/60 font-mono">
+          <tbody className="divide-y divide-slate-800/60 font-mono sbc-zebra-list">
             {students.map((student) => {
               const studentId = student.id || student.studentId || student.email;
               const wpmVal = student.wpm ?? student.avgWpm ?? 0;

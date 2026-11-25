@@ -193,6 +193,11 @@
               "type": "text",
               "raw_text": "**Усунення емоджі у Дереві Знань та Кабінеті Студента (`SBC-434`, `EP-SH`):** у `apps/student/src/components/StudentPortalApp.tsx`, `packages/ui/src/skill-graph/GameSkillTreeWidget.tsx` та `apps/teacher/src/features/skill-graph/ui/GameSkillTreeWidget.tsx` замінено Unicode-емоджі (`🟢`, `🔒`, `✨`, `💡`) на векторні іконки `lucide-react` (`Lock`, `Sparkles`, `HelpCircle`) та семантичні колірні індикатори.",
               "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Делікатне чергування фонів рядків (`.sbc-zebra-list`) для списків і таблиць (`SBC-434`, `EP-SH`):** у `packages/ui/src/theme/light-theme.css` введено перевикористовуваний клас `.sbc-zebra-list` із м'якою тональною відмінністю парних рядків (`rgba(0,0,0,0.028)` у світлій та `rgba(255,255,255,0.025)` у темній темі + hover `0.055`) та підключено до списків інцидентів `AnomalyTreeWidget` і таблиць `StudentAnalyticsTable`, `CourseGraphViewer`, `MetricsAuditInspector`, `DatasetExportCenter`.",
+              "subitems": []
             }
           ]
         },

@@ -1209,7 +1209,7 @@ export function MetricsAuditInspector({
                       <th className="py-3 px-4 text-center">Статус</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-800/60 text-xs">
+                  <tbody className="divide-y divide-slate-800/60 text-xs sbc-zebra-list">
                     {testMatrix.map((item) => (
                       <tr key={item.id} className="hover:bg-slate-800/30 transition-colors">
                         <td className="py-3.5 px-4 font-mono font-bold text-purple-400">{item.id}</td>

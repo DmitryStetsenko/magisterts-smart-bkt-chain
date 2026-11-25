@@ -393,9 +393,9 @@ export function AnomalyTreeWidget({
                   </span>
                 </div>
 
-                {/* Expanded Incident Rows with divide-y */}
+                {/* Expanded Incident Rows with divide-y & subtle zebra striping */}
                 {isExpanded && (
-                  <div className="flex flex-col divide-y divide-slate-800/50">
+                  <div className="flex flex-col divide-y divide-slate-800/50 sbc-zebra-list">
                     {items.length === 0 ? (
                       <p className="text-xs text-slate-500 py-3 px-3.5">Немає інцидентів за пошуковим запитом "{searchTerm}"</p>
                     ) : (
