@@ -147,7 +147,7 @@
             },
             {
               "type": "text",
-              "raw_text": "У [`apps/student/src/components/StudentPortalApp.tsx`](file:///apps/student/src/components/StudentPortalApp.tsx) у `confirmCourseSwitch()` додано синхронізацію URL (`window.history.replaceState(null, '', '/practice/' + slug)`), щоб при `F5` не повертався попередній курс із URL-параметра `initialCourseSlug`.",
+              "raw_text": "У [`apps/student/src/components/StudentPortalApp.tsx`](file:///apps/student/src/components/StudentPortalApp.tsx) усунено race condition при перезавантаженні (`F5`): додано `isCourseHydrated` (очікування гідрації збереженого курсу з `localStorage` перед першим запитом), `courseFetchSeqRef` (ігнорування застарілих відповідей `fetchCourseStructureAndState`) та синхронізацію URL (`window.history.replaceState(null, '', '/practice/' + slug)`).",
               "subitems": []
             },
             {

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { io } from 'socket.io-client';
 import { Brain, Sparkles, CheckCircle, AlertCircle, RefreshCw, User, Code2, BookOpen, Scale, ChevronDown, ArrowRight, AlertTriangle, X, Settings, Network, Compass, Flame, History, MessageSquareQuote, CheckCircle2, Trophy, Target, MessageSquare, Info, HelpCircle, GraduationCap, Lock, Unlock, SlidersHorizontal } from 'lucide-react';
 import { MonacoCodeEditor } from '../features/code-editor/ui/MonacoCodeEditor';
@@ -52,6 +52,8 @@ export function StudentPortalContent({
   const [courses, setCourses] = useState<CourseItem[]>(DEFAULT_COURSES);
   // Завжди ініціалізуємо стабільним дефолтним значенням на сервері та клієнті для запобігання Hydration Mismatch
   const [activeCourseSlug, setActiveCourseSlug] = useState<string>(initialCourseSlug || 'js-dev');
+  const [isCourseHydrated, setIsCourseHydrated] = useState<boolean>(Boolean(initialCourseSlug));
+  const courseFetchSeqRef = useRef<number>(0);
   const [task, setTask] = useState<TaskDetail | null>(null);
   const [exhaustedModalData, setExhaustedModalData] = useState<{ skillId: string; skillTitle: string } | null>(null);
 
@@ -193,6 +195,7 @@ export function StudentPortalContent({
   useEffect(() => {
     if (initialCourseSlug) {
       setActiveCourseSlug(initialCourseSlug);
+      setIsCourseHydrated(true);
       return;
     }
     if (typeof window !== 'undefined') {
@@ -201,6 +204,7 @@ export function StudentPortalContent({
         setActiveCourseSlug(savedCourse);
       }
     }
+    setIsCourseHydrated(true);
   }, [initialCourseSlug]);
 
   useEffect(() => {
@@ -326,10 +330,14 @@ export function StudentPortalContent({
   };
 
   const fetchCourseStructureAndState = async (courseSlug: string) => {
+    const reqId = ++courseFetchSeqRef.current;
     try {
       const courseRes = await fetch(`${API_URL}/api/v1/courses/${courseSlug}`);
       const bktRes = await fetch(`${API_URL}/api/v1/bkt/state/${currentUserId}`);
       const analyticsRes = await fetch(`${API_URL}/api/v1/bkt/analytics/students?courseSlug=${courseSlug}`);
+
+      // Ігноруємо застарілу відповідь, якщо курс уже перемкнули
+      if (reqId !== courseFetchSeqRef.current) return;
 
       let bktMap: Record<string, number> = {};
       if (bktRes.ok) {
@@ -526,8 +534,9 @@ export function StudentPortalContent({
   };
 
   useEffect(() => {
+    if (!isCourseHydrated) return;
     fetchRecommendedTask(activeCourseSlug, undefined, initialSkillSlug);
-  }, [activeCourseSlug, initialSkillSlug]);
+  }, [activeCourseSlug, initialSkillSlug, isCourseHydrated]);
 
   useEffect(() => {
     const socket = io(`${API_URL}/telemetry`, {

@@ -31,7 +31,7 @@
             },
             {
               "type": "text",
-              "raw_text": "У [`apps/student/src/components/StudentPortalApp.tsx`](file:///apps/student/src/components/StudentPortalApp.tsx) виправлено скидання курсу після `F5`: при перемиканні курсу синхронізується URL `/practice/${slug}` через `window.history.replaceState`.",
+              "raw_text": "У [`apps/student/src/components/StudentPortalApp.tsx`](file:///apps/student/src/components/StudentPortalApp.tsx) виправлено скидання курсу та race condition після `F5`: додано синхронізацію URL `/practice/${slug}`, прапорець `isCourseHydrated` (щоб не запускати паразитний запит `js-dev` до читання `localStorage`) та лічильник послідовності `courseFetchSeqRef` для відкидання застарілих відповідей Skill DAG.",
               "subitems": []
             },
             {
