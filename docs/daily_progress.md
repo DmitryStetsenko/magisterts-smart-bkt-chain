@@ -44,6 +44,7 @@
    - **Усунення FOUC-миготіння при перезавантаженні (`ThemeInitScript`) та візуальне розділення зон Shell:**
      - Створено синхронний блокуючий `<ThemeInitScript />` у `packages/ui/src/theme/ThemeInitScript.tsx` і вбудовано в `<head>` усіх 4 `layout.tsx` (`student`, `study`, `teacher`, `admin`) із кешуванням останньої розв'язаної теми `sbc_last_resolved_theme`.
      - Введено окремі семантичні токени `--sbc-bg-header` (`#141414` dark / `#eef0f4` light) та `--sbc-bg-rail` (`#181818` dark / `#f4f5f7` light) у `AppShellLayout`, щоб верхній хедер і ліва рейка чітко відокремлювалися від висувної бічної панелі (`--sbc-bg-surface`) без злиття інтерфейсу.
+     - Переведено картку умови завдання (`task-condition-card`), банер адаптації складності та варіанти відповідей `QuizTaskEditor` у `apps/student` із захардкоджених темних hex (`bg-[#1e1e1e]`, `border-[#2b2b2b]`) на динамічні токени `--sbc-bg-surface` / `--sbc-bg-subtle` / `--sbc-text-primary`.
      - Замінено всі застарілі темніші fallback-кольори `#121215` / `#18181b` на актуальні `#181818` / `#1f1f1f` в `AppShellLayout`, `layout.tsx`, `StudentPortalApp` та `apps/admin` (і оновлено метадані заголовка `apps/admin`).
      - Додано захист `isInitialized` у `ThemeProvider` (`ThemeContext.tsx`), що повністю усуває 1-кадровий спалах темної теми при клієнтському перемиканні модулів/роутів у світлому режимі (підтверджено Playwright `MutationObserver` тестом у `e2e/theme-settings.spec.ts`: `flashCount === 0`).
 

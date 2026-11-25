@@ -115,11 +115,11 @@ export function QuizTaskEditor({
               className={`p-3.5 sm:p-4 rounded-xl border transition-all flex items-start justify-between gap-3 cursor-pointer ${
                 isPassed
                   ? active
-                    ? 'bg-emerald-500/10 border-emerald-500/30 text-white cursor-default'
-                    : 'bg-[#1e1e1e] border-[#2b2b2b] text-[#6e6e6e] cursor-not-allowed opacity-60'
+                    ? 'bg-emerald-500/10 border-emerald-500/40 text-[var(--sbc-text-primary,#cccccc)] cursor-default'
+                    : 'bg-[var(--sbc-bg-surface,#1f1f1f)] border-[var(--sbc-border-subtle,#2b2b2b)] text-[var(--sbc-text-tertiary,#6e6e6e)] cursor-not-allowed opacity-60'
                   : active
-                  ? 'bg-[#252525] border-indigo-500/60 text-white shadow-sm ring-1 ring-indigo-500/20'
-                  : 'bg-[#1e1e1e] border-[#2b2b2b] hover:border-[#383838] hover:bg-[#232323] text-[#cccccc]'
+                  ? 'bg-indigo-500/10 border-indigo-500/60 text-[var(--sbc-text-primary,#cccccc)] shadow-sm ring-1 ring-indigo-500/20'
+                  : 'bg-[var(--sbc-bg-surface,#1f1f1f)] border-[var(--sbc-border-subtle,#2b2b2b)] hover:border-[var(--sbc-border-strong,#333333)] hover:bg-[var(--sbc-bg-subtle,#262626)] text-[var(--sbc-text-primary,#cccccc)]'
               }`}
             >
               <div className="flex items-start gap-3 flex-1 min-w-0">
@@ -129,16 +129,16 @@ export function QuizTaskEditor({
                   } flex items-center justify-center font-mono font-bold text-xs transition-colors shrink-0 mt-0.5 ${
                     isPassed
                       ? active
-                        ? 'bg-emerald-500 text-black'
-                        : 'bg-[#2b2b2b] text-[#6e6e6e]'
+                        ? 'bg-emerald-600 text-white'
+                        : 'bg-[var(--sbc-bg-subtle,#262626)] text-[var(--sbc-text-tertiary,#6e6e6e)]'
                       : active
                       ? 'bg-indigo-600 text-white'
-                      : 'bg-[#2b2b2b] border border-[#333333] text-[#909090]'
+                      : 'bg-[var(--sbc-bg-subtle,#262626)] border border-[var(--sbc-border-strong,#333333)] text-[var(--sbc-text-muted,#909090)]'
                   }`}
                 >
                   {active ? <CheckCircle2 className="w-3.5 h-3.5 stroke-[2.5]" /> : letter}
                 </div>
-                <span className={`text-sm leading-relaxed ${active ? 'font-semibold text-white' : 'font-normal text-[#cccccc]'}`}>
+                <span className={`text-sm leading-relaxed ${active ? 'font-semibold text-[var(--sbc-text-primary,#cccccc)]' : 'font-normal text-[var(--sbc-text-primary,#cccccc)]'}`}>
                   {opt.text}
                 </span>
               </div>
@@ -149,7 +149,7 @@ export function QuizTaskEditor({
                     ✓ Обрано
                   </span>
                 )}
-                <span className="text-[11px] font-mono text-[#6e6e6e]">{letter}</span>
+                <span className="text-[11px] font-mono text-[var(--sbc-text-tertiary,#6e6e6e)]">{letter}</span>
               </div>
             </div>
           );

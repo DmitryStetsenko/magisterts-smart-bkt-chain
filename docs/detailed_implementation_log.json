@@ -330,6 +330,11 @@
             },
             {
               "type": "text",
+              "raw_text": "**Усунення hardcoded dark hex у `apps/student`:** у `StudentPortalApp.tsx` (`task-condition-card`, банер адаптації складності) та `QuizTaskEditor.tsx` (картки варіантів A–D) замінено `bg-[#1e1e1e]`, `bg-[#262626]`, `border-[#2b2b2b]`, `text-[#cccccc]` на динамічні CSS-токени `--sbc-*` для повної підтримки світлої теми.",
+              "subitems": []
+            },
+            {
+              "type": "text",
               "raw_text": "**Zero-FOUC при перезавантаженні та навігації (`packages/ui/src/theme/ThemeInitScript.tsx`, `ThemeContext.tsx`):** додано синхронний inline-скрипт у `<head>` усіх 4 `layout.tsx`, прибрано застарілі `#121215` fallback-фони та додано guard `isInitialized` у `ThemeProvider`, щоб перемонтування провайдера при переході між модулями ніколи не вмикало `.dark` до зчитування активної теми (підтверджено `MutationObserver` E2E-тестом: 0 спалахів).",
               "subitems": []
             }
