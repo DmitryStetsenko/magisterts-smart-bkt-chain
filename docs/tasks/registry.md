@@ -526,6 +526,7 @@
 | **SBC-429** | `Fix` | `MS` | resolve formula 7 review points, fix table formatting, eliminate homoglyphs and release V-2.2 | 2026-11-18 | `d5de25d` |
 | **SBC-430** | `Story` | `MS` | differentiate baseline BKT from author proposals, update college affiliation and release V-3.0 | 2026-11-19 | `451d2ab` |
 | **SBC-431** | `Fix` | `MS` | eliminate plural modestiae nami and enforce impersonal academic style in V-3.1 | 2026-11-19 | `f222775` |
+| **SBC-432** | `Story` | `MS` | analyze supervisor edits V-4.0, update author metadata and establish presentation speech plan workspace V-1.0 | 2026-11-25 | `pending` |
 
 
 ---
