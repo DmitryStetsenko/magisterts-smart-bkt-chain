@@ -97,4 +97,39 @@ test.describe('Cross-App Settings Theme Switcher (SBC-433)', () => {
       await adminContext.close();
     }
   });
+
+  test('switching modules in Study Portal in Light Mode never flashes dark class', async ({ page }) => {
+    await page.addInitScript(() => {
+      localStorage.setItem('sbc_theme_mode', 'light');
+      localStorage.setItem('sbc_theme_mode_updated_at', String(Date.now() + 60000));
+    });
+
+    await page.goto('http://localhost:3006/courses/js-dev/syntax-and-variables/syntax-and-variables', {
+      waitUntil: 'domcontentloaded',
+      timeout: 60000,
+    });
+    await expect(page.locator('html')).not.toHaveClass(/\bdark\b/, { timeout: 10000 });
+    await page.waitForTimeout(800);
+
+    // Watch html class attribute for any dark flash during module switch
+    await page.evaluate(() => {
+      (window as any).__darkFlashCount = 0;
+      const obs = new MutationObserver(() => {
+        if (document.documentElement.classList.contains('dark')) {
+          (window as any).__darkFlashCount++;
+        }
+      });
+      obs.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+    });
+
+    // Click Module 2 in sidebar
+    const module2Btn = page.locator('button', { hasText: 'Модуль 2' }).first();
+    await expect(module2Btn).toBeVisible({ timeout: 15000 });
+    await module2Btn.click();
+    await page.waitForTimeout(1500);
+
+    const flashCount = await page.evaluate(() => (window as any).__darkFlashCount);
+    expect(flashCount).toBe(0);
+    await expect(page.locator('html')).not.toHaveClass(/\bdark\b/);
+  });
 });

@@ -277,7 +277,7 @@
             },
             {
               "type": "text",
-              "raw_text": "**Zero-FOUC при перезавантаженні (`packages/ui/src/theme/ThemeInitScript.tsx`):** додано синхронний inline-скрипт у `<head>` усіх 4 `layout.tsx` та прибрано застарілі `#121215` fallback-фони (які викликали видиме просвітлення `#121215 → #181818` або темний спалах перед світлою темою).",
+              "raw_text": "**Zero-FOUC при перезавантаженні та навігації (`packages/ui/src/theme/ThemeInitScript.tsx`, `ThemeContext.tsx`):** додано синхронний inline-скрипт у `<head>` усіх 4 `layout.tsx`, прибрано застарілі `#121215` fallback-фони та додано guard `isInitialized` у `ThemeProvider`, щоб перемонтування провайдера при переході між модулями ніколи не вмикало `.dark` до зчитування активної теми (підтверджено `MutationObserver` E2E-тестом: 0 спалахів).",
               "subitems": []
             }
           ]

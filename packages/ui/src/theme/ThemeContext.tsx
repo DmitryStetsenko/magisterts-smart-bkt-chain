@@ -88,17 +88,23 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [hasLocalThemeOverride, setHasLocalThemeOverride] = useState<boolean>(false);
   const [systemIsDark, setSystemIsDark] = useState<boolean>(true);
   const [customTokens, setCustomTokensState] = useState<CustomThemeConfig>(DEFAULT_THEME_TOKENS);
+  const [isInitialized, setIsInitialized] = useState<boolean>(false);
 
   // Ініціалізація з localStorage + завантаження глобальної теми за замовчуванням із бекенду
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
-    // 1. Зчитування збереженого локального режиму
+    // 1. Зчитування збереженого локального режиму або останньої активної теми (запобігає спалаху dark при навігації між модулями)
     const savedMode = localStorage.getItem(THEME_MODE_STORAGE_KEY) as ThemeMode | null;
+    const lastResolved = localStorage.getItem(THEME_LAST_RESOLVED_KEY) as 'dark' | 'light' | null;
     const hasLocal = Boolean(savedMode && (savedMode === 'dark' || savedMode === 'light' || savedMode === 'system'));
     if (hasLocal && savedMode) {
       setThemeState(savedMode);
       setHasLocalThemeOverride(true);
+    } else if (lastResolved === 'light' || lastResolved === 'dark') {
+      setThemeState(lastResolved);
+    } else if (!document.documentElement.classList.contains('dark')) {
+      setThemeState('light');
     }
 
     // 2. Зчитування локальних кастомних токенів
@@ -114,6 +120,11 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
         console.warn('Failed to parse saved theme tokens', e);
       }
     }
+
+    // 3. Відстеження системної теми
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    setSystemIsDark(mediaQuery.matches);
+    setIsInitialized(true);
 
     // 2.5 Завантаження глобального налаштування теми за замовчуванням з SystemConfig API
     let isMounted = true;
@@ -149,10 +160,6 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
       .catch(() => {
         // Silent fallback when API is offline
       });
-
-    // 3. Відстеження системної теми
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    setSystemIsDark(mediaQuery.matches);
 
     const handleMediaChange = (e: MediaQueryListEvent) => {
       setSystemIsDark(e.matches);
@@ -196,13 +203,14 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     return theme;
   }, [theme, systemIsDark]);
 
-  // Застосування змінних до DOM при зміні теми або токенів
+  // Застосування змінних до DOM лише ПІСЛЯ ініціалізації (запобігає спалаху dark при навігації між роутами)
   useEffect(() => {
+    if (!isInitialized) return;
     applyThemeVariables(resolvedTheme, customTokens);
     if (typeof window !== 'undefined') {
       localStorage.setItem(THEME_LAST_RESOLVED_KEY, resolvedTheme);
     }
-  }, [resolvedTheme, customTokens]);
+  }, [isInitialized, resolvedTheme, customTokens]);
 
   const setTheme = useCallback((mode: ThemeMode) => {
     setThemeState(mode);

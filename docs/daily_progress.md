@@ -44,6 +44,7 @@
    - **Усунення FOUC-миготіння при перезавантаженні (`ThemeInitScript`):**
      - Створено синхронний блокуючий `<ThemeInitScript />` у `packages/ui/src/theme/ThemeInitScript.tsx` і вбудовано в `<head>` усіх 4 `layout.tsx` (`student`, `study`, `teacher`, `admin`) із кешуванням останньої розв'язаної теми `sbc_last_resolved_theme`.
      - Замінено всі застарілі темніші fallback-кольори `#121215` / `#18181b` на актуальні `#181818` / `#1f1f1f` в `AppShellLayout`, `layout.tsx`, `StudentPortalApp` та `apps/admin` (і оновлено метадані заголовка `apps/admin`).
+     - Додано захист `isInitialized` у `ThemeProvider` (`ThemeContext.tsx`), що повністю усуває 1-кадровий спалах темної теми при клієнтському перемиканні модулів/роутів у світлому режимі (підтверджено Playwright `MutationObserver` тестом у `e2e/theme-settings.spec.ts`: `flashCount === 0`).
 
 ### 🎯 Наступні дії (Next Steps):
 1. **Фінальне тестування з живим Docker/API та злиття гілки `feat/theme-system-tokens` у `dev`:**
