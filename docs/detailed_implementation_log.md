@@ -52,7 +52,8 @@
   - `apps/admin/src/features/theme-customizer/ui/ThemeCustomizerView.tsx`: розроблено повноцінний UI редагування наскрізної палітри кольорів у табі `system` адмінки з інтерактивним Live Preview, пресетами та секцією **«Тема за замовчуванням для всіх застосунків»** (`SYSTEM_DEFAULT_THEME`).
 - **Бекенд-персистентність глобальної теми за замовчуванням (`apps/api`):**
   - Створено `apps/api/src/adapters/inbound/http/system-config.controller.ts` з ендпоінтами `GET /api/v1/system-config/theme` та `PUT /api/v1/system-config/theme` на базі існуючого `SystemConfigService` (таблиця PostgreSQL `system_configs`).
-  - `ThemeProvider` у `@sbc/ui` завантажує глобальну тему за замовчуванням із API та застосовує її на всіх порталах (різних портах/доменах), якщо користувач не задав локальне перевизначення у `localStorage`.
+  - `ThemeProvider` у `@sbc/ui` завантажує глобальну тему за замовчуванням із API разом із міткою часу `updatedAt` (`SYSTEM_DEFAULT_THEME_UPDATED_AT`) та автоматично застосовує її на всіх порталах, якщо користувач не має новішого локального вибору (`sbc_theme_mode_updated_at`).
+  - Усунено самоциклічні CSS-змінні (`--color-slate-*: var(--color-slate-*, ...)`) у `globals.css` усіх 4 порталів шляхом переходу на нециклічну пару `:root { --sbc-slate-* }` + `@theme inline { --color-slate-*: var(--sbc-slate-*) }`.
 - **Верифікація:**
   - Усі production-збірки (`build:api`, `build:student`, `build:study`, `build:teacher`, `build:admin`) пройшли без помилок.
   - Наскрізний Playwright E2E-тест `e2e/theme-settings.spec.ts` підтвердив перемикання `light` / `dark` у Налаштуваннях усіх 4 порталів та трансляцію глобальної теми за замовчуванням з Admin (3004) на Student (3002) із чистим `localStorage` (**5/5 passed**).

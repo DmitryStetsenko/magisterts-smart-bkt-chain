@@ -64,14 +64,28 @@ test.describe('Cross-App Settings Theme Switcher (SBC-433)', () => {
       const apiData = await apiRes.json();
       expect(apiData.defaultTheme).toBe('light');
 
-      // Open a brand new browser context (empty localStorage) on Student Portal (port 3002)
+      // Open a brand new browser context on Student Portal (port 3002) with a STALE localStorage 'dark' (no newer timestamp)
       const studentContext = await browser.newContext();
       const studentPage = await studentContext.newPage();
+      await studentPage.addInitScript(() => {
+        localStorage.setItem('sbc_theme_mode', 'dark');
+      });
       await studentPage.goto('http://localhost:3002', { waitUntil: 'networkidle', timeout: 60000 });
 
-      // Student Portal should automatically adopt Light theme from Admin default
+      // Student Portal should automatically adopt Light theme from newer Admin global default
       await expect(studentPage.locator('html')).not.toHaveClass(/\bdark\b/, { timeout: 10000 });
       await studentContext.close();
+
+      // Verify non-cyclic CSS variable --sbc-slate-800 resolves cleanly on Study Portal (3006)
+      const studyContext = await browser.newContext();
+      const studyPage = await studyContext.newPage();
+      await studyPage.goto('http://localhost:3006', { waitUntil: 'networkidle', timeout: 60000 });
+      await expect(studyPage.locator('html')).not.toHaveClass(/\bdark\b/, { timeout: 10000 });
+      const slate800 = await studyPage.evaluate(() =>
+        getComputedStyle(document.documentElement).getPropertyValue('--sbc-slate-800').trim()
+      );
+      expect(slate800).toBeTruthy();
+      await studyContext.close();
 
       // Restore global default back to Dark
       const restorePromise = adminPage.waitForResponse(

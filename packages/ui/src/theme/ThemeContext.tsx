@@ -5,6 +5,7 @@ import { ThemeMode, CustomThemeConfig, ThemeContextValue } from './theme.types';
 import { DEFAULT_THEME_TOKENS } from './defaultTokens';
 
 const THEME_MODE_STORAGE_KEY = 'sbc_theme_mode';
+const THEME_MODE_UPDATED_AT_KEY = 'sbc_theme_mode_updated_at';
 const THEME_TOKENS_STORAGE_KEY = 'sbc_custom_theme_tokens';
 
 function getApiBaseUrl(): string {
@@ -44,32 +45,40 @@ function applyThemeVariables(resolvedTheme: 'dark' | 'light', tokens: CustomThem
   root.style.setProperty('--card-foreground', currentTokens.textPrimary);
   root.style.setProperty('--border', currentTokens.borderSubtle);
 
-  // 🩶 Перевизначаємо Tailwind кольори slate у спокійні тони Antigravity IDE (VS Code Dark Modern)
-  if (resolvedTheme === 'dark') {
-    root.style.setProperty('--color-slate-950', currentTokens.bgRoot);      // #181818 (тло Antigravity IDE)
-    root.style.setProperty('--color-slate-900', currentTokens.bgSurface);   // #1f1f1f (панелі Antigravity IDE)
-    root.style.setProperty('--color-slate-800', currentTokens.borderSubtle);// #2b2b2b (дуже м'які розділювачі)
-    root.style.setProperty('--color-slate-700', currentTokens.borderStrong);// #333333 (спокійні межі карток)
-    root.style.setProperty('--color-slate-600', currentTokens.textTertiary);
-    root.style.setProperty('--color-slate-500', currentTokens.textTertiary);
-    root.style.setProperty('--color-slate-400', currentTokens.textMuted);
-    root.style.setProperty('--color-slate-300', currentTokens.textPrimary);
-    root.style.setProperty('--color-slate-200', '#dcdcdc');
-    root.style.setProperty('--color-slate-100', '#e8e8e8');
-    root.style.setProperty('--color-slate-50', '#ffffff');
-  } else {
-    root.style.setProperty('--color-slate-950', currentTokens.bgRoot);
-    root.style.setProperty('--color-slate-900', currentTokens.bgSurface);
-    root.style.setProperty('--color-slate-800', currentTokens.bgSubtle);
-    root.style.setProperty('--color-slate-700', currentTokens.borderSubtle);
-    root.style.setProperty('--color-slate-600', currentTokens.borderStrong);
-    root.style.setProperty('--color-slate-500', currentTokens.textTertiary);
-    root.style.setProperty('--color-slate-400', currentTokens.textMuted);
-    root.style.setProperty('--color-slate-300', currentTokens.textPrimary);
-    root.style.setProperty('--color-slate-200', currentTokens.textPrimary);
-    root.style.setProperty('--color-slate-100', currentTokens.textPrimary);
-    root.style.setProperty('--color-slate-50', currentTokens.textPrimary);
-  }
+  // 🩶 Перевизначаємо Tailwind кольори slate через нециклічні змінні --sbc-slate-*
+  const slateMap: Record<string, string> =
+    resolvedTheme === 'dark'
+      ? {
+          '950': currentTokens.bgRoot,
+          '900': currentTokens.bgSurface,
+          '800': currentTokens.borderSubtle,
+          '700': currentTokens.borderStrong,
+          '600': currentTokens.textTertiary,
+          '500': currentTokens.textTertiary,
+          '400': currentTokens.textMuted,
+          '300': currentTokens.textPrimary,
+          '200': '#dcdcdc',
+          '100': '#e8e8e8',
+          '50': '#ffffff',
+        }
+      : {
+          '950': currentTokens.bgRoot,
+          '900': currentTokens.bgSurface,
+          '800': currentTokens.bgSubtle,
+          '700': currentTokens.borderSubtle,
+          '600': currentTokens.borderStrong,
+          '500': currentTokens.textTertiary,
+          '400': currentTokens.textMuted,
+          '300': currentTokens.textPrimary,
+          '200': currentTokens.textPrimary,
+          '100': currentTokens.textPrimary,
+          '50': currentTokens.textPrimary,
+        };
+
+  Object.entries(slateMap).forEach(([shade, value]) => {
+    root.style.setProperty(`--sbc-slate-${shade}`, value);
+    root.style.setProperty(`--color-slate-${shade}`, value);
+  });
 }
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
@@ -112,11 +121,21 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
       .then((data) => {
         if (!isMounted || !data) return;
         const remoteDefault = data.defaultTheme as ThemeMode | undefined;
+        const remoteUpdatedAt = Number(data.updatedAt) || 0;
+        const localMode = localStorage.getItem(THEME_MODE_STORAGE_KEY);
+        const localUpdatedAt = Number(localStorage.getItem(THEME_MODE_UPDATED_AT_KEY)) || 0;
+
         if (remoteDefault === 'dark' || remoteDefault === 'light' || remoteDefault === 'system') {
           setDefaultThemeState(remoteDefault);
           // Застосовуємо глобальну тему за замовчуванням, якщо користувач не обрав локальне перевизначення
-          if (!localStorage.getItem(THEME_MODE_STORAGE_KEY)) {
+          // АБО якщо адміністратор оновив глобальну тему пізніше за локальний вибір користувача
+          if (!localMode || (remoteUpdatedAt > 0 && remoteUpdatedAt > localUpdatedAt)) {
             setThemeState(remoteDefault);
+            if (localMode && remoteUpdatedAt > localUpdatedAt) {
+              localStorage.removeItem(THEME_MODE_STORAGE_KEY);
+              localStorage.removeItem(THEME_MODE_UPDATED_AT_KEY);
+              setHasLocalThemeOverride(false);
+            }
           }
         }
         if (data.customTokens && !localStorage.getItem(THEME_TOKENS_STORAGE_KEY)) {
@@ -186,6 +205,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     setHasLocalThemeOverride(true);
     if (typeof window !== 'undefined') {
       localStorage.setItem(THEME_MODE_STORAGE_KEY, mode);
+      localStorage.setItem(THEME_MODE_UPDATED_AT_KEY, String(Date.now()));
       // Відправляємо кастомну подію для синхронізації в рамках одного вікна
       window.dispatchEvent(new Event('sbc-theme-change'));
     }
@@ -196,14 +216,18 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     setThemeState(defaultTheme);
     if (typeof window !== 'undefined') {
       localStorage.removeItem(THEME_MODE_STORAGE_KEY);
+      localStorage.removeItem(THEME_MODE_UPDATED_AT_KEY);
       window.dispatchEvent(new Event('sbc-theme-change'));
     }
   }, [defaultTheme]);
 
   const setDefaultTheme = useCallback(async (mode: ThemeMode) => {
     setDefaultThemeState(mode);
-    if (typeof window !== 'undefined' && !localStorage.getItem(THEME_MODE_STORAGE_KEY)) {
-      setThemeState(mode);
+    setThemeState(mode);
+    setHasLocalThemeOverride(false);
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem(THEME_MODE_STORAGE_KEY);
+      localStorage.removeItem(THEME_MODE_UPDATED_AT_KEY);
     }
     const res = await fetch(`${getApiBaseUrl()}/system-config/theme`, {
       method: 'PUT',

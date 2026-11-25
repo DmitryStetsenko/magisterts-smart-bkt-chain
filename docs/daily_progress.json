@@ -78,7 +78,8 @@
                 "Додано REST-контролер `apps/api/src/adapters/inbound/http/system-config.controller.ts` (`GET/PUT /api/v1/system-config/theme`, ключі `SYSTEM_DEFAULT_THEME`, `SYSTEM_CUSTOM_THEME_TOKENS`).",
                 "Оновлено `ThemeContext` у `@sbc/ui` (`defaultTheme`, `setDefaultTheme`, `hasLocalThemeOverride`, `clearLocalThemeOverride`): портали без локального перевизначення автоматично підхоплюють глобальну тему за замовчуванням з бекенду.",
                 "Додано секцію «Тема за замовчуванням для всіх застосунків» у `ThemeCustomizerView` (`apps/admin`).",
-                "Проведено успішну збірку (`build:api`, `build:student`, `build:study`, `build:teacher`, `build:admin`) та наскрізну перевірку у Playwright E2E (`e2e/theme-settings.spec.ts`: 5/5 тестів пройдено, включно з трансляцією глобальної теми з Admin на Student із чистим `localStorage`)."
+                "Усунено циклічні CSS-токени `--color-slate-*` у `globals.css` усіх 4 порталів (переведено на `@theme inline` + `--sbc-slate-*` у `:root`, що ліквідувало білі рамки та миготіння старих стилів при перезавантаженні) і додано пріоритет за міткою часу `updatedAt` для миттєвого застосування глобальної теми адміна поверх застарілого `localStorage`.",
+                "Проведено успішну збірку (`build:api`, `build:student`, `build:study`, `build:teacher`, `build:admin`) та наскрізну перевірку у Playwright E2E (`e2e/theme-settings.spec.ts`: 5/5 тестів пройдено, включно з трансляцією глобальної теми з Admin на Student/Study поверх старого `localStorage`)."
               ]
             },
             {

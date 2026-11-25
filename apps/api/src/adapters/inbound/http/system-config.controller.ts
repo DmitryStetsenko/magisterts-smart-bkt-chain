@@ -6,6 +6,7 @@ const ALLOWED_THEMES = ['dark', 'light', 'system'] as const;
 type ThemeMode = (typeof ALLOWED_THEMES)[number];
 
 const DEFAULT_THEME_KEY = 'SYSTEM_DEFAULT_THEME';
+const DEFAULT_THEME_UPDATED_AT_KEY = 'SYSTEM_DEFAULT_THEME_UPDATED_AT';
 const CUSTOM_TOKENS_KEY = 'SYSTEM_CUSTOM_THEME_TOKENS';
 
 @ApiTags('SystemConfig')
@@ -21,6 +22,9 @@ export class SystemConfigController {
       ? (rawMode as ThemeMode)
       : 'dark';
 
+    const rawUpdatedAt = await this.systemConfigService.get(DEFAULT_THEME_UPDATED_AT_KEY, '0');
+    const updatedAt = Number(rawUpdatedAt) || 0;
+
     const rawTokens = await this.systemConfigService.get(CUSTOM_TOKENS_KEY, '');
     let customTokens: Record<string, unknown> | null = null;
     if (rawTokens) {
@@ -33,6 +37,7 @@ export class SystemConfigController {
 
     return {
       defaultTheme,
+      updatedAt,
       customTokens,
     };
   }
@@ -57,6 +62,11 @@ export class SystemConfigController {
         DEFAULT_THEME_KEY,
         body.defaultTheme,
         'Global default UI theme mode for all Smart-BKT-Chain web portals (dark | light | system)',
+      );
+      await this.systemConfigService.set(
+        DEFAULT_THEME_UPDATED_AT_KEY,
+        String(Date.now()),
+        'Epoch timestamp (ms) when global default theme was last changed by Admin',
       );
     }
 

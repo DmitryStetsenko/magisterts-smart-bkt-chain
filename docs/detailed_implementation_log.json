@@ -232,7 +232,12 @@
             },
             {
               "type": "text",
-              "raw_text": "`ThemeProvider` у `@sbc/ui` завантажує глобальну тему за замовчуванням із API та застосовує її на всіх порталах (різних портах/доменах), якщо користувач не задав локальне перевизначення у `localStorage`.",
+              "raw_text": "`ThemeProvider` у `@sbc/ui` завантажує глобальну тему за замовчуванням із API разом із міткою часу `updatedAt` (`SYSTEM_DEFAULT_THEME_UPDATED_AT`) та автоматично застосовує її на всіх порталах, якщо користувач не має новішого локального вибору (`sbc_theme_mode_updated_at`).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Усунено самоциклічні CSS-змінні (`--color-slate-*: var(--color-slate-*, ...)`) у `globals.css` усіх 4 порталів шляхом переходу на нециклічну пару `:root { --sbc-slate-* }` + `@theme inline { --color-slate-*: var(--sbc-slate-*) }`.",
               "subitems": []
             },
             {
