@@ -313,7 +313,7 @@ export const StudentActivityTimelineWidget: React.FC<StudentActivityTimelineWidg
                       </div>
                       {payload.detectedMisconception && (
                         <div className="text-[11px] text-amber-300 bg-amber-950/30 px-2 py-1 rounded border border-amber-800/40">
-                          ⚠️ Омана: <strong>{payload.detectedMisconception.title || payload.detectedMisconception.key}</strong>
+                          ⚠️ Омана: <strong>{typeof payload.detectedMisconception === 'string' ? payload.detectedMisconception : (payload.detectedMisconception.title || payload.detectedMisconception.key)}</strong>
                         </div>
                       )}
                     </div>

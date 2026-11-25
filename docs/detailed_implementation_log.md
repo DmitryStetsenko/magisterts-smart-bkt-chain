@@ -30,6 +30,12 @@
   5. *Build Next.js Documentation Site* (`npm run build:docs`) — збірка статичного експорту (`output: "export"`, `trailingSlash: true`, `basePath: "/magisterts-smart-bkt-chain"`).
   6. *Upload Artifact & Deploy Pages* (`actions/upload-pages-artifact@v3` + `actions/deploy-pages@v4`).
 
+### 0.1.7.107 Контрастність темних 900/950 плашок у Світлій темі (`SBC-434`, `EP-SH`)
+- **Проблема:** У [`packages/ui/src/theme/light-theme.css`](file:///packages/ui/src/theme/light-theme.css) правила для темних підкладок охоплювали лише `bg-{amber,emerald,blue,indigo,purple,rose,red}-950`, через що плашки з `bg-cyan-950/60` (зокрема індикатори часу вивчення теорії `5 сек` / `29 сек` у [`StudentActivityTimelineWidget.tsx`](file:///apps/teacher/src/features/analytics/ui/StudentActivityTimelineWidget.tsx)) та `bg-*-900/*` залишалися темно-синьо-сірими з темним текстом `#0369a1` у світлій темі.
+- **Виправлення:**
+  - У [`packages/ui/src/theme/light-theme.css`](file:///packages/ui/src/theme/light-theme.css) додано семантичні світлі паперові фони й межі для всіх `900`/`950` колірних шкал (`cyan`, `sky`, `teal`, `violet`, `green`, `yellow`, `amber`, `emerald`, `blue`, `indigo`, `purple`, `rose`, `red`) із безпечним селектором `[class^="bg-..."], [class*=" bg-..."]`, який не зачіпає `hover:bg-*` класи.
+  - У [`apps/teacher/src/features/analytics/ui/StudentActivityTimelineWidget.tsx`](file:///apps/teacher/src/features/analytics/ui/StudentActivityTimelineWidget.tsx) виправлено відображення `payload.detectedMisconception`, коли бекенд повертає назву омани рядком.
+
 ### 0.1.7.106 Серверна персистентність та відновлення стану Сократівських підказок після перезавантаження сторінки (`SBC-436`, `EP-ST`)
 - **Проблема:** У [`apps/student/src/components/StudentPortalApp.tsx`](file:///apps/student/src/components/StudentPortalApp.tsx) стан розкритих підказок (`revealedHintLevel`) зберігався лише в ефемерному React `useState(0)` та скидався в `0` при кожному виклику `fetchRecommendedTask`. Після оновлення сторінки розкриті підказки знову закривалися, що одночасно погіршувало UX і дозволяло скинути штраф `-15% / -30%` до BKT-приросту перед відправкою відповіді.
 - **Архітектурне рішення (Backend as Single Source of Truth):**

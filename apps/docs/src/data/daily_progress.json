@@ -168,6 +168,11 @@
               "type": "text",
               "raw_text": "Додано unit-тести у `audit-log.service.spec.ts` та підтверджено проходження тестів і збірок `apps/api` й `apps/student`.",
               "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Контрастність темних `900`/`950` плашок у Світлій темі (`SBC-434`, `EP-SH`):** у `packages/ui/src/theme/light-theme.css` додано світлі паперові підкладки для `bg-cyan/sky/teal/violet/green/yellow-900/950` та `900`-відтінків усіх акцентів без зачіпання `hover:bg-*`, а в `StudentActivityTimelineWidget.tsx` (`apps/teacher`) виправлено відображення рядкового `detectedMisconception`.",
+              "subitems": []
             }
           ]
         },

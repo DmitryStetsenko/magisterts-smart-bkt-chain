@@ -112,29 +112,65 @@ html:not(.dark) .text-slate-700 {
   color: var(--sbc-text-muted, #52525b);
 }
 
-/* 3. Dark-only 950 tinted alert/banner backgrounds -> soft light paper tints */
-html:not(.dark) [class*="bg-amber-950"] {
-  background-color: rgba(245, 158, 11, 0.10);
-  border-color: rgba(217, 119, 6, 0.28);
+/* 3. Dark-only 900/950 tinted alert/banner/badge backgrounds -> soft light paper tints */
+html:not(.dark) :is(
+  [class^="bg-amber-950"], [class*=" bg-amber-950"],
+  [class^="bg-amber-900"], [class*=" bg-amber-900"],
+  [class^="bg-yellow-950"], [class*=" bg-yellow-950"],
+  [class^="bg-yellow-900"], [class*=" bg-yellow-900"]
+) {
+  background-color: rgba(245, 158, 11, 0.12);
+  border-color: rgba(217, 119, 6, 0.30);
 }
-html:not(.dark) [class*="bg-emerald-950"] {
-  background-color: rgba(16, 185, 129, 0.10);
-  border-color: rgba(5, 150, 105, 0.28);
+html:not(.dark) :is(
+  [class^="bg-emerald-950"], [class*=" bg-emerald-950"],
+  [class^="bg-emerald-900"], [class*=" bg-emerald-900"],
+  [class^="bg-green-950"], [class*=" bg-green-950"],
+  [class^="bg-green-900"], [class*=" bg-green-900"]
+) {
+  background-color: rgba(16, 185, 129, 0.12);
+  border-color: rgba(5, 150, 105, 0.30);
 }
-html:not(.dark) [class*="bg-blue-950"] {
-  background-color: rgba(59, 130, 246, 0.08);
-  border-color: rgba(37, 99, 235, 0.25);
+html:not(.dark) :is(
+  [class^="bg-blue-950"], [class*=" bg-blue-950"],
+  [class^="bg-blue-900"], [class*=" bg-blue-900"]
+) {
+  background-color: rgba(59, 130, 246, 0.10);
+  border-color: rgba(37, 99, 235, 0.28);
 }
-html:not(.dark) [class*="bg-indigo-950"] {
-  background-color: rgba(99, 102, 241, 0.08);
-  border-color: rgba(79, 70, 229, 0.25);
+html:not(.dark) :is(
+  [class^="bg-cyan-950"], [class*=" bg-cyan-950"],
+  [class^="bg-cyan-900"], [class*=" bg-cyan-900"],
+  [class^="bg-sky-950"], [class*=" bg-sky-950"],
+  [class^="bg-sky-900"], [class*=" bg-sky-900"],
+  [class^="bg-teal-950"], [class*=" bg-teal-950"],
+  [class^="bg-teal-900"], [class*=" bg-teal-900"]
+) {
+  background-color: rgba(6, 182, 212, 0.12);
+  border-color: rgba(8, 145, 178, 0.30);
 }
-html:not(.dark) [class*="bg-purple-950"] {
-  background-color: rgba(139, 92, 246, 0.08);
-  border-color: rgba(124, 58, 237, 0.25);
+html:not(.dark) :is(
+  [class^="bg-indigo-950"], [class*=" bg-indigo-950"],
+  [class^="bg-indigo-900"], [class*=" bg-indigo-900"]
+) {
+  background-color: rgba(99, 102, 241, 0.10);
+  border-color: rgba(79, 70, 229, 0.28);
 }
-html:not(.dark) [class*="bg-rose-950"],
-html:not(.dark) [class*="bg-red-950"] {
-  background-color: rgba(244, 63, 94, 0.08);
-  border-color: rgba(225, 29, 72, 0.25);
+html:not(.dark) :is(
+  [class^="bg-purple-950"], [class*=" bg-purple-950"],
+  [class^="bg-purple-900"], [class*=" bg-purple-900"],
+  [class^="bg-violet-950"], [class*=" bg-violet-950"],
+  [class^="bg-violet-900"], [class*=" bg-violet-900"]
+) {
+  background-color: rgba(139, 92, 246, 0.10);
+  border-color: rgba(124, 58, 237, 0.28);
+}
+html:not(.dark) :is(
+  [class^="bg-rose-950"], [class*=" bg-rose-950"],
+  [class^="bg-rose-900"], [class*=" bg-rose-900"],
+  [class^="bg-red-950"], [class*=" bg-red-950"],
+  [class^="bg-red-900"], [class*=" bg-red-900"]
+) {
+  background-color: rgba(244, 63, 94, 0.10);
+  border-color: rgba(225, 29, 72, 0.28);
 }
