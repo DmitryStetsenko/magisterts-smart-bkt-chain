@@ -5529,3 +5529,20 @@ eferenceAnswer, критерії options.keywords (microtask|мікротаск|
 
 
 
+
+
+---
+
+### 11.78. Концепція Режимів Проходження (`TRAINING` vs `GRADED`), Крос-Портального Блокування Підручника та Політик Викладача (EP-ST, EP-TC, EP-BK)
+- **Контекст та виявлена проблема:**
+  Виявлено архітектурну асиметрію: перехід до підручника через кнопку в `apps/student` (`AbandonTaskModal.tsx`) скидав BKT-прогрес навички на `0%`, тоді як заздалегідь відкрита вкладка `apps/study` (`StudyAppClient.tsx`) не синхронізувалася з активною сесією тренажера й ніяк не регулювалася.
+- **Спроєктована архітектура (зафіксовано в [`docs/brainstorm/22_practice_modes_study_lock_and_teacher_governance.md`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/docs/brainstorm/22_practice_modes_study_lock_and_teacher_governance.md)):**
+  1. **Двоконтурна модель (`PracticeIntegrityMode` × `IntegrityPolicy`):**
+     - `TRAINING` (Тренувальний): вільний доступ до `apps/study` без скидань, статус `🔵 Натреновано`, не підміняє офіційну оцінку.
+     - `GRADED` (Суворий / На оцінку): серверна фіксація `ActivePracticeSession` у `/telemetry`, миттєве перекриття всіх відкритих вкладок `apps/study` через `Study Lock Overlay` (WS-подія `strict_session_changed` + перевірка на `window.focus`), трекінг втрати фокусу (`TAB_SWITCH_OUT`), статус `🟢 Оцінено`.
+     - Політика викладача у `Classroom` / `CourseEnrollment`: `STUDENT_CHOICE` *(за замовчуванням)*, `FORCED_GRADED` (з опціональним таймером `strictModeUntil`), `FORCED_TRAINING` та точковий `integrityPolicyOverride` для окремого студента.
+  2. **Інваріанти перемикання (Zero-Mix Rule + Scope per Skill + Post-Mastery Review):**
+     - Зміна режиму навички при `progress > 0%` виконується атомарно через `POST /api/v1/bkt/switch-mode` виключно зі скиданням поточного прогресу цієї навички (без втрати інших модулів курсу).
+     - Для навичок, що вже мають підтверджену `gradedMastery`, дозволено повернення у режим повторення (`TRAINING`) без перезапису офіційної оцінки.
+  3. **Оновлення індексу брейнштормів:**
+     - Оновлено [`docs/brainstorm/README.md`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/docs/brainstorm/README.md) (додано позиції #21 та #22).

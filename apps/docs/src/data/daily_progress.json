@@ -16,6 +16,26 @@
           "items": [
             {
               "type": "text",
+              "raw_text": "**Мозковий штурм та архітектурна концепція режимів проходження (`TRAINING` vs `GRADED`), крос-портального блокування підручника та політик викладача (`EP-ST`, `EP-TC`, `EP-BK`):**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Проведено аудит асиметрії доступу до підручника між `apps/student` (`AbandonTaskModal`) та вже відкритою вкладкою `apps/study` (`StudyAppClient.tsx`) і зафіксовано повну концепцію у [`docs/brainstorm/22_practice_modes_study_lock_and_teacher_governance.md`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/docs/brainstorm/22_practice_modes_study_lock_and_teacher_governance.md) (додано до реєстру [`docs/brainstorm/README.md`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/docs/brainstorm/README.md)).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Спроєктовано двоконтурну модель `PracticeIntegrityMode` (`TRAINING` — вільне тренування з підручником vs `GRADED` — суворий режим «На оцінку» із серверним `Study Lock Overlay` в усіх відкритих вкладках `apps/study` та трекінгом `visibilitychange`/`blur`) × `IntegrityPolicy` викладача (`STUDENT_CHOICE` за замовчуванням, `FORCED_GRADED` із опціональним таймером контрольної, `FORCED_TRAINING` та точковим override студента).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Закріплено правило чистого старту (Zero-Mix Rule) на рівні окремої навички/модуля (зміна режиму при `progress > 0` можлива лише зі скиданням прогресу поточної навички) та безпечний режим повторення для вже оцінених (`GRADED`) навичок без втрати офіційної оцінки.",
+              "subitems": []
+            },
+            {
+              "type": "text",
               "raw_text": "**Сценарій живої демонстрації та ручної перевірки потоку (`.docx`) + калібрування стартових пріорів «холодного старту» BKT (`SBC-438`, `EP-BKT`):**",
               "subitems": []
             },
