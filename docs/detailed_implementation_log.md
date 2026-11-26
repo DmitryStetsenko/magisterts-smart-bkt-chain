@@ -5577,3 +5577,6 @@ eferenceAnswer, критерії options.keywords (microtask|мікротаск|
 - **Індивідуальний перемикач режиму проходження для обраного студента в `apps/teacher` (`Огляд Групи`):**
   - Додано `PATCH /api/v1/classrooms/student-policy` (`ClassroomService.upsertStudentCoursePolicy`) для миттєвого встановлення індивідуальної політики (`STUDENT_CHOICE` / `FORCED_TRAINING` / `FORCED_GRADED`) для будь-якого студента на активному курсі (з автоматичним upsert `CourseEnrollment` та WebSocket-сповіщенням `integrity_policy_changed`).
   - У [`apps/teacher/src/app/page.tsx`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/teacher/src/app/page.tsx) додано компактну панель «Режим проходження для [Ім'я студента]» прямо під шапкою картки студента.
+
+- **Оптимізація UX бічної панелі завдань у `apps/student`:**
+  - У [`StudentPortalApp.tsx`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/student/src/components/StudentPortalApp.tsx) секцію **«Режим проходження»** піднято на перше місце під вкладкою «Умова» (скорочено опис до 1 рядка), далі — «Поточна навичка та BKT стан», «Матеріал для повторення», «Сократівські підказки», «Відкриті Тест-Кейси»; технічні секції «Параметри тестування» (із бейджем складності) та «Рекомендація BKT Engine» переведено у стан `defaultOpen={false}`.

@@ -18905,6 +18905,16 @@
               "type": "text",
               "raw_text": "У [`apps/teacher/src/app/page.tsx`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/teacher/src/app/page.tsx) додано компактну панель «Режим проходження для [Ім'я студента]» прямо під шапкою картки студента.",
               "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Оптимізація UX бічної панелі завдань у `apps/student`:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "У [`StudentPortalApp.tsx`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/student/src/components/StudentPortalApp.tsx) секцію **«Режим проходження»** піднято на перше місце під вкладкою «Умова» (скорочено опис до 1 рядка), далі — «Поточна навичка та BKT стан», «Матеріал для повторення», «Сократівські підказки», «Відкриті Тест-Кейси»; технічні секції «Параметри тестування» (із бейджем складності) та «Рекомендація BKT Engine» переведено у стан `defaultOpen={false}`.",
+              "subitems": []
             }
           ]
         }
