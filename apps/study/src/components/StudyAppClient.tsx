@@ -166,31 +166,49 @@ export function StudyAppClient({
           const dbSkills = courseData.skills || [];
           const defaultThreshold = courseData.defaultMasteryThreshold ?? 0.85;
 
-          const dbMasteryById: Record<string, number> = {};
-          dbModules.forEach((mod: any) => {
-            const modSkills = dbSkills.filter((s: any) => s.moduleId === mod.id);
-            const avg =
-              modSkills.length === 0
-                ? 0
-                : modSkills.reduce((acc: number, s: any) => acc + (bktMap[s.id] ?? 0), 0) /
-                  modSkills.length;
-            dbMasteryById[mod.id] = avg;
-            nextScores[mod.slug] = Math.round(avg * 100);
-          });
+          if (dbModules.length > 0) {
+            const dbMasteryById: Record<string, number> = {};
+            dbModules.forEach((mod: any) => {
+              const modSkills = dbSkills.filter((s: any) => s.moduleId === mod.id);
+              const avg =
+                modSkills.length === 0
+                  ? 0
+                  : modSkills.reduce((acc: number, s: any) => acc + (bktMap[s.id] ?? 0), 0) /
+                    modSkills.length;
+              dbMasteryById[mod.id] = avg;
+              nextScores[mod.slug] = Math.round(avg * 100);
+            });
 
-          // Послідовний BKT-гейтинг: кожен наступний модуль відкривається лише після опанування попереднього
-          let chainUnlocked = true;
-          dbModules.forEach((mod: any, idx: number) => {
-            if (idx === 0) {
-              nextUnlocked[mod.slug] = true;
-            } else {
-              const prevMod = dbModules[idx - 1];
-              const prevMastery = dbMasteryById[prevMod.id] ?? 0;
-              const prevThreshold = prevMod.minMasteryThreshold ?? defaultThreshold;
-              chainUnlocked = chainUnlocked && prevMastery >= prevThreshold;
-              nextUnlocked[mod.slug] = chainUnlocked;
-            }
-          });
+            // Послідовний BKT-гейтинг: кожен наступний модуль відкривається лише після опанування попереднього
+            let chainUnlocked = true;
+            dbModules.forEach((mod: any, idx: number) => {
+              if (idx === 0) {
+                nextUnlocked[mod.slug] = true;
+              } else {
+                const prevMod = dbModules[idx - 1];
+                const prevMastery = dbMasteryById[prevMod.id] ?? 0;
+                const prevThreshold = prevMod.minMasteryThreshold ?? defaultThreshold;
+                chainUnlocked = chainUnlocked && prevMastery >= prevThreshold;
+                nextUnlocked[mod.slug] = chainUnlocked;
+              }
+            });
+          } else if (dbSkills.length > 0) {
+            // Курси на базі прямого Skill DAG без окремих CourseModule (зокрема web-algorithms-school)
+            dbSkills.forEach((skill: any, idx: number) => {
+              const mastery = bktMap[skill.id] ?? 0;
+              nextScores[skill.slug] = Math.round(mastery * 100);
+
+              const deps: Array<{ parentSkillId: string; requiredMastery?: number }> =
+                skill.parentDependencies || [];
+              if (deps.length === 0) {
+                nextUnlocked[skill.slug] = idx === 0 || true;
+              } else {
+                nextUnlocked[skill.slug] = deps.every(
+                  (dep) => (bktMap[dep.parentSkillId] ?? 0) >= (dep.requiredMastery ?? defaultThreshold)
+                );
+              }
+            });
+          }
         }
       } catch (err) {
         console.warn('Failed to sync live BKT state in study app:', err);
@@ -203,8 +221,10 @@ export function StudyAppClient({
     };
 
     syncLiveBktState();
+    window.addEventListener('focus', syncLiveBktState);
     return () => {
       isCancelled = true;
+      window.removeEventListener('focus', syncLiveBktState);
     };
   }, [activeCourseSlug, currentUserId, activeCurriculum]);
   const currentUserInitials = currentUserName

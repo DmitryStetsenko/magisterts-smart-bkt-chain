@@ -2,6 +2,16 @@
 
 Цей документ фіксує щоденний прогрес розробки, архітектурні рішення та планування наступних кроків для системи «Smart-BKT-Chain».
 
+## 📅 26 листопада 2026 року
+
+### ✅ Що зроблено за день:
+1. **Сценарій живої демонстрації та ручної перевірки потоку (`.docx`) + калібрування стартових пріорів «холодного старту» BKT (`SBC-438`, `EP-BKT`):**
+   - Створено формалізований сценарій живої демонстрації та мануального тестування наскрізного потоку [`DEMO_TRACK.md`](file:///SCIENCE/THESES/IICTE-2026_20-11-26/PRESENTATION/DEMO_TRACK.md) (без іконок, аудит `audit_presentation.py` — `0 violations`) і Word-генератор [`generate_demo_track_docx.py`](file:///SCIENCE/THESES/IICTE-2026_20-11-26/PRESENTATION/generate_demo_track_docx.py) → [`DEMO_TRACK_SMART_BKT_CHAIN.docx`](file:///SCIENCE/THESES/IICTE-2026_20-11-26/PRESENTATION/docs/DEMO_TRACK_SMART_BKT_CHAIN.docx) (наскрізний цикл: підручник `apps/study` → тренажер `apps/student` → кабінет викладача `apps/teacher` → адмін-верифікатор `apps/admin` → тестова вибірка Монте-Карло, Таблиця 1).
+   - Під час мануального прогону виявлено та усунено розсинхрон стартових пріорів BKT при створенні нового стану навички: у [`apps/api/src/adapters/inbound/http/bkt.controller.ts`](file:///apps/api/src/adapters/inbound/http/bkt.controller.ts) та [`packages/database/prisma/seed.ts`](file:///packages/database/prisma/seed.ts) значення «холодного старту» синхронізовано з канонічними параметрами тез (`P(L_0) = 0.15, P(T) = 0.20, P(S) = 0.10, P(G) = 0.15` замість `0.50 / 0.20` та `0.40 / 0.25`), що унеможливлює передчасне розблокування Модуля 2 (`85.5%`) після першої відповіді.
+   - Усунено перекриття підписів у графі Skill DAG при увімкненому режимі «Метрики графа» ([`packages/ui/src/skill-graph/GameSkillTreeWidget.tsx`](file:///packages/ui/src/skill-graph/GameSkillTreeWidget.tsx): збільшено вертикальний крок шарів до `245px` та зміщено бейдж порогу `≥0.85` на `72%` вертикального ребра) і виправлено класифікацію копіпасту в `CODE`-завданнях ([`MonacoCodeEditor.tsx`](file:///apps/student/src/features/code-editor/ui/MonacoCodeEditor.tsx), [`StudentPortalApp.tsx`](file:///apps/student/src/components/StudentPortalApp.tsx), [`behavioral-adjuster.ts`](file:///apps/api/src/domain/bkt/behavioral-adjuster.ts), [`AnomalyTreeWidget.tsx`](file:///packages/ui/src/analytics/AnomalyTreeWidget.tsx)) — прибрано хибне спрацювання автодоповнення IntelliSense (`change.text.length > 3`), відфільтровано штатні спроби (`G <= 0.3, S <= 0.2`) із «Дерева Аномалій» та забезпечено коректне потрапляння вставки коду в категорію **«Буфер обміну / Сторонній код (Paste Anomaly)»**.
+   - Виправлено живу синхронізацію прогресу та розблокування модулів у підручнику [`apps/study/src/components/StudyAppClient.tsx`](file:///apps/study/src/components/StudyAppClient.tsx) для курсів на базі прямого Skill DAG (`web-algorithms-school`, `dbSkills` + `parentDependencies` + оновлення на `window focus`).
+   - Створено Word-генератор [`generate_slides_script_docx.py`](file:///SCIENCE/THESES/IICTE-2026_20-11-26/PRESENTATION/generate_slides_script_docx.py) та згенеровано [`SLIDES_SCRIPT.docx`](file:///SCIENCE/THESES/IICTE-2026_20-11-26/PRESENTATION/docs/SLIDES_SCRIPT.docx) (10 слайдів, 28 формул OMML).
+
 ## 📅 25 листопада 2026 року
 
 ### ✅ Що зроблено за день:

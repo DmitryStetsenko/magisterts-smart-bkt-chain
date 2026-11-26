@@ -203,30 +203,50 @@ export function AnomalyTreeWidget({
     enrichedAdjustments.forEach((item) => {
       const reasons = (item.adjustReasons || []).join(' ').toLowerCase();
 
-      if (reasons.includes('paste') || reasons.includes('вставка') || reasons.includes('копіюв') || reasons.includes('буфер')) {
+      if (
+        reasons.includes('paste') ||
+        reasons.includes('копіпаст') ||
+        reasons.includes('вставк') ||
+        reasons.includes('копіюв') ||
+        reasons.includes('буфер')
+      ) {
         paste.push(item);
-      } else if (reasons.includes('loop') || reasons.includes('зацикл') || reasons.includes('спам') || reasons.includes('повтор') || reasons.includes('семантик')) {
+      } else if (
+        reasons.includes('loop') ||
+        reasons.includes('зацикл') ||
+        reasons.includes('спам') ||
+        reasons.includes('повтор') ||
+        reasons.includes('семантик')
+      ) {
         semantic.push(item);
-      } else if (item.pGuessUsed && item.pGuessUsed > 0.3) {
+      } else if (
+        (item.pGuessUsed && item.pGuessUsed > 0.3) ||
+        reasons.includes('швидк') ||
+        reasons.includes('latency') ||
+        reasons.includes('вгадуван')
+      ) {
         speedrun.push(item);
-      } else if (item.pSlipUsed && item.pSlipUsed > 0.2) {
+      } else if (
+        (item.pSlipUsed && item.pSlipUsed > 0.2) ||
+        reasons.includes('описк') ||
+        reasons.includes('хаотичн') ||
+        reasons.includes('ваганн') ||
+        reasons.includes('неуважн') ||
+        reasons.includes('socratic_hint_penalty')
+      ) {
         friction.push(item);
-      } else if (reasons.includes('швидк') || reasons.includes('latency') || reasons.includes('час')) {
-        speedrun.push(item);
-      } else {
-        // Fallback: if pGuess modified -> speedrun, else friction
-        if ((item.pGuessUsed || 0) >= (item.pSlipUsed || 0)) {
-          speedrun.push(item);
-        } else {
-          friction.push(item);
-        }
       }
+      // Звичайні штатні спроби (G <= 0.3, S <= 0.2, adjustReasons = []) НЕ є аномаліями — пропускаємо їх
     });
 
     return { paste, speedrun, semantic, friction };
   }, [enrichedAdjustments]);
 
-  const totalAnomalies = enrichedAdjustments.length;
+  const totalAnomalies =
+    classifiedItems.paste.length +
+    classifiedItems.speedrun.length +
+    classifiedItems.semantic.length +
+    classifiedItems.friction.length;
 
   // Filter items by category tab and search query
   const getFilteredItems = (items: AnomalyItem[]) => {

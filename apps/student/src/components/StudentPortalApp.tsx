@@ -2027,11 +2027,11 @@ export function StudentPortalContent({
                 />
               ) : (
                 <MonacoCodeEditor
-                  userId="demo-student"
+                  userId={currentUserId}
                   taskId={task.id}
                   initialCode={code}
                   onChange={setCode}
-                  onSubmit={() => handleEvaluate({ code })}
+                  onSubmit={(telemetry) => handleEvaluate({ code, ...(telemetry || {}) })}
                   isSubmitting={isSubmitting}
                   onNextTask={() => fetchRecommendedTask(activeCourseSlug)}
                   isPassed={Boolean(evalResult?.isPassed)}

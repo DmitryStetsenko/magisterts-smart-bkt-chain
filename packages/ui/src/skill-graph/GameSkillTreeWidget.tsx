@@ -108,10 +108,12 @@ export function GameSkillTreeWidget({
 
     const positionsById = new Map<string, { x: number; y: number }>();
     const maxLayer = Math.max(0, ...Array.from(layersMap.keys()));
+    const isTeacherMetricsVisible = role === 'teacher' && showTeacherMetrics;
+    const layerStep = isTeacherMetricsVisible ? 245 : 175;
 
     layersMap.forEach((layerNodes, layerIdx) => {
       const count = layerNodes.length;
-      const y = 85 + layerIdx * 135;
+      const y = 85 + layerIdx * layerStep;
       layerNodes.forEach((n, posIdx) => {
         const x =
           count === 1
@@ -123,7 +125,7 @@ export function GameSkillTreeWidget({
 
     return {
       positions: nodes.map((n) => positionsById.get(n.id) || { x: canvasWidth / 2, y: 85 }),
-      height: Math.max(550, (maxLayer + 1) * 145 + 100),
+      height: Math.max(550, (maxLayer + 1) * layerStep + 140),
     };
   })();
 
@@ -179,14 +181,21 @@ export function GameSkillTreeWidget({
     });
   }
 
-  // Derive adjustments to display: from props or from node
-  const activeAdjustments = adjustments.length > 0 
+  // Derive real anomalies only (exclude normal baseline submissions with G <= 0.3, S <= 0.2 and empty adjustReasons)
+  const rawAdjustments = adjustments.length > 0 
     ? adjustments 
     : nodes.flatMap((n) => (n.recentAdjustments || []).map((ra) => ({
         ...ra,
         skillSlug: n.slug,
         skillTitle: n.title,
       })));
+
+  const activeAdjustments = rawAdjustments.filter((item) => {
+    const hasReason = Array.isArray(item.adjustReasons) && item.adjustReasons.length > 0;
+    const highGuess = typeof item.pGuessUsed === 'number' && item.pGuessUsed > 0.3;
+    const highSlip = typeof item.pSlipUsed === 'number' && item.pSlipUsed > 0.2;
+    return hasReason || highGuess || highSlip;
+  });
 
   return (
     <div className="w-full h-full flex flex-col bg-slate-950 text-slate-100 overflow-hidden relative select-none">
@@ -378,8 +387,9 @@ export function GameSkillTreeWidget({
                     : 'url(#dagArrowLocked)'
                   : undefined;
 
+                const isVerticalEdge = Math.abs(fromPos.x - toPos.x) < 20;
                 const midX = (fromPos.x + toPos.x) / 2;
-                const midY = (sy + ey) / 2;
+                const midY = isVerticalEdge ? sy + deltaY * 0.72 : (sy + ey) / 2;
 
                 return (
                   <g key={`edge-${id}`}>

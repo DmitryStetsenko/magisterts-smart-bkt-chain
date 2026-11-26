@@ -746,15 +746,15 @@ async function main() {
   await insertModuleTasks(schoolDom.id, schoolWebDomEventsTasks);
   await insertModuleTasks(schoolProjects.id, schoolWebAppliedProjectsTasks);
 
-  // Initial BKT State for Student in School Course (Starts at Module 1: Basics)
+  // Initial BKT State for Student in School Course (Starts at Module 1: Basics — canonical cold-start priors)
   await prisma.bktState.create({
     data: {
       userId: student.id,
       skillId: schoolBasics.id,
-      pMastery: 0.4,
-      pTransit: 0.25,
+      pMastery: 0.15,
+      pTransit: 0.2,
       pSlip: 0.1,
-      pGuess: 0.2,
+      pGuess: 0.15,
     },
   });
 

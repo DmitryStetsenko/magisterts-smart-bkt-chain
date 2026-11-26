@@ -69,6 +69,24 @@ export class BehavioralAdjuster {
       );
     }
 
+    // ── Guess / Paste: копіпаст у практичних завданнях із коду (CODE) ──
+    if (
+      s.taskType === 'CODE' &&
+      ((s.pasteEvents !== undefined && s.pasteEvents > 0) ||
+        (s.typingWpm !== undefined && s.typingWpm > 120))
+    ) {
+      if (s.isCorrect) {
+        pGuess = Math.max(pGuess, C.GUESS_ON_PASTE_OPEN_TEXT);
+        reasons.push(
+          `G↑ ${pGuess}: підозра на копіпаст коду з буфера обміну (paste: ${s.pasteEvents ?? 0}, wpm: ${s.typingWpm ?? 'Н/А'})`,
+        );
+      } else {
+        reasons.push(
+          `Зафіксовано вставку коду з буфера обміну (paste: ${s.pasteEvents ?? 0})`,
+        );
+      }
+    }
+
     // ── Slip: аналізується для неправильних або частково зарахованих відповідей ──
     if (!s.isCorrect) {
       const chaotic =

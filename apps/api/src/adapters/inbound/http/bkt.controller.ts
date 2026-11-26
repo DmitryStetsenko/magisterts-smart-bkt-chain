@@ -310,10 +310,10 @@ export class BktController {
         data: {
           userId: user.id,
           skillId: task.skillId,
-          pMastery: 0.5,
+          pMastery: 0.15,
           pTransit: 0.2,
           pSlip: 0.1,
-          pGuess: 0.2,
+          pGuess: 0.15,
         },
       });
     }

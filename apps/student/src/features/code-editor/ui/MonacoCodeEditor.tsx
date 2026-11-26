@@ -11,7 +11,13 @@ interface MonacoCodeEditorProps {
   taskId: string;
   initialCode: string;
   onChange: (value: string) => void;
-  onSubmit: () => void;
+  onSubmit: (telemetry?: {
+    reactionLatencyMs: number;
+    deletionRatio: number;
+    pauseCount: number;
+    pasteEvents: number;
+    typingWpm: number;
+  }) => void;
   isSubmitting?: boolean;
   onNextTask?: () => void;
   isPassed?: boolean;
@@ -70,32 +76,20 @@ export function MonacoCodeEditor({
       handleKeyDown(e as any);
     });
 
+    // Фіксуємо виключно реальну вставку з буфера обміну (Ctrl+V / контекстне меню),
+    // щоб автодоповнення IntelliSense (autocomplete) не спрацьовувало як копіпаст
     editor.onDidPaste(() => {
       handlePaste();
     });
 
-    // Detect text deletions or pastes from model content changes
+    // Відстежуємо лише видалення символів (Backspace/Delete) у змінах моделі
     editor.onDidChangeModelContent((e) => {
-      const changes = e.changes;
-      for (const change of changes) {
-        // If inserted text length is > 3 characters in a single change -> Paste event
-        if (change.text.length > 3) {
-          handlePaste();
-        }
-        // If removed text length (rangeLength) > 0 and added text is empty -> Delete event
-        else if (change.rangeLength > 0 && change.text.length === 0) {
+      for (const change of e.changes) {
+        if (change.rangeLength > 0 && change.text.length === 0) {
           handleDelete(1);
         }
       }
     });
-
-    // Also attach native DOM paste event listener on editor container DOM node
-    const domNode = editor.getDomNode();
-    if (domNode) {
-      domNode.addEventListener('paste', () => {
-        handlePaste();
-      });
-    }
   };
 
   return (
@@ -139,7 +133,17 @@ export function MonacoCodeEditor({
           </button>
 
           <button
-            onClick={onSubmit}
+            onClick={() => {
+              const totalChars = Math.max(1, (initialCode || '').length);
+              const deletionRatio = Math.min(1, Number((metrics.deleteCount / (totalChars + metrics.deleteCount)).toFixed(3)));
+              onSubmit({
+                reactionLatencyMs: metrics.lastPauseMs,
+                deletionRatio,
+                pauseCount: metrics.lastPauseMs > 2000 ? 1 : 0,
+                pasteEvents: metrics.pasteEvents,
+                typingWpm: metrics.wpm,
+              });
+            }}
             disabled={isSubmitting || isPassed}
             className={`inline-flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-xs font-medium transition-colors ${
               isPassed

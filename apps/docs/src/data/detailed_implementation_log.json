@@ -120,6 +120,74 @@
           ]
         },
         {
+          "title": "0.1.7.112 Синхронізація стартових пріорів «холодного старту» BKT та Word-документ демонстраційного потоку (`SBC-438`, `EP-BKT`)",
+          "level": 3,
+          "paragraphs": [],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "**Діагностика під час мануального E2E-прогону:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Після скидання прогресу (`POST /api/v1/bkt/reset`) перша відповідь у Модулі 1 створювала запис `bktState` у [`apps/api/src/adapters/inbound/http/bkt.controller.ts`](file:///apps/api/src/adapters/inbound/http/bkt.controller.ts#L308-L319) зі стартовим `pMastery = 0.50` і `pGuess = 0.20`, через що вже перша правильна відповідь піднімала оцінку до `0.8545` (`85.5%`) і миттєво відкривала Модуль 2 (`requiredMastery = 0.85`).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Виправлення:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "У [`bkt.controller.ts`](file:///apps/api/src/adapters/inbound/http/bkt.controller.ts#L308-L319) та [`packages/database/prisma/seed.ts`](file:///packages/database/prisma/seed.ts#L749-L759) (для `schoolBasics`) встановлено канонічні стартові пріори `P(L_0) = 0.15`, `P(T) = 0.20`, `P(S) = 0.10`, `P(G) = 0.15` (узгоджено з тезами `V-4.0` та Слайдом 6: `15% → 61.1%` при чесній відповіді та `15% → 32.7%` при швидкому вгадуванні `P_adj(G) = 0.85`).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Документація демонстрації:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Оновлено [`DEMO_TRACK.md`](file:///SCIENCE/THESES/IICTE-2026_20-11-26/PRESENTATION/DEMO_TRACK.md) (старт із підручника `apps/study` → `apps/student` → `apps/teacher` → `apps/admin`, 12-пунктовий чек-лист мануального тестування, блок про тестову вибірку Монте-Карло) та створено генератор [`generate_demo_track_docx.py`](file:///SCIENCE/THESES/IICTE-2026_20-11-26/PRESENTATION/generate_demo_track_docx.py) → [`DEMO_TRACK_SMART_BKT_CHAIN.docx`](file:///SCIENCE/THESES/IICTE-2026_20-11-26/PRESENTATION/docs/DEMO_TRACK_SMART_BKT_CHAIN.docx).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Усунення перекриття метрик у графі Skill DAG та коректна класифікація копіпасту в `CODE`-завданнях:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "[`packages/ui/src/skill-graph/GameSkillTreeWidget.tsx`](file:///packages/ui/src/skill-graph/GameSkillTreeWidget.tsx): вертикальний крок шарів збільшено зі `135px` до `245px` при активному `showTeacherMetrics` (`175px` у базовому режимі), а бейдж `≥0.85` на вертикальних ребрах зміщено на `72%` довжини ребра, що усуває накладання `Paste 100%` / `P(L)` на поріг і наступний вузол.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "[`MonacoCodeEditor.tsx`](file:///apps/student/src/features/code-editor/ui/MonacoCodeEditor.tsx) + [`StudentPortalApp.tsx`](file:///apps/student/src/components/StudentPortalApp.tsx): під час відправки `CODE`-завдання передаються телеметричні сигнали `pasteEvents`, `typingWpm`, `deletionRatio`, `pauseCount`.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "[`behavioral-adjuster.ts`](file:///apps/api/src/domain/bkt/behavioral-adjuster.ts) + [`AnomalyTreeWidget.tsx`](file:///packages/ui/src/analytics/AnomalyTreeWidget.tsx): додано детекцію копіпасту для `taskType === 'CODE'` (`G↑ 0.90` при `isCorrect`), вимкнено хибний детектор автопідстановки IntelliSense (`change.text.length > 3`, залишено лише `editor.onDidPaste()`) і прибрано потрапляння штатних спроб (`G <= 0.3, S <= 0.2`) у «Дерево Аномалій».",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "[`apps/study/src/components/StudyAppClient.tsx`](file:///apps/study/src/components/StudyAppClient.tsx): додано гілку синхронізації BKT-прогресу та порогового допуску через `courseData.skills` і `parentDependencies` (коли `courseData.modules` порожній, як у `web-algorithms-school`) із автооновленням при поверненні фокусу вікна (`window.addEventListener('focus', ...)`).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Згенеровано [`SLIDES_SCRIPT.docx`](file:///SCIENCE/THESES/IICTE-2026_20-11-26/PRESENTATION/docs/SLIDES_SCRIPT.docx) за допомогою [`generate_slides_script_docx.py`](file:///SCIENCE/THESES/IICTE-2026_20-11-26/PRESENTATION/generate_slides_script_docx.py).",
+              "subitems": []
+            }
+          ]
+        },
+        {
           "title": "0.1.7.111 Нелінійний Skill DAG (Fork/Join) у шкільному курсі та перемикач «Граф DAG» у `GameSkillTreeWidget` (`SBC-438`, `EP-SH`)",
           "level": 3,
           "paragraphs": [],
