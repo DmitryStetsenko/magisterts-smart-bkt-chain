@@ -198,7 +198,7 @@ export function UserProfileDrawer({
             <div className="pt-3">
               <DrawerSection
                 title={statsTitle}
-                defaultOpen={true}
+                defaultOpen={false}
               >
                 <div className="grid grid-cols-2 gap-2 pt-0.5">
                   {stats.map((stat, idx) => {
@@ -227,7 +227,7 @@ export function UserProfileDrawer({
             <DrawerSection
               title="Тема Оформлення"
               icon={Palette}
-              defaultOpen={true}
+              defaultOpen={false}
             >
               <div className="py-2 px-1 flex items-center justify-between">
                 <span className="text-xs text-zinc-400">Режим інтерфейсу</span>
@@ -241,7 +241,7 @@ export function UserProfileDrawer({
             <div className="pt-3">
               <DrawerSection
                 title="Керування Сесією"
-                defaultOpen={true}
+                defaultOpen={false}
               >
                 <div className="divide-y divide-slate-800/50">
                   {onOpenAuthModal && (

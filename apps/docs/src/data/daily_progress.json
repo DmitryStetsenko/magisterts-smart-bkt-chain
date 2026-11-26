@@ -71,6 +71,11 @@
             },
             {
               "type": "text",
+              "raw_text": "**Глобальний стандарт згорнутих секцій сайдбара (`defaultOpen = false`) по всій платформі (`SBC-439`, `EP-SH`):** у [`DrawerSection.tsx`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/packages/ui/src/drawer/DrawerSection.tsx) змінено базовий стан секцій на `defaultOpen = false`, оновлено Правило 7 у [`.agents/AGENTS.md`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/.agents/AGENTS.md) («1 головний відкритий блок на вкладку, решта — згорнуті») та переведено [`UserProfileDrawer.tsx`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/packages/ui/src/drawer/UserProfileDrawer.tsx), [`StudyAppClient.tsx`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/study/src/components/StudyAppClient.tsx), [`StudentPortalApp.tsx`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/student/src/components/StudentPortalApp.tsx), [`apps/teacher/src/app/page.tsx`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/teacher/src/app/page.tsx) і [`apps/admin/src/app/page.tsx`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/admin/src/app/page.tsx) на єдиний мінімалістичний стандарт; оновлено [`e2e/course-and-modules.spec.ts`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/e2e/course-and-modules.spec.ts).",
+              "subitems": []
+            },
+            {
+              "type": "text",
               "raw_text": "**Сценарій живої демонстрації та ручної перевірки потоку (`.docx`) + калібрування стартових пріорів «холодного старту» BKT (`SBC-438`, `EP-BKT`):**",
               "subitems": []
             },

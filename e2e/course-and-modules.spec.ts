@@ -127,7 +127,9 @@ test.describe('Course Architecture, Modular Curriculum & BKT Mastery Gating E2E 
     await expect(page.getByText('Для точних наук, криптографії, алгоритміки та кібербезпеки')).toBeVisible();
 
     // Verify Sequential Course Authoring Roadmap in Create Drawer (Steps 2-5 locked without popups)
-    await expect(page.getByRole('button', { name: /Маршрут автора курсу/i })).toBeVisible();
+    const createRoadmapBtn = page.getByRole('button', { name: /Маршрут автора курсу/i });
+    await expect(createRoadmapBtn).toBeVisible();
+    await createRoadmapBtn.click();
     const roadmapStep2 = page.locator('aside').getByText('2. Модульна структура');
     await expect(roadmapStep2).toBeVisible();
     await expect(page.locator('aside').getByText('🔒 Заблоковано').first()).toBeVisible();
@@ -149,8 +151,10 @@ test.describe('Course Architecture, Modular Curriculum & BKT Mastery Gating E2E 
     await catalogRailBtn.click();
     await expect(page.getByText('Управління Навчальними Курсами')).toBeVisible({ timeout: 10000 });
 
-    // 2.3 Verify Category Filter in sidebar
-    await expect(page.getByRole('button', { name: /Предметні категорії/i })).toBeVisible();
+    // 2.3 Verify Category Filter in sidebar (collapsed by default -> expand)
+    const categoriesSectionBtn = page.getByRole('button', { name: /Предметні категорії/i });
+    await expect(categoriesSectionBtn).toBeVisible();
+    await categoriesSectionBtn.click();
     const progCategorySidebarBtn = page.locator('aside button:has-text("Програмування & IT")').first();
     await expect(progCategorySidebarBtn).toBeVisible();
     await progCategorySidebarBtn.click();

@@ -1134,7 +1134,7 @@ export function StudentPortalContent({
                         iconColor="text-indigo-400"
                         titleColor="text-indigo-400 group-hover:text-indigo-300"
                         badge={`${Math.round(activeSkillMasteryPct)}%`}
-                        defaultOpen={true}
+                        defaultOpen={false}
                         className="border-t border-slate-800/80 pt-2.5"
                       >
                         <div className="flex flex-col gap-2 py-1">
@@ -1207,7 +1207,7 @@ export function StudentPortalContent({
                         icon={BookOpen}
                         iconColor="text-blue-400"
                         titleColor="text-blue-400 group-hover:text-blue-300"
-                        defaultOpen={true}
+                        defaultOpen={false}
                         className="border-t border-slate-800/80 pt-2.5"
                       >
                         <div className="py-1.5 flex flex-col gap-2">
@@ -1358,7 +1358,7 @@ export function StudentPortalContent({
                           iconColor="text-emerald-400"
                           titleColor="text-emerald-400 group-hover:text-emerald-300"
                           badge={task.testCases?.length || 0}
-                          defaultOpen={true}
+                          defaultOpen={false}
                           className="border-t border-slate-800/80 pt-2.5"
                         >
                           <div className="flex flex-col divide-y divide-slate-800/50">
@@ -1676,7 +1676,7 @@ export function StudentPortalContent({
                         iconColor="text-emerald-400"
                         titleColor="text-emerald-400 group-hover:text-emerald-300"
                         badge={`${(inspectedSkill.pMastery * 100).toFixed(1)}%`}
-                        defaultOpen={true}
+                        defaultOpen={false}
                         className="border-t border-slate-800/80 pt-2.5"
                       >
                         <div className="py-1 flex flex-col gap-2">
@@ -1715,7 +1715,7 @@ export function StudentPortalContent({
                         icon={Compass}
                         iconColor="text-indigo-400"
                         titleColor="text-indigo-400 group-hover:text-indigo-300"
-                        defaultOpen={true}
+                        defaultOpen={false}
                         className="border-t border-slate-800/80 pt-2.5"
                       >
                         <div className="text-[11px] text-slate-300 py-1 flex items-center gap-1.5">
@@ -1789,7 +1789,7 @@ export function StudentPortalContent({
                       icon={Settings}
                       iconColor="text-amber-400"
                       titleColor="text-amber-400 group-hover:text-amber-300"
-                      defaultOpen={true}
+                      defaultOpen={false}
                     >
                       <div className="flex flex-col gap-3 text-xs text-slate-300 py-1">
                         <p className="text-slate-400 text-xs leading-relaxed">Параметри середовища розробки та актуалізації моделі знань.</p>

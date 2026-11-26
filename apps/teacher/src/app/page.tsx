@@ -173,16 +173,16 @@ export default function TeacherDashboardPage() {
   const [activeTab, setActiveTab] = useState<TeacherTab>('analytics');
   const [auditSubTab, setAuditSubTab] = useState<'live-log' | 'what-if' | 'test-matrix' | 'mechanisms'>('live-log');
   // Collapsible sections state inside Metrics Audit drawer
-  const [isGeneralToolsOpen, setIsGeneralToolsOpen] = useState<boolean>(true);
+  const [isGeneralToolsOpen, setIsGeneralToolsOpen] = useState<boolean>(false);
   const [isStudentsListOpen, setIsStudentsListOpen] = useState<boolean>(true);
   // Collapsible sections state inside Analytics drawer (Rule 7)
-  const [isCohortDistributionOpen, setIsCohortDistributionOpen] = useState<boolean>(true);
-  const [isRiskFeedOpen, setIsRiskFeedOpen] = useState<boolean>(true);
+  const [isCohortDistributionOpen, setIsCohortDistributionOpen] = useState<boolean>(false);
+  const [isRiskFeedOpen, setIsRiskFeedOpen] = useState<boolean>(false);
   const [isFilteredRosterOpen, setIsFilteredRosterOpen] = useState<boolean>(true);
   // Collapsible sections state inside CourseMap drawer (Rule 7)
   const [isTriadAuditOpen, setIsTriadAuditOpen] = useState<boolean>(true);
-  const [isCognitiveTrapsOpen, setIsCognitiveTrapsOpen] = useState<boolean>(true);
-  const [isAdaptiveParamsOpen, setIsAdaptiveParamsOpen] = useState<boolean>(true);
+  const [isCognitiveTrapsOpen, setIsCognitiveTrapsOpen] = useState<boolean>(false);
+  const [isAdaptiveParamsOpen, setIsAdaptiveParamsOpen] = useState<boolean>(false);
   // By default, student selection is in the top bar, so canvas has 100% space
   const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
   const [activeStudentView, setActiveStudentView] = useState<'metrics' | 'tree' | 'timeline'>('metrics');
@@ -190,11 +190,11 @@ export default function TeacherDashboardPage() {
 
   // Teacher Review Queue State & Filter Tab ('pending' | 'reviewed')
   const [reviewFilterTab, setReviewFilterTab] = useState<'pending' | 'reviewed'>('pending');
-  const [isReviewFilterOpen, setIsReviewFilterOpen] = useState<boolean>(true);
+  const [isReviewFilterOpen, setIsReviewFilterOpen] = useState<boolean>(false);
   const [isReviewItemsOpen, setIsReviewItemsOpen] = useState<boolean>(true);
   // Settings Drawer State (Rule 7)
-  const [isBktThresholdsOpen, setIsBktThresholdsOpen] = useState<boolean>(true);
-  const [isGuessPenaltiesOpen, setIsGuessPenaltiesOpen] = useState<boolean>(true);
+  const [isBktThresholdsOpen, setIsBktThresholdsOpen] = useState<boolean>(false);
+  const [isGuessPenaltiesOpen, setIsGuessPenaltiesOpen] = useState<boolean>(false);
   const [reviewQueue, setReviewQueue] = useState<any[]>([]);
   const [selectedReviewId, setSelectedReviewId] = useState<string | null>(null);
   const [isReviewSubmitting, setIsReviewSubmitting] = useState<boolean>(false);

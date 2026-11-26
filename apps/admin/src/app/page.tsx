@@ -595,7 +595,7 @@ export default function AdminCMSDashboard() {
               <DrawerSection
                 title="Дидактичні шаблони"
                 icon={Sparkles}
-                defaultOpen={true}
+                defaultOpen={false}
               >
                 <div className="flex flex-col gap-1 pt-1 text-xs">
                   <button
@@ -638,7 +638,7 @@ export default function AdminCMSDashboard() {
                 title="Теми цього курсу"
                 icon={Layers}
                 badge={`${selectedStudioCourse.modules?.length || 0} тем`}
-                defaultOpen={true}
+                defaultOpen={false}
               >
                 <div className="flex flex-col divide-y divide-slate-800/50 pt-1 max-h-56 overflow-y-auto">
                   {(selectedStudioCourse.modules || []).map((m, idx) => {
@@ -737,7 +737,7 @@ export default function AdminCMSDashboard() {
                       title="Готовність курсу"
                       icon={CheckCircle2}
                       badge={selectedStudioCourse.isPublished ? 'PUBLISHED' : 'DRAFT'}
-                      defaultOpen={true}
+                      defaultOpen={false}
                     >
                       <div className="flex flex-col gap-2 pt-1 text-xs">
                         <div className="flex items-center justify-between p-2 rounded-lg bg-slate-950/80 border border-slate-800/80">
@@ -901,7 +901,7 @@ export default function AdminCMSDashboard() {
                     <DrawerSection
                       title="Тестування модуля"
                       icon={FlaskConical}
-                      defaultOpen={true}
+                      defaultOpen={false}
                     >
                       <div className="flex flex-col gap-2 pt-1 text-xs">
                         <p className="text-[11px] text-slate-400 leading-tight">
@@ -933,7 +933,7 @@ export default function AdminCMSDashboard() {
               <DrawerSection
                 title="Дії та інструменти"
                 icon={Settings}
-                defaultOpen={true}
+                defaultOpen={false}
               >
                 <div className="flex flex-col gap-1.5 pt-1 text-xs">
                   <button
@@ -1044,7 +1044,7 @@ export default function AdminCMSDashboard() {
               <DrawerSection
                 title="Живий перегляд"
                 icon={ExternalLink}
-                defaultOpen={true}
+                defaultOpen={false}
               >
                 <div className="flex flex-col gap-1.5 pt-1 text-xs">
                   <a
@@ -1142,7 +1142,7 @@ export default function AdminCMSDashboard() {
               <DrawerSection
                 title="Маршрут автора курсу"
                 icon={Layers}
-                defaultOpen={true}
+                defaultOpen={false}
               >
                 <div className="flex flex-col gap-1.5 pt-1 text-xs">
                   {/* Step 1: Active */}
@@ -1276,7 +1276,7 @@ export default function AdminCMSDashboard() {
                 title="Предметні категорії"
                 icon={Folder}
                 badge={String(categories.length || 4)}
-                defaultOpen={true}
+                defaultOpen={false}
               >
                 <div className="flex flex-col divide-y divide-slate-800/50 pt-1">
                   <button
@@ -1346,7 +1346,7 @@ export default function AdminCMSDashboard() {
               <DrawerSection
                 title="Статус публікації"
                 icon={ShieldCheck}
-                defaultOpen={true}
+                defaultOpen={false}
               >
                 <div className="flex flex-col gap-1 pt-1 text-xs">
                   <button
@@ -1401,7 +1401,7 @@ export default function AdminCMSDashboard() {
               <DrawerSection
                 title="Банк завдань"
                 icon={Layers}
-                defaultOpen={true}
+                defaultOpen={false}
               >
                 <div className="flex flex-col gap-1.5 text-xs text-slate-400 pt-1">
                   <div className="flex items-center justify-between py-1 border-b border-slate-800/60">
@@ -1448,7 +1448,7 @@ export default function AdminCMSDashboard() {
               <DrawerSection
                 title="Дидактичні Режими"
                 icon={BookOpen}
-                defaultOpen={true}
+                defaultOpen={false}
               >
                 <div className="flex flex-col gap-1.5 text-[11px] text-slate-400 pt-1">
                   <div className="flex flex-col gap-0.5 py-1 border-b border-slate-800/60">
@@ -1474,7 +1474,7 @@ export default function AdminCMSDashboard() {
               <DrawerSection
                 title="Швидкий Експорт ШІ"
                 icon={Download}
-                defaultOpen={true}
+                defaultOpen={false}
               >
                 <div className="flex flex-col gap-2 pt-1">
                   <a
@@ -1628,7 +1628,7 @@ export default function AdminCMSDashboard() {
                 title="Метрики Аудиту"
                 icon={Sparkles}
                 badge={datasetStats.total}
-                defaultOpen={true}
+                defaultOpen={false}
               >
                 <div className="flex flex-col gap-1.5 text-xs text-slate-400 pt-1">
                   <div className="flex items-center justify-between py-1 border-b border-slate-800/60">
@@ -1686,7 +1686,7 @@ export default function AdminCMSDashboard() {
               <DrawerSection
                 title="Ключові формули BKT"
                 icon={Sparkles}
-                defaultOpen={true}
+                defaultOpen={false}
               >
                 <div className="flex flex-col gap-2 pt-1 text-[11px] font-mono text-slate-300">
                   <div className="p-2 rounded bg-slate-950/60 border border-slate-800/80">
@@ -1721,7 +1721,7 @@ export default function AdminCMSDashboard() {
                 <DrawerSection
                   title="Web3 SBT Релейєр"
                   icon={ShieldCheck}
-                  defaultOpen={true}
+                  defaultOpen={false}
                 >
                   <div className="flex flex-col gap-2 pt-1 text-xs text-slate-400">
                     <div className="flex items-center justify-between">

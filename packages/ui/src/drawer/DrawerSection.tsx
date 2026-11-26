@@ -31,7 +31,7 @@ export function DrawerSection({
   iconColor = 'text-slate-400',
   titleColor = 'text-slate-400 group-hover:text-slate-200',
   badge,
-  defaultOpen = true,
+  defaultOpen = false,
   isOpen: controlledIsOpen,
   onToggle,
   action,

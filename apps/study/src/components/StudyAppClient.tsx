@@ -659,7 +659,7 @@ export function StudyAppClient({
                         iconColor="text-blue-400"
                         badge={activeCurriculum.gradeLevel || '10-11 кл'}
                         badgeColor="blue"
-                        defaultOpen={true}
+                        defaultOpen={false}
                       >
                         <div className="flex flex-col gap-1.5 p-1">
                           <div className="text-xs font-semibold text-white">
@@ -733,7 +733,7 @@ export function StudyAppClient({
                         iconColor="text-emerald-400"
                         badge={`${currentModule.units.length}`}
                         badgeColor="emerald"
-                        defaultOpen={true}
+                        defaultOpen={false}
                       >
                         <div className="flex flex-col divide-y divide-slate-800/50">
                           {currentModule.units.map((unit, idx) => {
@@ -826,7 +826,7 @@ console.log(greeting, "Номер спроби:", counter);`}
                           icon={Sparkles}
                           iconColor="text-amber-400"
                           titleColor="text-amber-400 group-hover:text-amber-300"
-                          defaultOpen={true}
+                          defaultOpen={false}
                         >
                           <p className="text-[11px] text-slate-400 leading-relaxed py-1">
                             Натисніть клавішу <kbd className="px-1.5 py-0.5 bg-slate-800 text-amber-300 rounded font-mono border border-slate-700">F</kbd> на клавіатурі або скористайтеся плаваючою панеллю інструментів унизу екрана для приховування меню та вибору стилю читання.
