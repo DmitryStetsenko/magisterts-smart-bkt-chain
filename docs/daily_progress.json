@@ -61,6 +61,11 @@
             },
             {
               "type": "text",
+              "raw_text": "**Індивідуальний перемикач режиму для обраного студента на головній вкладці Кабінету Викладача:** додано ендпоінт `PATCH /api/v1/classrooms/student-policy` (`upsertStudentCoursePolicy` у [`classroom.service.ts`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/api/src/domain/classroom/classroom.service.ts) та [`classroom.controller.ts`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/api/src/adapters/inbound/http/classroom.controller.ts)) і панель швидкого вибору політики (**Вибір студента** / **Тільки тренування** / **Суворий (На оцінку)**) безпосередньо у картці обраного студента в [`apps/teacher/src/app/page.tsx`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/teacher/src/app/page.tsx) з live-трансляцією через WebSocket.",
+              "subitems": []
+            },
+            {
+              "type": "text",
               "raw_text": "**Сценарій живої демонстрації та ручної перевірки потоку (`.docx`) + калібрування стартових пріорів «холодного старту» BKT (`SBC-438`, `EP-BKT`):**",
               "subitems": []
             },

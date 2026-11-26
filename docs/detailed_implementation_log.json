@@ -18890,6 +18890,21 @@
               "type": "text",
               "raw_text": "Розширено [`e2e/practice-integrity-modes.spec.ts`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/e2e/practice-integrity-modes.spec.ts) перевіркою `studyPage.goto('http://localhost:3003')` → `studyPage.goBack()` (`1/1 passed`, `19.5s`).",
               "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Індивідуальний перемикач режиму проходження для обраного студента в `apps/teacher` (`Огляд Групи`):**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Додано `PATCH /api/v1/classrooms/student-policy` (`ClassroomService.upsertStudentCoursePolicy`) для миттєвого встановлення індивідуальної політики (`STUDENT_CHOICE` / `FORCED_TRAINING` / `FORCED_GRADED`) для будь-якого студента на активному курсі (з автоматичним upsert `CourseEnrollment` та WebSocket-сповіщенням `integrity_policy_changed`).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "У [`apps/teacher/src/app/page.tsx`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/teacher/src/app/page.tsx) додано компактну панель «Режим проходження для [Ім'я студента]» прямо під шапкою картки студента.",
+              "subitems": []
             }
           ]
         }

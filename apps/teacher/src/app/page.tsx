@@ -42,6 +42,8 @@ export default function TeacherDashboardPage() {
   const [selectedStudentId, setSelectedStudentId] = useState<string | null>(null);
   const [selectedSkillSlug, setSelectedSkillSlug] = useState<string | null>(null);
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
+  const [studentIntegrityPolicy, setStudentIntegrityPolicy] = useState<'STUDENT_CHOICE' | 'FORCED_TRAINING' | 'FORCED_GRADED'>('STUDENT_CHOICE');
+  const [isUpdatingStudentPolicy, setIsUpdatingStudentPolicy] = useState<boolean>(false);
 
   // Search & Filter state inside side drawers and top bar
   const [studentSearch, setStudentSearch] = useState<string>('');
@@ -338,6 +340,50 @@ export default function TeacherDashboardPage() {
 
   const activeCourse = courses.find((c) => c.slug === activeCourseSlug) || courses[0] || DEFAULT_COURSES[0];
   const selectedStudent = students.find((s) => (s.id || s.studentId || s.email) === selectedStudentId) || students[0];
+
+  // Завантаження актуальної політики режиму проходження для обраного студента на поточному курсі
+  useEffect(() => {
+    const stId = selectedStudent?.id || selectedStudent?.studentId;
+    if (!stId || !activeCourseSlug) return;
+    let cancelled = false;
+    fetch(`${API_URL}/api/v1/bkt/policy/${stId}?courseSlug=${encodeURIComponent(activeCourseSlug)}`)
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (!cancelled && data?.effectivePolicy) {
+          setStudentIntegrityPolicy(data.effectivePolicy);
+        }
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, [selectedStudent?.id, selectedStudent?.studentId, activeCourseSlug]);
+
+  const handleSetStudentIntegrityPolicy = async (
+    nextPolicy: 'STUDENT_CHOICE' | 'FORCED_TRAINING' | 'FORCED_GRADED',
+  ) => {
+    const stId = selectedStudent?.id || selectedStudent?.studentId;
+    if (!stId || !activeCourseSlug) return;
+    setIsUpdatingStudentPolicy(true);
+    try {
+      const res = await fetch(`${API_URL}/api/v1/classrooms/student-policy`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId: stId,
+          courseSlug: activeCourseSlug,
+          integrityPolicyOverride: nextPolicy,
+        }),
+      });
+      if (res.ok) {
+        setStudentIntegrityPolicy(nextPolicy);
+      }
+    } catch (err) {
+      console.error('Failed to update student integrity policy:', err);
+    } finally {
+      setIsUpdatingStudentPolicy(false);
+    }
+  };
 
   // Calculate RPG Skill Graph nodes specifically for the selected student
   const studentGraphNodes: SkillGraphNode[] = React.useMemo(() => {
@@ -1755,6 +1801,47 @@ export default function TeacherDashboardPage() {
                     <RotateCcw className="w-3.5 h-3.5 text-rose-400" />
                     <span>Скинути прогрес</span>
                   </button>
+                </div>
+              </div>
+
+              {/* 🛡️ Індивідуальна політика режиму проходження для обраного студента */}
+              <div className="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-slate-800/60">
+                <div className="flex items-center gap-2 text-xs text-slate-400">
+                  <ShieldCheck className="w-4 h-4 text-amber-400 shrink-0" />
+                  <span>
+                    Режим проходження для <strong className="text-white">{selectedStudent.name}</strong>:
+                  </span>
+                </div>
+                <div className="inline-flex items-center gap-1 p-0.5 rounded-lg bg-slate-950/70 border border-slate-800/70">
+                  {(
+                    [
+                      { id: 'STUDENT_CHOICE', label: 'Вибір студента' },
+                      { id: 'FORCED_TRAINING', label: 'Тільки тренування' },
+                      { id: 'FORCED_GRADED', label: 'Суворий (На оцінку)' },
+                    ] as const
+                  ).map((opt) => {
+                    const isActive = studentIntegrityPolicy === opt.id;
+                    return (
+                      <button
+                        key={opt.id}
+                        type="button"
+                        disabled={isUpdatingStudentPolicy}
+                        data-testid={`student-policy-btn-${opt.id}`}
+                        onClick={() => handleSetStudentIntegrityPolicy(opt.id)}
+                        className={`px-2.5 py-1 rounded-md text-[11px] font-medium transition-colors cursor-pointer disabled:opacity-50 ${
+                          isActive
+                            ? opt.id === 'FORCED_GRADED'
+                              ? 'bg-amber-600 text-white'
+                              : opt.id === 'FORCED_TRAINING'
+                              ? 'bg-blue-600 text-white'
+                              : 'bg-slate-800 text-white'
+                            : 'text-slate-400 hover:text-slate-200'
+                        }`}
+                      >
+                        {opt.label}
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
 

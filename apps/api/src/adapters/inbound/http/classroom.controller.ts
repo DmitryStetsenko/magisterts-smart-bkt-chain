@@ -166,6 +166,29 @@ export class ClassroomController {
     return { success: true, enrollment };
   }
 
+  @Patch('student-policy')
+  @ApiOperation({ summary: 'Встановлення індивідуальної політики режиму проходження для студента на курсі' })
+  async upsertStudentPolicy(
+    @Body() body: { userId: string; courseSlug: string; integrityPolicyOverride: 'STUDENT_CHOICE' | 'FORCED_TRAINING' | 'FORCED_GRADED' | null },
+  ): Promise<{ success: boolean; enrollment: CourseEnrollmentDto }> {
+    if (!body?.userId || !body?.courseSlug) {
+      throw new BadRequestException('userId та courseSlug є обов\'язковими');
+    }
+    const enrollment = await this.classroomService.upsertStudentCoursePolicy(
+      body.userId,
+      body.courseSlug,
+      body.integrityPolicyOverride ?? null,
+    );
+    this.telemetryGateway.notifyPolicyChanged({
+      classroomId: enrollment.classroomId ?? undefined,
+      userId: enrollment.userId,
+      courseId: enrollment.courseId,
+      integrityPolicy: enrollment.effectiveIntegrityPolicy || 'STUDENT_CHOICE',
+      strictModeUntil: enrollment.strictModeUntil ?? null,
+    });
+    return { success: true, enrollment };
+  }
+
   @Delete(':id')
   @ApiOperation({ summary: 'Видалення навчального класу' })
   async deleteClassroom(

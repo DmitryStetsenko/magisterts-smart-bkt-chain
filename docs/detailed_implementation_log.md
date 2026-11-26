@@ -5573,3 +5573,7 @@ eferenceAnswer, критерії options.keywords (microtask|мікротаск|
   - У [`StudentPortalApp.tsx`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/student/src/components/StudentPortalApp.tsx) прибрано скидання суворої сесії в `beforeunload` / unmount cleanup (тепер знімається лише при опануванні навички, зміні режиму чи явному скиданні).
   - У [`StudyAppClient.tsx`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/study/src/components/StudyAppClient.tsx) додано підписки на `pageshow` (відновлення з `bfcache` при кліку стрілок Назад/Вперед), `popstate` та `cache: 'no-store'`.
   - Розширено [`e2e/practice-integrity-modes.spec.ts`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/e2e/practice-integrity-modes.spec.ts) перевіркою `studyPage.goto('http://localhost:3003')` → `studyPage.goBack()` (`1/1 passed`, `19.5s`).
+
+- **Індивідуальний перемикач режиму проходження для обраного студента в `apps/teacher` (`Огляд Групи`):**
+  - Додано `PATCH /api/v1/classrooms/student-policy` (`ClassroomService.upsertStudentCoursePolicy`) для миттєвого встановлення індивідуальної політики (`STUDENT_CHOICE` / `FORCED_TRAINING` / `FORCED_GRADED`) для будь-якого студента на активному курсі (з автоматичним upsert `CourseEnrollment` та WebSocket-сповіщенням `integrity_policy_changed`).
+  - У [`apps/teacher/src/app/page.tsx`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/teacher/src/app/page.tsx) додано компактну панель «Режим проходження для [Ім'я студента]» прямо під шапкою картки студента.

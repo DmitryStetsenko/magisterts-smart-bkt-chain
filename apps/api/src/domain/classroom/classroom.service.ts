@@ -446,6 +446,59 @@ export class ClassroomService {
   }
 
   /**
+   * Встановлення або оновлення індивідуальної політики доброчесності студента на курсі (upsert CourseEnrollment)
+   */
+  async upsertStudentCoursePolicy(
+    userId: string,
+    courseIdOrSlug: string,
+    integrityPolicyOverride: IntegrityPolicy | null,
+  ): Promise<CourseEnrollmentDto> {
+    let targetUserId = userId;
+    let user = await this.prisma.user.findUnique({ where: { id: targetUserId } });
+    if (!user) {
+      user = await this.prisma.user.findFirst({ where: { role: 'STUDENT' } });
+      if (!user) throw new NotFoundException(`Користувача з ID ${userId} не знайдено`);
+      targetUserId = user.id;
+    }
+
+    const course = await this.prisma.course.findFirst({
+      where: { OR: [{ id: courseIdOrSlug }, { slug: courseIdOrSlug }] },
+    });
+    if (!course) {
+      throw new NotFoundException(`Курс "${courseIdOrSlug}" не знайдено`);
+    }
+
+    const enrollment = await this.prisma.courseEnrollment.upsert({
+      where: {
+        userId_courseId: {
+          userId: targetUserId,
+          courseId: course.id,
+        },
+      },
+      update: {
+        integrityPolicyOverride: (integrityPolicyOverride as any) ?? null,
+        isActive: true,
+      },
+      create: {
+        userId: targetUserId,
+        courseId: course.id,
+        mode: 'FULL_CYCLE',
+        integrityPolicyOverride: (integrityPolicyOverride as any) ?? null,
+        isActive: true,
+      },
+      include: {
+        course: true,
+        classroom: true,
+      },
+    });
+
+    this.logger.log(
+      `Student ${targetUserId} course ${course.slug} policy override set to ${integrityPolicyOverride ?? 'INHERIT'}`,
+    );
+    return this.formatEnrollment(enrollment);
+  }
+
+  /**
    * Видалити навчальний клас
    */
   async deleteClassroom(classroomId: string): Promise<{ success: boolean }> {
