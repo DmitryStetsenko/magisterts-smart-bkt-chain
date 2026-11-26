@@ -1,6 +1,29 @@
 import { AuthUserDto } from './auth.types';
 
 export type EnrollmentMode = 'FULL_CYCLE' | 'TESTING_ONLY' | 'MODULAR';
+export type PracticeIntegrityMode = 'TRAINING' | 'GRADED';
+export type IntegrityPolicy = 'STUDENT_CHOICE' | 'FORCED_TRAINING' | 'FORCED_GRADED';
+
+export interface ActiveStrictSessionDto {
+  active: boolean;
+  userId: string;
+  courseSlug?: string;
+  skillId?: string;
+  skillTitle?: string;
+  taskId?: string;
+  mode: PracticeIntegrityMode;
+  startedAt?: string;
+}
+
+export interface UpdateClassroomPolicyDto {
+  integrityPolicy: IntegrityPolicy;
+  strictModeMinutes?: number | null;
+  strictModeUntil?: string | null;
+}
+
+export interface UpdateEnrollmentPolicyDto {
+  integrityPolicyOverride: IntegrityPolicy | null;
+}
 
 export interface ClassroomDto {
   id: string;
@@ -10,6 +33,8 @@ export interface ClassroomDto {
   courseId: string;
   defaultMode: EnrollmentMode;
   allowedModules: string[];
+  integrityPolicy?: IntegrityPolicy;
+  strictModeUntil?: string | null;
   createdAt: string;
   updatedAt: string;
   teacher?: AuthUserDto;
@@ -31,6 +56,9 @@ export interface CourseEnrollmentDto {
   classroomId?: string | null;
   mode: EnrollmentMode;
   allowedModules: string[];
+  integrityPolicyOverride?: IntegrityPolicy | null;
+  effectiveIntegrityPolicy?: IntegrityPolicy;
+  strictModeUntil?: string | null;
   isActive: boolean;
   enrolledAt: string;
   updatedAt: string;
@@ -49,6 +77,8 @@ export interface CreateClassroomDto {
   code?: string;
   defaultMode?: EnrollmentMode;
   allowedModules?: string[];
+  integrityPolicy?: IntegrityPolicy;
+  strictModeUntil?: string | null;
 }
 
 export interface JoinClassroomDto {

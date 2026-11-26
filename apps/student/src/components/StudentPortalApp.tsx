@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { io } from 'socket.io-client';
-import { Brain, Sparkles, CheckCircle, AlertCircle, RefreshCw, User, Code2, BookOpen, Scale, ChevronDown, ArrowRight, AlertTriangle, X, Settings, Network, Compass, Flame, History, MessageSquareQuote, CheckCircle2, Trophy, Target, MessageSquare, Info, HelpCircle, GraduationCap, Lock, Unlock, SlidersHorizontal } from 'lucide-react';
+import { Brain, Sparkles, CheckCircle, AlertCircle, RefreshCw, User, Code2, BookOpen, Scale, ChevronDown, ArrowRight, AlertTriangle, X, Settings, Network, Compass, Flame, History, MessageSquareQuote, CheckCircle2, Trophy, Target, MessageSquare, Info, HelpCircle, GraduationCap, Lock, Unlock, SlidersHorizontal, ShieldCheck } from 'lucide-react';
 import { MonacoCodeEditor } from '../features/code-editor/ui/MonacoCodeEditor';
 import { QuizTaskEditor } from '../features/quiz-editor/ui/QuizTaskEditor';
 import { EssayTaskEditor } from '../features/essay-editor/ui/EssayTaskEditor';
@@ -21,6 +21,8 @@ import {
   StudentAnalyticsItemDto,
   TaskEvaluationResponseDto,
   TaskSequencerResultDto,
+  PracticeIntegrityMode,
+  IntegrityPolicy,
 } from '@sbc/types';
 import { getAppBaseUrl, ROUTES, resolveStudyUrl } from '@sbc/routes';
 
@@ -274,6 +276,17 @@ export function StudentPortalContent({
   const [isTheoryDrawerOpen, setIsTheoryDrawerOpen] = useState<boolean>(false);
   const [fullLessonConfirmUrl, setFullLessonConfirmUrl] = useState<string | null>(null);
   const [isAbandoning, setIsAbandoning] = useState<boolean>(false);
+
+  // 🛡️ Режими проходження навички (TRAINING vs GRADED) та політика викладача (Brainstorm #22)
+  const [skillModeMap, setSkillModeMap] = useState<
+    Record<string, { activeMode: PracticeIntegrityMode; attemptsCount: number; gradedMastery: number | null }>
+  >({});
+  const [integrityPolicy, setIntegrityPolicy] = useState<IntegrityPolicy>('STUDENT_CHOICE');
+  const [strictModeUntil, setStrictModeUntil] = useState<string | null>(null);
+  const [policyClassroomName, setPolicyClassroomName] = useState<string | null>(null);
+  const [pendingModeSwitch, setPendingModeSwitch] = useState<PracticeIntegrityMode | null>(null);
+  const [isSwitchingMode, setIsSwitchingMode] = useState<boolean>(false);
+  const [modeSwitchNotice, setModeSwitchNotice] = useState<string | null>(null);
   const [recommendation, setRecommendation] = useState<TaskSequencerResultDto | null>(null);
   const [hasRemediationTask, setHasRemediationTask] = useState<boolean>(true);
   const [code, setCode] = useState<string>('');
@@ -342,10 +355,26 @@ export function StudentPortalContent({
 
       let bktMap: Record<string, number> = {};
       if (bktRes.ok) {
-        const states: Array<{ skillId: string; pMastery: number }> = await bktRes.json();
+        const states: Array<{
+          skillId: string;
+          pMastery: number;
+          attemptsCount?: number;
+          activeMode?: PracticeIntegrityMode;
+          gradedMastery?: number | null;
+        }> = await bktRes.json();
+        const nextModeMap: Record<
+          string,
+          { activeMode: PracticeIntegrityMode; attemptsCount: number; gradedMastery: number | null }
+        > = {};
         states.forEach((s) => {
           bktMap[s.skillId] = s.pMastery;
+          nextModeMap[s.skillId] = {
+            activeMode: s.activeMode || 'TRAINING',
+            attemptsCount: s.attemptsCount ?? 0,
+            gradedMastery: s.gradedMastery ?? null,
+          };
         });
+        setSkillModeMap(nextModeMap);
       }
 
       let adjustments: StudentAdjustmentDto[] = [];
@@ -667,7 +696,184 @@ export function StudentPortalContent({
     }
   };
 
+  const currentSkillModeMeta = task?.skillId ? skillModeMap[task.skillId] : undefined;
+  const isPolicyLocked = integrityPolicy !== 'STUDENT_CHOICE';
+  const effectiveSkillMode: PracticeIntegrityMode =
+    integrityPolicy === 'FORCED_GRADED'
+      ? 'GRADED'
+      : integrityPolicy === 'FORCED_TRAINING'
+      ? 'TRAINING'
+      : currentSkillModeMeta?.activeMode || 'TRAINING';
+  const isPostMasteryReview =
+    effectiveSkillMode === 'TRAINING' &&
+    currentSkillModeMeta?.gradedMastery !== null &&
+    currentSkillModeMeta?.gradedMastery !== undefined &&
+    currentSkillModeMeta.gradedMastery >= 0.85;
+
+  // Завантаження ефективної політики викладача для курсу та live-підписка на її зміну
+  useEffect(() => {
+    const fetchPolicy = async () => {
+      try {
+        const res = await fetch(
+          `${API_URL}/api/v1/bkt/policy/${currentUserId}?courseSlug=${encodeURIComponent(activeCourseSlug)}`,
+        );
+        if (res.ok) {
+          const data = await res.json();
+          setIntegrityPolicy(data.effectivePolicy || 'STUDENT_CHOICE');
+          setStrictModeUntil(data.strictModeUntil || null);
+          setPolicyClassroomName(data.classroomName || null);
+        }
+      } catch (err) {
+        console.warn('Failed to load integrity policy:', err);
+      }
+    };
+    fetchPolicy();
+
+    const socket = io(`${API_URL}/telemetry`, {
+      transports: ['websocket'],
+      upgrade: false,
+    });
+    socket.on('integrity_policy_changed', () => {
+      fetchPolicy();
+    });
+    return () => {
+      socket.disconnect();
+    };
+  }, [currentUserId, activeCourseSlug]);
+
+  // Синхронізація активної строгої сесії з бекендом для крос-портального Study Lock (apps/study)
+  useEffect(() => {
+    if (!task?.skillId) return;
+    const isStrictActive = effectiveSkillMode === 'GRADED';
+    const syncSession = (active: boolean) => {
+      fetch(`${API_URL}/api/v1/bkt/active-session`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        keepalive: true,
+        body: JSON.stringify({
+          userId: currentUserId,
+          courseSlug: activeCourseSlug,
+          skillId: task.skillId,
+          skillTitle: task.skill?.title || '',
+          taskId: task.id,
+          mode: active ? 'GRADED' : 'TRAINING',
+          active,
+        }),
+      }).catch(() => {});
+    };
+
+    syncSession(isStrictActive);
+
+    const handleBeforeUnload = () => {
+      if (isStrictActive) syncSession(false);
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+      if (isStrictActive) syncSession(false);
+    };
+  }, [currentUserId, activeCourseSlug, task?.id, task?.skillId, task?.skill?.title, effectiveSkillMode]);
+
+  // Трекінг перемикання вкладок (visibilitychange) для всіх типів завдань у режимі GRADED
+  useEffect(() => {
+    if (!task?.id || effectiveSkillMode !== 'GRADED') return;
+    let blurAt: number | null = null;
+    const onVisibility = () => {
+      if (document.visibilityState === 'hidden') {
+        blurAt = Date.now();
+        logActivity('TAB_SWITCH_OUT', { mode: 'GRADED', phase: 'blur' });
+      } else if (blurAt !== null) {
+        const awayMs = Date.now() - blurAt;
+        blurAt = null;
+        logActivity('TAB_SWITCH_RETURN', { mode: 'GRADED', awayMs });
+      }
+    };
+    document.addEventListener('visibilitychange', onVisibility);
+    return () => document.removeEventListener('visibilitychange', onVisibility);
+  }, [task?.id, effectiveSkillMode]);
+
+  const executeModeSwitch = async (targetMode: PracticeIntegrityMode, forceReset: boolean) => {
+    if (!task?.skillId) return;
+    setIsSwitchingMode(true);
+    try {
+      const res = await fetch(`${API_URL}/api/v1/bkt/switch-mode`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId: currentUserId,
+          skillId: task.skillId,
+          targetMode,
+          courseSlug: activeCourseSlug,
+          forceReset,
+        }),
+      });
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        setModeSwitchNotice(errData.message || 'Не вдалося перемкнути режим');
+        setTimeout(() => setModeSwitchNotice(null), 4000);
+        return;
+      }
+      const result = await res.json();
+      setSkillModeMap((prev) => ({
+        ...prev,
+        [task.skillId]: {
+          activeMode: result.activeMode,
+          attemptsCount: result.wasReset ? 0 : prev[task.skillId]?.attemptsCount ?? 0,
+          gradedMastery: result.preservedGradedMastery ?? null,
+        },
+      }));
+      if (result.wasReset) {
+        setCode('');
+        setEssayAnswer('');
+        setRevealedHintLevel(0);
+        setEvalResult(null);
+        setTaskSubmissions([]);
+        setConsecutiveFailures(0);
+      }
+      await fetchCourseStructureAndState(activeCourseSlug);
+      if (result.wasReset) {
+        await fetchRecommendedTask(activeCourseSlug);
+      }
+      setModeSwitchNotice(
+        result.activeMode === 'GRADED'
+          ? 'Увімкнено Суворий режим «На оцінку» (підручник заблоковано під час спроби)'
+          : result.preservedGradedMastery
+          ? 'Увімкнено режим повторення (вашу офіційну оцінку збережено)'
+          : 'Увімкнено Тренувальний режим (підручник відкрито вільно)',
+      );
+      setTimeout(() => setModeSwitchNotice(null), 3500);
+    } catch (err) {
+      console.error('Failed to switch mode:', err);
+    } finally {
+      setIsSwitchingMode(false);
+      setPendingModeSwitch(null);
+    }
+  };
+
+  const handleRequestModeSwitch = (targetMode: PracticeIntegrityMode) => {
+    if (isPolicyLocked || targetMode === effectiveSkillMode || !task?.skillId) return;
+    const hasAttempts = (currentSkillModeMeta?.attemptsCount ?? 0) > 0;
+    const isGoingToPostMasteryReview =
+      targetMode === 'TRAINING' &&
+      currentSkillModeMeta?.gradedMastery !== null &&
+      currentSkillModeMeta?.gradedMastery !== undefined &&
+      currentSkillModeMeta.gradedMastery >= 0.85;
+
+    if (hasAttempts && !isGoingToPostMasteryReview) {
+      setPendingModeSwitch(targetMode);
+    } else {
+      executeModeSwitch(targetMode, false);
+    }
+  };
+
   const handleRequestFullLesson = (url: string) => {
+    // У Тренувальному режимі підручник відкривається вільно БЕЗ скидання прогресу!
+    if (effectiveSkillMode === 'TRAINING') {
+      logActivity('TEXTBOOK_OPENED_IN_TRAINING', { destinationUrl: url });
+      window.open(url, '_blank');
+      return;
+    }
+
     const currentSkill = graphNodes.find((n) => n.slug === task?.skill?.slug);
     logActivity('TASK_ABANDON_PROMPTED', {
       destinationUrl: url,
@@ -1120,6 +1326,94 @@ export function StudentPortalContent({
                             <span>Підказки Сократа не закладені для цієї вправи.</span>
                           </div>
                         )}
+                      </DrawerSection>
+
+                      {/* Section 5.5: Режим проходження навички (TRAINING vs GRADED) */}
+                      <DrawerSection
+                        title="Режим проходження"
+                        icon={ShieldCheck}
+                        iconColor={effectiveSkillMode === 'GRADED' ? 'text-amber-400' : 'text-blue-400'}
+                        titleColor={effectiveSkillMode === 'GRADED' ? 'text-amber-400 group-hover:text-amber-300' : 'text-blue-400 group-hover:text-blue-300'}
+                        badge={effectiveSkillMode === 'GRADED' ? 'На оцінку' : 'Тренування'}
+                        defaultOpen={true}
+                        className="border-t border-slate-800/80 pt-2.5"
+                      >
+                        <div className="py-1.5 flex flex-col gap-2">
+                          <div className="grid grid-cols-2 gap-1 p-1 rounded-lg bg-slate-950/60 border border-slate-800/70">
+                            <button
+                              type="button"
+                              disabled={isPolicyLocked || isSwitchingMode}
+                              data-testid="mode-btn-training"
+                              onClick={() => handleRequestModeSwitch('TRAINING')}
+                              className={`py-1.5 px-2 rounded-md text-[11px] font-semibold flex items-center justify-center gap-1.5 transition-colors ${
+                                effectiveSkillMode === 'TRAINING'
+                                  ? 'bg-blue-600 text-white shadow-sm'
+                                  : isPolicyLocked
+                                  ? 'text-slate-600 cursor-not-allowed'
+                                  : 'text-slate-400 hover:text-slate-200 cursor-pointer'
+                              }`}
+                            >
+                              <BookOpen className="w-3.5 h-3.5" />
+                              <span>Тренування</span>
+                            </button>
+                            <button
+                              type="button"
+                              disabled={isPolicyLocked || isSwitchingMode}
+                              data-testid="mode-btn-graded"
+                              onClick={() => handleRequestModeSwitch('GRADED')}
+                              className={`py-1.5 px-2 rounded-md text-[11px] font-semibold flex items-center justify-center gap-1.5 transition-colors ${
+                                effectiveSkillMode === 'GRADED'
+                                  ? 'bg-amber-600 text-white shadow-sm'
+                                  : isPolicyLocked
+                                  ? 'text-slate-600 cursor-not-allowed'
+                                  : 'text-slate-400 hover:text-slate-200 cursor-pointer'
+                              }`}
+                            >
+                              <ShieldCheck className="w-3.5 h-3.5" />
+                              <span>На оцінку</span>
+                            </button>
+                          </div>
+
+                          {isPolicyLocked && (
+                            <div
+                              data-testid="policy-locked-banner"
+                              className="flex items-center gap-1.5 text-[11px] text-amber-400 bg-amber-500/10 border border-amber-500/20 rounded-lg px-2.5 py-1.5"
+                            >
+                              <Lock className="w-3.5 h-3.5 shrink-0" />
+                              <span>
+                                Зафіксовано викладачем
+                                {policyClassroomName ? ` (${policyClassroomName})` : ''}
+                                {strictModeUntil
+                                  ? ` до ${new Date(strictModeUntil).toLocaleTimeString('uk-UA', { hour: '2-digit', minute: '2-digit' })}`
+                                  : ''}
+                              </span>
+                            </div>
+                          )}
+
+                          {isPostMasteryReview && (
+                            <div
+                              data-testid="post-mastery-review-badge"
+                              className="flex items-center gap-1.5 text-[11px] text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 rounded-lg px-2.5 py-1.5"
+                            >
+                              <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
+                              <span>
+                                Оцінку збережено ({Math.round((currentSkillModeMeta?.gradedMastery || 0) * 100)}%) — режим повторення
+                              </span>
+                            </div>
+                          )}
+
+                          <p className="text-[11px] text-slate-400 leading-snug">
+                            {effectiveSkillMode === 'GRADED'
+                              ? 'Суворий режим: підручник заблоковано в усіх вкладках. Перехід у підручник або зміна режиму скидає прогрес поточної навички.'
+                              : 'М’який режим: підручник відкрито вільно без скидання прогресу. Для офіційної оцінки перейдіть у режим «На оцінку».'}
+                          </p>
+
+                          {modeSwitchNotice && (
+                            <div className="text-[11px] text-indigo-300 bg-indigo-500/10 border border-indigo-500/20 rounded-lg px-2.5 py-1.5 animate-fadeIn">
+                              {modeSwitchNotice}
+                            </div>
+                          )}
+                        </div>
                       </DrawerSection>
 
                       {/* Section 6: Навчальний модуль у разі труднощів */}
@@ -2350,6 +2644,64 @@ export function StudentPortalContent({
         targetLessonUrl={fullLessonConfirmUrl}
         isSubmitting={isAbandoning}
       />
+
+      {/* 🔄 Модальне вікно підтвердження зміни режиму навички (Zero-Mix Rule) */}
+      {pendingModeSwitch && (
+        <>
+          <div
+            className="fixed inset-0 bg-slate-950/75 backdrop-blur-sm z-50 animate-fadeIn"
+            onClick={() => !isSwitchingMode && setPendingModeSwitch(null)}
+          />
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none">
+            <div
+              data-testid="switch-mode-confirm-modal"
+              className="w-full max-w-md bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl p-5 flex flex-col gap-4 pointer-events-auto animate-fadeIn"
+            >
+              <div className="flex items-start gap-3">
+                <div className="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-400 border border-amber-500/20 flex items-center justify-center shrink-0">
+                  <AlertTriangle className="w-5 h-5" />
+                </div>
+                <div className="flex flex-col gap-0.5">
+                  <h3 className="text-sm font-bold text-white">
+                    {pendingModeSwitch === 'GRADED'
+                      ? 'Перехід у Суворий режим «На оцінку»'
+                      : 'Перехід у Тренувальний режим'}
+                  </h3>
+                  <span className="text-xs text-amber-400">
+                    Прогрес поточної навички буде скинуто на 0%
+                  </span>
+                </div>
+              </div>
+
+              <p className="text-xs text-slate-300 leading-relaxed">
+                {pendingModeSwitch === 'GRADED'
+                  ? 'Щоб оцінювання було чесним (Zero-Mix Rule), тренувальний прогрес поточної навички буде скинуто, а підручник заблоковано на час проходження. Прогрес інших модулів курсу збережеться.'
+                  : 'Поточна оцінювальна спроба цієї навички буде скинута, і ви зможете вільно тренуватися з відкритим підручником.'}
+              </p>
+
+              <div className="flex items-center justify-end gap-2 pt-1">
+                <button
+                  type="button"
+                  disabled={isSwitchingMode}
+                  onClick={() => setPendingModeSwitch(null)}
+                  className="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium cursor-pointer"
+                >
+                  Скасувати
+                </button>
+                <button
+                  type="button"
+                  disabled={isSwitchingMode}
+                  data-testid="confirm-switch-mode-btn"
+                  onClick={() => executeModeSwitch(pendingModeSwitch, true)}
+                  className="px-4 py-2 rounded-xl bg-amber-600 hover:bg-amber-500 text-white text-xs font-semibold cursor-pointer disabled:opacity-50"
+                >
+                  {isSwitchingMode ? 'Перемикання...' : 'Скинути навичку і перемкнути режим'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
 
       {/* 👤 Права бічна панель (Right Profile & Courses Drawer) */}
       <StudentProfileDrawer

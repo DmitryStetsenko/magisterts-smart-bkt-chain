@@ -13,8 +13,11 @@ import {
   Trash2,
   ChevronRight,
   Key,
+  ShieldCheck,
+  Lock,
+  Clock,
 } from 'lucide-react';
-import { ClassroomDto } from '@sbc/types';
+import { ClassroomDto, IntegrityPolicy } from '@sbc/types';
 import { CreateClassroomModal } from './CreateClassroomModal';
 import { getAppBaseUrl } from '@sbc/routes';
 
@@ -35,6 +38,39 @@ export const ClassroomManager: React.FC<ClassroomManagerProps> = ({
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
   const [copiedLink, setCopiedLink] = useState<string | null>(null);
   const [expandedClassroomId, setExpandedClassroomId] = useState<string | null>(null);
+  const [updatingPolicyId, setUpdatingPolicyId] = useState<string | null>(null);
+
+  const handleUpdateClassroomPolicy = async (
+    classroomId: string,
+    integrityPolicy: IntegrityPolicy,
+    strictModeMinutes?: number | null,
+  ) => {
+    setUpdatingPolicyId(classroomId);
+    try {
+      const res = await fetch(`${apiUrl}/api/v1/classrooms/${classroomId}/policy`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          integrityPolicy,
+          strictModeMinutes: strictModeMinutes ?? null,
+        }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.classroom) {
+          setClassrooms((prev) =>
+            prev.map((c) => (c.id === classroomId ? { ...c, ...data.classroom } : c)),
+          );
+        } else {
+          await fetchClassrooms();
+        }
+      }
+    } catch {
+      alert('Не вдалося оновити політику режиму групи');
+    } finally {
+      setUpdatingPolicyId(null);
+    }
+  };
 
   const fetchClassrooms = useCallback(async () => {
     try {
@@ -143,6 +179,33 @@ export const ClassroomManager: React.FC<ClassroomManagerProps> = ({
                         <span className="text-[10px] font-mono text-slate-400 bg-slate-900 px-1.5 py-0.5 rounded border border-slate-800">
                           {cls.defaultMode === 'FULL_CYCLE' ? 'Повний цикл BKT' : 'Тестування'}
                         </span>
+                        <span
+                          data-testid={`classroom-policy-badge-${cls.id}`}
+                          className={`text-[10px] font-mono px-2 py-0.5 rounded border flex items-center gap-1 ${
+                            cls.integrityPolicy === 'FORCED_GRADED'
+                              ? 'text-amber-300 bg-amber-950/60 border-amber-700/50'
+                              : cls.integrityPolicy === 'FORCED_TRAINING'
+                              ? 'text-blue-300 bg-blue-950/60 border-blue-700/50'
+                              : 'text-emerald-300 bg-emerald-950/40 border-emerald-800/40'
+                          }`}
+                        >
+                          {cls.integrityPolicy === 'FORCED_GRADED' ? (
+                            <>
+                              <Lock className="w-2.5 h-2.5" />
+                              <span>Суворий (Зафіксовано)</span>
+                            </>
+                          ) : cls.integrityPolicy === 'FORCED_TRAINING' ? (
+                            <>
+                              <Lock className="w-2.5 h-2.5" />
+                              <span>Тренування (Зафіксовано)</span>
+                            </>
+                          ) : (
+                            <>
+                              <ShieldCheck className="w-2.5 h-2.5" />
+                              <span>Вибір студента</span>
+                            </>
+                          )}
+                        </span>
                         {cls.allowedModules && cls.allowedModules.length > 0 ? (
                           <span className="text-[10px] font-mono text-purple-300 bg-purple-950/60 px-2 py-0.5 rounded border border-purple-800/40">
                             {cls.allowedModules.length} {cls.allowedModules.length === 1 ? 'модуль' : cls.allowedModules.length < 5 ? 'модулі' : 'модулів'}
@@ -224,6 +287,75 @@ export const ClassroomManager: React.FC<ClassroomManagerProps> = ({
                       <Trash2 className="w-3.5 h-3.5" />
                     </button>
                   </div>
+                </div>
+
+                {/* Integrity Policy Governance Bar */}
+                <div className="pl-12 pr-1 flex flex-wrap items-center justify-between gap-2 pt-1.5 border-t border-slate-800/40">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="text-[10px] font-mono uppercase tracking-wider text-slate-500">
+                      Режим проходження:
+                    </span>
+                    <div className="inline-flex items-center gap-1 p-0.5 rounded-lg bg-slate-950/70 border border-slate-800/70">
+                      {(
+                        [
+                          { id: 'STUDENT_CHOICE', label: 'Вибір студента' },
+                          { id: 'FORCED_TRAINING', label: 'Тільки тренування' },
+                          { id: 'FORCED_GRADED', label: 'Суворий (На оцінку)' },
+                        ] as const
+                      ).map((opt) => {
+                        const isActive = (cls.integrityPolicy || 'STUDENT_CHOICE') === opt.id;
+                        return (
+                          <button
+                            key={opt.id}
+                            type="button"
+                            disabled={updatingPolicyId === cls.id}
+                            data-testid={`policy-btn-${cls.id}-${opt.id}`}
+                            onClick={() => handleUpdateClassroomPolicy(cls.id, opt.id, null)}
+                            className={`px-2 py-1 rounded-md text-[11px] font-medium transition-colors cursor-pointer disabled:opacity-50 ${
+                              isActive
+                                ? opt.id === 'FORCED_GRADED'
+                                  ? 'bg-amber-600 text-white'
+                                  : opt.id === 'FORCED_TRAINING'
+                                  ? 'bg-blue-600 text-white'
+                                  : 'bg-slate-800 text-white'
+                                : 'text-slate-400 hover:text-slate-200'
+                            }`}
+                          >
+                            {opt.label}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {cls.integrityPolicy === 'FORCED_GRADED' && (
+                    <div className="flex items-center gap-1.5 text-[11px] text-amber-400">
+                      <Clock className="w-3 h-3" />
+                      {cls.strictModeUntil ? (
+                        <span className="font-mono text-[10px]">
+                          до {new Date(cls.strictModeUntil).toLocaleTimeString('uk-UA', { hour: '2-digit', minute: '2-digit' })}
+                        </span>
+                      ) : (
+                        <span className="font-mono text-[10px] text-slate-400">без таймера</span>
+                      )}
+                      <button
+                        type="button"
+                        disabled={updatingPolicyId === cls.id}
+                        onClick={() => handleUpdateClassroomPolicy(cls.id, 'FORCED_GRADED', 45)}
+                        className="px-1.5 py-0.5 rounded border border-amber-500/30 hover:bg-amber-500/15 text-[10px] font-mono cursor-pointer"
+                      >
+                        +45 хв
+                      </button>
+                      <button
+                        type="button"
+                        disabled={updatingPolicyId === cls.id}
+                        onClick={() => handleUpdateClassroomPolicy(cls.id, 'FORCED_GRADED', 90)}
+                        className="px-1.5 py-0.5 rounded border border-amber-500/30 hover:bg-amber-500/15 text-[10px] font-mono cursor-pointer"
+                      >
+                        +90 хв
+                      </button>
+                    </div>
+                  )}
                 </div>
 
                 {/* Expanded Students List */}

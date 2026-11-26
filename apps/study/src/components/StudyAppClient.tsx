@@ -29,6 +29,9 @@ import {
 } from 'lucide-react';
 import { DrawerSection, AppShellLayout, Breadcrumbs, UserProfileDrawer, AuthModal, ThemeSettingsSection } from '@sbc/ui';
 import { ROUTES, buildStudyToPracticeUrl } from '@sbc/routes';
+import type { ActiveStrictSessionDto } from '@sbc/types';
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
 import {
   SCHOOL_WEB_CURRICULUM,
   LessonUnit,
@@ -227,6 +230,81 @@ export function StudyAppClient({
       window.removeEventListener('focus', syncLiveBktState);
     };
   }, [activeCourseSlug, currentUserId, activeCurriculum]);
+
+  // 🛡️ Крос-портальне блокування підручника під час активної сесії «На оцінку» (GRADED) у тренажері
+  const [activeStrictSession, setActiveStrictSession] = useState<ActiveStrictSessionDto | null>(null);
+  const [isUnlockingStudy, setIsUnlockingStudy] = useState<boolean>(false);
+
+  useEffect(() => {
+    let isCancelled = false;
+
+    const checkActiveStrictSession = async () => {
+      try {
+        const res = await fetch(`${API_URL}/api/v1/bkt/active-session/${currentUserId}`);
+        if (!res.ok) return;
+        const data: ActiveStrictSessionDto = await res.json();
+        if (!isCancelled) {
+          setActiveStrictSession(data?.active && data?.mode === 'GRADED' ? data : null);
+        }
+      } catch {
+        // Non-blocking check
+      }
+    };
+
+    const handleVisibility = () => {
+      if (document.visibilityState === 'visible') {
+        checkActiveStrictSession();
+      }
+    };
+
+    checkActiveStrictSession();
+    window.addEventListener('focus', checkActiveStrictSession);
+    document.addEventListener('visibilitychange', handleVisibility);
+    const intervalId = window.setInterval(() => {
+      if (document.visibilityState === 'visible') {
+        checkActiveStrictSession();
+      }
+    }, 2500);
+
+    return () => {
+      isCancelled = true;
+      window.removeEventListener('focus', checkActiveStrictSession);
+      document.removeEventListener('visibilitychange', handleVisibility);
+      window.clearInterval(intervalId);
+    };
+  }, [currentUserId]);
+
+  const handleAbandonStrictSessionAndUnlock = async () => {
+    if (!activeStrictSession) return;
+    setIsUnlockingStudy(true);
+    try {
+      if (activeStrictSession.skillId) {
+        await fetch(`${API_URL}/api/v1/bkt/reset-skill`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            userId: currentUserId,
+            skillId: activeStrictSession.skillId,
+          }),
+        });
+      } else {
+        await fetch(`${API_URL}/api/v1/bkt/active-session`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            userId: currentUserId,
+            mode: 'TRAINING',
+            active: false,
+          }),
+        });
+      }
+      setActiveStrictSession(null);
+    } catch (err) {
+      console.error('Failed to abandon strict session from study app:', err);
+    } finally {
+      setIsUnlockingStudy(false);
+    }
+  };
   const currentUserInitials = currentUserName
     .split(' ')
     .filter(Boolean)
@@ -1013,6 +1091,60 @@ console.log(greeting, "Номер спроби:", counter);`}
             scrollProgressPct={scrollProgress}
             estimatedMinutesLeft={currentUnit.estimatedMinutes}
           />
+
+          {/* 🔒 Оверлей серверного блокування підручника під час активної сесії «На оцінку» (GRADED) */}
+          {activeStrictSession?.active && (
+            <div
+              data-testid="study-lock-overlay"
+              className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/90 backdrop-blur-md animate-fadeIn"
+            >
+              <div className="w-full max-w-md rounded-2xl bg-[var(--sbc-bg-surface,#1f1f1f)] border border-amber-500/30 shadow-2xl p-6 flex flex-col gap-4">
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-amber-500/15 text-amber-400 border border-amber-500/30 flex items-center justify-center shrink-0">
+                    <Lock className="w-5 h-5" />
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    <span className="text-[10px] font-mono uppercase tracking-wider text-amber-400 font-bold">
+                      Суворий режим «На оцінку» активний
+                    </span>
+                    <h3 className="text-base font-bold text-[var(--sbc-text-primary,#f4f4f5)]">
+                      Підручник тимчасово заблоковано
+                    </h3>
+                  </div>
+                </div>
+
+                <p className="text-xs text-[var(--sbc-text-muted,#a1a1aa)] leading-relaxed">
+                  У вашому кабінеті тренажера зараз відкрито завдання у <strong className="text-[var(--sbc-text-primary,#f4f4f5)]">Суворому режимі (На оцінку)</strong>
+                  {activeStrictSession.skillTitle ? (
+                    <> з теми <strong className="text-amber-300">«{activeStrictSession.skillTitle}»</strong></>
+                  ) : null}.
+                  Для чесної діагностики знань доступ до підручника в усіх вкладках обмежено до завершення спроби.
+                </p>
+
+                <div className="flex flex-col gap-2 pt-1">
+                  <a
+                    href={practiceUrl}
+                    className="w-full px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold flex items-center justify-center gap-2 transition-colors"
+                  >
+                    <GraduationCap className="w-4 h-4" />
+                    <span>Повернутися до тренажера</span>
+                  </a>
+
+                  <button
+                    type="button"
+                    disabled={isUnlockingStudy}
+                    data-testid="study-lock-abandon-btn"
+                    onClick={handleAbandonStrictSessionAndUnlock}
+                    className="w-full px-4 py-2 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-rose-400 text-xs font-semibold transition-colors cursor-pointer disabled:opacity-50"
+                  >
+                    {isUnlockingStudy
+                      ? 'Скидання спроби...'
+                      : 'Перервати спробу (скинути прогрес навички) і відкрити урок'}
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
       </AppShellLayout>
   );
 }

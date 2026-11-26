@@ -30,6 +30,17 @@ enum EnrollmentMode {
   MODULAR
 }
 
+enum PracticeIntegrityMode {
+  TRAINING
+  GRADED
+}
+
+enum IntegrityPolicy {
+  STUDENT_CHOICE
+  FORCED_TRAINING
+  FORCED_GRADED
+}
+
 enum TaskDifficulty {
   EASY
   MEDIUM
@@ -250,10 +261,13 @@ model BktState {
   pTransit      Float     @default(0.2)
   pSlip         Float     @default(0.1)
   pGuess        Float     @default(0.2)
-  attemptsCount Int       @default(0)
-  isMastered    Boolean   @default(false)
-  masteredAt    DateTime?
-  updatedAt     DateTime  @updatedAt
+  attemptsCount    Int                   @default(0)
+  isMastered       Boolean               @default(false)
+  masteredAt       DateTime?
+  activeMode       PracticeIntegrityMode @default(TRAINING)
+  gradedMastery    Float?
+  gradedMasteredAt DateTime?
+  updatedAt        DateTime              @updatedAt
 
   @@unique([userId, skillId])
   @@map("bkt_states")
@@ -401,9 +415,11 @@ model Classroom {
   teacher        User               @relation("TeacherClassrooms", fields: [teacherId], references: [id], onDelete: Cascade)
   courseId       String
   course         Course             @relation(fields: [courseId], references: [id], onDelete: Cascade)
-  defaultMode    EnrollmentMode     @default(FULL_CYCLE)
-  allowedModules String[]           @default([])
-  createdAt      DateTime           @default(now())
+  defaultMode     EnrollmentMode     @default(FULL_CYCLE)
+  allowedModules  String[]           @default([])
+  integrityPolicy IntegrityPolicy    @default(STUDENT_CHOICE)
+  strictModeUntil DateTime?
+  createdAt       DateTime           @default(now())
   updatedAt      DateTime           @updatedAt
   students       User[]             @relation("ClassroomStudents")
   enrollments    CourseEnrollment[]
@@ -421,9 +437,10 @@ model CourseEnrollment {
   course         Course         @relation(fields: [courseId], references: [id], onDelete: Cascade)
   classroomId    String?
   classroom      Classroom?     @relation(fields: [classroomId], references: [id], onDelete: SetNull)
-  mode           EnrollmentMode @default(FULL_CYCLE)
-  allowedModules String[]       @default([])
-  isActive       Boolean        @default(true)
+  mode                    EnrollmentMode   @default(FULL_CYCLE)
+  allowedModules          String[]         @default([])
+  integrityPolicyOverride IntegrityPolicy?
+  isActive                Boolean          @default(true)
   enrolledAt     DateTime       @default(now())
   updatedAt      DateTime       @updatedAt
 

@@ -2,6 +2,7 @@ import {
   Controller,
   Get,
   Post,
+  Patch,
   Delete,
   Body,
   Param,
@@ -15,11 +16,14 @@ import {
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { ClassroomService } from '../../../domain/classroom/classroom.service';
 import { AuthService } from '../../../domain/auth/auth.service';
+import { TelemetryGateway } from '../websocket/telemetry.gateway';
 import {
   ClassroomDto,
   CourseEnrollmentDto,
   CreateClassroomDto,
   EnrollStudentDto,
+  UpdateClassroomPolicyDto,
+  UpdateEnrollmentPolicyDto,
 } from '@sbc/types';
 
 @ApiTags('Classrooms & Course Enrollments')
@@ -28,6 +32,7 @@ export class ClassroomController {
   constructor(
     private readonly classroomService: ClassroomService,
     private readonly authService: AuthService,
+    private readonly telemetryGateway: TelemetryGateway,
   ) {}
 
   @Get()
@@ -126,6 +131,39 @@ export class ClassroomController {
   ): Promise<{ success: boolean; enrollments: CourseEnrollmentDto[] }> {
     const enrollments = await this.classroomService.getStudentEnrollments(userId);
     return { success: true, enrollments };
+  }
+
+  @Patch(':id/policy')
+  @ApiOperation({ summary: 'Оновлення політики режимів проходження (STUDENT_CHOICE / FORCED_GRADED / FORCED_TRAINING) для класу' })
+  async updateClassroomPolicy(
+    @Param('id') id: string,
+    @Body() body: UpdateClassroomPolicyDto,
+  ): Promise<{ success: boolean; classroom: ClassroomDto }> {
+    const classroom = await this.classroomService.updateClassroomPolicy(id, body);
+    this.telemetryGateway.notifyPolicyChanged({
+      classroomId: classroom.id,
+      courseId: classroom.courseId,
+      integrityPolicy: classroom.integrityPolicy || 'STUDENT_CHOICE',
+      strictModeUntil: classroom.strictModeUntil ?? null,
+    });
+    return { success: true, classroom };
+  }
+
+  @Patch('enrollments/:enrollmentId/policy')
+  @ApiOperation({ summary: 'Точкове перевизначення політики доброчесності для окремого студента' })
+  async updateEnrollmentPolicy(
+    @Param('enrollmentId') enrollmentId: string,
+    @Body() body: UpdateEnrollmentPolicyDto,
+  ): Promise<{ success: boolean; enrollment: CourseEnrollmentDto }> {
+    const enrollment = await this.classroomService.updateEnrollmentPolicy(enrollmentId, body);
+    this.telemetryGateway.notifyPolicyChanged({
+      classroomId: enrollment.classroomId ?? undefined,
+      userId: enrollment.userId,
+      courseId: enrollment.courseId,
+      integrityPolicy: enrollment.effectiveIntegrityPolicy || 'STUDENT_CHOICE',
+      strictModeUntil: enrollment.strictModeUntil ?? null,
+    });
+    return { success: true, enrollment };
   }
 
   @Delete(':id')

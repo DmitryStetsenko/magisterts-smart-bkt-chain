@@ -16,22 +16,42 @@
           "items": [
             {
               "type": "text",
-              "raw_text": "**Мозковий штурм та архітектурна концепція режимів проходження (`TRAINING` vs `GRADED`), крос-портального блокування підручника та політик викладача (`EP-ST`, `EP-TC`, `EP-BK`):**",
+              "raw_text": "**Реалізація режимів проходження (`TRAINING` vs `GRADED`), крос-портального блокування підручника (`Study Lock`) та політик викладача (`SBC-439`, `EP-ST`, `EP-TC`, `EP-BK`):**",
               "subitems": []
             },
             {
               "type": "text",
-              "raw_text": "Проведено аудит асиметрії доступу до підручника між `apps/student` (`AbandonTaskModal`) та вже відкритою вкладкою `apps/study` (`StudyAppClient.tsx`) і зафіксовано повну концепцію у [`docs/brainstorm/22_practice_modes_study_lock_and_teacher_governance.md`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/docs/brainstorm/22_practice_modes_study_lock_and_teacher_governance.md) (додано до реєстру [`docs/brainstorm/README.md`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/docs/brainstorm/README.md)).",
+              "raw_text": "Зафіксовано архітектурну концепцію у [`docs/brainstorm/22_practice_modes_study_lock_and_teacher_governance.md`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/docs/brainstorm/22_practice_modes_study_lock_and_teacher_governance.md) (індекс [`docs/brainstorm/README.md`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/docs/brainstorm/README.md)), зведено гілки `feat/theme-system-tokens` → `dev` → `master` та запушено на `origin`.",
               "subitems": []
             },
             {
               "type": "text",
-              "raw_text": "Спроєктовано двоконтурну модель `PracticeIntegrityMode` (`TRAINING` — вільне тренування з підручником vs `GRADED` — суворий режим «На оцінку» із серверним `Study Lock Overlay` в усіх відкритих вкладках `apps/study` та трекінгом `visibilitychange`/`blur`) × `IntegrityPolicy` викладача (`STUDENT_CHOICE` за замовчуванням, `FORCED_GRADED` із опціональним таймером контрольної, `FORCED_TRAINING` та точковим override студента).",
+              "raw_text": "**БД та спільні контракти:** розширено [`packages/database/prisma/schema.prisma`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/packages/database/prisma/schema.prisma) (`PracticeIntegrityMode`, `IntegrityPolicy`, поля `activeMode`/`gradedMastery`/`gradedMasteredAt` у `BktState`, `integrityPolicy`/`strictModeUntil` у `Classroom`, `integrityPolicyOverride` у `CourseEnrollment`), синхронізовано схему (`prisma db push` + `prisma generate`) та оновлено `@sbc/types` (`bkt.types.ts`, `classroom.types.ts`).",
               "subitems": []
             },
             {
               "type": "text",
-              "raw_text": "Закріплено правило чистого старту (Zero-Mix Rule) на рівні окремої навички/модуля (зміна режиму при `progress > 0` можлива лише зі скиданням прогресу поточної навички) та безпечний режим повторення для вже оцінених (`GRADED`) навичок без втрати офіційної оцінки.",
+              "raw_text": "**Бекенд (`apps/api`):** у `TelemetryGateway`, `ClassroomService`, `ClassroomController` і `BktController` реалізовано обчислення ефективної політики викладача (з урахуванням таймера `strictModeUntil` та індивідуального override), `PATCH /api/v1/classrooms/:id/policy`, `PATCH /api/v1/classrooms/enrollments/:enrollmentId/policy`, `GET /api/v1/bkt/policy/:userId`, `GET/POST /api/v1/bkt/active-session` та `POST /api/v1/bkt/switch-mode` (правило чистого старту Zero-Mix Rule на рівні навички + збереження `gradedMastery` при поверненні в режим повторення).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Портал підручника (`apps/study`):** у [`StudyAppClient.tsx`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/study/src/components/StudyAppClient.tsx) додано серверно-синхронізований `Study Lock Overlay` (`study-lock-overlay`), який миттєво перекриває вже відкриті вкладки підручника під час активної спроби в режимі `GRADED` і дозволяє повернутися в тренажер або перервати спробу зі скиданням прогресу навички.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Портал студента (`apps/student`):** у [`StudentPortalApp.tsx`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/student/src/components/StudentPortalApp.tsx) та [`useTelemetry.ts`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/student/src/features/code-editor/lib/useTelemetry.ts) додано секцію перемикання режиму `Тренування` / `На оцінку` (із замком `🔒 Зафіксовано викладачем` при жорсткій політиці, модальним підтвердженням скидання Zero-Mix Rule, бейджем збереженої оцінки в режимі повторення, вільним переходом у підручник у `TRAINING` та трекінгом `visibilitychange`/`blur` у `GRADED`).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Кабінет викладача (`apps/teacher`):** у [`ClassroomManager.tsx`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/teacher/src/features/classrooms/ui/ClassroomManager.tsx) додано панель керування політикою групи (`Вибір студента` / `Тільки тренування` / `Суворий (На оцінку)`) та швидкі таймери контрольної (`+45 хв`, `+90 хв`) із live-трансляцією через WebSocket.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Верифікація:** успішна збірка всіх 5 пакетів/порталів (`@sbc/types`, `apps/api`, `apps/study`, `apps/student`, `apps/teacher`), проходження `12/12` наборів (`78/78` unit-тестів `apps/api`) та наскрізного дво-вкладочного Playwright E2E-тесту [`e2e/practice-integrity-modes.spec.ts`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/e2e/practice-integrity-modes.spec.ts) (`1/1 passed`).",
               "subitems": []
             },
             {

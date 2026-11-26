@@ -1,4 +1,4 @@
-import { Controller, Post, Get, Delete, Body, Param, Query, NotFoundException, Res } from '@nestjs/common';
+import { Controller, Post, Get, Delete, Body, Param, Query, NotFoundException, BadRequestException, ForbiddenException, Optional, Res } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiQuery } from '@nestjs/swagger';
 import type { Response } from 'express';
 import * as vm from 'vm';
@@ -10,6 +10,7 @@ import { OpenTextHeuristicEvaluator } from '../../../domain/evaluation/open-text
 import { OpenAnswerEvaluatorService } from '../../../domain/evaluation/open-answer-evaluator.service';
 import { MisconceptionMatcher } from '../../../domain/evaluation/misconception-matcher';
 import { AuditLogService } from '../../../domain/audit/audit-log.service';
+import { ClassroomService } from '../../../domain/classroom/classroom.service';
 import { SubmitTaskDto } from './dto/submit-task.dto';
 import { SubmissionStatus, TaskType, TeacherReviewStatus } from '@sbc/database';
 import type {
@@ -18,6 +19,10 @@ import type {
   StudentAnalyticsItemDto,
   TaskEvaluationResponseDto,
   CreateActivityLogDto,
+  SwitchSkillModeDto,
+  SwitchSkillModeResultDto,
+  ActiveStrictSessionDto,
+  PracticeIntegrityMode,
 } from '@sbc/types';
 
 @ApiTags('BKT')
@@ -28,6 +33,7 @@ export class BktController {
     private readonly telemetryGateway: TelemetryGateway,
     private readonly openAnswerEvaluator: OpenAnswerEvaluatorService,
     private readonly auditLogService: AuditLogService,
+    @Optional() private readonly classroomService?: ClassroomService,
   ) {}
 
   @Post('evaluate')
@@ -451,6 +457,18 @@ export class BktController {
       }
 
       const isMastered = BktEngine.isMastered(calcResult.pMasteryPosterior);
+      const activeMode = (bktState as any).activeMode || 'TRAINING';
+      const existingGradedMastery: number | null = (bktState as any).gradedMastery ?? null;
+      const existingGradedMasteredAt: Date | null = (bktState as any).gradedMasteredAt ?? null;
+
+      let nextGradedMastery = existingGradedMastery;
+      let nextGradedMasteredAt = existingGradedMasteredAt;
+      if (activeMode === 'GRADED') {
+        nextGradedMastery = calcResult.pMasteryPosterior;
+        if (isMastered) {
+          nextGradedMasteredAt = existingGradedMasteredAt || new Date();
+        }
+      }
 
       updatedState = await this.prisma.bktState.update({
         where: { id: bktState.id },
@@ -459,8 +477,14 @@ export class BktController {
           attemptsCount: bktState.attemptsCount + 1,
           isMastered,
           masteredAt: isMastered ? (bktState.masteredAt || new Date()) : null,
-        },
+          gradedMastery: nextGradedMastery,
+          gradedMasteredAt: nextGradedMasteredAt,
+        } as any,
       });
+
+      if (activeMode === 'GRADED' && isMastered) {
+        this.telemetryGateway.clearActiveStrictSession(user.id);
+      }
     }
 
     bktResult = calcResult;
@@ -772,6 +796,248 @@ export class BktController {
     });
   }
 
+  @Get('policy/:userId')
+  @ApiOperation({ summary: 'Get effective practice integrity policy for a student and course' })
+  async getStudentIntegrityPolicy(
+    @Param('userId') userId: string,
+    @Query('courseSlug') courseSlug?: string,
+  ) {
+    if (!this.classroomService) {
+      return { effectivePolicy: 'STUDENT_CHOICE', strictModeUntil: null };
+    }
+    return this.classroomService.getEffectiveIntegrityPolicyForStudent(userId, courseSlug);
+  }
+
+  @Get('active-session/:userId')
+  @ApiOperation({ summary: 'Get current active strict session status for cross-app Study Lock' })
+  async getActiveStrictSession(@Param('userId') userId: string): Promise<ActiveStrictSessionDto> {
+    let targetUserId = userId;
+    if (!targetUserId || targetUserId === 'demo-student') {
+      const demo = await this.prisma.user.findFirst({ where: { role: 'STUDENT' } });
+      if (demo) targetUserId = demo.id;
+    }
+    return this.telemetryGateway.getActiveStrictSession(targetUserId);
+  }
+
+  @Post('active-session')
+  @ApiOperation({ summary: 'Set or clear active strict practice session for cross-app Study Lock' })
+  async updateActiveStrictSession(
+    @Body()
+    dto: {
+      userId?: string;
+      courseSlug?: string;
+      skillId?: string;
+      skillTitle?: string;
+      taskId?: string;
+      mode: PracticeIntegrityMode;
+      active: boolean;
+    },
+  ): Promise<ActiveStrictSessionDto> {
+    let targetUserId = dto.userId;
+    let user = targetUserId ? await this.prisma.user.findUnique({ where: { id: targetUserId } }) : null;
+    if (!user) {
+      user = await this.prisma.user.findFirst({ where: { role: 'STUDENT' } });
+      targetUserId = user?.id || 'demo-student';
+    }
+    this.telemetryGateway.setActiveStrictSession({
+      active: Boolean(dto.active && dto.mode === 'GRADED'),
+      userId: targetUserId,
+      courseSlug: dto.courseSlug,
+      skillId: dto.skillId,
+      skillTitle: dto.skillTitle,
+      taskId: dto.taskId,
+      mode: dto.mode || 'TRAINING',
+      startedAt: new Date().toISOString(),
+    });
+    return this.telemetryGateway.getActiveStrictSession(targetUserId);
+  }
+
+  @Post('switch-mode')
+  @ApiOperation({ summary: 'Switch skill practice mode (TRAINING <-> GRADED) enforcing teacher policy and Zero-Mix reset rule' })
+  async switchSkillMode(@Body() dto: SwitchSkillModeDto): Promise<SwitchSkillModeResultDto> {
+    if (!dto?.skillId || !dto?.targetMode) {
+      throw new BadRequestException('skillId та targetMode є обов\'язковими');
+    }
+
+    let targetUserId = dto.userId;
+    let user = targetUserId ? await this.prisma.user.findUnique({ where: { id: targetUserId } }) : null;
+    if (!user) {
+      user = await this.prisma.user.findFirst({ where: { role: 'STUDENT' } });
+      if (!user) throw new NotFoundException('Student user not found');
+      targetUserId = user.id;
+    }
+
+    const skill = await this.prisma.skillNode.findUnique({
+      where: { id: dto.skillId },
+      select: { id: true, courseId: true, title: true },
+    });
+    if (!skill) {
+      throw new NotFoundException(`Skill ${dto.skillId} not found`);
+    }
+
+    // 1. Check teacher integrity policy
+    if (this.classroomService) {
+      const policyInfo = await this.classroomService.getEffectiveIntegrityPolicyForStudent(
+        targetUserId,
+        dto.courseSlug || skill.courseId || undefined,
+      );
+      if (policyInfo.effectivePolicy === 'FORCED_GRADED' && dto.targetMode !== 'GRADED') {
+        throw new ForbiddenException('Режим зафіксовано викладачем: дозволено лише Суворий режим (На оцінку)');
+      }
+      if (policyInfo.effectivePolicy === 'FORCED_TRAINING' && dto.targetMode !== 'TRAINING') {
+        throw new ForbiddenException('Режим зафіксовано викладачем: дозволено лише Тренувальний режим');
+      }
+    }
+
+    const existing = await this.prisma.bktState.findUnique({
+      where: { userId_skillId: { userId: targetUserId, skillId: dto.skillId } },
+    });
+
+    const existingMode = (existing as any)?.activeMode || 'TRAINING';
+    const existingGradedMastery: number | null = (existing as any)?.gradedMastery ?? null;
+    const existingGradedMasteredAt: Date | null = (existing as any)?.gradedMasteredAt ?? null;
+    const isAlreadyGradedMastered = existingGradedMastery !== null && existingGradedMastery >= 0.85;
+
+    // 2. Post-Mastery Review Mode: returning to TRAINING after already earning a GRADED mastery preserves official grade!
+    if (dto.targetMode === 'TRAINING' && isAlreadyGradedMastered) {
+      const updated = await this.prisma.bktState.update({
+        where: { id: existing!.id },
+        data: { activeMode: 'TRAINING' } as any,
+      });
+      this.telemetryGateway.clearActiveStrictSession(targetUserId);
+      try {
+        await this.auditLogService.logEvent({
+          userId: targetUserId,
+          actorId: targetUserId,
+          actorRole: 'STUDENT',
+          courseId: skill.courseId || undefined,
+          skillId: dto.skillId,
+          eventType: 'SKILL_MODE_SWITCHED',
+          payload: {
+            fromMode: existingMode,
+            toMode: 'TRAINING',
+            wasReset: false,
+            postMasteryReview: true,
+            preservedGradedMastery: existingGradedMastery,
+          },
+        });
+      } catch {}
+
+      return {
+        success: true,
+        skillId: dto.skillId,
+        activeMode: 'TRAINING',
+        wasReset: false,
+        preservedGradedMastery: existingGradedMastery,
+        pMastery: updated.pMastery,
+      };
+    }
+
+    // 3. Zero-Mix Rule: if attempts already exist and mode is changing, require explicit reset
+    const hasProgress = Boolean(existing && existing.attemptsCount > 0);
+    let wasReset = false;
+
+    if (hasProgress && existingMode !== dto.targetMode) {
+      if (!dto.forceReset) {
+        throw new BadRequestException(
+          'RESET_REQUIRED: Зміна режиму проходження навички потребує скидання поточного прогресу цієї навички.',
+        );
+      }
+
+      const tasksInSkill = await this.prisma.task.findMany({
+        where: { skillId: dto.skillId },
+        select: { id: true },
+      });
+      const taskIds = tasksInSkill.map((t) => t.id);
+
+      await this.prisma.submission.deleteMany({
+        where: { userId: targetUserId, taskId: { in: taskIds } },
+      });
+      await this.prisma.bktHistory.deleteMany({
+        where: { userId: targetUserId, skillId: dto.skillId },
+      });
+
+      const updated = await this.prisma.bktState.update({
+        where: { id: existing!.id },
+        data: {
+          pMastery: 0.15,
+          pTransit: 0.2,
+          pSlip: 0.1,
+          pGuess: 0.15,
+          attemptsCount: 0,
+          isMastered: false,
+          masteredAt: null,
+          activeMode: dto.targetMode,
+          gradedMastery: dto.targetMode === 'GRADED' ? null : existingGradedMastery,
+          gradedMasteredAt: dto.targetMode === 'GRADED' ? null : existingGradedMasteredAt,
+        } as any,
+      });
+
+      wasReset = true;
+      if (dto.targetMode === 'TRAINING') {
+        this.telemetryGateway.clearActiveStrictSession(targetUserId);
+      }
+      this.telemetryGateway.notifyBktReset(targetUserId, dto.skillId);
+
+      try {
+        await this.auditLogService.logEvent({
+          userId: targetUserId,
+          actorId: targetUserId,
+          actorRole: 'STUDENT',
+          courseId: skill.courseId || undefined,
+          skillId: dto.skillId,
+          eventType: 'SKILL_MODE_SWITCHED',
+          payload: {
+            fromMode: existingMode,
+            toMode: dto.targetMode,
+            wasReset: true,
+          },
+        });
+      } catch {}
+
+      return {
+        success: true,
+        skillId: dto.skillId,
+        activeMode: dto.targetMode,
+        wasReset,
+        preservedGradedMastery: (updated as any).gradedMastery ?? null,
+        pMastery: updated.pMastery,
+      };
+    }
+
+    // 4. Clean initial mode selection (0 attempts) or idempotent mode confirmation
+    const upserted = await this.prisma.bktState.upsert({
+      where: { userId_skillId: { userId: targetUserId, skillId: dto.skillId } },
+      create: {
+        userId: targetUserId,
+        skillId: dto.skillId,
+        pMastery: 0.15,
+        pTransit: 0.2,
+        pSlip: 0.1,
+        pGuess: 0.15,
+        attemptsCount: 0,
+        isMastered: false,
+        activeMode: dto.targetMode,
+      } as any,
+      update: {
+        activeMode: dto.targetMode,
+      } as any,
+    });
+
+    if (dto.targetMode === 'TRAINING') {
+      this.telemetryGateway.clearActiveStrictSession(targetUserId);
+    }
+
+    return {
+      success: true,
+      skillId: dto.skillId,
+      activeMode: dto.targetMode,
+      wasReset: false,
+      preservedGradedMastery: (upserted as any).gradedMastery ?? null,
+      pMastery: upserted.pMastery,
+    };
+  }
+
   @Post('reset-skill')
   @ApiOperation({ summary: 'Reset student BKT state and submissions for a specific skill node' })
   async resetStudentSkillState(@Body() dto: { userId?: string; skillId: string }) {
@@ -810,6 +1076,7 @@ export class BktController {
       },
     });
 
+    this.telemetryGateway.clearActiveStrictSession(targetUserId);
     this.telemetryGateway.notifyBktReset(targetUserId, dto.skillId);
 
     try {

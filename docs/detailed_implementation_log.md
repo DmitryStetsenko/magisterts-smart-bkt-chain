@@ -5546,3 +5546,24 @@ eferenceAnswer, критерії options.keywords (microtask|мікротаск|
      - Для навичок, що вже мають підтверджену `gradedMastery`, дозволено повернення у режим повторення (`TRAINING`) без перезапису офіційної оцінки.
   3. **Оновлення індексу брейнштормів:**
      - Оновлено [`docs/brainstorm/README.md`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/docs/brainstorm/README.md) (додано позиції #21 та #22).
+
+
+---
+
+### 11.79. Повна Реалізація Режимів Проходження (`TRAINING` / `GRADED`), Крос-Портального `Study Lock` та Політик Викладача (SBC-439, EP-ST, EP-TC, EP-BK)
+- **Схема БД (`packages/database/prisma/schema.prisma`) та DTO (`@sbc/types`):**
+  - Додано переліки `PracticeIntegrityMode (TRAINING, GRADED)` та `IntegrityPolicy (STUDENT_CHOICE, FORCED_TRAINING, FORCED_GRADED)`.
+  - Розширено `BktState` (`activeMode`, `gradedMastery`, `gradedMasteredAt`), `Classroom` (`integrityPolicy`, `strictModeUntil`) і `CourseEnrollment` (`integrityPolicyOverride`).
+  - Додано типізовані контракти `ActiveStrictSessionDto`, `UpdateClassroomPolicyDto`, `UpdateEnrollmentPolicyDto`, `SwitchSkillModeDto`, `SwitchSkillModeResultDto`.
+- **Бекенд (`apps/api`):**
+  - `TelemetryGateway`: реалізовано серверний трекінг активних строгих сесій (`activeSessions`), події `join_study`, `set_practice_session`, `tab_visibility_event`, а також трансляцію `strict_session_changed` та `integrity_policy_changed`.
+  - `ClassroomService` / `ClassroomController`: реалізовано `resolveEffectiveIntegrityPolicy(...)` (автоматичне повернення в `STUDENT_CHOICE` після завершення `strictModeUntil`), `PATCH /api/v1/classrooms/:id/policy` та `PATCH /api/v1/classrooms/enrollments/:enrollmentId/policy`.
+  - `BktController`: реалізовано `GET /api/v1/bkt/policy/:userId`, `GET/POST /api/v1/bkt/active-session`, `POST /api/v1/bkt/switch-mode` (перевірка політики викладача, Zero-Mix скидання лише поточної навички, збереження `gradedMastery` при поверненні у `TRAINING` після опанування) та авто-розблокування `Study Lock` при скиданні чи опануванні навички.
+- **Фронтенд (`apps/study`, `apps/student`, `apps/teacher`):**
+  - `apps/study` (`StudyAppClient.tsx`): додано `Study Lock Overlay` (`study-lock-overlay`), синхронізований із `GET /api/v1/bkt/active-session/:userId` на `focus`, `visibilitychange` та інтервальному опитуванні, із кнопкою повернення в тренажер або переривання спроби (`study-lock-abandon-btn`).
+  - `apps/student` (`StudentPortalApp.tsx`, `useTelemetry.ts`): додано `<DrawerSection title="Режим проходження">` (`mode-btn-training`, `mode-btn-graded`), індикатор блокування викладачем (`policy-locked-banner`), бейдж збереженої оцінки (`post-mastery-review-badge`), модальне підтвердження Zero-Mix (`switch-mode-confirm-modal`), вільний перехід у підручник у `TRAINING` та трекінг втрати фокусу вкладки (`TAB_SWITCH_OUT` / `TAB_BLUR`) у `GRADED`.
+  - `apps/teacher` (`ClassroomManager.tsx`): додано inline-панель керування політикою групи (`Вибір студента`, `Тільки тренування`, `Суворий (На оцінку)`) і швидкі таймери контрольної (`+45 хв`, `+90 хв`).
+- **Верифікація:**
+  - Успішні збірки: `@sbc/types`, `apps/api`, `apps/study`, `apps/student`, `apps/teacher` (0 помилок).
+  - Unit-тести `apps/api`: `12/12` suites, `78/78` tests passed.
+  - Наскрізний Playwright E2E-тест `e2e/practice-integrity-modes.spec.ts` (2 одночасні вкладки `apps/student` + `apps/study`): `1/1 passed (34.5s)`.

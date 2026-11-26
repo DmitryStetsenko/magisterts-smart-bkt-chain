@@ -4,7 +4,12 @@ import { TelemetryMetrics, TelemetrySocketPayload } from '../model/telemetry.typ
 
 const SOCKET_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
 
-export function useTelemetry(userId: string, taskId: string) {
+export function useTelemetry(
+  userId: string,
+  taskId: string,
+  mode: 'TRAINING' | 'GRADED' = 'TRAINING',
+  skillId?: string,
+) {
   const [metrics, setMetrics] = useState<TelemetryMetrics>({
     wpm: 0,
     lastPauseMs: 0,
@@ -53,6 +58,60 @@ export function useTelemetry(userId: string, taskId: string) {
       }
     };
   }, [userId, taskId]);
+
+  // Track tab visibility / focus loss for academic integrity telemetry
+  useEffect(() => {
+    if (!userId || !taskId) return;
+    let blurTimestamp: number | null = null;
+
+    const emitBlur = () => {
+      if (blurTimestamp !== null) return;
+      blurTimestamp = Date.now();
+      if (socketRef.current?.connected) {
+        socketRef.current.emit('tab_visibility_event', {
+          userId,
+          taskId,
+          skillId,
+          event: 'TAB_BLUR',
+          mode,
+        });
+      }
+    };
+
+    const emitReturn = () => {
+      if (blurTimestamp === null) return;
+      const awayMs = Date.now() - blurTimestamp;
+      blurTimestamp = null;
+      if (socketRef.current?.connected) {
+        socketRef.current.emit('tab_visibility_event', {
+          userId,
+          taskId,
+          skillId,
+          event: 'TAB_RETURN',
+          awayMs,
+          mode,
+        });
+      }
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'hidden') {
+        emitBlur();
+      } else {
+        emitReturn();
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('blur', emitBlur);
+    window.addEventListener('focus', emitReturn);
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('blur', emitBlur);
+      window.removeEventListener('focus', emitReturn);
+    };
+  }, [userId, taskId, skillId, mode]);
 
   const subscribeBktReset = useCallback((callback: (data: { userId: string; skillId?: string }) => void) => {
     const socket = socketRef.current;

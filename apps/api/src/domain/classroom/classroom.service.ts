@@ -12,6 +12,9 @@ import {
   CreateClassroomDto,
   EnrollStudentDto,
   EnrollmentMode,
+  IntegrityPolicy,
+  UpdateClassroomPolicyDto,
+  UpdateEnrollmentPolicyDto,
 } from '@sbc/types';
 
 @Injectable()
@@ -51,6 +54,8 @@ export class ClassroomService {
         courseId: dto.courseId,
         defaultMode: (dto.defaultMode as any) || 'FULL_CYCLE',
         allowedModules: dto.allowedModules || [],
+        integrityPolicy: (dto.integrityPolicy as any) || 'STUDENT_CHOICE',
+        strictModeUntil: dto.strictModeUntil ? new Date(dto.strictModeUntil) : null,
       },
       include: {
         course: true,
@@ -264,6 +269,183 @@ export class ClassroomService {
   }
 
   /**
+   * Обчислення ефективної політики доброчесності з урахуванням таймера strictModeUntil та override студента
+   */
+  resolveEffectiveIntegrityPolicy(
+    classroomPolicy?: string | null,
+    strictModeUntil?: Date | string | null,
+    enrollmentOverride?: string | null,
+  ): { effectivePolicy: IntegrityPolicy; strictModeUntil: string | null } {
+    if (enrollmentOverride) {
+      return {
+        effectivePolicy: enrollmentOverride as IntegrityPolicy,
+        strictModeUntil: null,
+      };
+    }
+
+    const basePolicy = (classroomPolicy as IntegrityPolicy) || 'STUDENT_CHOICE';
+    if (basePolicy === 'FORCED_GRADED' && strictModeUntil) {
+      const untilDate = strictModeUntil instanceof Date ? strictModeUntil : new Date(strictModeUntil);
+      if (untilDate.getTime() <= Date.now()) {
+        return { effectivePolicy: 'STUDENT_CHOICE', strictModeUntil: null };
+      }
+      return { effectivePolicy: 'FORCED_GRADED', strictModeUntil: untilDate.toISOString() };
+    }
+
+    return {
+      effectivePolicy: basePolicy,
+      strictModeUntil: strictModeUntil
+        ? (strictModeUntil instanceof Date ? strictModeUntil.toISOString() : String(strictModeUntil))
+        : null,
+    };
+  }
+
+  /**
+   * Отримання ефективної політики доброчесності для студента на конкретному курсі
+   */
+  async getEffectiveIntegrityPolicyForStudent(
+    userId: string,
+    courseIdOrSlug?: string,
+  ): Promise<{
+    effectivePolicy: IntegrityPolicy;
+    strictModeUntil: string | null;
+    classroomId?: string;
+    classroomName?: string;
+  }> {
+    let targetUserId = userId;
+    let user = await this.prisma.user.findUnique({ where: { id: targetUserId } });
+    if (!user) {
+      user = await this.prisma.user.findFirst({ where: { role: 'STUDENT' } });
+      if (user) targetUserId = user.id;
+    }
+
+    if (!user) {
+      return { effectivePolicy: 'STUDENT_CHOICE', strictModeUntil: null };
+    }
+
+    let courseId: string | undefined;
+    if (courseIdOrSlug) {
+      const course = await this.prisma.course.findFirst({
+        where: { OR: [{ id: courseIdOrSlug }, { slug: courseIdOrSlug }] },
+        select: { id: true },
+      });
+      courseId = course?.id;
+    }
+
+    const enrollment = await this.prisma.courseEnrollment.findFirst({
+      where: {
+        userId: targetUserId,
+        isActive: true,
+        ...(courseId ? { courseId } : {}),
+      },
+      include: { classroom: true },
+      orderBy: { updatedAt: 'desc' },
+    });
+
+    if (!enrollment) {
+      // Fallback: check if any classroom for this course has FORCED_GRADED if demo student has no explicit enrollment
+      if (courseId) {
+        const directClassroom = await this.prisma.classroom.findFirst({
+          where: {
+            courseId,
+            students: { some: { id: targetUserId } },
+          },
+          orderBy: { updatedAt: 'desc' },
+        });
+        if (directClassroom) {
+          const resolved = this.resolveEffectiveIntegrityPolicy(
+            directClassroom.integrityPolicy,
+            directClassroom.strictModeUntil,
+            null,
+          );
+          return {
+            ...resolved,
+            classroomId: directClassroom.id,
+            classroomName: directClassroom.name,
+          };
+        }
+      }
+      return { effectivePolicy: 'STUDENT_CHOICE', strictModeUntil: null };
+    }
+
+    const resolved = this.resolveEffectiveIntegrityPolicy(
+      enrollment.classroom?.integrityPolicy,
+      enrollment.classroom?.strictModeUntil,
+      enrollment.integrityPolicyOverride,
+    );
+
+    return {
+      ...resolved,
+      classroomId: enrollment.classroom?.id,
+      classroomName: enrollment.classroom?.name,
+    };
+  }
+
+  /**
+   * Оновлення політики доброчесності на рівні класу викладачем
+   */
+  async updateClassroomPolicy(classroomId: string, dto: UpdateClassroomPolicyDto): Promise<ClassroomDto> {
+    const existing = await this.prisma.classroom.findUnique({ where: { id: classroomId } });
+    if (!existing) {
+      throw new NotFoundException(`Клас із ID ${classroomId} не знайдено`);
+    }
+
+    let strictModeUntil: Date | null = null;
+    if (dto.integrityPolicy === 'FORCED_GRADED') {
+      if (dto.strictModeMinutes && dto.strictModeMinutes > 0) {
+        strictModeUntil = new Date(Date.now() + dto.strictModeMinutes * 60 * 1000);
+      } else if (dto.strictModeUntil) {
+        strictModeUntil = new Date(dto.strictModeUntil);
+      }
+    }
+
+    const updated = await this.prisma.classroom.update({
+      where: { id: classroomId },
+      data: {
+        integrityPolicy: dto.integrityPolicy as any,
+        strictModeUntil,
+      },
+      include: {
+        course: true,
+        teacher: { include: { profile: true } },
+        students: { include: { profile: true } },
+        _count: { select: { students: true } },
+      },
+    });
+
+    this.logger.log(
+      `Classroom ${classroomId} policy updated to ${dto.integrityPolicy} (until: ${strictModeUntil?.toISOString() || 'indefinite'})`,
+    );
+    return this.formatClassroom(updated);
+  }
+
+  /**
+   * Точкове перевизначення політики доброчесності для окремого студента
+   */
+  async updateEnrollmentPolicy(enrollmentId: string, dto: UpdateEnrollmentPolicyDto): Promise<CourseEnrollmentDto> {
+    const existing = await this.prisma.courseEnrollment.findUnique({ where: { id: enrollmentId } });
+    if (!existing) {
+      throw new NotFoundException(`Зарахування з ID ${enrollmentId} не знайдено`);
+    }
+
+    const updated = await this.prisma.courseEnrollment.update({
+      where: { id: enrollmentId },
+      data: {
+        integrityPolicyOverride: (dto.integrityPolicyOverride as any) ?? null,
+      },
+      include: {
+        course: true,
+        classroom: true,
+      },
+    });
+
+    this.logger.log(
+      `Enrollment ${enrollmentId} policy override updated to ${dto.integrityPolicyOverride ?? 'INHERIT_CLASSROOM'}`,
+    );
+    return this.formatEnrollment(updated);
+  }
+
+  /**
    * Видалити навчальний клас
    */
   async deleteClassroom(classroomId: string): Promise<{ success: boolean }> {
@@ -288,6 +470,7 @@ export class ClassroomService {
   }
 
   private formatClassroom(c: any): ClassroomDto {
+    const resolved = this.resolveEffectiveIntegrityPolicy(c.integrityPolicy, c.strictModeUntil, null);
     return {
       id: c.id,
       name: c.name,
@@ -296,6 +479,8 @@ export class ClassroomService {
       courseId: c.courseId,
       defaultMode: c.defaultMode,
       allowedModules: c.allowedModules || [],
+      integrityPolicy: resolved.effectivePolicy,
+      strictModeUntil: resolved.strictModeUntil,
       createdAt: c.createdAt?.toISOString?.() || new Date().toISOString(),
       updatedAt: c.updatedAt?.toISOString?.() || new Date().toISOString(),
       studentsCount: c._count?.students ?? c.students?.length ?? 0,
@@ -347,6 +532,11 @@ export class ClassroomService {
   }
 
   private formatEnrollment(e: any): CourseEnrollmentDto {
+    const resolved = this.resolveEffectiveIntegrityPolicy(
+      e.classroom?.integrityPolicy,
+      e.classroom?.strictModeUntil,
+      e.integrityPolicyOverride,
+    );
     return {
       id: e.id,
       userId: e.userId,
@@ -354,6 +544,9 @@ export class ClassroomService {
       classroomId: e.classroomId,
       mode: e.mode,
       allowedModules: e.allowedModules || [],
+      integrityPolicyOverride: e.integrityPolicyOverride ?? null,
+      effectiveIntegrityPolicy: resolved.effectivePolicy,
+      strictModeUntil: resolved.strictModeUntil,
       isActive: e.isActive,
       enrolledAt: e.enrolledAt?.toISOString?.() || new Date().toISOString(),
       updatedAt: e.updatedAt?.toISOString?.() || new Date().toISOString(),

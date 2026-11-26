@@ -1,3 +1,5 @@
+import type { PracticeIntegrityMode } from './classroom.types';
+
 /**
  * Параметри BKT моделі та оцінки володіння навичкою
  */
@@ -20,7 +22,27 @@ export interface BktStateDto {
   isMastered: boolean;     // Чи досягнуто поріг майстерності (зазвичай >= 0.85 або 0.95)
   totalAttempts: number;
   correctAttempts: number;
+  activeMode?: PracticeIntegrityMode;
+  gradedMastery?: number | null;
+  gradedMasteredAt?: string | Date | null;
   lastUpdated?: string | Date;
+}
+
+export interface SwitchSkillModeDto {
+  userId?: string;
+  skillId: string;
+  targetMode: PracticeIntegrityMode;
+  courseSlug?: string;
+  forceReset?: boolean;
+}
+
+export interface SwitchSkillModeResultDto {
+  success: boolean;
+  skillId: string;
+  activeMode: PracticeIntegrityMode;
+  wasReset: boolean;
+  preservedGradedMastery: number | null;
+  pMastery: number;
 }
 
 /**
