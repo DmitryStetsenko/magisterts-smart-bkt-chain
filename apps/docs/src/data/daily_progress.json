@@ -41,6 +41,11 @@
             },
             {
               "type": "text",
+              "raw_text": "Створено структурований довідник запитань і відповідей (Q&A) до виступу на IICTE-2026 у форматах Markdown ([`QA_PREPARATION_GUIDE.md`](file:///SCIENCE/THESES/IICTE-2026_20-11-26/PRESENTATION/docs/QA_PREPARATION_GUIDE.md)) та Word ([`QA_PREPARATION_GUIDE.docx`](file:///SCIENCE/THESES/IICTE-2026_20-11-26/PRESENTATION/docs/QA_PREPARATION_GUIDE.docx)) за допомогою генератора [`generate_qa_docx.py`](file:///SCIENCE/THESES/IICTE-2026_20-11-26/PRESENTATION/generate_qa_docx.py): 6 тематичних блоків (`Heading 1`), 16 запитань/правил (`Heading 2`), 8 уточнювальних підпитань (`Heading 3`), 40 нативних формул `OMML`, без іконок — готово до імпорту в Google Docs із бічною навігацією.",
+              "subitems": []
+            },
+            {
+              "type": "text",
               "raw_text": "У [`apps/student/src/components/StudentPortalApp.tsx`](file:///apps/student/src/components/StudentPortalApp.tsx) виправлено скидання курсу, миготіння заголовка `JavaScript & Web Dev` та race condition після `F5`: додано `web-algorithms-school` до `DEFAULT_COURSES`, стан `Завантаження курсу...` до гідрації `isCourseHydrated`, синхронізацію URL `/practice/${slug}` та лічильник послідовності `courseFetchSeqRef`. Підтверджено живим E2E-тестом [`e2e/student-course-reload-dag.spec.ts`](file:///e2e/student-course-reload-dag.spec.ts) (`1/1 passed` у Chromium: перевірено заголовок, `☑ Граф DAG` за замовчуванням, координати розгалуження `Цикли` / `Функції` та стійкість після `page.reload()`).",
               "subitems": []
             },
