@@ -240,7 +240,10 @@ export function StudyAppClient({
 
     const checkActiveStrictSession = async () => {
       try {
-        const res = await fetch(`${API_URL}/api/v1/bkt/active-session/${currentUserId}`);
+        const res = await fetch(
+          `${API_URL}/api/v1/bkt/active-session/${currentUserId}?_t=${Date.now()}`,
+          { cache: 'no-store' },
+        );
         if (!res.ok) return;
         const data: ActiveStrictSessionDto = await res.json();
         if (!isCancelled) {
@@ -257,18 +260,27 @@ export function StudyAppClient({
       }
     };
 
+    const handlePageShow = () => {
+      // Гарантована перевірка при відновленні сторінки з bfcache (стрілки браузера Назад/Вперед)
+      checkActiveStrictSession();
+    };
+
     checkActiveStrictSession();
     window.addEventListener('focus', checkActiveStrictSession);
+    window.addEventListener('pageshow', handlePageShow);
+    window.addEventListener('popstate', checkActiveStrictSession);
     document.addEventListener('visibilitychange', handleVisibility);
     const intervalId = window.setInterval(() => {
       if (document.visibilityState === 'visible') {
         checkActiveStrictSession();
       }
-    }, 2500);
+    }, 2000);
 
     return () => {
       isCancelled = true;
       window.removeEventListener('focus', checkActiveStrictSession);
+      window.removeEventListener('pageshow', handlePageShow);
+      window.removeEventListener('popstate', checkActiveStrictSession);
       document.removeEventListener('visibilitychange', handleVisibility);
       window.clearInterval(intervalId);
     };

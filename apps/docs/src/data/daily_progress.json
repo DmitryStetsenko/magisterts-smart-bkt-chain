@@ -56,6 +56,11 @@
             },
             {
               "type": "text",
+              "raw_text": "**Фікс стійкості `Study Lock` при навігації стрілками браузера (`bfcache` / Back-Forward) та переходах у тій самій вкладці:** додано персистентний DB-fallback у `GET /api/v1/bkt/active-session/:userId` (`BktState` із `activeMode = 'GRADED'` та `isMastered = false`), прибрано передчасне скидання суворої сесії на `beforeunload` у [`StudentPortalApp.tsx`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/student/src/components/StudentPortalApp.tsx) та додано обробники `pageshow` / `popstate` + `cache: 'no-store'` у [`StudyAppClient.tsx`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/study/src/components/StudyAppClient.tsx). Підтверджено розширеним E2E-тестом із `page.goBack()` (`1/1 passed`).",
+              "subitems": []
+            },
+            {
+              "type": "text",
               "raw_text": "**Сценарій живої демонстрації та ручної перевірки потоку (`.docx`) + калібрування стартових пріорів «холодного старту» BKT (`SBC-438`, `EP-BKT`):**",
               "subitems": []
             },

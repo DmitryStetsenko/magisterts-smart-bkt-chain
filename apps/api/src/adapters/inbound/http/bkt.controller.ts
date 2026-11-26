@@ -816,7 +816,42 @@ export class BktController {
       const demo = await this.prisma.user.findFirst({ where: { role: 'STUDENT' } });
       if (demo) targetUserId = demo.id;
     }
-    return this.telemetryGateway.getActiveStrictSession(targetUserId);
+
+    // 1. Check in-memory live strict session first
+    const liveSession = this.telemetryGateway.getActiveStrictSession(targetUserId);
+    if (liveSession.active && liveSession.mode === 'GRADED') {
+      return liveSession;
+    }
+
+    // 2. Persistent DB fallback: if student has an unmastered skill actively in GRADED mode,
+    // keep Study Lock active even across same-tab navigation, Back/Forward arrows, or tab closes.
+    const activeGradedState = await this.prisma.bktState.findFirst({
+      where: {
+        userId: targetUserId,
+        activeMode: 'GRADED' as any,
+        isMastered: false,
+      } as any,
+      include: {
+        skill: {
+          include: { course: { select: { slug: true } } },
+        },
+      },
+      orderBy: { updatedAt: 'desc' },
+    });
+
+    if (activeGradedState) {
+      return {
+        active: true,
+        userId: targetUserId,
+        courseSlug: (activeGradedState as any).skill?.course?.slug,
+        skillId: activeGradedState.skillId,
+        skillTitle: (activeGradedState as any).skill?.title,
+        mode: 'GRADED',
+        startedAt: activeGradedState.updatedAt?.toISOString?.() || new Date().toISOString(),
+      };
+    }
+
+    return liveSession;
   }
 
   @Post('active-session')

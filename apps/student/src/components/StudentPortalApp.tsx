@@ -742,36 +742,25 @@ export function StudentPortalContent({
   }, [currentUserId, activeCourseSlug]);
 
   // Синхронізація активної строгої сесії з бекендом для крос-портального Study Lock (apps/study)
+  // Важливо: НЕ скидаємо сувору сесію на beforeunload/unmount, щоб перехід у тій самій вкладці
+  // чи стрілками браузера назад/вперед на підручник не обходив Study Lock!
   useEffect(() => {
     if (!task?.skillId) return;
     const isStrictActive = effectiveSkillMode === 'GRADED';
-    const syncSession = (active: boolean) => {
-      fetch(`${API_URL}/api/v1/bkt/active-session`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        keepalive: true,
-        body: JSON.stringify({
-          userId: currentUserId,
-          courseSlug: activeCourseSlug,
-          skillId: task.skillId,
-          skillTitle: task.skill?.title || '',
-          taskId: task.id,
-          mode: active ? 'GRADED' : 'TRAINING',
-          active,
-        }),
-      }).catch(() => {});
-    };
-
-    syncSession(isStrictActive);
-
-    const handleBeforeUnload = () => {
-      if (isStrictActive) syncSession(false);
-    };
-    window.addEventListener('beforeunload', handleBeforeUnload);
-    return () => {
-      window.removeEventListener('beforeunload', handleBeforeUnload);
-      if (isStrictActive) syncSession(false);
-    };
+    fetch(`${API_URL}/api/v1/bkt/active-session`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      keepalive: true,
+      body: JSON.stringify({
+        userId: currentUserId,
+        courseSlug: activeCourseSlug,
+        skillId: task.skillId,
+        skillTitle: task.skill?.title || '',
+        taskId: task.id,
+        mode: isStrictActive ? 'GRADED' : 'TRAINING',
+        active: isStrictActive,
+      }),
+    }).catch(() => {});
   }, [currentUserId, activeCourseSlug, task?.id, task?.skillId, task?.skill?.title, effectiveSkillMode]);
 
   // Трекінг перемикання вкладок (visibilitychange) для всіх типів завдань у режимі GRADED

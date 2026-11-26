@@ -5567,3 +5567,9 @@ eferenceAnswer, критерії options.keywords (microtask|мікротаск|
   - Успішні збірки: `@sbc/types`, `apps/api`, `apps/study`, `apps/student`, `apps/teacher` (0 помилок).
   - Unit-тести `apps/api`: `12/12` suites, `78/78` tests passed.
   - Наскрізний Playwright E2E-тест `e2e/practice-integrity-modes.spec.ts` (2 одночасні вкладки `apps/student` + `apps/study`): `1/1 passed (34.5s)`.
+
+- **Додатковий фікс стійкості `Study Lock` при переходах стрілками браузера (`bfcache`) та у тій самій вкладці:**
+  - У [`bkt.controller.ts`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/api/src/adapters/inbound/http/bkt.controller.ts) (`GET /api/v1/bkt/active-session/:userId`) додано персистентну перевірку БД (`BktState` із `activeMode = 'GRADED'`, `isMastered = false`), щоб блокування не зникало при закритті або переході зі сторінки тренажера.
+  - У [`StudentPortalApp.tsx`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/student/src/components/StudentPortalApp.tsx) прибрано скидання суворої сесії в `beforeunload` / unmount cleanup (тепер знімається лише при опануванні навички, зміні режиму чи явному скиданні).
+  - У [`StudyAppClient.tsx`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/study/src/components/StudyAppClient.tsx) додано підписки на `pageshow` (відновлення з `bfcache` при кліку стрілок Назад/Вперед), `popstate` та `cache: 'no-store'`.
+  - Розширено [`e2e/practice-integrity-modes.spec.ts`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/e2e/practice-integrity-modes.spec.ts) перевіркою `studyPage.goto('http://localhost:3003')` → `studyPage.goBack()` (`1/1 passed`, `19.5s`).

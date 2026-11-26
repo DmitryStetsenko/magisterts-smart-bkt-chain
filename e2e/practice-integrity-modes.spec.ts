@@ -73,6 +73,12 @@ test.describe('Practice Integrity Modes & Cross-App Study Lock', () => {
     const lockOverlay = studyPage.getByTestId('study-lock-overlay');
     await expect(lockOverlay).toBeVisible({ timeout: 10000 });
 
+    // 4.5. Регресійна перевірка стрілок браузера (Назад/Вперед + bfcache):
+    // Переходимо з підручника на іншу сторінку й повертаємося стрілкою «Назад» — блокування має зберегтися!
+    await studyPage.goto('http://localhost:3003', { waitUntil: 'domcontentloaded' });
+    await studyPage.goBack({ waitUntil: 'domcontentloaded' });
+    await expect(studyPage.getByTestId('study-lock-overlay')).toBeVisible({ timeout: 10000 });
+
     // 5. Натискаємо «Перервати спробу і відкрити урок» прямо в оверлеї підручника
     await studyPage.getByTestId('study-lock-abandon-btn').click();
     await expect(lockOverlay).toBeHidden({ timeout: 10000 });
