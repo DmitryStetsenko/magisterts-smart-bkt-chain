@@ -162,6 +162,11 @@
             },
             {
               "type": "text",
+              "raw_text": "Згенеровано Word-версію довідника формул і метрик [`PRESENTATION/docs/FORMULAS_AND_METRICS_GUIDE.docx`](file:///SCIENCE/THESES/IICTE-2026_20-11-26/PRESENTATION/docs/FORMULAS_AND_METRICS_GUIDE.docx) за допомогою [`PRESENTATION/generate_formulas_docx.py`](file:///SCIENCE/THESES/IICTE-2026_20-11-26/PRESENTATION/generate_formulas_docx.py) (15 нативних заголовків `Title / Heading 1–2`, 2 стилізовані таблиці, 57 формул `OMML` із вертикальними дробами `<m:f>`, без іконок) та проведено звірку PDF-презентації [`PRESENTATION/RELEASE/Архітектура_Smart-BKT-Chain.pdf`](file:///SCIENCE/THESES/IICTE-2026_20-11-26/PRESENTATION/RELEASE/Архітектура_Smart-BKT-Chain.pdf) (10 слайдів NotebookLM) на узгодженість із тезами `V-4.0`.",
+              "subitems": []
+            },
+            {
+              "type": "text",
               "raw_text": "У [`apps/student/src/components/StudentPortalApp.tsx`](file:///apps/student/src/components/StudentPortalApp.tsx) усунено миготіння заголовка `JavaScript & Web Dev` та race condition при перезавантаженні (`F5`): додано `web-algorithms-school` у `DEFAULT_COURSES`, індикатор `Завантаження курсу...` до завершення `isCourseHydrated`, `courseFetchSeqRef` та синхронізацію URL. Верифіковано Playwright E2E-тестом [`e2e/student-course-reload-dag.spec.ts`](file:///e2e/student-course-reload-dag.spec.ts) (`1 passed`).",
               "subitems": []
             },

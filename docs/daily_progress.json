@@ -46,6 +46,11 @@
             },
             {
               "type": "text",
+              "raw_text": "Оновлено [`FORMULAS_AND_METRICS_GUIDE.md`](file:///SCIENCE/THESES/IICTE-2026_20-11-26/PRESENTATION/docs/FORMULAS_AND_METRICS_GUIDE.md) (прибрано іконки, додано підзаголовки `###` для 7 формул і 3 етапів еволюції), створено Word-генератор [`generate_formulas_docx.py`](file:///SCIENCE/THESES/IICTE-2026_20-11-26/PRESENTATION/generate_formulas_docx.py) та згенеровано [`FORMULAS_AND_METRICS_GUIDE.docx`](file:///SCIENCE/THESES/IICTE-2026_20-11-26/PRESENTATION/docs/FORMULAS_AND_METRICS_GUIDE.docx) (15 нативних заголовків, 2 таблиці, 57 формул `OMML`); додано й перевірено фінальну PDF-презентацію [`Архітектура_Smart-BKT-Chain.pdf`](file:///SCIENCE/THESES/IICTE-2026_20-11-26/PRESENTATION/RELEASE/Архітектура_Smart-BKT-Chain.pdf).",
+              "subitems": []
+            },
+            {
+              "type": "text",
               "raw_text": "У [`apps/student/src/components/StudentPortalApp.tsx`](file:///apps/student/src/components/StudentPortalApp.tsx) виправлено скидання курсу, миготіння заголовка `JavaScript & Web Dev` та race condition після `F5`: додано `web-algorithms-school` до `DEFAULT_COURSES`, стан `Завантаження курсу...` до гідрації `isCourseHydrated`, синхронізацію URL `/practice/${slug}` та лічильник послідовності `courseFetchSeqRef`. Підтверджено живим E2E-тестом [`e2e/student-course-reload-dag.spec.ts`](file:///e2e/student-course-reload-dag.spec.ts) (`1/1 passed` у Chromium: перевірено заголовок, `☑ Граф DAG` за замовчуванням, координати розгалуження `Цикли` / `Функції` та стійкість після `page.reload()`).",
               "subitems": []
             },
