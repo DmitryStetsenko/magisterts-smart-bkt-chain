@@ -30,6 +30,10 @@
   5. *Build Next.js Documentation Site* (`npm run build:docs`) — збірка статичного експорту (`output: "export"`, `trailingSlash: true`, `basePath: "/magisterts-smart-bkt-chain"`).
   6. *Upload Artifact & Deploy Pages* (`actions/upload-pages-artifact@v3` + `actions/deploy-pages@v4`).
 
+### 0.1.7.113 Закриття задачі беклогу `[BACKLOG-4]` (`SBC-314`) за результатами впровадження `SBC-272`–`SBC-274` та `SBC-438`
+- **Контекст:** у реєстрі беклогу [`docs/backlog/README.md`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/docs/backlog/README.md) задача `[BACKLOG-4]` (`SBC-314`) залишалася у статусі `PROPOSED`, хоча основний функціонал перемикання курсів (`localStorage`, toast-сповіщення, модальне підтвердження `pendingCourseSlug`, URL `/practice/${slug}`) уже працював у [`StudentPortalApp.tsx`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/student/src/components/StudentPortalApp.tsx) та [`apps/teacher/src/app/page.tsx`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/teacher/src/app/page.tsx).
+- **Рішення:** статус `[BACKLOG-4]` (`SBC-314`) переведено в `DONE` із фіксацією реалізованих комітів (`SBC-272`, `SBC-273`, `SBC-274`, `SBC-438`) та закриттям додаткових експериментальних пунктів (`BroadcastChannel`, Quick Switcher, транзитний екран) як непотрібних.
+
 ### 0.1.7.112 Синхронізація стартових пріорів «холодного старту» BKT та Word-документ демонстраційного потоку (`SBC-438`, `EP-BKT`)
 - **Діагностика під час мануального E2E-прогону:**
   - Після скидання прогресу (`POST /api/v1/bkt/reset`) перша відповідь у Модулі 1 створювала запис `bktState` у [`apps/api/src/adapters/inbound/http/bkt.controller.ts`](file:///apps/api/src/adapters/inbound/http/bkt.controller.ts#L308-L319) зі стартовим `pMastery = 0.50` і `pGuess = 0.20`, через що вже перша правильна відповідь піднімала оцінку до `0.8545` (`85.5%`) і миттєво відкривала Модуль 2 (`requiredMastery = 0.85`).

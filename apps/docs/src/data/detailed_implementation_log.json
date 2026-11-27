@@ -120,6 +120,24 @@
           ]
         },
         {
+          "title": "0.1.7.113 Закриття задачі беклогу `[BACKLOG-4]` (`SBC-314`) за результатами впровадження `SBC-272`–`SBC-274` та `SBC-438`",
+          "level": 3,
+          "paragraphs": [],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "**Контекст:** у реєстрі беклогу [`docs/backlog/README.md`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/docs/backlog/README.md) задача `[BACKLOG-4]` (`SBC-314`) залишалася у статусі `PROPOSED`, хоча основний функціонал перемикання курсів (`localStorage`, toast-сповіщення, модальне підтвердження `pendingCourseSlug`, URL `/practice/${slug}`) уже працював у [`StudentPortalApp.tsx`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/student/src/components/StudentPortalApp.tsx) та [`apps/teacher/src/app/page.tsx`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/teacher/src/app/page.tsx).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Рішення:** статус `[BACKLOG-4]` (`SBC-314`) переведено в `DONE` із фіксацією реалізованих комітів (`SBC-272`, `SBC-273`, `SBC-274`, `SBC-438`) та закриттям додаткових експериментальних пунктів (`BroadcastChannel`, Quick Switcher, транзитний екран) як непотрібних.",
+              "subitems": []
+            }
+          ]
+        },
+        {
           "title": "0.1.7.112 Синхронізація стартових пріорів «холодного старту» BKT та Word-документ демонстраційного потоку (`SBC-438`, `EP-BKT`)",
           "level": 3,
           "paragraphs": [],
