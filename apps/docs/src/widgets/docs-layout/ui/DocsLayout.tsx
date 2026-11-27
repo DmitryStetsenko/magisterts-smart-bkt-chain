@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import roadmapData from '../../../data/roadmap.json';
 import techStackData from '../../../data/tech_stack.json';
+import mfsdArchitectureData from '../../../data/mfsd_architecture.json';
 import projectManagementData from '../../../data/project_management.json';
 import telemetryData from '../../../data/telemetry_analytics.json';
 import studyPortalData from '../../../data/apps_study_portal.json';
@@ -36,6 +37,7 @@ function DocsLayoutContent({ children }: DocsLayoutContentProps) {
   // Cast JSON data
   const roadmapDoc = roadmapData as DocData;
   const techDoc = techStackData as DocData;
+  const mfsdDoc = mfsdArchitectureData as DocData;
   const pmDoc = projectManagementData as DocData;
   const telemetryDoc = telemetryData as DocData;
   const studyDoc = studyPortalData as DocData;
@@ -50,6 +52,7 @@ function DocsLayoutContent({ children }: DocsLayoutContentProps) {
   const activeTab = useMemo<Tab>(() => {
     if (pathname.includes('/help')) return 'help';
     if (pathname.includes('/guide')) return 'guide';
+    if (pathname.includes('/mfsd')) return 'mfsd';
     if (pathname.includes('/tech')) return 'tech';
     if (pathname.includes('/telemetry')) return 'telemetry';
     if (pathname.includes('/pm')) return 'pm';
@@ -69,6 +72,8 @@ function DocsLayoutContent({ children }: DocsLayoutContentProps) {
         return guideDoc;
       case 'tech':
         return techDoc;
+      case 'mfsd':
+        return mfsdDoc;
       case 'telemetry':
         return telemetryDoc;
       case 'pm':
@@ -93,6 +98,7 @@ function DocsLayoutContent({ children }: DocsLayoutContentProps) {
     guideDoc,
     roadmapDoc,
     techDoc,
+    mfsdDoc,
     telemetryDoc,
     pmDoc,
     studyDoc,
@@ -337,6 +343,16 @@ function DocsLayoutContent({ children }: DocsLayoutContentProps) {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
                     </svg>
                     <span>Технічний стек</span>
+                  </Link>
+                  <Link
+                    href="/mfsd/"
+                    onClick={() => setIsSidebarOpen(false)}
+                    className={`w-full text-left py-2 px-2.5 rounded-lg text-xs font-semibold tracking-wide transition-all flex items-center gap-2.5 ${activeTab === 'mfsd' ? (isDarkMode ? 'bg-zinc-800 text-white shadow-md' : 'bg-white text-zinc-950 shadow-sm') : (isDarkMode ? 'text-zinc-400 hover:text-zinc-200' : 'text-zinc-600 hover:text-zinc-900')}`}
+                  >
+                    <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 5a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1V5zm10 0a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zM4 15a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1v-4zm10 0a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z" />
+                    </svg>
+                    <span>Архітектура M-FSD</span>
                   </Link>
                   <Link
                     href="/telemetry/"

@@ -181,6 +181,7 @@ def compile_file(source_path, primary_output_path, secondary_output_path=None):
 def main():
     compile_file("docs/roadmap.md", "docs/roadmap.json", "apps/docs/src/data/roadmap.json")
     compile_file("docs/tech_stack.source.md", "docs/tech_stack.json", "apps/docs/src/data/tech_stack.json")
+    compile_file("docs/mfsd_architecture.md", "docs/mfsd_architecture.json", "apps/docs/src/data/mfsd_architecture.json")
     compile_file("docs/project_management.md", "docs/project_management.json", "apps/docs/src/data/project_management.json")
     compile_file("docs/daily_progress.md", "docs/daily_progress.json", "apps/docs/src/data/daily_progress.json")
     compile_file("docs/detailed_implementation_log.md", "docs/detailed_implementation_log.json", "apps/docs/src/data/detailed_implementation_log.json")

@@ -26,7 +26,12 @@
             },
             {
               "type": "text",
-              "raw_text": "Сформульовано та задокументовано офіційний архітектурний підхід **`M-FSD` (Monorepo Feature-Sliced Design: Shared Foundation + Portal Slices)** у [`docs/brainstorm/23_monorepo_fsd_and_shared_ui_kit_architecture.md`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/docs/brainstorm/23_monorepo_fsd_and_shared_ui_kit_architecture.md) (індекс [`docs/brainstorm/README.md`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/docs/brainstorm/README.md)): аудит 6 порталів, матриця дозволених імпортів, дерево прийняття рішень розміщення коду, регламент сегментів (`ui/model/api/lib/config`) та Public API (`index.ts`), кількісні пороги декомпозиції монолітів (`app/page.tsx` ≤ 100 рядків, `views/` ≤ 300, `widgets/` ≤ 400), специфікація UI-Kit у `@sbc/ui/shared/ui/` на токенах `--sbc-*` і чеклист Pre-Commit аудиту.",
+              "raw_text": "Створено окремий канонічний документ архітектури [`docs/mfsd_architecture.md`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/docs/mfsd_architecture.md), інтегровано його в компілятор [`scripts/compile_docs.py`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/scripts/compile_docs.py) (`docs/mfsd_architecture.json`, `apps/docs/src/data/mfsd_architecture.json`) та додано маршрут `/mfsd/` у портал документації `apps/docs`.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Сформульовано та задокументовано офіційний архітектурний підхід **`M-FSD` (Monorepo Feature-Sliced Design: Shared Foundation + Portal Slices)** у [`docs/mfsd_architecture.md`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/docs/mfsd_architecture.md) та [`docs/brainstorm/23_monorepo_fsd_and_shared_ui_kit_architecture.md`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/docs/brainstorm/23_monorepo_fsd_and_shared_ui_kit_architecture.md) (індекс [`docs/brainstorm/README.md`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/docs/brainstorm/README.md)): аудит 6 порталів, матриця дозволених імпортів, дерево прийняття рішень розміщення коду, регламент сегментів (`ui/model/api/lib/config`) та Public API (`index.ts`), кількісні пороги декомпозиції монолітів (`app/page.tsx` ≤ 100 рядків, `views/` ≤ 300, `widgets/` ≤ 400), специфікація UI-Kit у `@sbc/ui/shared/ui/` на токенах `--sbc-*` і чеклист Pre-Commit аудиту.",
               "subitems": []
             },
             {

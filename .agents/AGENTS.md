@@ -287,7 +287,7 @@
 ---
 
 ### 15. 🧱 Архітектурний Стандарт `M-FSD` (Monorepo Feature-Sliced Design: Shared Foundation + Portal Slices)
-Усі фронтенд-застосунки цього та наступних мультипортальних монорепозиторіїв проєктуються, розвиваються та рефакторяться виключно за стандартом **`M-FSD` (Monorepo Feature-Sliced Design)** — принципом **«Спільний Фундамент + Слайси Порталів»** згідно зі специфікацією [`docs/brainstorm/23_monorepo_fsd_and_shared_ui_kit_architecture.md`](file:///docs/brainstorm/23_monorepo_fsd_and_shared_ui_kit_architecture.md):
+Усі фронтенд-застосунки цього та наступних мультипортальних монорепозиторіїв проєктуються, розвиваються та рефакторяться виключно за стандартом **`M-FSD` (Monorepo Feature-Sliced Design)** — принципом **«Спільний Фундамент + Слайси Порталів»** згідно зі специфікацією [`docs/mfsd_architecture.md`](file:///docs/mfsd_architecture.md) (контекст рішення: [`docs/brainstorm/23_monorepo_fsd_and_shared_ui_kit_architecture.md`](file:///docs/brainstorm/23_monorepo_fsd_and_shared_ui_kit_architecture.md)):
 
 1. **Дворівнева структура монорепозиторію:**
    - **Рівень А — `Shared Foundation` (`packages/*`):**

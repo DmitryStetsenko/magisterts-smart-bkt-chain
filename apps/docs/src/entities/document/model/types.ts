@@ -38,6 +38,7 @@ export type Tab =
   | 'help'
   | 'roadmap'
   | 'tech'
+  | 'mfsd'
   | 'telemetry'
   | 'pm'
   | 'study'
