@@ -5,7 +5,14 @@
 ## 📅 27 листопада 2026 року
 
 ### ✅ Що зроблено за день:
-1. **Фаза 2 `SBC-315` — міграція модальних вікон `apps/study` та `apps/student` на `@sbc/ui` (`Modal` / `ConfirmModal`):**
+1. **Фаза 2 `SBC-315` — міграція модальних вікон `apps/teacher` на `@sbc/ui` (`Modal`, `ConfirmModal`, `Button`, `Badge`):**
+   - У [`apps/teacher/src/app/page.tsx`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/teacher/src/app/page.tsx) переведено всі 3 вбудовані модальні вікна на єдиний UI-Kit:
+     - `metricModal` (пояснення формул `P(L)`, `WPM`, `Copy-Paste Ratio`, `Індекс Втоми`) → `<Modal>` із `--sbc-*` блоками формул та `<Button>` у футері;
+     - `pendingCourseSlug` (підтвердження перемикання курсу моніторингу) → `<ConfirmModal>`;
+     - `resetConfirmStudent` (курс-ізольоване та глобальне анулювання прогресу студента із safety-перемикачем) → `<Modal>` із `<Badge>` та `<Button>`.
+   - У [`CreateClassroomModal.tsx`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/teacher/src/features/classrooms/ui/CreateClassroomModal.tsx) замінено локальний `fixed inset-0` контейнер і кнопки на `<Modal>` та `<Button>` із `@sbc/ui`.
+   - **Верифікація:** `npx tsc -p apps/teacher/tsconfig.json --noEmit` без помилок; Playwright E2E `e2e/course-and-modules.spec.ts` + `e2e/theme-settings.spec.ts` (`11/11 passed`), `e2e/light-theme-contrast.spec.ts` (`4/4 passed`, Teacher 0 порушень) та сценарій `CreateClassroomModal` у `e2e/onboarding-and-classrooms.spec.ts` пройшли успішно.
+2. **Фаза 2 `SBC-315` — міграція модальних вікон `apps/study` та `apps/student` на `@sbc/ui` (`Modal` / `ConfirmModal`):**
    - Розширено [`Modal.tsx`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/packages/ui/src/shared/ui/modal/Modal.tsx) та [`ConfirmModal.tsx`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/packages/ui/src/shared/ui/modal/ConfirmModal.tsx) підтримкою E2E-селекторів (`overlayTestId`, `dialogTestId`, `confirmTestId`, `cancelTestId`, `closeTestId`, `hideCancelButton`).
    - У [`StudyAppClient.tsx`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/study/src/components/StudyAppClient.tsx) переведено оверлей `Study Lock` (`study-lock-overlay`) на спільні `<Modal>`, `<Button>` та `<Badge>` із `@sbc/ui`.
    - У [`AbandonTaskModal.tsx`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/student/src/components/AbandonTaskModal.tsx) та [`StudentPortalApp.tsx`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/student/src/components/StudentPortalApp.tsx) замінено 4 саморобні модальні вікна (відмова від завдання заради підручника, вичерпання завдань модуля, підтвердження зміни курсу та перемикання режиму `Zero-Mix Rule`) на єдиний `<ConfirmModal>` із `@sbc/ui`.

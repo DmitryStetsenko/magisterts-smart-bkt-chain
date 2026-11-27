@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { io } from 'socket.io-client';
 import { ShieldCheck, Network, Users, BarChart3, Code2, BookOpen, Scale, ChevronDown, ChevronUp, X, Search, RotateCcw, AlertTriangle, CheckCircle2, Lock, HelpCircle, Code, FileText, CheckSquare, Sparkles, Keyboard, Copy, Activity, Info, GitBranch, Layers, ClipboardCheck, Tag, FlaskConical, Compass, User, Globe, Plus, Minus, GraduationCap, Clock, Trophy } from 'lucide-react';
 import { StudentAnalyticsItem } from '../features/analytics/model/analytics.types';
-import { AnomalyTreeWidget, GameSkillTreeWidget, SkillGraphNode, AppShellLayout, Breadcrumbs, UserProfileDrawer, ThemeSettingsSection } from '@sbc/ui';
+import { AnomalyTreeWidget, GameSkillTreeWidget, SkillGraphNode, AppShellLayout, Breadcrumbs, UserProfileDrawer, ThemeSettingsSection, Modal, ConfirmModal, Button, Badge } from '@sbc/ui';
 import { CourseDto, TaskDto } from '@sbc/types';
 import { ReviewQueueInspector } from '../features/reviews/ui/ReviewQueueInspector';
 import { CourseGraphViewer } from '../features/course-map/ui/CourseGraphViewer';
@@ -1469,202 +1469,208 @@ export default function TeacherDashboardPage() {
       mainClassName="p-4 lg:p-6 overflow-y-auto flex flex-col gap-6 bg-slate-950"
       overlays={
         <>
-{/* 🧮 Interactive Metric Explanation Modal */}
-      {metricModal && (
-        <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 animate-fadeIn">
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl max-w-lg w-full p-6 shadow-2xl flex flex-col gap-4 relative">
-            <button
-              onClick={() => setMetricModal(null)}
-              className="absolute top-4 right-4 p-1 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-all"
-            >
-              <X className="w-5 h-5" />
-            </button>
-
-            {metricModal === 'bkt' && (
-              <>
-                <div className="flex items-center gap-3 text-emerald-400">
-                  <div className="p-2 bg-emerald-500/10 border border-emerald-500/20 rounded-xl">
-                    <Sparkles className="w-5 h-5" />
-                  </div>
-                  <h3 className="text-base font-bold text-white">Середня Майстерність P(L) — Bayesian Knowledge Tracing</h3>
-                </div>
-                <div className="text-xs text-slate-300 flex flex-col gap-3 leading-relaxed">
-                  <p>
-                    Параметр <span className="font-mono text-emerald-400 font-bold">P(L)</span> визначає ймовірність того, що студент повністю засвоїв концепцію конкретного модуля.
-                  </p>
-                  <div className="p-3 bg-slate-950 border border-slate-800 rounded-xl font-mono text-[11px] text-slate-200">
-                    P(L_t | obs) = [ P(L_t-1) * (1 - P(S)) ] / [ P(L_t-1) * (1 - P(S)) + (1 - P(L_t-1)) * P(G) ]
-                  </div>
-                  <ul className="list-disc pl-4 space-y-1 text-slate-400">
-                    <li><strong className="text-slate-200">P(G) = 0.20:</strong> Ймовірність вгадування (Guessing).</li>
-                    <li><strong className="text-slate-200">P(S) = 0.10:</strong> Ймовірність описки/вислизання (Slip).</li>
-                    <li><strong className="text-slate-200">P(T) = 0.15:</strong> Ймовірність засвоєння після спроби (Transition).</li>
-                  </ul>
-                  <p className="text-[11px] text-slate-400 italic">
-                    При досягненні P(L) ≥ 0.95 (95%) модуль вважається успішно засвоєним, і студенту відкривається доступ до наступних вузлів DAG.
-                  </p>
-                </div>
-              </>
-            )}
-
-            {metricModal === 'wpm' && (
-              <>
-                <div className="flex items-center gap-3 text-indigo-400">
-                  <div className="p-2 bg-indigo-500/10 border border-indigo-500/20 rounded-xl">
-                    <Keyboard className="w-5 h-5" />
-                  </div>
-                  <h3 className="text-base font-bold text-white">Швидкість Набору Коду (WPM)</h3>
-                </div>
-                <div className="text-xs text-slate-300 flex flex-col gap-3 leading-relaxed">
-                  <p>
-                    <span className="font-mono text-indigo-400 font-bold">WPM (Words Per Minute)</span> розраховується в реальному часі на основі натискань клавіш у Monaco Editor.
-                  </p>
-                  <div className="p-3 bg-slate-950 border border-slate-800 rounded-xl font-mono text-[11px] text-slate-200">
-                    WPM = (Всього символів / 5) / (Час введення в хвилинах)
-                  </div>
-                  <p className="text-[11px] text-slate-400">
-                    Нормальний темп розробника: 35–65 WPM. Аномально високі стрибки (&gt;150 WPM) вказують на автодоповнення або масовий paste коду.
-                  </p>
-                </div>
-              </>
-            )}
-
-            {metricModal === 'copypaste' && (
-              <>
-                <div className="flex items-center gap-3 text-amber-400">
-                  <div className="p-2 bg-amber-500/10 border border-amber-500/20 rounded-xl">
-                    <Copy className="w-5 h-5" />
-                  </div>
-                  <h3 className="text-base font-bold text-white">Copy-Paste Ratio (Частка Вставленого Коду)</h3>
-                </div>
-                <div className="text-xs text-slate-300 flex flex-col gap-3 leading-relaxed">
-                  <p>
-                    <span className="font-mono text-amber-400 font-bold">Copy-Paste Ratio</span> визначає співвідношення символів, доданих через комбінації Ctrl+V / Command+V, до загального обсягу коду.
-                  </p>
-                  <div className="p-3 bg-slate-950 border border-slate-800 rounded-xl font-mono text-[11px] text-slate-200">
-                    CopyPasteRatio = Символів з Clipboard / Загальна кількість символів рішення
-                  </div>
-                  <p className="text-[11px] text-slate-400">
-                    Показник &gt; 60% може свідчити про списування чи використання сторонніх генераторів коду без самостійного введення.
-                  </p>
-                </div>
-              </>
-            )}
-
-            {metricModal === 'fatigue' && (
-              <>
-                <div className="flex items-center gap-3 text-purple-400">
-                  <div className="p-2 bg-purple-500/10 border border-purple-500/20 rounded-xl">
-                    <Activity className="w-5 h-5" />
-                  </div>
-                  <h3 className="text-base font-bold text-white">Індекс Втоми (Idle Pauses & Cognitive Load)</h3>
-                </div>
-                <div className="text-xs text-slate-300 flex flex-col gap-3 leading-relaxed">
-                  <p>
-                    <span className="font-mono text-purple-400 font-bold">Індекс Втоми</span> відстежує аномально тривалі зупинки редагування (&gt; 15 секунд) та часті видалення великих блоків (Backspace / Delete).
-                  </p>
-                  <div className="p-3 bg-slate-950 border border-slate-800 rounded-xl font-mono text-[11px] text-slate-200">
-                    FatigueIndex = Кількість_Пауз_&gt;15с + (Видалено_Символів / 50)
-                  </div>
-                  <p className="text-[11px] text-slate-400">
-                    Високий показник свідчить про виникнення труднощів, замішання або когнітивного перевантаження під час виконання задачі.
-                  </p>
-                </div>
-              </>
-            )}
-
-            <div className="pt-2 flex justify-end">
-              <button
-                onClick={() => setMetricModal(null)}
-                className="px-4 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold transition-all cursor-pointer"
-              >
-                Зрозуміло
-              </button>
+      {/* 🧮 Interactive Metric Explanation Modal */}
+      <Modal
+        isOpen={Boolean(metricModal)}
+        onClose={() => setMetricModal(null)}
+        size="lg"
+        icon={
+          metricModal === 'bkt' ? (
+            <div className="p-2 bg-emerald-950/50 border border-emerald-500/30 rounded-xl text-emerald-400">
+              <Sparkles className="w-5 h-5" />
             </div>
+          ) : metricModal === 'wpm' ? (
+            <div className="p-2 bg-indigo-950/50 border border-indigo-500/30 rounded-xl text-indigo-400">
+              <Keyboard className="w-5 h-5" />
+            </div>
+          ) : metricModal === 'copypaste' ? (
+            <div className="p-2 bg-amber-950/50 border border-amber-500/30 rounded-xl text-amber-400">
+              <Copy className="w-5 h-5" />
+            </div>
+          ) : (
+            <div className="p-2 bg-purple-950/50 border border-purple-500/30 rounded-xl text-purple-400">
+              <Activity className="w-5 h-5" />
+            </div>
+          )
+        }
+        title={
+          metricModal === 'bkt'
+            ? 'Середня Майстерність P(L) — Bayesian Knowledge Tracing'
+            : metricModal === 'wpm'
+            ? 'Швидкість Набору Коду (WPM)'
+            : metricModal === 'copypaste'
+            ? 'Copy-Paste Ratio (Частка Вставленого Коду)'
+            : 'Індекс Втоми (Idle Pauses & Cognitive Load)'
+        }
+        footer={
+          <div className="flex justify-end">
+            <Button variant="secondary" size="sm" onClick={() => setMetricModal(null)}>
+              Зрозуміло
+            </Button>
           </div>
-        </div>
-      )}
+        }
+      >
+        {metricModal === 'bkt' && (
+          <div className="text-xs text-[var(--sbc-text-muted,#909090)] flex flex-col gap-3 leading-relaxed">
+            <p>
+              Параметр <span className="font-mono text-emerald-400 font-bold">P(L)</span> визначає ймовірність того, що студент повністю засвоїв концепцію конкретного модуля.
+            </p>
+            <div className="p-3 bg-[var(--sbc-bg-subtle,#262626)] border border-[var(--sbc-border-subtle,#2b2b2b)] rounded-xl font-mono text-[11px] text-[var(--sbc-text-primary,#cccccc)]">
+              P(L_t | obs) = [ P(L_t-1) * (1 - P(S)) ] / [ P(L_t-1) * (1 - P(S)) + (1 - P(L_t-1)) * P(G) ]
+            </div>
+            <ul className="list-disc pl-4 space-y-1">
+              <li><strong className="text-[var(--sbc-text-primary,#cccccc)]">P(G) = 0.20:</strong> Ймовірність вгадування (Guessing).</li>
+              <li><strong className="text-[var(--sbc-text-primary,#cccccc)]">P(S) = 0.10:</strong> Ймовірність описки/вислизання (Slip).</li>
+              <li><strong className="text-[var(--sbc-text-primary,#cccccc)]">P(T) = 0.15:</strong> Ймовірність засвоєння після спроби (Transition).</li>
+            </ul>
+            <p className="text-[11px] italic">
+              При досягненні P(L) ≥ 0.95 (95%) модуль вважається успішно засвоєним, і студенту відкривається доступ до наступних вузлів DAG.
+            </p>
+          </div>
+        )}
+
+        {metricModal === 'wpm' && (
+          <div className="text-xs text-[var(--sbc-text-muted,#909090)] flex flex-col gap-3 leading-relaxed">
+            <p>
+              <span className="font-mono text-indigo-400 font-bold">WPM (Words Per Minute)</span> розраховується в реальному часі на основі натискань клавіш у Monaco Editor.
+            </p>
+            <div className="p-3 bg-[var(--sbc-bg-subtle,#262626)] border border-[var(--sbc-border-subtle,#2b2b2b)] rounded-xl font-mono text-[11px] text-[var(--sbc-text-primary,#cccccc)]">
+              WPM = (Всього символів / 5) / (Час введення в хвилинах)
+            </div>
+            <p className="text-[11px]">
+              Нормальний темп розробника: 35–65 WPM. Аномально високі стрибки (&gt;150 WPM) вказують на автодоповнення або масовий paste коду.
+            </p>
+          </div>
+        )}
+
+        {metricModal === 'copypaste' && (
+          <div className="text-xs text-[var(--sbc-text-muted,#909090)] flex flex-col gap-3 leading-relaxed">
+            <p>
+              <span className="font-mono text-amber-400 font-bold">Copy-Paste Ratio</span> визначає співвідношення символів, доданих через комбінації Ctrl+V / Command+V, до загального обсягу коду.
+            </p>
+            <div className="p-3 bg-[var(--sbc-bg-subtle,#262626)] border border-[var(--sbc-border-subtle,#2b2b2b)] rounded-xl font-mono text-[11px] text-[var(--sbc-text-primary,#cccccc)]">
+              CopyPasteRatio = Символів з Clipboard / Загальна кількість символів рішення
+            </div>
+            <p className="text-[11px]">
+              Показник &gt; 60% може свідчити про списування чи використання сторонніх генераторів коду без самостійного введення.
+            </p>
+          </div>
+        )}
+
+        {metricModal === 'fatigue' && (
+          <div className="text-xs text-[var(--sbc-text-muted,#909090)] flex flex-col gap-3 leading-relaxed">
+            <p>
+              <span className="font-mono text-purple-400 font-bold">Індекс Втоми</span> відстежує аномально тривалі зупинки редагування (&gt; 15 секунд) та часті видалення великих блоків (Backspace / Delete).
+            </p>
+            <div className="p-3 bg-[var(--sbc-bg-subtle,#262626)] border border-[var(--sbc-border-subtle,#2b2b2b)] rounded-xl font-mono text-[11px] text-[var(--sbc-text-primary,#cccccc)]">
+              FatigueIndex = Кількість_Пауз_&gt;15с + (Видалено_Символів / 50)
+            </div>
+            <p className="text-[11px]">
+              Високий показник свідчить про виникнення труднощів, замішання або когнітивного перевантаження під час виконання задачі.
+            </p>
+          </div>
+        )}
+      </Modal>
 
       {/* Course Switch Confirmation Modal Popup */}
-      {pendingCourseSlug && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-md animate-fadeIn">
-          <div className="max-w-md w-full p-6 bg-slate-900 border border-purple-500/40 rounded-2xl shadow-2xl flex flex-col gap-5 text-center transform transition-all scale-100">
-            <div className="mx-auto p-3.5 bg-purple-500/10 border border-purple-500/30 rounded-full text-purple-400">
-              <ShieldCheck className="w-8 h-8 animate-pulse" />
-            </div>
-            <div className="flex flex-col gap-2">
-              <h3 className="text-lg font-bold text-white">Перемикання Дисципліни Моніторингу</h3>
-              <p className="text-xs text-slate-300 leading-relaxed">
-                Перемкнути навчальну аналітику, журнал перевірки та граф навичок на курс <strong className="text-purple-300">"{courses.find(c => c.slug === pendingCourseSlug)?.title || pendingCourseSlug}"</strong>?
-              </p>
-              <div className="p-3 bg-slate-950/70 border border-slate-800 rounded-xl text-[11px] text-slate-400 text-left flex flex-col gap-1">
-                <span>📊 Буде перераховано метрики когорти для обраного курсу.</span>
-                <span>🎓 Список студентів та черга перевірки оновляться відповідно.</span>
-              </div>
-            </div>
-            <div className="flex items-center gap-3">
-              <button
-                onClick={cancelCourseSwitch}
-                className="flex-1 py-2.5 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs transition-all cursor-pointer border border-slate-700"
-              >
-                Скасувати
-              </button>
-              <button
-                onClick={confirmCourseSwitch}
-                className="flex-1 py-2.5 px-4 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs uppercase tracking-wider shadow-lg shadow-purple-600/30 transition-all cursor-pointer border border-purple-400/30"
-              >
-                Підтвердити перехід
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <ConfirmModal
+        isOpen={Boolean(pendingCourseSlug)}
+        onClose={cancelCourseSwitch}
+        onConfirm={confirmCourseSwitch}
+        variant="info"
+        icon={<ShieldCheck className="w-5 h-5" />}
+        title="Перемикання Дисципліни Моніторингу"
+        description={
+          pendingCourseSlug ? (
+            <>
+              Перемкнути навчальну аналітику, журнал перевірки та граф навичок на курс{' '}
+              <strong className="text-purple-300">
+                &quot;{courses.find((c) => c.slug === pendingCourseSlug)?.title || pendingCourseSlug}&quot;
+              </strong>
+              ?
+            </>
+          ) : undefined
+        }
+        warnings={[
+          'Буде перераховано метрики когорти для обраного курсу.',
+          'Список студентів та черга перевірки оновляться відповідно.',
+        ]}
+        cancelLabel="Скасувати"
+        confirmLabel="Підтвердити перехід"
+      />
 
       {/* ⚠️ Reset Student BKT Progress Confirmation Modal (Course-Scoped vs Global with Safety Toggle) */}
-      {resetConfirmStudent && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-md animate-fadeIn">
-          <div className="max-w-md w-full p-6 bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl flex flex-col gap-5 text-center transform transition-all scale-100">
-            <div className="mx-auto p-3.5 bg-amber-500/10 border border-amber-500/30 rounded-full text-amber-400">
-              <RotateCcw className="w-8 h-8" />
-            </div>
-
-            <div className="flex flex-col gap-1.5">
-              <h3 className="text-lg font-bold text-white">Анулювання Прогресу Студента</h3>
-              <p className="text-xs text-slate-300">
-                Оберіть рівень скидання даних для студента <strong className="text-white">"{resetConfirmStudent.name}"</strong>
-              </p>
-            </div>
-
+      <Modal
+        isOpen={Boolean(resetConfirmStudent)}
+        onClose={() => {
+          if (isResettingStudent) return;
+          setResetConfirmStudent(null);
+          setResetGlobalSafetyToggle(false);
+        }}
+        closeOnOverlayClick={!isResettingStudent}
+        closeOnEscape={!isResettingStudent}
+        hideCloseButton={isResettingStudent}
+        size="md"
+        icon={
+          <div className="w-9 h-9 rounded-xl bg-amber-950/50 border border-amber-500/30 text-amber-400 flex items-center justify-center shrink-0">
+            <RotateCcw className="w-5 h-5" />
+          </div>
+        }
+        title="Анулювання Прогресу Студента"
+        subtitle={
+          resetConfirmStudent ? (
+            <>
+              Оберіть рівень скидання даних для студента{' '}
+              <strong className="text-[var(--sbc-text-primary,#cccccc)]">&quot;{resetConfirmStudent.name}&quot;</strong>
+            </>
+          ) : undefined
+        }
+        footer={
+          <Button
+            variant="secondary"
+            size="sm"
+            fullWidth
+            disabled={isResettingStudent}
+            onClick={() => {
+              setResetConfirmStudent(null);
+              setResetGlobalSafetyToggle(false);
+            }}
+          >
+            Закрити без змін
+          </Button>
+        }
+      >
+        {resetConfirmStudent && (
+          <div className="flex flex-col gap-3.5">
             {/* Option 1: Course-Scoped Reset (Primary & Safe) */}
             <div className="p-3.5 bg-indigo-950/40 border border-indigo-500/40 rounded-xl text-left flex flex-col gap-2">
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between gap-2">
                 <span className="text-[11px] font-bold text-indigo-300 uppercase tracking-wider flex items-center gap-1.5">
                   <span>🎯 Скинути прогрес поточного курсу</span>
                 </span>
-                <span className="text-[9px] font-mono font-bold px-1.5 py-0.5 rounded bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+                <Badge variant="accent" size="xs" mono>
                   Рекомендовано
-                </span>
+                </Badge>
               </div>
-              <p className="text-xs text-slate-300 leading-relaxed">
-                Скидає відповіді, BKT-оцінки <code className="text-indigo-300 font-mono">P(L)</code> та чернетки <strong className="text-white">лише для дисципліни "{activeCourse.title}"</strong>. Прогрес студента в інших предметах залишиться недоторканим.
+              <p className="text-xs text-[var(--sbc-text-muted,#909090)] leading-relaxed">
+                Скидає відповіді, BKT-оцінки <code className="text-indigo-300 font-mono">P(L)</code> та чернетки{' '}
+                <strong className="text-[var(--sbc-text-primary,#cccccc)]">лише для дисципліни &quot;{activeCourse.title}&quot;</strong>. Прогрес студента в інших предметах залишиться недоторканим.
               </p>
-              <button
-                disabled={isResettingStudent}
-                onClick={() => handleResetStudent(resetConfirmStudent.id || resetConfirmStudent.studentId || resetConfirmStudent.email, 'course')}
-                className="w-full mt-1 py-2 px-3 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs shadow-md shadow-indigo-600/30 transition-all cursor-pointer flex items-center justify-center gap-2 disabled:opacity-50"
+              <Button
+                variant="primary"
+                size="sm"
+                fullWidth
+                isLoading={isResettingStudent}
+                leftIcon={<RotateCcw className="w-3.5 h-3.5" />}
+                onClick={() =>
+                  handleResetStudent(
+                    resetConfirmStudent.id || resetConfirmStudent.studentId || resetConfirmStudent.email,
+                    'course'
+                  )
+                }
               >
-                {isResettingStudent ? (
-                  <>
-                    <RotateCcw className="w-3.5 h-3.5 animate-spin" />
-                    <span>Скидання курсу...</span>
-                  </>
-                ) : (
-                  <>
-                    <RotateCcw className="w-3.5 h-3.5" />
-                    <span>Скинути тільки курс "{activeCourse.title}"</span>
-                  </>
-                )}
-              </button>
+                {isResettingStudent ? 'Скидання курсу...' : `Скинути тільки курс "${activeCourse.title}"`}
+              </Button>
             </div>
 
             {/* Option 2: Global Account Reset with Safety Toggle */}
@@ -1675,61 +1681,44 @@ export default function TeacherDashboardPage() {
                   <span>Повне анулювання акаунта (всі курси)</span>
                 </span>
               </div>
-              <p className="text-[11px] text-slate-300 leading-relaxed">
-                Безповоротно видаляє всі спроби, історію та BKT-стан по <strong className="text-rose-300">всіх навчальних курсах платформи</strong>.
+              <p className="text-[11px] text-[var(--sbc-text-muted,#909090)] leading-relaxed">
+                Безповоротно видаляє всі спроби, історію та BKT-стан по{' '}
+                <strong className="text-rose-300">всіх навчальних курсах платформи</strong>.
               </p>
 
               {/* Safety Switch Toggle */}
-              <label className="flex items-center gap-2.5 p-2 bg-slate-950/70 border border-slate-800 rounded-lg cursor-pointer hover:border-slate-700 transition-all select-none">
+              <label className="flex items-center gap-2.5 p-2 bg-[var(--sbc-bg-subtle,#262626)] border border-[var(--sbc-border-subtle,#2b2b2b)] rounded-lg cursor-pointer transition-all select-none">
                 <input
                   type="checkbox"
                   checked={resetGlobalSafetyToggle}
                   onChange={(e) => setResetGlobalSafetyToggle(e.target.checked)}
                   className="w-4 h-4 rounded text-rose-600 focus:ring-rose-500 border-slate-700 bg-slate-900 cursor-pointer"
                 />
-                <span className="text-[11px] font-medium text-slate-300">
+                <span className="text-[11px] font-medium text-[var(--sbc-text-primary,#cccccc)]">
                   Я розумію ризики і підтверджую глобальне скидання
                 </span>
               </label>
 
-              <button
-                disabled={!resetGlobalSafetyToggle || isResettingStudent}
-                onClick={() => handleResetStudent(resetConfirmStudent.id || resetConfirmStudent.studentId || resetConfirmStudent.email, 'all')}
-                className={`w-full py-2 px-3 rounded-lg font-bold text-xs transition-all flex items-center justify-center gap-2 border ${
-                  resetGlobalSafetyToggle && !isResettingStudent
-                    ? 'bg-rose-600 hover:bg-rose-500 text-white shadow-lg shadow-rose-900/40 border-rose-400/40 cursor-pointer'
-                    : 'bg-slate-800 text-slate-500 border-slate-700/60 cursor-not-allowed opacity-60'
-                }`}
+              <Button
+                variant="danger"
+                size="sm"
+                fullWidth
+                isLoading={isResettingStudent}
+                disabled={!resetGlobalSafetyToggle}
+                leftIcon={<AlertTriangle className="w-3.5 h-3.5" />}
+                onClick={() =>
+                  handleResetStudent(
+                    resetConfirmStudent.id || resetConfirmStudent.studentId || resetConfirmStudent.email,
+                    'all'
+                  )
+                }
               >
-                {isResettingStudent ? (
-                  <>
-                    <RotateCcw className="w-3.5 h-3.5 animate-spin" />
-                    <span>Повне скидання...</span>
-                  </>
-                ) : (
-                  <>
-                    <AlertTriangle className="w-3.5 h-3.5" />
-                    <span>Скинути весь прогрес студента</span>
-                  </>
-                )}
-              </button>
-            </div>
-
-            <div className="flex justify-end pt-1">
-              <button
-                disabled={isResettingStudent}
-                onClick={() => {
-                  setResetConfirmStudent(null);
-                  setResetGlobalSafetyToggle(false);
-                }}
-                className="w-full py-2 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold text-xs transition-all cursor-pointer border border-slate-700 disabled:opacity-50"
-              >
-                Закрити без змін
-              </button>
+                {isResettingStudent ? 'Повне скидання...' : 'Скинути весь прогрес студента'}
+              </Button>
             </div>
           </div>
-        </div>
-      )}
+        )}
+      </Modal>
     
         </>
       }

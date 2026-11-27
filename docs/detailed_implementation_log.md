@@ -30,6 +30,12 @@
   5. *Build Next.js Documentation Site* (`npm run build:docs`) — збірка статичного експорту (`output: "export"`, `trailingSlash: true`, `basePath: "/magisterts-smart-bkt-chain"`).
   6. *Upload Artifact & Deploy Pages* (`actions/upload-pages-artifact@v3` + `actions/deploy-pages@v4`).
 
+### 0.1.7.117 Фаза 2 `SBC-315`: Міграція модальних вікон `apps/teacher` на `@sbc/ui` (`Modal`, `ConfirmModal`, `Button`, `Badge`)
+- **Міграція `apps/teacher`:**
+  - [`apps/teacher/src/app/page.tsx`](file:///apps/teacher/src/app/page.tsx): три саморобні `fixed inset-0 z-50` модальні вікна (`metricModal`, `pendingCourseSlug`, `resetConfirmStudent`) замінено на канонічні `<Modal>`, `<ConfirmModal>`, `<Button>` та `<Badge>` із `@sbc/ui` з переведенням формульних карток на змінні `--sbc-bg-subtle` / `--sbc-border-subtle`.
+  - [`apps/teacher/src/features/classrooms/ui/CreateClassroomModal.tsx`](file:///apps/teacher/src/features/classrooms/ui/CreateClassroomModal.tsx): обгорнуто форму створення класу/групи у `<Modal size="lg">` із `<Button form="create-classroom-form">` у футері, усунувши дубльований бекдроп і хедер.
+- **Верифікація:** `npx tsc -p apps/teacher/tsconfig.json --noEmit` (`0` помилок), Playwright E2E `course-and-modules.spec.ts` + `theme-settings.spec.ts` (`11/11 passed`), `light-theme-contrast.spec.ts` (`4/4 passed`, Teacher: 28 елементів, 0 порушень) та тест `CreateClassroomModal` в `onboarding-and-classrooms.spec.ts` (`passed`; непов'язаний крок 3 `/join/KOD-KN21` мав таймаут навігації).
+
 ### 0.1.7.116 Фаза 2 `SBC-315`: Міграція модальних вікон `apps/study` та `apps/student` на `Modal` / `ConfirmModal` з `@sbc/ui`
 - **Оновлення UI-Kit (`packages/ui/src/shared/ui/modal/`):** додано опціональні пропси `overlayTestId`, `dialogTestId`, `closeTestId` у [`Modal.tsx`](file:///packages/ui/src/shared/ui/modal/Modal.tsx) та `testId`, `confirmTestId`, `cancelTestId`, `hideCancelButton` у [`ConfirmModal.tsx`](file:///packages/ui/src/shared/ui/modal/ConfirmModal.tsx) для повної сумісності з регресійними Playwright-селекторами.
 - **Міграція `apps/study` та `apps/student`:**
