@@ -5,7 +5,12 @@
 ## 📅 27 листопада 2026 року
 
 ### ✅ Що зроблено за день:
-1. **Реалізація Фази 1 `SBC-315` (`@sbc/ui/src/shared/ui/` — Атомарний UI-Kit за стандартом `M-FSD`):**
+1. **Фаза 2 `SBC-315` — міграція модальних вікон `apps/study` та `apps/student` на `@sbc/ui` (`Modal` / `ConfirmModal`):**
+   - Розширено [`Modal.tsx`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/packages/ui/src/shared/ui/modal/Modal.tsx) та [`ConfirmModal.tsx`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/packages/ui/src/shared/ui/modal/ConfirmModal.tsx) підтримкою E2E-селекторів (`overlayTestId`, `dialogTestId`, `confirmTestId`, `cancelTestId`, `closeTestId`, `hideCancelButton`).
+   - У [`StudyAppClient.tsx`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/study/src/components/StudyAppClient.tsx) переведено оверлей `Study Lock` (`study-lock-overlay`) на спільні `<Modal>`, `<Button>` та `<Badge>` із `@sbc/ui`.
+   - У [`AbandonTaskModal.tsx`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/student/src/components/AbandonTaskModal.tsx) та [`StudentPortalApp.tsx`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/student/src/components/StudentPortalApp.tsx) замінено 4 саморобні модальні вікна (відмова від завдання заради підручника, вичерпання завдань модуля, підтвердження зміни курсу та перемикання режиму `Zero-Mix Rule`) на єдиний `<ConfirmModal>` із `@sbc/ui`.
+   - **Верифікація:** пройшли збірки `build:study` та `build:student`, а також усі 3 Playwright E2E-тести на живих серверах (`practice-integrity-modes`, `student-course-reload-dag`, `study-bkt-gating-sync` — `3 passed`).
+2. **Реалізація Фази 1 `SBC-315` (`@sbc/ui/src/shared/ui/` — Атомарний UI-Kit за стандартом `M-FSD`):**
    - Створено канонічний FSD-шар `packages/ui/src/shared/ui/` із Public API `index.ts` на базі семантичних дизайн-токенів `--sbc-*` та підтримкою Dark/Light тем (`light-theme.css`):
      - `button/Button.tsx` (6 варіантів: `primary | secondary | accent | danger | outline | ghost`, 4 розміри `xs..lg`, `isLoading`, `leftIcon`/`rightIcon`, зворотна сумісність із `label`);
      - `modal/Modal.tsx` та `modal/ConfirmModal.tsx` (React Portal, `Escape`/backdrop close, lock scroll, `aria-modal`, варіанти `info | accent | warning | danger`, список `warnings`);

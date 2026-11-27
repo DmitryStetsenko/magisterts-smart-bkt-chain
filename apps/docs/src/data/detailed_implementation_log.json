@@ -120,6 +120,44 @@
           ]
         },
         {
+          "title": "0.1.7.116 Фаза 2 `SBC-315`: Міграція модальних вікон `apps/study` та `apps/student` на `Modal` / `ConfirmModal` з `@sbc/ui`",
+          "level": 3,
+          "paragraphs": [],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "**Оновлення UI-Kit (`packages/ui/src/shared/ui/modal/`):** додано опціональні пропси `overlayTestId`, `dialogTestId`, `closeTestId` у [`Modal.tsx`](file:///packages/ui/src/shared/ui/modal/Modal.tsx) та `testId`, `confirmTestId`, `cancelTestId`, `hideCancelButton` у [`ConfirmModal.tsx`](file:///packages/ui/src/shared/ui/modal/ConfirmModal.tsx) для повної сумісності з регресійними Playwright-селекторами.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Міграція `apps/study` та `apps/student`:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "[`apps/study/src/components/StudyAppClient.tsx`](file:///apps/study/src/components/StudyAppClient.tsx): оверлей серверного блокування `Study Lock` (`study-lock-overlay`) перенесено на блокуючий `<Modal>` із `<Badge>` та `<Button variant=\"danger\">` із `@sbc/ui`.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "[`apps/student/src/components/AbandonTaskModal.tsx`](file:///apps/student/src/components/AbandonTaskModal.tsx): локальний `fixed inset-0` бекдроп і кнопки замінено на `<ConfirmModal variant=\"warning\">`.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "[`apps/student/src/components/StudentPortalApp.tsx`](file:///apps/student/src/components/StudentPortalApp.tsx): 3 вбудовані модальні вікна (вичерпання завдань модуля `exhaustedModalData`, перемикання курсу `pendingCourseSlug`, перемикання режиму `pendingModeSwitch`) переведено на `<ConfirmModal>`.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Верифікація:** `npm run build:study`, `npm run build:student` (`0` помилок) та Playwright E2E (`e2e/practice-integrity-modes.spec.ts`, `e2e/student-course-reload-dag.spec.ts`, `e2e/study-bkt-gating-sync.spec.ts` — `3/3 passed`).",
+              "subitems": []
+            }
+          ]
+        },
+        {
           "title": "0.1.7.115 Реалізація Фази 1 Shared UI-Kit у `packages/ui/src/shared/ui/` (`SBC-315`, `EP-SH`)",
           "level": 3,
           "paragraphs": [],

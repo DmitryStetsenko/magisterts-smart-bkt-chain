@@ -27,7 +27,7 @@ import {
   Lock,
   Unlock
 } from 'lucide-react';
-import { DrawerSection, AppShellLayout, Breadcrumbs, UserProfileDrawer, AuthModal, ThemeSettingsSection } from '@sbc/ui';
+import { DrawerSection, AppShellLayout, Breadcrumbs, UserProfileDrawer, AuthModal, ThemeSettingsSection, Modal, Button, Badge } from '@sbc/ui';
 import { ROUTES, buildStudyToPracticeUrl } from '@sbc/routes';
 import type { ActiveStrictSessionDto } from '@sbc/types';
 
@@ -1105,58 +1105,60 @@ console.log(greeting, "Номер спроби:", counter);`}
           />
 
           {/* 🔒 Оверлей серверного блокування підручника під час активної сесії «На оцінку» (GRADED) */}
-          {activeStrictSession?.active && (
-            <div
-              data-testid="study-lock-overlay"
-              className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/90 backdrop-blur-md animate-fadeIn"
-            >
-              <div className="w-full max-w-md rounded-2xl bg-[var(--sbc-bg-surface,#1f1f1f)] border border-amber-500/30 shadow-2xl p-6 flex flex-col gap-4">
-                <div className="flex items-start gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-amber-500/15 text-amber-400 border border-amber-500/30 flex items-center justify-center shrink-0">
-                    <Lock className="w-5 h-5" />
-                  </div>
-                  <div className="flex flex-col gap-1">
-                    <span className="text-[10px] font-mono uppercase tracking-wider text-amber-400 font-bold">
-                      Суворий режим «На оцінку» активний
-                    </span>
-                    <h3 className="text-base font-bold text-[var(--sbc-text-primary,#f4f4f5)]">
-                      Підручник тимчасово заблоковано
-                    </h3>
-                  </div>
-                </div>
+          <Modal
+            isOpen={Boolean(activeStrictSession?.active)}
+            onClose={() => {}}
+            hideCloseButton
+            closeOnOverlayClick={false}
+            closeOnEscape={false}
+            overlayTestId="study-lock-overlay"
+            size="md"
+            icon={
+              <div className="w-10 h-10 rounded-xl bg-amber-950/50 text-amber-400 border border-amber-500/30 flex items-center justify-center shrink-0">
+                <Lock className="w-5 h-5" />
+              </div>
+            }
+            title="Підручник тимчасово заблоковано"
+            subtitle={
+              <Badge variant="warning" size="xs" mono className="mt-1">
+                Суворий режим «На оцінку» активний
+              </Badge>
+            }
+          >
+            <div className="flex flex-col gap-4">
+              <p className="text-xs text-[var(--sbc-text-muted,#909090)] leading-relaxed">
+                У вашому кабінеті тренажера зараз відкрито завдання у{' '}
+                <strong className="text-[var(--sbc-text-primary,#cccccc)]">Суворому режимі (На оцінку)</strong>
+                {activeStrictSession?.skillTitle ? (
+                  <> з теми <strong className="text-amber-300">«{activeStrictSession.skillTitle}»</strong></>
+                ) : null}.
+                Для чесної діагностики знань доступ до підручника в усіх вкладках обмежено до завершення спроби.
+              </p>
 
-                <p className="text-xs text-[var(--sbc-text-muted,#a1a1aa)] leading-relaxed">
-                  У вашому кабінеті тренажера зараз відкрито завдання у <strong className="text-[var(--sbc-text-primary,#f4f4f5)]">Суворому режимі (На оцінку)</strong>
-                  {activeStrictSession.skillTitle ? (
-                    <> з теми <strong className="text-amber-300">«{activeStrictSession.skillTitle}»</strong></>
-                  ) : null}.
-                  Для чесної діагностики знань доступ до підручника в усіх вкладках обмежено до завершення спроби.
-                </p>
+              <div className="flex flex-col gap-2 pt-1">
+                <a
+                  href={practiceUrl}
+                  className="w-full h-10 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold flex items-center justify-center gap-2 transition-colors"
+                >
+                  <GraduationCap className="w-4 h-4" />
+                  <span>Повернутися до тренажера</span>
+                </a>
 
-                <div className="flex flex-col gap-2 pt-1">
-                  <a
-                    href={practiceUrl}
-                    className="w-full px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold flex items-center justify-center gap-2 transition-colors"
-                  >
-                    <GraduationCap className="w-4 h-4" />
-                    <span>Повернутися до тренажера</span>
-                  </a>
-
-                  <button
-                    type="button"
-                    disabled={isUnlockingStudy}
-                    data-testid="study-lock-abandon-btn"
-                    onClick={handleAbandonStrictSessionAndUnlock}
-                    className="w-full px-4 py-2 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-rose-400 text-xs font-semibold transition-colors cursor-pointer disabled:opacity-50"
-                  >
-                    {isUnlockingStudy
-                      ? 'Скидання спроби...'
-                      : 'Перервати спробу (скинути прогрес навички) і відкрити урок'}
-                  </button>
-                </div>
+                <Button
+                  variant="danger"
+                  size="md"
+                  fullWidth
+                  isLoading={isUnlockingStudy}
+                  data-testid="study-lock-abandon-btn"
+                  onClick={handleAbandonStrictSessionAndUnlock}
+                >
+                  {isUnlockingStudy
+                    ? 'Скидання спроби...'
+                    : 'Перервати спробу (скинути прогрес навички) і відкрити урок'}
+                </Button>
               </div>
             </div>
-          )}
+          </Modal>
       </AppShellLayout>
   );
 }

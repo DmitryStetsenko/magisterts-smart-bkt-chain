@@ -30,6 +30,14 @@
   5. *Build Next.js Documentation Site* (`npm run build:docs`) — збірка статичного експорту (`output: "export"`, `trailingSlash: true`, `basePath: "/magisterts-smart-bkt-chain"`).
   6. *Upload Artifact & Deploy Pages* (`actions/upload-pages-artifact@v3` + `actions/deploy-pages@v4`).
 
+### 0.1.7.116 Фаза 2 `SBC-315`: Міграція модальних вікон `apps/study` та `apps/student` на `Modal` / `ConfirmModal` з `@sbc/ui`
+- **Оновлення UI-Kit (`packages/ui/src/shared/ui/modal/`):** додано опціональні пропси `overlayTestId`, `dialogTestId`, `closeTestId` у [`Modal.tsx`](file:///packages/ui/src/shared/ui/modal/Modal.tsx) та `testId`, `confirmTestId`, `cancelTestId`, `hideCancelButton` у [`ConfirmModal.tsx`](file:///packages/ui/src/shared/ui/modal/ConfirmModal.tsx) для повної сумісності з регресійними Playwright-селекторами.
+- **Міграція `apps/study` та `apps/student`:**
+  - [`apps/study/src/components/StudyAppClient.tsx`](file:///apps/study/src/components/StudyAppClient.tsx): оверлей серверного блокування `Study Lock` (`study-lock-overlay`) перенесено на блокуючий `<Modal>` із `<Badge>` та `<Button variant="danger">` із `@sbc/ui`.
+  - [`apps/student/src/components/AbandonTaskModal.tsx`](file:///apps/student/src/components/AbandonTaskModal.tsx): локальний `fixed inset-0` бекдроп і кнопки замінено на `<ConfirmModal variant="warning">`.
+  - [`apps/student/src/components/StudentPortalApp.tsx`](file:///apps/student/src/components/StudentPortalApp.tsx): 3 вбудовані модальні вікна (вичерпання завдань модуля `exhaustedModalData`, перемикання курсу `pendingCourseSlug`, перемикання режиму `pendingModeSwitch`) переведено на `<ConfirmModal>`.
+- **Верифікація:** `npm run build:study`, `npm run build:student` (`0` помилок) та Playwright E2E (`e2e/practice-integrity-modes.spec.ts`, `e2e/student-course-reload-dag.spec.ts`, `e2e/study-bkt-gating-sync.spec.ts` — `3/3 passed`).
+
 ### 0.1.7.115 Реалізація Фази 1 Shared UI-Kit у `packages/ui/src/shared/ui/` (`SBC-315`, `EP-SH`)
 - **Створені модулі (`M-FSD` `Shared Foundation`):**
   - [`packages/ui/src/shared/ui/button/Button.tsx`](file:///packages/ui/src/shared/ui/button/Button.tsx): поліморфна кнопка (`primary | secondary | accent | danger | outline | ghost`, розміри `xs | sm | md | lg`, `isLoading` з `Loader2`, `leftIcon`/`rightIcon`, `fullWidth`, `forwardRef`).

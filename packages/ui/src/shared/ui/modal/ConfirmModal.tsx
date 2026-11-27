@@ -20,6 +20,11 @@ export interface ConfirmModalProps {
   cancelLabel?: string;
   isConfirming?: boolean;
   confirmDisabled?: boolean;
+  hideCancelButton?: boolean;
+  testId?: string;
+  confirmTestId?: string;
+  cancelTestId?: string;
+  closeTestId?: string;
   size?: ModalSize;
   children?: React.ReactNode;
 }
@@ -75,6 +80,11 @@ export const ConfirmModal: React.FC<ConfirmModalProps> = ({
   cancelLabel = 'Скасувати',
   isConfirming = false,
   confirmDisabled = false,
+  hideCancelButton = false,
+  testId,
+  confirmTestId,
+  cancelTestId,
+  closeTestId,
   size = 'md',
   children,
 }) => {
@@ -85,6 +95,8 @@ export const ConfirmModal: React.FC<ConfirmModalProps> = ({
       isOpen={isOpen}
       onClose={onClose}
       size={size}
+      dialogTestId={testId}
+      closeTestId={closeTestId}
       closeOnOverlayClick={!isConfirming}
       closeOnEscape={!isConfirming}
       hideCloseButton={isConfirming}
@@ -98,17 +110,21 @@ export const ConfirmModal: React.FC<ConfirmModalProps> = ({
       }
       footer={
         <div className="flex items-center justify-end gap-2.5">
-          <Button
-            variant="secondary"
-            size="sm"
-            onClick={onClose}
-            disabled={isConfirming}
-          >
-            {cancelLabel}
-          </Button>
+          {!hideCancelButton && (
+            <Button
+              variant="secondary"
+              size="sm"
+              data-testid={cancelTestId}
+              onClick={onClose}
+              disabled={isConfirming}
+            >
+              {cancelLabel}
+            </Button>
+          )}
           <Button
             variant={cfg.confirmButtonVariant}
             size="sm"
+            data-testid={confirmTestId}
             onClick={onConfirm}
             isLoading={isConfirming}
             disabled={confirmDisabled}

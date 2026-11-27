@@ -16,6 +16,31 @@
           "items": [
             {
               "type": "text",
+              "raw_text": "**Фаза 2 `SBC-315` — міграція модальних вікон `apps/study` та `apps/student` на `@sbc/ui` (`Modal` / `ConfirmModal`):**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Розширено [`Modal.tsx`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/packages/ui/src/shared/ui/modal/Modal.tsx) та [`ConfirmModal.tsx`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/packages/ui/src/shared/ui/modal/ConfirmModal.tsx) підтримкою E2E-селекторів (`overlayTestId`, `dialogTestId`, `confirmTestId`, `cancelTestId`, `closeTestId`, `hideCancelButton`).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "У [`StudyAppClient.tsx`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/study/src/components/StudyAppClient.tsx) переведено оверлей `Study Lock` (`study-lock-overlay`) на спільні `<Modal>`, `<Button>` та `<Badge>` із `@sbc/ui`.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "У [`AbandonTaskModal.tsx`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/student/src/components/AbandonTaskModal.tsx) та [`StudentPortalApp.tsx`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/student/src/components/StudentPortalApp.tsx) замінено 4 саморобні модальні вікна (відмова від завдання заради підручника, вичерпання завдань модуля, підтвердження зміни курсу та перемикання режиму `Zero-Mix Rule`) на єдиний `<ConfirmModal>` із `@sbc/ui`.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Верифікація:** пройшли збірки `build:study` та `build:student`, а також усі 3 Playwright E2E-тести на живих серверах (`practice-integrity-modes`, `student-course-reload-dag`, `study-bkt-gating-sync` — `3 passed`).",
+              "subitems": []
+            },
+            {
+              "type": "text",
               "raw_text": "**Реалізація Фази 1 `SBC-315` (`@sbc/ui/src/shared/ui/` — Атомарний UI-Kit за стандартом `M-FSD`):**",
               "subitems": []
             },

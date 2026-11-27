@@ -19,6 +19,9 @@ export interface ModalProps {
   closeOnEscape?: boolean;
   hideCloseButton?: boolean;
   usePortal?: boolean;
+  overlayTestId?: string;
+  dialogTestId?: string;
+  closeTestId?: string;
   className?: string;
   children: React.ReactNode;
 }
@@ -47,6 +50,9 @@ export const Modal: React.FC<ModalProps> = ({
   closeOnEscape = true,
   hideCloseButton = false,
   usePortal = true,
+  overlayTestId,
+  dialogTestId,
+  closeTestId,
   className = '',
   children,
 }) => {
@@ -81,6 +87,7 @@ export const Modal: React.FC<ModalProps> = ({
 
   const modalNode = (
     <div
+      data-testid={overlayTestId}
       className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/65 backdrop-blur-sm animate-fadeIn"
       onClick={(event) => {
         if (closeOnOverlayClick && event.target === event.currentTarget) {
@@ -92,6 +99,7 @@ export const Modal: React.FC<ModalProps> = ({
       aria-labelledby={title ? titleId : undefined}
     >
       <div
+        data-testid={dialogTestId}
         className={[
           'w-full rounded-2xl border shadow-2xl overflow-hidden flex flex-col max-h-[90vh]',
           'bg-[var(--sbc-bg-surface,#1f1f1f)] border-[var(--sbc-border-strong,#333333)] text-[var(--sbc-text-primary,#cccccc)]',
@@ -127,6 +135,7 @@ export const Modal: React.FC<ModalProps> = ({
                 <button
                   type="button"
                   onClick={onClose}
+                  data-testid={closeTestId}
                   aria-label="Закрити"
                   className="p-1.5 rounded-lg text-[var(--sbc-text-muted,#909090)] hover:text-[var(--sbc-text-primary,#cccccc)] hover:bg-[var(--sbc-bg-subtle,#262626)] transition-colors cursor-pointer"
                 >

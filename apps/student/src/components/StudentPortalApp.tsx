@@ -12,7 +12,7 @@ import { StudentProfileDrawer } from './StudentProfileDrawer';
 import { AbandonTaskModal } from './AbandonTaskModal';
 import { JustInTimeTheoryDrawer } from '../features/theory-capsule/ui/JustInTimeTheoryDrawer';
 import { resolveTheoryCapsule } from '../features/theory-capsule/model/theory-capsules';
-import { GameSkillTreeWidget, SkillGraphNode, DrawerSection, AppShellLayout, Breadcrumbs, AuthModal, ThemeSettingsSection } from '@sbc/ui';
+import { GameSkillTreeWidget, SkillGraphNode, DrawerSection, AppShellLayout, Breadcrumbs, AuthModal, ThemeSettingsSection, ConfirmModal } from '@sbc/ui';
 import {
   TaskDto,
   CourseDto,
@@ -1948,64 +1948,50 @@ export function StudentPortalContent({
           </button>
         </div>
       )}
-          {/* Exhausted Module Tasks Modal Popup */}
-      {exhaustedModalData && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-md animate-fadeIn">
-          <div className="max-w-md w-full p-6 bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl flex flex-col gap-5 text-center transform transition-all scale-100">
-            <div className="mx-auto p-3.5 bg-amber-500/10 border border-amber-500/30 rounded-full text-amber-400">
-              <AlertTriangle className="w-8 h-8 animate-pulse" />
-            </div>
-            <div className="flex flex-col gap-2">
-              <h3 className="text-lg font-bold text-white">Завдання модуля закінчилися</h3>
-              <p className="text-xs text-slate-300 leading-relaxed">
-                Завдання даного модуля (<strong className="text-indigo-400">"{exhaustedModalData.skillTitle}"</strong>) закінчилися, і ви не набрали необхідну кількість балів (&ge;95%).
-                Ваш прогрес на цьому модулі буде анульований для повторної спроби.
-              </p>
-            </div>
-            <button
-              onClick={handleConfirmSkillReset}
-              className="w-full py-3 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs uppercase tracking-wider shadow-lg shadow-indigo-600/30 transition-all cursor-pointer border border-indigo-400/30"
-            >
-              ОК, анулювати прогрес модуля
-            </button>
-          </div>
-        </div>
-      )}
+      {/* Exhausted Module Tasks Modal Popup */}
+      <ConfirmModal
+        isOpen={Boolean(exhaustedModalData)}
+        onClose={handleConfirmSkillReset}
+        onConfirm={handleConfirmSkillReset}
+        variant="warning"
+        hideCancelButton
+        title="Завдання модуля закінчилися"
+        description={
+          exhaustedModalData ? (
+            <>
+              Завдання даного модуля (<strong className="text-indigo-400">&quot;{exhaustedModalData.skillTitle}&quot;</strong>) закінчилися, і ви не набрали необхідну кількість балів (&ge;95%). Ваш прогрес на цьому модулі буде анульований для повторної спроби.
+            </>
+          ) : undefined
+        }
+        confirmLabel="ОК, анулювати прогрес модуля"
+      />
 
       {/* Course Switch Confirmation Modal Popup */}
-      {pendingCourseSlug && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-md animate-fadeIn">
-          <div className="max-w-md w-full p-6 bg-slate-900 border border-indigo-500/40 rounded-2xl shadow-2xl flex flex-col gap-5 text-center transform transition-all scale-100">
-            <div className="mx-auto p-3.5 bg-indigo-500/10 border border-indigo-500/30 rounded-full text-indigo-400">
-              <BookOpen className="w-8 h-8 animate-pulse" />
-            </div>
-            <div className="flex flex-col gap-2">
-              <h3 className="text-lg font-bold text-white">Перемикання Навчального Курсу</h3>
-              <p className="text-xs text-slate-300 leading-relaxed">
-                Ви дійсно бажаєте перейти до вивчення курсу <strong className="text-indigo-300">"{courses.find(c => c.slug === pendingCourseSlug)?.title || pendingCourseSlug}"</strong>?
-              </p>
-              <div className="p-3 bg-slate-950/70 border border-slate-800 rounded-xl text-[11px] text-slate-400 text-left flex flex-col gap-1">
-                <span>⚠️ Незбережені зміни в поточному коді будуть скинуті.</span>
-                <span>📊 Буде завантажено індивідуальну траєкторію BKT нового курсу.</span>
-              </div>
-            </div>
-            <div className="flex items-center gap-3">
-              <button
-                onClick={cancelCourseSwitch}
-                className="flex-1 py-2.5 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs transition-all cursor-pointer border border-slate-700"
-              >
-                Скасувати
-              </button>
-              <button
-                onClick={confirmCourseSwitch}
-                className="flex-1 py-2.5 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs uppercase tracking-wider shadow-lg shadow-indigo-600/30 transition-all cursor-pointer border border-indigo-400/30"
-              >
-                Підтвердити перехід
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <ConfirmModal
+        isOpen={Boolean(pendingCourseSlug)}
+        onClose={cancelCourseSwitch}
+        onConfirm={confirmCourseSwitch}
+        variant="info"
+        icon={<BookOpen className="w-5 h-5" />}
+        title="Перемикання Навчального Курсу"
+        description={
+          pendingCourseSlug ? (
+            <>
+              Ви дійсно бажаєте перейти до вивчення курсу{' '}
+              <strong className="text-indigo-300">
+                &quot;{courses.find((c) => c.slug === pendingCourseSlug)?.title || pendingCourseSlug}&quot;
+              </strong>
+              ?
+            </>
+          ) : undefined
+        }
+        warnings={[
+          'Незбережені зміни в поточному коді будуть скинуті.',
+          'Буде завантажено індивідуальну траєкторію BKT нового курсу.',
+        ]}
+        cancelLabel="Скасувати"
+        confirmLabel="Підтвердити перехід"
+      />
         </>
       }
     >
@@ -2631,62 +2617,32 @@ export function StudentPortalContent({
       />
 
       {/* 🔄 Модальне вікно підтвердження зміни режиму навички (Zero-Mix Rule) */}
-      {pendingModeSwitch && (
-        <>
-          <div
-            className="fixed inset-0 bg-slate-950/75 backdrop-blur-sm z-50 animate-fadeIn"
-            onClick={() => !isSwitchingMode && setPendingModeSwitch(null)}
-          />
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none">
-            <div
-              data-testid="switch-mode-confirm-modal"
-              className="w-full max-w-md bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl p-5 flex flex-col gap-4 pointer-events-auto animate-fadeIn"
-            >
-              <div className="flex items-start gap-3">
-                <div className="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-400 border border-amber-500/20 flex items-center justify-center shrink-0">
-                  <AlertTriangle className="w-5 h-5" />
-                </div>
-                <div className="flex flex-col gap-0.5">
-                  <h3 className="text-sm font-bold text-white">
-                    {pendingModeSwitch === 'GRADED'
-                      ? 'Перехід у Суворий режим «На оцінку»'
-                      : 'Перехід у Тренувальний режим'}
-                  </h3>
-                  <span className="text-xs text-amber-400">
-                    Прогрес поточної навички буде скинуто на 0%
-                  </span>
-                </div>
-              </div>
-
-              <p className="text-xs text-slate-300 leading-relaxed">
-                {pendingModeSwitch === 'GRADED'
-                  ? 'Щоб оцінювання було чесним (Zero-Mix Rule), тренувальний прогрес поточної навички буде скинуто, а підручник заблоковано на час проходження. Прогрес інших модулів курсу збережеться.'
-                  : 'Поточна оцінювальна спроба цієї навички буде скинута, і ви зможете вільно тренуватися з відкритим підручником.'}
-              </p>
-
-              <div className="flex items-center justify-end gap-2 pt-1">
-                <button
-                  type="button"
-                  disabled={isSwitchingMode}
-                  onClick={() => setPendingModeSwitch(null)}
-                  className="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium cursor-pointer"
-                >
-                  Скасувати
-                </button>
-                <button
-                  type="button"
-                  disabled={isSwitchingMode}
-                  data-testid="confirm-switch-mode-btn"
-                  onClick={() => executeModeSwitch(pendingModeSwitch, true)}
-                  className="px-4 py-2 rounded-xl bg-amber-600 hover:bg-amber-500 text-white text-xs font-semibold cursor-pointer disabled:opacity-50"
-                >
-                  {isSwitchingMode ? 'Перемикання...' : 'Скинути навичку і перемкнути режим'}
-                </button>
-              </div>
-            </div>
-          </div>
-        </>
-      )}
+      <ConfirmModal
+        isOpen={Boolean(pendingModeSwitch)}
+        onClose={() => !isSwitchingMode && setPendingModeSwitch(null)}
+        onConfirm={() => {
+          if (pendingModeSwitch) {
+            return executeModeSwitch(pendingModeSwitch, true);
+          }
+        }}
+        variant="warning"
+        testId="switch-mode-confirm-modal"
+        confirmTestId="confirm-switch-mode-btn"
+        isConfirming={isSwitchingMode}
+        title={
+          pendingModeSwitch === 'GRADED'
+            ? 'Перехід у Суворий режим «На оцінку»'
+            : 'Перехід у Тренувальний режим'
+        }
+        description={
+          pendingModeSwitch === 'GRADED'
+            ? 'Щоб оцінювання було чесним (Zero-Mix Rule), тренувальний прогрес поточної навички буде скинуто, а підручник заблоковано на час проходження. Прогрес інших модулів курсу збережеться.'
+            : 'Поточна оцінювальна спроба цієї навички буде скинута, і ви зможете вільно тренуватися з відкритим підручником.'
+        }
+        warnings={['Прогрес поточної навички буде скинуто на 0%.']}
+        cancelLabel="Скасувати"
+        confirmLabel={isSwitchingMode ? 'Перемикання...' : 'Скинути навичку і перемкнути режим'}
+      />
 
       {/* 👤 Права бічна панель (Right Profile & Courses Drawer) */}
       <StudentProfileDrawer
