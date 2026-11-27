@@ -16,6 +16,32 @@
           "items": [
             {
               "type": "text",
+              "raw_text": "**Реалізація Фази 1 `SBC-315` (`@sbc/ui/src/shared/ui/` — Атомарний UI-Kit за стандартом `M-FSD`):**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Створено канонічний FSD-шар `packages/ui/src/shared/ui/` із Public API `index.ts` на базі семантичних дизайн-токенів `--sbc-*` та підтримкою Dark/Light тем (`light-theme.css`):",
+              "subitems": [
+                "`button/Button.tsx` (6 варіантів: `primary | secondary | accent | danger | outline | ghost`, 4 розміри `xs..lg`, `isLoading`, `leftIcon`/`rightIcon`, зворотна сумісність із `label`);",
+                "`modal/Modal.tsx` та `modal/ConfirmModal.tsx` (React Portal, `Escape`/backdrop close, lock scroll, `aria-modal`, варіанти `info | accent | warning | danger`, список `warnings`);",
+                "`badge/Badge.tsx` (`neutral | info | success | warning | danger | accent`, `mono`, `dot`);",
+                "`tooltip/Tooltip.tsx` (клавіатурна доступність, 4 позиції);",
+                "`select/DropdownSelect.tsx` (стилізований доступний селектор із `Escape`/outside-click)."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "Оновлено [`packages/ui/src/index.ts`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/packages/ui/src/index.ts), [`Button.tsx`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/packages/ui/src/Button.tsx) (проксі-реекспорт) та [`Button.stories.tsx`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/packages/ui/src/Button.stories.tsx).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Верифікація:** `npx tsc -p packages/ui/tsconfig.json --noEmit` та збірки всіх 4 порталів (`build:study`, `build:student`, `build:teacher`, `build:admin`) пройшли без жодної помилки.",
+              "subitems": []
+            },
+            {
+              "type": "text",
               "raw_text": "**Затвердження стандарту `M-FSD` (*Shared Foundation + Portal Slices*) та детальних правил для монорепозиторіїв (`SBC-315`, `EP-SH`):**",
               "subitems": []
             },

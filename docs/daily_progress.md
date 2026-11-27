@@ -5,7 +5,16 @@
 ## 📅 27 листопада 2026 року
 
 ### ✅ Що зроблено за день:
-1. **Затвердження стандарту `M-FSD` (*Shared Foundation + Portal Slices*) та детальних правил для монорепозиторіїв (`SBC-315`, `EP-SH`):**
+1. **Реалізація Фази 1 `SBC-315` (`@sbc/ui/src/shared/ui/` — Атомарний UI-Kit за стандартом `M-FSD`):**
+   - Створено канонічний FSD-шар `packages/ui/src/shared/ui/` із Public API `index.ts` на базі семантичних дизайн-токенів `--sbc-*` та підтримкою Dark/Light тем (`light-theme.css`):
+     - `button/Button.tsx` (6 варіантів: `primary | secondary | accent | danger | outline | ghost`, 4 розміри `xs..lg`, `isLoading`, `leftIcon`/`rightIcon`, зворотна сумісність із `label`);
+     - `modal/Modal.tsx` та `modal/ConfirmModal.tsx` (React Portal, `Escape`/backdrop close, lock scroll, `aria-modal`, варіанти `info | accent | warning | danger`, список `warnings`);
+     - `badge/Badge.tsx` (`neutral | info | success | warning | danger | accent`, `mono`, `dot`);
+     - `tooltip/Tooltip.tsx` (клавіатурна доступність, 4 позиції);
+     - `select/DropdownSelect.tsx` (стилізований доступний селектор із `Escape`/outside-click).
+   - Оновлено [`packages/ui/src/index.ts`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/packages/ui/src/index.ts), [`Button.tsx`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/packages/ui/src/Button.tsx) (проксі-реекспорт) та [`Button.stories.tsx`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/packages/ui/src/Button.stories.tsx).
+   - **Верифікація:** `npx tsc -p packages/ui/tsconfig.json --noEmit` та збірки всіх 4 порталів (`build:study`, `build:student`, `build:teacher`, `build:admin`) пройшли без жодної помилки.
+2. **Затвердження стандарту `M-FSD` (*Shared Foundation + Portal Slices*) та детальних правил для монорепозиторіїв (`SBC-315`, `EP-SH`):**
    - Створено ізольовану гілку `feat/monorepo-fsd-ui-kit` від `dev`.
    - Створено окремий канонічний документ архітектури [`docs/mfsd_architecture.md`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/docs/mfsd_architecture.md), інтегровано його в компілятор [`scripts/compile_docs.py`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/scripts/compile_docs.py) (`docs/mfsd_architecture.json`, `apps/docs/src/data/mfsd_architecture.json`) та додано маршрут `/mfsd/` у портал документації `apps/docs`.
    - Сформульовано та задокументовано офіційний архітектурний підхід **`M-FSD` (Monorepo Feature-Sliced Design: Shared Foundation + Portal Slices)** у [`docs/mfsd_architecture.md`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/docs/mfsd_architecture.md) та [`docs/brainstorm/23_monorepo_fsd_and_shared_ui_kit_architecture.md`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/docs/brainstorm/23_monorepo_fsd_and_shared_ui_kit_architecture.md) (індекс [`docs/brainstorm/README.md`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/docs/brainstorm/README.md)): аудит 6 порталів, матриця дозволених імпортів, дерево прийняття рішень розміщення коду, регламент сегментів (`ui/model/api/lib/config`) та Public API (`index.ts`), кількісні пороги декомпозиції монолітів (`app/page.tsx` ≤ 100 рядків, `views/` ≤ 300, `widgets/` ≤ 400), специфікація UI-Kit у `@sbc/ui/shared/ui/` на токенах `--sbc-*` і чеклист Pre-Commit аудиту.

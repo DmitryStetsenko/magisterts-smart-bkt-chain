@@ -30,6 +30,16 @@
   5. *Build Next.js Documentation Site* (`npm run build:docs`) — збірка статичного експорту (`output: "export"`, `trailingSlash: true`, `basePath: "/magisterts-smart-bkt-chain"`).
   6. *Upload Artifact & Deploy Pages* (`actions/upload-pages-artifact@v3` + `actions/deploy-pages@v4`).
 
+### 0.1.7.115 Реалізація Фази 1 Shared UI-Kit у `packages/ui/src/shared/ui/` (`SBC-315`, `EP-SH`)
+- **Створені модулі (`M-FSD` `Shared Foundation`):**
+  - [`packages/ui/src/shared/ui/button/Button.tsx`](file:///packages/ui/src/shared/ui/button/Button.tsx): поліморфна кнопка (`primary | secondary | accent | danger | outline | ghost`, розміри `xs | sm | md | lg`, `isLoading` з `Loader2`, `leftIcon`/`rightIcon`, `fullWidth`, `forwardRef`).
+  - [`packages/ui/src/shared/ui/modal/Modal.tsx`](file:///packages/ui/src/shared/ui/modal/Modal.tsx) та [`ConfirmModal.tsx`](file:///packages/ui/src/shared/ui/modal/ConfirmModal.tsx): SSR-безпечний `createPortal`, блокування скролу, закриття по `Escape` та кліку по бекдропу, `role="dialog"` / `aria-modal="true"`, спеціалізований `ConfirmModal` із варіантами `info | accent | warning | danger` і списком `warnings`.
+  - [`packages/ui/src/shared/ui/badge/Badge.tsx`](file:///packages/ui/src/shared/ui/badge/Badge.tsx): статус-бейджі (`neutral | info | success | warning | danger | accent`), `mono`, `dot`, сумісні з `light-theme.css`.
+  - [`packages/ui/src/shared/ui/tooltip/Tooltip.tsx`](file:///packages/ui/src/shared/ui/tooltip/Tooltip.tsx): спливаючий тултіп із підтримкою hover/focus і `role="tooltip"`.
+  - [`packages/ui/src/shared/ui/select/DropdownSelect.tsx`](file:///packages/ui/src/shared/ui/select/DropdownSelect.tsx): доступний селектор (`aria-haspopup="listbox"`, `Escape`, outside-click, іконки, описи й бейджі опцій).
+  - Public API у [`packages/ui/src/shared/ui/index.ts`](file:///packages/ui/src/shared/ui/index.ts) та реекспорт із [`packages/ui/src/index.ts`](file:///packages/ui/src/index.ts); оновлено проксі [`Button.tsx`](file:///packages/ui/src/Button.tsx) і [`Button.stories.tsx`](file:///packages/ui/src/Button.stories.tsx).
+- **Верифікація:** `tsc --noEmit` для `packages/ui` та продакшен-збірки `build:study`, `build:student`, `build:teacher`, `build:admin` завершилися з кодом `0`.
+
 ### 0.1.7.114 Стандарт `M-FSD` (Monorepo Feature-Sliced Design: Shared Foundation + Portal Slices) та Специфікація Shared UI-Kit (`SBC-315`, `EP-SH`)
 - **Аудит стану кодової бази:** зафіксовано різницю між повним FSD у `apps/docs` та гібридним FSD-lite у продуктових порталах (`StudentPortalApp.tsx` 146 KB, `apps/teacher/src/app/page.tsx` ~2 180 рядків, `CourseStudioView.tsx` 103 KB, `MetricsAuditInspector.tsx` 101 KB, `StudyAppClient.tsx` 52 KB, 8 inline-модалок + 11 `*Modal.tsx`, застарілий `Button.tsx` у `@sbc/ui`, дублікати `GameSkillTreeWidget.tsx` і `AnomalyTreeWidget.tsx` у `apps/teacher`).
 - **Створена документація та правила:**
