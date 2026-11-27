@@ -27,7 +27,7 @@ import {
   Lock,
   Unlock
 } from 'lucide-react';
-import { DrawerSection, AppShellLayout, Breadcrumbs, UserProfileDrawer, AuthModal, ThemeSettingsSection, Modal, Button, Badge } from '@sbc/ui';
+import { DrawerSection, AppShellLayout, Breadcrumbs, UserProfileDrawer, AuthModal, ThemeSettingsSection, Modal, Button, Badge, CodePlayground } from '@sbc/ui';
 import { ROUTES, buildStudyToPracticeUrl } from '@sbc/routes';
 import type { ActiveStrictSessionDto } from '@sbc/types';
 
@@ -38,8 +38,7 @@ import {
   LessonSection,
   CurriculumModule,
   CourseCurriculum,
-} from '../data/school-web-curriculum';
-import { CodePlayground } from './CodePlayground';
+} from '@/data/school-web-curriculum';
 import { 
   ReaderFloatingToolbar, 
   ReaderSettings, 
@@ -47,7 +46,7 @@ import {
   ReadingTheme, 
   ReadingFont, 
   ReadingFontSize 
-} from './ReaderFloatingToolbar';
+} from '@/features/zen-reader';
 
 interface StudyAppClientProps {
   initialCourseSlug?: string;

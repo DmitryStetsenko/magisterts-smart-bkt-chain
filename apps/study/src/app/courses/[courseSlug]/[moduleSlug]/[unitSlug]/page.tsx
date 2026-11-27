@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { SCHOOL_WEB_CURRICULUM } from '@/data/school-web-curriculum';
-import { StudyAppClient } from '@/components/StudyAppClient';
+import { StudyLessonView as StudyAppClient } from '@/views/study-lesson';
 import { adaptCourseToCurriculum } from '@/lib/curriculum-adapter';
 import { CourseCurriculumDto } from '@sbc/types';
 

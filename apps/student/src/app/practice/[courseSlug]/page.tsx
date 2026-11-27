@@ -1,5 +1,5 @@
 import React from 'react';
-import StudentPortalContent from '@/components/StudentPortalApp';
+import { StudentPracticeView as StudentPortalContent } from '@/views/student-practice';
 
 interface PracticeCoursePageProps {
   params: Promise<{

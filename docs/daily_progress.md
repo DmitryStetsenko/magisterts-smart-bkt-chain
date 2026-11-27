@@ -5,7 +5,14 @@
 ## 📅 27 листопада 2026 року
 
 ### ✅ Що зроблено за день:
-1. **Завершення Фази 2 `SBC-315` — міграція решти інспектор-модалок у `apps/teacher` та `@sbc/ui`:**
+1. **Фаза 3 `SBC-315` (`M-FSD` структура) — зачистка мертвих дублікатів, ліквідація `src/components/` та винесення шару `views/`:**
+   - **Видалено 6 мертвих/дублюючих файлів:** локальні копії `AnomalyTreeWidget.tsx`, `GameSkillTreeWidget.tsx` та `skill-graph.types.ts` у `apps/teacher/src/features/` і `apps/student/src/features/`, а також зайвий реекспорт-проксі `apps/study/src/components/CodePlayground.tsx` (замінено на прямий імпорт із `@sbc/ui`).
+   - **Повністю ліквідовано `src/components/` у всіх порталах (`Правило 15 M-FSD`):**
+     - `apps/study`: `StudyLessonView.tsx` перенесено у `src/views/study-lesson/`, а `ReaderFloatingToolbar.tsx` — у `src/features/zen-reader/` із Public API `index.ts`.
+     - `apps/student`: створено `src/entities/course/` (`CourseItem` для усунення циклічної залежності `widgets ← views`), `src/widgets/student-profile/` (`StudentProfileDrawer`), `src/features/practice-progress/`, `src/features/abandon-task/` та `src/views/student-practice/` (`StudentPracticeView`); оновлено маршрути `app/**/page.tsx`.
+   - **Тонкий шар `app/` у `apps/teacher` та `apps/admin`:** 2 180-рядковий `apps/teacher/src/app/page.tsx` винесено в `src/views/teacher-dashboard/ui/TeacherDashboardView.tsx`, а 2 272-рядковий `apps/admin/src/app/page.tsx` — у `src/views/admin-portal/ui/AdminPortalView.tsx`; обидва `app/page.tsx` скорочено до 5-рядкових роут-обгорток.
+   - **Верифікація:** `npx tsc --noEmit` для всіх 4 порталів (`study`, `student`, `teacher`, `admin`) — `0` помилок; Playwright E2E (`course-and-modules`, `light-theme-contrast`, `practice-integrity-modes`, `student-course-reload-dag`, `study-bkt-gating-sync`) — **11/11 passed**.
+2. **Завершення Фази 2 `SBC-315` — міграція решти інспектор-модалок у `apps/teacher` та `@sbc/ui`:**
    - Переведено на `<Modal>`, `<ConfirmModal>`, `<Button>` та `<Badge>` із `@sbc/ui` усі 5 залишкових модальних інспекторів:
      - [`AnomalyRadarWidget.tsx`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/teacher/src/features/analytics/ui/AnomalyRadarWidget.tsx) (`Modal` аудиту аномалії + `<Badge>` для `P(G)`/`P(S)`);
      - [`StudentAnalyticsTable.tsx`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/teacher/src/features/analytics/ui/StudentAnalyticsTable.tsx) (`ConfirmModal` підтвердження глобального скидання);

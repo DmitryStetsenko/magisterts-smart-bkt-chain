@@ -1,6 +1,6 @@
 import React from 'react';
-import StudentPortalContent from '../components/StudentPortalApp';
+import { StudentPracticeView } from '@/views/student-practice';
 
 export default function Page() {
-  return <StudentPortalContent />;
+  return <StudentPracticeView />;
 }

@@ -3,7 +3,7 @@
 import React from 'react';
 import { UserProfileDrawer, UserProfileDrawerCourse } from '@sbc/ui';
 import { Flame, ShieldCheck } from 'lucide-react';
-import { CourseItem } from './StudentPortalApp';
+import { CourseItem } from '@/entities/course';
 
 export interface StudentProfileDrawerProps {
   isOpen: boolean;

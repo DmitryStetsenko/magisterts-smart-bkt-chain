@@ -120,6 +120,44 @@
           ]
         },
         {
+          "title": "0.1.7.120 Фаза 3 `SBC-315` (`M-FSD` Структура): Ліквідація `src/components/`, мертвих дублікатів та винесення `views/` і `entities/`",
+          "level": 3,
+          "paragraphs": [],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "**Зачистка спадщини (`Zero Dead Copies`):** видалено невикористовувані локальні копії `AnomalyTreeWidget.tsx` та `GameSkillTreeWidget.tsx` із `apps/teacher/src/features/` і `apps/student/src/features/` (разом із `apps/teacher/src/features/skill-graph/model/skill-graph.types.ts`) та проксі-обгортку `apps/study/src/components/CodePlayground.tsx` (замінено на прямий імпорт із `@sbc/ui`).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Перебудова порталів за `M-FSD` (`app → views → widgets → features → entities`):**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "`apps/study`: `src/views/study-lesson/` (`StudyLessonView`) та `src/features/zen-reader/` (`ReaderFloatingToolbar`) із `index.ts`; папка `src/components/` видалена.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "`apps/student`: виділено `src/entities/course/` (`CourseItem` розриває зворотну залежність `widgets → views`), `src/widgets/student-profile/` (`StudentProfileDrawer`), `src/features/practice-progress/` (`StudentProgressPill`), `src/features/abandon-task/` (`AbandonTaskModal`) та `src/views/student-practice/` (`StudentPracticeView`); оновлено всі 3 роути `app/**/page.tsx`; папка `src/components/` видалена.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "`apps/teacher` та `apps/admin`: сторінки-моноліти перенесено з `app/page.tsx` у [`TeacherDashboardView.tsx`](file:///apps/teacher/src/views/teacher-dashboard/ui/TeacherDashboardView.tsx) та [`AdminPortalView.tsx`](file:///apps/admin/src/views/admin-portal/ui/AdminPortalView.tsx) із Public API `index.ts`; кореневі `app/page.tsx` скорочено до 5 рядків.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Верифікація:** `tsc --noEmit` (`study`, `student`, `teacher`, `admin`) — `0` помилок; Playwright E2E (5 спеків) — **11/11 passed**.",
+              "subitems": []
+            }
+          ]
+        },
+        {
           "title": "0.1.7.119 Завершення Фази 2 `SBC-315`: Міграція інспектор-модалок `apps/teacher` та спільного `@sbc/ui` (`AnomalyTreeWidget`)",
           "level": 3,
           "paragraphs": [],

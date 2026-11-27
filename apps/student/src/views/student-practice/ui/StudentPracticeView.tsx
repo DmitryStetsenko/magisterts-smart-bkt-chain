@@ -3,15 +3,15 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { io } from 'socket.io-client';
 import { Brain, Sparkles, CheckCircle, AlertCircle, RefreshCw, User, Code2, BookOpen, Scale, ChevronDown, ArrowRight, AlertTriangle, X, Settings, Network, Compass, Flame, History, MessageSquareQuote, CheckCircle2, Trophy, Target, MessageSquare, Info, HelpCircle, GraduationCap, Lock, Unlock, SlidersHorizontal, ShieldCheck } from 'lucide-react';
-import { MonacoCodeEditor } from '../features/code-editor/ui/MonacoCodeEditor';
-import { QuizTaskEditor } from '../features/quiz-editor/ui/QuizTaskEditor';
-import { EssayTaskEditor } from '../features/essay-editor/ui/EssayTaskEditor';
-import { SkillDagMap } from '../features/skill-graph/ui/SkillDagMap';
-import { StudentProgressPill } from './StudentProgressPill';
-import { StudentProfileDrawer } from './StudentProfileDrawer';
-import { AbandonTaskModal } from './AbandonTaskModal';
-import { JustInTimeTheoryDrawer } from '../features/theory-capsule/ui/JustInTimeTheoryDrawer';
-import { resolveTheoryCapsule } from '../features/theory-capsule/model/theory-capsules';
+import { MonacoCodeEditor } from '@/features/code-editor/ui/MonacoCodeEditor';
+import { QuizTaskEditor } from '@/features/quiz-editor/ui/QuizTaskEditor';
+import { EssayTaskEditor } from '@/features/essay-editor/ui/EssayTaskEditor';
+import { SkillDagMap } from '@/features/skill-graph/ui/SkillDagMap';
+import { StudentProgressPill } from '@/features/practice-progress';
+import { StudentProfileDrawer } from '@/widgets/student-profile';
+import { AbandonTaskModal } from '@/features/abandon-task';
+import { JustInTimeTheoryDrawer } from '@/features/theory-capsule/ui/JustInTimeTheoryDrawer';
+import { resolveTheoryCapsule } from '@/features/theory-capsule/model/theory-capsules';
 import { GameSkillTreeWidget, SkillGraphNode, DrawerSection, AppShellLayout, Breadcrumbs, AuthModal, ThemeSettingsSection, ConfirmModal } from '@sbc/ui';
 import {
   TaskDto,
@@ -25,10 +25,11 @@ import {
   IntegrityPolicy,
 } from '@sbc/types';
 import { getAppBaseUrl, ROUTES, resolveStudyUrl } from '@sbc/routes';
+import type { CourseItem } from '@/entities/course';
 
 // Перевикористовуємо уніфіковані типи DTO платформи
 export type TaskDetail = TaskDto;
-export type CourseItem = Partial<CourseDto> & { slug: string; title: string; category?: string };
+export type { CourseItem };
 
 const DEFAULT_COURSES: CourseItem[] = [
   { slug: 'web-algorithms-school', title: 'Вебтехнології та алгоритмізація (10–11 класи)', category: 'Програмування & IT' },

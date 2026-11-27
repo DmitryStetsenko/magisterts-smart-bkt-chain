@@ -16,6 +16,34 @@
           "items": [
             {
               "type": "text",
+              "raw_text": "**Фаза 3 `SBC-315` (`M-FSD` структура) — зачистка мертвих дублікатів, ліквідація `src/components/` та винесення шару `views/`:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Видалено 6 мертвих/дублюючих файлів:** локальні копії `AnomalyTreeWidget.tsx`, `GameSkillTreeWidget.tsx` та `skill-graph.types.ts` у `apps/teacher/src/features/` і `apps/student/src/features/`, а також зайвий реекспорт-проксі `apps/study/src/components/CodePlayground.tsx` (замінено на прямий імпорт із `@sbc/ui`).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Повністю ліквідовано `src/components/` у всіх порталах (`Правило 15 M-FSD`):**",
+              "subitems": [
+                "`apps/study`: `StudyLessonView.tsx` перенесено у `src/views/study-lesson/`, а `ReaderFloatingToolbar.tsx` — у `src/features/zen-reader/` із Public API `index.ts`.",
+                "`apps/student`: створено `src/entities/course/` (`CourseItem` для усунення циклічної залежності `widgets ← views`), `src/widgets/student-profile/` (`StudentProfileDrawer`), `src/features/practice-progress/`, `src/features/abandon-task/` та `src/views/student-practice/` (`StudentPracticeView`); оновлено маршрути `app/**/page.tsx`."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Тонкий шар `app/` у `apps/teacher` та `apps/admin`:** 2 180-рядковий `apps/teacher/src/app/page.tsx` винесено в `src/views/teacher-dashboard/ui/TeacherDashboardView.tsx`, а 2 272-рядковий `apps/admin/src/app/page.tsx` — у `src/views/admin-portal/ui/AdminPortalView.tsx`; обидва `app/page.tsx` скорочено до 5-рядкових роут-обгорток.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Верифікація:** `npx tsc --noEmit` для всіх 4 порталів (`study`, `student`, `teacher`, `admin`) — `0` помилок; Playwright E2E (`course-and-modules`, `light-theme-contrast`, `practice-integrity-modes`, `student-course-reload-dag`, `study-bkt-gating-sync`) — **11/11 passed**.",
+              "subitems": []
+            },
+            {
+              "type": "text",
               "raw_text": "**Завершення Фази 2 `SBC-315` — міграція решти інспектор-модалок у `apps/teacher` та `@sbc/ui`:**",
               "subitems": []
             },

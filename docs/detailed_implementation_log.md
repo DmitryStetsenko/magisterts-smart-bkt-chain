@@ -30,6 +30,14 @@
   5. *Build Next.js Documentation Site* (`npm run build:docs`) — збірка статичного експорту (`output: "export"`, `trailingSlash: true`, `basePath: "/magisterts-smart-bkt-chain"`).
   6. *Upload Artifact & Deploy Pages* (`actions/upload-pages-artifact@v3` + `actions/deploy-pages@v4`).
 
+### 0.1.7.120 Фаза 3 `SBC-315` (`M-FSD` Структура): Ліквідація `src/components/`, мертвих дублікатів та винесення `views/` і `entities/`
+- **Зачистка спадщини (`Zero Dead Copies`):** видалено невикористовувані локальні копії `AnomalyTreeWidget.tsx` та `GameSkillTreeWidget.tsx` із `apps/teacher/src/features/` і `apps/student/src/features/` (разом із `apps/teacher/src/features/skill-graph/model/skill-graph.types.ts`) та проксі-обгортку `apps/study/src/components/CodePlayground.tsx` (замінено на прямий імпорт із `@sbc/ui`).
+- **Перебудова порталів за `M-FSD` (`app → views → widgets → features → entities`):**
+  - `apps/study`: `src/views/study-lesson/` (`StudyLessonView`) та `src/features/zen-reader/` (`ReaderFloatingToolbar`) із `index.ts`; папка `src/components/` видалена.
+  - `apps/student`: виділено `src/entities/course/` (`CourseItem` розриває зворотну залежність `widgets → views`), `src/widgets/student-profile/` (`StudentProfileDrawer`), `src/features/practice-progress/` (`StudentProgressPill`), `src/features/abandon-task/` (`AbandonTaskModal`) та `src/views/student-practice/` (`StudentPracticeView`); оновлено всі 3 роути `app/**/page.tsx`; папка `src/components/` видалена.
+  - `apps/teacher` та `apps/admin`: сторінки-моноліти перенесено з `app/page.tsx` у [`TeacherDashboardView.tsx`](file:///apps/teacher/src/views/teacher-dashboard/ui/TeacherDashboardView.tsx) та [`AdminPortalView.tsx`](file:///apps/admin/src/views/admin-portal/ui/AdminPortalView.tsx) із Public API `index.ts`; кореневі `app/page.tsx` скорочено до 5 рядків.
+- **Верифікація:** `tsc --noEmit` (`study`, `student`, `teacher`, `admin`) — `0` помилок; Playwright E2E (5 спеків) — **11/11 passed**.
+
 ### 0.1.7.119 Завершення Фази 2 `SBC-315`: Міграція інспектор-модалок `apps/teacher` та спільного `@sbc/ui` (`AnomalyTreeWidget`)
 - **Міграція інспекторів (`apps/teacher` + `packages/ui`):**
   - [`AnomalyRadarWidget.tsx`](file:///apps/teacher/src/features/analytics/ui/AnomalyRadarWidget.tsx), [`MetricsAuditInspector.tsx`](file:///apps/teacher/src/features/metrics-audit/ui/MetricsAuditInspector.tsx), [`ReviewQueueInspector.tsx`](file:///apps/teacher/src/features/reviews/ui/ReviewQueueInspector.tsx) та [`packages/ui/src/analytics/AnomalyTreeWidget.tsx`](file:///packages/ui/src/analytics/AnomalyTreeWidget.tsx): локальні `fixed inset-0` оверлеї переведено на канонічний `<Modal>`, `<Button>` та `<Badge>` із `--sbc-*` токенами.
