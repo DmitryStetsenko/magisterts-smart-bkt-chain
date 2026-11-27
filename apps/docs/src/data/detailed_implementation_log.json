@@ -120,6 +120,44 @@
           ]
         },
         {
+          "title": "0.1.7.118 Фаза 2 `SBC-315`: Міграція всіх 18 модальних вікон `apps/admin` на `@sbc/ui` (`Modal`, `ConfirmModal`, `Button`, `Badge`)",
+          "level": 3,
+          "paragraphs": [],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "**Розширення `@sbc/ui` ([`Modal.tsx`](file:///packages/ui/src/shared/ui/modal/Modal.tsx)):** додано широкі розміри `'3xl' | '4xl' | '5xl' | '6xl'`, проп `zIndexClassName` (для вкладених суб-модалок `z-[60]`) та `bodyClassName` (для split/tab конструкторів).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Міграція `apps/admin` (13 файлів, 18 модалок):**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "`users/`: [`UserModal.tsx`](file:///apps/admin/src/features/users/ui/UserModal.tsx), [`EnrollCourseModal.tsx`](file:///apps/admin/src/features/users/ui/EnrollCourseModal.tsx), [`UserManagementCenter.tsx`](file:///apps/admin/src/features/users/ui/UserManagementCenter.tsx) (`ConfirmModal` видалення).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "`dataset-export/`: [`DatasetExportCenter.tsx`](file:///apps/admin/src/features/dataset-export/ui/DatasetExportCenter.tsx) (`Modal` JSON-інспектора + `ConfirmModal` очищення логів).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "`course-manager/`: [`CourseManager.tsx`](file:///apps/admin/src/features/course-manager/ui/CourseManager.tsx), [`CourseEditModal.tsx`](file:///apps/admin/src/features/course-manager/ui/CourseEditModal.tsx), [`CategoryManagerModal.tsx`](file:///apps/admin/src/features/course-manager/ui/CategoryManagerModal.tsx), [`CreateSkillModal.tsx`](file:///apps/admin/src/features/course-manager/ui/CreateSkillModal.tsx), [`CreateTaskModal.tsx`](file:///apps/admin/src/features/course-manager/ui/CreateTaskModal.tsx), [`ModuleTestSandboxModal.tsx`](file:///apps/admin/src/features/course-manager/ui/ModuleTestSandboxModal.tsx), [`CourseImportModal.tsx`](file:///apps/admin/src/features/course-manager/ui/CourseImportModal.tsx), [`AiCourseScaffolderModal.tsx`](file:///apps/admin/src/features/course-manager/ui/AiCourseScaffolderModal.tsx), [`ModuleManagerModal.tsx`](file:///apps/admin/src/features/course-manager/ui/ModuleManagerModal.tsx) (головне вікно + 3 суб-модалки з `z-[60]`) та [`TheoryLessonBuilderModal.tsx`](file:///apps/admin/src/features/course-manager/ui/TheoryLessonBuilderModal.tsx).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Верифікація:** `tsc --noEmit` для `packages/ui` і `apps/admin` (`0` помилок); `course-and-modules.spec.ts` (`4/4 passed`), `light-theme-contrast.spec.ts` (`4/4 passed`, Admin 65 елементів — 0 порушень), та модальні тести `CourseImportModal` / `AiCourseScaffolderModal` у `course-creation-wizard-flow.spec.ts` (`passed`; 2 інших кейси впали на застарілих асертах `bg-slate-800` / згорнутого `DrawerSection` із `SBC-433`/`SBC-439`).",
+              "subitems": []
+            }
+          ]
+        },
+        {
           "title": "0.1.7.117 Фаза 2 `SBC-315`: Міграція модальних вікон `apps/teacher` на `@sbc/ui` (`Modal`, `ConfirmModal`, `Button`, `Badge`)",
           "level": 3,
           "paragraphs": [],

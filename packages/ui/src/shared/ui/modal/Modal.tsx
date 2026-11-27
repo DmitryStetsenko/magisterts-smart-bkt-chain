@@ -4,7 +4,7 @@ import React, { useEffect, useId, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
 
-export type ModalSize = 'sm' | 'md' | 'lg' | 'xl' | '2xl';
+export type ModalSize = 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl' | '4xl' | '5xl' | '6xl';
 
 export interface ModalProps {
   isOpen: boolean;
@@ -22,6 +22,8 @@ export interface ModalProps {
   overlayTestId?: string;
   dialogTestId?: string;
   closeTestId?: string;
+  zIndexClassName?: string;
+  bodyClassName?: string;
   className?: string;
   children: React.ReactNode;
 }
@@ -32,6 +34,10 @@ const SIZE_CLASSES: Record<ModalSize, string> = {
   lg: 'max-w-lg',
   xl: 'max-w-xl',
   '2xl': 'max-w-2xl',
+  '3xl': 'max-w-3xl',
+  '4xl': 'max-w-4xl',
+  '5xl': 'max-w-5xl',
+  '6xl': 'max-w-6xl',
 };
 
 /**
@@ -53,6 +59,8 @@ export const Modal: React.FC<ModalProps> = ({
   overlayTestId,
   dialogTestId,
   closeTestId,
+  zIndexClassName = 'z-50',
+  bodyClassName = 'px-5 py-4 overflow-y-auto flex-1',
   className = '',
   children,
 }) => {
@@ -88,7 +96,7 @@ export const Modal: React.FC<ModalProps> = ({
   const modalNode = (
     <div
       data-testid={overlayTestId}
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/65 backdrop-blur-sm animate-fadeIn"
+      className={`fixed inset-0 ${zIndexClassName} flex items-center justify-center p-4 bg-black/65 backdrop-blur-sm animate-fadeIn`}
       onClick={(event) => {
         if (closeOnOverlayClick && event.target === event.currentTarget) {
           onClose();
@@ -146,7 +154,7 @@ export const Modal: React.FC<ModalProps> = ({
           </div>
         )}
 
-        <div className="px-5 py-4 overflow-y-auto flex-1">{children}</div>
+        <div className={bodyClassName}>{children}</div>
 
         {footer && (
           <div className="px-5 py-3.5 border-t border-[var(--sbc-border-subtle,#2b2b2b)] bg-[var(--sbc-bg-subtle,#262626)]/40 shrink-0">

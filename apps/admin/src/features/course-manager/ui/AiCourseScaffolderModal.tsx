@@ -20,6 +20,7 @@ import {
   Check,
 } from 'lucide-react';
 import type { CourseDto, AiCourseScaffoldRequestDto } from '@sbc/types';
+import { Modal, Badge } from '@sbc/ui';
 import {
   downloadParsedCourseWorkbook,
   type ParsedCourseImportDto,
@@ -87,8 +88,6 @@ export const AiCourseScaffolderModal: React.FC<AiCourseScaffolderModalProps> = (
     }
     return () => clearInterval(interval);
   }, [isGenerating]);
-
-  if (!isOpen) return null;
 
   const handleApplyPreset = (preset: (typeof PROMPT_PRESETS)[0]) => {
     setPrompt(preset.prompt);
@@ -183,42 +182,28 @@ export const AiCourseScaffolderModal: React.FC<AiCourseScaffolderModalProps> = (
   };
 
   return (
-    <div
-      role="dialog"
-      aria-label="ШІ One-Shot Генератор курсу"
-      className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto animate-fadeIn"
-    >
-      <div className="bg-slate-900 border border-slate-800 rounded-2xl max-w-2xl w-full shadow-2xl flex flex-col overflow-hidden my-auto border-t-purple-500/40 border-t">
-        {/* Modal Header */}
-        <div className="flex items-center justify-between px-5 py-4 border-b border-slate-800/80 bg-slate-900/50">
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400">
-              <Sparkles className="w-4 h-4" />
-            </div>
-            <div>
-              <h2 className="text-sm font-bold text-white flex items-center gap-2">
-                <span>ШІ One-Shot Генератор курсу</span>
-                <span className="text-[10px] font-mono font-normal uppercase px-1.5 py-0.5 rounded bg-purple-500/10 text-purple-300 border border-purple-500/20">
-                  Gemini 2.5 + Fallback
-                </span>
-              </h2>
-              <p className="text-[11px] text-slate-400">
-                Автоматична генерація паспорта, модулів, DAG-компетентностей, 5-блочної теорії та тест-кейсів
-              </p>
-            </div>
-          </div>
-          <button
-            onClick={onClose}
-            disabled={isGenerating || isSubmitting}
-            className="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800 transition-colors"
-          >
-            <X className="w-4 h-4" />
-          </button>
+    <Modal
+      isOpen={isOpen}
+      onClose={() => !(isGenerating || isSubmitting) && onClose()}
+      size="2xl"
+      closeOnOverlayClick={!(isGenerating || isSubmitting)}
+      closeOnEscape={!(isGenerating || isSubmitting)}
+      hideCloseButton={isGenerating || isSubmitting}
+      icon={
+        <div className="w-8 h-8 rounded-lg bg-purple-950/50 border border-purple-500/30 flex items-center justify-center text-purple-400">
+          <Sparkles className="w-4 h-4" />
         </div>
-
-        {/* Modal Body */}
-        <div className="p-5 space-y-4 max-h-[calc(85vh-120px)] overflow-y-auto">
-          {error && (
+      }
+      title={
+        <span className="flex items-center gap-2 flex-wrap">
+          <span>ШІ One-Shot Генератор курсу</span>
+          <Badge variant="accent" size="xs" mono>Gemini 2.5 + Fallback</Badge>
+        </span>
+      }
+      subtitle="Автоматична генерація паспорта, модулів, DAG-компетентностей, 5-блочної теорії та тест-кейсів"
+    >
+      <div className="space-y-4">
+        {error && (
             <div className="flex items-start gap-2.5 p-3 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-300 text-xs animate-fadeIn">
               <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-rose-400" />
               <div className="flex-1">{error}</div>
@@ -565,8 +550,7 @@ export const AiCourseScaffolderModal: React.FC<AiCourseScaffolderModalProps> = (
               </div>
             </>
           )}
-        </div>
       </div>
-    </div>
+    </Modal>
   );
 };

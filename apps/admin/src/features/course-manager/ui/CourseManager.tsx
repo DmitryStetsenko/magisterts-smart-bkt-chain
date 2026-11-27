@@ -20,6 +20,7 @@ import {
   Upload,
 } from 'lucide-react';
 import type { CourseDto, CreateCourseDto, CourseCategoryDto } from '@sbc/types';
+import { Modal, Button } from '@sbc/ui';
 import { CourseEditModal } from './CourseEditModal';
 import { ModuleManagerModal } from './ModuleManagerModal';
 import { CategoryManagerModal } from './CategoryManagerModal';
@@ -645,23 +646,41 @@ export const CourseManager: React.FC<CourseManagerProps> = ({
       </div>
 
       {/* Modal dialog for creating new course */}
-      {isModalOpen && (
-        <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl max-w-lg w-full p-6 shadow-2xl flex flex-col gap-5 animate-fadeIn">
-            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-              <h3 className="text-base font-bold text-white flex items-center gap-2">
-                <Sparkles className="w-4 h-4 text-emerald-400" />
-                <span>Створення Нового Навчального Курсу</span>
-              </h3>
-              <button
-                onClick={() => setIsModalOpen(false)}
-                className="text-slate-400 hover:text-white text-sm"
-              >
-                ✕
-              </button>
-            </div>
-
-            <form onSubmit={handleCreateCourse} className="flex flex-col gap-4">
+      <Modal
+        isOpen={isModalOpen}
+        onClose={() => !isSubmitting && setIsModalOpen(false)}
+        size="lg"
+        closeOnOverlayClick={!isSubmitting}
+        closeOnEscape={!isSubmitting}
+        icon={
+          <div className="w-8 h-8 rounded-lg bg-emerald-950/50 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
+            <Sparkles className="w-4 h-4" />
+          </div>
+        }
+        title="Створення Нового Навчального Курсу"
+        footer={
+          <div className="flex items-center justify-end gap-2.5">
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => setIsModalOpen(false)}
+              disabled={isSubmitting}
+            >
+              Скасувати
+            </Button>
+            <Button
+              type="submit"
+              form="admin-create-course-form"
+              variant="accent"
+              size="sm"
+              isLoading={isSubmitting}
+            >
+              {isSubmitting ? 'Збереження...' : 'Зберегти Курс'}
+            </Button>
+          </div>
+        }
+      >
+        <form id="admin-create-course-form" onSubmit={handleCreateCourse} className="flex flex-col gap-4">
               <div>
                 <label className="block text-xs font-semibold text-slate-300 mb-1">
                   Назва Курсу *
@@ -750,27 +769,8 @@ export const CourseManager: React.FC<CourseManagerProps> = ({
                   />
                 </div>
               </div>
-
-              <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-800">
-                <button
-                  type="button"
-                  onClick={() => setIsModalOpen(false)}
-                  className="px-3.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium cursor-pointer"
-                >
-                  Скасувати
-                </button>
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="px-3.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-medium cursor-pointer disabled:opacity-50"
-                >
-                  {isSubmitting ? 'Збереження...' : 'Зберегти Курс'}
-                </button>
-              </div>
             </form>
-          </div>
-        </div>
-      )}
+      </Modal>
 
       {/* Edit Course Modal */}
       {editingCourse && (

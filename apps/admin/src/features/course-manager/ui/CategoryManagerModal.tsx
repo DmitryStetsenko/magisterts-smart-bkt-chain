@@ -1,20 +1,18 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   Folder,
   Plus,
   Trash2,
-  X,
-  Sparkles,
   CheckCircle2,
   Code,
   Languages,
   Scale,
   Binary,
-  BookOpen,
 } from 'lucide-react';
 import type { CourseCategoryDto, CreateCourseCategoryDto } from '@sbc/types';
+import { Modal, Button } from '@sbc/ui';
 
 interface CategoryManagerModalProps {
   isOpen: boolean;
@@ -36,18 +34,6 @@ export const CategoryManagerModal: React.FC<CategoryManagerModalProps> = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
-
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
-    };
-    if (isOpen) {
-      window.addEventListener('keydown', handleKeyDown);
-      return () => window.removeEventListener('keydown', handleKeyDown);
-    }
-  }, [isOpen, onClose]);
-
-  if (!isOpen) return null;
 
   const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
 
@@ -140,26 +126,26 @@ export const CategoryManagerModal: React.FC<CategoryManagerModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
-      <div className="bg-slate-900 border border-slate-800 rounded-2xl max-w-2xl w-full p-6 shadow-2xl flex flex-col gap-5 animate-fadeIn max-h-[90vh] overflow-hidden">
-        {/* Header */}
-        <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-          <div className="flex items-center gap-2.5">
-            <div className="p-2 bg-emerald-600/20 border border-emerald-500/30 rounded-lg text-emerald-400">
-              <Folder className="w-5 h-5" />
-            </div>
-            <div>
-              <h3 className="text-base font-bold text-white">Керування Предметними Категоріями</h3>
-              <p className="text-xs text-slate-400">Наскрізна класифікація курсів за галузями знань</p>
-            </div>
-          </div>
-          <button
-            onClick={onClose}
-            className="p-1 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white transition-colors cursor-pointer"
-          >
-            <X className="w-5 h-5" />
-          </button>
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      size="2xl"
+      icon={
+        <div className="p-2 bg-emerald-950/50 border border-emerald-500/30 rounded-lg text-emerald-400">
+          <Folder className="w-5 h-5" />
         </div>
+      }
+      title="Керування Предметними Категоріями"
+      subtitle="Наскрізна класифікація курсів за галузями знань"
+      footer={
+        <div className="flex justify-end">
+          <Button variant="secondary" size="sm" onClick={onClose}>
+            Закрити
+          </Button>
+        </div>
+      }
+    >
+      <div className="flex flex-col gap-4">
 
         {error && (
           <div className="p-2.5 bg-rose-950/40 border border-rose-500/40 rounded-lg text-rose-300 text-xs">
@@ -299,18 +285,7 @@ export const CategoryManagerModal: React.FC<CategoryManagerModalProps> = ({
             </div>
           </div>
         </div>
-
-        {/* Footer */}
-        <div className="flex justify-end pt-3 border-t border-slate-800">
-          <button
-            type="button"
-            onClick={onClose}
-            className="px-4 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium cursor-pointer"
-          >
-            Закрити
-          </button>
-        </div>
       </div>
-    </div>
+    </Modal>
   );
 };

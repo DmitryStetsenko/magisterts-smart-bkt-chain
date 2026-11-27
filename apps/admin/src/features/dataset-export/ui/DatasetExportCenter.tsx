@@ -27,6 +27,7 @@ import {
   Trash2
 } from 'lucide-react';
 import { StudentActivityLogDto } from '@sbc/types';
+import { Modal, ConfirmModal, Button, Badge } from '@sbc/ui';
 
 export interface DatasetStats {
   total: number;
@@ -696,136 +697,97 @@ export const DatasetExportCenter: React.FC<DatasetExportCenterProps> = ({
       </div>
 
       {/* 🔍 Raw Payload Modal Inspector */}
-      {inspectingLog && (
-        <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 animate-fadeIn">
-          <div className="bg-slate-900 border border-slate-800 rounded-xl max-w-2xl w-full p-5 shadow-2xl flex flex-col gap-4 relative">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-800/80">
-              <div className="flex items-center gap-2">
-                <Database className="w-4 h-4 text-emerald-400" />
-                <h3 className="text-sm font-bold text-white">
-                  JSON Пейлоад Події: <code className="text-emerald-400 text-xs font-mono">{inspectingLog.eventType}</code>
-                </h3>
-              </div>
-              <button
-                type="button"
-                onClick={() => setInspectingLog(null)}
-                className="p-1 text-slate-400 hover:text-white rounded-lg transition-colors cursor-pointer"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-
-            <div className="grid grid-cols-2 gap-2 text-[11px] font-mono text-slate-400 bg-slate-950/60 p-3 rounded-lg border border-slate-800/80">
-              <div>ID: <span className="text-slate-200">{inspectingLog.id}</span></div>
-              <div>Час: <span className="text-slate-200">{inspectingLog.createdAt}</span></div>
-              <div>User: <span className="text-slate-200">{inspectingLog.userId}</span></div>
-              <div>Роль: <span className="text-slate-200">{inspectingLog.actorRole || 'STUDENT'}</span></div>
+      <Modal
+        isOpen={Boolean(inspectingLog)}
+        onClose={() => setInspectingLog(null)}
+        size="2xl"
+        icon={
+          <div className="w-8 h-8 rounded-lg bg-emerald-950/50 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
+            <Database className="w-4 h-4" />
+          </div>
+        }
+        title={
+          inspectingLog ? (
+            <span className="flex items-center gap-2 flex-wrap">
+              <span>JSON Пейлоад Події:</span>
+              <Badge variant="success" size="xs" mono>{inspectingLog.eventType}</Badge>
+            </span>
+          ) : undefined
+        }
+        footer={
+          <div className="flex items-center justify-end">
+            <Button variant="secondary" size="sm" onClick={() => setInspectingLog(null)}>
+              Закрити
+            </Button>
+          </div>
+        }
+      >
+        {inspectingLog && (
+          <div className="flex flex-col gap-4">
+            <div className="grid grid-cols-2 gap-2 text-[11px] font-mono text-[var(--sbc-text-muted,#909090)] bg-[var(--sbc-bg-subtle,#262626)] p-3 rounded-lg border border-[var(--sbc-border-subtle,#2b2b2b)]">
+              <div>ID: <span className="text-[var(--sbc-text-primary,#cccccc)]">{inspectingLog.id}</span></div>
+              <div>Час: <span className="text-[var(--sbc-text-primary,#cccccc)]">{inspectingLog.createdAt}</span></div>
+              <div>User: <span className="text-[var(--sbc-text-primary,#cccccc)]">{inspectingLog.userId}</span></div>
+              <div>Роль: <span className="text-[var(--sbc-text-primary,#cccccc)]">{inspectingLog.actorRole || 'STUDENT'}</span></div>
             </div>
 
             <div className="relative">
-              <pre className="p-3 bg-slate-950 rounded-lg border border-slate-800/80 text-emerald-300 font-mono text-xs overflow-x-auto max-h-72 leading-relaxed">
+              <pre className="p-3 bg-zinc-950 rounded-lg border border-[var(--sbc-border-subtle,#2b2b2b)] text-emerald-300 font-mono text-xs overflow-x-auto max-h-72 leading-relaxed">
                 {JSON.stringify(inspectingLog.payload || {}, null, 2)}
               </pre>
-              <button
-                type="button"
+              <Button
+                variant="secondary"
+                size="xs"
                 onClick={handleCopyPayload}
-                className="absolute top-2.5 right-2.5 px-2.5 py-1 rounded bg-slate-800/80 hover:bg-slate-700 text-slate-200 text-[11px] flex items-center gap-1 transition-colors cursor-pointer"
+                leftIcon={isCopied ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
+                className="absolute top-2.5 right-2.5"
               >
-                {isCopied ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
-                <span>{isCopied ? 'Скопійовано' : 'Копіювати'}</span>
-              </button>
-            </div>
-
-            <div className="flex items-center justify-end pt-2 border-t border-slate-800/80">
-              <button
-                type="button"
-                onClick={() => setInspectingLog(null)}
-                className="px-4 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-medium transition-colors cursor-pointer"
-              >
-                Закрити
-              </button>
+                {isCopied ? 'Скопійовано' : 'Копіювати'}
+              </Button>
             </div>
           </div>
-        </div>
-      )}
+        )}
+      </Modal>
 
       {/* 🗑️ Clear Logs Safety Confirmation Modal */}
-      {isClearModalOpen && (
-        <div className="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-md flex items-center justify-center p-4 animate-fadeIn">
-          <div className="bg-slate-900 border border-rose-500/40 rounded-2xl max-w-md w-full p-6 shadow-2xl flex flex-col gap-4 relative">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-800/80">
-              <div className="flex items-center gap-2 text-rose-400">
-                <div className="p-2 bg-rose-500/10 border border-rose-500/20 rounded-xl">
-                  <Trash2 className="w-5 h-5" />
-                </div>
-                <div>
-                  <h3 className="text-sm font-bold text-white">Очищення бази аудит-логу</h3>
-                  <span className="text-[11px] text-rose-400 font-mono">НЕЗВОРОТНА ОПЕРАЦІЯ</span>
-                </div>
-              </div>
-              <button
-                type="button"
-                onClick={() => setIsClearModalOpen(false)}
-                className="p-1 text-slate-400 hover:text-white rounded-lg transition-colors cursor-pointer"
-              >
-                <X className="w-4 h-4" />
-              </button>
+      <ConfirmModal
+        isOpen={isClearModalOpen}
+        onClose={() => !isClearing && setIsClearModalOpen(false)}
+        onConfirm={handleClearAllLogs}
+        variant="danger"
+        size="md"
+        icon={<Trash2 className="w-4 h-4" />}
+        title="Очищення бази аудит-логу"
+        description={
+          <span>
+            Ви збираєтеся видалити всі <strong className="text-[var(--sbc-text-primary,#cccccc)] font-mono">{logs.length}</strong> збережених подій аудит-логу (спроби розв&apos;язання, підказки Сократа, анулювання, час вивчення теорії).
+          </span>
+        }
+        warnings={['Це призведе до повного обнулення датасету для навчання ШІ-моделей та хроніки викладача.']}
+        cancelLabel="Скасувати"
+        confirmLabel={isClearing ? 'Очищення...' : 'Підтвердити очищення'}
+        isConfirming={isClearing}
+        confirmDisabled={clearConfirmInput.trim() !== 'ОЧИСТИТИ'}
+      >
+        <div className="space-y-2 pt-1">
+          <p className="text-xs text-[var(--sbc-text-muted,#909090)]">
+            Для підтвердження введіть слово <strong className="text-[var(--sbc-text-primary,#cccccc)] font-mono selection:bg-rose-500">ОЧИСТИТИ</strong> у поле нижче:
+          </p>
+          <input
+            type="text"
+            placeholder="Введіть ОЧИСТИТИ..."
+            value={clearConfirmInput}
+            onChange={(e) => setClearConfirmInput(e.target.value)}
+            className="w-full px-3 py-2 bg-[var(--sbc-bg-root,#181818)] border border-[var(--sbc-border-strong,#333333)] focus:border-rose-500 rounded-lg text-xs text-[var(--sbc-text-primary,#cccccc)] font-mono placeholder:text-[var(--sbc-text-tertiary,#6e6e6e)] focus:outline-none"
+            autoFocus
+          />
+          {clearError && (
+            <div className="text-xs text-rose-400 font-medium">
+              {clearError}
             </div>
-
-            <div className="text-xs text-slate-300 flex flex-col gap-2 leading-relaxed">
-              <p>
-                Ви збираєтеся видалити всі <strong className="text-white font-mono">{logs.length}</strong> збережених подій аудит-логу (спроби розв&apos;язання, підказки Сократа, анулювання, час вивчення теорії).
-              </p>
-              <div className="p-3 bg-rose-950/30 border border-rose-500/20 rounded-lg text-rose-300 text-[11px]">
-                ⚠️ Це призведе до повного обнулення датасету для навчання ШІ-моделей та хроніки викладача.
-              </div>
-              <p className="mt-1 text-slate-400">
-                Для підтвердження введіть слово <strong className="text-white font-mono selection:bg-rose-500">ОЧИСТИТИ</strong> у поле нижче:
-              </p>
-            </div>
-
-            <input
-              type="text"
-              placeholder="Введіть ОЧИСТИТИ..."
-              value={clearConfirmInput}
-              onChange={(e) => setClearConfirmInput(e.target.value)}
-              className="w-full px-3 py-2 bg-slate-950 border border-slate-800 focus:border-rose-500 rounded-lg text-xs text-white font-mono placeholder:text-slate-600 focus:outline-none"
-              autoFocus
-            />
-
-            {clearError && (
-              <div className="text-xs text-rose-400 font-medium">
-                {clearError}
-              </div>
-            )}
-
-            <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-800/80">
-              <button
-                type="button"
-                onClick={() => setIsClearModalOpen(false)}
-                disabled={isClearing}
-                className="px-3.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium transition-colors cursor-pointer"
-              >
-                Скасувати
-              </button>
-
-              <button
-                type="button"
-                onClick={handleClearAllLogs}
-                disabled={clearConfirmInput.trim() !== 'ОЧИСТИТИ' || isClearing}
-                className={`px-4 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all ${
-                  clearConfirmInput.trim() === 'ОЧИСТИТИ' && !isClearing
-                    ? 'bg-rose-600 hover:bg-rose-500 text-white cursor-pointer shadow-lg shadow-rose-900/30'
-                    : 'bg-slate-800 text-slate-500 cursor-not-allowed border border-slate-700/50'
-                }`}
-              >
-                <Trash2 className="w-3.5 h-3.5" />
-                <span>{isClearing ? 'Очищення...' : 'Підтвердити очищення'}</span>
-              </button>
-            </div>
-          </div>
+          )}
         </div>
-      )}
+      </ConfirmModal>
     </div>
   );
 };

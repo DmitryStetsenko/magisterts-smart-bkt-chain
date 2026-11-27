@@ -1,8 +1,9 @@
 'use client';
 
 import React, { useState } from 'react';
-import { FlaskConical, X, Play, CheckCircle2, AlertTriangle, ExternalLink, ArrowRight, BookOpen, RefreshCw } from 'lucide-react';
+import { FlaskConical, Play, CheckCircle2, AlertTriangle, ExternalLink, BookOpen, RefreshCw } from 'lucide-react';
 import { CourseModuleDto } from '@sbc/types';
+import { Modal, Button, Badge } from '@sbc/ui';
 
 interface ModuleTestSandboxModalProps {
   isOpen: boolean;
@@ -63,43 +64,40 @@ export const ModuleTestSandboxModal: React.FC<ModuleTestSandboxModalProps> = ({
     setSelectedOptionId(null);
   };
 
-  React.useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
-    };
-    if (isOpen) {
-      window.addEventListener('keydown', handleKeyDown);
-      return () => window.removeEventListener('keydown', handleKeyDown);
-    }
-  }, [isOpen, onClose]);
-
   return (
-    <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
-      <div className="bg-slate-900 border border-slate-800 rounded-xl max-w-2xl w-full p-5 flex flex-col gap-4 shadow-2xl animate-fadeIn max-h-[90vh] overflow-y-auto">
-        {/* Header */}
-        <div className="flex items-center justify-between pb-3 border-b border-slate-800 shrink-0">
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-emerald-500/15 flex items-center justify-center text-emerald-400">
-              <FlaskConical className="w-4 h-4" />
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <h3 className="text-sm font-bold text-white">Авторська Пісочниця Тестування Модуля</h3>
-                <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                  Live BKT Sandbox
-                </span>
-              </div>
-              <p className="text-[11px] text-slate-400 mt-0.5 truncate max-w-md">{module.title}</p>
-            </div>
-          </div>
-          <button
-            type="button"
-            onClick={onClose}
-            className="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800 transition-colors"
-          >
-            <X className="w-4 h-4" />
-          </button>
+    <Modal
+      isOpen={Boolean(isOpen && module)}
+      onClose={onClose}
+      size="2xl"
+      icon={
+        <div className="w-8 h-8 rounded-lg bg-emerald-950/50 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
+          <FlaskConical className="w-4 h-4" />
         </div>
+      }
+      title={
+        <span className="flex items-center gap-2 flex-wrap">
+          <span>Авторська Пісочниця Тестування Модуля</span>
+          <Badge variant="success" size="xs" mono>Live BKT Sandbox</Badge>
+        </span>
+      }
+      subtitle={module.title}
+      footer={
+        <div className="flex items-center justify-between gap-2">
+          <Button
+            variant="ghost"
+            size="xs"
+            onClick={handleReset}
+            leftIcon={<RefreshCw className="w-3 h-3" />}
+          >
+            Скинути стан симуляції
+          </Button>
+          <Button variant="secondary" size="sm" onClick={onClose}>
+            Закрити пісочницю
+          </Button>
+        </div>
+      }
+    >
+      <div className="flex flex-col gap-4">
 
         {/* Module Health Banner */}
         <div className="p-3 bg-slate-950/80 border border-slate-800 rounded-lg flex items-center justify-between gap-3 text-xs">
@@ -245,26 +243,7 @@ export const ModuleTestSandboxModal: React.FC<ModuleTestSandboxModalProps> = ({
             </div>
           </div>
         )}
-
-        {/* Footer */}
-        <div className="flex items-center justify-between pt-2 border-t border-slate-800 shrink-0">
-          <button
-            type="button"
-            onClick={handleReset}
-            className="text-slate-400 hover:text-white text-xs flex items-center gap-1 cursor-pointer"
-          >
-            <RefreshCw className="w-3 h-3" />
-            <span>Скинути стан симуляції</span>
-          </button>
-          <button
-            type="button"
-            onClick={onClose}
-            className="px-4 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-white text-xs font-semibold transition-colors cursor-pointer"
-          >
-            Закрити пісочницю
-          </button>
-        </div>
       </div>
-    </div>
+    </Modal>
   );
 };

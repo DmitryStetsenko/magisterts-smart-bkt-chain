@@ -1,8 +1,9 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { X, BookPlus, Check, AlertCircle } from 'lucide-react';
+import { BookPlus, Check, AlertCircle } from 'lucide-react';
 import { AuthUserDto, EnrollmentMode } from '@sbc/types';
+import { Modal, Button } from '@sbc/ui';
 
 interface CourseOption {
   id: string;
@@ -54,8 +55,6 @@ export const EnrollCourseModal: React.FC<EnrollCourseModalProps> = ({
     fetchCourses();
   }, [isOpen, apiUrl]);
 
-  if (!isOpen) return null;
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedCourseId) {
@@ -91,32 +90,43 @@ export const EnrollCourseModal: React.FC<EnrollCourseModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm animate-fadeIn">
-      <div className="w-full max-w-md bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl overflow-hidden flex flex-col">
-        {/* Header */}
-        <div className="px-5 py-4 border-b border-slate-800 flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400">
-              <BookPlus className="w-4 h-4" />
-            </div>
-            <div>
-              <h3 className="text-sm font-bold text-white">Підключити курс учню</h3>
-              <p className="text-[11px] text-slate-400 truncate max-w-[260px]">
-                {user.profile?.firstName ? `${user.profile.firstName} ${user.profile.lastName || ''} (${user.email})` : user.email}
-              </p>
-            </div>
-          </div>
-          <button
-            type="button"
-            onClick={onClose}
-            className="p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition-colors"
-          >
-            <X className="w-4 h-4" />
-          </button>
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      size="md"
+      closeOnOverlayClick={!isSubmitting}
+      closeOnEscape={!isSubmitting}
+      icon={
+        <div className="w-8 h-8 rounded-lg bg-indigo-950/50 border border-indigo-500/30 flex items-center justify-center text-indigo-400">
+          <BookPlus className="w-4 h-4" />
         </div>
-
-        {/* Body */}
-        <form onSubmit={handleSubmit} className="p-5 flex flex-col gap-4 text-xs">
+      }
+      title="Підключити курс учню"
+      subtitle={
+        user.profile?.firstName
+          ? `${user.profile.firstName} ${user.profile.lastName || ''} (${user.email})`
+          : user.email
+      }
+      footer={
+        <div className="flex items-center justify-end gap-2.5">
+          <Button variant="secondary" size="sm" onClick={onClose} disabled={isSubmitting}>
+            Скасувати
+          </Button>
+          <Button
+            type="submit"
+            form="admin-enroll-course-form"
+            variant="primary"
+            size="sm"
+            isLoading={isSubmitting}
+            disabled={!selectedCourseId}
+            leftIcon={<Check className="w-3.5 h-3.5" />}
+          >
+            {isSubmitting ? 'Зарахування...' : 'Підключити курс'}
+          </Button>
+        </div>
+      }
+    >
+      <form id="admin-enroll-course-form" onSubmit={handleSubmit} className="flex flex-col gap-4 text-xs">
           {error && (
             <div className="p-3 rounded-lg bg-rose-500/10 border border-rose-500/20 text-rose-300 flex items-center gap-2">
               <AlertCircle className="w-4 h-4 shrink-0 text-rose-400" />
@@ -238,28 +248,7 @@ export const EnrollCourseModal: React.FC<EnrollCourseModalProps> = ({
               </label>
             </div>
           </div>
-
-          {/* Footer */}
-          <div className="pt-3 border-t border-slate-800 flex items-center justify-end gap-2.5">
-            <button
-              type="button"
-              onClick={onClose}
-              disabled={isSubmitting}
-              className="px-3.5 py-1.5 rounded-lg border border-slate-800 text-slate-400 hover:text-white hover:bg-slate-800/60 transition-colors cursor-pointer text-xs"
-            >
-              Скасувати
-            </button>
-            <button
-              type="submit"
-              disabled={isSubmitting || !selectedCourseId}
-              className="px-4 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-medium flex items-center gap-1.5 transition-colors cursor-pointer text-xs disabled:opacity-50"
-            >
-              <Check className="w-3.5 h-3.5" />
-              <span>{isSubmitting ? 'Зарахування...' : 'Підключити курс'}</span>
-            </button>
-          </div>
         </form>
-      </div>
-    </div>
+    </Modal>
   );
 };

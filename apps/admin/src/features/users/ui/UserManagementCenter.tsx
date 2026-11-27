@@ -20,6 +20,7 @@ import {
   ExternalLink,
 } from 'lucide-react';
 import { AuthUserDto, CreateUserDto, UpdateUserDto, UserRole, UserStatus } from '@sbc/types';
+import { ConfirmModal } from '@sbc/ui';
 import { UserModal } from './UserModal';
 import { EnrollCourseModal } from './EnrollCourseModal';
 
@@ -467,44 +468,29 @@ export const UserManagementCenter: React.FC<UserManagementCenterProps> = ({ apiU
       )}
 
       {/* Delete Confirmation Modal */}
-      {userToDelete && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm animate-fadeIn">
-          <div className="w-full max-w-sm bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-2xl flex flex-col gap-4">
-            <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-lg bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-400 shrink-0">
-                <Trash2 className="w-4 h-4" />
-              </div>
-              <div>
-                <h4 className="text-sm font-bold text-white">Видалити користувача?</h4>
-                <p className="text-[11px] text-slate-400 truncate max-w-[220px]">
-                  {userToDelete.email}
-                </p>
-              </div>
+      <ConfirmModal
+        isOpen={Boolean(userToDelete)}
+        onClose={() => setUserToDelete(null)}
+        onConfirm={handleConfirmDelete}
+        variant="danger"
+        size="sm"
+        icon={<Trash2 className="w-4 h-4" />}
+        title="Видалити користувача?"
+        description={
+          userToDelete ? (
+            <div className="space-y-1.5">
+              <p className="font-mono text-[11px] text-[var(--sbc-text-primary,#cccccc)] truncate">
+                {userToDelete.email}
+              </p>
+              <p>
+                Ця дія незворотна. Усі дані проходження, історія BKT та спроби користувача будуть видалені.
+              </p>
             </div>
-
-            <p className="text-xs text-slate-300">
-              Ця дія незворотна. Усі дані проходження, історія BKT та спроби користувача будуть видалені.
-            </p>
-
-            <div className="flex items-center justify-end gap-2.5 pt-2 border-t border-slate-800">
-              <button
-                type="button"
-                onClick={() => setUserToDelete(null)}
-                className="px-3 py-1.5 rounded-lg border border-slate-800 text-slate-400 hover:text-white text-xs cursor-pointer"
-              >
-                Скасувати
-              </button>
-              <button
-                type="button"
-                onClick={handleConfirmDelete}
-                className="px-3.5 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-500 text-white text-xs font-medium cursor-pointer"
-              >
-                Підтвердити видалення
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+          ) : undefined
+        }
+        cancelLabel="Скасувати"
+        confirmLabel="Підтвердити видалення"
+      />
     </div>
   );
 };

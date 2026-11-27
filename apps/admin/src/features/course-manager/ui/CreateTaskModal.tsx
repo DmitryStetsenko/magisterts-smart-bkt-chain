@@ -1,8 +1,9 @@
 'use client';
 
 import React, { useState } from 'react';
-import { CheckSquare, Code2, FileText, X, Check, AlertCircle, Plus, Trash2, HelpCircle } from 'lucide-react';
+import { CheckSquare, Code2, FileText, Check, AlertCircle, Plus, Trash2, HelpCircle } from 'lucide-react';
 import { TaskType, TaskDifficulty } from '@sbc/types';
+import { Modal, Button } from '@sbc/ui';
 
 interface CreateTaskModalProps {
   isOpen: boolean;
@@ -47,18 +48,6 @@ export const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  React.useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
-    };
-    if (isOpen) {
-      window.addEventListener('keydown', handleKeyDown);
-      return () => window.removeEventListener('keydown', handleKeyDown);
-    }
-  }, [isOpen, onClose]);
-
-  if (!isOpen) return null;
 
   const handleAddOption = () => {
     const nextId = `opt_${options.length + 1}`;
@@ -146,28 +135,38 @@ export const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
-      <div className="bg-slate-900 border border-slate-800 rounded-xl max-w-xl w-full p-5 flex flex-col gap-4 shadow-2xl animate-fadeIn max-h-[90vh] overflow-y-auto">
-        {/* Header */}
-        <div className="flex items-center justify-between pb-3 border-b border-slate-800 shrink-0">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-indigo-500/15 flex items-center justify-center text-indigo-400">
-              <CheckSquare className="w-4 h-4" />
-            </div>
-            <div>
-              <h3 className="text-sm font-bold text-white">Додати Навчальне Завдання</h3>
-              <p className="text-[11px] text-slate-400 truncate max-w-xs">{skillTitle}</p>
-            </div>
-          </div>
-          <button
-            type="button"
-            onClick={onClose}
-            className="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800 transition-colors"
-          >
-            <X className="w-4 h-4" />
-          </button>
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      size="xl"
+      closeOnOverlayClick={!isSubmitting}
+      closeOnEscape={!isSubmitting}
+      icon={
+        <div className="w-8 h-8 rounded-lg bg-indigo-950/50 border border-indigo-500/30 flex items-center justify-center text-indigo-400">
+          <CheckSquare className="w-4 h-4" />
         </div>
-
+      }
+      title="Додати Навчальне Завдання"
+      subtitle={skillTitle}
+      footer={
+        <div className="flex items-center justify-end gap-2">
+          <Button variant="ghost" size="sm" onClick={onClose} disabled={isSubmitting}>
+            Скасувати
+          </Button>
+          <Button
+            type="submit"
+            form="admin-create-task-form"
+            variant="primary"
+            size="sm"
+            isLoading={isSubmitting}
+            leftIcon={<Check className="w-3.5 h-3.5" />}
+          >
+            {isSubmitting ? 'Збереження...' : 'Зберегти завдання в банк'}
+          </Button>
+        </div>
+      }
+    >
+      <div className="flex flex-col gap-4">
         {error && (
           <div className="p-2.5 rounded-lg bg-rose-500/10 border border-rose-500/20 text-rose-300 text-xs flex items-center gap-2">
             <AlertCircle className="w-4 h-4 shrink-0" />
@@ -175,7 +174,7 @@ export const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4 text-xs">
+        <form id="admin-create-task-form" onSubmit={handleSubmit} className="flex flex-col gap-4 text-xs">
           {/* Modality Selector */}
           <div className="flex flex-col gap-1.5">
             <label className="text-slate-300 font-medium">Формат оцінювання (Тип завдання) *</label>
@@ -415,33 +414,8 @@ export const CreateTaskModal: React.FC<CreateTaskModalProps> = ({
               />
             </div>
           </div>
-
-          {/* Footer Actions */}
-          <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-800 shrink-0">
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-3 py-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors text-xs cursor-pointer"
-            >
-              Скасувати
-            </button>
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="px-4 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-semibold transition-all text-xs cursor-pointer flex items-center gap-1.5 disabled:opacity-50"
-            >
-              {isSubmitting ? (
-                <span>Збереження...</span>
-              ) : (
-                <>
-                  <Check className="w-3.5 h-3.5" />
-                  <span>Зберегти завдання в банк</span>
-                </>
-              )}
-            </button>
-          </div>
         </form>
       </div>
-    </div>
+    </Modal>
   );
 };

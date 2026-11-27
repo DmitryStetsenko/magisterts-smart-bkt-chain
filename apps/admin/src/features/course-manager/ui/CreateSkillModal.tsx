@@ -1,9 +1,10 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Target, X, Check, AlertCircle, Sparkles, Sliders, CheckCircle2 } from 'lucide-react';
+import { Target, Check, AlertCircle, Sliders, CheckCircle2 } from 'lucide-react';
 import { TaskDifficulty } from '@sbc/types';
 import { slugify, validateSlug } from '@sbc/routes';
+import { Modal, Button } from '@sbc/ui';
 
 interface CreateSkillModalProps {
   isOpen: boolean;
@@ -36,18 +37,6 @@ export const CreateSkillModal: React.FC<CreateSkillModalProps> = ({
   const [pT, setPT] = useState(0.1);
   const [pS, setPS] = useState(0.1);
   const [pG, setPG] = useState(0.2);
-
-  React.useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
-    };
-    if (isOpen) {
-      window.addEventListener('keydown', handleKeyDown);
-      return () => window.removeEventListener('keydown', handleKeyDown);
-    }
-  }, [isOpen, onClose]);
-
-  if (!isOpen) return null;
 
   const slugValidation = validateSlug(slug, { maxLength: 50 });
 
@@ -107,28 +96,38 @@ export const CreateSkillModal: React.FC<CreateSkillModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
-      <div className="bg-slate-900 border border-slate-800 rounded-xl max-w-lg w-full p-5 flex flex-col gap-4 shadow-2xl animate-fadeIn">
-        {/* Header */}
-        <div className="flex items-center justify-between pb-3 border-b border-slate-800">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-emerald-500/15 flex items-center justify-center text-emerald-400">
-              <Target className="w-4 h-4" />
-            </div>
-            <div>
-              <h3 className="text-sm font-bold text-white">Додати BKT-Компетенцію</h3>
-              <p className="text-[11px] text-slate-400 truncate max-w-xs">{moduleTitle}</p>
-            </div>
-          </div>
-          <button
-            type="button"
-            onClick={onClose}
-            className="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800 transition-colors"
-          >
-            <X className="w-4 h-4" />
-          </button>
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      size="lg"
+      closeOnOverlayClick={!isSubmitting}
+      closeOnEscape={!isSubmitting}
+      icon={
+        <div className="w-8 h-8 rounded-lg bg-emerald-950/50 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
+          <Target className="w-4 h-4" />
         </div>
-
+      }
+      title="Додати BKT-Компетенцію"
+      subtitle={moduleTitle}
+      footer={
+        <div className="flex items-center justify-end gap-2">
+          <Button variant="ghost" size="sm" onClick={onClose} disabled={isSubmitting}>
+            Скасувати
+          </Button>
+          <Button
+            type="submit"
+            form="admin-create-skill-form"
+            variant="accent"
+            size="sm"
+            isLoading={isSubmitting}
+            leftIcon={<Check className="w-3.5 h-3.5" />}
+          >
+            {isSubmitting ? 'Збереження...' : 'Створити компетенцію'}
+          </Button>
+        </div>
+      }
+    >
+      <div className="flex flex-col gap-3.5">
         {error && (
           <div className="p-2.5 rounded-lg bg-rose-500/10 border border-rose-500/20 text-rose-300 text-xs flex items-center gap-2">
             <AlertCircle className="w-4 h-4 shrink-0" />
@@ -136,7 +135,7 @@ export const CreateSkillModal: React.FC<CreateSkillModalProps> = ({
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="flex flex-col gap-3.5 text-xs">
+        <form id="admin-create-skill-form" onSubmit={handleSubmit} className="flex flex-col gap-3.5 text-xs">
           {/* Title */}
           <div className="flex flex-col gap-1">
             <label className="text-slate-300 font-medium">Назва компетенції (мікро-навички) *</label>
@@ -277,33 +276,8 @@ export const CreateSkillModal: React.FC<CreateSkillModalProps> = ({
               </div>
             </div>
           </div>
-
-          {/* Footer Actions */}
-          <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-800">
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-3 py-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors text-xs cursor-pointer"
-            >
-              Скасувати
-            </button>
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="px-4 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-semibold transition-all text-xs cursor-pointer flex items-center gap-1.5 disabled:opacity-50"
-            >
-              {isSubmitting ? (
-                <span>Збереження...</span>
-              ) : (
-                <>
-                  <Check className="w-3.5 h-3.5" />
-                  <span>Створити компетенцію</span>
-                </>
-              )}
-            </button>
-          </div>
         </form>
       </div>
-    </div>
+    </Modal>
   );
 };

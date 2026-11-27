@@ -22,6 +22,7 @@ import {
   ArrowRight,
 } from 'lucide-react';
 import { CourseModuleDto } from '@sbc/types';
+import { Modal, Button, Badge } from '@sbc/ui';
 
 interface TheoryLessonBuilderModalProps {
   isOpen: boolean;
@@ -373,79 +374,92 @@ console.log(\`Спроба \${currentAttempt} з \${MAX_ATTEMPTS}\`);`,
     activeTab === 'RAW_MARKDOWN' ? rawMarkdown : serializeLessonBlocks(blocks, module.title);
 
   return (
-    <div className="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-sm flex items-center justify-center p-3 sm:p-5">
-      <div className="bg-slate-900 border border-slate-800 rounded-2xl max-w-4xl w-full flex flex-col max-h-[92vh] shadow-2xl overflow-hidden animate-fadeIn">
-        {/* Header */}
-        <div className="flex items-center justify-between px-5 py-3.5 border-b border-slate-800 shrink-0 bg-slate-900/90">
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-emerald-500/15 flex items-center justify-center text-emerald-400">
-              <BookOpen className="w-4 h-4" />
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <h3 className="text-sm font-bold text-white">Візуальний Конструктор Теорії Уроку</h3>
-                <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                  Block Builder
-                </span>
-              </div>
-              <p className="text-[11px] text-slate-400 truncate max-w-md">
-                {courseTitle} • {module.title}
-              </p>
-            </div>
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      size="4xl"
+      closeOnOverlayClick={!isSubmitting}
+      closeOnEscape={!isSubmitting}
+      icon={
+        <div className="w-8 h-8 rounded-lg bg-emerald-950/50 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
+          <BookOpen className="w-4 h-4" />
+        </div>
+      }
+      title={
+        <span className="flex items-center gap-2 flex-wrap">
+          <span>Візуальний Конструктор Теорії Уроку</span>
+          <Badge variant="success" size="xs" mono>Block Builder</Badge>
+        </span>
+      }
+      subtitle={`${courseTitle} • ${module.title}`}
+      headerRight={
+        <div className="flex items-center bg-[var(--sbc-bg-root,#181818)] p-0.5 rounded-lg border border-[var(--sbc-border-subtle,#2b2b2b)] text-[11px]">
+          <button
+            type="button"
+            onClick={() => handleTabSwitch('BUILDER')}
+            className={`px-3 py-1 rounded-md transition-colors cursor-pointer flex items-center gap-1.5 ${
+              activeTab === 'BUILDER'
+                ? 'bg-emerald-600 text-white font-medium shadow-sm'
+                : 'text-[var(--sbc-text-muted,#909090)] hover:text-[var(--sbc-text-primary,#cccccc)]'
+            }`}
+          >
+            <Sliders className="w-3 h-3" />
+            <span>Блоковий Конструктор</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => handleTabSwitch('PREVIEW')}
+            className={`px-3 py-1 rounded-md transition-colors cursor-pointer flex items-center gap-1.5 ${
+              activeTab === 'PREVIEW'
+                ? 'bg-emerald-600 text-white font-medium shadow-sm'
+                : 'text-[var(--sbc-text-muted,#909090)] hover:text-[var(--sbc-text-primary,#cccccc)]'
+            }`}
+          >
+            <Eye className="w-3 h-3" />
+            <span>Превʼю для учня</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => handleTabSwitch('RAW_MARKDOWN')}
+            className={`px-3 py-1 rounded-md transition-colors cursor-pointer flex items-center gap-1.5 ${
+              activeTab === 'RAW_MARKDOWN'
+                ? 'bg-emerald-600 text-white font-medium shadow-sm'
+                : 'text-[var(--sbc-text-muted,#909090)] hover:text-[var(--sbc-text-primary,#cccccc)]'
+            }`}
+          >
+            <FileText className="w-3 h-3" />
+            <span>Markdown</span>
+          </button>
+        </div>
+      }
+      bodyClassName="p-0 overflow-hidden flex-1 flex flex-col"
+      footer={
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2 text-xs text-[var(--sbc-text-muted,#909090)]">
+            <span>Збережеться у модуль:</span>
+            <Badge variant="success" size="xs" mono>{module.title}</Badge>
           </div>
 
-          <div className="flex items-center gap-2">
-            {/* Tab switchers */}
-            <div className="flex items-center bg-slate-950 p-0.5 rounded-lg border border-slate-800 text-[11px]">
-              <button
-                type="button"
-                onClick={() => handleTabSwitch('BUILDER')}
-                className={`px-3 py-1 rounded-md transition-colors cursor-pointer flex items-center gap-1.5 ${
-                  activeTab === 'BUILDER'
-                    ? 'bg-emerald-600 text-white font-medium shadow-sm'
-                    : 'text-slate-400 hover:text-white'
-                }`}
-              >
-                <Sliders className="w-3 h-3" />
-                <span>Блоковий Конструктор</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => handleTabSwitch('PREVIEW')}
-                className={`px-3 py-1 rounded-md transition-colors cursor-pointer flex items-center gap-1.5 ${
-                  activeTab === 'PREVIEW'
-                    ? 'bg-emerald-600 text-white font-medium shadow-sm'
-                    : 'text-slate-400 hover:text-white'
-                }`}
-              >
-                <Eye className="w-3 h-3" />
-                <span>Превʼю для учня</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => handleTabSwitch('RAW_MARKDOWN')}
-                className={`px-3 py-1 rounded-md transition-colors cursor-pointer flex items-center gap-1.5 ${
-                  activeTab === 'RAW_MARKDOWN'
-                    ? 'bg-emerald-600 text-white font-medium shadow-sm'
-                    : 'text-slate-400 hover:text-white'
-                }`}
-              >
-                <FileText className="w-3 h-3" />
-                <span>Markdown</span>
-              </button>
-            </div>
-
-            <button
-              type="button"
-              onClick={onClose}
-              className="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800 transition-colors ml-2"
+          <div className="flex items-center gap-2.5">
+            <Button variant="ghost" size="sm" onClick={onClose} disabled={isSubmitting}>
+              Скасувати
+            </Button>
+            <Button
+              variant="accent"
+              size="sm"
+              onClick={handleSave}
+              isLoading={isSubmitting}
+              leftIcon={<Save className="w-3.5 h-3.5" />}
             >
-              <X className="w-4 h-4" />
-            </button>
+              {isSubmitting ? 'Збереження...' : 'Зберегти конспект у модуль'}
+            </Button>
           </div>
         </div>
+      }
+    >
+      <>
 
         {error && (
           <div className="mx-5 mt-3 p-2.5 rounded-lg bg-rose-500/10 border border-rose-500/20 text-rose-300 text-xs flex items-center gap-2">
@@ -837,37 +851,7 @@ console.log(\`Спроба \${currentAttempt} з \${MAX_ATTEMPTS}\`);`,
             </div>
           )}
         </div>
-
-        {/* Footer Actions */}
-        <div className="flex items-center justify-between px-5 py-3.5 border-t border-slate-800 bg-slate-900/90 shrink-0">
-          <div className="flex items-center gap-2 text-xs text-slate-400">
-            <span>Збережеться у модуль:</span>
-            <code className="text-emerald-400 font-mono text-[11px] bg-slate-950 px-2 py-0.5 rounded border border-slate-800">
-              {module.title}
-            </code>
-          </div>
-
-          <div className="flex items-center gap-2.5">
-            <button
-              type="button"
-              onClick={onClose}
-              disabled={isSubmitting}
-              className="px-3.5 py-1.5 text-xs text-slate-400 hover:text-white transition-colors cursor-pointer"
-            >
-              Скасувати
-            </button>
-            <button
-              type="button"
-              onClick={handleSave}
-              disabled={isSubmitting}
-              className="px-5 py-1.5 bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white text-xs font-bold rounded-lg transition-colors cursor-pointer flex items-center gap-1.5 shadow-lg shadow-emerald-950/40"
-            >
-              <Save className="w-3.5 h-3.5" />
-              <span>{isSubmitting ? 'Збереження...' : 'Зберегти конспект у модуль'}</span>
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
+      </>
+    </Modal>
   );
 };
