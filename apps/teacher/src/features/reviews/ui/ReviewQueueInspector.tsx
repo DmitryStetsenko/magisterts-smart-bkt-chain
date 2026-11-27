@@ -1,8 +1,9 @@
 'use client';
 
 import React, { useState } from 'react';
-import { AlertTriangle, ShieldAlert, X, Scale } from 'lucide-react';
+import { AlertTriangle, ShieldAlert, Scale } from 'lucide-react';
 import { ReviewQueueItemDto, ReviewAttemptDto } from '@sbc/types';
+import { Modal, Button } from '@sbc/ui';
 
 export type ReviewAttempt = ReviewAttemptDto;
 export type ReviewQueueItem = ReviewQueueItemDto;
@@ -270,109 +271,105 @@ export const ReviewQueueInspector: React.FC<ReviewQueueInspectorProps> = ({
       </div>
 
       {/* ⚠️ Модальне вікно анулювання результату спроби (Teacher Annulment Protocol) */}
-      {isAnnulModalOpen && (
-        <div
-          role="dialog"
-          aria-modal="true"
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm animate-fadeIn"
-        >
-          <div className="w-full max-w-lg bg-slate-900 border border-rose-500/30 rounded-2xl p-6 shadow-2xl flex flex-col gap-4 text-left">
-            <div className="flex items-center justify-between border-b border-slate-800/80 pb-3">
-              <div className="flex items-center gap-2 text-rose-400">
-                <ShieldAlert className="w-5 h-5 shrink-0" />
-                <h3 className="font-bold text-white text-sm">Анулювання результату спроби</h3>
-              </div>
-              <button
-                onClick={() => setIsAnnulModalOpen(false)}
-                className="text-slate-400 hover:text-white p-1 rounded-lg transition-colors cursor-pointer"
+      <Modal
+        isOpen={isAnnulModalOpen}
+        onClose={() => !isSubmitting && setIsAnnulModalOpen(false)}
+        size="lg"
+        closeOnOverlayClick={!isSubmitting}
+        closeOnEscape={!isSubmitting}
+        icon={
+          <div className="w-8 h-8 rounded-lg bg-rose-950/50 border border-rose-500/30 flex items-center justify-center text-rose-400">
+            <ShieldAlert className="w-4 h-4" />
+          </div>
+        }
+        title="Анулювання результату спроби"
+        footer={
+          <div className="flex items-center justify-end gap-2.5">
+            <Button
+              variant="ghost"
+              size="sm"
+              disabled={isSubmitting}
+              onClick={() => setIsAnnulModalOpen(false)}
+            >
+              Скасувати
+            </Button>
+            <Button
+              variant="danger"
+              size="sm"
+              isLoading={isSubmitting}
+              disabled={!annulComment.trim()}
+              leftIcon={<AlertTriangle className="w-3.5 h-3.5" />}
+              onClick={() => {
+                if (onAnnul) {
+                  onAnnul(currentReview.submissionId, annulReason, annulComment.trim(), annulMultiplier);
+                  setIsAnnulModalOpen(false);
+                }
+              }}
+            >
+              Підтвердити анулювання
+            </Button>
+          </div>
+        }
+      >
+        <div className="flex flex-col gap-4 text-left">
+          <p className="text-xs text-[var(--sbc-text-muted,#909090)] leading-relaxed">
+            Ви збираєтесь анулювати спробу студента <strong className="text-[var(--sbc-text-primary,#cccccc)]">{currentReview.studentName}</strong> для завдання <strong className="text-purple-300">{currentReview.taskTitle}</strong>. Результат буде відхилено, показник майстерності BKT відкочено зі штрафом, а в незмінний аудит-лог внесено запис порушення.
+          </p>
+
+          <div className="flex flex-col gap-3">
+            <div>
+              <label className="text-[11px] font-semibold text-[var(--sbc-text-muted,#909090)] uppercase tracking-wider block mb-1.5">
+                Причина анулювання
+              </label>
+              <select
+                value={annulReason}
+                onChange={(e) => setAnnulReason(e.target.value)}
+                className="w-full px-3 py-2 bg-[var(--sbc-bg-root,#181818)] border border-[var(--sbc-border-strong,#333333)] rounded-lg text-xs text-[var(--sbc-text-primary,#cccccc)] focus:outline-none focus:border-rose-500 cursor-pointer"
               >
-                <X className="w-4 h-4" />
-              </button>
+                <option value="PLAGIARISM">Списування / плагіат коду</option>
+                <option value="AI_GENERATED_SUSPECTED">Підозра на генерацію стороннім ШІ</option>
+                <option value="IRRESPONSIBLE_GUESS">Бездумне вгадування / спам спроб</option>
+                <option value="CODE_MISMATCH">Невідповідність розв'язку завданню</option>
+                <option value="OTHER">Інше порушення академічної доброчесності</option>
+              </select>
             </div>
 
-            <p className="text-xs text-slate-300 leading-relaxed">
-              Ви збираєтесь анулювати спробу студента <strong className="text-white">{currentReview.studentName}</strong> для завдання <strong className="text-purple-300">{currentReview.taskTitle}</strong>. Результат буде відхилено, показник майстерності BKT відкочено зі штрафом, а в незмінний аудит-лог внесено запис порушення.
-            </p>
-
-            <div className="flex flex-col gap-3">
-              <div>
-                <label className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider block mb-1.5">
-                  Причина анулювання
-                </label>
-                <select
-                  value={annulReason}
-                  onChange={(e) => setAnnulReason(e.target.value)}
-                  className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-xs text-slate-200 focus:outline-none focus:border-rose-500 cursor-pointer"
-                >
-                  <option value="PLAGIARISM">Списування / плагіат коду</option>
-                  <option value="AI_GENERATED_SUSPECTED">Підозра на генерацію стороннім ШІ</option>
-                  <option value="IRRESPONSIBLE_GUESS">Бездумне вгадування / спам спроб</option>
-                  <option value="CODE_MISMATCH">Невідповідність розв'язку завданню</option>
-                  <option value="OTHER">Інше порушення академічної доброчесності</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider block mb-1.5">
-                  Штрафний коефіцієнт BKT
-                </label>
-                <div className="flex items-center gap-2">
-                  <input
-                    type="number"
-                    step="0.05"
-                    min="1.0"
-                    max="2.0"
-                    value={annulMultiplier}
-                    onChange={(e) => setAnnulMultiplier(Number(e.target.value))}
-                    className="w-24 px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-xs text-slate-200 font-mono focus:outline-none focus:border-rose-500"
-                  />
-                  <span className="text-[11px] text-slate-400 font-sans">
-                    (×{annulMultiplier} відкату від раніше отриманого приросту ΔP(L))
-                  </span>
-                </div>
-              </div>
-
-              <div>
-                <label className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider block mb-1.5">
-                  Педагогічний коментар (обов'язково)
-                </label>
-                <textarea
-                  rows={3}
-                  required
-                  placeholder="Поясніть студенту причину анулювання (що саме виявлено та як виправити)..."
-                  value={annulComment}
-                  onChange={(e) => setAnnulComment(e.target.value)}
-                  className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-xs text-slate-200 focus:outline-none focus:border-rose-500 leading-relaxed"
+            <div>
+              <label className="text-[11px] font-semibold text-[var(--sbc-text-muted,#909090)] uppercase tracking-wider block mb-1.5">
+                Штрафний коефіцієнт BKT
+              </label>
+              <div className="flex items-center gap-2">
+                <input
+                  type="number"
+                  step="0.05"
+                  min="1.0"
+                  max="2.0"
+                  value={annulMultiplier}
+                  onChange={(e) => setAnnulMultiplier(Number(e.target.value))}
+                  className="w-24 px-3 py-2 bg-[var(--sbc-bg-root,#181818)] border border-[var(--sbc-border-strong,#333333)] rounded-lg text-xs text-[var(--sbc-text-primary,#cccccc)] font-mono focus:outline-none focus:border-rose-500"
                 />
+                <span className="text-[11px] text-[var(--sbc-text-muted,#909090)] font-sans">
+                  (×{annulMultiplier} відкату від раніше отриманого приросту ΔP(L))
+                </span>
               </div>
             </div>
 
-            <div className="flex items-center justify-end gap-2.5 pt-2 border-t border-slate-800/80">
-              <button
-                type="button"
-                onClick={() => setIsAnnulModalOpen(false)}
-                className="px-3.5 py-1.5 rounded-lg text-slate-400 hover:text-white text-xs font-medium transition-colors cursor-pointer"
-              >
-                Скасувати
-              </button>
-              <button
-                type="button"
-                disabled={isSubmitting || !annulComment.trim()}
-                onClick={() => {
-                  if (onAnnul) {
-                    onAnnul(currentReview.submissionId, annulReason, annulComment.trim(), annulMultiplier);
-                    setIsAnnulModalOpen(false);
-                  }
-                }}
-                className="px-4 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-500 text-white text-xs font-semibold transition-all cursor-pointer disabled:opacity-50 flex items-center gap-1.5 shadow-lg shadow-rose-950/50"
-              >
-                <AlertTriangle className="w-3.5 h-3.5" />
-                <span>Підтвердити анулювання</span>
-              </button>
+            <div>
+              <label className="text-[11px] font-semibold text-[var(--sbc-text-muted,#909090)] uppercase tracking-wider block mb-1.5">
+                Педагогічний коментар (обов'язково)
+              </label>
+              <textarea
+                rows={3}
+                required
+                placeholder="Поясніть студенту причину анулювання (що саме виявлено та як виправити)..."
+                value={annulComment}
+                onChange={(e) => setAnnulComment(e.target.value)}
+                className="w-full px-3 py-2 bg-[var(--sbc-bg-root,#181818)] border border-[var(--sbc-border-strong,#333333)] rounded-lg text-xs text-[var(--sbc-text-primary,#cccccc)] focus:outline-none focus:border-rose-500 leading-relaxed"
+              />
             </div>
           </div>
         </div>
-      )}
+      </Modal>
     </div>
   );
 };

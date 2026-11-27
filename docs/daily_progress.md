@@ -5,7 +5,15 @@
 ## 📅 27 листопада 2026 року
 
 ### ✅ Що зроблено за день:
-1. **Фаза 2 `SBC-315` — міграція всіх 18 модальних вікон `apps/admin` на `@sbc/ui` (`Modal`, `ConfirmModal`, `Button`, `Badge`):**
+1. **Завершення Фази 2 `SBC-315` — міграція решти інспектор-модалок у `apps/teacher` та `@sbc/ui`:**
+   - Переведено на `<Modal>`, `<ConfirmModal>`, `<Button>` та `<Badge>` із `@sbc/ui` усі 5 залишкових модальних інспекторів:
+     - [`AnomalyRadarWidget.tsx`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/teacher/src/features/analytics/ui/AnomalyRadarWidget.tsx) (`Modal` аудиту аномалії + `<Badge>` для `P(G)`/`P(S)`);
+     - [`StudentAnalyticsTable.tsx`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/teacher/src/features/analytics/ui/StudentAnalyticsTable.tsx) (`ConfirmModal` підтвердження глобального скидання);
+     - [`MetricsAuditInspector.tsx`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/teacher/src/features/metrics-audit/ui/MetricsAuditInspector.tsx) (`Modal` пояснення метрик та формул);
+     - [`ReviewQueueInspector.tsx`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/teacher/src/features/reviews/ui/ReviewQueueInspector.tsx) (`Modal` протоколу анулювання спроби викладачем);
+     - [`packages/ui/src/analytics/AnomalyTreeWidget.tsx`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/packages/ui/src/analytics/AnomalyTreeWidget.tsx) (`Modal` деталей інциденту на `--sbc-*` токенах та імпортах із `../shared/ui`).
+   - **Верифікація:** `npx tsc --noEmit` для `packages/ui`, `apps/teacher` та `apps/student` — `0` помилок; `e2e/light-theme-contrast.spec.ts` — `4/4 passed` (`0` порушень контрастності).
+2. **Фаза 2 `SBC-315` — міграція всіх 18 модальних вікон `apps/admin` на `@sbc/ui` (`Modal`, `ConfirmModal`, `Button`, `Badge`):**
    - Розширено [`Modal.tsx`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/packages/ui/src/shared/ui/modal/Modal.tsx) для великих конструкторів: додано розміри `'3xl' | '4xl' | '5xl' | '6xl'`, `zIndexClassName` (підтримка вкладених суб-модалок `z-[60]`) та `bodyClassName`.
    - Переведено на `@sbc/ui` усі 18 модалок у 13 файлах `apps/admin`:
      - **Users & RBAC:** [`UserModal.tsx`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/admin/src/features/users/ui/UserModal.tsx), [`EnrollCourseModal.tsx`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/admin/src/features/users/ui/EnrollCourseModal.tsx), [`UserManagementCenter.tsx`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/admin/src/features/users/ui/UserManagementCenter.tsx) (`ConfirmModal` видалення користувача).

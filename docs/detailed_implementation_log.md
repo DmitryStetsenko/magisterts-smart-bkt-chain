@@ -30,6 +30,12 @@
   5. *Build Next.js Documentation Site* (`npm run build:docs`) — збірка статичного експорту (`output: "export"`, `trailingSlash: true`, `basePath: "/magisterts-smart-bkt-chain"`).
   6. *Upload Artifact & Deploy Pages* (`actions/upload-pages-artifact@v3` + `actions/deploy-pages@v4`).
 
+### 0.1.7.119 Завершення Фази 2 `SBC-315`: Міграція інспектор-модалок `apps/teacher` та спільного `@sbc/ui` (`AnomalyTreeWidget`)
+- **Міграція інспекторів (`apps/teacher` + `packages/ui`):**
+  - [`AnomalyRadarWidget.tsx`](file:///apps/teacher/src/features/analytics/ui/AnomalyRadarWidget.tsx), [`MetricsAuditInspector.tsx`](file:///apps/teacher/src/features/metrics-audit/ui/MetricsAuditInspector.tsx), [`ReviewQueueInspector.tsx`](file:///apps/teacher/src/features/reviews/ui/ReviewQueueInspector.tsx) та [`packages/ui/src/analytics/AnomalyTreeWidget.tsx`](file:///packages/ui/src/analytics/AnomalyTreeWidget.tsx): локальні `fixed inset-0` оверлеї переведено на канонічний `<Modal>`, `<Button>` та `<Badge>` із `--sbc-*` токенами.
+  - [`StudentAnalyticsTable.tsx`](file:///apps/teacher/src/features/analytics/ui/StudentAnalyticsTable.tsx): модальне підтвердження анулювання прогресу студента замінено на `<ConfirmModal variant="danger">`.
+- **Верифікація:** `tsc --noEmit` для `packages/ui`, `apps/teacher`, `apps/student` (`0` помилок); `light-theme-contrast.spec.ts` (`4/4 passed`, 0 порушень). *(Примітка: у `full-flow.spec.ts` 2 давні тести впали через непов'язані зміни `SBC-438`/`SBC-439` — перейменований `JavaScript & Web Engineering` та вільний перехід у підручник у режимі `TRAINING` без `abandon-task-modal`.)*
+
 ### 0.1.7.118 Фаза 2 `SBC-315`: Міграція всіх 18 модальних вікон `apps/admin` на `@sbc/ui` (`Modal`, `ConfirmModal`, `Button`, `Badge`)
 - **Розширення `@sbc/ui` ([`Modal.tsx`](file:///packages/ui/src/shared/ui/modal/Modal.tsx)):** додано широкі розміри `'3xl' | '4xl' | '5xl' | '6xl'`, проп `zIndexClassName` (для вкладених суб-модалок `z-[60]`) та `bodyClassName` (для split/tab конструкторів).
 - **Міграція `apps/admin` (13 файлів, 18 модалок):**

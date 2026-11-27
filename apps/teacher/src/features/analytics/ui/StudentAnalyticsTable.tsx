@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { Users, Activity, Zap, AlertTriangle, RotateCcw } from 'lucide-react';
 import { StudentAnalyticsItem } from '../model/analytics.types';
+import { ConfirmModal } from '@sbc/ui';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
 
@@ -156,48 +157,24 @@ export const StudentAnalyticsTable: React.FC<StudentAnalyticsTableProps> = ({
       </div>
 
       {/* ⚠️ Custom Reset Confirmation Modal */}
-      {confirmTargetId && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 max-w-md w-full shadow-2xl flex flex-col gap-4 animate-in fade-in zoom-in-95">
-            <div className="flex items-center gap-3 text-rose-400">
-              <div className="p-2.5 bg-rose-500/10 border border-rose-500/20 rounded-xl">
-                <AlertTriangle className="w-6 h-6" />
-              </div>
-              <h3 className="text-lg font-bold text-white">Підтвердження анулювання</h3>
-            </div>
-
-            <div className="flex flex-col gap-2">
-              <p className="text-sm text-slate-300 leading-relaxed">
-                Ви дійсно бажаєте повністю анулювати навчальний прогрес для цього студента?
-              </p>
-              <div className="p-3 bg-rose-950/40 border border-rose-500/40 rounded-xl text-[11px] text-rose-200 text-left flex flex-col gap-1.5">
-                <span className="font-bold text-rose-300 uppercase tracking-wider text-[10px]">⚠️ Увага: Глобальне анулювання</span>
-                <span className="text-slate-300 leading-relaxed">
-                  Буде скинуто <strong>всі розв'язки, BKT-оцінки та історію спроб по ВСІХ курсах платформи</strong> (а не лише для поточної дисципліни).
-                </span>
-                <span className="text-[10px] text-slate-400 font-mono pt-1 border-t border-rose-500/20">
-                  • Цю дію неможливо скасувати
-                </span>
-              </div>
-            </div>
-
-            <div className="flex items-center justify-end gap-3 mt-2">
-              <button
-                onClick={() => setConfirmTargetId(null)}
-                className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold border border-slate-700 transition-all cursor-pointer"
-              >
-                Скасувати
-              </button>
-              <button
-                onClick={() => executeReset(confirmTargetId)}
-                className="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold shadow-lg shadow-rose-900/30 transition-all cursor-pointer"
-              >
-                Так, анулювати
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <ConfirmModal
+        isOpen={Boolean(confirmTargetId)}
+        onClose={() => setConfirmTargetId(null)}
+        onConfirm={() => {
+          if (confirmTargetId) executeReset(confirmTargetId);
+        }}
+        variant="danger"
+        size="md"
+        icon={<AlertTriangle className="w-5 h-5" />}
+        title="Підтвердження анулювання"
+        description="Ви дійсно бажаєте повністю анулювати навчальний прогрес для цього студента?"
+        warnings={[
+          'Увага: Глобальне анулювання — буде скинуто всі розвʼязки, BKT-оцінки та історію спроб по ВСІХ курсах платформи.',
+          'Цю дію неможливо скасувати.',
+        ]}
+        cancelLabel="Скасувати"
+        confirmLabel="Так, анулювати"
+      />
     </div>
   );
 };

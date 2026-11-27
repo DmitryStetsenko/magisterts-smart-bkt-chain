@@ -16,6 +16,27 @@
           "items": [
             {
               "type": "text",
+              "raw_text": "**Завершення Фази 2 `SBC-315` — міграція решти інспектор-модалок у `apps/teacher` та `@sbc/ui`:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Переведено на `<Modal>`, `<ConfirmModal>`, `<Button>` та `<Badge>` із `@sbc/ui` усі 5 залишкових модальних інспекторів:",
+              "subitems": [
+                "[`AnomalyRadarWidget.tsx`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/teacher/src/features/analytics/ui/AnomalyRadarWidget.tsx) (`Modal` аудиту аномалії + `<Badge>` для `P(G)`/`P(S)`);",
+                "[`StudentAnalyticsTable.tsx`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/teacher/src/features/analytics/ui/StudentAnalyticsTable.tsx) (`ConfirmModal` підтвердження глобального скидання);",
+                "[`MetricsAuditInspector.tsx`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/teacher/src/features/metrics-audit/ui/MetricsAuditInspector.tsx) (`Modal` пояснення метрик та формул);",
+                "[`ReviewQueueInspector.tsx`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/teacher/src/features/reviews/ui/ReviewQueueInspector.tsx) (`Modal` протоколу анулювання спроби викладачем);",
+                "[`packages/ui/src/analytics/AnomalyTreeWidget.tsx`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/packages/ui/src/analytics/AnomalyTreeWidget.tsx) (`Modal` деталей інциденту на `--sbc-*` токенах та імпортах із `../shared/ui`)."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Верифікація:** `npx tsc --noEmit` для `packages/ui`, `apps/teacher` та `apps/student` — `0` помилок; `e2e/light-theme-contrast.spec.ts` — `4/4 passed` (`0` порушень контрастності).",
+              "subitems": []
+            },
+            {
+              "type": "text",
               "raw_text": "**Фаза 2 `SBC-315` — міграція всіх 18 модальних вікон `apps/admin` на `@sbc/ui` (`Modal`, `ConfirmModal`, `Button`, `Badge`):**",
               "subitems": []
             },

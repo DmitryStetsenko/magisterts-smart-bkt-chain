@@ -120,6 +120,34 @@
           ]
         },
         {
+          "title": "0.1.7.119 Завершення Фази 2 `SBC-315`: Міграція інспектор-модалок `apps/teacher` та спільного `@sbc/ui` (`AnomalyTreeWidget`)",
+          "level": 3,
+          "paragraphs": [],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "**Міграція інспекторів (`apps/teacher` + `packages/ui`):**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "[`AnomalyRadarWidget.tsx`](file:///apps/teacher/src/features/analytics/ui/AnomalyRadarWidget.tsx), [`MetricsAuditInspector.tsx`](file:///apps/teacher/src/features/metrics-audit/ui/MetricsAuditInspector.tsx), [`ReviewQueueInspector.tsx`](file:///apps/teacher/src/features/reviews/ui/ReviewQueueInspector.tsx) та [`packages/ui/src/analytics/AnomalyTreeWidget.tsx`](file:///packages/ui/src/analytics/AnomalyTreeWidget.tsx): локальні `fixed inset-0` оверлеї переведено на канонічний `<Modal>`, `<Button>` та `<Badge>` із `--sbc-*` токенами.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "[`StudentAnalyticsTable.tsx`](file:///apps/teacher/src/features/analytics/ui/StudentAnalyticsTable.tsx): модальне підтвердження анулювання прогресу студента замінено на `<ConfirmModal variant=\"danger\">`.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Верифікація:** `tsc --noEmit` для `packages/ui`, `apps/teacher`, `apps/student` (`0` помилок); `light-theme-contrast.spec.ts` (`4/4 passed`, 0 порушень). *(Примітка: у `full-flow.spec.ts` 2 давні тести впали через непов'язані зміни `SBC-438`/`SBC-439` — перейменований `JavaScript & Web Engineering` та вільний перехід у підручник у режимі `TRAINING` без `abandon-task-modal`.)*",
+              "subitems": []
+            }
+          ]
+        },
+        {
           "title": "0.1.7.118 Фаза 2 `SBC-315`: Міграція всіх 18 модальних вікон `apps/admin` на `@sbc/ui` (`Modal`, `ConfirmModal`, `Button`, `Badge`)",
           "level": 3,
           "paragraphs": [],

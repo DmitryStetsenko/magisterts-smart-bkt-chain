@@ -23,6 +23,7 @@ import {
   User,
   Globe
 } from 'lucide-react';
+import { Modal, Button, Badge } from '@sbc/ui';
 import { StudentAnalyticsItem } from '../../analytics/model/analytics.types';
 
 interface MetricsAuditInspectorProps {
@@ -1517,80 +1518,65 @@ export function MetricsAuditInspector({
       </div>
 
       {/* 📖 Interactive Deep Dive Explanation Modal on Click */}
-      {activeExplanation && (
-        <div 
-          onClick={() => setActiveExplanation(null)}
-          className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 animate-fadeIn"
-        >
-          <div 
-            onClick={(e) => e.stopPropagation()}
-            className="bg-slate-900 border border-purple-500/40 rounded-2xl max-w-lg w-full p-6 shadow-2xl flex flex-col gap-4 relative animate-scaleUp text-slate-100"
-          >
-            <button
-              onClick={() => setActiveExplanation(null)}
-              className="absolute top-4 right-4 p-1.5 text-slate-400 hover:text-white hover:bg-slate-800 rounded-xl transition-all cursor-pointer"
-              title="Закрити"
-            >
-              <X className="w-5 h-5" />
-            </button>
-
-            <div className="flex items-start gap-3.5 pr-8">
-              <div className="w-10 h-10 rounded-xl bg-purple-500/20 border border-purple-500/30 text-purple-300 flex items-center justify-center shrink-0">
-                <BookOpen className="w-5 h-5 text-purple-400" />
-              </div>
-              <div>
-                <div className="flex items-center gap-2 flex-wrap">
-                  <h3 className="text-base font-bold text-white tracking-tight">
-                    {activeExplanation.title}
-                  </h3>
-                  {activeExplanation.badge && (
-                    <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-purple-500/10 text-purple-300 border border-purple-500/20">
-                      {activeExplanation.badge}
-                    </span>
-                  )}
-                </div>
-                {activeExplanation.formula && (
-                  <div className="mt-1 px-2.5 py-1 bg-slate-950 rounded-lg border border-slate-800 text-xs font-mono font-bold text-emerald-400 inline-block">
-                    {activeExplanation.formula}
-                  </div>
-                )}
-              </div>
-            </div>
-
-            <div className="flex flex-col gap-3 text-xs leading-relaxed text-slate-300 mt-1">
-              <div className="bg-slate-950/70 p-3.5 rounded-xl border border-slate-800">
-                <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wide block mb-1">
-                  📖 Що це означає:
-                </span>
-                <p>{activeExplanation.description}</p>
-              </div>
-
-              <div className="bg-indigo-950/20 p-3.5 rounded-xl border border-indigo-500/20">
-                <span className="text-[11px] font-bold text-indigo-300 uppercase tracking-wide block mb-1">
-                  🎯 Педагогічний вплив на алгоритм:
-                </span>
-                <p className="text-indigo-100">{activeExplanation.pedagogicalImpact}</p>
-              </div>
-
-              {activeExplanation.example && (
-                <div className="bg-purple-950/20 p-3 rounded-xl border border-purple-500/20 text-[11px] font-mono text-purple-200">
-                  <strong className="text-purple-300 block mb-0.5">Приклад у поточній відповіді:</strong>
-                  {activeExplanation.example}
-                </div>
-              )}
-            </div>
-
-            <div className="pt-2 flex justify-end">
-              <button
-                onClick={() => setActiveExplanation(null)}
-                className="px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs transition-all shadow-md shadow-purple-600/30 cursor-pointer"
-              >
-                Зрозуміло
-              </button>
-            </div>
+      <Modal
+        isOpen={Boolean(activeExplanation)}
+        onClose={() => setActiveExplanation(null)}
+        size="lg"
+        icon={
+          <div className="w-10 h-10 rounded-xl bg-purple-950/50 border border-purple-500/30 text-purple-300 flex items-center justify-center shrink-0">
+            <BookOpen className="w-5 h-5 text-purple-400" />
           </div>
-        </div>
-      )}
+        }
+        title={
+          activeExplanation ? (
+            <span className="flex items-center gap-2 flex-wrap">
+              <span>{activeExplanation.title}</span>
+              {activeExplanation.badge && (
+                <Badge variant="accent" size="xs" mono>{activeExplanation.badge}</Badge>
+              )}
+            </span>
+          ) : undefined
+        }
+        subtitle={
+          activeExplanation?.formula ? (
+            <code className="mt-1 px-2 py-0.5 bg-[var(--sbc-bg-subtle,#262626)] rounded border border-[var(--sbc-border-subtle,#2b2b2b)] text-[11px] font-mono font-bold text-emerald-400 inline-block">
+              {activeExplanation.formula}
+            </code>
+          ) : undefined
+        }
+        footer={
+          <div className="flex justify-end">
+            <Button variant="primary" size="sm" onClick={() => setActiveExplanation(null)}>
+              Зрозуміло
+            </Button>
+          </div>
+        }
+      >
+        {activeExplanation && (
+          <div className="flex flex-col gap-3 text-xs leading-relaxed text-[var(--sbc-text-muted,#909090)]">
+            <div className="bg-[var(--sbc-bg-subtle,#262626)] p-3.5 rounded-xl border border-[var(--sbc-border-subtle,#2b2b2b)]">
+              <span className="text-[11px] font-bold text-[var(--sbc-text-primary,#cccccc)] uppercase tracking-wide block mb-1">
+                📖 Що це означає:
+              </span>
+              <p>{activeExplanation.description}</p>
+            </div>
+
+            <div className="bg-indigo-950/20 p-3.5 rounded-xl border border-indigo-500/20">
+              <span className="text-[11px] font-bold text-indigo-300 uppercase tracking-wide block mb-1">
+                🎯 Педагогічний вплив на алгоритм:
+              </span>
+              <p className="text-[var(--sbc-text-primary,#cccccc)]">{activeExplanation.pedagogicalImpact}</p>
+            </div>
+
+            {activeExplanation.example && (
+              <div className="bg-purple-950/20 p-3 rounded-xl border border-purple-500/20 text-[11px] font-mono text-purple-200">
+                <strong className="text-purple-300 block mb-0.5">Приклад у поточній відповіді:</strong>
+                {activeExplanation.example}
+              </div>
+            )}
+          </div>
+        )}
+      </Modal>
     </div>
   );
 }

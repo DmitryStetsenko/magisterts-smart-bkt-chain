@@ -25,6 +25,7 @@ import {
   Lightbulb
 } from 'lucide-react';
 import { SkillGraphNode } from '../skill-graph/skill-graph.types';
+import { Modal, Button, Badge } from '../shared/ui';
 
 export interface AnomalyItem {
   id?: string;
@@ -495,60 +496,77 @@ export function AnomalyTreeWidget({
       {/* ───────────────────────────────────────────────────────────── */}
       {/* MODAL INSPECTOR: Detailed Incident View                       */}
       {/* ───────────────────────────────────────────────────────────── */}
-      {selectedItem && (
-        <div 
-          onClick={() => setSelectedItem(null)}
-          className="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4"
-        >
-          <div 
-            onClick={(e) => e.stopPropagation()}
-            className="w-full max-w-xl bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-2xl flex flex-col gap-4 text-slate-200 animate-in fade-in zoom-in-95 duration-150"
-          >
-            <div className="flex items-start justify-between border-b border-slate-800 pb-3">
-              <div>
-                <h4 className="text-sm font-bold text-white flex items-center gap-2">
-                  <span className="text-purple-400">Деталі інциденту:</span>
-                  <span>{selectedItem.taskTitle}</span>
-                </h4>
-                <p className="text-xs text-slate-400 mt-0.5">
-                  Модуль: <strong className="text-slate-200">{selectedItem.skillTitle}</strong> ({selectedItem.skillSlug})
-                </p>
-              </div>
-              <button
-                onClick={() => setSelectedItem(null)}
-                className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-all cursor-pointer"
+      <Modal
+        isOpen={Boolean(selectedItem)}
+        onClose={() => setSelectedItem(null)}
+        size="xl"
+        title={
+          selectedItem ? (
+            <span className="flex items-center gap-2 flex-wrap">
+              <span className="text-purple-400">Деталі інциденту:</span>
+              <span>{selectedItem.taskTitle}</span>
+            </span>
+          ) : undefined
+        }
+        subtitle={
+          selectedItem ? (
+            <>
+              Модуль: <strong className="text-[var(--sbc-text-primary,#cccccc)]">{selectedItem.skillTitle}</strong> ({selectedItem.skillSlug})
+            </>
+          ) : undefined
+        }
+        footer={
+          <div className="flex items-center justify-end gap-3">
+            <Button variant="ghost" size="sm" onClick={() => setSelectedItem(null)}>
+              Закрити
+            </Button>
+            {onNavigateToTask && selectedItem?.taskId && (
+              <Button
+                variant="primary"
+                size="sm"
+                leftIcon={<ExternalLink className="w-3.5 h-3.5" />}
+                onClick={() => {
+                  const tid = selectedItem.taskId!;
+                  const sslug = selectedItem.skillSlug;
+                  setSelectedItem(null);
+                  onNavigateToTask(tid, sslug);
+                }}
               >
-                ✕
-              </button>
-            </div>
-
+                Перейти до завдання
+              </Button>
+            )}
+          </div>
+        }
+      >
+        {selectedItem && (
+          <div className="flex flex-col gap-4">
             <div className="flex flex-col gap-1 text-xs">
-              <span className="text-[10px] uppercase font-mono tracking-wider text-slate-500 font-semibold">Умова завдання:</span>
-              <p className="p-3 bg-slate-950 border border-slate-800 rounded-xl text-slate-300 leading-relaxed font-sans">
+              <span className="text-[10px] uppercase font-mono tracking-wider text-[var(--sbc-text-muted,#909090)] font-semibold">Умова завдання:</span>
+              <p className="p-3 bg-[var(--sbc-bg-subtle,#262626)] border border-[var(--sbc-border-subtle,#2b2b2b)] rounded-xl text-[var(--sbc-text-primary,#cccccc)] leading-relaxed font-sans">
                 {selectedItem.taskDescription}
               </p>
             </div>
 
             {/* Role specific explanation */}
             <div className="flex flex-col gap-1 text-xs">
-              <span className="text-[10px] uppercase font-mono tracking-wider text-slate-500 font-semibold">
+              <span className="text-[10px] uppercase font-mono tracking-wider text-[var(--sbc-text-muted,#909090)] font-semibold">
                 {role === 'student' ? 'Вплив на прогрес та порада:' : 'Діагноз Телеметрії та Реакція Рушія BKT:'}
               </span>
               <div className="p-3.5 bg-purple-950/20 border border-purple-500/30 rounded-xl flex flex-col gap-2">
                 {role === 'teacher' ? (
-                  <div className="flex items-center justify-between text-xs font-mono">
+                  <div className="flex items-center justify-between gap-2 flex-wrap text-xs font-mono">
                     <span className="text-amber-300 font-bold">
                       {selectedItem.pGuessUsed && selectedItem.pGuessUsed > 0.3
                         ? 'Підвищення P(Guess): Ймовірність вгадування збільшено'
                         : 'Підвищення P(Slip): Захист від втрати знання'}
                     </span>
                     <div className="flex items-center gap-2">
-                      <span className="px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30 font-bold">
+                      <Badge variant="warning" size="xs" mono>
                         P(Guess) = {selectedItem.pGuessUsed ?? 0.2}
-                      </span>
-                      <span className="px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 font-bold">
+                      </Badge>
+                      <Badge variant="accent" size="xs" mono>
                         P(Slip) = {selectedItem.pSlipUsed ?? 0.1}
-                      </span>
+                      </Badge>
                     </div>
                   </div>
                 ) : (
@@ -572,33 +590,9 @@ export function AnomalyTreeWidget({
                 )}
               </div>
             </div>
-
-            {/* Actions */}
-            <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-800">
-              <button
-                onClick={() => setSelectedItem(null)}
-                className="px-4 py-2 rounded-xl text-xs font-bold text-slate-400 hover:text-white hover:bg-slate-800 cursor-pointer transition-all"
-              >
-                Закрити
-              </button>
-              {onNavigateToTask && selectedItem.taskId && (
-                <button
-                  onClick={() => {
-                    const tid = selectedItem.taskId!;
-                    const sslug = selectedItem.skillSlug;
-                    setSelectedItem(null);
-                    onNavigateToTask(tid, sslug);
-                  }}
-                  className="px-4 py-2 rounded-xl text-xs font-bold bg-purple-600 hover:bg-purple-500 text-white flex items-center gap-1.5 shadow-lg shadow-purple-600/30 cursor-pointer transition-all"
-                >
-                  <ExternalLink className="w-3.5 h-3.5" />
-                  <span>Перейти до завдання</span>
-                </button>
-              )}
-            </div>
           </div>
-        </div>
-      )}
+        )}
+      </Modal>
     </div>
   );
 }
