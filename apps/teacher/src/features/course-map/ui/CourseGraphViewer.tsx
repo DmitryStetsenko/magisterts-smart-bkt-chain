@@ -19,6 +19,7 @@ import {
   GitBranch
 } from 'lucide-react';
 import { SubConceptsPopover } from './SubConceptsPopover';
+import { Badge, DropdownSelect } from '@sbc/ui';
 
 export type TaskItem = TaskDto;
 export type SkillNodeItem = Pick<SkillNodeDto, 'id' | 'slug' | 'title' | 'description' | 'category' | 'difficulty'>;
@@ -246,25 +247,22 @@ export function CourseGraphViewer({
     switch (diff) {
       case 'HARD':
         return (
-          <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-rose-500/10 border border-rose-500/20 text-rose-300 text-[10px] font-semibold">
-            <span className="w-1.5 h-1.5 rounded-full bg-rose-500 shrink-0" />
-            <span>Складне (100%)</span>
-          </span>
+          <Badge variant="danger" size="xs" dot>
+            Складне (100%)
+          </Badge>
         );
       case 'MEDIUM':
         return (
-          <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-amber-500/10 border border-amber-500/20 text-amber-300 text-[10px] font-semibold">
-            <span className="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0" />
-            <span>Нормальне (100%)</span>
-          </span>
+          <Badge variant="warning" size="xs" dot>
+            Нормальне (100%)
+          </Badge>
         );
       case 'EASY':
       default:
         return (
-          <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 text-[10px] font-semibold">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
-            <span>Полегшене (70%)</span>
-          </span>
+          <Badge variant="success" size="xs" dot>
+            Полегшене (70%)
+          </Badge>
         );
     }
   };
@@ -503,16 +501,18 @@ export function CourseGraphViewer({
               )}
             </div>
 
-            <select
+            <DropdownSelect<'ALL' | 'EASY' | 'MEDIUM' | 'HARD'>
+              size="sm"
+              className="min-w-[140px]"
               value={difficultyFilter}
-              onChange={(e: any) => setDifficultyFilter(e.target.value)}
-              className="bg-slate-900/80 border border-slate-800 rounded-lg px-2.5 py-1 text-xs text-slate-300 focus:outline-none focus:border-purple-500 font-mono"
-            >
-              <option value="ALL">Всі рівні</option>
-              <option value="EASY">Полегшені</option>
-              <option value="MEDIUM">Нормальні</option>
-              <option value="HARD">Складні</option>
-            </select>
+              onChange={(val) => setDifficultyFilter(val)}
+              options={[
+                { value: 'ALL', label: 'Всі рівні' },
+                { value: 'EASY', label: 'Полегшені' },
+                { value: 'MEDIUM', label: 'Нормальні' },
+                { value: 'HARD', label: 'Складні' },
+              ]}
+            />
 
             {viewMode === 'full' && (
               <div className="flex items-center gap-1">

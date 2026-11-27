@@ -10,7 +10,7 @@
 | ID | Jira Key | Пріоритет | Статус | Цільовий компонент / модуль | Короткий опис задачі |
 | :--- | :--- | :--- | :--- | :--- | :--- |
 | **`[BACKLOG-11]`** | `SBC-434` | ⚪ **P1 (Critical)** | `DONE` | `packages/ui`, `apps/study`, `apps/student`, `apps/teacher`, `apps/admin` | **Повний аудит і адаптація контрастності Світлої Теми (WCAG AA/AAA): усунення нечитабельних `text-white`, світлих акцентів `text-*-200/300/400/500`, темних `bg-*-950/*` та перемикання Monaco** |
-| **`[BACKLOG-10]`** | `SBC-315` | 🟡 **P1 (Critical)** | `IN_PROGRESS` | `packages/ui`, `apps/*` | **Побудова канонічного FSD Shared UI-Kit (Button, Modal, Badge, Tooltip, Select) у `@sbc/ui` (Фази 1–2 та структурна M-FSD перебудова `views`/`widgets`/`entities` виконані; далі — декомпозиція великих view-файлів)** |
+| **`[BACKLOG-10]`** | `SBC-315` | ⚪ **P1 (Critical)** | `DONE` | `packages/ui`, `apps/*` | **Канонічний `M-FSD` Shared UI-Kit (`Button`, `Modal`, `ConfirmModal`, `Badge`, `Tooltip`, `DropdownSelect`) у `@sbc/ui`, міграція всіх порталів та повна декомпозиція view-монолітів у `views/` і `widgets/`** |
 | **`[BACKLOG-9]`** | `SBC-311` | 🟠 **P2 (High)** | `ACCEPTED` | `apps/student` | **Режим експрес-підтвердження знань екстерном (Test-Out Fast-Track) у тренажері без проходження всієї теорії** |
 | **`[BACKLOG-7]`** | `TBD` | 🟡 **P2 (High)** | `IN_PROGRESS` | `apps/student`, `domain/learning` | Інтерактивний дидактичний шар навчання: доопрацювання inline-капсули теорії ($P(L_n) < 0.35$) та Misconception Engine для квізів/коду (база створена в `SBC-271`, `SBC-281`, `SBC-287`) |
 | **`[BACKLOG-1]`** | `SBC-313` | 🟡 **P2 (High)** | `PROPOSED` | `apps/admin` | Інструмент аудиту та валідації курсів на відповідність педагогічним стандартам (Linter & Validator) |
@@ -195,7 +195,7 @@
 
 ### 🧩 [BACKLOG-10] (SBC-315) Побудова канонічного FSD Shared UI-Kit (Button, Modal, Badge, Tooltip, Select) у @sbc/ui
 - **Пріоритет:** 🔴 **Пріоритет №1 (Critical — після завершення роутингу SBC-312)**
-- **Статус:** IN_PROGRESS (Фаза 1 `packages/ui/src/shared/ui/` реалізована; триває Фаза 2 міграції порталів)
+- **Статус:** DONE (реалізовано у рамках стандарту `M-FSD` — Фази 1–3, гілка `feat/monorepo-fsd-ui-kit`)
 - **Цільові пакети та застосунки:** packages/ui (@sbc/ui), pps/student, pps/study, pps/teacher, pps/admin.
 - **Контекст та інженерний дефіцит:**
   Поточна кодова база веб-застосунків дублює атомарні UI-елементи (кнопки дій, діалоги підтвердження дій, кольорові бейджі BKT та складності, інпути) за допомогою inline Tailwind CSS безпосередньо в кожному екрані. Це призводить до:

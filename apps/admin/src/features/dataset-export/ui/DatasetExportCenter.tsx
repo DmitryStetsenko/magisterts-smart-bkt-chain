@@ -27,7 +27,7 @@ import {
   Trash2
 } from 'lucide-react';
 import { StudentActivityLogDto } from '@sbc/types';
-import { Modal, ConfirmModal, Button, Badge } from '@sbc/ui';
+import { Modal, ConfirmModal, Button, Badge, DropdownSelect } from '@sbc/ui';
 
 export interface DatasetStats {
   total: number;
@@ -519,21 +519,19 @@ export const DatasetExportCenter: React.FC<DatasetExportCenterProps> = ({
           )}
 
           {/* Quick User Selector Dropdown */}
-          <div className="relative">
-            <select
-              value={userFilter}
-              onChange={(e) => handleUserFilterChange(e.target.value)}
-              className="px-2.5 py-1 bg-slate-900 border border-slate-800 rounded-lg text-xs text-slate-200 focus:outline-none focus:border-emerald-500 cursor-pointer max-w-[170px] truncate"
-              title="Швидкий вибір користувача зі списку подій"
-            >
-              <option value="">Всі користувачі ({logs.length})</option>
-              {activeUsers.map((u) => (
-                <option key={u.userId} value={u.userId}>
-                  {u.name} ({u.count})
-                </option>
-              ))}
-            </select>
-          </div>
+          <DropdownSelect
+            size="sm"
+            className="min-w-[180px]"
+            value={userFilter}
+            onChange={(val) => handleUserFilterChange(val)}
+            options={[
+              { value: '', label: `Всі користувачі (${logs.length})` },
+              ...activeUsers.map((u) => ({
+                value: u.userId,
+                label: `${u.name} (${u.count})`,
+              })),
+            ]}
+          />
 
           {/* Search by Name, Email, or ID */}
           <div className="relative w-full sm:w-56">
@@ -633,9 +631,9 @@ export const DatasetExportCenter: React.FC<DatasetExportCenterProps> = ({
                                 {uInfo.primary}
                               </span>
                               {log.actorRole && (
-                                <span className="px-1.5 py-0.2 rounded text-[9px] font-mono font-bold bg-slate-800 text-slate-400 border border-slate-700/60 shrink-0">
+                                <Badge variant="neutral" size="xs" mono className="text-[9px] px-1.5 py-0">
                                   {log.actorRole}
-                                </span>
+                                </Badge>
                               )}
                             </div>
                             {uInfo.secondary && uInfo.secondary !== uInfo.primary && (

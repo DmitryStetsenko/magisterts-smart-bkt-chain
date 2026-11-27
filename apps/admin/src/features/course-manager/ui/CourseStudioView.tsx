@@ -28,6 +28,7 @@ import {
   Upload,
 } from 'lucide-react';
 import type { CourseDto, CourseModuleDto, SkillNodeDto, CourseCategoryDto, UpdateCourseDto } from '@sbc/types';
+import { Tooltip } from '@sbc/ui';
 import { slugify, validateSlug } from '@sbc/routes';
 import { CreateSkillModal } from './CreateSkillModal';
 import { CreateTaskModal } from './CreateTaskModal';
@@ -35,37 +36,11 @@ import { ModuleTestSandboxModal } from './ModuleTestSandboxModal';
 import { TheoryLessonBuilderModal } from './TheoryLessonBuilderModal';
 import { CourseImportModal } from './CourseImportModal';
 import { AiCourseScaffolderModal } from './AiCourseScaffolderModal';
-import { MASTERY_STANDARDS } from './CourseCreateView';
+import { CourseStudioSettingsTab } from './CourseStudioSettingsTab';
+import { formatCleanSkillTitle, getCleanSkillDescription } from '../lib/skillFormatting';
 import { downloadCourseTemplate, downloadCourseExport } from '../services/courseWorkbookService';
 
-/**
- * Очищує назву навички від дублюючого префікса «Модуль N:» та запобігає повторенню назви батьківського модуля
- */
-export const formatCleanSkillTitle = (skillTitle?: string | null, moduleTitle?: string | null): string => {
-  if (!skillTitle) return 'Компетенція BKT';
-  let clean = skillTitle.replace(/^(?:Модуль|Module)\s*\d+:\s*/i, '').trim();
-  const cleanMod = (moduleTitle || '').replace(/^(?:Модуль|Module)\s*\d+:\s*/i, '').trim();
-  if (!clean || (cleanMod && clean.toLowerCase() === cleanMod.toLowerCase())) {
-    return clean || 'Базова навичка модуля';
-  }
-  return clean;
-};
-
-/**
- * Запобігає дублюванню однакового тексту опису модуля і навички
- */
-export const getCleanSkillDescription = (skillDesc?: string | null, modDesc?: string | null, taskCount: number = 0): string | null => {
-  if (!skillDesc || !skillDesc.trim()) {
-    return taskCount > 0 ? `Атомарна BKT компетенція • ${taskCount} завд. у банку` : null;
-  }
-  const isDuplicate = modDesc && modDesc.trim().toLowerCase() === skillDesc.trim().toLowerCase();
-  if (isDuplicate) {
-    return taskCount > 0
-      ? `Атомарна BKT компетенція • ${taskCount} завд. у банку`
-      : 'Атомарна BKT компетенція модуля';
-  }
-  return skillDesc.trim();
-};
+export { formatCleanSkillTitle, getCleanSkillDescription };
 
 interface CourseStudioViewProps {
   course: CourseDto;
@@ -1533,18 +1508,26 @@ export const CourseStudioView: React.FC<CourseStudioViewProps> = ({
                                     </div>
 
                                     <div className="grid grid-cols-4 gap-1.5 text-[10px] font-mono shrink-0">
-                                      <span className="px-1.5 py-0.5 rounded bg-slate-950 border border-slate-800 text-slate-400" title="Початковий рівень знань P(L₀)">
-                                        P(L₀): <span className="text-emerald-400 font-bold">{skill.pInit ?? '0.50'}</span>
-                                      </span>
-                                      <span className="px-1.5 py-0.5 rounded bg-slate-950 border border-slate-800 text-slate-400" title="Ймовірність навчання P(T)">
-                                        P(T): <span className="text-emerald-400 font-bold">{skill.pTransit ?? '0.10'}</span>
-                                      </span>
-                                      <span className="px-1.5 py-0.5 rounded bg-slate-950 border border-slate-800 text-slate-400" title="Ймовірність помилки P(S)">
-                                        P(S): <span className="text-rose-400 font-bold">{skill.pSlip ?? '0.10'}</span>
-                                      </span>
-                                      <span className="px-1.5 py-0.5 rounded bg-slate-950 border border-slate-800 text-slate-400" title="Ймовірність вгадування P(G)">
-                                        P(G): <span className="text-indigo-400 font-bold">{skill.pGuess ?? '0.20'}</span>
-                                      </span>
+                                      <Tooltip content="Початковий рівень знань P(L₀)">
+                                        <span className="px-1.5 py-0.5 rounded bg-slate-950 border border-slate-800 text-slate-400">
+                                          P(L₀): <span className="text-emerald-400 font-bold">{skill.pInit ?? '0.50'}</span>
+                                        </span>
+                                      </Tooltip>
+                                      <Tooltip content="Ймовірність навчання P(T)">
+                                        <span className="px-1.5 py-0.5 rounded bg-slate-950 border border-slate-800 text-slate-400">
+                                          P(T): <span className="text-emerald-400 font-bold">{skill.pTransit ?? '0.10'}</span>
+                                        </span>
+                                      </Tooltip>
+                                      <Tooltip content="Ймовірність помилки P(S)">
+                                        <span className="px-1.5 py-0.5 rounded bg-slate-950 border border-slate-800 text-slate-400">
+                                          P(S): <span className="text-rose-400 font-bold">{skill.pSlip ?? '0.10'}</span>
+                                        </span>
+                                      </Tooltip>
+                                      <Tooltip content="Ймовірність вгадування P(G)">
+                                        <span className="px-1.5 py-0.5 rounded bg-slate-950 border border-slate-800 text-slate-400">
+                                          P(G): <span className="text-indigo-400 font-bold">{skill.pGuess ?? '0.20'}</span>
+                                        </span>
+                                      </Tooltip>
                                     </div>
                                   </div>
 
@@ -1668,155 +1651,29 @@ export const CourseStudioView: React.FC<CourseStudioViewProps> = ({
       {/* SUB-TAB 2: GENERAL COURSE SETTINGS                                       */}
       {/* ========================================================================= */}
       {activeSubTab === 'SETTINGS' && (
-        <form onSubmit={handleSaveSettings} className="flex flex-col gap-6 max-w-4xl">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="flex flex-col gap-1.5 md:col-span-2">
-              <label className="text-xs font-semibold text-slate-300">Назва курсу *</label>
-              <input
-                type="text"
-                value={settingsTitle}
-                onChange={(e) => setSettingsTitle(e.target.value)}
-                required
-                className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-emerald-500"
-              />
-            </div>
-
-            <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-semibold text-slate-300">Slug ID (URL-адреса) *</label>
-              <input
-                type="text"
-                value={settingsSlug}
-                onChange={(e) => setSettingsSlug(e.target.value)}
-                required
-                className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs font-mono text-emerald-400 focus:outline-none focus:border-emerald-500"
-              />
-            </div>
-
-            <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-semibold text-slate-300">Предметна галузь (Категорія)</label>
-              <select
-                value={settingsCategoryId || ''}
-                onChange={(e) => setSettingsCategoryId(e.target.value || null)}
-                className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-slate-200 focus:outline-none focus:border-emerald-500 cursor-pointer"
-              >
-                <option value="">Без категорії</option>
-                {categories.map((c) => (
-                  <option key={c.id} value={c.id}>{c.title}</option>
-                ))}
-              </select>
-            </div>
-
-            <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-semibold text-slate-300">Цільова аудиторія</label>
-              <input
-                type="text"
-                value={settingsAudience}
-                onChange={(e) => setSettingsAudience(e.target.value)}
-                className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-slate-200 focus:outline-none focus:border-emerald-500"
-              />
-            </div>
-
-            {/* In-Form BKT Mastery Threshold Standards Switcher in Studio Settings */}
-            <div className="flex flex-col gap-2 md:col-span-2">
-              <label className="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
-                <Target className="w-4 h-4 text-emerald-400" />
-                <span>Нормативний BKT-поріг майстерності</span>
-              </label>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                {MASTERY_STANDARDS.map((std) => {
-                  const isSelected = Math.abs(settingsThreshold - std.value) < 0.001;
-                  return (
-                    <button
-                      key={std.value}
-                      type="button"
-                      onClick={() => setSettingsThreshold(std.value)}
-                      className={`p-2.5 rounded-xl border text-left transition-all cursor-pointer flex flex-col gap-1 ${
-                        isSelected
-                          ? 'bg-emerald-500/15 border-emerald-500/50 text-white shadow-sm shadow-emerald-950/40'
-                          : 'bg-slate-950/60 border-slate-800/80 text-slate-400 hover:text-slate-200 hover:bg-slate-900/60'
-                      }`}
-                    >
-                      <div className="flex items-center justify-between">
-                        <span className={`text-xs font-semibold ${isSelected ? 'text-emerald-300' : 'text-slate-300'}`}>
-                          {std.title}
-                        </span>
-                        <span className="text-[10px] font-mono text-slate-500">
-                          {std.badge}
-                        </span>
-                      </div>
-                      <span className="text-[10px] text-slate-400 line-clamp-1">{std.tag}</span>
-                    </button>
-                  );
-                })}
-              </div>
-              <div className="flex items-center gap-2 pt-1">
-                <span className="text-[11px] text-slate-400">Точне числове значення:</span>
-                <input
-                  type="number"
-                  step="0.01"
-                  min="0.5"
-                  max="0.99"
-                  value={settingsThreshold}
-                  onChange={(e) => setSettingsThreshold(parseFloat(e.target.value) || 0.85)}
-                  className="w-24 px-2 py-1 bg-slate-950 border border-slate-800 rounded-lg text-xs font-mono text-emerald-400 focus:outline-none focus:border-emerald-500"
-                />
-              </div>
-            </div>
-
-            <div className="flex flex-col gap-1.5 md:col-span-2">
-              <label className="text-xs font-semibold text-slate-300">Опис курсу & Методичні цілі</label>
-              <textarea
-                rows={3}
-                value={settingsDescription}
-                onChange={(e) => setSettingsDescription(e.target.value)}
-                className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-slate-200 focus:outline-none focus:border-emerald-500 resize-none"
-              />
-            </div>
-          </div>
-
-          <div className="p-4 rounded-xl bg-slate-950/60 border border-slate-800 flex items-center justify-between">
-            <div className="flex flex-col">
-              <span className="text-xs font-semibold text-slate-200">Опублікувати курс у каталозі</span>
-              <span className="text-[11px] text-slate-400">
-                {settingsPublished
-                  ? 'Курс доступний усім студентам та викладачам платформи'
-                  : 'Курс збережено як чернетку'}
-              </span>
-            </div>
-            <label className="relative inline-flex items-center cursor-pointer">
-              <input
-                type="checkbox"
-                checked={settingsPublished}
-                onChange={(e) => setSettingsPublished(e.target.checked)}
-                className="sr-only peer"
-              />
-              <div className="w-11 h-6 bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
-            </label>
-          </div>
-
-          {/* Step 1 Actions: Save + Continue to Step 2 */}
-          <div className="flex items-center justify-between gap-3 pt-4 border-t border-slate-800">
-            <button
-              type="submit"
-              disabled={isSavingSettings}
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white text-xs font-semibold transition-all cursor-pointer"
-            >
-              <Save className="w-4 h-4" />
-              <span>{isSavingSettings ? 'Збереження...' : 'Зберегти зміни метаданих'}</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => {
-                if (onAdvanceStep) onAdvanceStep(2);
-                else handleStepSelect(2);
-              }}
-              className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold transition-all cursor-pointer shadow-md shadow-emerald-950/50"
-            >
-              <span>Продовжити: Модульна структура (Крок 2) →</span>
-            </button>
-          </div>
-        </form>
+        <CourseStudioSettingsTab
+          categories={categories}
+          settingsTitle={settingsTitle}
+          onChangeTitle={setSettingsTitle}
+          settingsSlug={settingsSlug}
+          onChangeSlug={setSettingsSlug}
+          settingsCategoryId={settingsCategoryId}
+          onChangeCategoryId={setSettingsCategoryId}
+          settingsAudience={settingsAudience}
+          onChangeAudience={setSettingsAudience}
+          settingsThreshold={settingsThreshold}
+          onChangeThreshold={setSettingsThreshold}
+          settingsDescription={settingsDescription}
+          onChangeDescription={setSettingsDescription}
+          settingsPublished={settingsPublished}
+          onChangePublished={setSettingsPublished}
+          isSavingSettings={isSavingSettings}
+          onSaveSettings={handleSaveSettings}
+          onAdvanceToModules={() => {
+            if (onAdvanceStep) onAdvanceStep(2);
+            else handleStepSelect(2);
+          }}
+        />
       )}
 
       {/* Turnkey Authoring Modals */}

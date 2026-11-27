@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Network, Plus, Trash2, Edit3, ArrowRight, Save, Layers } from 'lucide-react';
 import type { TaskDifficulty } from '@sbc/types';
+import { DropdownSelect } from '@sbc/ui';
 import { AdminSkillNode } from '../model/skill-editor.types';
 
 interface SkillDagEditorProps {
@@ -229,21 +230,23 @@ export const SkillDagEditor: React.FC<SkillDagEditorProps> = ({
               </div>
 
               <div className="flex flex-col gap-1.5">
-                <label className="text-xs font-semibold text-slate-300">Складність</label>
-                <select
-                  value={formData.difficulty}
-                  onChange={(e) =>
+                <DropdownSelect<Extract<TaskDifficulty, 'EASY' | 'MEDIUM' | 'HARD'>>
+                  label="Складність"
+                  fullWidth
+                  size="sm"
+                  value={formData.difficulty as Extract<TaskDifficulty, 'EASY' | 'MEDIUM' | 'HARD'>}
+                  onChange={(val) =>
                     setFormData({
                       ...formData,
-                      difficulty: e.target.value as Extract<TaskDifficulty, 'EASY' | 'MEDIUM' | 'HARD'>,
+                      difficulty: val,
                     })
                   }
-                  className="px-3.5 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-slate-100 focus:outline-none focus:border-indigo-500"
-                >
-                  <option value="EASY">EASY</option>
-                  <option value="MEDIUM">MEDIUM</option>
-                  <option value="HARD">HARD</option>
-                </select>
+                  options={[
+                    { value: 'EASY', label: 'EASY' },
+                    { value: 'MEDIUM', label: 'MEDIUM' },
+                    { value: 'HARD', label: 'HARD' },
+                  ]}
+                />
               </div>
             </div>
 

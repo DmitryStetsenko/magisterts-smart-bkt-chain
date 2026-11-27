@@ -16,7 +16,37 @@
           "items": [
             {
               "type": "text",
-              "raw_text": "**Фаза 3 `SBC-315` (`M-FSD` структура) — зачистка мертвих дублікатів, ліквідація `src/components/` та винесення шару `views/`:**",
+              "raw_text": "**Фаза 3.2 `SBC-315` (`M-FSD`) — декомпозиція великих `views/` на віджети, уніфікація `DropdownSelect` / `Badge` / `Tooltip` та закриття `[BACKLOG-10]`:**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Розбиття монолітних view та інспекторів на `widgets/`, `entities/`, `features/`:**",
+              "subitems": [
+                "`apps/study`: `StudyLessonView.tsx` (1163 -> 842 рядків) розкладено через [`StudySidebarDrawer.tsx`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/study/src/widgets/study-sidebar/ui/StudySidebarDrawer.tsx) та [`LessonContentCanvas.tsx`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/study/src/widgets/lesson-reader/ui/LessonContentCanvas.tsx).",
+                "`apps/student`: `StudentPracticeView.tsx` (2697 -> 1407 рядків) розкладено через [`PracticeSidebarDrawer.tsx`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/student/src/widgets/practice-sidebar/ui/PracticeSidebarDrawer.tsx) та [`PracticeTaskWorkspace.tsx`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/student/src/widgets/practice-workspace/ui/PracticeTaskWorkspace.tsx).",
+                "`apps/teacher`: `TeacherDashboardView.tsx` (2170 -> 1177 рядків) розкладено на [`entities/course`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/teacher/src/entities/course/index.ts), [`TeacherSidebarDrawer.tsx`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/teacher/src/widgets/teacher-sidebar/ui/TeacherSidebarDrawer.tsx) та [`StudentAnalyticsWorkspace.tsx`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/teacher/src/widgets/student-analytics/ui/StudentAnalyticsWorkspace.tsx); `MetricsAuditInspector.tsx` (1582 -> 613 рядків) розкладено на [`bktMath.ts`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/teacher/src/features/metrics-audit/model/bktMath.ts), [`MetricsWhatIfSandbox.tsx`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/teacher/src/features/metrics-audit/ui/MetricsWhatIfSandbox.tsx), [`MetricsTestMatrixTab.tsx`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/teacher/src/features/metrics-audit/ui/MetricsTestMatrixTab.tsx) і [`MetricsMechanismsTab.tsx`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/teacher/src/features/metrics-audit/ui/MetricsMechanismsTab.tsx).",
+                "`apps/admin`: `AdminPortalView.tsx` (2272 -> 984 рядків) розкладено на [`coursePresets.ts`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/admin/src/shared/config/coursePresets.ts) та [`AdminSidebarDrawer.tsx`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/admin/src/widgets/admin-sidebar/ui/AdminSidebarDrawer.tsx); з `CourseStudioView.tsx` винесено [`skillFormatting.ts`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/admin/src/features/course-manager/lib/skillFormatting.ts) та [`CourseStudioSettingsTab.tsx`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/apps/admin/src/features/course-manager/ui/CourseStudioSettingsTab.tsx)."
+              ]
+            },
+            {
+              "type": "text",
+              "raw_text": "**Уніфікація UI-Kit (`DropdownSelect`, `Badge`, `Tooltip`) across portals:** замінено кастомні та нативні `<select>` (збережено нативний `<select>` лише у `CreateClassroomModal.tsx` для сумісності з `selectOption`), статус-бейджі та тултіпи у `CourseGraphViewer.tsx`, `MetricsWhatIfSandbox.tsx`, `MetricsTestMatrixTab.tsx`, `CourseStudioSettingsTab.tsx`, `CourseStudioView.tsx`, `SkillDagEditor.tsx`, `DatasetExportCenter.tsx`, `LessonContentCanvas.tsx`, `PracticeTaskWorkspace.tsx`.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Виявлено та усунено регресію через Playwright E2E:** усунуто неявний fallthrough у fallback вкладки налаштувань у `PracticeSidebarDrawer` (`if (activeTab === 'task' && !task) return null`) та аналогічно в `TeacherSidebarDrawer`, що зберігав згорнутий стан `DrawerSection` під час завантаження задачі (`practice-integrity-modes.spec.ts` тепер 100% стабільний).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Верифікація:** `npx tsc --noEmit` (`@sbc/ui`, `study`, `student`, `teacher`, `admin`) — `0` помилок; Playwright E2E (14 сценаріїв у 6 спеках включно з `practice-integrity-modes` та `course-ecosystem-cross-app-sync`) — пройдено повністю; статус `SBC-315` у [`docs/backlog/README.md`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/docs/backlog/README.md) переведено в `DONE`.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Фаза 3.1 `SBC-315` (`M-FSD` структура) — зачистка мертвих дублікатів, ліквідація `src/components/` та винесення шару `views/`:**",
               "subitems": []
             },
             {

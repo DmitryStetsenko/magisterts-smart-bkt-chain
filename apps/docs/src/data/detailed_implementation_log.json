@@ -120,6 +120,64 @@
           ]
         },
         {
+          "title": "0.1.7.121 Фаза 3.2 `SBC-315` (`M-FSD`): Декомпозиція великих `views/` та фіч у `widgets/`, уніфікація `DropdownSelect` / `Badge` / `Tooltip` та закриття `[BACKLOG-10]`",
+          "level": 3,
+          "paragraphs": [],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "**Декомпозиція монолітних екранів (`M-FSD Layers: views → widgets → features → entities`):**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "`apps/study` (`1163 → 842` рядки в `StudyLessonView.tsx`): виділено віджети [`StudySidebarDrawer.tsx`](file:///apps/study/src/widgets/study-sidebar/ui/StudySidebarDrawer.tsx) (4 вкладки бічної панелі) та [`LessonContentCanvas.tsx`](file:///apps/study/src/widgets/lesson-reader/ui/LessonContentCanvas.tsx) (полотно уроку з секціями, картками оман, `CodePlayground` і шлюзом у тренажер).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "`apps/student` (`2697 → 1407` рядків у `StudentPracticeView.tsx`): виділено [`PracticeSidebarDrawer.tsx`](file:///apps/student/src/widgets/practice-sidebar/ui/PracticeSidebarDrawer.tsx) (умова/режим `TRAINING`/`GRADED`, історія спроб, BKT DAG, інспектор вузла, налаштування) та [`PracticeTaskWorkspace.tsx`](file:///apps/student/src/widgets/practice-workspace/ui/PracticeTaskWorkspace.tsx) (панель завдання, редактори Monaco/Quiz/Essay, банери деградації/анулювання, фідбек і JIT-теорія). Виправлено баг ініціалізації `DrawerSection`: прибрано fallthrough у `settings`-fallback під час завантаження (`task === null`), щоб `useState(defaultOpen)` секції «Режим проходження» завжди стартував розгорнутим.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "`apps/teacher`: [`TeacherDashboardView.tsx`](file:///apps/teacher/src/views/teacher-dashboard/ui/TeacherDashboardView.tsx) (`2170 → 1177` рядків) розділено через [`entities/course`](file:///apps/teacher/src/entities/course/index.ts), [`TeacherSidebarDrawer.tsx`](file:///apps/teacher/src/widgets/teacher-sidebar/ui/TeacherSidebarDrawer.tsx) (із тим же фіксом `return null` при `!courseDetails`) і [`StudentAnalyticsWorkspace.tsx`](file:///apps/teacher/src/widgets/student-analytics/ui/StudentAnalyticsWorkspace.tsx); [`MetricsAuditInspector.tsx`](file:///apps/teacher/src/features/metrics-audit/ui/MetricsAuditInspector.tsx) (`1582 → 613` рядків) розділено на [`bktMath.ts`](file:///apps/teacher/src/features/metrics-audit/model/bktMath.ts), [`MetricsWhatIfSandbox.tsx`](file:///apps/teacher/src/features/metrics-audit/ui/MetricsWhatIfSandbox.tsx), [`MetricsTestMatrixTab.tsx`](file:///apps/teacher/src/features/metrics-audit/ui/MetricsTestMatrixTab.tsx) і [`MetricsMechanismsTab.tsx`](file:///apps/teacher/src/features/metrics-audit/ui/MetricsMechanismsTab.tsx).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "`apps/admin`: [`AdminPortalView.tsx`](file:///apps/admin/src/views/admin-portal/ui/AdminPortalView.tsx) (`2272 → 984` рядки) розділено на [`coursePresets.ts`](file:///apps/admin/src/shared/config/coursePresets.ts) та [`AdminSidebarDrawer.tsx`](file:///apps/admin/src/widgets/admin-sidebar/ui/AdminSidebarDrawer.tsx); із `CourseStudioView.tsx` (`1899 → 1756` рядків) виділено [`skillFormatting.ts`](file:///apps/admin/src/features/course-manager/lib/skillFormatting.ts) та [`CourseStudioSettingsTab.tsx`](file:///apps/admin/src/features/course-manager/ui/CourseStudioSettingsTab.tsx).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Уніфікація примітивів `@sbc/ui` (`DropdownSelect`, `Badge`, `Tooltip`):**",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Впроваджено `<DropdownSelect>` у `CourseGraphViewer.tsx`, `MetricsWhatIfSandbox.tsx`, `CourseStudioSettingsTab.tsx`, `SkillDagEditor.tsx`, `DatasetExportCenter.tsx` (із збереженням нативного `<select>` у `CreateClassroomModal.tsx` через контракт `selectOption` у E2E `course-ecosystem-cross-app-sync`).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Впроваджено `<Badge>` у `LessonContentCanvas.tsx`, `PracticeTaskWorkspace.tsx`, `CourseGraphViewer.tsx`, `MetricsTestMatrixTab.tsx`, `DatasetExportCenter.tsx`.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "Впроваджено `<Tooltip>` для інтерактивних BKT-параметрів $P(L_0), P(T), P(S), P(G)$ у `CourseStudioView.tsx`.",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Верифікація та закриття `SBC-315`:** `tsc --noEmit` across `@sbc/ui`, `study`, `student`, `teacher`, `admin` — `0` помилок; Playwright E2E (14 кейсів across 6 спеків: `course-and-modules`, `course-ecosystem-cross-app-sync`, `light-theme-contrast`, `practice-integrity-modes`, `student-course-reload-dag`, `study-bkt-gating-sync`) — **усі пройшли**; `[BACKLOG-10]` (`SBC-315`) закрито зі статусом `DONE` в [`docs/backlog/README.md`](file:///docs/backlog/README.md).",
+              "subitems": []
+            }
+          ]
+        },
+        {
           "title": "0.1.7.120 Фаза 3 `SBC-315` (`M-FSD` Структура): Ліквідація `src/components/`, мертвих дублікатів та винесення `views/` і `entities/`",
           "level": 3,
           "paragraphs": [],
