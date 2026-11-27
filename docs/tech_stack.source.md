@@ -77,8 +77,12 @@ smart-bkt-chain/
 │   ├── types/                # Спільні інтерфейси та DTO
 │   │   ├── index.ts
 │   │   └── package.json
-│   └── ui/                   # Спільні компоненти та Storybook (Tailwind + shadcn/ui)
-│       ├── src/              # Компоненти інтерфейсу
+│   └── ui/                   # Глобальний Shared UI-Kit (shared/ui) + композитні віджети (AppShellLayout, SkillTree, CodePlayground)
+│       ├── src/
+│       │   ├── shared/ui/    # Атомарні UI-примітиви на токенах --sbc-* (Button, Modal, ConfirmModal, Badge, Tooltip, Select)
+│       │   ├── shell/        # Opera Shell v2.0 (AppShellLayout)
+│       │   ├── theme/        # Система тем Dark/Light та CSS-токени
+│       │   └── ...           # Міжпортальні віджети (skill-graph, analytics, drawer, code)
 │       ├── .storybook/       # Конфігурація Storybook
 │       └── package.json
 ├── docs/                     # Проєктна документація
@@ -103,8 +107,13 @@ smart-bkt-chain/
     *   При компіляції Solidity-контрактів у `packages/contracts`, утиліти (Foundry/Hardhat) генерують JSON ABI та відповідні TypeScript-інтерфейси.
     *   Фронтенд (через Wagmi/Viem) та бекенд (через Viem релейєри) імпортують ці згенеровані ABI та типи.
 4.  **Спільна дизайн-система та Storybook (`@sbc/ui`):**
-    *   Усі UI-компоненти, побудовані на базі Tailwind CSS та Radix UI (shadcn/ui), розробляються в ізольованому пакеті `packages/ui`.
+    *   Усі UI-компоненти, побудовані на базі Tailwind CSS, Radix UI та семантичних дизайн-токенів (`--sbc-*` для Dark/Light тем), розробляються в ізольованому пакеті `packages/ui`.
     *   **Storybook** інтегрований у цей пакет для розробки компонентів у повній ізоляції від логіки сторінок, стану додатків чи API-запитів.
+
+### 2.2. Дворівнева адаптація Feature-Sliced Design (Monorepo-Adapted FSD)
+Для уникнення дублювання нижніх шарів між 6 порталами та запобігання появі монолітних компонентів у клієнтській частині діє адаптована до монорепозиторію двошарова модель FSD:
+1.  **Рівень А — Міжпортальний фундамент (`packages/*` як Global Foundation):** `@sbc/types` та `@sbc/contracts` виконують роль глобального `shared/model` + `shared/api`; `@sbc/routes` — `shared/routes`; `@sbc/ui` розділяється на атомарний `shared/ui/` UI-Kit (`Button`, `Modal`, `ConfirmModal`, `Badge`, `Tooltip`, `DropdownSelect`) та міжпортальні композитні віджети (`AppShellLayout`, `UserProfileDrawer`, `GameSkillTreeWidget`, `AnomalyTreeWidget`, `CodePlayground`).
+2.  **Рівень Б — Локальні шари порталу (`apps/*/src/`):** компактна 4-шарова ієрархія `app/ → views/ → widgets/ → features/` (+ опціональний `entities/` для портало-специфічних сутностей) із суворим потоком залежностей згори вниз, Public API (`index.ts`), тонким роутинговим `app/` та забороною нетипізованої папки `src/components/`.
 
 ---
 
@@ -119,8 +128,8 @@ smart-bkt-chain/
 
 *   **Фреймворк:** **Next.js 16+ (остання стабільна версія)** (на базі React 19).
     *   *Чому:* Повна сумісність із серверними компонентами (RSC). Для оптимізації застосовується гібридна модель: статична генерація для публічних зон та динамічний SSR/CSR з захистом ролей у кабінетах.
-*   **Архітектурна методологія:** **Feature-Sliced Design (FSD)**.
-    *   *Чому:* Забезпечує декомпозицію клієнтського коду на незалежні шари (`shared`, `entities`, `features`, `widgets`, `pages`, `app`), виключаючи спагеті-код та кругові залежності.
+*   **Архітектурна методологія:** **Monorepo-Adapted Feature-Sliced Design (FSD)**.
+    *   *Чому:* Поєднує спільний фундамент на рівні workspace-пакетів (`@sbc/ui/shared/ui`, `@sbc/types`, `@sbc/routes`) із локальними шарами порталів (`app → views → widgets → features`), виключаючи дублювання UI-примітивів, «божественні» компоненти, спагеті-код та кругові залежності.
 *   **Канонічний макет екосистеми (`AppShellLayout` у `@sbc/ui` — Minimalist Borderless Design):**
     *   *Чому:* Уніфікований безрамковий каркас **Opera Shell v2.0** для 4 ключових порталів (`apps/study`, `apps/student`, `apps/teacher`, `apps/admin`). Забезпечує сувору ізоляцію скролу (`h-screen w-screen overflow-hidden`), компактну дворівневу верхню шапку (`h-[56px]`) з єдиним рендером `<Breadcrumbs>` і безрамковим тригером спільного `UserProfileDrawer`, лаконічну вертикальну рейку **Minimalist Borderless Icon Rail (`w-12`)** з автоматичними міжпортальними лінками через `@sbc/routes`, висувний Drawer (`sm:w-[300px] lg:w-[320px]`) на базі `<DrawerSection>` з розділювачами `divide-y divide-slate-800/50` та чисте контентне полотно (Clean Borderless Canvas) без вкладених рамок-«матрьошок».
 *   **Спільні компоненти та дизайн-система (`@sbc/ui`):**

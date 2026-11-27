@@ -38,7 +38,7 @@
           "code_blocks": [
             {
               "lang": "text",
-              "content": "smart-bkt-chain/\n├── apps/\n│   ├── web/                  # Next.js Landing & Public Portal (Порт 3001)\n│   ├── student/              # Next.js Student Portal (Monaco, RPG Skill Tree, Telemetry) (Порт 3002)\n│   ├── teacher/              # Next.js Teacher Portal (BKT Heatmap, Review Queue) (Порт 3003)\n│   ├── admin/                # Next.js Admin Panel (Skill DAG Builder, CMS) (Порт 3004)\n│   ├── study/                # Next.js Study Portal (Zen Reading, Playgrounds, Theory) (Порт 3006)\n│   ├── api/                  # NestJS Backend API (Hexagonal, BKT Engine, WebSockets) (Порт 3000)\n│   └── docs/                 # Next.js Docs & Architecture Presenter (Порт 3005)\n│       └── package.json\n├── packages/\n│   ├── database/             # Prisma schema та клієнт БД\n│   │   ├── prisma/\n│   │   │   └── schema.prisma\n│   │   └── package.json\n│   ├── contracts/            # Solidity смарт-контракти (Hardhat/Foundry)\n│   │   ├── contracts/\n│   │   └── package.json\n│   ├── routes/               # Єдиний реєстр маршрутів, портів та міжпортальних посилань\n│   │   ├── src/\n│   │   └── package.json\n│   ├── types/                # Спільні інтерфейси та DTO\n│   │   ├── index.ts\n│   │   └── package.json\n│   └── ui/                   # Спільні компоненти та Storybook (Tailwind + shadcn/ui)\n│       ├── src/              # Компоненти інтерфейсу\n│       ├── .storybook/       # Конфігурація Storybook\n│       └── package.json\n├── docs/                     # Проєктна документація\n│   └── tech_stack.md\n├── docker-compose.yml        # Локальна інфраструктура (PostgreSQL)\n├── package.json              # Корневий конфіг workspaces\n└── turbo.json                # Конфігурація Turborepo (опціонально)"
+              "content": "smart-bkt-chain/\n├── apps/\n│   ├── web/                  # Next.js Landing & Public Portal (Порт 3001)\n│   ├── student/              # Next.js Student Portal (Monaco, RPG Skill Tree, Telemetry) (Порт 3002)\n│   ├── teacher/              # Next.js Teacher Portal (BKT Heatmap, Review Queue) (Порт 3003)\n│   ├── admin/                # Next.js Admin Panel (Skill DAG Builder, CMS) (Порт 3004)\n│   ├── study/                # Next.js Study Portal (Zen Reading, Playgrounds, Theory) (Порт 3006)\n│   ├── api/                  # NestJS Backend API (Hexagonal, BKT Engine, WebSockets) (Порт 3000)\n│   └── docs/                 # Next.js Docs & Architecture Presenter (Порт 3005)\n│       └── package.json\n├── packages/\n│   ├── database/             # Prisma schema та клієнт БД\n│   │   ├── prisma/\n│   │   │   └── schema.prisma\n│   │   └── package.json\n│   ├── contracts/            # Solidity смарт-контракти (Hardhat/Foundry)\n│   │   ├── contracts/\n│   │   └── package.json\n│   ├── routes/               # Єдиний реєстр маршрутів, портів та міжпортальних посилань\n│   │   ├── src/\n│   │   └── package.json\n│   ├── types/                # Спільні інтерфейси та DTO\n│   │   ├── index.ts\n│   │   └── package.json\n│   └── ui/                   # Глобальний Shared UI-Kit (shared/ui) + композитні віджети (AppShellLayout, SkillTree, CodePlayground)\n│       ├── src/\n│       │   ├── shared/ui/    # Атомарні UI-примітиви на токенах --sbc-* (Button, Modal, ConfirmModal, Badge, Tooltip, Select)\n│       │   ├── shell/        # Opera Shell v2.0 (AppShellLayout)\n│       │   ├── theme/        # Система тем Dark/Light та CSS-токени\n│       │   └── ...           # Міжпортальні віджети (skill-graph, analytics, drawer, code)\n│       ├── .storybook/       # Конфігурація Storybook\n│       └── package.json\n├── docs/                     # Проєктна документація\n│   └── tech_stack.md\n├── docker-compose.yml        # Локальна інфраструктура (PostgreSQL)\n├── package.json              # Корневий конфіг workspaces\n└── turbo.json                # Конфігурація Turborepo (опціонально)"
             }
           ],
           "items": []
@@ -80,9 +80,29 @@
               "type": "text",
               "raw_text": "**Спільна дизайн-система та Storybook (`@sbc/ui`):**",
               "subitems": [
-                "Усі UI-компоненти, побудовані на базі Tailwind CSS та Radix UI (shadcn/ui), розробляються в ізольованому пакеті `packages/ui`.",
+                "Усі UI-компоненти, побудовані на базі Tailwind CSS, Radix UI та семантичних дизайн-токенів (`--sbc-*` для Dark/Light тем), розробляються в ізольованому пакеті `packages/ui`.",
                 "**Storybook** інтегрований у цей пакет для розробки компонентів у повній ізоляції від логіки сторінок, стану додатків чи API-запитів."
               ]
+            }
+          ]
+        },
+        {
+          "title": "2.2. Дворівнева адаптація Feature-Sliced Design (Monorepo-Adapted FSD)",
+          "level": 3,
+          "paragraphs": [
+            "Для уникнення дублювання нижніх шарів між 6 порталами та запобігання появі монолітних компонентів у клієнтській частині діє адаптована до монорепозиторію двошарова модель FSD:"
+          ],
+          "code_blocks": [],
+          "items": [
+            {
+              "type": "text",
+              "raw_text": "**Рівень А — Міжпортальний фундамент (`packages/*` як Global Foundation):** `@sbc/types` та `@sbc/contracts` виконують роль глобального `shared/model` + `shared/api`; `@sbc/routes` — `shared/routes`; `@sbc/ui` розділяється на атомарний `shared/ui/` UI-Kit (`Button`, `Modal`, `ConfirmModal`, `Badge`, `Tooltip`, `DropdownSelect`) та міжпортальні композитні віджети (`AppShellLayout`, `UserProfileDrawer`, `GameSkillTreeWidget`, `AnomalyTreeWidget`, `CodePlayground`).",
+              "subitems": []
+            },
+            {
+              "type": "text",
+              "raw_text": "**Рівень Б — Локальні шари порталу (`apps/*/src/`):** компактна 4-шарова ієрархія `app/ → views/ → widgets/ → features/` (+ опціональний `entities/` для портало-специфічних сутностей) із суворим потоком залежностей згори вниз, Public API (`index.ts`), тонким роутинговим `app/` та забороною нетипізованої папки `src/components/`.",
+              "subitems": []
             },
             {
               "type": "text",
@@ -137,9 +157,9 @@
             },
             {
               "type": "text",
-              "raw_text": "**Архітектурна методологія:** **Feature-Sliced Design (FSD)**.",
+              "raw_text": "**Архітектурна методологія:** **Monorepo-Adapted Feature-Sliced Design (FSD)**.",
               "subitems": [
-                "Забезпечує декомпозицію клієнтського коду на незалежні шари (`shared`, `entities`, `features`, `widgets`, `pages`, `app`), виключаючи спагеті-код та кругові залежності."
+                "Поєднує спільний фундамент на рівні workspace-пакетів (`@sbc/ui/shared/ui`, `@sbc/types`, `@sbc/routes`) із локальними шарами порталів (`app → views → widgets → features`), виключаючи дублювання UI-примітивів, «божественні» компоненти, спагеті-код та кругові залежності."
               ]
             },
             {
