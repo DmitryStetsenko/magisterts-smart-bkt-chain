@@ -120,7 +120,7 @@
           ]
         },
         {
-          "title": "0.1.7.114 Стандарт Дворівневої Адаптації FSD до Монорепозиторію та Архітектурна Специфікація Shared UI-Kit (`SBC-315`, `EP-SH`)",
+          "title": "0.1.7.114 Стандарт `M-FSD` (Monorepo Feature-Sliced Design: Shared Foundation + Portal Slices) та Специфікація Shared UI-Kit (`SBC-315`, `EP-SH`)",
           "level": 3,
           "paragraphs": [],
           "code_blocks": [],
@@ -137,17 +137,17 @@
             },
             {
               "type": "text",
-              "raw_text": "[`docs/brainstorm/23_monorepo_fsd_and_shared_ui_kit_architecture.md`](file:///docs/brainstorm/23_monorepo_fsd_and_shared_ui_kit_architecture.md) (додано в [`docs/brainstorm/README.md`](file:///docs/brainstorm/README.md)): дворівнева модель (Рівень А — Global Foundation `packages/*` з поділом `@sbc/ui` на `shared/ui/` та композити; Рівень Б — локальні шари `app → views → widgets → features`), 4 архітектурні інваріанти, специфікація `SBC-315` (`Button`, `Modal`, `ConfirmModal`, `Badge`, `Tooltip`, `DropdownSelect` на токенах `--sbc-*`) та 3-фазна стратегія міграції.",
+              "raw_text": "[`docs/brainstorm/23_monorepo_fsd_and_shared_ui_kit_architecture.md`](file:///docs/brainstorm/23_monorepo_fsd_and_shared_ui_kit_architecture.md) (індекс [`docs/brainstorm/README.md`](file:///docs/brainstorm/README.md)): закріплено назву **`M-FSD` (Monorepo Feature-Sliced Design: Shared Foundation + Portal Slices)**, повну матрицю імпортів, дерево прийняття рішень щодо розміщення коду, регламент сегментів (`ui/`, `model/`, `api/`, `lib/`, `config/`) і Public API (`index.ts`), кількісні пороги декомпозиції (`app/**/page.tsx` ≤ 100 рядків, `views/` ≤ 300, `widgets/`/`features/*/ui/` ≤ 400), специфікацію `SBC-315` (`Button`, `Modal`, `ConfirmModal`, `Badge`, `Tooltip`, `DropdownSelect` на токенах `--sbc-*`), чеклист Pre-Commit аудиту та 3-фазну стратегію міграції.",
               "subitems": []
             },
             {
               "type": "text",
-              "raw_text": "[`.agents/AGENTS.md`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/.agents/AGENTS.md): введено **Правило 15** (`Monorepo-Adapted FSD Standard`).",
+              "raw_text": "[`.agents/AGENTS.md`](file:///.agents/AGENTS.md): деталізовано **Правило 15** (`M-FSD Standard`) для використання в поточному та наступних мультипортальних проєктах.",
               "subitems": []
             },
             {
               "type": "text",
-              "raw_text": "[`docs/tech_stack.source.md`](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/docs/tech_stack.source.md): додано підрозділ `2.2. Дворівнева адаптація Feature-Sliced Design (Monorepo-Adapted FSD)` та оновлено структуру `@sbc/ui`.",
+              "raw_text": "[`docs/tech_stack.source.md`](file:///docs/tech_stack.source.md): актуалізовано підрозділ `2.2. Архітектура M-FSD` та опис `@sbc/ui`.",
               "subitems": []
             }
           ]

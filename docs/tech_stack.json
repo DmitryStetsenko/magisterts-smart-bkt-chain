@@ -87,21 +87,21 @@
           ]
         },
         {
-          "title": "2.2. Дворівнева адаптація Feature-Sliced Design (Monorepo-Adapted FSD)",
+          "title": "2.2. Архітектура `M-FSD` (Monorepo Feature-Sliced Design: Shared Foundation + Portal Slices)",
           "level": 3,
           "paragraphs": [
-            "Для уникнення дублювання нижніх шарів між 6 порталами та запобігання появі монолітних компонентів у клієнтській частині діє адаптована до монорепозиторію двошарова модель FSD:"
+            "Для уникнення дублювання нижніх шарів між 6 порталами та запобігання появі монолітних компонентів у клієнтській частині діє канонічна двошарова модель **`M-FSD`**:"
           ],
           "code_blocks": [],
           "items": [
             {
               "type": "text",
-              "raw_text": "**Рівень А — Міжпортальний фундамент (`packages/*` як Global Foundation):** `@sbc/types` та `@sbc/contracts` виконують роль глобального `shared/model` + `shared/api`; `@sbc/routes` — `shared/routes`; `@sbc/ui` розділяється на атомарний `shared/ui/` UI-Kit (`Button`, `Modal`, `ConfirmModal`, `Badge`, `Tooltip`, `DropdownSelect`) та міжпортальні композитні віджети (`AppShellLayout`, `UserProfileDrawer`, `GameSkillTreeWidget`, `AnomalyTreeWidget`, `CodePlayground`).",
+              "raw_text": "**Рівень А — `Shared Foundation` (`packages/*`):** `@sbc/types` та `@sbc/contracts` виконують роль глобального `shared/model` + `shared/api`; `@sbc/routes` — `shared/routes`; `@sbc/ui` розділяється на атомарний `shared/ui/` UI-Kit (`Button`, `Modal`, `ConfirmModal`, `Badge`, `Tooltip`, `DropdownSelect` на токенах `--sbc-*`) та міжпортальні композитні віджети (`AppShellLayout`, `UserProfileDrawer`, `GameSkillTreeWidget`, `AnomalyTreeWidget`, `CodePlayground`).",
               "subitems": []
             },
             {
               "type": "text",
-              "raw_text": "**Рівень Б — Локальні шари порталу (`apps/*/src/`):** компактна 4-шарова ієрархія `app/ → views/ → widgets/ → features/` (+ опціональний `entities/` для портало-специфічних сутностей) із суворим потоком залежностей згори вниз, Public API (`index.ts`), тонким роутинговим `app/` та забороною нетипізованої папки `src/components/`.",
+              "raw_text": "**Рівень Б — `Portal Slices` (`apps/*/src/`):** компактна 4-шарова ієрархія `app/ → views/ → widgets/ → features/` (+ опціональний `entities/` для портало-специфічних сутностей) із суворим потоком залежностей згори вниз, Public API (`index.ts`), тонким роутинговим `app/` (≤ 100 рядків), кількісними обмеженнями декомпозиції та забороною нетипізованої папки `src/components/`.",
               "subitems": []
             },
             {
@@ -157,9 +157,9 @@
             },
             {
               "type": "text",
-              "raw_text": "**Архітектурна методологія:** **Monorepo-Adapted Feature-Sliced Design (FSD)**.",
+              "raw_text": "**Архітектурна методологія:** **`M-FSD` (Monorepo Feature-Sliced Design: Shared Foundation + Portal Slices)**.",
               "subitems": [
-                "Поєднує спільний фундамент на рівні workspace-пакетів (`@sbc/ui/shared/ui`, `@sbc/types`, `@sbc/routes`) із локальними шарами порталів (`app → views → widgets → features`), виключаючи дублювання UI-примітивів, «божественні» компоненти, спагеті-код та кругові залежності."
+                "Поєднує спільний фундамент на рівні workspace-пакетів (`@sbc/ui/shared/ui`, `@sbc/types`, `@sbc/routes`) із локальними слайсами порталів (`app → views → widgets → features`), виключаючи дублювання UI-примітивів, «божественні» компоненти, спагеті-код та кругові залежності."
               ]
             },
             {

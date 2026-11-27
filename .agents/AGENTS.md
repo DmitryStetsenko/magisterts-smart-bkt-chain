@@ -286,24 +286,40 @@
 
 ---
 
-### 15. 🧱 Архітектурний Стандарт Монорепозиторного FSD та Shared UI-Kit (`@sbc/ui`) (Monorepo-Adapted FSD Standard)
-Усі фронтенд-застосунки цього та наступних мультипортальних монорепозиторіїв проєктуються виключно за **Дворівневою Адаптацією Feature-Sliced Design (Monorepo-Adapted FSD)** згідно зі специфікацією [`docs/brainstorm/23_monorepo_fsd_and_shared_ui_kit_architecture.md`](file:///docs/brainstorm/23_monorepo_fsd_and_shared_ui_kit_architecture.md):
+### 15. 🧱 Архітектурний Стандарт `M-FSD` (Monorepo Feature-Sliced Design: Shared Foundation + Portal Slices)
+Усі фронтенд-застосунки цього та наступних мультипортальних монорепозиторіїв проєктуються, розвиваються та рефакторяться виключно за стандартом **`M-FSD` (Monorepo Feature-Sliced Design)** — принципом **«Спільний Фундамент + Слайси Порталів»** згідно зі специфікацією [`docs/brainstorm/23_monorepo_fsd_and_shared_ui_kit_architecture.md`](file:///docs/brainstorm/23_monorepo_fsd_and_shared_ui_kit_architecture.md):
 
-1. **Рівень А — Міжпортальний фундамент (`packages/*` як Global Foundation):**
-   - Спільні DTO, контракти API та типізований роутинг живуть у `packages/types`, `packages/contracts`, `packages/routes` (замість локальних дублів `shared/api` у кожному застосунку).
-   - Пакет `@sbc/ui` (`packages/ui/src/`) чітко поділяється на:
-     - `shared/ui/` — атомарний **UI-Kit** (`Button`, `Modal`, `ConfirmModal`, `Badge`, `Tooltip`, `DropdownSelect`, `Input`), побудований **виключно на дизайн-токенах** (`--sbc-*`) із підтримкою Dark/Light тем та WCAG AA/AAA;
-     - `widgets/` (та `shell/`, `theme/`, `code/`) — міжпортальні композитні віджети (`AppShellLayout`, `UserProfileDrawer`, `DrawerSection`, `Breadcrumbs`, `CodePlayground`, `GameSkillTreeWidget`, `AnomalyTreeWidget`).
+1. **Дворівнева структура монорепозиторію:**
+   - **Рівень А — `Shared Foundation` (`packages/*`):**
+     - `packages/types` (`@sbc/types`) — глобальний `shared/model` (DTO, доменні типи, API-пейлоади).
+     - `packages/contracts` (`@sbc/contracts`) — глобальний `shared/api` для Web3/ABI.
+     - `packages/routes` (`@sbc/routes`) — глобальний `shared/routes` (єдині URL, порти, міжпортальні посилання).
+     - `packages/ui` (`@sbc/ui`) — чіткий поділ на:
+       - `shared/ui/` — атомарний **UI-Kit** (`Button`, `Modal`, `ConfirmModal`, `Badge`, `Tooltip`, `DropdownSelect`, `Input`) без бізнес-логіки, побудований **виключно на семантичних дизайн-токенах `--sbc-*`** із гарантованою WCAG AA/AAA контрастністю у Dark/Light темах;
+       - `widgets/` (та `shell/`, `theme/`, `code/`) — міжпортальні композитні віджети (`AppShellLayout`, `UserProfileDrawer`, `DrawerSection`, `Breadcrumbs`, `CodePlayground`, `GameSkillTreeWidget`, `AnomalyTreeWidget`, `AuthModal`).
+   - **Рівень Б — `Portal Slices` (`apps/*/src/`):**
+     - Компактна 4-шарова ієрархія всередині кожного порталу: **`app/ → views/ → widgets/ → features/`** (+ опціональний **`entities/`** лише для локальних доменних сутностей, яких немає в інших порталах).
+     - **`app/`** — виключно роутинг Next.js App Router (`layout.tsx`, `page.tsx`, `loading.tsx`, `error.tsx`, `generateMetadata`, провайдери).
+     - **`views/`** (заміна `pages/` для уникнення конфлікту з Next.js) — композиція екрана конкретного маршруту.
+     - **`widgets/`** — самостійні великі UI-блоки, що координують кілька фіч або формують окрему робочу зону.
+     - **`features/`** — конкретні сценарії дій користувача з канонічними сегментами (`ui/`, `model/`, `api/`, `lib/`, `config/`) та обов'язковим **Public API (`index.ts`)**.
 
-2. **Рівень Б — Локальні шари веб-застосунку (`apps/*/src/`):**
-   - Кожен застосунок будується на компактній ієрархії: `app/ → views/ → widgets/ → features/` (+ опціональний `entities/` лише для суто локальних доменних сутностей цього порталу).
-   - **Шар `app/`** відповідає виключно за роутинг Next.js App Router (`layout.tsx`, `page.tsx`, метадані, провайдери). Файли `page.tsx` не містять бізнес-логіки або масивної верстки — лише делегують рендер у `views/*`.
-   - **Шар `views/`** (замість `pages/`, щоб не конфліктувати з роутингом Next.js) відповідає за композицію конкретного екрана.
-   - **Шар `widgets/`** інкапсулює самостійні великі UI-блоки; **шар `features/`** — конкретні сценарії дій користувача із сегментами `ui/`, `model/`, `lib/`, `api/` та обов'язковим Public API (`index.ts`).
+2. **Сувора матриця залежностей та Public API:**
+   - Дозволений потік імпортів **тільки згори вниз**: `app → views → widgets → features → entities → @sbc/ui → @sbc/types / @sbc/routes`.
+   - **Заборонено:** імпортувати вищий шар із нижчого; імпортувати сусідні слайси одного шару (`features/A` ↔ `features/B`, `widgets/A` ↔ `widgets/B`); імпортувати напряму з іншого `apps/*` (`apps/student` ↔ `apps/teacher`).
+   - **Public API (`index.ts`):** будь-який імпорт зі слайсу або з `@sbc/ui` виконується лише через кореневий `index.ts` (глибокі імпорти в `features/x/ui/Internal` або `packages/ui/src/...` заборонені).
 
-3. **Суворі інваріанти якості та чистоти коду:**
-   - **Заборона `src/components/`:** заборонено створювати папку `components/` у нових порталах або складати туди нові файли в існуючих; атомарні примітиви виносяться у `@sbc/ui/shared/ui`, локальні великі блоки — у `widgets/` або `features/*/ui`.
-   - **Потік залежностей згори вниз та Public API:** верхній шар може імпортувати лише нижчі (`app → views → widgets → features → entities → shared`); перехресні імпорти між слайсами одного шару та глибокі імпорти в обхід `index.ts` заборонені.
-   - **Zero Local UI Primitives:** заборонено дублювати в `apps/*` локальні `fixed inset-0 z-50` модальні оверлеї, кастомні кнопки чи статус-бейджі — нові елементи мають використовувати чи розширювати `@sbc/ui` (`shared/ui`).
-   - **Декомпозиція монолітів і видалення мертвих копій:** при створенні нового функціоналу не допускається розростання `views/`/`widgets/` у файли-моноліти (500–1000+ рядків із багатьма незалежними зонами відповідальності), а при перенесенні компонента в `@sbc/ui` локальна копія в `apps/*` видаляється в тому ж комміті.
+3. **Дерево розміщення коду, сегменти та іменування:**
+   - Атомарний UI-елемент без бізнес-логіки → `packages/ui/src/shared/ui/<kebab-name>/`; композит для 2+ порталів → `@sbc/ui`; дія в одному порталі → `apps/<app>/src/features/<kebab-slice>/`; велика панель сторінки → `apps/<app>/src/widgets/<kebab-widget>/`; екран маршруту → `apps/<app>/src/views/<kebab-view>/`.
+   - Запити до API (`fetch`, WebSocket) виносяться в сегмент `api/` або `model/` слайсу, а не змішуються у великих `ui/*.tsx` файлах; чисті допоміжні функції кладуться в `lib/`.
+   - Конвенція імен: слайси та пакети у `kebab-case`, компоненти у `PascalCase.tsx`, хуки у `useCamelCase.ts`, типи у `*.types.ts`.
+
+4. **Анти-монолітні ліміти, Zero Local Primitives та Заборона спадщини:**
+   - **Заборона `src/components/` та `src/utils/`:** заборонено створювати ці папки в нових порталах або додавати туди нові файли в існуючих.
+   - **Кількісні орієнтири:** `app/**/page.tsx` — **≤ 80–100 рядків** (0 бізнес-логіки); `views/` — **≤ 250–300 рядків**; `widgets/` / `features/*/ui/` — при перевищенні **~350–400 рядків** або поєднанні **≥ 2 незалежних підблоків / модалок** файл обов'язково декомпозується.
+   - **Zero Local UI Primitives:** заборонено писати в `apps/*` локальні `fixed inset-0 z-50` модальні оверлеї, кастомні кнопки дій чи статус-бейджі — нові елементи мають використовувати чи розширювати `@sbc/ui` (`shared/ui`) із токенами `--sbc-*`.
+   - **Zero Dead Copies:** при винесенні віджета або компонента в `@sbc/ui` локальна копія в `apps/*` видаляється в **тому ж комміті**.
+
+5. **Pre-Commit `M-FSD` Перевірка:**
+   - Перед фіксацією змін перевірити: відсутність нових файлів у `components/`/`utils/`, тонкий `app/page.tsx`, відсутність монолітів 400+ рядків, використання `@sbc/ui` примітивів на `--sbc-*` токенах, імпорти лише через `index.ts` згори вниз, роботу Dark/Light тем та відсутність мертвих копій.
 

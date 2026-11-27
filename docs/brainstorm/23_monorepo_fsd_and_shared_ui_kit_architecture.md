@@ -1,23 +1,28 @@
-# 23. Адаптація Feature-Sliced Design (FSD) до Монорепозиторію та Канонічний Shared UI-Kit (`SBC-315`)
+# 23. Архітектура `M-FSD` (Monorepo Feature-Sliced Design: Shared Foundation + Portal Slices) та Канонічний Shared UI-Kit (`SBC-315`)
 
 **Дата:** 27 листопада 2026  
-**Статус:** Архітектурний стандарт проєкту та майбутніх мультипортальних систем (`Rule 15` у [`.agents/AGENTS.md`](file:///.agents/AGENTS.md))  
+**Офіційна назва підходу:** **`M-FSD` (Monorepo Feature-Sliced Design)** — принцип **«Спільний Фундамент + Слайси Порталів» (*Shared Foundation + Portal Slices*)**  
+**Статус:** Канонічний архітектурний стандарт проєкту та майбутніх мультипортальних монорепозиторіїв (`Правило 15` у [`.agents/AGENTS.md`](file:///.agents/AGENTS.md))  
 **Пов'язані задачі:** `SBC-315` (`[BACKLOG-10]`), `SBC-312`, `SBC-433`, `SBC-434`
 
 ---
 
-## 1. Контекст і Чому Класичний FSD не Працює «в Лоб» у Монорепозиторії
+## 1. Назва, Філософія та Проблема Класичного FSD у Монорепозиторії
 
-Класичний **Feature-Sliced Design (FSD)** спроєктовано під один ізольований фронтенд-застосунок із 7 шарами (`app → processes → pages → widgets → features → entities → shared`). У мультипортальному монорепозиторії на кшталт **Smart-BKT-Chain** (6 Next.js застосунків: `web`, `student`, `teacher`, `study`, `admin`, `docs` + спільні `packages/*`) механічне копіювання класичного FSD у кожен `apps/*` створює дві системні проблеми:
+**`M-FSD` (Monorepo Feature-Sliced Design)** — це еволюційна адаптація класичної методології Feature-Sliced Design спеціально для мультипортальних Next.js / TypeScript монорепозиторіїв.
 
-1. **Дублювання нижніх шарів між порталами:** `shared/ui`, `shared/api`, `shared/config` та базові `entities/` починають копіюватися з однієї апки в іншу або розбігаються в стилях/типах.
-2. **Оверхед і «роздування» порожніх шарів:** замість реальної модульності з'являється формалізм або, навпаки, «гібридний FSD-lite» (`app/` + `features/` + `components/`), у якому вся логіка накопичується у гігантських файлах-монолітах.
+Класичний FSD проєктовано під один SPA-застосунок із 7 шарами (`app → processes → pages → widgets → features → entities → shared`). У монорепозиторії з кількома рольовими порталами (у **Smart-BKT-Chain** це 6 фронтендів: `web`, `student`, `teacher`, `study`, `admin`, `docs` + `packages/*`) сліпе копіювання класичного FSD у кожен `apps/*` створює дві системні проблеми:
+
+1. **Дублювання нижніх шарів між порталами:** `shared/ui`, `shared/api`, `shared/config` та базові `entities/` копіюються між апками і розходяться в дизайні, доступності та типах.
+2. **Оверхед і сповзання в «FSD-lite»:** замість реальної ізоляції виникає формалізм порожніх папок або гібрид `app/ + features/ + components/`, де вся складна логіка осідає у гігантських файлах-монолітах.
+
+**Ключова ідея `M-FSD`:** винести глобальний фундамент (`shared/*` та міжпортальні `widgets/*`) на рівень **Workspace Packages (`packages/*`)**, а всередині кожного застосунку (`apps/*/src/`) залишити компактні вертикальні шари **Portal Slices** (`app → views → widgets → features → [entities]`).
 
 ---
 
 ## 2. Аудит Поточного Стану Платформи (Baseline станом на 27.11.2026)
 
-| Застосунок / Пакет | Поточна структура | Відповідність FSD | Ключові прогалини та борг |
+| Застосунок / Пакет | Поточна структура | Відповідність FSD | Ключові прогалини та технічний борг |
 | :--- | :--- | :--- | :--- |
 | **`apps/docs`** | `app/`, `views/`, `widgets/`, `features/`, `entities/`, `shared/` | Повний класичний FSD | Еталонна шарувата структура, але локальний `shared/ui` ізольований від `@sbc/ui`. |
 | **`apps/student`** | `app/`, `features/`, `components/` | Гібридний FSD-lite | Неканонічна папка `components/`; моноліт `StudentPortalApp.tsx` (~146 KB, ~2 740 рядків) поєднує `view`, `widget`, WebSocket, BKT і 3 inline-модалки. |
@@ -28,87 +33,110 @@
 
 ---
 
-## 3. Цільова Модель: Дворівневий Монорепозиторний FSD (Monorepo-Adapted FSD)
+## 3. Дворівнева Архітектура `M-FSD`
 
-Замість дублювання 6–7 шарів у кожному порталі, архітектура поділяється на **два взаємодоповнювальні рівні**:
+### 3.1. Рівень А — `Shared Foundation` (`packages/*` як Міжпортальне Ядро)
+Усе, що перевикористовується більш ніж в одному застосунку або задає єдину дизайн-систему й контракти, розміщується в workspace-пакетах:
 
-### 3.1. Рівень А — Міжпортальний Фундамент (`packages/*` як Global Foundation)
-Усе, що використовується більш ніж у одному застосунку або визначає єдину дизайн-систему екосистеми, піднімається в workspace-пакети:
+| Пакет | Роль у `M-FSD` | Вміст |
+| :--- | :--- | :--- |
+| **`packages/types` (`@sbc/types`)** | Global `shared/model` | Єдині DTO, інтерфейси BKT, завдань, телеметрії, курсів і класів. |
+| **`packages/contracts` (`@sbc/contracts`)** | Global `shared/api` | ABI смарт-контрактів і контракти блокчейн-взаємодії. |
+| **`packages/routes` (`@sbc/routes`)** | Global `shared/routes` | Єдиний типізований реєстр портів і міжпортальних URL (`resolveStudyUrl` тощо). |
+| **`packages/ui` (`@sbc/ui`) → `shared/ui/`** | Global `shared/ui` (UI-Kit) | Атомарні UI-примітиви без бізнес-логіки на дизайн-токенах `--sbc-*`: `Button`, `Modal`, `ConfirmModal`, `Badge`, `Tooltip`, `DropdownSelect`, `Input`. |
+| **`packages/ui` (`@sbc/ui`) → `widgets/` (+ `shell/`, `theme/`, `code/`)** | Global `widgets` & `shared/lib` | Міжпортальні композити: `AppShellLayout`, `UserProfileDrawer`, `DrawerSection`, `Breadcrumbs`, `CodePlayground`, `GameSkillTreeWidget`, `AnomalyTreeWidget`, `AuthModal`, `ThemeProvider`. |
 
-- **`packages/types` (`@sbc/types`) + `packages/contracts`** → **Global `shared/model` & `shared/api`** (єдині DTO, доменні типи, схеми API та Web3 ABI).
-- **`packages/routes` (`@sbc/routes`)** → **Global `shared/routes` & `shared/config`** (типізовані міжпортальні посилання, порти, константи маршрутів).
-- **`packages/ui` (`@sbc/ui`)** → розділяється на два чіткі публічні підрівні:
-  1. **`packages/ui/src/shared/ui/` (Атомарний UI-Kit):** чисті UI-примітиви без бізнес-логіки (`Button`, `Modal`, `ConfirmModal`, `Badge`, `Tooltip`, `DropdownSelect`, `Input`), побудовані **виключно на семантичних дизайн-токенах** (`--sbc-*`) із гарантованою сумісністю з Dark/Light темами та WCAG AA/AAA.
-  2. **`packages/ui/src/widgets/` + `shared/theme/`, `shared/code/`, `shell/`:** міжпортальні композитні віджети (`AppShellLayout`, `UserProfileDrawer`, `DrawerSection`, `Breadcrumbs`, `CodePlayground`, `GameSkillTreeWidget`, `AnomalyTreeWidget`, `AuthModal`).
-
-### 3.2. Рівень Б — Локальні Шари Застосунку (`apps/*/src/`)
-Усередині кожного Next.js застосунку (`student`, `teacher`, `study`, `admin`, `web`, `docs`) використовується компактна **4-шарова структура** (+ опціональний `entities/` для суто локальних моделей):
+### 3.2. Рівень Б — `Portal Slices` (`apps/*/src/` як Локальні Шари Порталу)
+Кожен фронтенд-портал будується на компактній 4-шаровій ієрархії (+ опціональний `entities/`):
 
 ```text
 apps/<portal>/src/
-├── app/              # Лише Next.js App Router (layout.tsx, page.tsx, metadata, Providers)
-├── views/            # Композиція сторінок/екранів (заміна Next.js pages/, щоб уникнути конфлікту маршрутів)
-├── widgets/          # Самостійні великі UI-блоки зі станом/координацією фіч (TaskWorkspace, StudentAnalyticsPanel)
-├── features/         # Конкретні сценарії дій (ui/, model/, lib/, api/, обов'язковий index.ts)
-└── entities/         # (Опціонально) Локальні доменні картки/моделі, унікальні тільки для цього порталу
+├── app/              # Тільки Next.js App Router (layout.tsx, page.tsx, loading/error, SEO metadata, Providers)
+├── views/            # Композиція сторінки маршруту (заміна pages/ для сумісності з Next.js App Router)
+├── widgets/          # Самостійні великі UI-блоки, що об'єднують 1+ features або формують секцію екрана
+├── features/         # Конкретні сценарії дій користувача (<slice>/ui, model, api, lib, index.ts)
+└── entities/         # (Опціонально) Локальні доменні картки/моделі, унікальні виключно для цього порталу
 ```
 
 ---
 
-## 4. Чотири Жорсткі Архітектурні Інваріанти
+## 4. Детальний Регламент Правил `M-FSD`
 
-1. **Заборона папки `src/components/`:**
-   - У FSD не існує безликої папки `components/` як звалища файлів без ролі.
-   - Атомарний UI-елемент → у `packages/ui/src/shared/ui/`.
-   - Складний блок сторінки → у `widgets/`.
-   - Конкретна бізнес-дія → у `features/<slice>/ui/`.
+### 4.1. Матриця Дозволених Залежностей (Import Matrix)
+Ключове правило `M-FSD`: **залежності напрямлені суворо згори вниз**. Жоден нижчий шар не знає про існування вищого, а слайси одного шару ізольовані один від одного.
 
-2. **Однонаправлений потік залежностей (Strict Top-Down Imports & Public API):**
-   - Дозволений напрямок імпортів: `app → views → widgets → features → entities → shared (@sbc/ui, @sbc/types, @sbc/routes)`.
-   - Заборонено перехресні імпорти між слайсами одного шару (`features/A` не імпортує `features/B`; їх поєднує `widgets/` або `views/`).
-   - Усі імпорти зі слайсу (`features/*`, `widgets/*`, `entities/*`) виконуються через **Public API (`index.ts`)** без глибоких шляхів у внутрішню реалізацію.
+| Хто імпортує ↓ \ Що імпортує → | `app/` | `views/` | `widgets/` | `features/` | `entities/` | `@sbc/ui/widgets` | `@sbc/ui/shared/ui` | `@sbc/types` / `@sbc/routes` | Інший `apps/*` |
+| :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+| **`app/`** | — | ✅ | ✅ *(рідко)* | ❌ | ❌ | ✅ *(Layout/Theme)* | ✅ | ✅ | ❌ |
+| **`views/`** | ❌ | ❌ *(між views)* | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ |
+| **`widgets/`** | ❌ | ❌ | ❌ *(інші widgets)* | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ |
+| **`features/`** | ❌ | ❌ | ❌ | ❌ *(сусідній слайс)* | ✅ | ❌ | ✅ | ✅ | ❌ |
+| **`entities/`** | ❌ | ❌ | ❌ | ❌ | ❌ *(сусідній слайс)* | ❌ | ✅ | ✅ | ❌ |
+| **`@sbc/ui/widgets`** | ❌ | ❌ | ❌ | ❌ | ❌ | — | ✅ | ✅ | ❌ |
+| **`@sbc/ui/shared/ui`** | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | — | ✅ *(тільки базові типи)* | ❌ |
 
-3. **Zero Local UI Primitives (Єдиний UI-Kit у `@sbc/ui`):**
-   - Заборонено створювати в `apps/*` локальні `fixed inset-0 z-50` модальні оверлеї, саморобні кнопки підтвердження чи статус-бейджі з дублюванням Tailwind-класів.
-   - Усі нові діалоги, бейджі, тултіпи та селектори використовуються з `@sbc/ui` (`shared/ui`), що гарантує візуальну цілісність та автоматичну підтримку тем.
+- **Правило Public API (`index.ts`):** імпорт із будь-якого слайсу (`features/practice-mode`, `widgets/task-workspace`, `entities/skill`) дозволяється **виключно через корінь слайсу (`index.ts`)**. Глибокі імпорти на кшталт `features/practice-mode/ui/ModeToggle` ззовні слайсу **заборонені**.
+- **Правило `packages/ui`:** імпорт із `@sbc/ui` іде виключно через публічну точку входу пакета (`import { Button, ConfirmModal, AppShellLayout } from '@sbc/ui'`), без прямих шляхів у `packages/ui/src/...`.
 
-4. **Тонкий `app/` + Декомпозиція Монолітів + Zero Dead Copies:**
-   - Файли `app/**/page.tsx` залишаються тонкими (орієнтовно до 50–100 рядків) і лише передають параметри у `views/*`.
-   - Файл у `views/` чи `widgets/` не перетворюється на «божественний компонент» на 1 000+ рядків: поява 2+ незалежних зон відповідальності вимагає декомпозиції у `widgets/` та `features/`.
-   - При винесенні компонента або віджета у `@sbc/ui` локальна копія в `apps/*` видаляється в тому ж комміті.
+### 4.2. Дерево Прийняття Рішень («Куди Покласти Новий Код?»)
+1. **Це чистий UI-атом без знання про курси/BKT (кнопка, модалка, бейдж, інпут, тултіп, селект)?** → `packages/ui/src/shared/ui/<component>/`.
+2. **Це складний компонент чи віджет, що використовується в 2+ порталах?** → `packages/ui/src/widgets/<widget-name>/` (або тематичний підкаталог `@sbc/ui`) з обов'язковим експортом у `packages/ui/src/index.ts`.
+3. **Це тип даних, схема DTO, маршрут або URL-білдер?** → `@sbc/types` або `@sbc/routes`.
+4. **Це конкретна користувацька дія/сценарій одного порталу** (перемикач режиму, форма інвайт-коду, інспектор черги перевірки, картка підказок)? → `apps/<portal>/src/features/<kebab-slice>/`.
+5. **Це самостійна секція сторінки, яка комбінує кілька фіч або складну панель** (робоча зона завдання, панель аналітики студента, редактор курсу)? → `apps/<portal>/src/widgets/<kebab-widget>/`.
+6. **Це екран конкретного URL-маршруту?** → `apps/<portal>/src/views/<kebab-view>/`, а `app/**/page.tsx` залишається тонкою обгорткою.
+
+### 4.3. Правила Сегментів та Іменування
+Усередині кожного слайсу (`features/<slice>/`, `widgets/<widget>/`, `entities/<entity>/`) використовуються лише стандартні сегменти FSD:
+- `ui/` — React-компоненти (`PascalCase.tsx`), стилі (якщо не вистачає Tailwind + токенів);
+- `model/` — локальний стан, хуки (`use*.ts`), типи слайсу (`*.types.ts`), стори Zustand;
+- `api/` — функції запитів до REST/WebSocket (`fetch*`, `update*`) із типізацією з `@sbc/types` (заборонено писати сирі `fetch(...)` усередині великих JSX-компонентів без винесення в `api/` або `model/`);
+- `lib/` — чисті допоміжні утиліти та трансформації (замість безіменних `utils/`);
+- `config/` — локальні константи слайсу;
+- `index.ts` — **обов'язковий Public API** реекспорт лише того, що потрібно зовнішнім споживачам.
+
+**Конвенція іменування:**
+- Папки слайсів і назви пакетів: **`kebab-case`** (`practice-mode`, `course-import`, `task-workspace`).
+- React-компоненти: **`PascalCase.tsx`** (`PracticeModeSwitcher.tsx`, `ConfirmModal.tsx`).
+- Хуки: **`useCamelCase.ts`** (`useTelemetry.ts`).
+
+### 4.4. Кількісні Пороги та Анти-Монолітні Запобіжники (De-Monolithization Guards)
+Щоб запобігти появі «файлів-богів» на 1 500–2 700 рядків, у `M-FSD` діють чіткі орієнтири декомпозиції:
+- **`app/**/page.tsx` та `layout.tsx`:** рекомендовано **≤ 80–100 рядків**, **0 бізнес-логіки** (тільки зчитування `params`/`searchParams`, `generateMetadata`, провайдери та рендер `<SomeView />`).
+- **`views/<view>/`:** рекомендовано **≤ 250–300 рядків** — це координатор віджетів, а не місце верстки всіх таблиць і модалок.
+- **`widgets/` та `features/*/ui/`:** якщо компонент перевищує **~350–400 рядків** або поєднує **≥ 2 незалежних підблоків / вкладених модалок**, його обов'язково розбивають на менші слайси або підкомпоненти в сегменті.
+
+### 4.5. Заборонені Анти-Патерни (Strict Prohibitions)
+1. **Заборона `src/components/` та `src/utils/`:** у нових порталах і при створенні нового коду ці папки суворо заборонені (існуючі в `student`/`study` підлягають поетапному розформуванню у `views/`, `widgets/`, `features/` та `@sbc/ui`).
+2. **Zero Local UI Primitives:** заборонено створювати в `apps/*` локальні `fixed inset-0 z-50` модальні оверлеї, саморобні кнопки або статус-бейджі замість `@sbc/ui` (`shared/ui`).
+3. **Заборона хардкоду кольорів у `shared/ui`:** усі примітиви UI-Kit будуються виключно на семантичних токенах `--sbc-*` (`--sbc-bg-surface`, `--sbc-bg-subtle`, `--sbc-text-primary`, `--sbc-text-muted`, `--sbc-border-subtle`) із гарантованою контрастністю WCAG AA/AAA у Dark та Light темах.
+4. **Zero Dead Copies:** при перенесенні компонента чи віджета в `@sbc/ui` локальна копія в `apps/*` видаляється в **тому ж комміті**.
+5. **Заборона крос-портальних імпортів:** `apps/student` ніколи не імпортує напряму з `apps/teacher` чи `apps/study` — тільки через `packages/*`.
+
+### 4.6. Pre-Commit `M-FSD` Audit Checklist
+Перед кожним коммітом (або завершенням фічі) перевіряється 7 пунктів:
+1. Чи не з'явилася нова папка `components/` або `utils/`?
+2. Чи залишився `app/**/page.tsx` тонким роут-обгортником без бізнес-логіки?
+3. Чи немає в змінах нового файлу на 400+ рядків із багатьма незалежними блоками?
+4. Чи використані `Button`, `Modal`, `ConfirmModal`, `Badge`, `Tooltip`, `DropdownSelect` із `@sbc/ui` замість локальних копій?
+5. Чи всі імпорти слайсів ідуть через `index.ts` і строго згори вниз за матрицею?
+6. Чи працюють усі нові UI-елементи коректно в обох темах (Dark / Light) через `--sbc-*`?
+7. Якщо щось перенесено в `@sbc/ui`, чи видалено старий дубль із `apps/*`?
 
 ---
 
 ## 5. Специфікація Shared UI-Kit (`SBC-315` у `packages/ui/src/shared/ui/`)
 
-Усі компоненти будуються на CSS-змінних `--sbc-bg-surface`, `--sbc-bg-subtle`, `--sbc-text-primary`, `--sbc-text-muted`, `--sbc-border-subtle` (з автоматичною інверсією у `light-theme.css`) без хардкодних `bg-slate-900` або `text-white` на нейтральних поверхнях:
-
-1. **`button/Button.tsx`:**
-   - Варіанти: `primary | secondary | accent | danger | outline | ghost`.
-   - Розміри: `xs | sm | md | lg`.
-   - Пропси: `isLoading`, `leftIcon`, `rightIcon`, `fullWidth`, повне проксі `ButtonHTMLAttributes`.
-2. **`modal/Modal.tsx` & `modal/ConfirmModal.tsx`:**
-   - Базовий `Modal`: React Portal (за потреби), єдиний backdrop (`backdrop-blur-sm`), закриття по `Escape` та кліку по бекдропу (`closeOnOverlayClick`), слоти `header` / `body` / `footer`, розміри `sm | md | lg | xl`.
-   - `ConfirmModal`: типова обгортка для небезпечних/критичних дій (`variant: 'info' | 'warning' | 'danger'`, масив застережень `warnings?: string[]`, стани `isConfirming`, `confirmDisabled`). Одразу закриває потребу в саморобних модалках у `student`, `teacher`, `study`, `admin`.
-3. **`badge/Badge.tsx`:**
-   - Семантичні варіанти: `neutral | info | success | warning | danger | accent`.
-   - Розміри (`xs | sm`) та компактний режим `mono` для BKT-відсотків (`85%`), складності (`EASY`/`MEDIUM`/`HARD`) і режимів (`TRAINING`/`GRADED`).
-4. **`tooltip/Tooltip.tsx`:**
-   - Доступний тултіп/поповер для метрик, формул BKT і заблокованих кнопок (усуває нативні `title` та дублювання кастомних поповерів).
-5. **`select/DropdownSelect.tsx`:**
-   - Стилізований під тему доступний селектор для вибору курсу, студента, політики чи фільтрів без нативних браузерних стрибків стилю.
+1. **`button/Button.tsx`:** варіанти `primary | secondary | accent | danger | outline | ghost`, розміри `xs | sm | md | lg`, пропси `isLoading`, `leftIcon`, `rightIcon`, `fullWidth`.
+2. **`modal/Modal.tsx` & `modal/ConfirmModal.tsx`:** базовий `Modal` (`backdrop-blur-sm`, закриття по `Escape` і кліку на бекдроп, слоти `header` / `body` / `footer`, розміри `sm | md | lg | xl`) та `ConfirmModal` (`variant: 'info' | 'warning' | 'danger'`, `warnings?: string[]`, `isConfirming`, `confirmDisabled`).
+3. **`badge/Badge.tsx`:** варіанти `neutral | info | success | warning | danger | accent`, розміри `xs | sm`, режим `mono` для BKT-показників (`85%`), рівнів складності та режимів (`TRAINING`/`GRADED`).
+4. **`tooltip/Tooltip.tsx`:** доступний тултіп/поповер на заміну нативних `title` та дубльованих поповерів.
+5. **`select/DropdownSelect.tsx`:** тематизований доступний селектор для курсів, студентів і політик.
 
 ---
 
 ## 6. Безпечна 3-Фазна Стратегія Впровадження (Zero-Regression Rollout)
 
-1. **Фаза 1 — Створення `packages/ui/src/shared/ui/` (нульовий ризик для робочих порталів):**
-   - Розробити `Button`, `Modal`, `ConfirmModal`, `Badge`, `Tooltip`, `DropdownSelect` на базі `--sbc-*` токенів.
-   - Експортувати їх із `packages/ui/src/index.ts`, зберігаючи тимчасову зворотну сумісність.
-   - Перевірити збірку `@sbc/ui` та всіх порталів (`build:student`, `build:teacher`, `build:study`, `build:admin`, `build:docs`).
-2. **Фаза 2 — Точкова міграція примітивів (по одному порталу з E2E-перевіркою):**
-   - Замінити локальні `fixed inset-0 z-50` модалки підтвердження на `ConfirmModal` з `@sbc/ui` (спочатку `apps/study` та `apps/student`, потім `apps/teacher` та `apps/admin`).
-   - Уніфікувати статус-бейджі та основні кнопки дій, проганяючи Playwright E2E після кожного порталу.
-3. **Фаза 3 — Декомпозиція монолітів і зачистка спадщини:**
-   - Розбити `StudentPortalApp.tsx`, `apps/teacher/src/app/page.tsx`, `CourseStudioView.tsx`, `MetricsAuditInspector.tsx` та `StudyAppClient.tsx` на `views/` + `widgets/` + `features/`.
-   - Ліквідувати папки `src/components/` та видалити мертві локальні дублікати (на кшталт `apps/teacher/src/features/skill-graph/ui/GameSkillTreeWidget.tsx` і `AnomalyTreeWidget.tsx`).
+1. **Фаза 1 — Побудова `packages/ui/src/shared/ui/` (нульовий ризик):** реалізувати `Button`, `Modal`, `ConfirmModal`, `Badge`, `Tooltip`, `DropdownSelect` на базі `--sbc-*`, експортувати через `packages/ui/src/index.ts`, перевірити збірку всіх порталів.
+2. **Фаза 2 — Точкова міграція примітивів (по одному порталу з E2E):** замінити локальні `fixed inset-0 z-50` модалки, кнопки та бейджі на `@sbc/ui/shared/ui` із прогоном Playwright E2E після кожного порталу.
+3. **Фаза 3 — Декомпозиція монолітів і зачистка спадщини:** розбити `StudentPortalApp.tsx`, `apps/teacher/src/app/page.tsx`, `CourseStudioView.tsx`, `MetricsAuditInspector.tsx` та `StudyAppClient.tsx` на `views/` + `widgets/` + `features/`, ліквідувати `src/components/` та видалити мертві дублікати (зокрема в `apps/teacher/src/features/`).

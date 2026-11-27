@@ -95,8 +95,8 @@
     - *Дата:* 26 листопада 2026
     - *Ключові теми:* Усунення асиметрії доступу до підручника в паралельній вкладці (`apps/study`), двоконтурна модель `IntegrityMode` (`TRAINING` vs `GRADED`) × `IntegrityPolicy` (`STUDENT_CHOICE` за замовчуванням vs `FORCED_GRADED` / `FORCED_TRAINING`), правило чистого старту без змішування прогресу (Zero-Mix Rule) на рівні навички/модуля, безпечне повторення вже оцінених навичок без втрати оцінки, крос-портальний `Study Lock Overlay` через WebSocket `/telemetry`, трекінг `visibilitychange` / `blur` та таймер контрольної для викладача.
 
-23. [23. Адаптація Feature-Sliced Design (FSD) до Монорепозиторію та Канонічний Shared UI-Kit (`SBC-315`)](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/docs/brainstorm/23_monorepo_fsd_and_shared_ui_kit_architecture.md)
+23. [23. Архітектура `M-FSD` (Monorepo Feature-Sliced Design: Shared Foundation + Portal Slices) та Канонічний Shared UI-Kit (`SBC-315`)](file:///d:/PROJECTS/MAGISTERS/SMART-BKT-CHAIN/docs/brainstorm/23_monorepo_fsd_and_shared_ui_kit_architecture.md)
     - *Дата:* 27 листопада 2026
-    - *Ключові теми:* Дворівнева адаптація FSD під мультипортальний монорепозиторій (`packages/*` як Global Foundation + `apps/*/src/` 4-шарова структура `app → views → widgets → features`), розділення `@sbc/ui` на атомарний `shared/ui/` UI-Kit (`Button`, `Modal`, `ConfirmModal`, `Badge`, `Tooltip`, `DropdownSelect` на токенах `--sbc-*`) та композитні `widgets/`, заборона `src/components/`, тонкий `app/page.tsx`, усунення дублів і безпечний 3-фазний план міграції.
+    - *Ключові теми:* Офіційне найменування підходу **`M-FSD`** (*Shared Foundation + Portal Slices*), повна матриця імпортів і залежностей, дерево прийняття рішень щодо розміщення коду, правила сегментів та Public API (`index.ts`), кількісні пороги декомпозиції монолітів (`app/page.tsx` ≤ 100 рядків), специфікація UI-Kit у `@sbc/ui/shared/ui/` на токенах `--sbc-*`, чеклист Pre-Commit аудиту та безпечний 3-фазний план міграції.
 
 
